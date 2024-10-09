@@ -11,12 +11,31 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.client.xvideos.net.readHtmlFromURL
+import com.client.xvideos.parcer.parserListVideo
 import com.client.xvideos.ui.theme.XvideosTheme
+import kotlinx.coroutines.runBlocking
+import timber.log.Timber
+import timber.log.Timber.DebugTree
+import timber.log.Timber.Forest.plant
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+
+        plant(DebugTree())
+        Timber.i("!!! Hello")
+
+        runBlocking {
+            val s = readHtmlFromURL()
+            s
+
+            parserListVideo(s)
+
+        }
+
         setContent {
             XvideosTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
