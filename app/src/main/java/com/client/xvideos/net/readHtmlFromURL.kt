@@ -23,7 +23,7 @@ private val client = HttpClient(OkHttp)//(OkHttp)
     }
 }
 
-suspend fun readHtmlFromURL(url : String = "https://www.xv-ru.com"): String {
+suspend fun readHtmlFromURL(url : String = "https://www.xvideos.com"): String {
 
     Timber.i("..readHtmlFromURL $url ")
 

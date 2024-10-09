@@ -89,4 +89,8 @@ dependencies {
     implementation libs.jsoup
     implementation libs.timber
     implementation libs.disk.lru.cache
+
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
+
 }
