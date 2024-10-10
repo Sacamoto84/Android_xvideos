@@ -21,9 +21,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import coil3.compose.AsyncImage
 import com.client.xvideos.model.GalleryItem
 import com.client.xvideos.net.readHtmlFromURL
+import com.client.xvideos.parcer.parseHTML5Player
 import com.client.xvideos.parcer.parserItemVideo
 import com.client.xvideos.parcer.parserListVideo
 import com.client.xvideos.ui.theme.XvideosTheme
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 import timber.log.Timber.DebugTree
@@ -32,6 +34,7 @@ import timber.log.Timber.Forest.plant
 
 var l = mutableStateListOf<GalleryItem>()
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,7 +47,9 @@ class MainActivity : ComponentActivity() {
         runBlocking {
             val s = readHtmlFromURL("https://www.xv-ru.com/video.uedlbibe330/shame4k._")
             ////l = parserListVideo(s).toMutableStateList()
-            val url = parserItemVideo(s)
+            val script = parserItemVideo(s)
+            val a = script?.let { parseHTML5Player(it) }
+            a
         }
 
 
