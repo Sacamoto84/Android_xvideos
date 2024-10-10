@@ -1,6 +1,10 @@
 package com.client.xvideos.screens.dashboards
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.hilt.ScreenModelKey
@@ -18,6 +22,7 @@ import dagger.multibindings.IntoMap
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
+var currentNumberScreen by mutableIntStateOf(1)
 
 class ScreenDashBoardsScreenModel @Inject constructor(
 
@@ -25,25 +30,22 @@ class ScreenDashBoardsScreenModel @Inject constructor(
 
     var l = mutableStateListOf<GalleryItem>()
 
-
-
     init {
-
-        runBlocking {
-            val s = readHtmlFromURL(urlStart)//readHtmlFromURL("https://www.xv-ru.com/video.uedlbibe330/shame4k._")
-            l = parserListVideo(s).toMutableStateList()
-            //val script = parserItemVideo(s)
-            //val a = script?.let { parseHTML5Player(it) }
-            //a
-        }
-
+        openNew(currentNumberScreen)
     }
-
 
     fun openItem(url : String,  navigator: Navigator){
         navigator.push(ScreenItem(url))
     }
 
+    fun openNew(numberScreen : Int = 1){
+        currentNumberScreen = numberScreen.coerceIn(1, 19999)
+        val url = urlStart+ if(currentNumberScreen == 1) "" else "/new/${currentNumberScreen-1}"
+        runBlocking {
+            l.clear()
+            l = parserListVideo(readHtmlFromURL(url)).toMutableStateList()
+        }
+    }
 
 
 }

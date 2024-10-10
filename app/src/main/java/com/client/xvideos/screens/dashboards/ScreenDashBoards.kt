@@ -51,23 +51,23 @@ class ScreenDashBoards : Screen {
         //val vm = getScreenModel<ScreenDashBoardsScreenModel>()
         val vm: ScreenDashBoardsScreenModel = getScreenModel()
         // ...
-        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+        Scaffold(modifier = Modifier.fillMaxSize(), containerColor = Color.Black) { innerPadding ->
 
             val itemsPerRow =
                 if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE) 4 else 3
-
 
             LazyColumn(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
+                item {
+                    //if(currentNumberScreen == 1)
+                    ScreenDashBoardsBottomNavigationButtons(1, vm)
+                }
 
                 items(vm.l.filter { !it.link.contains("THUMBNUM") }.chunked(itemsPerRow)) { row ->
-
-
                     Row(modifier = Modifier.fillMaxWidth()) {
-
                         row.forEach { cell ->
 
                             Box(
@@ -92,7 +92,9 @@ class ScreenDashBoards : Screen {
                                 //Text(text = it.id.toString())
                                 Text(
                                     text = cell.duration.dropLast(1),
-                                    modifier = Modifier.fillMaxWidth().offset(1.dp, 1.dp),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .offset(1.dp, 1.dp),
                                     textAlign = TextAlign.Right,
                                     fontSize = 14.sp,
                                     color = Color.Black
@@ -119,6 +121,10 @@ class ScreenDashBoards : Screen {
                     }
 
 
+                }
+
+                item {
+                    ScreenDashBoardsBottomNavigationButtons(1, vm)
                 }
 
             }
