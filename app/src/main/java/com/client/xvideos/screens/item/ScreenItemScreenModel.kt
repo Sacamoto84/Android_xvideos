@@ -6,6 +6,7 @@ import android.content.pm.ActivityInfo.SCREEN_ORIENTATION_USER
 import android.content.pm.ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE
 import android.net.Uri
 import android.os.Build
+import androidx.annotation.OptIn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
@@ -55,7 +56,7 @@ import com.client.xvideos.screens.item.util.buildMediaSource
 import com.client.xvideos.screens.item.util.createPlayerView
 import com.client.xvideos.screens.item.util.initPlayer
 
-var passedString: String = ""
+
 
 class ScreenItemScreenModel @AssistedInject constructor(
     @Assisted val url: String,
@@ -66,6 +67,8 @@ class ScreenItemScreenModel @AssistedInject constructor(
     interface Factory : ScreenModelFactory {
         fun create(url: String): ScreenItemScreenModel
     }
+
+    var passedString: String = ""
 
     val a: MutableState<HTML5PlayerConfig?> = mutableStateOf(HTML5PlayerConfig())
 
@@ -91,80 +94,7 @@ class ScreenItemScreenModel @AssistedInject constructor(
     }
 
 
-    @Composable
-    fun Player() {
-        val context = LocalContext.current
-        val activity = LocalContext.current as Activity
-        var player: Player? by remember {
-            mutableStateOf(null)
-        }
 
-        val enterFullscreen = { activity.requestedOrientation = SCREEN_ORIENTATION_USER_LANDSCAPE }
-        val exitFullscreen = {
-            // Will reset to SCREEN_ORIENTATION_USER later
-            activity.requestedOrientation = SCREEN_ORIENTATION_USER
-        }
-
-        val playerView = createPlayerView(player)
-        activity.requestedOrientation = SCREEN_ORIENTATION_USER
-        playerView.controllerAutoShow = true
-        playerView.keepScreenOn = true
-        playerView.setShowBuffering(SHOW_BUFFERING_WHEN_PLAYING)
-        playerView.setFullscreenButtonClickListener { isFullScreen ->
-            with(context) {
-                if (isFullScreen) {
-                    if (activity.requestedOrientation == SCREEN_ORIENTATION_USER) {
-                        enterFullscreen()
-                    }
-                } else {
-                    exitFullscreen()
-                }
-            }
-        }
-        ComposableLifecycle { _, event ->
-            when (event) {
-                Lifecycle.Event.ON_START -> {
-                    if (Build.VERSION.SDK_INT > 23) {
-                        player = initPlayer(context)
-                        playerView.onResume()
-                    }
-                }
-
-                Lifecycle.Event.ON_RESUME -> {
-                    if (Build.VERSION.SDK_INT <= 23) {
-                        player = initPlayer(context)
-                        playerView.onResume()
-                    }
-                }
-
-                Lifecycle.Event.ON_PAUSE -> {
-                    if (Build.VERSION.SDK_INT <= 23) {
-                        playerView.apply {
-                            player?.release()
-                            onPause()
-                            player = null
-                        }
-                    }
-                }
-
-                Lifecycle.Event.ON_STOP -> {
-                    if (Build.VERSION.SDK_INT > 23) {
-                        playerView.apply {
-                            player?.release()
-                            onPause()
-                            player = null
-                        }
-                    }
-                }
-
-                else -> {}
-            }
-        }
-
-        AndroidView(
-            factory = { playerView }
-        )
-    }
 
 
 

@@ -13,6 +13,7 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import coil3.compose.AsyncImage
+import com.client.xvideos.screens.item.util.Player
 
 class ScreenItem(val url: String) : Screen {
 
@@ -30,22 +31,22 @@ class ScreenItem(val url: String) : Screen {
 
         Column {
 
-            vm.Player()
+            Player(vm.passedString)
 
             AsyncImage(
                 model = vm.a.value?.thumbUrl169,
                 contentDescription = null,
             )
             Divider()
-            AsyncImage(
-                model = vm.a.value?.thumbUrl,
-                contentDescription = null,
-            )
+//            AsyncImage(
+//                model = vm.a.value?.thumbUrl,
+//                contentDescription = null,
+//            )
             Divider()
-            AsyncImage(
-                model = vm.a.value?.thumbSlide,
-                contentDescription = null,
-            )
+//            AsyncImage(
+//                model = vm.a.value?.thumbSlide,
+//                contentDescription = null,
+//            )
             Divider()
             AsyncImage(
                 model = vm.a.value?.thumbSlideBig,

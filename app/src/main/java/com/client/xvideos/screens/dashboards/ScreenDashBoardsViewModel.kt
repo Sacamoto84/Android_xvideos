@@ -9,6 +9,7 @@ import com.client.xvideos.model.GalleryItem
 import com.client.xvideos.net.readHtmlFromURL
 import com.client.xvideos.parcer.parserListVideo
 import com.client.xvideos.screens.item.ScreenItem
+import com.client.xvideos.urlStart
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -29,7 +30,7 @@ class ScreenDashBoardsScreenModel @Inject constructor(
     init {
 
         runBlocking {
-            val s = readHtmlFromURL("https://www.xvideos.com")//readHtmlFromURL("https://www.xv-ru.com/video.uedlbibe330/shame4k._")
+            val s = readHtmlFromURL(urlStart)//readHtmlFromURL("https://www.xv-ru.com/video.uedlbibe330/shame4k._")
             l = parserListVideo(s).toMutableStateList()
             //val script = parserItemVideo(s)
             //val a = script?.let { parseHTML5Player(it) }

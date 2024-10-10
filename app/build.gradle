@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
 
+    id("org.jetbrains.kotlin.plugin.serialization")
+
     id ("com.google.devtools.ksp")
     id ("com.google.dagger.hilt.android")
 }
@@ -167,5 +169,7 @@ dependencies {
     implementation "androidx.media3:media3-decoder:1.4.1"
     implementation "androidx.media3:media3-datasource:1.4.1"
 
+
+    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.1'
 
 }

@@ -40,7 +40,7 @@ suspend fun readHtmlFromURL(url : String = "https://www.xvideos.com"): String {
         try {
             //Downloader.cache.HtmlChannel.send(url)
             response = client.get(url)
-            println(response.toString())
+            //println(response.toString())
             return response.bodyAsText()
         } catch (e: Exception) {
             Timber.e("Ошибка " + e.message)
