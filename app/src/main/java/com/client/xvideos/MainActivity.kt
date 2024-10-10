@@ -40,7 +40,7 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            XvideosTheme {
+            XvideosTheme(darkTheme = true) {
                 Navigator(ScreenDashBoards())
             }
         }
