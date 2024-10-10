@@ -1,5 +1,6 @@
 package com.client.xvideos.screens.dashboards
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
@@ -43,6 +44,7 @@ class ScreenDashBoards : Screen {
                     AsyncImage(
                         model = it.previewImage,
                         contentDescription = null,
+                        modifier = Modifier.clickable { vm.openItem("https://www.xv-ru.com"+it.link, navigator) }
                     )
                 }
 

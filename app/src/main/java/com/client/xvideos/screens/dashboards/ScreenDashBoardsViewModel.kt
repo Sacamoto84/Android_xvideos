@@ -4,9 +4,11 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.toMutableStateList
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.hilt.ScreenModelKey
+import cafe.adriel.voyager.navigator.Navigator
 import com.client.xvideos.model.GalleryItem
 import com.client.xvideos.net.readHtmlFromURL
 import com.client.xvideos.parcer.parserListVideo
+import com.client.xvideos.screens.item.ScreenItem
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -16,9 +18,13 @@ import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 
-class ScreenDashBoardsScreenModel @Inject constructor(): ScreenModel{
+class ScreenDashBoardsScreenModel @Inject constructor(
+
+): ScreenModel{
 
     var l = mutableStateListOf<GalleryItem>()
+
+
 
     init {
 
@@ -31,6 +37,13 @@ class ScreenDashBoardsScreenModel @Inject constructor(): ScreenModel{
         }
 
     }
+
+
+    fun openItem(url : String,  navigator: Navigator){
+        navigator.push(ScreenItem(url))
+    }
+
+
 
 }
 

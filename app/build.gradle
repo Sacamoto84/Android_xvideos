@@ -65,6 +65,7 @@ dependencies {
     implementation libs.androidx.ui.graphics
     implementation libs.androidx.ui.tooling.preview
     implementation libs.androidx.material3
+    implementation libs.androidx.media3.exoplayer.smoothstreaming
     testImplementation libs.junit
     androidTestImplementation libs.androidx.junit
     androidTestImplementation libs.androidx.espresso.core
@@ -137,5 +138,34 @@ dependencies {
     implementation 'androidx.compose.material:material-icons-extended'
     // Optional - Add window size utils
     implementation 'androidx.compose.material3.adaptive:adaptive'
+
+
+
+
+    implementation "androidx.media3:media3-ui:1.4.1"
+    implementation "androidx.media3:media3-exoplayer:1.4.1"
+    implementation "androidx.media3:media3-exoplayer-dash:1.4.1"
+    implementation "androidx.media3:media3-ui:1.4.1"
+    implementation "androidx.media3:media3-exoplayer-hls:1.4.1"
+    implementation "androidx.media3:media3-common:1.4.1"
+
+
+    // For loading data using the Cronet network stack
+    //implementation "androidx.media3:media3-datasource-cronet:$media3_version"
+    // For loading data using the OkHttp network stack
+    //implementation "androidx.media3:media3-datasource-okhttp:$media3_version"
+    // For loading data using librtmp
+    //implementation "androidx.media3:media3-datasource-rtmp:$media3_version"
+
+    implementation "androidx.media3:media3-ui-leanback:1.4.1"
+    implementation "androidx.media3:media3-session:1.4.1"
+    implementation "androidx.media3:media3-extractor:1.4.1"
+    implementation "androidx.media3:media3-cast:1.4.1"
+    implementation "androidx.media3:media3-exoplayer-workmanager:1.4.1"
+    implementation "androidx.media3:media3-transformer:1.4.1"
+    //implementation "androidx.media3:media3-database:$media3_version"
+    implementation "androidx.media3:media3-decoder:1.4.1"
+    implementation "androidx.media3:media3-datasource:1.4.1"
+
 
 }
