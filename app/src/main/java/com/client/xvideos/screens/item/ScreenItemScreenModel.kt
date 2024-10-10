@@ -1,27 +1,30 @@
-package com.client.xvideos.screens
+package com.client.xvideos.screens.item
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
 import javax.inject.Inject
 
 
-class ScreenDashBoardsScreenModel @Inject constructor(): ScreenModel{
-    val items = 10
+class ScreenItemScreenModel @Inject constructor(): ScreenModel {
+
+    init{
+
+    }
+
 }
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class ScreenModuleDashBoards {
+abstract class ScreenModuleItem{
 
     @Binds
     @IntoMap
-    @ScreenModelKey(ScreenDashBoardsScreenModel::class)
-    abstract fun bindScreenDashBoardsScreenModel(hiltListScreenModel: ScreenDashBoardsScreenModel): ScreenModel
+    @ScreenModelKey(ScreenItemScreenModel::class)
+    abstract fun bindScreenItemScreenModel(hiltListScreenModel: ScreenItemScreenModel): ScreenModel
 
 }

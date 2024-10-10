@@ -1,4 +1,4 @@
-package com.client.xvideos.screens
+package com.client.xvideos.screens.dashboards
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,7 +17,6 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import coil3.compose.AsyncImage
-import com.client.xvideos.l
 
 
 class ScreenDashBoards : Screen {
@@ -28,7 +27,7 @@ class ScreenDashBoards : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         //val vm = getScreenModel<ScreenDashBoardsScreenModel>()
-        val viewModel: ScreenDashBoardsScreenModel = getScreenModel()
+        val vm: ScreenDashBoardsScreenModel = getScreenModel()
         // ...
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
 
@@ -37,7 +36,7 @@ class ScreenDashBoards : Screen {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                items(l) {
+                items(vm.l) {
                     Divider()
                     Text(text = it.id.toString())
                     Text(text = it.title)
