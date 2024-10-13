@@ -9,6 +9,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,12 +22,15 @@ import androidx.lifecycle.Lifecycle
 import androidx.media3.common.Player
 import androidx.media3.ui.PlayerView
 import androidx.media3.ui.PlayerView.SHOW_BUFFERING_WHEN_PLAYING
+import timber.log.Timber
 
 @OptIn(androidx.media3.common.util.UnstableApi::class)
 @Composable
 fun Player(passedString: String, autostart: Boolean = false, repeat: Boolean = false) {
+
     val context = LocalContext.current
     val activity = LocalContext.current as Activity
+
     var player: Player? by remember {
         mutableStateOf(null)
     }
@@ -43,11 +47,17 @@ fun Player(passedString: String, autostart: Boolean = false, repeat: Boolean = f
         }
     }
 
-    DisposableEffect(key1 = player) {
+    //LaunchedEffect(Unit) {
         playerView.player = player
+    //}
+
+    DisposableEffect(Unit) {
+        //playerView.player = player
         onDispose {
+            Timber.i("!!! DisposableEffect")
             playerView.player = null
-            //player = null
+            player?.release()
+            player = null
         }
     }
 

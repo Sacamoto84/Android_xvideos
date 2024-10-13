@@ -1,6 +1,7 @@
 package com.client.xvideos.net
 
 
+import android.util.LruCache
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.HttpTimeout
@@ -10,6 +11,8 @@ import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import timber.log.Timber
+
+private val lruCacheHTML: LruCache<String, String> = LruCache<String, String>(1000)
 
 private val client = HttpClient(OkHttp)//(OkHttp)
 {
@@ -23,32 +26,35 @@ private val client = HttpClient(OkHttp)//(OkHttp)
     }
 }
 
-suspend fun readHtmlFromURL(url : String = "https://www.xvideos.com"): String {
+suspend fun readHtmlFromURL(url: String = "https://www.xvideos.com"): String {
 
-    Timber.i("..readHtmlFromURL $url ")
+    Timber.i("!!!..readHtmlFromURL $url ")
 
-//    if (cacheCheck(url))
-//    {
-//        //Если в кеше есть страница то ее и читаем
-//        val html = cacheHTMLRead(url)
-//        return html
-//    }
-//    else
-//    {
-        Timber.i("В кеше нет данных")
-        lateinit var response: HttpResponse
-        try {
-            //Downloader.cache.HtmlChannel.send(url)
-            response = client.get(url)
-            //println(response.toString())
-            return response.bodyAsText()
-        } catch (e: Exception) {
-            Timber.e("Ошибка " + e.message)
+    //Если есть в кеше возвращает содержимое
+    if (lruCacheHTML.get(url) != null) {
+        Timber.i("!!! В кеше есть данные")
+        return lruCacheHTML.get(url)
+    }
+
+    Timber.i("!!! В кеше нет данных")
+    lateinit var response: HttpResponse
+    try {
+        response = client.get(url)
+        //println(response.toString())
+        val body = response.bodyAsText()
+
+        if (lruCacheHTML.get(url) == null) {
+            lruCacheHTML.put(url, body)
         }
 
-        //Сохраним в кеш данный html
-        //client.close()
-        return ""
+        return body
+    } catch (e: Exception) {
+        Timber.e("Ошибка " + e.message)
+    }
+
+    //Сохраним в кеш данный html
+    //client.close()
+    return ""
 
 
 }

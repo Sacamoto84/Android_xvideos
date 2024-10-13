@@ -3,8 +3,12 @@ package com.client.xvideos
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import cafe.adriel.voyager.navigator.Navigator
+import coil.ImageLoader
+import coil.ImageLoaderFactory
+import coil.disk.DiskCache
+import coil.memory.MemoryCache
+import coil.util.DebugLogger
 import com.client.xvideos.screens.dashboards.ScreenDashBoards
 import com.client.xvideos.search.getSearchResults
 import com.client.xvideos.search.parseJson
@@ -18,7 +22,27 @@ import timber.log.Timber.Forest.plant
 val urlStart = "https://www.xv-ru.com"
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : ComponentActivity(), ImageLoaderFactory {
+
+    override fun newImageLoader(): ImageLoader {
+        return ImageLoader.Builder(this)
+            .memoryCache {
+                MemoryCache.Builder(this)
+                    .maxSizePercent(0.20)
+                    .build()
+            }
+            .diskCache {
+                DiskCache.Builder()
+                    .directory(cacheDir.resolve("image_cache"))
+                    .maxSizeBytes(1000 * 1024 * 1024)
+                    .build()
+            }
+            .logger(DebugLogger())
+            .respectCacheHeaders(false)
+            .build()
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //enableEdgeToEdge()

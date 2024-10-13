@@ -19,7 +19,12 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import okhttp3.Dispatcher
 import javax.inject.Inject
 
 var currentNumberScreen by mutableIntStateOf(1)
@@ -41,8 +46,8 @@ class ScreenDashBoardsScreenModel @Inject constructor(
     fun openNew(numberScreen : Int = 1){
         currentNumberScreen = numberScreen.coerceIn(1, 19999)
         val url = urlStart+ if(currentNumberScreen == 1) "" else "/new/${currentNumberScreen-1}"
-        runBlocking {
-            l.clear()
+        GlobalScope.launch {
+            //l.clear()
             l = parserListVideo(readHtmlFromURL(url)).toMutableStateList()
         }
     }
