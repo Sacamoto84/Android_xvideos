@@ -39,7 +39,6 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
                     .maxSizeBytes(1000 * 1024 * 1024)
                     .build()
             }
-            //.logger(DebugLogger())
             .respectCacheHeaders(false)
             .allowHardware(true)
             .allowRgb565(true)
@@ -48,8 +47,6 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
             .diskCachePolicy(CachePolicy.ENABLED)
             .dispatcher(Dispatchers.IO)
             .bitmapFactoryMaxParallelism(8)
-            //.addLastModifiedToFileCacheKey(false)
-
             .build()
     }
 
