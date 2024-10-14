@@ -8,12 +8,14 @@ import coil.ImageLoader
 import coil.ImageLoaderFactory
 import coil.disk.DiskCache
 import coil.memory.MemoryCache
+import coil.request.CachePolicy
 import coil.util.DebugLogger
 import com.client.xvideos.screens.dashboards.ScreenDashBoards
 import com.client.xvideos.search.getSearchResults
 import com.client.xvideos.search.parseJson
 import com.client.xvideos.ui.theme.XvideosTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 import timber.log.Timber.DebugTree
@@ -28,7 +30,7 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
         return ImageLoader.Builder(this)
             .memoryCache {
                 MemoryCache.Builder(this)
-                    .maxSizePercent(0.20)
+                    .maxSizePercent(0.25)
                     .build()
             }
             .diskCache {
@@ -37,8 +39,17 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
                     .maxSizeBytes(1000 * 1024 * 1024)
                     .build()
             }
-            .logger(DebugLogger())
+            //.logger(DebugLogger())
             .respectCacheHeaders(false)
+            .allowHardware(true)
+            .allowRgb565(true)
+            .interceptorDispatcher(Dispatchers.IO)
+            .memoryCachePolicy(CachePolicy.ENABLED)
+            .diskCachePolicy(CachePolicy.ENABLED)
+            .dispatcher(Dispatchers.IO)
+            .bitmapFactoryMaxParallelism(8)
+            //.addLastModifiedToFileCacheKey(false)
+
             .build()
     }
 
@@ -56,8 +67,7 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
                 a
                 val b = a?.let { parseJson(it) }
                 b
-            }
-            catch (e :Exception){
+            } catch (e: Exception) {
                 Timber.e(e.localizedMessage)
             }
             //b

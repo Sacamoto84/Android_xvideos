@@ -18,9 +18,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
+@OptIn(DelicateCoroutinesApi::class)
 @Composable
-fun ScreenDashBoardsBottomNavigationButtons(indexScreen: Int, vm: ScreenDashBoardsScreenModel) {
+fun ScreenDashBoardsBottomNavigationButtons(vm: ScreenDashBoardsScreenModel) {
+
+    val currentNumberScreen = vm.pagerState.currentPage
 
     Row(
         modifier = Modifier
@@ -40,7 +47,10 @@ fun ScreenDashBoardsBottomNavigationButtons(indexScreen: Int, vm: ScreenDashBoar
                         Color(0xFFFF9000)
                 )
                 .clickable {
-                    vm.openNew(currentNumberScreen - 1)
+                    GlobalScope.launch(Dispatchers.Main) {
+                        vm.pagerState.scrollToPage((vm.pagerState.currentPage - 1).coerceAtLeast(1))
+                    }
+                    //vm.openNew(currentNumberScreen - 1)
                 }, contentAlignment = Alignment.Center
         ) {
             Text(
@@ -52,6 +62,7 @@ fun ScreenDashBoardsBottomNavigationButtons(indexScreen: Int, vm: ScreenDashBoar
         }
 
         repeat(10) {
+
             Box(
                 modifier = Modifier
                     .padding(horizontal = (0.5).dp)
@@ -59,13 +70,20 @@ fun ScreenDashBoardsBottomNavigationButtons(indexScreen: Int, vm: ScreenDashBoar
                     .height(48.dp)
                     .border(
                         2.dp,
-                        Color(if (currentNumberScreen == it + 1) 0xFFFF9900 else 0x000000)
+                        Color(if (vm.pagerState.currentPage == it + 1) 0xFFFF9900 else 0x000000)
                     )
-
                     .background(
                         Color(0xFF252525)
                     )
-                    .clickable { vm.openNew(it + 1) }, contentAlignment = Alignment.Center
+                    .clickable {
+
+                        //vm.openNew(it + 1)
+                        GlobalScope.launch(Dispatchers.Main) {
+                            vm.pagerState.scrollToPage((it + 1).coerceAtLeast(1))
+                        }
+
+                    },
+                contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = (it + 1).toString(),
@@ -87,7 +105,16 @@ fun ScreenDashBoardsBottomNavigationButtons(indexScreen: Int, vm: ScreenDashBoar
                         Color(0xFFFF9000)
                 )
                 .clickable {
-                    vm.openNew(currentNumberScreen + 1)
+                    //vm.openNew(currentNumberScreen + 1)
+                    GlobalScope.launch(Dispatchers.Main) {
+                        vm.pagerState.scrollToPage(
+                            (vm.pagerState.currentPage + 1).coerceIn(
+                                1,
+                                20000
+                            )
+                        )
+                    }
+
                 }, contentAlignment = Alignment.Center
         ) {
             Text(

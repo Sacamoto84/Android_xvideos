@@ -1,11 +1,9 @@
 package com.client.xvideos.screens.dashboards
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -17,23 +15,19 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 
-
 class ScreenDashBoards : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
 
-    @OptIn(ExperimentalLayoutApi::class)
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         //val vm = getScreenModel<ScreenDashBoardsScreenModel>()
         val vm: ScreenDashBoardsScreenModel = getScreenModel()
-
-        val pagerState = rememberPagerState(1) { 20000 }
-
+        //val pagerState = rememberPagerState(1) { 20000 }
         // ...
         Scaffold(
-            bottomBar = { ScreenDashBoardsBottomNavigationButtons(1, vm) },
+            bottomBar = { ScreenDashBoardsBottomNavigationButtons(vm) },
             modifier = Modifier.fillMaxSize(),
             containerColor = Color.Black,
 
@@ -41,7 +35,7 @@ class ScreenDashBoards : Screen {
         ) { innerPadding ->
 
             HorizontalPager(
-                state = pagerState,
+                state = vm.pagerState,
                 modifier = Modifier.fillMaxSize(),
                 beyondViewportPageCount = 1
             ) { pageIndex ->

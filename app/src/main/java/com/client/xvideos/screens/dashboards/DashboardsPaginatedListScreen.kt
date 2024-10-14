@@ -1,17 +1,24 @@
 package com.client.xvideos.screens.dashboards
 
 import android.content.res.Configuration
+import android.provider.SyncStateContract.Columns
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -45,8 +52,8 @@ import com.skydoves.landscapist.coil.CoilImage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-private suspend fun openNew(numberScreen: Int = 1): SnapshotStateList<GalleryItem> {
-    currentNumberScreen = numberScreen.coerceIn(1, 19999)
+private suspend fun openNew(numberScreen: Int = 0): SnapshotStateList<GalleryItem> {
+    val currentNumberScreen = numberScreen.coerceIn(1, 19999)
     val url = urlStart + if (currentNumberScreen == 1) "" else "/new/${currentNumberScreen - 1}"
     return parserListVideo(readHtmlFromURL(url)).toMutableStateList()
 }
@@ -61,39 +68,29 @@ fun DashboardsPaginatedListScreen(pageIndex: Int, vm: ScreenDashBoardsScreenMode
     LaunchedEffect(pageIndex) {
         withContext(Dispatchers.IO) {
             l.clear()
-            l.addAll(openNew(pageIndex))
+            l.addAll(openNew(pageIndex).filter { !it.link.contains("THUMBNUM") })
         }
     }
 
 
     val navigator = LocalNavigator.currentOrThrow
 
-    val items = remember { mutableStateListOf<Int>() }
-    val listState = rememberLazyListState()
-    var isLoading by remember { mutableStateOf(false) }
-    val coroutineScope = rememberCoroutineScope()
+    //val items = remember { mutableStateListOf<Int>() }
+    //val listState = rememberLazyListState()
+    //var isLoading by remember { mutableStateOf(false) }
+    //val coroutineScope = rememberCoroutineScope()
 
     val numberOfPages = 3 // Количество страниц (списков)
 
     val itemsPerRow =
-        if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE) 4 else 3
-
-    // Загружаем начальные данные
-//    LaunchedEffect(Unit) {
-//        vm.openNew(pageIndex)
-//    }
+        if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE) 4 else 2
 
     LazyColumn(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-//        item {
-//            //if(currentNumberScreen == 1)
-//            ScreenDashBoardsBottomNavigationButtons(1, vm)
-//        }
-
-        items(l.filter { !it.link.contains("THUMBNUM") }.chunked(itemsPerRow))
+        items(l.chunked(itemsPerRow))
         { row ->
 
             Row(modifier = Modifier.fillMaxWidth()) {
@@ -104,6 +101,7 @@ fun DashboardsPaginatedListScreen(pageIndex: Int, vm: ScreenDashBoardsScreenMode
                             .weight(1f)
                             .aspectRatio(352f / 198f)
                             .padding(1.dp)
+                            .background(Color.DarkGray)
                             //.border(1.dp, Color.Black)
                             //.fillParentMaxWidth()
                             .clickable { vm.openItem(urlStart + cell.link, navigator) },
@@ -138,13 +136,13 @@ fun DashboardsPaginatedListScreen(pageIndex: Int, vm: ScreenDashBoardsScreenMode
                         )
 
 
+                        val offsetY = (-6).dp
                         //PlayerLite(it.previewVideo)
-                        //Text(text = it.id.toString())
                         Text(
                             text = cell.duration.dropLast(1),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .offset(1.dp, 1.dp),
+                                .offset(1.dp, offsetY+ 1.dp),
                             textAlign = TextAlign.Right,
                             fontSize = 14.sp,
                             color = Color.Black
@@ -152,7 +150,7 @@ fun DashboardsPaginatedListScreen(pageIndex: Int, vm: ScreenDashBoardsScreenMode
 
                         Text(
                             text = cell.duration.dropLast(1),
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier.fillMaxWidth().offset(0.dp, offsetY),
                             textAlign = TextAlign.Right,
                             fontSize = 14.sp,
                             color = Color.White
@@ -173,9 +171,6 @@ fun DashboardsPaginatedListScreen(pageIndex: Int, vm: ScreenDashBoardsScreenMode
 
         }
 
-        //item {
-        //    ScreenDashBoardsBottomNavigationButtons(1, vm)
-        //}
 
     }
 

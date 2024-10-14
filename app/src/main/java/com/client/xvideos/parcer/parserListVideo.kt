@@ -42,16 +42,17 @@ fun parserListVideo(html: String): List<GalleryItem> {
             previewVideo = videoPreviewUrl
         ))
 
-        // Выводим результат
-        println("ID: $videoId")
-        println("Title: $videoTitle")
-        println("Link: $videoLink")
-        println("Duration: $videoDuration")
-        println("Channel: $channelName")
-        println("Views: $views")
-        println("Image: $dataSrc")
-        println("Preview: $videoPreviewUrl")
-        println("-------------")
+//        // Выводим результат
+//        println("ID: $videoId")
+//        println("Title: $videoTitle")
+//        println("Link: $videoLink")
+//        println("Duration: $videoDuration")
+//        println("Channel: $channelName")
+//        println("Views: $views")
+//        println("Image: $dataSrc")
+//        println("Preview: $videoPreviewUrl")
+//        println("-------------")
+
     }
 
     return list
