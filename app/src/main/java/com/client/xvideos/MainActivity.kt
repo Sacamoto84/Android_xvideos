@@ -15,6 +15,7 @@ import com.client.xvideos.search.getSearchResults
 import com.client.xvideos.search.parseJson
 import com.client.xvideos.ui.theme.XvideosTheme
 import dagger.hilt.android.AndroidEntryPoint
+import io.sanghun.compose.video.cache.VideoPlayerCacheManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
@@ -57,6 +58,8 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
 
         plant(DebugTree())
         Timber.i("!!! Hello")
+
+        VideoPlayerCacheManager.initialize(this, 1024 * 1024 * 1024)    // 1GB
 
         runBlocking {
             try {

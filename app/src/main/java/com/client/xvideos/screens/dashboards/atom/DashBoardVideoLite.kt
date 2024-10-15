@@ -1,9 +1,8 @@
-package com.client.xvideos.screens.item.util
+package com.client.xvideos.screens.dashboards.atom
 
 import android.app.Activity
 import android.content.pm.ActivityInfo.SCREEN_ORIENTATION_USER
-import android.content.pm.ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE
-import android.os.Build
+import android.net.Uri
 import androidx.annotation.OptIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,39 +19,56 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.media3.common.Player
+import androidx.media3.common.Player.REPEAT_MODE_ONE
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.datasource.DefaultHttpDataSource
+import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
-import androidx.media3.ui.PlayerView.SHOW_BUFFERING_WHEN_PLAYING
+import com.client.xvideos.screens.item.util.ComposableLifecycle
+import com.client.xvideos.screens.item.util.buildMediaSource
 import timber.log.Timber
 
-@OptIn(androidx.media3.common.util.UnstableApi::class)
+
+@OptIn(UnstableApi::class)
 @Composable
-fun Player(passedString: String, autostart: Boolean = false, repeat: Boolean = false) {
+fun DashBoardVideoLite(passedString: String) {
 
     val context = LocalContext.current
     val activity = LocalContext.current as Activity
+
+
+    //val trackSelector =  DefaultTrackSelector(context)
+
 
     var player: Player? by remember {
         mutableStateOf(null)
     }
 
-    val enterFullscreen = { activity.requestedOrientation = SCREEN_ORIENTATION_USER_LANDSCAPE }
-    val exitFullscreen = {
-        // Will reset to SCREEN_ORIENTATION_USER later
-        activity.requestedOrientation = SCREEN_ORIENTATION_USER
-    }
+//    LaunchedEffect(Unit) {
+//        player = ExoPlayer.Builder(context).build().apply {
+//            val defaultHttpDataSourceFactory = DefaultHttpDataSource.Factory()
+//            val uri = Uri.parse(passedString)
+//            val mediaSource = buildMediaSource(uri, defaultHttpDataSourceFactory, null)
+//            setMediaSource(mediaSource)
+//            playWhenReady = true
+//            prepare()
+//        }
+//    }
 
     val playerView = remember {
         PlayerView(context).apply {
             this.player = player
+            controllerAutoShow = false
+            hideController()
+            keepScreenOn = true
+            setUseController(false)
         }
     }
 
-    //LaunchedEffect(Unit) {
-        playerView.player = player
-    //}
+    playerView.player = player
 
     DisposableEffect(Unit) {
-        //playerView.player = player
+
         onDispose {
             Timber.i("!!! DisposableEffect")
             playerView.player = null
@@ -61,31 +77,27 @@ fun Player(passedString: String, autostart: Boolean = false, repeat: Boolean = f
         }
     }
 
-    activity.requestedOrientation = SCREEN_ORIENTATION_USER
-
-    playerView.controllerAutoShow = true
-    playerView.keepScreenOn = true
-    playerView.setShowBuffering(SHOW_BUFFERING_WHEN_PLAYING)
-
-    playerView.setFullscreenButtonClickListener { isFullScreen ->
-        with(context) {
-            if (isFullScreen) {
-                if (activity.requestedOrientation == SCREEN_ORIENTATION_USER) {
-                    enterFullscreen()
-                }
-            } else {
-                exitFullscreen()
-            }
-        }
-    }
-
-
     ComposableLifecycle { _, event ->
         when (event) {
             Lifecycle.Event.ON_START -> {
-                if (Build.VERSION.SDK_INT > 23) {
-                    player = initPlayer(context, passedString)
+
+                player = ExoPlayer.Builder(context).build().apply {
+                    setMediaSource(
+                        buildMediaSource(
+                            Uri.parse(passedString),
+                            DefaultHttpDataSource.Factory(),
+                            null
+                        )
+                    )
+                    playWhenReady = true
+                    prepare()
+
                     playerView.onResume()
+
+                    //player?.volume = 0f
+                    //player?.repeatMode = REPEAT_MODE_ONE
+                    //player?.prepare()
+                    //player?.play()
                 }
             }
 
@@ -107,7 +119,12 @@ fun Player(passedString: String, autostart: Boolean = false, repeat: Boolean = f
         }
     }
 
-    AndroidView(modifier = Modifier.fillMaxWidth().background(Color.Black),
+    AndroidView(modifier = Modifier
+        .fillMaxWidth()
+        .background(Color.Black),
         factory = { playerView }
     )
+
 }
+
+

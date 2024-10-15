@@ -15,7 +15,7 @@ android {
 
     defaultConfig {
         applicationId "com.client.xvideos"
-        minSdk 22
+        minSdk 24
         targetSdk 34
         versionCode 1
         versionName "1.0"
@@ -67,8 +67,14 @@ dependencies {
     implementation libs.androidx.ui
     implementation libs.androidx.ui.graphics
     implementation libs.androidx.ui.tooling.preview
+
+    implementation 'com.google.android.material:material:1.13.0-alpha06'
+    implementation 'com.google.android.material:compose-theme-adapter:1.2.1'
+    implementation "androidx.compose.material:material:1.7.3"
+
     implementation libs.androidx.material3
     implementation libs.androidx.media3.exoplayer.smoothstreaming
+    implementation libs.androidx.storage
     testImplementation libs.junit
     androidTestImplementation libs.androidx.junit
     androidTestImplementation libs.androidx.espresso.core
@@ -176,5 +182,10 @@ dependencies {
 //    implementation "com.github.skydoves:landscapist-glide:2.4.1"
 //    implementation "com.github.skydoves:landscapist-placeholder:2.4.1"
     implementation "com.github.skydoves:landscapist-coil:2.4.1"
+
+    implementation("network.chaintech:compose-multiplatform-media-player:1.0.23")
+    implementation "org.jetbrains.compose.components:components-resources:1.7.0-rc01"
+    implementation "io.sanghun:compose-video:1.2.0"
+
 
 }

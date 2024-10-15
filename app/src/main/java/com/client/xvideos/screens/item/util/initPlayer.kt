@@ -7,7 +7,7 @@ import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
 
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
-fun initPlayer(context: Context, passedString : String): Player {
+fun initPlayer(context: Context, passedString : String ): Player {
     return ExoPlayer.Builder(context).build().apply {
         val defaultHttpDataSourceFactory = DefaultHttpDataSource.Factory()
         val uri = Uri.parse(passedString)

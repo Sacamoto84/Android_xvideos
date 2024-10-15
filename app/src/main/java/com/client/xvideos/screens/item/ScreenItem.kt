@@ -9,7 +9,7 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.client.xvideos.screens.item.util.Player
+import com.client.xvideos.screens.item.util.ZoomableVideoPlayer
 
 class ScreenItem(val url: String) : Screen {
 
@@ -23,11 +23,9 @@ class ScreenItem(val url: String) : Screen {
             factory.create(url)
         }
 
-
-
         Column {
 
-            Player(vm.passedString)
+            ZoomableVideoPlayer(vm.passedString)
 
 //            AsyncImage(
 //                model = vm.a.value?.thumbUrl169,
@@ -50,9 +48,10 @@ class ScreenItem(val url: String) : Screen {
 //            )
 
 
-
         }
 
 
     }
+
+
 }
