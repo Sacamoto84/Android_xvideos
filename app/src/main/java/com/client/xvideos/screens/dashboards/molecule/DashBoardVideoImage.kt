@@ -75,8 +75,8 @@ fun DashBoardVideoImage(item: GalleryItem, onLongClick : () -> Unit ) {
         } else {
             DashBoardImage(item.previewImage, context)
 
-            val offsetY = (-6).dp
-            //PlayerLite(it.previewVideo)
+            val offsetY = (-3).dp
+
             Text(
                 text = item.duration.dropLast(1),
                 modifier = Modifier

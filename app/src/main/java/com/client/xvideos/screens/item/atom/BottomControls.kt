@@ -62,48 +62,7 @@ fun BottomControls(
     Timber.i("!!! videoTimeBack:$videoTimeBack videoTime:$videoTime  currentTime:${currentTime()} isDragging:${isDragging}")
 
     Column(modifier = modifier.padding(bottom = 32.dp)) {
-        ///...
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .background(Color(0xFF1C1C1C))) {
-            Slider(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .fillMaxWidth(),
-                value = buffer.toFloat(),
-                enabled = false,
-                onValueChange = {},
-                valueRange = 0f..100f,
-                colors =
-                SliderDefaults.colors(
-                    disabledThumbColor = Color.Transparent,
-                    disabledActiveTrackColor = Color.LightGray
-                )
-            )
 
-            Slider(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .fillMaxWidth(),
-                value = videoTimeBack.toFloat(),
-                onValueChange = {
-                    videoTimeBack = it.toLong()
-                    isDragging = true
-                },
-                onValueChangeFinished = {
-                    onValueChangedFinished.invoke(videoTimeBack.toFloat())
-                    isDragging = false
-                },
-                valueRange = 0f..duration.toFloat(),
-                colors = SliderDefaults.colors(
-                    thumbColor = Color.White,
-                    activeTrackColor = Color.White,
-                    activeTickColor = Color.DarkGray
-                )
-            )
-        }
-
-        ///...
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -112,14 +71,92 @@ fun BottomControls(
             verticalAlignment = Alignment.CenterVertically
         ) {
 
+
             Text(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                text = currentTime.invoke().formatMinSec() + "/" + duration.formatMinSec(),
+                modifier = Modifier.padding(start = 4.dp),
+                text = currentTime.invoke().formatMinSec(),
                 color = Color.Cyan
             )
 
+
+
+            ///...
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth().weight(1f)
+                    .background(Color(0xFF1C1C1C))
+            ) {
+                Slider(
+                    modifier = Modifier
+                        .padding(horizontal = 8.dp)
+                        .fillMaxWidth(),
+                    value = buffer.toFloat(),
+                    enabled = false,
+                    onValueChange = {},
+                    valueRange = 0f..100f,
+                    colors =
+                    SliderDefaults.colors(
+                        disabledThumbColor = Color.Transparent,
+                        disabledActiveTrackColor = Color.LightGray
+                    )
+                )
+
+                Slider(
+                    modifier = Modifier
+                        .padding(horizontal = 8.dp)
+                        .fillMaxWidth(),
+                    value = videoTimeBack.toFloat(),
+                    onValueChange = {
+                        videoTimeBack = it.toLong()
+                        isDragging = true
+                    },
+                    onValueChangeFinished = {
+                        onValueChangedFinished.invoke(videoTimeBack.toFloat())
+                        isDragging = false
+                    },
+                    valueRange = 0f..duration.toFloat(),
+                    colors = SliderDefaults.colors(
+                        thumbColor = Color.White,
+                        activeTrackColor = Color.White,
+                        activeTickColor = Color.DarkGray
+                    )
+                )
+            }
+
+            Text(
+                modifier = Modifier.padding(end = 4.dp),
+                text = duration.formatMinSec(),
+                color = Color.Cyan
+            )
+
+        }
+
+        //...
+        Row(modifier = Modifier.fillMaxWidth().background(Color.DarkGray), horizontalArrangement = Arrangement.SpaceBetween) {
             IconButton(
-                modifier = Modifier.padding(horizontal = 16.dp),
+                modifier = Modifier.padding(horizontal = 0.dp),
+                onClick = {},
+                colors = IconButtonDefaults.iconButtonColors(contentColor = Color.White)
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.fit_to_page_outline),
+                    contentDescription = "", tint = Color.White
+                )
+            }
+
+            IconButton(
+                modifier = Modifier.padding(horizontal = 0.dp),
+                onClick = {},
+                colors = IconButtonDefaults.iconButtonColors(contentColor = Color.White)
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.pause_circle),
+                    contentDescription = "", tint = Color.White
+                )
+            }
+
+            IconButton(
+                modifier = Modifier.padding(horizontal = 0.dp),
                 onClick = {},
                 colors = IconButtonDefaults.iconButtonColors(contentColor = Color.White)
             ) {
@@ -130,6 +167,8 @@ fun BottomControls(
             }
 
         }
+
+
     }
 }
 

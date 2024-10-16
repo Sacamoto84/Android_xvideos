@@ -1,8 +1,10 @@
 package com.client.xvideos.screens.item.util
 
 import android.net.Uri
+import androidx.annotation.OptIn
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.common.util.Util
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.dash.DashMediaSource
@@ -11,6 +13,7 @@ import androidx.media3.exoplayer.smoothstreaming.SsMediaSource
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 
+@OptIn(UnstableApi::class)
 fun buildMediaSource(
     uri: Uri,
     defaultHttpDataSourceFactory: DefaultHttpDataSource.Factory,
