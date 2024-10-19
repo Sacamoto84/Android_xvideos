@@ -50,28 +50,10 @@ fun DashBoardVideoImage(item: GalleryItem, onLongClick : () -> Unit ) {
             }
     )
 
-
     ) {
 
-
         if (isVideo) {
-
             DashBoardVideoLite(item.previewVideo)
-
-//            VideoPlayerView(
-//                modifier = Modifier.fillMaxSize(),
-//                url = item.previewVideo,
-//                playerConfig = PlayerConfig(
-//                    isMute = true,
-//                    loop = true,
-//                    isSeekBarVisible = false,
-//                    showDesktopControls = false,
-//                    isPauseResumeEnabled = false,
-//                    isAutoHideControlEnabled = true,
-//                    controlHideIntervalSeconds = 0
-//                )
-//            )
-
         } else {
             DashBoardImage(item.previewImage, context)
 

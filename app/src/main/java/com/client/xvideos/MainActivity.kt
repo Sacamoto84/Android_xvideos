@@ -14,6 +14,7 @@ import coil.memory.MemoryCache
 import coil.request.CachePolicy
 import coil.util.DebugLogger
 import com.client.xvideos.screens.dashboards.ScreenDashBoards
+import com.client.xvideos.screens.tags.ScreenTags
 import com.client.xvideos.search.getSearchResults
 import com.client.xvideos.search.parseJson
 import com.client.xvideos.sign_in.domen.GoogleAuthUiClient
@@ -183,7 +184,7 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
 
         setContent {
             XvideosTheme(darkTheme = true) {
-                Navigator(ScreenDashBoards())
+                Navigator(ScreenTags("blonde"))
             }
         }
     }

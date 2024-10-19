@@ -1,8 +1,12 @@
 package com.client.xvideos.screens.item
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Divider
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusModifier
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
@@ -23,9 +27,12 @@ class ScreenItem(val url: String) : Screen {
             factory.create(url)
         }
 
-        Column {
+        Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
+            vm.ComposeTags()
+            ZoomableVideoPlayer(vm.passedString, Modifier.weight(1f))
 
-            ZoomableVideoPlayer(vm.passedString)
+
+
 
 //            AsyncImage(
 //                model = vm.a.value?.thumbUrl169,

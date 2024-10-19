@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.pm.ActivityInfo.SCREEN_ORIENTATION_USER
 import androidx.annotation.OptIn
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,6 +17,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.MimeTypes
@@ -30,7 +33,7 @@ import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 @Composable
-fun ZoomableVideoPlayer(videoUri: String) {
+fun ZoomableVideoPlayer(videoUri: String, modifier : Modifier = Modifier) {
 
     var totalDuration by remember { mutableLongStateOf(0L) }
     var currentTime by remember { mutableLongStateOf(0L) }
@@ -44,7 +47,7 @@ fun ZoomableVideoPlayer(videoUri: String) {
     val activity = LocalContext.current as Activity
     activity.requestedOrientation = SCREEN_ORIENTATION_USER
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = Modifier.fillMaxSize().then(modifier).background(Color.Cyan), verticalArrangement = Arrangement.Bottom) {
 
         VideoPlayer(
             mediaItems = listOf(
