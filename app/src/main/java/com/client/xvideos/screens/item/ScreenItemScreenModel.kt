@@ -10,6 +10,7 @@ import com.client.xvideos.model.HTML5PlayerConfig
 import com.client.xvideos.net.readHtmlFromURL
 import com.client.xvideos.parcer.parseHTML5Player
 import com.client.xvideos.parcer.parserItemVideo
+import com.client.xvideos.parcer.parserItemVideoTags
 import dagger.Binds
 import dagger.Module
 import dagger.assisted.Assisted
@@ -21,6 +22,7 @@ import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
 import kotlinx.coroutines.runBlocking
 
+data class ScreenItemsTags(val uploader : String, val model : String, val tags : List<String>)
 
 class ScreenItemScreenModel @AssistedInject constructor(
     @Assisted val url: String,
@@ -38,12 +40,18 @@ class ScreenItemScreenModel @AssistedInject constructor(
 
     //val mediaItem: MediaItem?
 
+
+
+
     init {
         runBlocking {
             val s = readHtmlFromURL(url)
             val script = parserItemVideo(s)
             a.value = script?.let { parseHTML5Player(it) }
             a
+
+            val stringTags = parserItemVideoTags(s)
+            stringTags
 
             //mediaItem = a.value?.let { MediaItem.fromUri(it.videoHLS) }
             passedString = a.value?.videoHLS.toString()

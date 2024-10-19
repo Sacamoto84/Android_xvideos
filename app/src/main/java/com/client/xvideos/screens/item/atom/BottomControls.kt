@@ -1,6 +1,8 @@
 package com.client.xvideos.screens.item.atom
 
-import androidx.compose.foundation.Image
+//noinspection UsingMaterialAndMaterial3Libraries
+//noinspection UsingMaterialAndMaterial3Libraries
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,15 +10,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
-import androidx.compose.material3.IconButton
-
-//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.Slider
-//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.SliderDefaults
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
-
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,7 +26,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.client.xvideos.R
@@ -42,7 +40,13 @@ fun BottomControls(
     currentTime: () -> Long,
     bufferedPercentage: () -> Int,
     onSeekChanged: (timeMs: Float) -> Unit,
-    onValueChangedFinished: (timeMs: Float) -> Unit
+    onValueChangedFinished: (timeMs: Float) -> Unit,
+
+    isPlaying : () -> Boolean,
+
+    onPlayClick : () -> Unit
+
+
 ) {
 
     var isDragging by remember { mutableStateOf(false) }   // Флаг перетаскивания
@@ -79,11 +83,11 @@ fun BottomControls(
             )
 
 
-
             ///...
             Box(
                 modifier = Modifier
-                    .fillMaxWidth().weight(1f)
+                    .fillMaxWidth()
+                    .weight(1f)
                     .background(Color(0xFF1C1C1C))
             ) {
                 Slider(
@@ -132,7 +136,13 @@ fun BottomControls(
         }
 
         //...
-        Row(modifier = Modifier.fillMaxWidth().background(Color.DarkGray), horizontalArrangement = Arrangement.SpaceBetween) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.DarkGray),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             IconButton(
                 modifier = Modifier.padding(horizontal = 0.dp),
                 onClick = {},
@@ -145,18 +155,21 @@ fun BottomControls(
             }
 
             IconButton(
-                modifier = Modifier.padding(horizontal = 0.dp),
-                onClick = {},
+                modifier = Modifier
+                    .padding(horizontal = 0.dp, vertical = 4.dp)
+                    .size(48.dp),
+                onClick = {onPlayClick.invoke()},
                 colors = IconButtonDefaults.iconButtonColors(contentColor = Color.White)
             ) {
+
                 Icon(
-                    painter = painterResource(R.drawable.pause_circle),
+                    painter = painterResource(if (isPlaying.invoke()) R.drawable.pause_circle else R.drawable.play_circle),
                     contentDescription = "", tint = Color.White
                 )
             }
 
             IconButton(
-                modifier = Modifier.padding(horizontal = 0.dp),
+                modifier = Modifier.padding(horizontal = 0.dp).size(32.dp),
                 onClick = {},
                 colors = IconButtonDefaults.iconButtonColors(contentColor = Color.White)
             ) {

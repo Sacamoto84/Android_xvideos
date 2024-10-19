@@ -57,7 +57,7 @@ fun ZoomableVideoPlayer(videoUri: String) {
             ),
             handleLifecycle = true,
             autoPlay = true,
-            usePlayerController = true,
+            usePlayerController = false,
             enablePip = false,
             handleAudioFocus = true,
             controllerConfig = VideoPlayerControllerConfig(
@@ -124,7 +124,10 @@ fun ZoomableVideoPlayer(videoUri: String) {
                 //playerE?.playWhenReady = true
             },
 
-            )
+            isPlaying = { isPlaying },
+            onPlayClick = { if (isPlaying) playerE?.pause() else playerE?.play() }
+
+        )
 
     }
 

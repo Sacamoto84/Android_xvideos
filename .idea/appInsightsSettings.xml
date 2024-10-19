@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.client.xvideos" />
+                  <option name="mobileSdkAppId" value="1:890737582019:android:8b31f7a4477701114f2776" />
+                  <option name="projectId" value="xvideos-38d56" />
+                  <option name="projectNumber" value="890737582019" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
