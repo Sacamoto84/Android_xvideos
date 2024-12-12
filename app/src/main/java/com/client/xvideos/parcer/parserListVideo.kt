@@ -19,9 +19,8 @@ fun parserListVideo(html: String): List<GalleryItem> {
         // Извлекаем данные
         val videoId = block.attr("data-id")
         val videoTitle = block.selectFirst("p.title a")?.text() ?: "No title"
-        val videoLink = block.selectFirst("p.title a")?.attr("href") ?: "No link"
+        val href = block.selectFirst("p.title a")?.attr("href") ?: "No link"
         val videoDuration = block.selectFirst("span.duration")?.text() ?: "No duration"
-
 
         // Получаем значение data-src
         val dataSrc: String = block.selectFirst("img[data-src]")?.attr("data-src") ?: "null"
@@ -31,16 +30,20 @@ fun parserListVideo(html: String): List<GalleryItem> {
         val views = block.selectFirst("p.metadata")?.text()?.split("Просмотров")?.get(0)?.trim()
             ?: "No views"
 
-        list.add(GalleryItem(
-            id = videoId.toLong(),
-            title = videoTitle,
-            link = videoLink,
-            duration = videoDuration,
-            views = views,
-            channel = channelName,
-            previewImage = dataSrc,
-            previewVideo = videoPreviewUrl
-        ))
+        list.add(
+            GalleryItem(
+                id = videoId.toLong(),
+                title = videoTitle,
+                href = href,
+                duration = videoDuration,
+                views = views,
+                channel = channelName,
+                previewImage = dataSrc,
+                previewVideo = videoPreviewUrl,
+                nameProfile = "TODO()",
+                linkProfile = "TODO()"
+            )
+        )
 
 //        // Выводим результат
 //        println("ID: $videoId")

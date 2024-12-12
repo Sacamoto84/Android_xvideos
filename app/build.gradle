@@ -9,17 +9,16 @@ plugins {
     id("com.google.dagger.hilt.android")
     alias(libs.plugins.google.gms.google.services)
 
-
 }
 
 android {
     namespace 'com.client.xvideos'
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         applicationId "com.client.xvideos"
         minSdk 24
-        targetSdk 34
+        targetSdk 35
         versionCode 1
         versionName "1.0"
 
@@ -71,14 +70,15 @@ dependencies {
     implementation libs.androidx.ui.graphics
     implementation libs.androidx.ui.tooling.preview
 
-    implementation 'com.google.android.material:material:1.13.0-alpha06'
+    implementation 'com.google.android.material:material:1.13.0-alpha08'
     implementation 'com.google.android.material:compose-theme-adapter:1.2.1'
-    implementation "androidx.compose.material:material:1.7.3"
+    implementation "androidx.compose.material:material:1.7.6"
 
     implementation libs.androidx.material3
     implementation libs.androidx.media3.exoplayer.smoothstreaming
     implementation libs.androidx.storage
     implementation libs.firebase.auth
+    implementation libs.firebase.firestore.ktx
     testImplementation libs.junit
     androidTestImplementation libs.androidx.junit
     androidTestImplementation libs.androidx.espresso.core
@@ -113,8 +113,8 @@ dependencies {
 //    //implementation(libs.coil.network.ktor)
 //    implementation(libs.coil.mp)
 
-    implementation("com.google.dagger:hilt-android:2.52")
-    ksp("com.google.dagger:hilt-android-compiler:2.52")
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.android.compiler)
 
 
     def voyagerVersion = '1.1.0-beta03'
@@ -148,19 +148,19 @@ dependencies {
     // Optional - Included automatically by material, only add when you need
     // the icons but not the material library (e.g. when using Material3 or a
     // custom design system based on Foundation)
-    implementation 'androidx.compose.material:material-icons-core'
+    implementation libs.androidx.material.icons.core
     // Optional - Add full set of material icons
-    implementation 'androidx.compose.material:material-icons-extended'
+    implementation libs.androidx.material.icons.extended
     // Optional - Add window size utils
-    implementation 'androidx.compose.material3.adaptive:adaptive'
+    implementation libs.androidx.adaptive
 
 
-    implementation "androidx.media3:media3-ui:1.4.1"
-    implementation "androidx.media3:media3-exoplayer:1.4.1"
-    implementation "androidx.media3:media3-exoplayer-dash:1.4.1"
-    implementation "androidx.media3:media3-ui:1.4.1"
-    implementation "androidx.media3:media3-exoplayer-hls:1.4.1"
-    implementation "androidx.media3:media3-common:1.4.1"
+    implementation libs.androidx.media3.ui
+    implementation libs.androidx.media3.exoplayer
+    implementation libs.androidx.media3.exoplayer.dash
+    implementation libs.androidx.media3.ui
+    implementation libs.androidx.media3.exoplayer.hls
+    implementation libs.androidx.media3.common
 
 
     // For loading data using the Cronet network stack
@@ -180,7 +180,6 @@ dependencies {
     implementation "androidx.media3:media3-decoder:1.4.1"
     implementation "androidx.media3:media3-datasource:1.4.1"
 
-
     implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.1'
 
 //    implementation "com.github.skydoves:landscapist-glide:2.4.1"
@@ -191,7 +190,6 @@ dependencies {
     implementation "org.jetbrains.compose.components:components-resources:1.7.0-rc01"
     implementation "io.sanghun:compose-video:1.2.0"
 
-
     //implementation 'com.firebaseui:firebase-ui-auth:7.2.0'
     // Required only if Facebook login support is required
     // Find the latest Facebook SDK releases here: https://goo.gl/Ce5L94
@@ -201,10 +199,10 @@ dependencies {
     implementation libs.firebase.analytics
     // Add the dependency for the Firebase Authentication library
     // When using the BoM, you don't specify versions in Firebase library dependencies
-    implementation("com.google.firebase:firebase-auth")
+    implementation(libs.google.firebase.auth)
 
     // Also add the dependency for the Google Play services library and specify its version
-    implementation("com.google.android.gms:play-services-auth:21.2.0")
+    implementation(libs.play.services.auth)
 
     implementation ("androidx.credentials:credentials")
     implementation ("androidx.credentials:credentials-play-services-auth")

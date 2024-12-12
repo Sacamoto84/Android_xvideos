@@ -26,17 +26,13 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.model.GalleryItem
 import com.client.xvideos.screens.dashboards.molecule.DashBoardVideoImage
 import com.client.xvideos.screens.tags.ScreenTagsViewModel
-import com.client.xvideos.screens.tags.model.ModelTagItem
-import com.client.xvideos.urlStart
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 @Composable
 fun TagsPaginatedListScreen(pageIndex: Int, vm: ScreenTagsViewModel) {
 
     val context = LocalContext.current
 
-    val l = remember { mutableStateListOf<ModelTagItem>() }
+    val l = remember { mutableStateListOf<GalleryItem>() }
 
     LaunchedEffect(pageIndex) {
 //        withContext(Dispatchers.IO) {
@@ -46,8 +42,6 @@ fun TagsPaginatedListScreen(pageIndex: Int, vm: ScreenTagsViewModel) {
     }
 
     val navigator = LocalNavigator.currentOrThrow
-
-    val numberOfPages = 3 // Количество страниц (списков)
 
     val itemsPerRow =
         if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE) 4 else 2
@@ -70,7 +64,11 @@ fun TagsPaginatedListScreen(pageIndex: Int, vm: ScreenTagsViewModel) {
                             .padding(1.dp)
                             .background(Color.DarkGray)
                     ) {
-                        DashBoardVideoImage(cell, onLongClick = {vm.openItem(urlStart + cell.link, navigator)})
+
+                        DashBoardVideoImage(cell, onLongClick = {
+                            //vm.openItem(urlStart + cell.link, navigator)
+                        })
+
                     }
                 }
                 // Если элементов в строке меньше, чем itemsPerRow, добавляем пустые ячейки

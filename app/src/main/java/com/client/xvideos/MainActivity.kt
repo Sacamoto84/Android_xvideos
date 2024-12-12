@@ -12,8 +12,6 @@ import coil.ImageLoaderFactory
 import coil.disk.DiskCache
 import coil.memory.MemoryCache
 import coil.request.CachePolicy
-import coil.util.DebugLogger
-import com.client.xvideos.screens.dashboards.ScreenDashBoards
 import com.client.xvideos.screens.tags.ScreenTags
 import com.client.xvideos.search.getSearchResults
 import com.client.xvideos.search.parseJson
@@ -22,10 +20,10 @@ import com.client.xvideos.ui.theme.XvideosTheme
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.auth.api.identity.SignInClient
-import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
 import io.sanghun.compose.video.cache.VideoPlayerCacheManager
@@ -42,21 +40,12 @@ private lateinit var auth: FirebaseAuth
 @AndroidEntryPoint
 class MainActivity : ComponentActivity(), ImageLoaderFactory {
 
-
     private val googleAuthUiClient by lazy {
         GoogleAuthUiClient(
             context = applicationContext,
             oneTapClient = Identity.getSignInClient(applicationContext)
         )
     }
-
-
-
-
-
-
-
-
 
     override fun newImageLoader(): ImageLoader {
         return ImageLoader.Builder(this)
@@ -117,11 +106,13 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
                             //updateUI(user)
                         } else {
                             // If sign in fails, display a message to the user.
-                            Timber.tag("onActivityResult").w(task.exception, "signInWithCredential:failure")
+                            Timber.tag("onActivityResult")
+                                .w(task.exception, "signInWithCredential:failure")
                             //updateUI(null)
                         }
                     }
             }
+
             else -> {
                 // Shouldn't happen.
                 Timber.tag("onActivityResult").d("No ID token!")
@@ -134,19 +125,23 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
         //enableEdgeToEdge()
 
         plant(DebugTree())
+
         Timber.i("!!! Hello")
 
+        //val a =1 /0
+
         oneTapClient = Identity.getSignInClient(this)
-//        signUpRequest = BeginSignInRequest.builder()
-//            .setGoogleIdTokenRequestOptions(
-//                BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
-//                    .setSupported(true)
-//                    // Your server's client ID, not your Android client ID.
-//                    .setServerClientId(getString(R.string.your_web_client_id))
-//                    // Show all accounts on the device.
-//                    .setFilterByAuthorizedAccounts(false)
-//                    .build())
-//            .build()
+
+        signUpRequest = BeginSignInRequest.builder()
+            .setGoogleIdTokenRequestOptions(
+                BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
+                    .setSupported(true)
+                    // Your server's client ID, not your Android client ID.
+                    .setServerClientId(getString(R.string.your_web_client_id))
+                    // Show all accounts on the device.
+                    .setFilterByAuthorizedAccounts(false)
+                    .build())
+            .build()
 //
 //        oneTapClient.beginSignIn(signUpRequest)
 //            .addOnSuccessListener(this) { result ->
@@ -165,8 +160,72 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
 //            }
 
 
-
         auth = Firebase.auth
+
+        val userId = auth.currentUser?.uid
+        val db: FirebaseFirestore = FirebaseFirestore.getInstance()
+
+        if (userId == null) {
+            // Ссылка на документ пользователя
+            val userDocRef = db.collection("users").document("userId")
+
+            // Добавление данных в подколлекцию "posts"
+            val post = hashMapOf(
+                "title" to "Первый пост",
+                "content" to "Это содержимое первого поста"
+            )
+
+            userDocRef.collection("posts").add(post)
+                .addOnSuccessListener { documentReference ->
+                    Timber.tag("Firestore").d("Пост добавлен с ID: ${documentReference.id}")
+                }
+                .addOnFailureListener { e ->
+                    Log.w("Firestore", "Ошибка добавления поста", e)
+                }
+
+            // Добавление данных в подколлекцию "messages"
+            val message = hashMapOf(
+                "sender" to "Друг пользователя",
+                "text" to "Привет!"
+            )
+
+            userDocRef.collection("messages").add(message)
+                .addOnSuccessListener { documentReference ->
+                    Timber.tag("Firestore").d("Сообщение добавлено с ID: ${documentReference.id}")
+                }
+                .addOnFailureListener { e ->
+                    Timber.tag("Firestore").w(e, "Ошибка добавления сообщения")
+                }
+
+        } else {
+            Timber.tag("Firestore").w("!!! Пользователь не аутентифицирован")
+        }
+
+
+//        val solarSystem = db.collection("solar_system")
+//        // Add a document
+//        solarSystem.add(
+//            mapOf(
+//                "name" to "Mercury",
+//                "number" to 1,
+//                "gravity" to 3.7
+//            )
+//        )
+//        // Add another document
+//        solarSystem.add(
+//            mapOf(
+//                "name" to "Venus",
+//                "number" to 2,
+//                "gravity" to 8.87
+//            )
+//        )
+//
+//        solarSystem.document("PLANET_EARTH")
+//            .set(mapOf(
+//                "name" to "Earth",
+//                "number" to 3,
+//                "gravity" to 9.807
+//            ))
 
         VideoPlayerCacheManager.initialize(this, 1024 * 1024 * 1024)    // 1GB
 
@@ -182,10 +241,18 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
             //b
         }
 
+
+
+
+
         setContent {
             XvideosTheme(darkTheme = true) {
                 Navigator(ScreenTags("blonde"))
             }
         }
+
+
+
+
     }
 }

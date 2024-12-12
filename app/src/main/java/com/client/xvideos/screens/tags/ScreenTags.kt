@@ -1,6 +1,7 @@
 package com.client.xvideos.screens.tags
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,7 +20,7 @@ import com.client.xvideos.screens.item.ScreenItemScreenModel
 import com.client.xvideos.screens.k.ScreenKScreenModel
 import com.client.xvideos.screens.tags.atom.TagsPaginatedListScreen
 
-class ScreenTags(val tag: String): Screen {
+class ScreenTags(val tag: String) : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
 
@@ -32,33 +33,17 @@ class ScreenTags(val tag: String): Screen {
             factory.create(tag)
         }
 
-        Scaffold(modifier = Modifier.fillMaxSize()) {
-
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
-
-                item {
-                    Text(tag)
+        Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
+            Column {
+                Text(tag)
+                Row {
+                    Text(vm.screen.title0 + " ")
+                    Text(vm.screen.title1, color = Color(0xFF787878))
                 }
-                item{
-                    Row {
-                        Text(vm.screen.title0+" ")
-                        Text(vm.screen.title1, color = Color(0xFF787878))
-                    }
-                }
-
-
-                item {
-
-                    TagsPaginatedListScreen(0, vm)
-
-                }
-
-
             }
 
-
-
-
+        }) {
+            TagsPaginatedListScreen(0, vm)
         }
 
 

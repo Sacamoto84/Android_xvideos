@@ -1,13 +1,13 @@
 package com.client.xvideos.screens.tags.parcer
 
+import com.client.xvideos.model.GalleryItem
 import com.client.xvideos.screens.tags.model.ModelScreenTag
-import com.client.xvideos.screens.tags.model.ModelTagItem
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
 fun parserScreenTags(html: String): ModelScreenTag {
 
-    val listItems = mutableListOf<ModelTagItem>()
+    val listItems = mutableListOf<GalleryItem>()
 
     // Парсим HTML-документ
     val document: Document = Jsoup.parse(html)
@@ -26,7 +26,7 @@ fun parserScreenTags(html: String): ModelScreenTag {
         for (video in videos) {
             val titleElement = video.selectFirst("p.title a")
             val title = titleElement?.attr("title") ?: "Без названия"
-            val videoUrl = titleElement?.attr("href") ?: "Нет ссылки"
+            val href = titleElement?.attr("href") ?: "Нет ссылки"
             val duration = video.selectFirst("p.title .duration")?.text() ?: "Нет информации"
 
             val channelName = video.selectFirst("p.metadata .name")?.text() ?: "Нет имени канала"
@@ -34,18 +34,22 @@ fun parserScreenTags(html: String): ModelScreenTag {
             val profileLink = video.selectFirst("p.metadata a")?.attr("href") ?: ""
 
             listItems.add(
-                ModelTagItem(
+                GalleryItem(
                     title = title,
-                    href = videoUrl,
+                    href = href,
                     duration = duration,
                     views = views,
                     nameProfile = channelName,
-                    linkProfile = profileLink
+                    linkProfile = profileLink,
+                    id = 0,
+                    channel = "TODO()",
+                    previewImage = "TODO()",
+                    previewVideo = "TODO()"
                 )
             )
 
             println("Название: $title")
-            println("Ссылка на видео: $videoUrl")
+            println("Ссылка на видео: $href")
             println("Длительность: $duration")
 
             println("Просмотры: $views")

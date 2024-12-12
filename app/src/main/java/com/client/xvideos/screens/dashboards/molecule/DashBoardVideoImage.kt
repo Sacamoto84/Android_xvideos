@@ -25,7 +25,6 @@ import com.client.xvideos.screens.dashboards.atom.DashBoardImage
 import com.client.xvideos.screens.dashboards.atom.DashBoardVideoLite
 import com.client.xvideos.vibrateWithPatternAndAmplitude
 
-
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DashBoardVideoImage(item: GalleryItem, onLongClick : () -> Unit ) {

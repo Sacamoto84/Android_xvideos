@@ -49,7 +49,7 @@ fun DashboardsPaginatedListScreen(pageIndex: Int, vm: ScreenDashBoardsScreenMode
     LaunchedEffect(pageIndex) {
         withContext(Dispatchers.IO) {
             l.clear()
-            l.addAll(openNew(pageIndex).filter { !it.link.contains("THUMBNUM") })
+            l.addAll(openNew(pageIndex).filter { !it.href.contains("THUMBNUM") })
         }
     }
 
@@ -84,7 +84,7 @@ fun DashboardsPaginatedListScreen(pageIndex: Int, vm: ScreenDashBoardsScreenMode
                             .padding(1.dp)
                             .background(Color.DarkGray)
                     ) {
-                        DashBoardVideoImage(cell, onLongClick = {vm.openItem(urlStart + cell.link, navigator)})
+                        DashBoardVideoImage(cell, onLongClick = {vm.openItem(urlStart + cell.href, navigator)})
                     }
                 }
                 // Если элементов в строке меньше, чем itemsPerRow, добавляем пустые ячейки

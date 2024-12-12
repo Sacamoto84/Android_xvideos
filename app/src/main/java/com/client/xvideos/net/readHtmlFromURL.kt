@@ -1,12 +1,9 @@
 package com.client.xvideos.net
 
-
 import android.util.LruCache
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.HttpTimeout
-import io.ktor.client.plugins.logging.LogLevel
-import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
@@ -16,9 +13,9 @@ private val lruCacheHTML: LruCache<String, String> = LruCache<String, String>(10
 
 private val client = HttpClient(OkHttp)//(OkHttp)
 {
-    install(Logging) {
-        level = LogLevel.INFO
-    }
+//    install(Logging) {
+//        level = LogLevel.INFO
+//    }
 
     install(HttpTimeout)
     {
