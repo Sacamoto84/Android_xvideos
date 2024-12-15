@@ -11,42 +11,40 @@ import timber.log.Timber
 
 private val lruCacheHTML: LruCache<String, String> = LruCache<String, String>(1000)
 
-private val client = HttpClient(OkHttp)//(OkHttp)
-{
-    install(HttpTimeout)
-    {
-        requestTimeoutMillis = Long.MAX_VALUE
-    }
-}
-
 suspend fun readHtmlFromURL(url: String = "https://www.xvideos.com"): String {
 
     Timber.i("!!!..readHtmlFromURL $url ")
 
+    val client = HttpClient(OkHttp)
+    {
+        install(HttpTimeout)
+        {
+            requestTimeoutMillis = Long.MAX_VALUE
+        }
+    }
+
     //Если есть в кеше возвращает содержимое
     if (lruCacheHTML.get(url) != null) {
-        Timber.i("!!! В кеше есть данные")
+        Timber.i("!!! readHtmlFromURL: В LRU кеше есть данные")
         return lruCacheHTML.get(url)
     }
 
-    Timber.i("!!! В кеше нет данных")
+    Timber.i("!!!  readHtmlFromURL: В LRU кеше нет данных")
+
+    //Если нет в кеше запрашиваем данные
     lateinit var response: HttpResponse
     try {
         response = client.get(url)
-        //println(response.toString())
         val body = response.bodyAsText()
-
-        if (lruCacheHTML.get(url) == null) {
-            lruCacheHTML.put(url, body)
-        }
-
+        lruCacheHTML.put(url, body)
         return body
     } catch (e: Exception) {
-        Timber.e("Ошибка " + e.message)
+        Timber.e("!!! readHtmlFromURL: Ошибка " + e.message)
+    } finally {
+        client.close()
     }
 
-    //Сохраним в кеш данный html
-    //client.close()
+
     return ""
 
 

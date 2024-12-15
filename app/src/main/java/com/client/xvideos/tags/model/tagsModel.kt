@@ -1,6 +1,5 @@
 package com.client.xvideos.tags.model
 
-
 //<li class="main-uploader">
 //<a class="btn btn-default label main uploader-tag hover-name" href="/milfed">
 //<span class="name">
@@ -13,7 +12,6 @@ package com.client.xvideos.tags.model
 //</a>
 //</li>
 
-
 data class TagsMainUploaderPornstar(val href: String, val name: String, val count: String)
 
 //<li class="model">
@@ -25,7 +23,6 @@ data class TagsMainUploaderPornstar(val href: String, val name: String, val coun
 //</span>
 //</a>
 //</li>
-
 
 data class TagsModel(
     val mainUploader: List<TagsMainUploaderPornstar>,
