@@ -3,6 +3,7 @@ package com.client.xvideos
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.core.view.WindowCompat
 import cafe.adriel.voyager.navigator.Navigator
 import coil.ImageLoader
 import coil.ImageLoaderFactory
@@ -54,6 +55,8 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //enableEdgeToEdge()
+
+        WindowCompat.setDecorFitsSystemWindows(window, false) // Поддержка WindowInsets
 
         plant(DebugTree())
 
