@@ -3,10 +3,9 @@ package com.client.xvideos.screens.item
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.focusModifier
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
@@ -38,17 +37,17 @@ class ScreenItem(val url: String) : Screen {
 //                model = vm.a.value?.thumbUrl169,
 //                contentDescription = null,
 //            )
-            Divider()
+            HorizontalDivider()
 //            AsyncImage(
 //                model = vm.a.value?.thumbUrl,
 //                contentDescription = null,
 //            )
-            Divider()
+            HorizontalDivider()
 //            AsyncImage(
 //                model = vm.a.value?.thumbSlide,
 //                contentDescription = null,
 //            )
-            Divider()
+            HorizontalDivider()
 //            AsyncImage(
 //                model = vm.a.value?.thumbSlideBig,
 //                contentDescription = null,

@@ -19,8 +19,7 @@ fun buildMediaSource(
     defaultHttpDataSourceFactory: DefaultHttpDataSource.Factory,
     overrideExtension: String?,
 ): MediaSource {
-    val type = Util.inferContentType(uri, overrideExtension)
-    return when (type) {
+    return when (val type = Util.inferContentType(uri, overrideExtension)) {
         C.CONTENT_TYPE_DASH -> DashMediaSource.Factory(defaultHttpDataSourceFactory)
             .createMediaSource(MediaItem.fromUri(uri))
 

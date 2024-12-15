@@ -13,10 +13,6 @@ private val lruCacheHTML: LruCache<String, String> = LruCache<String, String>(10
 
 private val client = HttpClient(OkHttp)//(OkHttp)
 {
-//    install(Logging) {
-//        level = LogLevel.INFO
-//    }
-
     install(HttpTimeout)
     {
         requestTimeoutMillis = Long.MAX_VALUE

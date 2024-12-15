@@ -16,11 +16,9 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.client.xvideos.screens.item.ScreenItemScreenModel
-import com.client.xvideos.screens.k.ScreenKScreenModel
 import com.client.xvideos.screens.tags.atom.TagsPaginatedListScreen
 
-class ScreenTags(val tag: String) : Screen {
+class ScreenTags(private val tag: String) : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
 

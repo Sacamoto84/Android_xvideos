@@ -17,7 +17,6 @@ fun parserItemVideoTags(html: String): TagsModel {
 
     val document1 = Jsoup.parse(html)
 
-
     val listMain = mutableListOf<TagsMainUploaderPornstar>()
     val uploader = document1.select("li.main-uploader")
     uploader.forEach {
