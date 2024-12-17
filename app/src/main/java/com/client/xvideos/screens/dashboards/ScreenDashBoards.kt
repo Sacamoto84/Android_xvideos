@@ -16,11 +16,18 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.client.xvideos.screens.common.bottomKeyboard.BottomListDashBoardNavigationButtons
+import com.client.xvideos.screens.common.bottomKeyboard.BottomListDashBoardNavigationButtons2
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class ScreenDashBoards : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
 
+    @OptIn(DelicateCoroutinesApi::class)
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -29,10 +36,27 @@ class ScreenDashBoards : Screen {
         //val pagerState = rememberPagerState(1) { 20000 }
         // ...
         Scaffold(
-            bottomBar = { ScreenDashBoardsBottomNavigationButtons(vm) },
+            bottomBar = {
+
+                //ScreenDashBoardsBottomNavigationButtons(vm)
+
+
+                BottomListDashBoardNavigationButtons2(
+                    vm.pagerState.currentPage,
+                    onChange = {
+                        GlobalScope.launch(Dispatchers.Main) {
+                            vm.pagerState.scrollToPage((it).coerceAtLeast(1))
+                        }
+
+                    },
+                    max = vm.pagerState.pageCount,
+                )
+
+
+            },
             modifier = Modifier.fillMaxSize(),
             containerColor = Color.Black,
-            ) { innerPadding ->
+        ) { innerPadding ->
 
             HorizontalPager(
                 state = vm.pagerState,
