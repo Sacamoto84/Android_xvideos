@@ -15,10 +15,10 @@
       </SelectionState>
       <SelectionState runConfigName="ScreenDashBoardsBottomNavigationButtonsPreview">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2024-12-15T15:16:38.876139200Z">
+        <DropdownSelection timestamp="2024-12-17T06:08:28.007403500Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\user\.android\avd\Pixel_8_API_34.avd" />
+              <DeviceId pluginId="PhysicalDevice" identifier="serial=G6UOHMKV9XROGILJ" />
             </handle>
           </Target>
         </DropdownSelection>

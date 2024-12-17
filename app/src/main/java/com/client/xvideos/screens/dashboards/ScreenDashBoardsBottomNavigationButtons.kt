@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,6 +21,7 @@ import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.KeyboardOptions
@@ -53,6 +55,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.client.xvideos.screens.common.bottomKeyboard.KeyboardNumber
 import com.composables.core.Menu
 import com.composables.core.MenuButton
 import com.composables.core.MenuContent
@@ -394,10 +397,13 @@ private fun MenuDot(modifier: Modifier = Modifier, value: Int, onChange: (Int) -
 
         Menu(
             modifier = Modifier
-                .align(Alignment.TopCenter)
-                .width(240.dp),
+                //.align(Alignment.TopCenter)
+                //.width(240.dp)
+            ,
             state = state
         ) {
+
+
 
             MenuButton(
                 Modifier.fillMaxSize().background(colorBlackBackground)
@@ -415,24 +421,23 @@ private fun MenuDot(modifier: Modifier = Modifier, value: Int, onChange: (Int) -
 
             MenuContent(
                 modifier = Modifier
-                    .padding(horizontal = 8.dp)
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(6.dp))
-                    .border(1.dp, Color(0xFFE0E0E0), RoundedCornerShape(6.dp))
-                    .background(colorBlackBackground),
+                    //.padding(horizontal = 8.dp)
+                    .padding(bottom = 8.dp)
+                    //.width(314.dp)
+                    .clip(RoundedCornerShape(24.dp))
+                    .background(Color(0xFF23242A)),
                 // exit = fadeOut()
                 //, enter = fadeIn()
             ) {
 
-                Row(modifier = Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.Center) {
-
-
+                Box(modifier = Modifier.wrapContentWidth()
+                    //.fillMaxWidth()
+                    //.padding(start = 8.dp, top = 16.dp)
+                    , contentAlignment = Alignment.Center
+                    ) {
 
                     //Клавиатура возвращает число
                     KeyboardNumber(value, { onChange.invoke(it); state.expanded = false }, max = max)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("of $max", color = colorTextWhite, fontSize = 24.sp)
-
                 }
 
 //                    MenuItem(
@@ -451,108 +456,4 @@ private fun MenuDot(modifier: Modifier = Modifier, value: Int, onChange: (Int) -
         }
     }
 
-}
-
-
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-private fun KeyboardNumber(value: Int, onClick: (Int) -> Unit, max: Int) {
-
-    var textFieldValue by remember {
-        mutableStateOf(TextFieldValue(value.toString(), TextRange(value.toString().length)))
-    }
-
-    Column {
-
-        Box(
-            modifier = Modifier
-                .height(48.dp)
-                .width(48.dp * 4 + 2.dp)
-                .border(1.dp, Color.Gray),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                textFieldValue.text,
-                color = Color.White,
-                textAlign = TextAlign.Center,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
-
-        Row(modifier = Modifier.padding(bottom = 8.dp)) {
-
-            ButtonNumber("1", w =  48.dp, h = 48.dp * 4 + 1.dp + 1.dp, onClick =  { textFieldValue = TextFieldValue("1", TextRange(1)) })
-
-            FlowRow(maxItemsInEachRow = 3) {
-                ButtonNumber("7", onClick =  { textFieldValue = addCharToTextField(textFieldValue, "7") })
-                ButtonNumber("8", onClick = { textFieldValue = addCharToTextField(textFieldValue, "8") })
-                ButtonNumber("9", onClick = { textFieldValue = addCharToTextField(textFieldValue, "7") })
-
-                ButtonNumber("4",onClick =  { textFieldValue = addCharToTextField(textFieldValue, "4") })
-                ButtonNumber("5", onClick = { textFieldValue = addCharToTextField(textFieldValue, "5") })
-                ButtonNumber("6", onClick = { textFieldValue = addCharToTextField(textFieldValue, "6") })
-
-                ButtonNumber("1", onClick = { textFieldValue = addCharToTextField(textFieldValue, "1") })
-                ButtonNumber("2", onClick = { textFieldValue = addCharToTextField(textFieldValue, "2") })
-                ButtonNumber("3", onClick = { textFieldValue = addCharToTextField(textFieldValue, "3") })
-
-                ButtonNumber("C", onClick = { textFieldValue = TextFieldValue("", TextRange(0)) })
-                ButtonNumber("0",onClick =  { textFieldValue = addCharToTextField(textFieldValue, "0") })
-                ButtonNumber("<-", onClick = {
-                    val newText = textFieldValue.text.dropLast(1)
-                    val newCursorPosition = newText.length
-                    textFieldValue = TextFieldValue(newText, TextRange(newCursorPosition))
-                })
-            }
-
-            Box(
-                modifier = Modifier
-                    .padding(top = 0.25.dp)
-                    .width(48.dp)
-                    .height(48.dp * 4 + 1.dp + 1.dp)
-                    .border(1.dp, Color.Gray)
-                    .clickable {
-                        val a = textFieldValue.text.toIntOrNull()
-                        if (a != null) {
-                            try {
-                                val i = a
-                                    .toInt()
-                                    .coerceIn(1, max)
-                                onClick.invoke(i)
-                            } catch (e: Exception) {
-                                Timber.e(e.localizedMessage)
-                            }
-                        }
-
-
-                    },
-                contentAlignment = Alignment.Center
-            ) {
-                Text("E", color = Color.White, fontSize = 24.sp)
-            }
-        }
-    }
-
-}
-
-private fun addCharToTextField(textFieldValue: TextFieldValue, char: String): TextFieldValue {
-    val newText = textFieldValue.text + char
-    val newCursorPosition = newText.length  // Курсор перемещаем в конец текста
-    return TextFieldValue(newText, TextRange(newCursorPosition))
-}
-
-@Composable
-private fun ButtonNumber(text: String, w : Dp = 48.dp, h: Dp = 48.dp, onClick: () -> Unit) {
-    Box(
-        modifier = Modifier
-            .padding(0.25.dp)
-            .width(w)
-            .height(h)
-            .border(1.dp, Color.Gray)
-            .clickable { onClick.invoke() },
-        contentAlignment = Alignment.Center
-    ) {
-        Text(text, color = Color.White, fontSize = 24.sp)
-    }
 }
