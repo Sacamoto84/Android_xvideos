@@ -28,122 +28,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.client.xvideos.screens.dashboards.ScreenDashBoardsScreenModel
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-
-@OptIn(DelicateCoroutinesApi::class)
-@Composable
-fun ScreenDashBoardsBottomNavigationButtons(vm: ScreenDashBoardsScreenModel) {
-
-    val currentNumberScreen = vm.pagerState.currentPage
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-
-        Box(
-            modifier = Modifier
-                .padding(horizontal = (0.5).dp)
-                .weight(1f)
-                .height(48.dp)
-                .background(
-                    if (currentNumberScreen == 1)
-                        Color(0xFF2c2c2c)
-                    else
-                        Color(0xFFFF9000)
-                )
-                .clickable {
-                    GlobalScope.launch(Dispatchers.Main) {
-                        vm.pagerState.scrollToPage((vm.pagerState.currentPage - 1).coerceAtLeast(1))
-                    }
-                    //vm.openNew(currentNumberScreen - 1)
-                }, contentAlignment = Alignment.Center
-        ) {
-            Text(
-                "<",
-                color = if (currentNumberScreen == 1) Color.DarkGray else Color.Black,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
-
-        repeat(10) {
-
-            Box(
-                modifier = Modifier
-                    .padding(horizontal = (0.5).dp)
-                    .weight(1f)
-                    .height(48.dp)
-                    .border(
-                        2.dp,
-                        Color(if (vm.pagerState.currentPage == it + 1) 0xFFFF9900 else 0x000000)
-                    )
-                    .background(
-                        colorBlackBackground
-                    )
-                    .clickable {
-
-                        //vm.openNew(it + 1)
-                        GlobalScope.launch(Dispatchers.Main) {
-                            vm.pagerState.scrollToPage((it + 1).coerceAtLeast(1))
-                        }
-
-                    },
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = (it + 1).toString(),
-                    color = Color(0xFFCCCCCC),
-                    textAlign = TextAlign.Center
-                )
-            }
-        }
-
-
-        Box(
-            modifier = Modifier
-                .padding(horizontal = (0.5).dp)
-                .weight(1f)
-                .height(48.dp)
-                .background(
-                    if (currentNumberScreen == 20000)
-                        Color(0xFF2c2c2c)
-                    else
-                        Color(0xFFFF9000)
-                )
-                .clickable {
-                    GlobalScope.launch(Dispatchers.Main) {
-                        vm.pagerState.scrollToPage(
-                            (vm.pagerState.currentPage + 1).coerceIn(
-                                1, 20000
-                            )
-                        )
-                    }
-                }, contentAlignment = Alignment.Center
-        ) {
-            Text(
-                ">",
-                color = if (currentNumberScreen == 20000) Color.DarkGray else Color.Black,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
-
-
-    }
-
-
-}
-
 
 @Preview
 @Composable
@@ -161,7 +52,7 @@ fun ScreenDashBoardsBottomNavigationButtonsPreview() {
 
         Text(value.toString(), fontSize = 32.sp)
 
-        BottomListDashBoardNavigationButtons(value, {
+        BottomListDashBoardNavigationButtons2(value, {
             value = it
             println("!!! $it")
         }, 20000)
@@ -187,140 +78,17 @@ private val height = 48.dp
  * max - Максимальный индекс экрана
  * onChange - Функция вызывается при изменении экрана и передается номер экрана
  */
-@OptIn(DelicateCoroutinesApi::class)
-@Composable
-fun BottomListDashBoardNavigationButtons(value: Int, onChange: (Int) -> Unit, max: Int) {
-
-    var wStart by remember { mutableIntStateOf(1) }
-    var wEnd by remember { mutableIntStateOf(if (max > 9) 9 else max) }
-
-    val wWindowDx by remember { mutableIntStateOf(wEnd - wStart + 1) }
-
-    var wIndex by remember { mutableIntStateOf(wStart) }
-
-
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-
-        ///////////////////////////////
-        Box(
-            modifier = Modifier
-                .padding(horizontal = (0.5).dp)
-                .weight(1f)
-                .height(height)
-                .background(
-                    if (value == 1) colorTextBlack else colorAccent
-                )
-                .clickable {
-                    GlobalScope.launch(Dispatchers.Main) {
-                        onChange.invoke((value - 1).coerceAtLeast(1))
-                    }
-                }, contentAlignment = Alignment.Center
-        ) {
-            Text(
-                "<",
-                color = if (value == 1) Color.DarkGray else Color.Black,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
-        ///////////////////////////////
-
-        println("!!! wStart:$wStart  wEnd:$wEnd wIndex:$wIndex wDx:$wWindowDx")
-
-
-//        for(i in  wStart .. wEnd) {
-//            Box(
-//                modifier = Modifier
-//                    .padding(horizontal = (0.5).dp)
-//                    .weight(1f)
-//                    .height(height)
-//                    .border(
-//                        2.dp,
-//                        Color(if (value == i) 0xFFFF9900 else 0x000000)
-//                    )
-//                    .background(colorBlackBackground)
-//                    .clickable {
-//                        wIndex = i
-//
-//                        if(i > wEnd) {
-//                            wEnd = i
-//                            wStart = i - wWindowDx
-//                        }
-//
-//                        GlobalScope.launch(Dispatchers.Main) {
-//                            onChange.invoke((i).coerceAtLeast(1))
-//                        }
-//                    },
-//                contentAlignment = Alignment.Center
-//            ) {
-//
-//                Text(
-//                    text = (i).toString(),
-//                    color = colorTextWhite,
-//                    textAlign = TextAlign.Center
-//                )
-//
-//            }
-//        }
-
-        MenuDot(
-            modifier = Modifier.weight(1f),
-            value,
-            onChange = { onChange.invoke(it) },
-            max = max
-        )
-
-        ///////////////////////////////
-        Box(
-            modifier = Modifier
-                .padding(horizontal = (0.5).dp)
-                .weight(1f)
-                .height(height)
-                .background(if (value >= max) colorTextBlack else colorAccent)
-                .clickable {
-                    GlobalScope.launch(Dispatchers.Main) {
-                        wIndex = value + 1
-                        onChange.invoke((wIndex).coerceIn(1, max))
-                        if (wIndex >= wEnd) {
-                            wEnd = wIndex
-                            wStart = wIndex - wWindowDx + 1
-                        }
-                    }
-                }, contentAlignment = Alignment.Center
-        ) {
-            Text(
-                ">",
-                color = if (value == max) Color.DarkGray else Color.Black,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
-
-
-    }
-
-
-}
-
-@OptIn(DelicateCoroutinesApi::class)
 @Composable
 fun BottomListDashBoardNavigationButtons2(value: Int, onChange: (Int) -> Unit, max: Int) {
 
     val list = remember { List(max) { it + 1 } }
 
     val state = rememberLazyListState()
-
     LaunchedEffect(value) {
-        val indexToScroll = value// Индекс, к которому нужно прокрутить
+        val indexToScroll = value + 1// Индекс, к которому нужно прокрутить
         val offset = calculateCenterOffset(state, indexToScroll)
         state.animateScrollToItem(index = indexToScroll, scrollOffset = -offset)
     }
-
 
     Row(
         modifier = Modifier
@@ -336,15 +104,15 @@ fun BottomListDashBoardNavigationButtons2(value: Int, onChange: (Int) -> Unit, m
                 .width(height)
                 .height(height)
                 .background(
-                    if (value == 1) colorTextBlack else colorAccent
+                    if (value == 0) colorTextBlack else colorAccent
                 )
                 .clickable {
-                    onChange.invoke((value - 1).coerceAtLeast(1))
+                    onChange.invoke((value - 1).coerceAtLeast(0))
                 }, contentAlignment = Alignment.Center
         ) {
             Text(
                 "<",
-                color = if (value == 1) Color.DarkGray else Color.Black,
+                color = if (value == 0) Color.DarkGray else Color.Black,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -366,11 +134,11 @@ fun BottomListDashBoardNavigationButtons2(value: Int, onChange: (Int) -> Unit, m
                         .height(height)
                         .border(
                             2.dp,
-                            Color(if (value == it) 0xFFFF9900 else 0x000000)
+                            Color(if (value == it - 1) 0xFFFF9900 else 0x000000)
                         )
                         .background(colorBlackBackground)
                         .clickable {
-                            onChange.invoke((it).coerceAtLeast(1))
+                            onChange.invoke((it - 1).coerceAtLeast(0))
                         }, contentAlignment = Alignment.Center
                 ) {
                     Text("$it", color = colorTextWhite)
@@ -381,8 +149,8 @@ fun BottomListDashBoardNavigationButtons2(value: Int, onChange: (Int) -> Unit, m
 
         MenuDot(
             modifier = Modifier.size(48.dp),
-            value,
-            onChange = { onChange.invoke(it) },
+            (value+1).coerceAtLeast(0),
+            onChange = { onChange.invoke((it - 1).coerceAtLeast(0)) },
             max = max
         )
 
@@ -393,24 +161,19 @@ fun BottomListDashBoardNavigationButtons2(value: Int, onChange: (Int) -> Unit, m
                 //.weight(1f)
                 .width(height)
                 .height(height)
-                .background(if (value >= max) colorTextBlack else colorAccent)
+                .background(if (value >= max-1) colorTextBlack else colorAccent)
                 .clickable {
-                    //GlobalScope.launch(Dispatchers.Main) {
-                    onChange.invoke((value + 1).coerceIn(1, max))
-                    //}
+                    onChange.invoke((value + 1).coerceIn(0, max))
                 }, contentAlignment = Alignment.Center
         ) {
             Text(
                 ">",
-                color = if (value == max) Color.DarkGray else Color.Black,
+                color = if (value >= (max-1)) Color.DarkGray else Color.Black,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
             )
         }
-
-
     }
-
 }
 
 // Функция для вычисления смещения, чтобы элемент был в центре экрана

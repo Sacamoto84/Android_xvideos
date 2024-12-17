@@ -16,7 +16,7 @@ class ScreenDashBoardsScreenModel @Inject constructor(
 
 ): ScreenModel{
 
-    val pagerState: PagerState = PagerState(1){20000}
+    val pagerState: PagerState = PagerState(0){20000}
 
     fun openItem(url : String,  navigator: Navigator){
         navigator.push(ScreenItem(url))

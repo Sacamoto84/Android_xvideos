@@ -37,18 +37,18 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
                     .maxSizePercent(0.25)
                     .build()
             }
-            .diskCache {
-                DiskCache.Builder()
-                    .directory(cacheDir.resolve("image_cache"))
-                    .maxSizeBytes(1000 * 1024 * 1024)
-                    .build()
-            }
+//            .diskCache {
+//                DiskCache.Builder()
+//                    .directory(cacheDir.resolve("image_cache"))
+//                    .maxSizeBytes(1000 * 1024 * 1024)
+//                    .build()
+//            }
             .respectCacheHeaders(false)
             .allowHardware(true)
             .allowRgb565(true)
             .interceptorDispatcher(Dispatchers.IO)
             .memoryCachePolicy(CachePolicy.ENABLED)
-            .diskCachePolicy(CachePolicy.ENABLED)
+            //.diskCachePolicy(CachePolicy.ENABLED)
             .dispatcher(Dispatchers.IO)
             .bitmapFactoryMaxParallelism(8)
             .build()
@@ -58,15 +58,15 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
         super.onCreate(savedInstanceState)
         //enableEdgeToEdge()
 
-        WindowCompat.setDecorFitsSystemWindows(window, false) // Поддержка WindowInsets
+        //WindowCompat.setDecorFitsSystemWindows(window, false) // Поддержка WindowInsets
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            // Код для SDK 30 и выше
-            window.insetsController?.apply {
-                // Отключаем системные жесты с боковых сторон
-                systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-            }
-        }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+//            // Код для SDK 30 и выше
+//            window.insetsController?.apply {
+//                // Отключаем системные жесты с боковых сторон
+//                systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+//            }
+//        }
 
 
         plant(DebugTree())

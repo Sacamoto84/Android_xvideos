@@ -21,7 +21,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -32,17 +31,19 @@ import com.client.xvideos.screens.dashboards.molecule.DashBoardVideoImage
 import com.client.xvideos.urlStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 private suspend fun openNew(numberScreen: Int = 0): SnapshotStateList<GalleryItem> {
-    val currentNumberScreen = numberScreen.coerceIn(1, 19999)
-    val url = urlStart + if (currentNumberScreen == 1) "" else "/new/${currentNumberScreen - 1}"
+    val currentNumberScreen = numberScreen.coerceIn(0, 19999)
+    val url = urlStart + if (currentNumberScreen == 0) "" else "/new/${currentNumberScreen}"
+    Timber.i("!!! openNew numberScreen:$numberScreen url:$url")
     return parserListVideo(readHtmlFromURL(url)).toMutableStateList()
 }
 
 @Composable
 fun DashboardsPaginatedListScreen(pageIndex: Int, vm: ScreenDashBoardsScreenModel) {
 
-    val context = LocalContext.current
+    println("!!! DashboardsPaginatedListScreen pageIndex:$pageIndex")
 
     val l = remember { mutableStateListOf<GalleryItem>() }
 
@@ -53,15 +54,7 @@ fun DashboardsPaginatedListScreen(pageIndex: Int, vm: ScreenDashBoardsScreenMode
         }
     }
 
-
     val navigator = LocalNavigator.currentOrThrow
-
-    //val items = remember { mutableStateListOf<Int>() }
-    //val listState = rememberLazyListState()
-    //var isLoading by remember { mutableStateOf(false) }
-    //val coroutineScope = rememberCoroutineScope()
-
-    val numberOfPages = 3 // Количество страниц (списков)
 
     val itemsPerRow =
         if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE) 4 else 2
@@ -70,13 +63,12 @@ fun DashboardsPaginatedListScreen(pageIndex: Int, vm: ScreenDashBoardsScreenMode
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
         items(l.chunked(itemsPerRow))
         { row ->
 
             Row(modifier = Modifier.fillMaxWidth()) {
 
-                row.forEachIndexed { index, cell ->
+                row.forEachIndexed { _, cell ->
                     Box(
                         modifier = Modifier
                             .weight(1f)
@@ -94,69 +86,6 @@ fun DashboardsPaginatedListScreen(pageIndex: Int, vm: ScreenDashBoardsScreenMode
                     }
                 }
             }
-
-
         }
-
-
     }
-
-
-//    LazyColumn(
-//        state = listState,
-//        modifier = Modifier.fillMaxSize()
-//    ) {
-//
-//        items(items.size) { index ->
-//            Text(
-//                text = "Item $index in List $pageIndex",
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .padding(16.dp), color = Color.White
-//            )
-//        }
-//
-//        // Показ индикатора загрузки внизу списка
-//        if (isLoading) {
-//            item {
-//                CircularProgressIndicator(
-//                    modifier = Modifier
-//                        .padding(16.dp)
-//                        //.align(Alignment.CenterHorizontally)
-//                )
-//            }
-//        }
-//    }
-
-//    // Проверка, если пользователь дошел до конца списка
-//    LaunchedEffect(listState) {
-//
-//        snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
-//            .collect { lastVisibleItemIndex ->
-//                if (lastVisibleItemIndex == items.size - 1 && !isLoading) {
-//                    coroutineScope.launch {
-//                        isLoading = true
-//                        loadMoreItems(items)
-//                        isLoading = false
-//                    }
-//                }
-//            }
-//
-//    }
-
-
-//    LaunchedEffect(Unit) {
-//        l.clear()
-//        l = openNew(pageIndex)
-//        l = openNew(pageIndex)
-//    }
-
-}
-
-
-suspend fun loadMoreItems(items: MutableList<Int>, batchSize: Int = 20) {
-    //delay(1000) // Имитация задержки для загрузки данных
-    val start = items.size
-    val end = start + batchSize
-    items.addAll((start until end).toList())
 }
