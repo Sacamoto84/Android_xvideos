@@ -30,7 +30,7 @@ class ScreenItem(val url: String) : Screen {
             //Отобразить теги
             ComposeTags(vm.tags, onClick = {vm.openTag(it, navigator)})
 
-            ZoomableVideoPlayer(videoUri = vm.passedString, Modifier.weight(1f))
+            ZoomableVideoPlayer(vm, videoUri = vm.passedString, Modifier.weight(1f))
 
         }
 

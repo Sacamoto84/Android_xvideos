@@ -4,26 +4,34 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.pm.ActivityInfo.SCREEN_ORIENTATION_USER
 import androidx.annotation.OptIn
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.MimeTypes
 import androidx.media3.common.Player
+import androidx.media3.common.Tracks
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.analytics.AnalyticsListener
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
+import com.client.xvideos.screens.item.ScreenItemScreenModel
 import com.client.xvideos.video.RepeatMode
 import com.client.xvideos.video.VideoPlayer
 import com.client.xvideos.video.controller.VideoPlayerControllerConfig
@@ -33,23 +41,13 @@ import java.util.concurrent.TimeUnit
 
 @OptIn(UnstableApi::class)
 @Composable
-fun ZoomableVideoPlayer(videoUri: String, modifier: Modifier = Modifier) {
+fun ZoomableVideoPlayer(
+    vm: ScreenItemScreenModel,
+    videoUri: String,
+    modifier: Modifier = Modifier,
+) {
 
     Timber.i("!!! ZoomableVideoPlayer url:$videoUri")
-
-    /**
-     * Общая продолжительность видео
-     */
-    var totalDuration by remember { mutableLongStateOf(0L) }
-
-    /**
-     * Текущее время видео
-     */
-    var currentTime by remember { mutableLongStateOf(0L) }
-
-    var bufferedPercentage by remember { mutableIntStateOf(0) }
-
-    var isPlaying by remember { mutableStateOf(false) }
 
     var playbackState by remember { mutableIntStateOf(0) }
 
@@ -59,8 +57,8 @@ fun ZoomableVideoPlayer(videoUri: String, modifier: Modifier = Modifier) {
     activity.requestedOrientation = SCREEN_ORIENTATION_USER
 
     val context = LocalContext.current
-    val trackSelector = DefaultTrackSelector(context)
 
+    val trackSelector = remember { DefaultTrackSelector(context) }
 
     Column(
         modifier = Modifier
@@ -73,6 +71,7 @@ fun ZoomableVideoPlayer(videoUri: String, modifier: Modifier = Modifier) {
 
 
         VideoPlayer(
+            trackSelector = trackSelector,
             mediaItems = listOf(
                 VideoPlayerMediaItem.NetworkMediaItem(
                     url = videoUri,
@@ -107,53 +106,74 @@ fun ZoomableVideoPlayer(videoUri: String, modifier: Modifier = Modifier) {
                 //currentTime = it
             },
             playerInstance = { // ExoPlayer instance (Experimental)
+
+                addListener(
+
+                    object : Player.Listener {
+                        override fun onTracksChanged(tracks: Tracks) {
+                            // Update UI using current tracks.
+                            if (tracks.groups.size == 0) return
+
+                            Timber.i("!!! onTracksChanged " + tracks.groups[0])
+
+                            vm.listFormat.clear()
+
+                            val group = tracks.groups[0]
+                            for (j in 0 until group.length) {
+                                val format = group.getTrackFormat(j)
+
+
+                                vm.listFormat.add(
+                                    ScreenItemScreenModel.FORMAT(
+                                        id = j,
+                                        width = format.width,
+                                        height = format.height,
+                                        bitrate = format.bitrate,
+                                        isSelect = group.isTrackSelected(j)
+                                    )
+                                )
+                                Timber.d("!!! Group: 0, Format: $j, Resolution: ${format.width}x${format.height}, Bitrate: ${format.bitrate}")
+                            }
+
+                        }
+                    }
+
+                )
+
                 addAnalyticsListener(
                     object : AnalyticsListener {
 
                         @OptIn(UnstableApi::class)
                         override fun onEvents(player: Player, events: AnalyticsListener.Events) {
                             super.onEvents(player, events)
-                            totalDuration = player.duration.coerceAtLeast(0L)
-                            currentTime = player.currentPosition.coerceAtLeast(0L)
-                            bufferedPercentage = player.bufferedPercentage
-                            isPlaying = player.isPlaying
+                            vm.totalDuration = player.duration.coerceAtLeast(0L)
+                            vm.currentTime = player.currentPosition.coerceAtLeast(0L)
+                            vm.bufferedPercentage = player.bufferedPercentage
+                            vm.isPlaying = player.isPlaying
                             playbackState = player.playbackState
                             playerE.value = player
-
-
-
-
-
 
 //                            val override1 = DefaultTrackSelector.SelectionOverride(0, 1) // Группа 0, Трек 1 (пример)
 //                            val trackSelectorParameters = trackSelector.buildUponParameters()
 //                                .setSelectionOverride(0, trackGroups[0], override1)
 //                                .build()
 
-                           val a = playerE.value?.playbackParameters
+                            val a = playerE.value?.playbackParameters
                             a
-
-                            //trackSelector.setParameters(trackSelectorParameters)
-
-
-
                         }
 
                     }
+
                 )
             },
             modifier = Modifier
                 .weight(1f)
-
-
 //                    .graphicsLayer(
 //                        scaleX = scale,
 //                        scaleY = scale,
 //                        translationX = offset.x,
 //                        translationY = offset.y
 //                    )
-
-
                 .fillMaxWidth()
         )
 
@@ -163,12 +183,12 @@ fun ZoomableVideoPlayer(videoUri: String, modifier: Modifier = Modifier) {
             //Блок кнопок
             ItemPlayerBottomControl(
                 modifier = Modifier,
-                totalDuration = { totalDuration },
-                bufferedPercentage = { bufferedPercentage },
-                currentTime = { currentTime },
+                totalDuration = { vm.totalDuration },
+                bufferedPercentage = { vm.bufferedPercentage },
+                currentTime = { vm.currentTime },
                 onSeekChanged = { timeMs: Float ->
                     //playerE?.pause()
-                    currentTime = timeMs.toLong()
+                    vm.currentTime = timeMs.toLong()
                     Timber.i("!!! onSeekChanged  ${timeMs.toLong()}")
                 },
                 onValueChangedFinished = {
@@ -177,10 +197,20 @@ fun ZoomableVideoPlayer(videoUri: String, modifier: Modifier = Modifier) {
                     //playerE?.playWhenReady = true
                 },
 
-                isPlaying = { isPlaying },
-                onPlayClick = { if (isPlaying) playerE.value?.pause() else playerE.value?.play() },
-                player = playerE.value
+                isPlaying = { vm.isPlaying },
+                onPlayClick = { if (vm.isPlaying) playerE.value?.pause() else playerE.value?.play() },
+                player = playerE.value,
             )
+        }
+
+        LazyColumn {
+            items(vm.listFormat) {
+                Box(
+                    modifier = Modifier
+                        .border(1.dp, Color.Black)
+                        .clickable { playerE.value?.let { it1 -> vm.switchTrack(it1, 0, it.id) } })
+                { Text(it.width.toString() + " select:" + it.isSelect) }
+            }
         }
 
 

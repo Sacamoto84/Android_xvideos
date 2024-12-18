@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
 import androidx.compose.material.Slider
 import androidx.compose.material.SliderDefaults
+import androidx.compose.material3.Button
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Text
@@ -32,8 +33,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.Player
+import androidx.media3.common.TrackSelectionOverride
 import androidx.media3.common.util.UnstableApi
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import com.client.xvideos.R
+import com.google.common.collect.ImmutableList
 import timber.log.Timber
 
 
@@ -53,6 +58,9 @@ fun ItemPlayerBottomControl(
     onPlayClick: () -> Unit,
     player: Player?,
 ) {
+
+    val list = remember { mutableListOf<String>() }
+
 
     var isDragging by remember { mutableStateOf(false) }   // Флаг перетаскивания
 
@@ -75,26 +83,35 @@ fun ItemPlayerBottomControl(
 
 
 
-    val trackGroups = player?.currentTracks?.groups
-    Timber.d("!!! --------------")
-    if (trackGroups != null) {
-
-        if (trackGroups.size > 0) {
-            val group = trackGroups[0]
-            for (j in 0 until group.length) {
-                val format = group.getTrackFormat(j)
-                Timber.d("!!! Group: 0, Format: $j, Resolution: ${format.width}x${format.height}, Bitrate: ${format.bitrate}")
-            }
-        }
-    }
+//
+//    val trackGroups = player?.currentTracks?.groups
+//    Timber.d("!!! --------------")
+//    if (trackGroups != null) {
+//
+//        if (trackGroups.size > 0) {
+//            val group = trackGroups[0]
+//            for (j in 0 until group.length) {
+//                val format = group.getTrackFormat(j)
+//                Timber.d("!!! Group: 0, Format: $j, Resolution: ${format.width}x${format.height}, Bitrate: ${format.bitrate}")
+//            }
+//        }
+//    }
 
     // Пытаемся получить TrackSelector из плеера
 
 
-    Timber.d("!!! --------------")
+   // Timber.d("!!! --------------")
 
 
     Column(modifier = modifier.padding(bottom = 32.dp)) {
+
+
+        Button(onClick = {
+        }) {
+
+
+        }
+
 
         Row(
             modifier = Modifier

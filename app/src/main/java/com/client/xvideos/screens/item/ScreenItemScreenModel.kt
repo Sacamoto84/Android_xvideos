@@ -1,10 +1,19 @@
 package com.client.xvideos.screens.item
 
 import android.content.Context
+import androidx.annotation.OptIn
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.media3.common.Player
+import androidx.media3.common.TrackSelectionOverride
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
@@ -26,7 +35,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
 import kotlinx.coroutines.runBlocking
-
+import timber.log.Timber
 
 
 class ScreenItemScreenModel @AssistedInject constructor(
@@ -72,15 +81,63 @@ class ScreenItemScreenModel @AssistedInject constructor(
     }
 
 
-
     /////////////////////////////////////////////////////////
     /**
      * ## Открыть экран с нужным тегом
      */
-    fun openTag(tag : String,  navigator: Navigator){
+    fun openTag(tag: String, navigator: Navigator) {
         navigator.push(ScreenTags(tag))
     }
     /////////////////////////////////////////////////////////
+
+
+    /**
+     * Общая продолжительность видео
+     */
+    var totalDuration by mutableLongStateOf(0L)
+
+    /**
+     * Текущее время видео
+     */
+    var currentTime by mutableLongStateOf(0L)
+
+    var bufferedPercentage by mutableIntStateOf(0)
+
+    var isPlaying by mutableStateOf(false)
+
+
+    data class FORMAT(val id: Int, val width: Int, val height: Int, val bitrate: Int, val isSelect: Boolean)
+
+
+    val listFormat = mutableStateListOf<FORMAT>()
+
+
+    @OptIn(UnstableApi::class)
+    fun switchTrack(player: Player, groupIndex: Int = 0, trackIndex: Int) {
+
+        Timber.d("!!! Switched to track: Group: $groupIndex, Track: $trackIndex")
+
+        player.stop()
+        player.seekTo(player.currentPosition)
+
+        // Создаем TrackSelectionOverride для новой дорожки
+        val trackGroup = player.currentTracks.groups[groupIndex].mediaTrackGroup
+        val override = TrackSelectionOverride(trackGroup, listOf(trackIndex))
+
+            player.trackSelectionParameters =
+                player.trackSelectionParameters
+                    .buildUpon()
+                    .setOverrideForType(
+                        override
+                    )
+                    .build()
+        player.prepare()
+        player.play()
+       // }
+
+        Timber.d("Switched to track: Group: $groupIndex, Track: $trackIndex")
+    }
+
 }
 
 @Module
