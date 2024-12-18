@@ -1,4 +1,4 @@
-package com.client.xvideos.tags.model
+package com.client.xvideos.screens.item.model
 
 //<li class="main-uploader">
 //<a class="btn btn-default label main uploader-tag hover-name" href="/milfed">
@@ -11,8 +11,8 @@ package com.client.xvideos.tags.model
 //</span>
 //</a>
 //</li>
-
 data class TagsMainUploaderPornstar(val href: String, val name: String, val count: String)
+
 
 //<li class="model">
 //<a class="btn btn-default label profile hover-name is-pornstar" data-id="306248827" href="/pornstars/london-river">
@@ -23,7 +23,6 @@ data class TagsMainUploaderPornstar(val href: String, val name: String, val coun
 //</span>
 //</a>
 //</li>
-
 data class TagsModel(
     val mainUploader: List<TagsMainUploaderPornstar>,
     val pornstars: List<TagsMainUploaderPornstar>,

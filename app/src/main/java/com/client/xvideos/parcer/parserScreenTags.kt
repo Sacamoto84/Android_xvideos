@@ -1,4 +1,4 @@
-package com.client.xvideos.screens.tags.parcer
+package com.client.xvideos.parcer
 
 import com.client.xvideos.model.GalleryItem
 import com.client.xvideos.screens.tags.model.ModelScreenTag

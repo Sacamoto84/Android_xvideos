@@ -1,14 +1,12 @@
 package com.client.xvideos.screens.dashboards.atom
 
 import android.app.Activity
-import android.content.pm.ActivityInfo.SCREEN_ORIENTATION_USER
 import android.net.Uri
 import androidx.annotation.OptIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -19,13 +17,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.media3.common.Player
-import androidx.media3.common.Player.REPEAT_MODE_ONE
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
-import com.client.xvideos.screens.item.util.ComposableLifecycle
-import com.client.xvideos.screens.item.util.buildMediaSource
+import com.client.xvideos.screens.item.deprecated.ComposableLifecycle
+import com.client.xvideos.screens.item.deprecated.buildMediaSource
 import timber.log.Timber
 
 

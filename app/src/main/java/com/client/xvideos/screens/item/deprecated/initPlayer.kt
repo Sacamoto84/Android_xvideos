@@ -1,4 +1,4 @@
-package com.client.xvideos.screens.item.util
+package com.client.xvideos.screens.item.deprecated
 
 import android.content.Context
 import android.net.Uri

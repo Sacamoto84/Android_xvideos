@@ -5,7 +5,7 @@ import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
 import com.client.xvideos.net.readHtmlFromURL
 import com.client.xvideos.screens.tags.model.ModelScreenTag
-import com.client.xvideos.screens.tags.parcer.parserScreenTags
+import com.client.xvideos.parcer.parserScreenTags
 import com.client.xvideos.urlStart
 import dagger.Binds
 import dagger.Module

@@ -1,27 +1,18 @@
 package com.client.xvideos
 
-import android.os.Build
 import android.os.Bundle
-import android.view.WindowInsetsController
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.core.view.WindowCompat
 import cafe.adriel.voyager.navigator.Navigator
 import coil.ImageLoader
 import coil.ImageLoaderFactory
-import coil.disk.DiskCache
 import coil.memory.MemoryCache
 import coil.request.CachePolicy
 import com.client.xvideos.screens.dashboards.ScreenDashBoards
-import com.client.xvideos.screens.tags.ScreenTags
-import com.client.xvideos.search.getSearchResults
-import com.client.xvideos.search.parseJson
 import com.client.xvideos.ui.theme.XvideosTheme
 import dagger.hilt.android.AndroidEntryPoint
-import io.sanghun.compose.video.cache.VideoPlayerCacheManager
+import com.client.xvideos.video.cache.VideoPlayerCacheManager
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
-import timber.log.Timber
 import timber.log.Timber.DebugTree
 import timber.log.Timber.Forest.plant
 
@@ -68,24 +59,21 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
 //            }
 //        }
 
-
         plant(DebugTree())
 
-        Timber.i("!!! Hello")
+        VideoPlayerCacheManager.initialize(this, 1024 * 1024)    // 1GB
 
-        VideoPlayerCacheManager.initialize(this, 1024 * 1024 * 1024)    // 1GB
-
-        runBlocking {
-            try {
-                val a = getSearchResults("sist")
-                a
-                val b = a?.let { parseJson(it) }
-                b
-            } catch (e: Exception) {
-                Timber.e(e.localizedMessage)
-            }
-            //b
-        }
+//        runBlocking {
+//            try {
+//                val a = getSearchResults("sist")
+//                a
+//                val b = a?.let { parseJson(it) }
+//                b
+//            } catch (e: Exception) {
+//                Timber.e(e.localizedMessage)
+//            }
+//            //b
+//        }
 
 
 

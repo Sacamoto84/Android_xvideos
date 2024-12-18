@@ -17,6 +17,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+/**
+ * ## Отображение текста канала и порноактрисы и показ количества подписок на них
+ */
 @Composable
 fun ScreenItemTagsModelPornostars(text: String, color: Color, count: String) {
 

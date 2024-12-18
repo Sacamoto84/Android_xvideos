@@ -3,12 +3,14 @@ package com.client.xvideos.screens.item.atom
 //noinspection UsingMaterialAndMaterial3Libraries
 //noinspection UsingMaterialAndMaterial3Libraries
 
+import androidx.annotation.OptIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
@@ -26,27 +28,30 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 import com.client.xvideos.R
-import com.client.xvideos.screens.item.util.formatMinSec
 import timber.log.Timber
 
 
+/**
+ * ## Нижний рядяд кнопок упраления плеером
+ */
+@OptIn(UnstableApi::class)
 @Composable
-fun BottomControls(
+fun ItemPlayerBottomControl(
     modifier: Modifier = Modifier,
     totalDuration: () -> Long,
     currentTime: () -> Long,
     bufferedPercentage: () -> Int,
     onSeekChanged: (timeMs: Float) -> Unit,
     onValueChangedFinished: (timeMs: Float) -> Unit,
-
-    isPlaying : () -> Boolean,
-
-    onPlayClick : () -> Unit
-
-
+    isPlaying: () -> Boolean,
+    onPlayClick: () -> Unit,
+    player: Player?,
 ) {
 
     var isDragging by remember { mutableStateOf(false) }   // Флаг перетаскивания
@@ -63,19 +68,45 @@ fun BottomControls(
 
     videoTimeBack = if (isDragging) videoTimeBack else videoTime
 
-    Timber.i("!!! videoTimeBack:$videoTimeBack videoTime:$videoTime  currentTime:${currentTime()} isDragging:${isDragging}")
+    //Timber.i("!!! videoTimeBack:$videoTimeBack videoTime:$videoTime  currentTime:${currentTime()} isDragging:${isDragging}")
+
+    val context = LocalContext.current
+
+
+
+
+    val trackGroups = player?.currentTracks?.groups
+    Timber.d("!!! --------------")
+    if (trackGroups != null) {
+
+        if (trackGroups.size > 0) {
+            val group = trackGroups[0]
+            for (j in 0 until group.length) {
+                val format = group.getTrackFormat(j)
+                Timber.d("!!! Group: 0, Format: $j, Resolution: ${format.width}x${format.height}, Bitrate: ${format.bitrate}")
+            }
+        }
+    }
+
+    // Пытаемся получить TrackSelector из плеера
+
+
+    Timber.d("!!! --------------")
+
 
     Column(modifier = modifier.padding(bottom = 32.dp)) {
 
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .height(48.dp)
                 .background(Color(0xFF1C1C1C)),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
 
 
+            //Текущее время
             Text(
                 modifier = Modifier.padding(start = 4.dp),
                 text = currentTime.invoke().formatMinSec(),
@@ -127,6 +158,7 @@ fun BottomControls(
                 )
             }
 
+            //Общее время
             Text(
                 modifier = Modifier.padding(end = 4.dp),
                 text = duration.formatMinSec(),
@@ -135,10 +167,11 @@ fun BottomControls(
 
         }
 
-        //...
+        //Строка с кнопками
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .height(64.dp)
                 .background(Color.DarkGray),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
@@ -154,6 +187,7 @@ fun BottomControls(
                 )
             }
 
+            //Кнопка запуск/пауза
             IconButton(
                 modifier = Modifier
                     .padding(horizontal = 0.dp, vertical = 4.dp)
