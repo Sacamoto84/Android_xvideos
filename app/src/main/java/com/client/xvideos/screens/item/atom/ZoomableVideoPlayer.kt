@@ -6,6 +6,7 @@ import android.content.pm.ActivityInfo.SCREEN_ORIENTATION_USER
 import androidx.annotation.OptIn
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,12 +17,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.MediaMetadata
@@ -54,11 +57,13 @@ fun ZoomableVideoPlayer(
 
     var once by remember { mutableStateOf(false) }
 
+    var isDragging by remember { mutableStateOf(false) }
+    var dragAmount by remember { mutableFloatStateOf(0f) } // Текущее смещение во время жеста
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .then(modifier)
-        ,
+            .then(modifier),
         verticalArrangement = Arrangement.Bottom
     ) {
 
@@ -126,7 +131,7 @@ fun ZoomableVideoPlayer(
                                 )
                                 Timber.d("!!! Group: 0, Format: $j, Resolution: ${format.width}x${format.height}, Bitrate: ${format.bitrate}")
                             }
-                            vm.listFormat.sortBy{it.height}
+                            vm.listFormat.sortBy { it.height }
 
                             if (!once) {
                                 vm.quality = vm.listFormat.last().height
@@ -150,7 +155,7 @@ fun ZoomableVideoPlayer(
                             vm.isPlaying = player.isPlaying
                             vm.playbackState = player.playbackState
 
-                            if(vm.playerE == null) {
+                            if (vm.playerE == null) {
                                 vm.playerE = player
                             }
 
@@ -169,6 +174,36 @@ fun ZoomableVideoPlayer(
 //                        translationY = offset.y
 //                    )
                 .fillMaxWidth()
+                .pointerInput(Unit) {
+                    detectHorizontalDragGestures(
+                        onDragStart = {
+                            isDragging = true
+                            dragAmount = 0f
+                        },
+                        onDragCancel = {
+                            isDragging = false
+                            dragAmount = 0f
+                        },
+                        onDragEnd = {
+                            isDragging = false
+                            if (dragAmount != 0f) {
+                                val seekOffsetMs =
+                                    (dragAmount / 100).toLong() * 1000 // Перевод пикселей в миллисекунды
+                                if (vm.playerE != null) {
+                                    val newPosition = (vm.playerE!!.currentPosition + seekOffsetMs).coerceIn(0, vm.playerE!!.duration)
+                                    vm.playerE!!.seekTo(newPosition)
+                                }
+                            }
+                        },
+
+                        onHorizontalDrag = { change, dragAmount1 ->
+                            change.consume() // Сообщаем системе, что жест обработан
+                            dragAmount += dragAmount1
+                        }
+
+                    )
+                }
+                .clickable { if (vm.isPlaying) vm.playerE?.pause() else vm.playerE?.play() }
         )
 
 
@@ -177,7 +212,6 @@ fun ZoomableVideoPlayer(
             //Блок кнопок
             ItemPlayerBottomControl(
                 modifier = Modifier,
-                totalDuration = { vm.totalDuration },
                 bufferedPercentage = { vm.bufferedPercentage },
                 currentTime = { vm.currentTime },
                 onSeekChanged = { timeMs: Float ->
@@ -193,18 +227,18 @@ fun ZoomableVideoPlayer(
 
                 isPlaying = { vm.isPlaying },
                 onPlayClick = { if (vm.isPlaying) vm.playerE?.pause() else vm.playerE?.play() },
-                player = vm.playerE,
+                vm = vm,
             )
         }
 
 
-        VideoQualitySelector(vm.quality, list = vm.listFormat) {
-            vm.quality = it
-            val targetId = vm.listFormat.find { el-> el.height == it }?.id
-            if (targetId != null) {
-                vm.playerE?.let { it1 -> vm.switchTrack(it1, targetId) }
-            }
-        }
+//        VideoQualitySelector(vm.quality, list = vm.listFormat) {
+//            vm.quality = it
+//            val targetId = vm.listFormat.find { el-> el.height == it }?.id
+//            if (targetId != null) {
+//                vm.playerE?.let { it1 -> vm.switchTrack(it1, targetId) }
+//            }
+//        }
 
 
     }

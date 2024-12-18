@@ -61,7 +61,7 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
 
         plant(DebugTree())
 
-        VideoPlayerCacheManager.initialize(this, 1024 * 1024)    // 1GB
+        VideoPlayerCacheManager.initialize(this, 1024 * 1024 * 1024)    // 1GB
 
 //        runBlocking {
 //            try {

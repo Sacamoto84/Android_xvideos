@@ -4,12 +4,14 @@ import android.content.Context
 import androidx.annotation.OptIn
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
 import androidx.media3.common.TrackSelectionOverride
 import androidx.media3.common.util.UnstableApi
@@ -125,9 +127,20 @@ class ScreenItemScreenModel @AssistedInject constructor(
 
     var quality by mutableIntStateOf(0)
 
+    /**
+     * Скорость воспроизведения
+     */
+    var speed by mutableFloatStateOf(1.0f)
 
+   ///////////////////////////////////////////////
+    /**
+     * ## Изменить номер дорожки
+     */
     @OptIn(UnstableApi::class)
-    fun switchTrack(player: Player, trackIndex: Int) {
+    fun switchTrack(trackIndex: Int) {
+        if (playerE == null) return
+
+        val player = playerE!!
 
         player.stop()
         player.seekTo(player.currentPosition)
@@ -150,6 +163,19 @@ class ScreenItemScreenModel @AssistedInject constructor(
 
         Timber.d("Switched to track: Track: $trackIndex")
     }
+    ///////////////////////////////////////////////
+    /**
+     * ## Изменение скорости воспроизведения
+     */
+    fun changePlaybackSpeed(speed: Float) {
+        if (playerE == null) return
+        val player = playerE!!
+        val params = PlaybackParameters(speed) // Создаем параметры с новой скоростью
+        player.playbackParameters = params
+        Timber.d("Playback speed changed to $speed")
+        this.speed = speed
+    }
+    ///////////////////////////////////////////////
 
 }
 
