@@ -8,6 +8,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.media3.common.Player
 import androidx.media3.common.TrackSelectionOverride
@@ -38,9 +39,10 @@ import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 
 
+@UnstableApi
 class ScreenItemScreenModel @AssistedInject constructor(
     @Assisted val url: String,
-    @ApplicationContext appContext: Context,
+    @ApplicationContext context: Context,
 ) : ScreenModel {
 
     @AssistedFactory
@@ -105,37 +107,48 @@ class ScreenItemScreenModel @AssistedInject constructor(
 
     var isPlaying by mutableStateOf(false)
 
+    var playerE by mutableStateOf<Player?>(null)
 
-    data class FORMAT(val id: Int, val width: Int, val height: Int, val bitrate: Int, val isSelect: Boolean)
+    var playbackState by  mutableIntStateOf(0)
 
+    val trackSelector =  DefaultTrackSelector(context)
+
+    data class FORMAT(
+        val id: Int,
+        val width: Int,
+        val height: Int,
+        val bitrate: Int,
+        val isSelect: Boolean,
+    )
 
     val listFormat = mutableStateListOf<FORMAT>()
 
+    var quality by mutableIntStateOf(0)
+
 
     @OptIn(UnstableApi::class)
-    fun switchTrack(player: Player, groupIndex: Int = 0, trackIndex: Int) {
-
-        Timber.d("!!! Switched to track: Group: $groupIndex, Track: $trackIndex")
+    fun switchTrack(player: Player, trackIndex: Int) {
 
         player.stop()
         player.seekTo(player.currentPosition)
 
         // Создаем TrackSelectionOverride для новой дорожки
-        val trackGroup = player.currentTracks.groups[groupIndex].mediaTrackGroup
+        val trackGroup = player.currentTracks.groups[0].mediaTrackGroup
         val override = TrackSelectionOverride(trackGroup, listOf(trackIndex))
 
-            player.trackSelectionParameters =
-                player.trackSelectionParameters
-                    .buildUpon()
-                    .setOverrideForType(
-                        override
-                    )
-                    .build()
+        player.trackSelectionParameters =
+            player.trackSelectionParameters
+                .buildUpon()
+                .setOverrideForType(
+                    override
+                )
+                .build()
+
         player.prepare()
         player.play()
-       // }
+        // }
 
-        Timber.d("Switched to track: Group: $groupIndex, Track: $trackIndex")
+        Timber.d("Switched to track: Track: $trackIndex")
     }
 
 }

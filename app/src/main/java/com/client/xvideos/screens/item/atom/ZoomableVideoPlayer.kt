@@ -49,29 +49,22 @@ fun ZoomableVideoPlayer(
 
     Timber.i("!!! ZoomableVideoPlayer url:$videoUri")
 
-    var playbackState by remember { mutableIntStateOf(0) }
-
-    val playerE = remember { mutableStateOf<Player?>(null) }
-
     val activity = LocalContext.current as Activity
     activity.requestedOrientation = SCREEN_ORIENTATION_USER
 
-    val context = LocalContext.current
-
-    val trackSelector = remember { DefaultTrackSelector(context) }
+    var once by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .then(modifier)
-        //.background(Color.Cyan)
         ,
         verticalArrangement = Arrangement.Bottom
     ) {
 
 
         VideoPlayer(
-            trackSelector = trackSelector,
+            trackSelector = vm.trackSelector,
             mediaItems = listOf(
                 VideoPlayerMediaItem.NetworkMediaItem(
                     url = videoUri,
@@ -122,7 +115,6 @@ fun ZoomableVideoPlayer(
                             for (j in 0 until group.length) {
                                 val format = group.getTrackFormat(j)
 
-
                                 vm.listFormat.add(
                                     ScreenItemScreenModel.FORMAT(
                                         id = j,
@@ -133,6 +125,12 @@ fun ZoomableVideoPlayer(
                                     )
                                 )
                                 Timber.d("!!! Group: 0, Format: $j, Resolution: ${format.width}x${format.height}, Bitrate: ${format.bitrate}")
+                            }
+                            vm.listFormat.sortBy{it.height}
+
+                            if (!once) {
+                                vm.quality = vm.listFormat.last().height
+                                once = true
                             }
 
                         }
@@ -150,16 +148,12 @@ fun ZoomableVideoPlayer(
                             vm.currentTime = player.currentPosition.coerceAtLeast(0L)
                             vm.bufferedPercentage = player.bufferedPercentage
                             vm.isPlaying = player.isPlaying
-                            playbackState = player.playbackState
-                            playerE.value = player
+                            vm.playbackState = player.playbackState
 
-//                            val override1 = DefaultTrackSelector.SelectionOverride(0, 1) // Группа 0, Трек 1 (пример)
-//                            val trackSelectorParameters = trackSelector.buildUponParameters()
-//                                .setSelectionOverride(0, trackGroups[0], override1)
-//                                .build()
+                            if(vm.playerE == null) {
+                                vm.playerE = player
+                            }
 
-                            val a = playerE.value?.playbackParameters
-                            a
                         }
 
                     }
@@ -193,23 +187,22 @@ fun ZoomableVideoPlayer(
                 },
                 onValueChangedFinished = {
                     Timber.i("!!! onValueChangedFinished ${it.toLong()}")
-                    playerE.value?.seekTo(it.toLong())
+                    vm.playerE?.seekTo(it.toLong())
                     //playerE?.playWhenReady = true
                 },
 
                 isPlaying = { vm.isPlaying },
-                onPlayClick = { if (vm.isPlaying) playerE.value?.pause() else playerE.value?.play() },
-                player = playerE.value,
+                onPlayClick = { if (vm.isPlaying) vm.playerE?.pause() else vm.playerE?.play() },
+                player = vm.playerE,
             )
         }
 
-        LazyColumn {
-            items(vm.listFormat) {
-                Box(
-                    modifier = Modifier
-                        .border(1.dp, Color.Black)
-                        .clickable { playerE.value?.let { it1 -> vm.switchTrack(it1, 0, it.id) } })
-                { Text(it.width.toString() + " select:" + it.isSelect) }
+
+        VideoQualitySelector(vm.quality, list = vm.listFormat) {
+            vm.quality = it
+            val targetId = vm.listFormat.find { el-> el.height == it }?.id
+            if (targetId != null) {
+                vm.playerE?.let { it1 -> vm.switchTrack(it1, targetId) }
             }
         }
 
