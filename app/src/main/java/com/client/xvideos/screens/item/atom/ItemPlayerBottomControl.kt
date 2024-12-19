@@ -77,7 +77,7 @@ fun ItemPlayerBottomControl(
     //Timber.i("!!! videoTimeBack:$videoTimeBack videoTime:$videoTime  currentTime:${currentTime()} isDragging:${isDragging}")
 
 
-    Column(modifier = modifier.padding(bottom = 32.dp)) {
+    Column(modifier = modifier.padding(bottom = 0.dp)) {
 
 
         Row(

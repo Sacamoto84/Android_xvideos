@@ -17,9 +17,11 @@ package com.client.xvideos.video
 
 import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
+import android.graphics.PorterDuff
 import android.view.Window
 import android.view.WindowManager
 import android.widget.ImageButton
+import android.widget.ProgressBar
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.background

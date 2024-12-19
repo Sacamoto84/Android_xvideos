@@ -38,6 +38,11 @@ fun DashBoardVideoImage(item: GalleryItem, onLongClick : () -> Unit ) {
     Box(modifier = Modifier
         .fillMaxSize()
         .combinedClickable (
+            onDoubleClick = {
+                vibrateWithPatternAndAmplitude(context = context)
+                onLongClick.invoke()
+            },
+
             onLongClick = {
                 //haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                 vibrateWithPatternAndAmplitude(context = context)

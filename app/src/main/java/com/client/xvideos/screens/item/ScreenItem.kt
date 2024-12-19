@@ -38,8 +38,9 @@ class ScreenItem(val url: String) : Screen {
 
         Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
             //Отобразить теги
-            //ComposeTags(vm.tags, onClick = { vm.openTag(it, navigator) })
-
+            if (!vm.isFullScreen) {
+                ComposeTags(vm.tags, onClick = { vm.openTag(it, navigator) })
+            }
             ZoomableVideoPlayer(vm, videoUri = vm.passedString, Modifier.weight(1f))
         }
 

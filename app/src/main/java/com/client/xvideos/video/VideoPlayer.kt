@@ -20,12 +20,14 @@ import com.client.xvideos.R as RR
 import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
 import android.graphics.Color
+import android.graphics.PorterDuff
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.ImageButton
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.annotation.FloatRange
 import androidx.compose.runtime.Composable
@@ -175,7 +177,10 @@ fun VideoPlayer(
     }
 
     val defaultPlayerView = remember {
-        PlayerView(context)
+        PlayerView(context).apply {
+            val basic_progressbar= this.findViewById<ProgressBar>(R.id.exo_buffering)
+            basic_progressbar?.indeterminateDrawable?.setColorFilter(Color.parseColor("#FFA500"), PorterDuff.Mode.SRC_IN)
+        }
     }
 
     LaunchedEffect(Unit) {
@@ -303,6 +308,7 @@ fun VideoPlayer(
             },
         )
     }
+
 }
 
 @SuppressLint("UnsafeOptInUsageError")
@@ -327,6 +333,7 @@ internal fun VideoPlayerSurface(
                 useController = usePlayerController
                 resizeMode = surfaceResizeMode.toPlayerViewResizeMode()
                 setBackgroundColor(Color.BLACK)
+
 
 //                setControllerShowTimeoutMs(0)
 //                controllerAutoShow = false // Автоматическое отображение при взаимодействии
@@ -394,6 +401,8 @@ internal fun VideoPlayerSurface(
 //                }
 
 
+                val basic_progressbar= this.findViewById<ProgressBar>(R.id.exo_buffering)
+                basic_progressbar?.indeterminateDrawable?.setColorFilter(Color.parseColor("#FFA500"), PorterDuff.Mode.SRC_IN)
 
                 val basic_control_view= this.findViewById<LinearLayout>(R.id.exo_basic_controls)
                 basic_control_view?.let {
