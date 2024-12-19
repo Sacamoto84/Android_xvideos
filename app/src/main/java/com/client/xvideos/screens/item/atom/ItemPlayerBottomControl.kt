@@ -151,35 +151,6 @@ fun ItemPlayerBottomControl(
 
         }
 
-        //Строка с кнопками
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(64.dp)
-                .background(Color.DarkGray),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
-            Row(verticalAlignment = Alignment.CenterVertically){
-                //Изменение качества
-                VideoQualitySelector(vm.quality, list = vm.listFormat) {
-                    vm.quality = it
-                    val targetId = vm.listFormat.find { el -> el.height == it }?.id
-                    if (targetId != null) {
-                        vm.switchTrack(targetId)
-                    }
-                }
-                Spacer(Modifier.width(8.dp))
-                VideoSpeedSelector(vm.speed, onClick = { vm.changePlaybackSpeed(it) })
-                Spacer(Modifier.width(8.dp))
-                IconButtonLocal(R.drawable.fit_to_page_outline){vm.isFullScreen = true}
-            }
-
-        }
-
-
-
 
 
         //Строка с кнопками
@@ -202,12 +173,33 @@ fun ItemPlayerBottomControl(
             ) {
 
                 Icon(
-                    painter = painterResource(if (isPlaying.invoke()) R.drawable.pause_circle else R.drawable.play_circle),
+                    painter = painterResource(if (isPlaying.invoke()) R.drawable.exo_icon_pause else R.drawable.exo_icon_play),
                     contentDescription = "", tint = Color.White
                 )
             }
 
+            Row(verticalAlignment = Alignment.CenterVertically){
+                //Изменение качества
+                VideoQualitySelector(vm.quality, list = vm.listFormat) {
+                    vm.quality = it
+                    val targetId = vm.listFormat.find { el -> el.height == it }?.id
+                    if (targetId != null) {
+                        vm.switchTrack(targetId)
+                    }
+                }
+                Spacer(Modifier.width(8.dp))
+                VideoSpeedSelector(vm.speed, onClick = { vm.changePlaybackSpeed(it) })
+                Spacer(Modifier.width(8.dp))
+                IconButtonLocal(R.drawable.exo_ic_fullscreen_enter){vm.isFullScreen = true}
+            }
+
         }
+
+
+
+
+
+
 
 
 

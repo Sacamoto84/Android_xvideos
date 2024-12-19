@@ -46,6 +46,7 @@ import androidx.core.view.WindowCompat
 import androidx.media3.common.util.RepeatModeUtil
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
+import androidx.media3.ui.R
 import com.client.xvideos.video.controller.VideoPlayerControllerConfig
 import com.client.xvideos.video.controller.applyToExoPlayerView
 import com.client.xvideos.video.util.findActivity
@@ -78,9 +79,7 @@ internal fun VideoPlayerFullScreenDialog(
     controllerConfig: VideoPlayerControllerConfig,
     repeatMode: RepeatMode,
     resizeMode: ResizeMode,
-    enablePip: Boolean,
     onDismissRequest: () -> Unit,
-    securePolicy: SecureFlagPolicy,
 ) {
     val context = LocalContext.current
 
@@ -90,7 +89,7 @@ internal fun VideoPlayerFullScreenDialog(
     }
 
     BackHandler(enabled = true) {
-        internalFullScreenPlayerView.findViewById<ImageButton>(androidx.media3.ui.R.id.exo_fullscreen)
+        internalFullScreenPlayerView.findViewById<ImageButton>(R.id.exo_fullscreen)
             .performClick()
     }
 
@@ -177,7 +176,7 @@ internal fun VideoPlayerFullScreenDialog(
             }
         }
 
-        internalFullScreenPlayerView.findViewById<ImageButton>(androidx.media3.ui.R.id.exo_fullscreen)
+        internalFullScreenPlayerView.findViewById<ImageButton>(R.id.exo_fullscreen)
             .performClick()
     }
 
@@ -185,15 +184,13 @@ internal fun VideoPlayerFullScreenDialog(
         defaultPlayerView = internalFullScreenPlayerView,
         player = player,
         usePlayerController = true,
-        handleLifecycle = !enablePip,
         autoDispose = false,
-        enablePip = enablePip,
         surfaceResizeMode = resizeMode,
-        onPipEntered = { onDismissRequest() },
         modifier = Modifier
             // .align(Alignment.Center)
             .fillMaxSize()
-            .systemBarsPadding() // Убирает статус и навигационные панели,
+            .systemBarsPadding(),
+        handleLifecycle = true // Убирает статус и навигационные панели,
     )
 }
 

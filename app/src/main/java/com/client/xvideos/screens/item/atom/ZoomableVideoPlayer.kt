@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 import android.content.pm.ActivityInfo.SCREEN_ORIENTATION_USER
+import android.graphics.Bitmap
 import androidx.annotation.OptIn
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -35,6 +36,7 @@ import androidx.media3.common.Tracks
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.analytics.AnalyticsListener
+import com.client.xvideos.noRippleClickable
 
 import com.client.xvideos.screens.item.ScreenModel_Item
 import com.client.xvideos.video.RepeatMode
@@ -94,7 +96,7 @@ fun ZoomableVideoPlayer(
             enablePip = false,
             handleAudioFocus = true,
             controllerConfig = VideoPlayerControllerConfig(
-                showSpeedAndPitchOverlay = true,
+                showSpeedAndPitchOverlay = false,
                 showSubtitleButton = false,
                 showCurrentTimeAndTotalTime = true,
                 showBufferingProgress = true,
@@ -102,7 +104,7 @@ fun ZoomableVideoPlayer(
                 showBackwardIncrementButton = true,
                 showBackTrackButton = false,
                 showNextTrackButton = false,
-                showRepeatModeButton = false,
+                showRepeatModeButton = true,
                 controllerShowTimeMilliSeconds = 1_000,
                 controllerAutoShow = true,
                 showFullScreenButton = true,
@@ -120,6 +122,7 @@ fun ZoomableVideoPlayer(
                 addListener(
 
                     object : Player.Listener {
+
                         override fun onTracksChanged(tracks: Tracks) {
                             // Update UI using current tracks.
                             if (tracks.groups.size == 0) return
@@ -151,12 +154,20 @@ fun ZoomableVideoPlayer(
                             }
 
                         }
+
+
                     }
+
+
 
                 )
 
                 addAnalyticsListener(
                     object : AnalyticsListener {
+
+
+
+
 
                         @OptIn(UnstableApi::class)
                         override fun onEvents(player: Player, events: AnalyticsListener.Events) {
@@ -171,7 +182,15 @@ fun ZoomableVideoPlayer(
 //                                vm.playerE = player
 //                            }
 
+                            // If no video or image track: show shutter, hide image view.
+                            // Otherwise: do nothing to wait for first frame or image.
+
+                            if (events.contains(AnalyticsListener.EVENT_RENDERED_FIRST_FRAME)) {
+                                // Hide shutter, hide image view.
+                            }
                         }
+
+
 
                     }
 
@@ -219,7 +238,7 @@ fun ZoomableVideoPlayer(
 
                     )
                 }
-                .clickable { if (vm.isPlaying) vm.playerE?.pause() else vm.playerE?.play() }
+                .noRippleClickable { if (vm.isPlaying) vm.playerE?.pause() else vm.playerE?.play() }
         )
 
 

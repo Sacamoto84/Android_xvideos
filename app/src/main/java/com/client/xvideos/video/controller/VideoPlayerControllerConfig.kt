@@ -94,9 +94,12 @@ internal fun VideoPlayerControllerConfig.applyToExoPlayerView(
 
     controllerView.findViewById<View>(androidx.media3.ui.R.id.exo_settings).isVisible =
         showSpeedAndPitchOverlay
+
     playerView.setShowSubtitleButton(showSubtitleButton)
+
     controllerView.findViewById<View>(androidx.media3.ui.R.id.exo_time).isVisible =
         showCurrentTimeAndTotalTime
+
     playerView.setShowBuffering(
         if (!showBufferingProgress) PlayerView.SHOW_BUFFERING_NEVER else PlayerView.SHOW_BUFFERING_ALWAYS,
     )
@@ -104,10 +107,18 @@ internal fun VideoPlayerControllerConfig.applyToExoPlayerView(
         showForwardIncrementButton
     controllerView.findViewById<View>(androidx.media3.ui.R.id.exo_rew_with_amount).isVisible =
         showBackwardIncrementButton
+
+
+
+
     playerView.setShowNextButton(showNextTrackButton)
+
     playerView.setShowPreviousButton(showBackTrackButton)
+
     playerView.setShowFastForwardButton(showForwardIncrementButton)
+
     playerView.setShowRewindButton(showBackwardIncrementButton)
+
     playerView.controllerShowTimeoutMs = controllerShowTimeMilliSeconds
     playerView.controllerAutoShow = controllerAutoShow
 

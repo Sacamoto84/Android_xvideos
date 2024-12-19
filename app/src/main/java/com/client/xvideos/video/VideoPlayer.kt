@@ -15,13 +15,16 @@
  */
 package com.client.xvideos.video
 
+import com.client.xvideos.R as RR
+
 import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
 import android.graphics.Color
-import android.os.Handler
-import android.os.Looper
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import android.widget.ImageButton
-import androidx.activity.compose.BackHandler
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.annotation.FloatRange
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -34,7 +37,6 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.SecureFlagPolicy
 import androidx.lifecycle.Lifecycle
@@ -44,7 +46,6 @@ import androidx.media3.common.C
 import androidx.media3.common.C.AUDIO_CONTENT_TYPE_MOVIE
 import androidx.media3.common.ForwardingPlayer
 import androidx.media3.common.MediaItem
-import androidx.media3.common.Player
 import androidx.media3.common.util.RepeatModeUtil.REPEAT_TOGGLE_MODE_ALL
 import androidx.media3.common.util.RepeatModeUtil.REPEAT_TOGGLE_MODE_NONE
 import androidx.media3.common.util.RepeatModeUtil.REPEAT_TOGGLE_MODE_ONE
@@ -55,22 +56,21 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.session.MediaSession
+import androidx.media3.ui.AspectRatioFrameLayout
+import androidx.media3.ui.PlayerControlView
 import androidx.media3.ui.PlayerView
 import androidx.media3.ui.R
 import com.client.xvideos.video.cache.VideoPlayerCacheManager
 import com.client.xvideos.video.controller.VideoPlayerControllerConfig
 import com.client.xvideos.video.controller.applyToExoPlayerView
-import com.client.xvideos.video.pip.enterPIPMode
-import com.client.xvideos.video.pip.isActivityStatePipMode
 import com.client.xvideos.video.uri.VideoPlayerMediaItem
 import com.client.xvideos.video.uri.toUri
 import com.client.xvideos.video.util.findActivity
-import com.client.xvideos.video.util.setFullScreen
 import kotlinx.coroutines.Dispatchers
-import java.util.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.util.*
 
 /**
  * [VideoPlayer] is UI component that can play video in Jetpack Compose. It works based on ExoPlayer.
@@ -120,7 +120,7 @@ fun VideoPlayer(
     seekBeforeMilliSeconds: Long = 10000L,
     seekAfterMilliSeconds: Long = 10000L,
     repeatMode: RepeatMode = RepeatMode.NONE,
-    resizeMode: ResizeMode = ResizeMode.FILL,
+    resizeMode: ResizeMode = ResizeMode.FIT,
     @FloatRange(from = 0.0, to = 1.0) volume: Float = 1f,
     onCurrentTimeChanged: (Long) -> Unit = {},
     fullScreenSecurePolicy: SecureFlagPolicy = SecureFlagPolicy.Inherit,
@@ -128,7 +128,6 @@ fun VideoPlayer(
     onFullScreenExit: () -> Unit = {},
     enablePip: Boolean = false,
     defaultFullScreeen: Boolean = false,
-    enablePipWhenBackPressed: Boolean = false,
     handleAudioFocus: Boolean = true,
     playerBuilder: ExoPlayer.Builder.() -> ExoPlayer.Builder = { this },
     playerInstance: ExoPlayer.() -> Unit = {},
@@ -169,11 +168,6 @@ fun VideoPlayer(
 
     val defaultPlayerView = remember {
         PlayerView(context)
-    }
-
-    BackHandler(enablePip && enablePipWhenBackPressed) {
-        enterPIPMode(context, defaultPlayerView)
-        player.play()
     }
 
     LaunchedEffect(Unit) {
@@ -241,6 +235,7 @@ fun VideoPlayer(
     }
 
     LaunchedEffect(controllerConfig, repeatMode) {
+
         defaultPlayerView.setRepeatToggleModes(
             if (controllerConfig.showRepeatModeButton) {
                 REPEAT_TOGGLE_MODE_ALL or REPEAT_TOGGLE_MODE_ONE
@@ -249,6 +244,7 @@ fun VideoPlayer(
             },
         )
         player.repeatMode = repeatMode.toExoPlayerRepeatMode()
+
     }
 
     LaunchedEffect(volume) {
@@ -261,7 +257,6 @@ fun VideoPlayer(
         player = player,
         usePlayerController = usePlayerController,
         handleLifecycle = handleLifecycle,
-        enablePip = enablePip,
         surfaceResizeMode = resizeMode
     )
 
@@ -278,8 +273,10 @@ fun VideoPlayer(
                 Timber.e("!!! onDismissRequest Нажата кнопка выхода из полноэкранного режимати из фулскрин")
                 fullScreenPlayerView?.let {
                     PlayerView.switchTargetView(player, it, defaultPlayerView)
+
                     defaultPlayerView.findViewById<ImageButton>(R.id.exo_fullscreen)
                         .performClick()
+
                     val currentActivity = context.findActivity()
                     currentActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                     //currentActivity.setFullScreen(false)
@@ -289,8 +286,6 @@ fun VideoPlayer(
                 isFullScreenModeEntered = false
 
             },
-            securePolicy = fullScreenSecurePolicy,
-            enablePip = enablePip,
             fullScreenPlayerView = {
                 fullScreenPlayerView = this
             },
@@ -306,29 +301,115 @@ internal fun VideoPlayerSurface(
     player: ExoPlayer,
     usePlayerController: Boolean,
     handleLifecycle: Boolean,
-    enablePip: Boolean,
     surfaceResizeMode: ResizeMode,
-    onPipEntered: () -> Unit = {},
     autoDispose: Boolean = true,
 ) {
-    val lifecycleOwner = rememberUpdatedState(LocalLifecycleOwner.current)
-    val context = LocalContext.current
+    val lifecycleOwner = rememberUpdatedState(androidx.lifecycle.compose.LocalLifecycleOwner.current)
 
-    var isPendingPipMode by remember { mutableStateOf(false) }
+    AndroidView(
+        modifier = modifier,
+
+        factory = {
+            defaultPlayerView.apply {
+                useController = usePlayerController
+                resizeMode = surfaceResizeMode.toPlayerViewResizeMode()
+                setBackgroundColor(Color.BLACK)
+
+                // Подключение кастомной разметки
+                val customControls = LayoutInflater.from(context).inflate(
+                    RR.layout.custom_player_controls,
+                    this,
+                    false
+                )
+                this.addView(customControls)
+
+                val text : TextView = customControls.findViewById(RR.id.speed)
+                text.text = "2X"
+
+//                // Логика для кнопки изменения соотношения сторон
+//                val aspectRatioButton: ImageButton = customControls.findViewById(RR.id.exo_aspect_ratio)
+//
+                val aspectRatios = listOf(
+                    AspectRatioFrameLayout.RESIZE_MODE_FIT,
+                    AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH,
+                    AspectRatioFrameLayout.RESIZE_MODE_FIXED_HEIGHT,
+                    AspectRatioFrameLayout.RESIZE_MODE_FILL,
+                    AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+                )
+//
+                var currentMode = 0
+//
+                text.setOnClickListener {
+                    currentMode = (currentMode + 1) % aspectRatios.size
+                    this.resizeMode = aspectRatios[currentMode]
+                }
+
+
+
+
+
+
+
+                val customButton = ImageButton(context).apply {
+                    setImageResource(RR.drawable.speed) // Ваш значок кнопки
+                    contentDescription = "Change Aspect Ratio"
+                    setBackgroundResource(android.R.color.transparent) // Убираем фон
+                    setOnClickListener {
+                        // Логика переключения режимов соотношения сторон
+                        val aspectRatios = listOf(
+                            AspectRatioFrameLayout.RESIZE_MODE_FIT,
+                            AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH,
+                            AspectRatioFrameLayout.RESIZE_MODE_FIXED_HEIGHT,
+                            AspectRatioFrameLayout.RESIZE_MODE_FILL,
+                            AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+                        )
+                        var currentMode = 0
+                        currentMode = (currentMode + 1) % aspectRatios.size
+                        resizeMode = aspectRatios[currentMode]
+                    }
+                }
+
+                // Получаем `PlayerControlView` и добавляем кнопку
+                val controlView = this.findViewById<LinearLayout>(R.id.exo_center_controls)
+
+                controlView?.let {
+
+                    val layoutParams = LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.WRAP_CONTENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT
+                        )
+                        it.addView(customButton, layoutParams)
+
+//                    // Находим контейнер для кнопок
+//                    val extraControlsContainer = it.findViewById<ViewGroup>(R.id.exo_extra_controls)
+//
+//                    // Если контейнер существует, добавляем кнопку
+                   // if (extraControlsContainer != null) {
+//                        val layoutParams = LinearLayout.LayoutParams(
+//                            LinearLayout.LayoutParams.WRAP_CONTENT,
+//                            LinearLayout.LayoutParams.WRAP_CONTENT
+//                        )
+//                        this.addView(customButton, layoutParams)
+                   // }
+
+//                    val layoutParams = LinearLayout.LayoutParams(
+//                        LinearLayout.LayoutParams.WRAP_CONTENT,
+//                        LinearLayout.LayoutParams.WRAP_CONTENT
+//                    )
+//                    layoutParams.marginStart = 16
+//                    layoutParams.marginEnd = 16
+//                    it.addView(customButton, layoutParams)
+
+                }
+
+
+
+            }
+        },
+    )
 
     DisposableEffect(
-
-        AndroidView(
-            modifier = modifier,
-
-            factory = {
-                defaultPlayerView.apply {
-                    useController = usePlayerController
-                    resizeMode = surfaceResizeMode.toPlayerViewResizeMode()
-                    setBackgroundColor(Color.GREEN)
-                }
-            },
-        ),
+        Unit,
     )
     {
         val observer = LifecycleEventObserver { _, event ->
@@ -337,19 +418,6 @@ internal fun VideoPlayerSurface(
                     if (handleLifecycle) {
                         player.pause()
                     }
-
-                    if (enablePip && player.playWhenReady) {
-                        isPendingPipMode = true
-
-                        Handler(Looper.getMainLooper()).post {
-                            enterPIPMode(context, defaultPlayerView)
-                            onPipEntered()
-
-                            Handler(Looper.getMainLooper()).postDelayed({
-                                isPendingPipMode = false
-                            }, 500)
-                        }
-                    }
                 }
 
                 Lifecycle.Event.ON_RESUME -> {
@@ -357,15 +425,16 @@ internal fun VideoPlayerSurface(
                         player.play()
                     }
 
-                    if (enablePip && player.playWhenReady) {
-                        defaultPlayerView.useController = usePlayerController
-                    }
+//                    if (enablePip && player.playWhenReady) {
+//                        defaultPlayerView.useController = usePlayerController
+//                    }
                 }
 
                 Lifecycle.Event.ON_STOP -> {
-                    val isPipMode = context.isActivityStatePipMode()
+                    //val isPipMode = context.isActivityStatePipMode()
 
-                    if (handleLifecycle || (enablePip && isPipMode && !isPendingPipMode)) {
+                    if (handleLifecycle) {
+                    //if (handleLifecycle || (enablePip && isPipMode && !isPendingPipMode)) {
                         player.stop()
                     }
                 }
