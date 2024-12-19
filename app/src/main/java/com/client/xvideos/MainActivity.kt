@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.core.view.WindowCompat
 import cafe.adriel.voyager.navigator.Navigator
 import coil.ImageLoader
 import coil.ImageLoaderFactory
@@ -48,9 +49,10 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         enableEdgeToEdge()
 
-        //WindowCompat.setDecorFitsSystemWindows(window, false) // Поддержка WindowInsets
+        WindowCompat.setDecorFitsSystemWindows(window, false) // Поддержка WindowInsets
 
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
 //            // Код для SDK 30 и выше
