@@ -20,8 +20,10 @@ import com.client.xvideos.R as RR
 import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
 import android.graphics.Color
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -37,6 +39,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.SecureFlagPolicy
 import androidx.lifecycle.Lifecycle
@@ -141,7 +144,7 @@ fun VideoPlayer(
     val player = remember {
         val httpDataSourceFactory = DefaultHttpDataSource.Factory()
 
-       ExoPlayer.Builder(context)
+        ExoPlayer.Builder(context)
             .setSeekBackIncrementMs(seekBeforeMilliSeconds)
             .setSeekForwardIncrementMs(seekAfterMilliSeconds)
             .setTrackSelector(trackSelector)
@@ -157,7 +160,12 @@ fun VideoPlayer(
                 if (cache != null) {
                     val cacheDataSourceFactory = CacheDataSource.Factory()
                         .setCache(cache)
-                        .setUpstreamDataSourceFactory(DefaultDataSource.Factory(context, httpDataSourceFactory))
+                        .setUpstreamDataSourceFactory(
+                            DefaultDataSource.Factory(
+                                context,
+                                httpDataSourceFactory
+                            )
+                        )
                     setMediaSourceFactory(DefaultMediaSourceFactory(cacheDataSourceFactory))
                 }
             }
@@ -193,7 +201,11 @@ fun VideoPlayer(
     LaunchedEffect(mediaItems, player) {
         mediaSession?.release()
         mediaSession = MediaSession.Builder(context, ForwardingPlayer(player))
-            .setId("VideoPlayerMediaSession_${UUID.randomUUID().toString().lowercase().split("-").first()}")
+            .setId(
+                "VideoPlayerMediaSession_${
+                    UUID.randomUUID().toString().lowercase().split("-").first()
+                }"
+            )
             .build()
         val exoPlayerMediaItems = withContext(Dispatchers.IO) {
             mediaItems.map {
@@ -304,7 +316,8 @@ internal fun VideoPlayerSurface(
     surfaceResizeMode: ResizeMode,
     autoDispose: Boolean = true,
 ) {
-    val lifecycleOwner = rememberUpdatedState(androidx.lifecycle.compose.LocalLifecycleOwner.current)
+    val lifecycleOwner =
+        rememberUpdatedState(androidx.lifecycle.compose.LocalLifecycleOwner.current)
 
     AndroidView(
         modifier = modifier,
@@ -315,45 +328,45 @@ internal fun VideoPlayerSurface(
                 resizeMode = surfaceResizeMode.toPlayerViewResizeMode()
                 setBackgroundColor(Color.BLACK)
 
-                // Подключение кастомной разметки
-                val customControls = LayoutInflater.from(context).inflate(
-                    RR.layout.custom_player_controls,
-                    this,
-                    false
-                )
-                this.addView(customControls)
+//                setControllerShowTimeoutMs(0)
+//                controllerAutoShow = false // Автоматическое отображение при взаимодействии
+//                controllerHideOnTouch = false // Автоматическое скрытие при касании экрана
+                 // Установить время в миллисекундах (10 секунд)
 
-                val text : TextView = customControls.findViewById(RR.id.speed)
-                text.text = "2X"
+//                // Подключение кастомной разметки
+//                val customControls = LayoutInflater.from(context).inflate(
+//                    RR.layout.custom_player_controls,
+//                    this,
+//                    false
+//                )
+//                this.addView(customControls)
+
+//                val text: TextView = customControls.findViewById(RR.id.speed)
+//                text.text = "2X"
 
 //                // Логика для кнопки изменения соотношения сторон
 //                val aspectRatioButton: ImageButton = customControls.findViewById(RR.id.exo_aspect_ratio)
 //
-                val aspectRatios = listOf(
-                    AspectRatioFrameLayout.RESIZE_MODE_FIT,
-                    AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH,
-                    AspectRatioFrameLayout.RESIZE_MODE_FIXED_HEIGHT,
-                    AspectRatioFrameLayout.RESIZE_MODE_FILL,
-                    AspectRatioFrameLayout.RESIZE_MODE_ZOOM
-                )
+//                val aspectRatios = listOf(
+//                    AspectRatioFrameLayout.RESIZE_MODE_FIT,
+//                    AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH,
+//                    AspectRatioFrameLayout.RESIZE_MODE_FIXED_HEIGHT,
+//                    AspectRatioFrameLayout.RESIZE_MODE_FILL,
+//                    AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+//                )
 //
                 var currentMode = 0
 //
-                text.setOnClickListener {
-                    currentMode = (currentMode + 1) % aspectRatios.size
-                    this.resizeMode = aspectRatios[currentMode]
-                }
-
-
-
-
-
+//                text.setOnClickListener {
+//                    currentMode = (currentMode + 1) % aspectRatios.size
+//                    this.resizeMode = aspectRatios[currentMode]
+//                }
 
 
                 val customButton = ImageButton(context).apply {
-                    setImageResource(RR.drawable.speed) // Ваш значок кнопки
+                    setImageResource(RR.drawable.resize1) // Ваш значок кнопки
                     contentDescription = "Change Aspect Ratio"
-                    setBackgroundResource(android.R.color.transparent) // Убираем фон
+                    setBackgroundResource(android.R.color.black) // Убираем фон
                     setOnClickListener {
                         // Логика переключения режимов соотношения сторон
                         val aspectRatios = listOf(
@@ -363,44 +376,52 @@ internal fun VideoPlayerSurface(
                             AspectRatioFrameLayout.RESIZE_MODE_FILL,
                             AspectRatioFrameLayout.RESIZE_MODE_ZOOM
                         )
-                        var currentMode = 0
                         currentMode = (currentMode + 1) % aspectRatios.size
                         resizeMode = aspectRatios[currentMode]
                     }
                 }
 
-                // Получаем `PlayerControlView` и добавляем кнопку
-                val controlView = this.findViewById<LinearLayout>(R.id.exo_center_controls)
-
-                controlView?.let {
-
-                    val layoutParams = LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.WRAP_CONTENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT
-                        )
-                        it.addView(customButton, layoutParams)
-
-//                    // Находим контейнер для кнопок
-//                    val extraControlsContainer = it.findViewById<ViewGroup>(R.id.exo_extra_controls)
-//
-//                    // Если контейнер существует, добавляем кнопку
-                   // if (extraControlsContainer != null) {
-//                        val layoutParams = LinearLayout.LayoutParams(
-//                            LinearLayout.LayoutParams.WRAP_CONTENT,
-//                            LinearLayout.LayoutParams.WRAP_CONTENT
-//                        )
-//                        this.addView(customButton, layoutParams)
-                   // }
-
+//                //Список по середине
+//                val controlView = this.findViewById<LinearLayout>(R.id.exo_center_controls)
+//                controlView?.let {
 //                    val layoutParams = LinearLayout.LayoutParams(
 //                        LinearLayout.LayoutParams.WRAP_CONTENT,
 //                        LinearLayout.LayoutParams.WRAP_CONTENT
 //                    )
 //                    layoutParams.marginStart = 16
-//                    layoutParams.marginEnd = 16
+////                    layoutParams.marginEnd = 16
 //                    it.addView(customButton, layoutParams)
+//                }
 
+
+
+                val basic_control_view= this.findViewById<LinearLayout>(R.id.exo_basic_controls)
+                basic_control_view?.let {
+
+                    val sizeInDp = 32
+                    val sizeInPx = TypedValue.applyDimension(
+                        TypedValue.COMPLEX_UNIT_DIP,
+                        sizeInDp.toFloat(),
+                        context.resources.displayMetrics
+                    ).toInt()
+
+                    val marginInDp = 8
+                    val marginInPx = TypedValue.applyDimension(
+                        TypedValue.COMPLEX_UNIT_DIP,
+                        marginInDp.toFloat(),
+                        context.resources.displayMetrics
+                    ).toInt()
+
+                    val layoutParams = LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
+                        marginStart = marginInPx
+                        marginEnd = marginInPx
+                    }
+
+                    //layoutParams.height = 48
+//                    layoutParams.marginEnd = 16
+                    it.addView(customButton, 0,  layoutParams)
                 }
+
 
 
 
@@ -434,7 +455,7 @@ internal fun VideoPlayerSurface(
                     //val isPipMode = context.isActivityStatePipMode()
 
                     if (handleLifecycle) {
-                    //if (handleLifecycle || (enablePip && isPipMode && !isPendingPipMode)) {
+                        //if (handleLifecycle || (enablePip && isPipMode && !isPendingPipMode)) {
                         player.stop()
                     }
                 }

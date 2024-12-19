@@ -102,10 +102,12 @@ fun ZoomableVideoPlayer(
                 showBufferingProgress = true,
                 showForwardIncrementButton = true,
                 showBackwardIncrementButton = true,
+
                 showBackTrackButton = false,
                 showNextTrackButton = false,
-                showRepeatModeButton = true,
-                controllerShowTimeMilliSeconds = 1_000,
+                showRepeatModeButton = false,
+
+                controllerShowTimeMilliSeconds = 10_000,
                 controllerAutoShow = true,
                 showFullScreenButton = true,
             ),
