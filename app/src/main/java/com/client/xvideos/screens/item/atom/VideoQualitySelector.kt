@@ -31,7 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.media3.common.util.UnstableApi
-import com.client.xvideos.screens.item.ScreenItemScreenModel
+import com.client.xvideos.screens.item.ScreenModel_Item
 import com.composables.core.Menu
 import com.composables.core.MenuButton
 import com.composables.core.MenuContent
@@ -46,13 +46,13 @@ fun VideoQualitySelectorPreview() {
     var q by remember { mutableIntStateOf(250) }
 
     val list = remember {
-        mutableStateListOf<ScreenItemScreenModel.FORMAT>().apply {
-            add(ScreenItemScreenModel.FORMAT(0, 250, 250, bitrate = 0, isSelect = true))
-            add(ScreenItemScreenModel.FORMAT(1, 360, 360, bitrate = 0, isSelect = true))
-            add(ScreenItemScreenModel.FORMAT(2, 480, 480, bitrate = 0, isSelect = true))
-            add(ScreenItemScreenModel.FORMAT(3, 720, 720, bitrate = 0, isSelect = true))
-            add(ScreenItemScreenModel.FORMAT(4, 1080, 1080, bitrate = 0, isSelect = true))
-            add(ScreenItemScreenModel.FORMAT(5, 1440, 1440, bitrate = 0, isSelect = true))
+        mutableStateListOf<ScreenModel_Item.FORMAT>().apply {
+            add(ScreenModel_Item.FORMAT(0, 250, 250, bitrate = 0, isSelect = true))
+            add(ScreenModel_Item.FORMAT(1, 360, 360, bitrate = 0, isSelect = true))
+            add(ScreenModel_Item.FORMAT(2, 480, 480, bitrate = 0, isSelect = true))
+            add(ScreenModel_Item.FORMAT(3, 720, 720, bitrate = 0, isSelect = true))
+            add(ScreenModel_Item.FORMAT(4, 1080, 1080, bitrate = 0, isSelect = true))
+            add(ScreenModel_Item.FORMAT(5, 1440, 1440, bitrate = 0, isSelect = true))
         }
     }
 
@@ -67,7 +67,7 @@ fun VideoQualitySelectorPreview() {
 @Composable
 fun VideoQualitySelector(
     h: Int,
-    list: SnapshotStateList<ScreenItemScreenModel.FORMAT>,
+    list: SnapshotStateList<ScreenModel_Item.FORMAT>,
     onClick: (Int) -> Unit,
 ) {
 

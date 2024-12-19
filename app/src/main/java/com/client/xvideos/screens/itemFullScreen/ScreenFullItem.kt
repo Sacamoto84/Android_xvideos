@@ -1,4 +1,4 @@
-package com.client.xvideos.screens.item
+package com.client.xvideos.screens.itemFullScreen
 
 import androidx.annotation.OptIn
 import androidx.compose.foundation.layout.Arrangement
@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import cafe.adriel.voyager.core.model.rememberNavigatorScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
@@ -16,10 +17,9 @@ import cafe.adriel.voyager.hilt.getNavigatorScreenModel
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.client.xvideos.screens.item.atom.ComposeTags
-import com.client.xvideos.screens.item.atom.ZoomableVideoPlayer
+import com.client.xvideos.screens.item.ScreenModel_Item
 
-class ScreenItem(val url: String) : Screen {
+class ScreenFullItem(val url: String) : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
 
@@ -28,19 +28,22 @@ class ScreenItem(val url: String) : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
 
-        val vm = getScreenModel<ScreenModel_Item, ScreenModel_Item.Factory> { factory ->
-            factory.create(url)
-        }
-
-//        val vm = navigator.getNavigatorScreenModel<ScreenModel_Item, ScreenModel_Item.Factory> { factory ->
+//        val a = getScreenModel<ScreenModel_Item, ScreenModel_Item.Factory> { factory ->
 //            factory.create(url)
 //        }
 
-        Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
-            //Отобразить теги
-            //ComposeTags(vm.tags, onClick = { vm.openTag(it, navigator) })
+        //val vm = navigator.rememberNavigatorScreenModel { a }
+        //val vm = rememberScreenModel { a }
 
-            ZoomableVideoPlayer(vm, videoUri = vm.passedString, Modifier.weight(1f))
+        val vm = navigator.getNavigatorScreenModel<ScreenModel_Item, ScreenModel_Item.Factory> { factory ->
+            factory.create(url)
+        }
+
+        Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
+
+
+
+
         }
 
     }

@@ -9,13 +9,19 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.media3.common.AudioAttributes
+import androidx.media3.common.C
+import androidx.media3.common.C.AUDIO_CONTENT_TYPE_MOVIE
 import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
 import androidx.media3.common.TrackSelectionOverride
 import androidx.media3.common.util.UnstableApi
+import androidx.media3.datasource.DefaultDataSource
+import androidx.media3.datasource.DefaultHttpDataSource
+import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.hilt.ScreenModelFactory
@@ -25,9 +31,12 @@ import com.client.xvideos.model.HTML5PlayerConfig
 import com.client.xvideos.net.readHtmlFromURL
 import com.client.xvideos.parcer.parseHTML5Player
 import com.client.xvideos.parcer.parserItemVideo
-import com.client.xvideos.screens.tags.ScreenTags
-import com.client.xvideos.screens.item.model.TagsModel
 import com.client.xvideos.parcer.parserItemVideoTags
+import com.client.xvideos.screens.item.model.TagsModel
+import com.client.xvideos.screens.itemFullScreen.ScreenFullItem
+import com.client.xvideos.screens.tags.ScreenTags
+import com.client.xvideos.video.cache.VideoPlayerCacheManager
+import com.client.xvideos.video.controller.VideoPlayerControllerConfig
 import dagger.Binds
 import dagger.Module
 import dagger.assisted.Assisted
@@ -42,15 +51,26 @@ import timber.log.Timber
 
 
 @UnstableApi
-class ScreenItemScreenModel @AssistedInject constructor(
+class ScreenModel_Item @AssistedInject constructor(
     @Assisted val url: String,
     @ApplicationContext context: Context,
 ) : ScreenModel {
 
     @AssistedFactory
     interface Factory : ScreenModelFactory {
-        fun create(url: String): ScreenItemScreenModel
+        fun create(url: String): ScreenModel_Item
     }
+
+    init {
+        Timber.e("!!! ScreenModel_Item init()")
+    }
+
+    override fun onDispose() {
+        super.onDispose()
+        Timber.e("!!! ScreenModel_Item onDispose")
+    }
+
+    var playerE by mutableStateOf<Player?>(null)
 
     var passedString: String = ""
 
@@ -72,17 +92,14 @@ class ScreenItemScreenModel @AssistedInject constructor(
             tags = parserItemVideoTags(s)
             tags
 
-            //mediaItem = a.value?.let { MediaItem.fromUri(it.videoHLS) }
             passedString = a.value?.videoHLS.toString()
 
-//            if (mediaItem != null) {
-//                playerM3.player.setMediaItem(mediaItem)
-//            }
-//            playerM3.player.prepare()
-//            playerM3.player.play()
+            playerE = null
 
         }
     }
+
+    var isFullScreen by mutableStateOf(false)
 
 
     /////////////////////////////////////////////////////////
@@ -109,11 +126,10 @@ class ScreenItemScreenModel @AssistedInject constructor(
 
     var isPlaying by mutableStateOf(false)
 
-    var playerE by mutableStateOf<Player?>(null)
 
-    var playbackState by  mutableIntStateOf(0)
+    var playbackState by mutableIntStateOf(0)
 
-    val trackSelector =  DefaultTrackSelector(context)
+    val trackSelector = DefaultTrackSelector(context)
 
     data class FORMAT(
         val id: Int,
@@ -127,12 +143,15 @@ class ScreenItemScreenModel @AssistedInject constructor(
 
     var quality by mutableIntStateOf(0)
 
+
+
+
     /**
      * Скорость воспроизведения
      */
     var speed by mutableFloatStateOf(1.0f)
 
-   ///////////////////////////////////////////////
+    ///////////////////////////////////////////////
     /**
      * ## Изменить номер дорожки
      */
@@ -175,7 +194,33 @@ class ScreenItemScreenModel @AssistedInject constructor(
         Timber.d("Playback speed changed to $speed")
         this.speed = speed
     }
+
     ///////////////////////////////////////////////
+    //Открыть плее в полном окне
+    fun openFullScreen(navigator: Navigator) {
+        if (playerE == null) return
+        navigator.push(ScreenFullItem(url))
+    }
+
+
+    val controllerConfigP = VideoPlayerControllerConfig(
+    showSpeedAndPitchOverlay = true,
+    showSubtitleButton = false,
+    showCurrentTimeAndTotalTime = true,
+    showBufferingProgress = true,
+    showForwardIncrementButton = true,
+    showBackwardIncrementButton = true,
+    showBackTrackButton = false,
+    showNextTrackButton = false,
+    showRepeatModeButton = false,
+    controllerShowTimeMilliSeconds = 1_000,
+    controllerAutoShow = true,
+    showFullScreenButton = true,
+    )
+
+    //val controllerConfigL = controllerConfigP.copy()
+
+
 
 }
 
@@ -183,11 +228,12 @@ class ScreenItemScreenModel @AssistedInject constructor(
 @InstallIn(SingletonComponent::class)
 abstract class ScreenModuleItem {
 
+    @OptIn(UnstableApi::class)
     @Binds
     @IntoMap
-    @ScreenModelFactoryKey(ScreenItemScreenModel.Factory::class)
+    @ScreenModelFactoryKey(ScreenModel_Item.Factory::class)
     abstract fun bindHiltDetailsScreenModelFactory(
-        hiltDetailsScreenModelFactory: ScreenItemScreenModel.Factory,
+        hiltDetailsScreenModelFactory: ScreenModel_Item.Factory,
     ): ScreenModelFactory
 
 }

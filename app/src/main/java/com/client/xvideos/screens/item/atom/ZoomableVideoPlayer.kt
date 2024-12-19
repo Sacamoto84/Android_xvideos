@@ -2,6 +2,7 @@ package com.client.xvideos.screens.item.atom
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 import android.content.pm.ActivityInfo.SCREEN_ORIENTATION_USER
 import androidx.annotation.OptIn
 import androidx.compose.foundation.border
@@ -32,9 +33,10 @@ import androidx.media3.common.MimeTypes
 import androidx.media3.common.Player
 import androidx.media3.common.Tracks
 import androidx.media3.common.util.UnstableApi
+import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.analytics.AnalyticsListener
-import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
-import com.client.xvideos.screens.item.ScreenItemScreenModel
+
+import com.client.xvideos.screens.item.ScreenModel_Item
 import com.client.xvideos.video.RepeatMode
 import com.client.xvideos.video.VideoPlayer
 import com.client.xvideos.video.controller.VideoPlayerControllerConfig
@@ -45,15 +47,15 @@ import java.util.concurrent.TimeUnit
 @OptIn(UnstableApi::class)
 @Composable
 fun ZoomableVideoPlayer(
-    vm: ScreenItemScreenModel,
+    vm: ScreenModel_Item,
     videoUri: String,
     modifier: Modifier = Modifier,
 ) {
 
     Timber.i("!!! ZoomableVideoPlayer url:$videoUri")
 
-    val activity = LocalContext.current as Activity
-    activity.requestedOrientation = SCREEN_ORIENTATION_USER
+    //val activity = LocalContext.current as Activity
+    //activity.requestedOrientation = SCREEN_ORIENTATION_PORTRAIT
 
     var once by remember { mutableStateOf(false) }
 
@@ -67,8 +69,16 @@ fun ZoomableVideoPlayer(
         verticalArrangement = Arrangement.Bottom
     ) {
 
-
         VideoPlayer(
+            onFullScreenExit = {
+                Timber.i("!!! onFullScreenExit")
+                vm.isFullScreen = false
+            },
+            onFullScreenEnter = {
+                Timber.i("!!! onFullScreenEnter")
+                vm.isFullScreen = true
+            },
+            defaultFullScreeen = vm.isFullScreen,
             trackSelector = vm.trackSelector,
             mediaItems = listOf(
                 VideoPlayerMediaItem.NetworkMediaItem(
@@ -84,7 +94,7 @@ fun ZoomableVideoPlayer(
             enablePip = false,
             handleAudioFocus = true,
             controllerConfig = VideoPlayerControllerConfig(
-                showSpeedAndPitchOverlay = false,
+                showSpeedAndPitchOverlay = true,
                 showSubtitleButton = false,
                 showCurrentTimeAndTotalTime = true,
                 showBufferingProgress = true,
@@ -105,6 +115,8 @@ fun ZoomableVideoPlayer(
             },
             playerInstance = { // ExoPlayer instance (Experimental)
 
+                vm.playerE = this
+
                 addListener(
 
                     object : Player.Listener {
@@ -121,7 +133,7 @@ fun ZoomableVideoPlayer(
                                 val format = group.getTrackFormat(j)
 
                                 vm.listFormat.add(
-                                    ScreenItemScreenModel.FORMAT(
+                                    ScreenModel_Item.FORMAT(
                                         id = j,
                                         width = format.width,
                                         height = format.height,
@@ -155,9 +167,9 @@ fun ZoomableVideoPlayer(
                             vm.isPlaying = player.isPlaying
                             vm.playbackState = player.playbackState
 
-                            if (vm.playerE == null) {
-                                vm.playerE = player
-                            }
+//                            if (vm.playerE == null) {
+//                                vm.playerE = player
+//                            }
 
                         }
 
@@ -190,7 +202,11 @@ fun ZoomableVideoPlayer(
                                 val seekOffsetMs =
                                     (dragAmount / 100).toLong() * 1000 // Перевод пикселей в миллисекунды
                                 if (vm.playerE != null) {
-                                    val newPosition = (vm.playerE!!.currentPosition + seekOffsetMs).coerceIn(0, vm.playerE!!.duration)
+                                    val newPosition =
+                                        (vm.playerE!!.currentPosition + seekOffsetMs).coerceIn(
+                                            0,
+                                            vm.playerE!!.duration
+                                        )
                                     vm.playerE!!.seekTo(newPosition)
                                 }
                             }
@@ -208,6 +224,7 @@ fun ZoomableVideoPlayer(
 
 
 
+        if(!vm.isFullScreen)
         Box(modifier = Modifier) {
             //Блок кнопок
             ItemPlayerBottomControl(
@@ -232,13 +249,7 @@ fun ZoomableVideoPlayer(
         }
 
 
-//        VideoQualitySelector(vm.quality, list = vm.listFormat) {
-//            vm.quality = it
-//            val targetId = vm.listFormat.find { el-> el.height == it }?.id
-//            if (targetId != null) {
-//                vm.playerE?.let { it1 -> vm.switchTrack(it1, targetId) }
-//            }
-//        }
+
 
 
     }

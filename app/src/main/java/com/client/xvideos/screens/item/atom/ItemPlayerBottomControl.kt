@@ -16,11 +16,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Slider
 import androidx.compose.material.SliderDefaults
-import androidx.compose.material3.Button
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Text
@@ -32,23 +30,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.media3.common.Player
-import androidx.media3.common.TrackSelectionOverride
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.R
-import com.client.xvideos.screens.item.ScreenItemScreenModel
-import com.google.common.collect.ImmutableList
-import timber.log.Timber
+import com.client.xvideos.screens.item.ScreenModel_Item
 
 
 /**
@@ -57,7 +47,7 @@ import timber.log.Timber
 @OptIn(UnstableApi::class)
 @Composable
 fun ItemPlayerBottomControl(
-    vm: ScreenItemScreenModel,
+    vm: ScreenModel_Item,
     modifier: Modifier = Modifier,
     currentTime: () -> Long,
     bufferedPercentage: () -> Int,
@@ -66,6 +56,7 @@ fun ItemPlayerBottomControl(
     isPlaying: () -> Boolean,
     onPlayClick: () -> Unit,
 ) {
+    val navigator = LocalNavigator.currentOrThrow
 
     val list = remember { mutableListOf<String>() }
 
@@ -182,7 +173,7 @@ fun ItemPlayerBottomControl(
                 Spacer(Modifier.width(8.dp))
                 VideoSpeedSelector(vm.speed, onClick = { vm.changePlaybackSpeed(it) })
                 Spacer(Modifier.width(8.dp))
-                IconButtonLocal(R.drawable.fit_to_page_outline){}
+                IconButtonLocal(R.drawable.fit_to_page_outline){vm.isFullScreen = true}
             }
 
         }
@@ -230,7 +221,7 @@ fun IconButtonLocal(@DrawableRes id: Int, sizeIB : Dp = 48.dp, sizeI : Dp = 40.d
         modifier = Modifier
             .padding(horizontal = 0.dp)
             .size(sizeIB),
-        onClick = {},
+        onClick = {onClick.invoke()},
         colors = IconButtonDefaults.iconButtonColors(contentColor = Color.White)
     ) {
         Icon(
