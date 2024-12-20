@@ -72,6 +72,7 @@ fun ZoomableVideoPlayer(
     ) {
 
         VideoPlayer(
+            vm = vm,
             onFullScreenExit = {
                 Timber.i("!!! onFullScreenExit")
                 vm.isFullScreen = false
@@ -93,7 +94,6 @@ fun ZoomableVideoPlayer(
             handleLifecycle = true,
             autoPlay = true,
             usePlayerController = false,
-            enablePip = false,
             handleAudioFocus = true,
             controllerConfig = VideoPlayerControllerConfig(
                 showSpeedAndPitchOverlay = false,

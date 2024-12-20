@@ -49,6 +49,7 @@ import androidx.media3.common.util.RepeatModeUtil
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import androidx.media3.ui.R
+import com.client.xvideos.screens.item.ScreenModel_Item
 import com.client.xvideos.video.controller.VideoPlayerControllerConfig
 import com.client.xvideos.video.controller.applyToExoPlayerView
 import com.client.xvideos.video.util.findActivity
@@ -75,6 +76,7 @@ import com.client.xvideos.video.util.setFullScreen
 @SuppressLint("UnsafeOptInUsageError")
 @Composable
 internal fun VideoPlayerFullScreenDialog(
+    vm : ScreenModel_Item,
     player: ExoPlayer,
     currentPlayerView: PlayerView,
     fullScreenPlayerView: PlayerView.() -> Unit,
@@ -183,6 +185,7 @@ internal fun VideoPlayerFullScreenDialog(
     }
 
     VideoPlayerSurface(
+        vm = vm,
         defaultPlayerView = internalFullScreenPlayerView,
         player = player,
         usePlayerController = true,

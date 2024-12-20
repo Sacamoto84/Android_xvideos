@@ -158,7 +158,6 @@ dependencies {
     implementation libs.androidx.media3.exoplayer.smoothstreaming
     implementation libs.androidx.media3.exoplayer.hls
     implementation libs.androidx.media3.exoplayer.workmanager
-    implementation libs.androidx.media3.ui
     implementation libs.androidx.media3.common
     // For loading data using the Cronet network stack
     //implementation "androidx.media3:media3-datasource-cronet:$media3_version"
@@ -170,7 +169,6 @@ dependencies {
     implementation libs.androidx.media3.session
     implementation libs.androidx.media3.extractor
     implementation libs.androidx.media3.cast
-
     implementation libs.androidx.media3.transformer
     //implementation "androidx.media3:media3-database:$media3_version"
     implementation libs.androidx.media3.decoder

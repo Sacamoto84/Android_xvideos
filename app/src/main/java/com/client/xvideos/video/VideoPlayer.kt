@@ -15,21 +15,23 @@
  */
 package com.client.xvideos.video
 
-import com.client.xvideos.R as RR
-
 import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.util.TypedValue
-import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+import android.widget.Button
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.ProgressBar
-import android.widget.TextView
+import android.widget.Toast
 import androidx.annotation.FloatRange
+import androidx.appcompat.widget.PopupMenu
+import androidx.compose.material.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -40,10 +42,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.SecureFlagPolicy
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.media3.common.AudioAttributes
@@ -62,9 +65,10 @@ import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.session.MediaSession
 import androidx.media3.ui.AspectRatioFrameLayout
-import androidx.media3.ui.PlayerControlView
 import androidx.media3.ui.PlayerView
 import androidx.media3.ui.R
+import com.client.xvideos.screens.item.ScreenModel_Item
+import com.client.xvideos.screens.item.atom.VideoQualitySelector
 import com.client.xvideos.video.cache.VideoPlayerCacheManager
 import com.client.xvideos.video.controller.VideoPlayerControllerConfig
 import com.client.xvideos.video.controller.applyToExoPlayerView
@@ -76,6 +80,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.*
+import com.client.xvideos.R as RR
 
 /**
  * [VideoPlayer] is UI component that can play video in Jetpack Compose. It works based on ExoPlayer.
@@ -116,6 +121,7 @@ import java.util.*
 @SuppressLint("SourceLockedOrientationActivity", "UnsafeOptInUsageError")
 @Composable
 fun VideoPlayer(
+    vm : ScreenModel_Item,
     modifier: Modifier = Modifier,
     mediaItems: List<VideoPlayerMediaItem>,
     handleLifecycle: Boolean = true,
@@ -131,7 +137,6 @@ fun VideoPlayer(
     fullScreenSecurePolicy: SecureFlagPolicy = SecureFlagPolicy.Inherit,
     onFullScreenEnter: () -> Unit = {},
     onFullScreenExit: () -> Unit = {},
-    enablePip: Boolean = false,
     defaultFullScreeen: Boolean = false,
     handleAudioFocus: Boolean = true,
     playerBuilder: ExoPlayer.Builder.() -> ExoPlayer.Builder = { this },
@@ -178,8 +183,16 @@ fun VideoPlayer(
 
     val defaultPlayerView = remember {
         PlayerView(context).apply {
+
             val basic_progressbar= this.findViewById<ProgressBar>(R.id.exo_buffering)
             basic_progressbar?.indeterminateDrawable?.setColorFilter(Color.parseColor("#FFA500"), PorterDuff.Mode.SRC_IN)
+
+
+            val exoPrev = this.findViewById<ImageButton>(R.id.exo_play_pause)
+            exoPrev.setColorFilter(
+                Color.parseColor("#FFA500"), // Задаем цвет из ресурсов
+                PorterDuff.Mode.SRC_IN // Режим наложения
+            )
         }
     }
 
@@ -269,6 +282,7 @@ fun VideoPlayer(
     }
 
     VideoPlayerSurface(
+        vm = vm,
         modifier = modifier,
         defaultPlayerView = defaultPlayerView,
         player = player,
@@ -281,6 +295,7 @@ fun VideoPlayer(
         var fullScreenPlayerView by remember { mutableStateOf<PlayerView?>(null) }
 
         VideoPlayerFullScreenDialog(
+            vm = vm,
             player = player,
             currentPlayerView = defaultPlayerView,
             controllerConfig = controllerConfig,
@@ -311,9 +326,12 @@ fun VideoPlayer(
 
 }
 
+private val orange = Color.parseColor("#FFA800")
+
 @SuppressLint("UnsafeOptInUsageError")
 @Composable
 internal fun VideoPlayerSurface(
+    vm : ScreenModel_Item,
     modifier: Modifier = Modifier,
     defaultPlayerView: PlayerView,
     player: ExoPlayer,
@@ -369,13 +387,13 @@ internal fun VideoPlayerSurface(
 //                    this.resizeMode = aspectRatios[currentMode]
 //                }
 
-
-                val customButton = ImageButton(context).apply {
+                ///////////////////////////////////////////////////////////////////////////////
+                //Кнопка изменения отношения сторон
+                val customButtonResize = ImageButton(context).apply {
                     setImageResource(RR.drawable.resize1) // Ваш значок кнопки
                     contentDescription = "Change Aspect Ratio"
-                    setBackgroundResource(android.R.color.black) // Убираем фон
+                    setBackgroundResource(android.R.color.transparent) // Убираем фон
                     setOnClickListener {
-                        // Логика переключения режимов соотношения сторон
                         val aspectRatios = listOf(
                             AspectRatioFrameLayout.RESIZE_MODE_FIT,
                             AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH,
@@ -387,6 +405,39 @@ internal fun VideoPlayerSurface(
                         resizeMode = aspectRatios[currentMode]
                     }
                 }
+                ///////////////////////////////////////////////////////////////////////////////
+                val customButtonText = Button(context).apply {
+                    text = "Показать меню" // Текст кнопки
+                    contentDescription = "Change Aspect Ratio"
+                    setBackgroundResource(android.R.color.darker_gray) // Убираем фон, если нужен прозрачный
+                    // Настройка стиля кнопки
+                    setTextColor(ContextCompat.getColor(context, RR.color.white)) // Цвет текста
+                    setPadding(16, 8, 16, 8) // Внутренние отступы
+                    textSize = 16f // Размер текста в sp
+                }
+
+                val compose = ComposeView(context)
+                compose.setContent {
+
+                    //Изменение качества
+                    VideoQualitySelector(vm.quality, list = vm.listFormat) {
+                        vm.quality = it
+                        val targetId = vm.listFormat.find { el -> el.height == it }?.id
+                        if (targetId != null) {
+                            vm.switchTrack(targetId)
+                        }
+                    }
+
+//                    Button(onClick = {}) {
+//                        Text(text ="eee", color = androidx.compose.ui.graphics.Color.Cyan)
+//                    }
+
+                }
+
+
+
+
+
 
 //                //Список по середине
 //                val controlView = this.findViewById<LinearLayout>(R.id.exo_center_controls)
@@ -401,35 +452,73 @@ internal fun VideoPlayerSurface(
 //                }
 
 
-                val basic_progressbar= this.findViewById<ProgressBar>(R.id.exo_buffering)
-                basic_progressbar?.indeterminateDrawable?.setColorFilter(Color.parseColor("#FFA500"), PorterDuff.Mode.SRC_IN)
+                //Затенение фона
+                this.findViewById<View>(R.id.exo_controls_background).apply {
+                    setBackgroundColor(0x60000000)
+                }
 
-                val basic_control_view= this.findViewById<LinearLayout>(R.id.exo_basic_controls)
-                basic_control_view?.let {
+                //Кнопка плей пауза
+                this.findViewById<ImageButton>(R.id.exo_play_pause).apply {
+                    setColorFilter( orange, PorterDuff.Mode.SRC_IN )
+                    scaleX = 1.5f // Увеличивает ширину в 2 раза
+                    scaleY = 1.5f // Увеличивает высоту в 2 раза
+                }
 
-                    val sizeInDp = 32
-                    val sizeInPx = TypedValue.applyDimension(
-                        TypedValue.COMPLEX_UNIT_DIP,
-                        sizeInDp.toFloat(),
-                        context.resources.displayMetrics
-                    ).toInt()
+                //Кнопка перемотки назад
+                findViewById<Button>(R.id.exo_rew_with_amount).apply {
+                    foreground?.mutate()?.setColorFilter( orange, PorterDuff.Mode.SRC_IN )
+                    setTextColor(orange)
+                    scaleX = 1.5f // Увеличивает ширину в 2 раза
+                    scaleY = 1.5f // Увеличивает высоту в 2 раза
 
-                    val marginInDp = 8
-                    val marginInPx = TypedValue.applyDimension(
-                        TypedValue.COMPLEX_UNIT_DIP,
-                        marginInDp.toFloat(),
-                        context.resources.displayMetrics
-                    ).toInt()
+                    // Получаем LayoutParams текущей кнопки
+                    val l = this.layoutParams as ViewGroup.MarginLayoutParams
+                    l.marginEnd = TypedValue.applyDimension( TypedValue.COMPLEX_UNIT_DIP, 20.toFloat(), context.resources.displayMetrics ).toInt()
+                    layoutParams = l
+                }
 
+                //Кнопка перемотки вперед
+                findViewById<Button>(R.id.exo_ffwd_with_amount).apply {
+                    foreground?.mutate()?.setColorFilter(orange, PorterDuff.Mode.SRC_IN)
+                    setTextColor(orange)
+                    scaleX = 1.5f // Увеличивает ширину в 2 раза
+                    scaleY = 1.5f // Увеличивает высоту в 2 раза
+
+                    // Получаем LayoutParams текущей кнопки
+                    val l = this.layoutParams as ViewGroup.MarginLayoutParams
+                    l.marginStart = TypedValue.applyDimension( TypedValue.COMPLEX_UNIT_DIP, 20.toFloat(), context.resources.displayMetrics ).toInt()
+                    layoutParams = l
+                }
+
+                //Прогресс бар
+                this.findViewById<ProgressBar>(R.id.exo_buffering).apply {
+                    indeterminateDrawable?.setColorFilter(orange, PorterDuff.Mode.SRC_IN )
+                }
+
+
+                val basicControlView= this.findViewById<LinearLayout>(R.id.exo_basic_controls)
+
+                basicControlView?.let {
+                    val marginInPx = TypedValue.applyDimension( TypedValue.COMPLEX_UNIT_DIP, 8.toFloat(), context.resources.displayMetrics ).toInt()
                     val layoutParams = LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
                         marginStart = marginInPx
                         marginEnd = marginInPx
                     }
+                    it.addView(customButtonResize, 0,  layoutParams)
+                    //////////////////////////////////////////////////////////////////
+                    it.addView(customButtonText, 0,  layoutParams)
 
-                    //layoutParams.height = 48
-//                    layoutParams.marginEnd = 16
-                    it.addView(customButton, 0,  layoutParams)
+                    it.addView(compose, 0,  layoutParams)
                 }
+
+
+
+
+
+
+
+
+
 
 
 
