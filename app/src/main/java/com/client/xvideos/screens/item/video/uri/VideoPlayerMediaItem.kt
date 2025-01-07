@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.client.xvideos.video.uri
+package com.client.xvideos.screens.item.video.uri
 
 import android.net.Uri
 import androidx.annotation.RawRes
 import androidx.media3.common.MediaItem.DrmConfiguration
 import androidx.media3.common.MediaMetadata
-import com.client.xvideos.video.uri.VideoPlayerMediaItem.AssetFileMediaItem
-import com.client.xvideos.video.uri.VideoPlayerMediaItem.NetworkMediaItem
-import com.client.xvideos.video.uri.VideoPlayerMediaItem.RawResourceMediaItem
-import com.client.xvideos.video.uri.VideoPlayerMediaItem.StorageMediaItem
+import com.client.xvideos.screens.item.video.uri.VideoPlayerMediaItem.AssetFileMediaItem
+import com.client.xvideos.screens.item.video.uri.VideoPlayerMediaItem.NetworkMediaItem
+import com.client.xvideos.screens.item.video.uri.VideoPlayerMediaItem.RawResourceMediaItem
+import com.client.xvideos.screens.item.video.uri.VideoPlayerMediaItem.StorageMediaItem
 
 interface BaseVideoPlayerMediaItem {
     val mediaMetadata: MediaMetadata

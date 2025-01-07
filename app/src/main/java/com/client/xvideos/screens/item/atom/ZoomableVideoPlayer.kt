@@ -39,10 +39,10 @@ import androidx.media3.exoplayer.analytics.AnalyticsListener
 import com.client.xvideos.noRippleClickable
 
 import com.client.xvideos.screens.item.ScreenModel_Item
-import com.client.xvideos.video.RepeatMode
-import com.client.xvideos.video.VideoPlayer
-import com.client.xvideos.video.controller.VideoPlayerControllerConfig
-import com.client.xvideos.video.uri.VideoPlayerMediaItem
+import com.client.xvideos.screens.item.video.RepeatMode
+import com.client.xvideos.screens.item.video.VideoPlayer
+import com.client.xvideos.screens.item.video.controller.VideoPlayerControllerConfig
+import com.client.xvideos.screens.item.video.uri.VideoPlayerMediaItem
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 

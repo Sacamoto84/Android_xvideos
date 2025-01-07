@@ -33,13 +33,19 @@ class ScreenDashBoards : Screen {
         //val pagerState = rememberPagerState(1) { 20000 }
         // ...
         Scaffold(
+            topBar = {
+//                ComposeCountry(
+//                    modifier =Modifier,
+//                    onClick = {}
+//                )
+            }
+            ,
             bottomBar = {
                 val job = rememberCoroutineScope()
                 BottomListDashBoardNavigationButtons2(
                     vm.pagerState.currentPage,
                     onChange = {
                         job.launch(Dispatchers.Main) {
-
                             vm.pagerState.scrollToPage((it).coerceAtLeast(0))
                         }
                     },

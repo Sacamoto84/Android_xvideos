@@ -23,6 +23,7 @@ import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
+import androidx.media3.ui.AspectRatioFrameLayout
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
@@ -35,8 +36,8 @@ import com.client.xvideos.parcer.parserItemVideoTags
 import com.client.xvideos.screens.item.model.TagsModel
 import com.client.xvideos.screens.itemFullScreen.ScreenFullItem
 import com.client.xvideos.screens.tags.ScreenTags
-import com.client.xvideos.video.cache.VideoPlayerCacheManager
-import com.client.xvideos.video.controller.VideoPlayerControllerConfig
+import com.client.xvideos.screens.item.video.cache.VideoPlayerCacheManager
+import com.client.xvideos.screens.item.video.controller.VideoPlayerControllerConfig
 import dagger.Binds
 import dagger.Module
 import dagger.assisted.Assisted
@@ -203,23 +204,23 @@ class ScreenModel_Item @AssistedInject constructor(
     }
 
 
-    val controllerConfigP = VideoPlayerControllerConfig(
-    showSpeedAndPitchOverlay = true,
-    showSubtitleButton = false,
-    showCurrentTimeAndTotalTime = true,
-    showBufferingProgress = true,
-    showForwardIncrementButton = true,
-    showBackwardIncrementButton = true,
-    showBackTrackButton = false,
-    showNextTrackButton = false,
-    showRepeatModeButton = false,
-    controllerShowTimeMilliSeconds = 1_000,
-    controllerAutoShow = true,
-    showFullScreenButton = true,
-    )
 
-    //val controllerConfigL = controllerConfigP.copy()
 
+
+    // Блок соотношения сторон
+    private var currentAspectRatios = 0
+    private val aspectRatios = listOf(
+                            AspectRatioFrameLayout.RESIZE_MODE_FIT,
+                            AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH,
+                            AspectRatioFrameLayout.RESIZE_MODE_FIXED_HEIGHT,
+                            AspectRatioFrameLayout.RESIZE_MODE_FILL,
+                            AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+                        )
+
+    fun aspectRatiosClick():Int{
+        currentAspectRatios = (currentAspectRatios + 1) % aspectRatios.size
+        return aspectRatios[currentAspectRatios]
+    }
 
 
 }

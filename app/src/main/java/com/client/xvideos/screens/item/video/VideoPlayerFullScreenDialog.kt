@@ -13,47 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.client.xvideos.video
+package com.client.xvideos.screens.item.video
 
 import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
-import android.graphics.PorterDuff
 import android.view.Window
-import android.view.WindowManager
 import android.widget.ImageButton
-import android.widget.ProgressBar
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
-import androidx.compose.ui.window.SecureFlagPolicy
-import androidx.core.view.WindowCompat
-import androidx.media3.common.util.RepeatModeUtil
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import androidx.media3.ui.R
 import com.client.xvideos.screens.item.ScreenModel_Item
-import com.client.xvideos.video.controller.VideoPlayerControllerConfig
-import com.client.xvideos.video.controller.applyToExoPlayerView
-import com.client.xvideos.video.util.findActivity
-import com.client.xvideos.video.util.setFullScreen
+import com.client.xvideos.screens.item.video.controller.VideoPlayerControllerConfig
+import com.client.xvideos.screens.item.video.controller.applyToExoPlayerView
+import com.client.xvideos.screens.item.video.util.findActivity
 
 /**
  * ExoPlayer does not support full screen views by default.

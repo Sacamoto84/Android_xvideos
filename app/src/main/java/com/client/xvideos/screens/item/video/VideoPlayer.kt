@@ -13,42 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.client.xvideos.video
+package com.client.xvideos.screens.item.video
 
 import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.graphics.PorterDuff
-import android.util.TypedValue
-import android.view.View
-import android.view.ViewGroup
-import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
-import android.widget.Button
 import android.widget.ImageButton
-import android.widget.LinearLayout
 import android.widget.ProgressBar
-import android.widget.Toast
 import androidx.annotation.FloatRange
-import androidx.appcompat.widget.PopupMenu
-import androidx.compose.material.Button
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.SecureFlagPolicy
-import androidx.core.content.ContextCompat
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.C.AUDIO_CONTENT_TYPE_MOVIE
@@ -64,23 +47,20 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.session.MediaSession
-import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 import androidx.media3.ui.R
 import com.client.xvideos.screens.item.ScreenModel_Item
-import com.client.xvideos.screens.item.atom.VideoQualitySelector
-import com.client.xvideos.video.cache.VideoPlayerCacheManager
-import com.client.xvideos.video.controller.VideoPlayerControllerConfig
-import com.client.xvideos.video.controller.applyToExoPlayerView
-import com.client.xvideos.video.uri.VideoPlayerMediaItem
-import com.client.xvideos.video.uri.toUri
-import com.client.xvideos.video.util.findActivity
+import com.client.xvideos.screens.item.video.cache.VideoPlayerCacheManager
+import com.client.xvideos.screens.item.video.controller.VideoPlayerControllerConfig
+import com.client.xvideos.screens.item.video.controller.applyToExoPlayerView
+import com.client.xvideos.screens.item.video.uri.VideoPlayerMediaItem
+import com.client.xvideos.screens.item.video.uri.toUri
+import com.client.xvideos.screens.item.video.util.findActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.*
-import com.client.xvideos.R as RR
 
 /**
  * [VideoPlayer] is UI component that can play video in Jetpack Compose. It works based on ExoPlayer.
@@ -326,249 +306,3 @@ fun VideoPlayer(
 
 }
 
-private val orange = Color.parseColor("#FFA800")
-
-@SuppressLint("UnsafeOptInUsageError")
-@Composable
-internal fun VideoPlayerSurface(
-    vm : ScreenModel_Item,
-    modifier: Modifier = Modifier,
-    defaultPlayerView: PlayerView,
-    player: ExoPlayer,
-    usePlayerController: Boolean,
-    handleLifecycle: Boolean,
-    surfaceResizeMode: ResizeMode,
-    autoDispose: Boolean = true,
-) {
-    val lifecycleOwner =
-        rememberUpdatedState(androidx.lifecycle.compose.LocalLifecycleOwner.current)
-
-    AndroidView(
-        modifier = modifier,
-
-        factory = {
-            defaultPlayerView.apply {
-                useController = usePlayerController
-                resizeMode = surfaceResizeMode.toPlayerViewResizeMode()
-                setBackgroundColor(Color.BLACK)
-
-
-//                setControllerShowTimeoutMs(0)
-//                controllerAutoShow = false // Автоматическое отображение при взаимодействии
-//                controllerHideOnTouch = false // Автоматическое скрытие при касании экрана
-                 // Установить время в миллисекундах (10 секунд)
-
-//                // Подключение кастомной разметки
-//                val customControls = LayoutInflater.from(context).inflate(
-//                    RR.layout.custom_player_controls,
-//                    this,
-//                    false
-//                )
-//                this.addView(customControls)
-
-//                val text: TextView = customControls.findViewById(RR.id.speed)
-//                text.text = "2X"
-
-//                // Логика для кнопки изменения соотношения сторон
-//                val aspectRatioButton: ImageButton = customControls.findViewById(RR.id.exo_aspect_ratio)
-//
-//                val aspectRatios = listOf(
-//                    AspectRatioFrameLayout.RESIZE_MODE_FIT,
-//                    AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH,
-//                    AspectRatioFrameLayout.RESIZE_MODE_FIXED_HEIGHT,
-//                    AspectRatioFrameLayout.RESIZE_MODE_FILL,
-//                    AspectRatioFrameLayout.RESIZE_MODE_ZOOM
-//                )
-//
-                var currentMode = 0
-//
-//                text.setOnClickListener {
-//                    currentMode = (currentMode + 1) % aspectRatios.size
-//                    this.resizeMode = aspectRatios[currentMode]
-//                }
-
-                ///////////////////////////////////////////////////////////////////////////////
-                //Кнопка изменения отношения сторон
-                val customButtonResize = ImageButton(context).apply {
-                    setImageResource(RR.drawable.resize1) // Ваш значок кнопки
-                    contentDescription = "Change Aspect Ratio"
-                    setBackgroundResource(android.R.color.transparent) // Убираем фон
-                    setOnClickListener {
-                        val aspectRatios = listOf(
-                            AspectRatioFrameLayout.RESIZE_MODE_FIT,
-                            AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH,
-                            AspectRatioFrameLayout.RESIZE_MODE_FIXED_HEIGHT,
-                            AspectRatioFrameLayout.RESIZE_MODE_FILL,
-                            AspectRatioFrameLayout.RESIZE_MODE_ZOOM
-                        )
-                        currentMode = (currentMode + 1) % aspectRatios.size
-                        resizeMode = aspectRatios[currentMode]
-                    }
-                }
-                ///////////////////////////////////////////////////////////////////////////////
-                val customButtonText = Button(context).apply {
-                    text = "Показать меню" // Текст кнопки
-                    contentDescription = "Change Aspect Ratio"
-                    setBackgroundResource(android.R.color.darker_gray) // Убираем фон, если нужен прозрачный
-                    // Настройка стиля кнопки
-                    setTextColor(ContextCompat.getColor(context, RR.color.white)) // Цвет текста
-                    setPadding(16, 8, 16, 8) // Внутренние отступы
-                    textSize = 16f // Размер текста в sp
-                }
-
-                val compose = ComposeView(context)
-                compose.setContent {
-
-                    //Изменение качества
-                    VideoQualitySelector(vm.quality, list = vm.listFormat) {
-                        vm.quality = it
-                        val targetId = vm.listFormat.find { el -> el.height == it }?.id
-                        if (targetId != null) {
-                            vm.switchTrack(targetId)
-                        }
-                    }
-
-//                    Button(onClick = {}) {
-//                        Text(text ="eee", color = androidx.compose.ui.graphics.Color.Cyan)
-//                    }
-
-                }
-
-
-
-
-
-
-//                //Список по середине
-//                val controlView = this.findViewById<LinearLayout>(R.id.exo_center_controls)
-//                controlView?.let {
-//                    val layoutParams = LinearLayout.LayoutParams(
-//                        LinearLayout.LayoutParams.WRAP_CONTENT,
-//                        LinearLayout.LayoutParams.WRAP_CONTENT
-//                    )
-//                    layoutParams.marginStart = 16
-////                    layoutParams.marginEnd = 16
-//                    it.addView(customButton, layoutParams)
-//                }
-
-
-                //Затенение фона
-                this.findViewById<View>(R.id.exo_controls_background).apply {
-                    setBackgroundColor(0x60000000)
-                }
-
-                //Кнопка плей пауза
-                this.findViewById<ImageButton>(R.id.exo_play_pause).apply {
-                    setColorFilter( orange, PorterDuff.Mode.SRC_IN )
-                    scaleX = 1.5f // Увеличивает ширину в 2 раза
-                    scaleY = 1.5f // Увеличивает высоту в 2 раза
-                }
-
-                //Кнопка перемотки назад
-                findViewById<Button>(R.id.exo_rew_with_amount).apply {
-                    foreground?.mutate()?.setColorFilter( orange, PorterDuff.Mode.SRC_IN )
-                    setTextColor(orange)
-                    scaleX = 1.5f // Увеличивает ширину в 2 раза
-                    scaleY = 1.5f // Увеличивает высоту в 2 раза
-
-                    // Получаем LayoutParams текущей кнопки
-                    val l = this.layoutParams as ViewGroup.MarginLayoutParams
-                    l.marginEnd = TypedValue.applyDimension( TypedValue.COMPLEX_UNIT_DIP, 20.toFloat(), context.resources.displayMetrics ).toInt()
-                    layoutParams = l
-                }
-
-                //Кнопка перемотки вперед
-                findViewById<Button>(R.id.exo_ffwd_with_amount).apply {
-                    foreground?.mutate()?.setColorFilter(orange, PorterDuff.Mode.SRC_IN)
-                    setTextColor(orange)
-                    scaleX = 1.5f // Увеличивает ширину в 2 раза
-                    scaleY = 1.5f // Увеличивает высоту в 2 раза
-
-                    // Получаем LayoutParams текущей кнопки
-                    val l = this.layoutParams as ViewGroup.MarginLayoutParams
-                    l.marginStart = TypedValue.applyDimension( TypedValue.COMPLEX_UNIT_DIP, 20.toFloat(), context.resources.displayMetrics ).toInt()
-                    layoutParams = l
-                }
-
-                //Прогресс бар
-                this.findViewById<ProgressBar>(R.id.exo_buffering).apply {
-                    indeterminateDrawable?.setColorFilter(orange, PorterDuff.Mode.SRC_IN )
-                }
-
-
-                val basicControlView= this.findViewById<LinearLayout>(R.id.exo_basic_controls)
-
-                basicControlView?.let {
-                    val marginInPx = TypedValue.applyDimension( TypedValue.COMPLEX_UNIT_DIP, 8.toFloat(), context.resources.displayMetrics ).toInt()
-                    val layoutParams = LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
-                        marginStart = marginInPx
-                        marginEnd = marginInPx
-                    }
-                    it.addView(customButtonResize, 0,  layoutParams)
-                    //////////////////////////////////////////////////////////////////
-                    it.addView(customButtonText, 0,  layoutParams)
-
-                    it.addView(compose, 0,  layoutParams)
-                }
-
-
-
-
-
-
-
-
-
-
-
-
-
-            }
-        },
-    )
-
-    DisposableEffect(
-        Unit,
-    )
-    {
-        val observer = LifecycleEventObserver { _, event ->
-            when (event) {
-                Lifecycle.Event.ON_PAUSE -> {
-                    if (handleLifecycle) {
-                        player.pause()
-                    }
-                }
-
-                Lifecycle.Event.ON_RESUME -> {
-                    if (handleLifecycle) {
-                        player.play()
-                    }
-
-//                    if (enablePip && player.playWhenReady) {
-//                        defaultPlayerView.useController = usePlayerController
-//                    }
-                }
-
-                Lifecycle.Event.ON_STOP -> {
-                    //val isPipMode = context.isActivityStatePipMode()
-
-                    if (handleLifecycle) {
-                        //if (handleLifecycle || (enablePip && isPipMode && !isPendingPipMode)) {
-                        player.stop()
-                    }
-                }
-
-                else -> {}
-            }
-        }
-        val lifecycle = lifecycleOwner.value.lifecycle
-        lifecycle.addObserver(observer)
-
-        onDispose {
-            if (autoDispose) {
-                player.release()
-                lifecycle.removeObserver(observer)
-            }
-        }
-    }
-}

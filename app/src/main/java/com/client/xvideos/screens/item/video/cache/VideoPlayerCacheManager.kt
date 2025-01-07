@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.client.xvideos.video.cache
+package com.client.xvideos.screens.item.video.cache
 
 import android.annotation.SuppressLint
 import android.content.Context
