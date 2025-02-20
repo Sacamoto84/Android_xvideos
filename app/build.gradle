@@ -80,9 +80,9 @@ dependencies {
     implementation libs.androidx.ui.graphics
     implementation libs.androidx.ui.tooling.preview
 
-    implementation 'com.google.android.material:material:1.13.0-alpha08'
-    implementation 'com.google.android.material:compose-theme-adapter:1.2.1'
-    implementation "androidx.compose.material:material:1.7.6"
+    implementation libs.material
+    implementation libs.compose.theme.adapter
+    implementation libs.androidx.material
 
     implementation libs.androidx.material3
 
@@ -106,8 +106,8 @@ dependencies {
     //implementation("io.ktor:ktor-client-jetty:2.2.3")
     implementation(libs.ktor.client.android)
     implementation(libs.ktor.network)
-    implementation("io.ktor:ktor-client-content-negotiation:3.0.3")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:3.0.3")
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.serialization.kotlinx.json)
 
     //Ебанное логирование
     implementation(libs.ktor.client.logging)
@@ -181,14 +181,14 @@ dependencies {
     implementation libs.androidx.media3.exoplayer.rtsp
     ///////////////////////////////////////////////////////////////////////////
 
-    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0'
 
 //    implementation "com.github.skydoves:landscapist-glide:2.4.1"
 //    implementation "com.github.skydoves:landscapist-placeholder:2.4.1"
-    implementation "com.github.skydoves:landscapist-coil:2.4.1"
+    implementation 'com.github.skydoves:landscapist-coil:2.4.7'
 
-    implementation("network.chaintech:compose-multiplatform-media-player:1.0.23")
-    implementation "org.jetbrains.compose.components:components-resources:1.7.0-rc01"
+    implementation('network.chaintech:compose-multiplatform-media-player:1.0.31')
+    implementation 'org.jetbrains.compose.components:components-resources:1.7.3'
 
     //implementation "io.sanghun:compose-video:1.2.0"
 
@@ -217,7 +217,13 @@ dependencies {
 
     implementation("com.composables:core:1.20.0")
 
-    implementation("org.seleniumhq.selenium:selenium-java:4.15.0")
-    implementation("org.seleniumhq.selenium:selenium-chrome-driver:4.15.0")
+//    implementation("org.seleniumhq.selenium:selenium-java:4.15.0")
+//    implementation("org.seleniumhq.selenium:selenium-chrome-driver:4.15.0")
 
+
+//    // For AppWidgets support
+//    implementation "androidx.glance:glance-appwidget:1.1.1"
+//
+//    // For Wear-Tiles support
+//    implementation "androidx.glance:glance-wear-tiles:1.0.0-alpha05"
 }

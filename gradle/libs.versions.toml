@@ -1,20 +1,25 @@
 [versions]
-agp = "8.7.3"
-coilNetworkOkhttp = "3.0.0-rc01"
+agp = "8.8.1"
+coilNetworkOkhttp = "3.0.4"
+composeThemeAdapter = "1.2.1"
 diskLruCache = "1.5"
-gson = "2.11.0"
-hiltAndroid = "2.52"
-hiltAndroidCompiler = "2.52"
-jsoup = "1.18.1"
-kotlin = "2.0.21"
+gson = "2.12.1"
+hiltAndroid = "2.55"
+hiltAndroidCompiler = "2.55"
+jsoup = "1.18.3"
+kotlin = "2.1.0"
 coreKtx = "1.15.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
-ktorClientAndroid = "3.0.3"
+ktorClientAndroid = "3.1.0"
+ktorClientContentNegotiation = "3.1.0"
+ktorSerializationKotlinxJson = "3.1.0"
 lifecycleRuntimeKtx = "2.8.7"
-activityCompose = "1.9.3"
-composeBom = "2024.12.01"
+activityCompose = "1.10.0"
+composeBom = "2025.02.00"
+material = "1.13.0-alpha10"
+materialVersion = "1.7.8"
 media3 = "1.5.1"
 media3ExoplayerRtsp = "1.5.1"
 room = "2.6.1"
@@ -25,11 +30,11 @@ media3ExoplayerSmoothstreaming = "1.5.1"
 storage = "1.5.0"
 googleGmsGoogleServices = "4.4.2"
 
-
 [libraries]
 androidx-adaptive = { module = "androidx.compose.material3.adaptive:adaptive" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 
+androidx-material = { module = "androidx.compose.material:material", version.ref = "materialVersion" }
 androidx-material-icons-core = { module = "androidx.compose.material:material-icons-core" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 androidx-media3-cast = { module = "androidx.media3:media3-cast", version.ref = "media3" }
@@ -57,6 +62,7 @@ coil-compose-core = { module = "io.coil-kt.coil3:coil-compose-core", version.ref
 coil-network-ktor = { module = "io.coil-kt.coil3:coil-network-ktor", version.ref = "coilNetworkOkhttp" }
 coil-mp = { module = "io.coil-kt.coil3:coil", version.ref = "coilNetworkOkhttp" }
 
+compose-theme-adapter = { module = "com.google.android.material:compose-theme-adapter", version.ref = "composeThemeAdapter" }
 disk-lru-cache = { module = "com.github.solkin:disk-lru-cache", version.ref = "diskLruCache" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
@@ -79,11 +85,14 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 
 ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktorClientAndroid" }
 ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktorClientAndroid" }
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktorClientContentNegotiation" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktorClientAndroid" }
 ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktorClientAndroid" }
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktorClientAndroid" }
 ktor-network = { module = "io.ktor:ktor-network", version.ref = "ktorClientAndroid" }
+ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktorSerializationKotlinxJson" }
 
+material = { module = "com.google.android.material:material", version.ref = "material" }
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4jApi" }
 slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4jSimple" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
