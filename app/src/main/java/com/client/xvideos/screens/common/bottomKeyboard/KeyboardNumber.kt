@@ -1,21 +1,16 @@
 package com.client.xvideos.screens.common.bottomKeyboard
 
-import android.icu.text.ListFormatter.Width
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -33,12 +28,12 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.client.xvideos.R
 import timber.log.Timber
-
 
 /**
  * Тема для клавиатуры
@@ -48,9 +43,6 @@ data class KeyboardNumberTheme(
     val colorBackground: Color = Color(0xFF3D3F4A), //Цвет всего фона диалога
     val colorText: Color = Color(0xFFDEE1EF),
 
-    //Циферблат
-
-
     //Кнопки
     val buttonColor: Color = Color(0xFF5A5D6C),
     val buttonWidth: Dp = 66.dp,
@@ -59,14 +51,12 @@ data class KeyboardNumberTheme(
     val buttonPadding: Dp = 4.dp,
 )
 
-
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun KeyboardNumber(
     value: Int,
-    onClick: (Int) -> Unit,
     max: Int,
     theme: KeyboardNumberTheme = KeyboardNumberTheme(),
+    onClick: (Int) -> Unit,
 ) {
 
     var textFieldValue by remember {
@@ -197,4 +187,11 @@ private fun addCharToTextField(textFieldValue: TextFieldValue, char: String): Te
     val newText = textFieldValue.text + char
     val newCursorPosition = newText.length  // Курсор перемещаем в конец текста
     return TextFieldValue(newText, TextRange(newCursorPosition))
+}
+
+
+@Preview
+@Composable
+private fun Prev(){
+    KeyboardNumber(5, 10, onClick = {})
 }

@@ -17,20 +17,24 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.client.xvideos.noRippleClickable
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -97,6 +101,29 @@ fun BottomListDashBoardNavigationButtons2(value: Int, onChange: (Int) -> Unit, m
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
 
+
+        //////////// Настройка ////////////
+        val showDialog = remember { mutableStateOf(false) }
+        if (showDialog.value)
+            MenuDotConfig(setShowDialog = { showDialog.value = it })
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .noRippleClickable(onClick = { showDialog.value = true }),
+            contentAlignment = Alignment.Center
+        ) {
+            BasicText(
+                "?",
+                style = TextStyle(
+                    fontWeight = FontWeight.Medium,
+                    color = colorTextWhite,
+                    fontSize = 24.sp
+                )
+            )
+        }
+        /////////// END Настройка ////////////
+
+
         ///////////////////////////////
         Box(
             modifier = Modifier
@@ -149,7 +176,7 @@ fun BottomListDashBoardNavigationButtons2(value: Int, onChange: (Int) -> Unit, m
 
         MenuDot(
             modifier = Modifier.size(48.dp),
-            (value+1).coerceAtLeast(0),
+            (value + 1).coerceAtLeast(0),
             onChange = { onChange.invoke((it - 1).coerceAtLeast(0)) },
             max = max
         )
@@ -161,14 +188,14 @@ fun BottomListDashBoardNavigationButtons2(value: Int, onChange: (Int) -> Unit, m
                 //.weight(1f)
                 .width(height)
                 .height(height)
-                .background(if (value >= max-1) colorTextBlack else colorAccent)
+                .background(if (value >= max - 1) colorTextBlack else colorAccent)
                 .clickable {
                     onChange.invoke((value + 1).coerceIn(0, max))
                 }, contentAlignment = Alignment.Center
         ) {
             Text(
                 ">",
-                color = if (value >= (max-1)) Color.DarkGray else Color.Black,
+                color = if (value >= (max - 1)) Color.DarkGray else Color.Black,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
             )

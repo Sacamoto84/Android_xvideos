@@ -1,9 +1,18 @@
 package com.client.xvideos
 
+import android.os.Build
 import android.os.Bundle
+import android.view.WindowInsets
+import android.view.WindowInsetsController
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.displayCutoutPadding
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import cafe.adriel.voyager.navigator.Navigator
 import coil.ImageLoader
@@ -41,16 +50,37 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
             .build()
     }
 
+    @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        WindowCompat.setDecorFitsSystemWindows(window, false) // Поддержка WindowInsets
+        super.onCreate(savedInstanceState)
+        //WindowCompat.setDecorFitsSystemWindows(window, false) // Поддержка WindowInsets
+
+        // Прячем системные UI
+        // true (по умолчанию): контент не может заходить под системные элементы
+        //false: контент может располагаться на весь экран, включая области под системными панелями (ты сам решаешь, где что рисовать).
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
+
+        window.insetsController?.let {
+            it.hide(WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars())
+            it.systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        }
+
+
         plant(DebugTree())
         VideoPlayerCacheManager.initialize(this, 1024 * 1024 * 1024)    // 1GB
         setContent {
             XvideosTheme(darkTheme = true) {
                 //Navigator(ScreenTags("blonde"))
-                Navigator(ScreenDashBoards())
+                Box(modifier = Modifier.fillMaxSize()
+                    //.displayCutoutPadding()
+                    //.systemBarsPadding())
+                )
+                {
+                    Navigator(ScreenDashBoards())
+                }
+
             }
         }
     }

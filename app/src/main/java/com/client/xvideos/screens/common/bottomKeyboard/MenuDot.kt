@@ -1,26 +1,56 @@
 package com.client.xvideos.screens.common.bottomKeyboard
 
+import android.R
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.Icon
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.Money
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.composables.core.Menu
-import com.composables.core.MenuButton
-import com.composables.core.MenuContent
+import androidx.compose.ui.window.Dialog
 import com.composables.core.rememberMenuState
+import com.composeunstyled.Button
+
+@Preview
+@Composable
+private fun MenuPreview() {
+    MenuDot(value = 1, onChange = {}, max = 10)
+}
+
 
 private val height = 48.dp
 
@@ -39,64 +69,174 @@ private val colorBlackBackground = Color(0xff3b3b3b)
 @Composable
 fun MenuDot(modifier: Modifier = Modifier, value: Int, onChange: (Int) -> Unit, max: Int) {
 
-    val state = rememberMenuState(expanded = false)
+//    val state = rememberMenuState(expanded = false)
+//
+//    Box(
+//        Modifier
+//            .padding(horizontal = (0.5).dp)
+//            .then(modifier)
+//            .height(height)
+//    ) {
+//
+//        Menu(
+//            modifier = Modifier,
+//            state = state
+//        ) {
+//
+//            //Сама кнопка для вызова диалога
+//            MenuButton(
+//                Modifier
+//                    .fillMaxSize()
+//                    .background(colorBlackBackground)
+//            ) {
+//                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+//                    BasicText(
+//                        "...",
+//                        style = TextStyle(
+//                            fontWeight = FontWeight.Medium,
+//                            color = colorTextWhite,
+//                            fontSize = 24.sp
+//                        )
+//                    )
+//                }
+//            }
+//
+//            MenuContent(
+//                modifier = Modifier
+//                    .padding(bottom = 0.dp)
+//                    .width(312.dp)
+//                    .clip(RoundedCornerShape(26.dp))
+//                    .background(Color(0xFF23242A)),
+//                // exit = fadeOut()
+//                //, enter = fadeIn()
+//            ) {
+//                Box(
+//                    modifier = Modifier
+//                        .padding(top = 8.dp)
+//                        .padding(horizontal = 8.dp), contentAlignment = Alignment.Center
+//                ) {
+//                    //Клавиатура возвращает число
+//                    KeyboardNumber(
+//                        value = value, max = max,
+//                        onClick = { onChange.invoke(it); state.expanded = false },
+//                    )
+//                }
+//
+//            }
+//
+//        }
+//
+//    }
 
-    Box(
-        Modifier
-            .padding(horizontal = (0.5).dp)
-            .then(modifier)
-            .height(height)
+}
+
+
+@Composable
+fun MenuDotConfig(modifier: Modifier = Modifier, setShowDialog: (Boolean) -> Unit) {
+
+    val txtFieldError = remember { mutableStateOf("") }
+    val txtField = remember { mutableStateOf("value") }
+
+
+    Dialog(
+        onDismissRequest = { setShowDialog(false) },
     ) {
 
-        Menu(
-            modifier = Modifier,
-            state = state
+        Surface(
+            shape = RoundedCornerShape(16.dp),
+            color = Color.White
         ) {
-
-            //Сама кнопка для вызова диалога
-            MenuButton(
-                Modifier
-                    .fillMaxSize()
-                    .background(colorBlackBackground)
+            Box(
+                contentAlignment = Alignment.Center
             ) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    BasicText(
-                        "...",
-                        style = TextStyle(
-                            fontWeight = FontWeight.Medium,
-                            color = colorTextWhite,
-                            fontSize = 24.sp
+                Column(modifier = Modifier.padding(20.dp)) {
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Set value",
+                            style = TextStyle(
+                                fontSize = 24.sp,
+                                fontFamily = FontFamily.Default,
+                                fontWeight = FontWeight.Bold
+                            )
                         )
-                    )
+                        Icon(
+                            imageVector = Icons.Filled.Cancel,
+                            contentDescription = "",
+                            tint = colorResource(R.color.darker_gray),
+                            modifier = Modifier
+                                .width(30.dp)
+                                .height(30.dp)
+                                .clickable {
+                                    setShowDialog(false)
+                                }
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    TextField(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .border(
+                                BorderStroke(
+                                    width = 2.dp,
+                                    color = colorResource(id = if (txtFieldError.value.isEmpty()) R.color.holo_green_light else R.color.holo_red_dark)
+                                ),
+                                shape = RoundedCornerShape(50)
+                            ),
+                        colors = TextFieldDefaults.textFieldColors(
+                            backgroundColor = Color.Transparent,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent
+                        ),
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Filled.Money,
+                                contentDescription = "",
+                                tint = colorResource(R.color.holo_green_light),
+                                modifier = Modifier
+                                    .width(20.dp)
+                                    .height(20.dp)
+                            )
+                        },
+                        placeholder = { Text(text = "Enter value") },
+                        value = txtField.value,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        onValueChange = {
+                            txtField.value = it.take(10)
+                        })
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
+                        Button(
+                            onClick = {
+                                if (txtField.value.isEmpty()) {
+                                    txtFieldError.value = "Field can not be empty"
+                                    return@Button
+                                }
+
+                                //setValue(txtField.value)
+                                //setShowDialog(false)
+
+                            },
+                            shape = RoundedCornerShape(50.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(50.dp)
+                        ) {
+                            Text(text = "Done")
+                        }
+                    }
                 }
             }
-
-            MenuContent(
-                modifier = Modifier
-                    .padding(bottom = 0.dp)
-                    .width(312.dp)
-                    .clip(RoundedCornerShape(26.dp))
-                    .background(Color(0xFF23242A)),
-                // exit = fadeOut()
-                //, enter = fadeIn()
-            ) {
-                Box(
-                    modifier = Modifier
-                        .padding(top = 8.dp)
-                        .padding(horizontal = 8.dp), contentAlignment = Alignment.Center
-                ) {
-                    //Клавиатура возвращает число
-                    KeyboardNumber(
-                        value,
-                        { onChange.invoke(it); state.expanded = false },
-                        max = max
-                    )
-                }
-
-            }
-
         }
-
     }
 
 }
+

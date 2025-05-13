@@ -1,32 +1,35 @@
 [versions]
-agp = "8.8.1"
+agp = "8.10.0"
 coilNetworkOkhttp = "3.0.4"
 composeThemeAdapter = "1.2.1"
+core = "1.31.0"
 diskLruCache = "1.5"
 gson = "2.12.1"
-hiltAndroid = "2.55"
-hiltAndroidCompiler = "2.55"
+hiltAndroid = "2.56.2"
+hiltAndroidCompiler = "2.56.2"
 jsoup = "1.18.3"
-kotlin = "2.1.0"
-coreKtx = "1.15.0"
+kotlin = "2.1.20"
+coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
-ktorClientAndroid = "3.1.0"
-ktorClientContentNegotiation = "3.1.0"
-ktorSerializationKotlinxJson = "3.1.0"
-lifecycleRuntimeKtx = "2.8.7"
-activityCompose = "1.10.0"
-composeBom = "2025.02.00"
-material = "1.13.0-alpha10"
-materialVersion = "1.7.8"
-media3 = "1.5.1"
-media3ExoplayerRtsp = "1.5.1"
-room = "2.6.1"
+
+ktorClientAndroid = "3.1.2"
+ktorClientContentNegotiation = "3.1.2"
+ktorSerializationKotlinxJson = "3.1.2"
+
+lifecycleRuntimeKtx = "2.9.0"
+activityCompose = "1.10.1"
+composeBom = "2025.05.00"
+material = "1.13.0-alpha13"
+materialVersion = "1.8.1"
+media3 = "1.6.1"
+media3ExoplayerRtsp = "1.6.1"
+room = "2.7.1"
 slf4jApi = "2.0.16"
 slf4jSimple = "2.0.16"
 timber = "5.0.1"
-media3ExoplayerSmoothstreaming = "1.5.1"
+media3ExoplayerSmoothstreaming = "1.6.1"
 storage = "1.5.0"
 googleGmsGoogleServices = "4.4.2"
 
@@ -37,6 +40,8 @@ androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = 
 androidx-material = { module = "androidx.compose.material:material", version.ref = "materialVersion" }
 androidx-material-icons-core = { module = "androidx.compose.material:material-icons-core" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
+
+#Media3
 androidx-media3-cast = { module = "androidx.media3:media3-cast", version.ref = "media3" }
 androidx-media3-common = { module = "androidx.media3:media3-common", version.ref = "media3" }
 androidx-media3-datasource = { module = "androidx.media3:media3-datasource", version.ref = "media3" }
@@ -44,13 +49,14 @@ androidx-media3-decoder = { module = "androidx.media3:media3-decoder", version.r
 androidx-media3-exoplayer = { module = "androidx.media3:media3-exoplayer", version.ref = "media3" }
 androidx-media3-exoplayer-dash = { module = "androidx.media3:media3-exoplayer-dash", version.ref = "media3" }
 androidx-media3-exoplayer-hls = { module = "androidx.media3:media3-exoplayer-hls", version.ref = "media3" }
-androidx-media3-exoplayer-rtsp = { module = "androidx.media3:media3-exoplayer-rtsp", version.ref = "media3ExoplayerRtsp" }
+androidx-media3-exoplayer-rtsp = { module = "androidx.media3:media3-exoplayer-rtsp", version.ref = "media3" }
 androidx-media3-exoplayer-workmanager = { module = "androidx.media3:media3-exoplayer-workmanager", version.ref = "media3" }
 androidx-media3-extractor = { module = "androidx.media3:media3-extractor", version.ref = "media3" }
 androidx-media3-session = { module = "androidx.media3:media3-session", version.ref = "media3" }
 androidx-media3-transformer = { module = "androidx.media3:media3-transformer", version.ref = "media3" }
 androidx-media3-ui = { module = "androidx.media3:media3-ui", version.ref = "media3" }
 androidx-media3-ui-leanback = { module = "androidx.media3:media3-ui-leanback", version.ref = "media3" }
+
 
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
@@ -63,13 +69,18 @@ coil-network-ktor = { module = "io.coil-kt.coil3:coil-network-ktor", version.ref
 coil-mp = { module = "io.coil-kt.coil3:coil", version.ref = "coilNetworkOkhttp" }
 
 compose-theme-adapter = { module = "com.google.android.material:compose-theme-adapter", version.ref = "composeThemeAdapter" }
+core = { module = "com.composables:core", version.ref = "core" }
 disk-lru-cache = { module = "com.github.solkin:disk-lru-cache", version.ref = "diskLruCache" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroidCompiler" }
+
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
+
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
