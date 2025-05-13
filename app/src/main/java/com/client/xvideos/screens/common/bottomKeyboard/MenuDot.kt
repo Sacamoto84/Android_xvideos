@@ -42,6 +42,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.composables.core.HorizontalSeparator
 import com.composables.core.rememberMenuState
 import com.composeunstyled.Button
 
@@ -177,41 +178,8 @@ fun MenuDotConfig(modifier: Modifier = Modifier, setShowDialog: (Boolean) -> Uni
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(20.dp))
+                    HorizontalSeparator(color = Color(0xFF9E9E9E))
 
-                    TextField(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .border(
-                                BorderStroke(
-                                    width = 2.dp,
-                                    color = colorResource(id = if (txtFieldError.value.isEmpty()) R.color.holo_green_light else R.color.holo_red_dark)
-                                ),
-                                shape = RoundedCornerShape(50)
-                            ),
-                        colors = TextFieldDefaults.textFieldColors(
-                            backgroundColor = Color.Transparent,
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent
-                        ),
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Filled.Money,
-                                contentDescription = "",
-                                tint = colorResource(R.color.holo_green_light),
-                                modifier = Modifier
-                                    .width(20.dp)
-                                    .height(20.dp)
-                            )
-                        },
-                        placeholder = { Text(text = "Enter value") },
-                        value = txtField.value,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        onValueChange = {
-                            txtField.value = it.take(10)
-                        })
-
-                    Spacer(modifier = Modifier.height(20.dp))
 
                     Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
                         Button(

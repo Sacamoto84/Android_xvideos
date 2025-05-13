@@ -19,6 +19,7 @@ import coil.ImageLoader
 import coil.ImageLoaderFactory
 import coil.memory.MemoryCache
 import coil.request.CachePolicy
+import com.client.xvideos.screens.config.ScreenConfig
 import com.client.xvideos.screens.dashboards.ScreenDashBoards
 import com.client.xvideos.ui.theme.XvideosTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -78,7 +79,8 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
                     //.systemBarsPadding())
                 )
                 {
-                    Navigator(ScreenDashBoards())
+                    //Navigator(ScreenDashBoards())
+                    Navigator(ScreenConfig())
                 }
 
             }
