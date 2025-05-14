@@ -18,19 +18,28 @@ import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
 import javax.inject.Inject
 import androidx.core.content.edit
+import cafe.adriel.voyager.core.model.screenModelScope
+import com.client.xvideos.repository.PreferencesRepository
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 
 class ScreenConfigSM @Inject constructor(
     val pref: SharedPreferences,
+    private val preferencesRepository: PreferencesRepository,
 ) : ScreenModel {
 
-    var countRow by mutableIntStateOf( pref.getInt("countRow", 2) )
+    /** Количество колонок true-2 false-1 */
+    val countRow = preferencesRepository.flowRow2
+        .stateIn(screenModelScope, SharingStarted.WhileSubscribed(5000), false)
 
-    fun saveCountRow()
-    {
-        pref.edit(commit = true) { putInt("countRow", countRow) }
+    /** Сохранить количество столбиков */
+    fun saveCountRow(enabled: Boolean) {
+        screenModelScope.launch {
+            preferencesRepository.setRow2(enabled)
+        }
     }
-
 
 
 }

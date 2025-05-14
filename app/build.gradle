@@ -87,6 +87,7 @@ dependencies {
     implementation libs.androidx.material3
 
     implementation libs.androidx.storage
+    implementation libs.androidx.datastore.core.android
     //implementation libs.firebase.auth
     //implementation libs.firebase.firestore.ktx
     testImplementation libs.junit
@@ -216,6 +217,9 @@ dependencies {
     implementation (libs.androidx.room.ktx)
 
     implementation(libs.core)
+
+    implementation libs.androidx.datastore.preferences
+    implementation libs.androidx.datastore.core
 
 //    implementation("org.seleniumhq.selenium:selenium-java:4.15.0")
 //    implementation("org.seleniumhq.selenium:selenium-chrome-driver:4.15.0")

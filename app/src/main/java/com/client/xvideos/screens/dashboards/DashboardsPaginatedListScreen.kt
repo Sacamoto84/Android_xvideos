@@ -57,7 +57,7 @@ fun DashboardsPaginatedListScreen(pageIndex: Int, vm: ScreenDashBoardsScreenMode
     val navigator = LocalNavigator.currentOrThrow
 
     val itemsPerRow =
-        if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE) 4 else 2
+        if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE) 4 else vm.rowCount
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),

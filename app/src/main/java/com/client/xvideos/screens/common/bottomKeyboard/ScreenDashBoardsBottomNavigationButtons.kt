@@ -34,7 +34,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.noRippleClickable
+import com.client.xvideos.screens.config.ScreenConfig
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -85,6 +88,8 @@ private val height = 48.dp
 @Composable
 fun BottomListDashBoardNavigationButtons2(value: Int, onChange: (Int) -> Unit, max: Int) {
 
+    val navigator = LocalNavigator.currentOrThrow
+
     val list = remember { List(max) { it + 1 } }
 
     val state = rememberLazyListState()
@@ -103,13 +108,18 @@ fun BottomListDashBoardNavigationButtons2(value: Int, onChange: (Int) -> Unit, m
 
 
         //////////// Настройка ////////////
-        val showDialog = remember { mutableStateOf(false) }
-        if (showDialog.value)
-            MenuDotConfig(setShowDialog = { showDialog.value = it })
+        //val showDialog = remember { mutableStateOf(false) }
+        //if (showDialog.value)
+        //    MenuDotConfig(setShowDialog = { showDialog.value = it })
         Box(
             modifier = Modifier
                 .size(48.dp)
-                .noRippleClickable(onClick = { showDialog.value = true }),
+                .noRippleClickable(onClick = {
+
+                    //showDialog.value = true
+                    navigator.push(ScreenConfig())
+
+                }),
             contentAlignment = Alignment.Center
         ) {
             BasicText(
