@@ -231,3 +231,7 @@ dependencies {
 //    // For Wear-Tiles support
 //    implementation "androidx.glance:glance-wear-tiles:1.0.0-alpha05"
 }
+
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
+}

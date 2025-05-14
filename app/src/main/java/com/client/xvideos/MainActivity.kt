@@ -9,9 +9,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import cafe.adriel.voyager.navigator.Navigator
@@ -19,14 +17,14 @@ import coil.ImageLoader
 import coil.ImageLoaderFactory
 import coil.memory.MemoryCache
 import coil.request.CachePolicy
-import com.client.xvideos.screens.config.ScreenConfig
 import com.client.xvideos.screens.dashboards.ScreenDashBoards
 import com.client.xvideos.ui.theme.XvideosTheme
 import dagger.hilt.android.AndroidEntryPoint
-import com.client.xvideos.screens.item.video.cache.VideoPlayerCacheManager
+import com.client.xvideos.screens.videoplayer.video.cache.VideoPlayerCacheManager
 import kotlinx.coroutines.Dispatchers
 import timber.log.Timber.DebugTree
 import timber.log.Timber.Forest.plant
+import com.client.xvideos.screens.favorites.ScreenFavorites
 
 const val urlStart = "https://www.xv-ru.com"
 
@@ -80,7 +78,7 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
                 )
                 {
                     Navigator(ScreenDashBoards())
-                    //Navigator(ScreenConfig())
+                    //Navigator(ScreenFavorites())
                 }
 
             }

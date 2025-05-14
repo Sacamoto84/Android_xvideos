@@ -6,7 +6,7 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.navigator.Navigator
 import com.client.xvideos.feature.preference.PreferencesRepository
-import com.client.xvideos.screens.item.ScreenItem
+import com.client.xvideos.screens.videoplayer.ScreenVideoPlayer
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -26,8 +26,8 @@ class ScreenDashBoardsScreenModel @Inject constructor(
 
     val pagerState: PagerState = PagerState(0) { 20000 }
 
-    fun openItem(url: String, navigator: Navigator) {
-        navigator.push(ScreenItem(url))
+    fun openVideoPlayer(url: String, navigator: Navigator) {
+        navigator.push(ScreenVideoPlayer(url))
     }
 
 }

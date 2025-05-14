@@ -20,7 +20,6 @@ fun parserListVideo(html: String): List<GalleryItem> {
     val countryCode = match?.groupValues?.get(1)
     currentCountries = getFlagEmoji("flag-$countryCode")
 
-
     // Находим все видео-блоки
     val videoBlocks = document.select("div.frame-block")
 
@@ -36,8 +35,11 @@ fun parserListVideo(html: String): List<GalleryItem> {
         val videoPreviewUrl = parserVideoPreviewFromImageUrl(dataSrc)
 
         val channelName = block.selectFirst("p.metadata .name")?.text() ?: "No channel"
-        val views = block.selectFirst("p.metadata")?.text()?.split("Просмотров")?.get(0)?.trim()
-            ?: "No views"
+        val views = block.selectFirst("p.metadata")?.text()?.split("Просмотров")?.get(0)?.trim() ?: "No views"
+
+        //val views = block.select("p.metadata span").last()?.ownText()?.trim() ?: "No views"
+
+        val channelLink = block.selectFirst("p.metadata a")?.attr("href") ?: "No channel link"
 
         list.add(
             GalleryItem(
@@ -50,7 +52,7 @@ fun parserListVideo(html: String): List<GalleryItem> {
                 previewImage = dataSrc,
                 previewVideo = videoPreviewUrl,
                 nameProfile = "TODO()",
-                linkProfile = "TODO()"
+                linkProfile = channelLink
             )
         )
 

@@ -105,35 +105,7 @@ fun BottomListDashBoardNavigationButtons2(value: Int, onChange: (Int) -> Unit, m
             .fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-
-
-        //////////// Настройка ////////////
-        //val showDialog = remember { mutableStateOf(false) }
-        //if (showDialog.value)
-        //    MenuDotConfig(setShowDialog = { showDialog.value = it })
-        Box(
-            modifier = Modifier
-                .size(48.dp)
-                .noRippleClickable(onClick = {
-
-                    //showDialog.value = true
-                    navigator.push(ScreenConfig())
-
-                }),
-            contentAlignment = Alignment.Center
-        ) {
-            BasicText(
-                "?",
-                style = TextStyle(
-                    fontWeight = FontWeight.Medium,
-                    color = colorTextWhite,
-                    fontSize = 24.sp
-                )
-            )
-        }
-        /////////// END Настройка ////////////
-
-
+        
         ///////////////////////////////
         Box(
             modifier = Modifier
@@ -155,8 +127,6 @@ fun BottomListDashBoardNavigationButtons2(value: Int, onChange: (Int) -> Unit, m
             )
         }
         ///////////////////////////////
-
-
         LazyRow(
             modifier = Modifier
                 .fillMaxWidth()

@@ -1,7 +1,7 @@
 package com.client.xvideos.parcer
 
-import com.client.xvideos.screens.item.model.TagsMainUploaderPornstar
-import com.client.xvideos.screens.item.model.TagsModel
+import com.client.xvideos.screens.videoplayer.model.TagsMainUploaderPornstar
+import com.client.xvideos.screens.videoplayer.model.TagsModel
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 

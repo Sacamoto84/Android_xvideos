@@ -29,7 +29,6 @@ import com.client.xvideos.feature.country.currentCountriesUpdate
 import com.client.xvideos.model.GalleryItem
 import com.client.xvideos.feature.net.readHtmlFromURL
 import com.client.xvideos.parcer.parserListVideo
-import com.client.xvideos.screens.dashboards.molecule.DashBoardVideoImage
 import com.client.xvideos.urlStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -53,6 +52,7 @@ fun DashboardsPaginatedListScreen(pageIndex: Int, vm: ScreenDashBoardsScreenMode
         withContext(Dispatchers.IO) {
             l.clear()
             l.addAll(openNew(pageIndex).filter { !it.href.contains("THUMBNUM") })
+            l
         }
     }
 
@@ -78,7 +78,11 @@ fun DashboardsPaginatedListScreen(pageIndex: Int, vm: ScreenDashBoardsScreenMode
                             .padding(1.dp)
                             .background(Color.DarkGray)
                     ) {
-                        DashBoardVideoImage(cell, onLongClick = {vm.openItem(urlStart + cell.href, navigator)})
+                        //Отобразить карточку картинка видео
+                        UrlVideoImageAndLongClick(cell, onLongClick = {
+                            //Открыть экран прлеера
+                            vm.openVideoPlayer(urlStart + cell.href, navigator)}
+                        )
                     }
                 }
                 // Если элементов в строке меньше, чем itemsPerRow, добавляем пустые ячейки

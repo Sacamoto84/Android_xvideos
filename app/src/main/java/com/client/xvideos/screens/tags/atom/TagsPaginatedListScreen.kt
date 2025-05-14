@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.model.GalleryItem
-import com.client.xvideos.screens.dashboards.molecule.DashBoardVideoImage
+import com.client.xvideos.screens.dashboards.UrlVideoImageAndLongClick
 import com.client.xvideos.screens.tags.ScreenTagsViewModel
 
 @Composable
@@ -65,7 +65,7 @@ fun TagsPaginatedListScreen(pageIndex: Int, vm: ScreenTagsViewModel) {
                             .background(Color.DarkGray)
                     ) {
 
-                        DashBoardVideoImage(cell, onLongClick = {
+                        UrlVideoImageAndLongClick(cell, onLongClick = {
                             //vm.openItem(urlStart + cell.link, navigator)
                         })
 
