@@ -34,13 +34,7 @@ class ScreenDashBoards : Screen {
         //val pagerState = rememberPagerState(1) { 20000 }
         // ...
         Scaffold(
-            topBar = {
-                ComposeCountry(
-                    modifier =Modifier,
-                    onClick = {}
-                )
-            }
-            ,
+            topBar = {ComposeCountry(modifier=Modifier)},
             bottomBar = {
                 val job = rememberCoroutineScope()
                 BottomListDashBoardNavigationButtons2(

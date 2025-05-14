@@ -1,61 +1,62 @@
 package com.client.xvideos
 
+import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.BasicText
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.client.xvideos.net.readHtmlFromURL
 import com.composables.core.Menu
 import com.composables.core.MenuButton
 import com.composables.core.MenuContent
 import com.composables.core.rememberMenuState
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import com.client.xvideos.net.readHtmlFromURL
-
 
 // Data class для представления страны
 data class Country(val name: String, val url: String, val flagClass: String)
 
-//fun main() {
-//    parserCountry()
-//}
-
-
 @Preview
 @Composable
 fun PreviewComposeCountry() {
-    ComposeCountry(
-        modifier = Modifier,
-        onClick = { }
-    )
+    ComposeCountry(modifier = Modifier)
 }
 
-val countries: List<Country> by lazy { parserCountry() }
-var cerrentCountries: String = "?" //Текущая страна
+private val countries: List<Country> by lazy { parserCountry() }
+
+var currentCountries: String by mutableStateOf("❓") //Текущая страна
 
 @OptIn(DelicateCoroutinesApi::class)
 @Composable
-fun ComposeCountry(modifier: Modifier = Modifier, onClick: () -> Unit) {
+fun ComposeCountry(modifier: Modifier = Modifier) {
+
+    val emojiFont = FontFamily(Font(R.font.flag)) // Убедитесь, что шрифт добавлен в res/font
 
     val state = rememberMenuState(expanded = false)
 
@@ -63,7 +64,7 @@ fun ComposeCountry(modifier: Modifier = Modifier, onClick: () -> Unit) {
         Modifier
             .padding(horizontal = (0.5).dp)
             .height(48.dp)
-            .width(120.dp)
+            .width(96.dp)
             .then(modifier)
     ) {
 
@@ -78,9 +79,10 @@ fun ComposeCountry(modifier: Modifier = Modifier, onClick: () -> Unit) {
                     .fillMaxSize()
                     .background(Color.Blue)
             ) {
+
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     BasicText(
-                        cerrentCountries,
+                        currentCountries,
                         style = TextStyle(
                             fontWeight = FontWeight.Medium,
                             color = Color.White,
@@ -88,6 +90,7 @@ fun ComposeCountry(modifier: Modifier = Modifier, onClick: () -> Unit) {
                         )
                     )
                 }
+
             }
 
             MenuContent(
@@ -100,19 +103,36 @@ fun ComposeCountry(modifier: Modifier = Modifier, onClick: () -> Unit) {
                 //, enter = fadeIn()
             ) {
 
-
                 LazyColumn {
-
                     items(countries) {
-                        Box(modifier = Modifier
-                            .border(1.dp, Color.Magenta)
-                            .clickable {
-                                GlobalScope.launch {
-                                    readHtmlFromURL(urlStart + it.url)
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 2.dp)
+                                //.border(1.dp, Color.Magenta)
+                                .clickable {
+                                    GlobalScope.launch {
+                                        readHtmlFromURL(urlStart + it.url)
+                                        withContext(Dispatchers.Main) {
+                                            Toast.makeText(
+                                                App.instance.applicationContext,
+                                                "${getFlagEmoji(it.flagClass)} ${it.name}", Toast.LENGTH_SHORT).show()
+                                        }
+
+                                    }
                                 }
-                            }
                         ) {
-                            Text(it.name, color = Color.White)
+
+                            BasicText(
+                                text = "${getFlagEmoji(it.flagClass)}  ${it.name} ",
+                                style = TextStyle(
+                                    fontFamily = emojiFont,
+                                    fontSize = 24.sp,
+                                    color = Color.White
+                                )
+                            )
+
+
                         }
                     }
 
@@ -143,6 +163,15 @@ fun ComposeCountry(modifier: Modifier = Modifier, onClick: () -> Unit) {
 }
 
 
+// Функция для преобразования flag-be в Unicode
+fun getFlagEmoji(countryCode: String): String {
+    val code = countryCode.replace("flag-", "").uppercase()
+    if (code.length != 2) return "❓" // Обработка некорректного кода
+    val firstChar = code[0].code - 'A'.code + 0x1F1E6
+    val secondChar = code[1].code - 'A'.code + 0x1F1E6
+    return String(Character.toChars(firstChar)) + String(Character.toChars(secondChar))
+}
+
 /**
  * Страна: Австралия, Ссылка: /change-country/au, Класс флага: flag-au
  *
@@ -164,13 +193,13 @@ fun ComposeCountry(modifier: Modifier = Modifier, onClick: () -> Unit) {
 
 
 private fun parserCountry(): List<Country> {
-// Парсинг HTML
+    // Парсинг HTML
     val document: Document = Jsoup.parse(html)
 
-// Извлекаем все элементы <li> с классом "country-"
+    // Извлекаем все элементы <li> с классом "country-"
     val countries = document.select("li[class^=country-]")
 
-// Список стран
+    // Список стран
     val countryList = countries.map { country ->
         val countryName = country.select("a").text().trim() // Название страны
         val countryHref = country.select("a").attr("href").trim() // Ссылка (href)

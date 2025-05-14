@@ -1,5 +1,7 @@
 package com.client.xvideos.parcer
 
+import com.client.xvideos.currentCountries
+import com.client.xvideos.getFlagEmoji
 import com.client.xvideos.model.GalleryItem
 import org.jsoup.nodes.Document
 import org.jsoup.Jsoup
@@ -11,6 +13,13 @@ fun parserListVideo(html: String): List<GalleryItem> {
 
     // Парсим HTML-документ
     val document: Document = Jsoup.parse(html)
+
+
+    val regex = Regex("""\bflag-([a-z]{2})\b""")
+    val match = regex.find(document.select("#site-localisation").toString())
+    val countryCode = match?.groupValues?.get(1)
+    currentCountries = getFlagEmoji("flag-$countryCode")
+
 
     // Находим все видео-блоки
     val videoBlocks = document.select("div.frame-block")

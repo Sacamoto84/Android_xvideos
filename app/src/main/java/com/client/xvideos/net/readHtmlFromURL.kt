@@ -94,6 +94,9 @@ suspend fun readHtmlFromURL(url: String = "https://www.xvideos.com"): String =
                     webView.evaluateJavascript(
                         "(function() { return document.documentElement.outerHTML; })();"
                     ) { html ->
+
+                        Timber.i("!!!..readHtmlFromURL end $url")
+
                         continuation
                             .resume(
                                 html.trim('"')
@@ -110,6 +113,8 @@ suspend fun readHtmlFromURL(url: String = "https://www.xvideos.com"): String =
             continuation.invokeOnCancellation { cause ->
                 webView.destroy()
             }
+
+
         }
     }
 
