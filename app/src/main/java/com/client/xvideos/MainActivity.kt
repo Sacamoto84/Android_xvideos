@@ -79,8 +79,8 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
                     //.systemBarsPadding())
                 )
                 {
-                    //Navigator(ScreenDashBoards())
-                    Navigator(ScreenConfig())
+                    Navigator(ScreenDashBoards())
+                    //Navigator(ScreenConfig())
                 }
 
             }
