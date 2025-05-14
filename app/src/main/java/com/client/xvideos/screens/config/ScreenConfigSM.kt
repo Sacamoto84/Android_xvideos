@@ -1,32 +1,21 @@
 package com.client.xvideos.screens.config
 
-import android.content.SharedPreferences
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import cafe.adriel.voyager.core.model.ScreenModel
-import cafe.adriel.voyager.hilt.ScreenModelFactory
-import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
 import cafe.adriel.voyager.hilt.ScreenModelKey
-import com.client.xvideos.screens.k.ScreenKScreenModel
-import com.client.xvideos.screens.tags.ScreenTagsViewModel
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
 import javax.inject.Inject
-import androidx.core.content.edit
 import cafe.adriel.voyager.core.model.screenModelScope
-import com.client.xvideos.repository.PreferencesRepository
+import com.client.xvideos.feature.preference.PreferencesRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 
 class ScreenConfigSM @Inject constructor(
-    val pref: SharedPreferences,
     private val preferencesRepository: PreferencesRepository,
 ) : ScreenModel {
 
@@ -38,6 +27,17 @@ class ScreenConfigSM @Inject constructor(
     fun saveCountRow(enabled: Boolean) {
         screenModelScope.launch {
             preferencesRepository.setRow2(enabled)
+        }
+    }
+
+    /** Режим Shemale */
+    val shemale = preferencesRepository.flowShemale
+        .stateIn(screenModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    /** Сохранить режим shemale */
+    fun saveShemale(enabled: Boolean) {
+        screenModelScope.launch {
+            preferencesRepository.setShemale(enabled)
         }
     }
 

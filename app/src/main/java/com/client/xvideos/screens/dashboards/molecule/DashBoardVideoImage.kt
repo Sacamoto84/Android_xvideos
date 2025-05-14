@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.sp
 import com.client.xvideos.model.GalleryItem
 import com.client.xvideos.screens.dashboards.atom.DashBoardImage
 import com.client.xvideos.screens.dashboards.atom.DashBoardVideoLite
-import com.client.xvideos.vibrateWithPatternAndAmplitude
+import com.client.xvideos.feature.vibrate.vibrateWithPatternAndAmplitude
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

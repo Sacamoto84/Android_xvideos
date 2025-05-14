@@ -1,26 +1,28 @@
 package com.client.xvideos.screens.dashboards
 
-import android.content.SharedPreferences
 import androidx.compose.foundation.pager.PagerState
 import cafe.adriel.voyager.core.model.ScreenModel
+import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.navigator.Navigator
-import com.client.xvideos.PrefEnum
+import com.client.xvideos.feature.preference.PreferencesRepository
 import com.client.xvideos.screens.item.ScreenItem
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 class ScreenDashBoardsScreenModel @Inject constructor(
-    pref: SharedPreferences,
+    private val pref: PreferencesRepository,
 ) : ScreenModel {
 
-    val rowCount by lazy {
-       if (pref.getBoolean(PrefEnum.COUNT_2ROW.key, PrefEnum.COUNT_2ROW.defaultValue as Boolean)) 2 else 1
-    }
+    /** Количество колонок true-2 false-1 */
+    val countRow = pref.flowRow2
+        .stateIn(screenModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     val pagerState: PagerState = PagerState(0) { 20000 }
 

@@ -1,4 +1,4 @@
-package com.client.xvideos
+package com.client.xvideos.feature.country
 
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -26,7 +27,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.client.xvideos.net.readHtmlFromURL
+import com.client.xvideos.App
+import com.client.xvideos.R
+import com.client.xvideos.feature.net.readHtmlFromURL
+import com.client.xvideos.urlStart
 import com.composables.core.Menu
 import com.composables.core.MenuButton
 import com.composables.core.MenuContent
@@ -40,6 +44,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
 // Data class для представления страны
+// Страна: Австралия, Ссылка: /change-country/au, Класс флага: flag-au
 data class Country(val name: String, val url: String, val flagClass: String)
 
 @Preview
@@ -51,6 +56,7 @@ fun PreviewComposeCountry() {
 private val countries: List<Country> by lazy { parserCountry() }
 
 var currentCountries: String by mutableStateOf("❓") //Текущая страна
+var currentCountriesUpdate: Int by mutableIntStateOf(0) //Увеличиваем при каждом изменении
 
 @OptIn(DelicateCoroutinesApi::class)
 @Composable
@@ -64,7 +70,7 @@ fun ComposeCountry(modifier: Modifier = Modifier) {
         Modifier
             .padding(horizontal = (0.5).dp)
             .height(48.dp)
-            .width(96.dp)
+            .width(48.dp)
             .then(modifier)
     ) {
 
@@ -77,7 +83,7 @@ fun ComposeCountry(modifier: Modifier = Modifier) {
             MenuButton(
                 Modifier
                     .fillMaxSize()
-                    .background(Color.Blue)
+                    .background(Color(0xFF151515))
             ) {
 
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -114,8 +120,9 @@ fun ComposeCountry(modifier: Modifier = Modifier) {
                                     GlobalScope.launch {
                                         readHtmlFromURL(urlStart + it.url)
                                         withContext(Dispatchers.Main) {
+                                            currentCountriesUpdate++
                                             Toast.makeText(
-                                                App.instance.applicationContext,
+                                                App.Companion.instance.applicationContext,
                                                 "${getFlagEmoji(it.flagClass)} ${it.name}", Toast.LENGTH_SHORT).show()
                                         }
 

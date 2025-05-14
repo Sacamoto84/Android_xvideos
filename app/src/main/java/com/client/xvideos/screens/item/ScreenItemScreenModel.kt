@@ -10,18 +10,10 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.media3.common.AudioAttributes
-import androidx.media3.common.C
-import androidx.media3.common.C.AUDIO_CONTENT_TYPE_MOVIE
 import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
 import androidx.media3.common.TrackSelectionOverride
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.datasource.DefaultDataSource
-import androidx.media3.datasource.DefaultHttpDataSource
-import androidx.media3.datasource.cache.CacheDataSource
-import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.ui.AspectRatioFrameLayout
 import cafe.adriel.voyager.core.model.ScreenModel
@@ -29,15 +21,13 @@ import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
 import cafe.adriel.voyager.navigator.Navigator
 import com.client.xvideos.model.HTML5PlayerConfig
-import com.client.xvideos.net.readHtmlFromURL
+import com.client.xvideos.feature.net.readHtmlFromURLDirect
 import com.client.xvideos.parcer.parseHTML5Player
 import com.client.xvideos.parcer.parserItemVideo
 import com.client.xvideos.parcer.parserItemVideoTags
 import com.client.xvideos.screens.item.model.TagsModel
 import com.client.xvideos.screens.itemFullScreen.ScreenFullItem
 import com.client.xvideos.screens.tags.ScreenTags
-import com.client.xvideos.screens.item.video.cache.VideoPlayerCacheManager
-import com.client.xvideos.screens.item.video.controller.VideoPlayerControllerConfig
 import dagger.Binds
 import dagger.Module
 import dagger.assisted.Assisted
@@ -84,7 +74,7 @@ class ScreenModel_Item @AssistedInject constructor(
     init {
         runBlocking {
 
-            val s = readHtmlFromURL(url)
+            val s = readHtmlFromURLDirect(url)
             val script = parserItemVideo(s)
             a.value = script?.let { parseHTML5Player(it) }
             a

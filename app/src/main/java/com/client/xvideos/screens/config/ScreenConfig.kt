@@ -1,43 +1,29 @@
 package com.client.xvideos.screens.config
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.room.util.TableInfo
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.client.xvideos.PrefEnum
 import com.client.xvideos.screens.config.atom.CheckboxPreference
 import com.composables.core.HorizontalSeparator
-import com.composeunstyled.Button
 import com.composeunstyled.Text
 
 
@@ -51,7 +37,7 @@ class ScreenConfig() : Screen {
         val vm: ScreenConfigSM = getScreenModel()
 
         val countRow = vm.countRow.collectAsState().value
-
+        val shemale = vm.shemale.collectAsState().value
 
         Scaffold(
 
@@ -72,9 +58,7 @@ class ScreenConfig() : Screen {
                         fontSize = 32.sp, color = Color.White
                     )
 
-
                 }
-
 
             },
 
@@ -84,17 +68,13 @@ class ScreenConfig() : Screen {
             containerColor = Color.White
         ) {
 
-            Column(modifier = Modifier
-                .padding(it)
-                .padding(16.dp)) {
+            Column(
+                modifier = Modifier
+                    .padding(it)
+                    .padding(16.dp)
+            ) {
 
                 HorizontalSeparator(color = Color(0xFF9E9E9E))
-
-//                    CheckboxPreference(
-//                        title = "2 столбика",
-//                        key = PrefEnum.COUNT_2ROW.key,
-//                        defaultValue = PrefEnum.COUNT_2ROW.defaultValue as Boolean
-//                    )
 
                 CheckboxPreference(
                     title = "2 столбика",
@@ -102,6 +82,13 @@ class ScreenConfig() : Screen {
                     onChange = { it1 -> vm.saveCountRow(it1) }
                 )
 
+                HorizontalSeparator(color = Color(0xFF9E9E9E))
+
+                CheckboxPreference(
+                    title = "Shemale",
+                    state = shemale,
+                    onChange = { it1 -> vm.saveShemale(it1) }
+                )
 
                 HorizontalSeparator(color = Color(0xFF9E9E9E))
             }

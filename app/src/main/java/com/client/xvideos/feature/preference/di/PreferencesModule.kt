@@ -1,10 +1,10 @@
-package com.client.xvideos.di
+package com.client.xvideos.feature.preference.di
 
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
-import com.client.xvideos.repository.PreferencesRepository
+import com.client.xvideos.feature.preference.PreferencesRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

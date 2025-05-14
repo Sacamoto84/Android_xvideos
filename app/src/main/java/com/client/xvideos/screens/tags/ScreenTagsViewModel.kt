@@ -3,7 +3,7 @@ package com.client.xvideos.screens.tags
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
-import com.client.xvideos.net.readHtmlFromURL
+import com.client.xvideos.feature.net.readHtmlFromURLDirect
 import com.client.xvideos.screens.tags.model.ModelScreenTag
 import com.client.xvideos.parcer.parserScreenTags
 import com.client.xvideos.urlStart
@@ -32,7 +32,7 @@ class ScreenTagsViewModel @AssistedInject constructor(
     init{
         val url = "$urlStart/tags/$tag"
         runBlocking {
-            val html = readHtmlFromURL(url)
+            val html = readHtmlFromURLDirect(url)
             screen = parserScreenTags(html)
         }
     }

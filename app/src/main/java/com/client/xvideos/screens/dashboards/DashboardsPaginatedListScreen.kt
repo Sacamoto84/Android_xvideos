@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -24,8 +25,9 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.client.xvideos.feature.country.currentCountriesUpdate
 import com.client.xvideos.model.GalleryItem
-import com.client.xvideos.net.readHtmlFromURL
+import com.client.xvideos.feature.net.readHtmlFromURL
 import com.client.xvideos.parcer.parserListVideo
 import com.client.xvideos.screens.dashboards.molecule.DashBoardVideoImage
 import com.client.xvideos.urlStart
@@ -47,7 +49,7 @@ fun DashboardsPaginatedListScreen(pageIndex: Int, vm: ScreenDashBoardsScreenMode
 
     val l = remember { mutableStateListOf<GalleryItem>() }
 
-    LaunchedEffect(pageIndex) {
+    LaunchedEffect(key1 = pageIndex, key2 = currentCountriesUpdate) {
         withContext(Dispatchers.IO) {
             l.clear()
             l.addAll(openNew(pageIndex).filter { !it.href.contains("THUMBNUM") })
@@ -57,7 +59,7 @@ fun DashboardsPaginatedListScreen(pageIndex: Int, vm: ScreenDashBoardsScreenMode
     val navigator = LocalNavigator.currentOrThrow
 
     val itemsPerRow =
-        if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE) 4 else vm.rowCount
+        if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE) 4 else if (vm.countRow.collectAsState().value) 2 else 1
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
