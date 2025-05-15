@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -19,6 +20,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -68,6 +70,8 @@ fun ComposeCountry(modifier: Modifier = Modifier) {
 
     val state = rememberMenuState(expanded = false)
 
+    val stateLazyList = rememberLazyListState()
+
     Box(
         Modifier
             .padding(horizontal = (0.5).dp)
@@ -106,14 +110,14 @@ fun ComposeCountry(modifier: Modifier = Modifier) {
                     .padding(bottom = 0.dp)
                     .width(312.dp)
                     //.clip(RoundedCornerShape(26.dp))
+                    .alpha(0.9F)
                     .background(grayColor(0x35)),
                 // exit = fadeOut()
                 //, enter = fadeIn()
             ) {
 
-                LazyColumn {
+                LazyColumn(state = stateLazyList) {
                     items(countries) {
-
 
                         Box(
                             modifier = Modifier

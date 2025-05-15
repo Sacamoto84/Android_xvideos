@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -28,6 +29,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
@@ -144,7 +146,35 @@ class ScreenFavorites() : Screen {
                             )
                             UrlVideoImageAndLongClick(cell, onLongClick = {
                                 //vm.openItem(urlStart + cell.link, navigator)
-                            })
+                            }, onDoubleClick = {}){
+
+                                Box(modifier = Modifier.fillMaxSize()) {
+                                    val offsetY = (-3).dp
+
+                                    //Продолжительность видео
+                                    Text(
+                                        text = item.duration.dropLast(1),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .offset(1.dp, offsetY + 1.dp),
+                                        textAlign = TextAlign.Right,
+                                        fontSize = 14.sp,
+                                        color = Color.Black
+                                    )
+
+                                    Text(
+                                        text = item.duration.dropLast(1),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .offset(0.dp, offsetY),
+                                        textAlign = TextAlign.Right,
+                                        fontSize = 14.sp,
+                                        color = Color.White
+                                    )
+
+                                }
+
+                            }
                         }
 
                         Row(

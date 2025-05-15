@@ -57,72 +57,7 @@ class ScreenDashBoards : Screen {
         //val pagerState = rememberPagerState(1) { 20000 }
         // ...
         Scaffold(
-            topBar = {
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(grayColor(0x0E)),
-                    horizontalArrangement = Arrangement.Absolute.SpaceBetween
-                ) {
-                    ComposeCountry(modifier = Modifier)
-
-
-
-                    Box(modifier = Modifier.fillMaxWidth().weight(1f))
-
-
-
-                    IconButton(onClick = {
-                        navigator.push(ScreenFavorites())
-                    }) {
-                        Icon(
-                            imageVector = Icons.Filled.FavoriteBorder,
-                            contentDescription = null,
-                            tint = Color.Gray,
-                            modifier = Modifier
-                                .size(32.dp)
-
-                        )
-                    }
-
-
-
-
-
-                    //////////// Настройка ////////////
-                    Box(
-                        modifier = Modifier.padding(start = 8.dp, end = 8.dp)
-                            .size(48.dp)
-                            //.border(1.dp,Color.Gray)
-                            .noRippleClickable(onClick = {
-                                navigator.push(ScreenConfig())
-                            }),
-                        contentAlignment = Alignment.Center
-                    ) {
-
-//                        BasicText(
-//                            "?",
-//                            style = TextStyle(
-//                                fontWeight = FontWeight.Medium,
-//                                color = Color(0xFFCCCCCC),
-//                                fontSize = 24.sp
-//                            )
-//                        )
-
-                        Icon(
-                            imageVector = Icons.Filled.Settings,
-                            contentDescription = "Настройки",
-                            tint = Color.LightGray,
-                            modifier = Modifier.size(32.dp)
-                        )
-                    }
-                    /////////// END Настройка ////////////
-
-                }
-
-
-            },
+            topBar = { TopBarDashboard() },
             bottomBar = {
                 val job = rememberCoroutineScope()
                 BottomListDashBoardNavigationButtons2(

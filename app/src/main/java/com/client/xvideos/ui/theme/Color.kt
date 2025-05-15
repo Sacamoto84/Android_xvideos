@@ -20,6 +20,8 @@ fun grayColor(hex: Int): Color {
     return Color(colorValue)
 }
 
+val colorHorisontalSeparator = Color(0xFF9E9E9E)
+
 val PornHubGray14_0x0E = Color(0xFF0E0E0E) //14 14 14
 val PornHubGray16_0x10 = Color(0xFF101010)  //16 16 16
 val PornHubGray21_0x15 = Color(0xFF151515)  //21 21 21

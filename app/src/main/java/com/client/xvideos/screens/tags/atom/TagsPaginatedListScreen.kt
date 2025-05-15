@@ -67,7 +67,7 @@ fun TagsPaginatedListScreen(pageIndex: Int, vm: ScreenTagsViewModel) {
 
                         UrlVideoImageAndLongClick(cell, onLongClick = {
                             //vm.openItem(urlStart + cell.link, navigator)
-                        })
+                        }, onDoubleClick = {})
 
                     }
                 }

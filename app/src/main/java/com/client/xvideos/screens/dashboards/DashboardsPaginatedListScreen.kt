@@ -8,27 +8,49 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Icon
+import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.Save
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.feature.country.currentCountriesUpdate
-import com.client.xvideos.model.GalleryItem
 import com.client.xvideos.feature.net.readHtmlFromURL
+import com.client.xvideos.model.GalleryItem
 import com.client.xvideos.parcer.parserListVideo
+import com.client.xvideos.ui.theme.grayColor
 import com.client.xvideos.urlStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -41,10 +63,18 @@ private suspend fun openNew(numberScreen: Int = 0): SnapshotStateList<GalleryIte
     return parserListVideo(readHtmlFromURL(url)).toMutableStateList()
 }
 
+
+/**
+ *
+ * ![Логотип Markdown](https://ah-img.luscious.net/Joking42/499900/sample_3941cb87cea03_01J9ZXQ9XTDKY6PQ01ZRWF1FFZ.1680x0.jpg)
+ *
+ *
+ */
 @Composable
 fun DashboardsPaginatedListScreen(pageIndex: Int, vm: ScreenDashBoardsScreenModel) {
 
     println("!!! DashboardsPaginatedListScreen pageIndex:$pageIndex")
+
 
     val l = remember { mutableStateListOf<GalleryItem>() }
 
@@ -60,6 +90,8 @@ fun DashboardsPaginatedListScreen(pageIndex: Int, vm: ScreenDashBoardsScreenMode
 
     val itemsPerRow =
         if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE) 4 else if (vm.countRow.collectAsState().value) 2 else 1
+
+
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -79,10 +111,216 @@ fun DashboardsPaginatedListScreen(pageIndex: Int, vm: ScreenDashBoardsScreenMode
                             .background(Color.DarkGray)
                     ) {
                         //Отобразить карточку картинка видео
-                        UrlVideoImageAndLongClick(cell, onLongClick = {
-                            //Открыть экран прлеера
-                            vm.openVideoPlayer(urlStart + cell.href, navigator)}
+                        UrlVideoImageAndLongClick(
+                            cell, onLongClick = {
+                                //Открыть экран прлеера
+                                vm.openVideoPlayer(urlStart + cell.href, navigator)
+                            },
+                            onDoubleClick = {
+
+                            }
                         )
+                        {
+
+                            Box(modifier = Modifier.fillMaxSize()) {
+                                val offsetY = (-3).dp
+
+                                //Продолжительность видео
+                                Text(
+                                    text = cell.duration.dropLast(1),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .offset(1.dp, offsetY + 1.dp),
+                                    textAlign = TextAlign.Right,
+                                    fontSize = 14.sp,
+                                    color = Color.Black
+                                )
+
+                                Text(
+                                    text = cell.duration.dropLast(1),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .offset(0.dp, offsetY),
+                                    textAlign = TextAlign.Right,
+                                    fontSize = 14.sp,
+                                    color = Color.White
+                                )
+
+
+                            }
+
+                            //Название канала
+                            Box(
+                                modifier = Modifier
+                                    .align(Alignment.TopStart)
+                                    .background(Color(0x60000000)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = cell.channel,
+                                    modifier = Modifier
+                                        .align(Alignment.Center), fontSize = 14.sp,
+                                    color = Color.White
+                                )
+                            }
+
+                            var expanded by remember { mutableStateOf(false) }
+
+                            //Индикатор что видео в фаворитах
+                            Box(
+                                modifier = Modifier.align(Alignment.BottomEnd),
+                                contentAlignment = Alignment.Center
+                            ) {
+
+                                IconButton(onClick = { }, enabled = false) {
+                                    Icon(
+                                        imageVector = Icons.Filled.FavoriteBorder,
+                                        contentDescription = "Like",
+                                        tint = grayColor(0xC6),
+                                        modifier = Modifier
+                                            .padding(0.dp)
+                                            .size(32.dp)
+                                    )
+                                }
+
+                            }
+
+                            Box(
+                                modifier = Modifier.align(Alignment.BottomStart),
+                                contentAlignment = Alignment.Center
+                            ) {
+
+                                IconButton(onClick = { expanded = true }) {
+                                    Icon(
+                                        Icons.Default.MoreVert,
+                                        contentDescription = "Localized description",
+                                        tint = Color.LightGray
+                                    )
+                                }
+
+                                DropdownMenu(
+                                    expanded = expanded,
+                                    onDismissRequest = { expanded = false },
+                                    containerColor = Color(0xFFF2EDF7),
+                                    shadowElevation = 2.dp, tonalElevation = 16.dp
+
+                                )
+                                {
+                                    DropdownMenuItem(
+                                        text = {
+                                            Text("Фоварит")
+                                        },
+                                        onClick = { expanded = false },
+                                        leadingIcon = {
+                                            Icon(
+                                                Icons.Outlined.FavoriteBorder,
+                                                contentDescription = null
+                                            )
+                                        }
+                                    )
+                                    DropdownMenuItem(
+                                        text = { Text("Сохранить") },
+                                        onClick = { /* Handle settings! */ },
+                                        leadingIcon = {
+                                            Icon(
+                                                Icons.Outlined.Save,
+                                                contentDescription = null
+                                            )
+                                        }
+                                    )
+
+                                    DropdownMenuItem(
+                                        text = { Text("Удалить") },
+                                        onClick = { /* Handle settings! */ },
+                                        leadingIcon = {
+                                            Icon(
+                                                Icons.Outlined.Save,
+                                                contentDescription = null
+                                            )
+                                        }
+                                    )
+
+                                    HorizontalDivider()
+                                    DropdownMenuItem(
+                                        text = { Text("Send Feedback") },
+                                        onClick = { /* Handle send feedback! */ },
+                                        leadingIcon = {
+                                            Icon(
+                                                Icons.Outlined.Email,
+                                                contentDescription = null
+                                            )
+                                        },
+                                        trailingIcon = { Text("F11", textAlign = TextAlign.Center) }
+                                    )
+                                }
+
+                            }
+
+//                            val state = rememberMenuState(expanded = false)
+//
+//                            Menu(
+//                                modifier = Modifier.align(Alignment.BottomStart),
+//                                state = state
+//                            ) {
+//
+//
+//                                //Сама кнопка для вызова диалога
+//                                MenuButton(
+//                                    Modifier
+//                                    //.background(Color(0xFF151515))
+//                                ) {
+//
+//                                    //Индикатор что видео в фаворитах
+//                                    Box(
+//                                        modifier = Modifier.align(Alignment.BottomStart),
+//                                        contentAlignment = Alignment.Center
+//                                    ) {
+//                                        Icon(
+//                                            imageVector = Icons.Filled.FavoriteBorder,
+//                                            contentDescription = "Like",
+//                                            tint = grayColor(0xC6),
+//                                            modifier = Modifier
+//                                                .padding(0.dp)
+//                                                .size(32.dp)
+//                                        )
+//                                    }
+//
+//
+//                                }
+//
+//                                MenuContent(
+//                                    modifier = Modifier
+//                                        .padding(horizontal = 8.dp)
+//                                        .clip(RoundedCornerShape(4.dp))
+//                                        //.border(1.dp, Color(0xFFE0E0E0), RoundedCornerShape(4.dp))
+//                                        //.padding(top = (-16).dp)
+//                                        //.width(312.dp)
+//                                        //.clip(RoundedCornerShape(26.dp))
+//                                        //.alpha(0.9F)
+//                                        .background(Color(0xFFE6E0EC))
+//                                        .padding(4.dp)
+//
+//                                    ,
+//                                    // exit = fadeOut()
+//                                    //, enter = fadeIn()
+//                                ) {
+//
+//                                    MenuItem(onClick = { /* TODO handle click */ }) {
+//                                        Text(
+//                                            "Добавить в фавориты",
+//                                            fontWeight = FontWeight.Bold,
+//                                            fontSize = 18.sp
+//                                            ,color = Color.Black
+//                                        )
+//                                    }
+//
+//                                }
+//
+//
+//                            }
+//
+
+                        }
                     }
                 }
                 // Если элементов в строке меньше, чем itemsPerRow, добавляем пустые ячейки
