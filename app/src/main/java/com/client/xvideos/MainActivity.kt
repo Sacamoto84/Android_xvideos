@@ -53,6 +53,9 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+
+
+
         //WindowCompat.setDecorFitsSystemWindows(window, false) // Поддержка WindowInsets
 
         // Прячем системные UI
@@ -70,6 +73,9 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
         plant(DebugTree())
         VideoPlayerCacheManager.initialize(this, 1024 * 1024 * 1024)    // 1GB
         setContent {
+
+            KeepScreenOn()
+
             XvideosTheme(darkTheme = true) {
                 //Navigator(ScreenTags("blonde"))
                 Box(modifier = Modifier.fillMaxSize()

@@ -14,7 +14,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -37,6 +40,8 @@ import com.client.xvideos.feature.country.ComposeCountry
 import com.client.xvideos.noRippleClickable
 import com.client.xvideos.screens.common.bottomKeyboard.BottomListDashBoardNavigationButtons2
 import com.client.xvideos.screens.config.ScreenConfig
+import com.client.xvideos.screens.favorites.ScreenFavorites
+import com.client.xvideos.ui.theme.grayColor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -57,16 +62,39 @@ class ScreenDashBoards : Screen {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(Color.DarkGray),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                        .background(grayColor(0x0E)),
+                    horizontalArrangement = Arrangement.Absolute.SpaceBetween
                 ) {
                     ComposeCountry(modifier = Modifier)
 
+
+
+                    Box(modifier = Modifier.fillMaxWidth().weight(1f))
+
+
+
+                    IconButton(onClick = {
+                        navigator.push(ScreenFavorites())
+                    }) {
+                        Icon(
+                            imageVector = Icons.Filled.FavoriteBorder,
+                            contentDescription = null,
+                            tint = Color.Gray,
+                            modifier = Modifier
+                                .size(32.dp)
+
+                        )
+                    }
+
+
+
+
+
                     //////////// Настройка ////////////
                     Box(
-                        modifier = Modifier
+                        modifier = Modifier.padding(start = 8.dp, end = 8.dp)
                             .size(48.dp)
-                            .border(1.dp,Color.Gray)
+                            //.border(1.dp,Color.Gray)
                             .noRippleClickable(onClick = {
                                 navigator.push(ScreenConfig())
                             }),
@@ -86,7 +114,7 @@ class ScreenDashBoards : Screen {
                             imageVector = Icons.Filled.Settings,
                             contentDescription = "Настройки",
                             tint = Color.LightGray,
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.size(32.dp)
                         )
                     }
                     /////////// END Настройка ////////////

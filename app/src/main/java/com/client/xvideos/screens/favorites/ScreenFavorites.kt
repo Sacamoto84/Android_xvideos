@@ -1,6 +1,8 @@
 package com.client.xvideos.screens.favorites
 
+import android.R
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,15 +18,18 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ArrowCircleDown
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
@@ -34,6 +39,9 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.model.GalleryItem
 import com.client.xvideos.room.entity.FavoriteGalleryItem
 import com.client.xvideos.screens.dashboards.UrlVideoImageAndLongClick
+import com.client.xvideos.screens.profile.ScreenProfile
+import com.composables.core.HorizontalSeparator
+import com.composeunstyled.Modal
 
 
 class ScreenFavorites() : Screen {
@@ -67,12 +75,53 @@ class ScreenFavorites() : Screen {
         val favorites = vm.favorites.collectAsState(initial = emptyList()).value
 
 
-        Scaffold(modifier = Modifier.fillMaxSize()) {
+        Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
+
+            Column {
+
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.Black),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+
+                    Text(
+                        "Избранное",
+                        color = Color.White,
+                        fontSize = 24.sp,
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
+
+
+
+                    IconButton(onClick = { navigator.push(ScreenProfile())}) {
+                        Icon(
+                            imageVector = Icons.Filled.AccountCircle,
+                            contentDescription = null,
+                            tint = Color.LightGray,
+                            modifier = Modifier
+                                .padding(end = 16.dp)
+                                .size(32.dp)
+
+                        )
+                    }
+                }
+                HorizontalSeparator(color = Color(0xFF9E9E9E))
+            }
+
+        }) {
 
             LazyColumn(modifier = Modifier.padding(it)) {
                 items(favorites) { item ->
 
-                    Column(modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp)) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 2.dp)
+                    ) {
 
                         Box(
                             modifier = Modifier
@@ -98,7 +147,11 @@ class ScreenFavorites() : Screen {
                             })
                         }
 
-                        Row(modifier = Modifier.fillMaxWidth().background(Color.Black)) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(Color.Black)
+                        ) {
 
 
                             IconButton(onClick = { vm.removeFavorite(item) }) {
@@ -112,7 +165,7 @@ class ScreenFavorites() : Screen {
                                 )
                             }
 
-                            IconButton(onClick = {  }) {
+                            IconButton(onClick = { }) {
                                 Icon(
                                     imageVector = Icons.Filled.Favorite,
                                     contentDescription = null,
@@ -123,7 +176,7 @@ class ScreenFavorites() : Screen {
                                 )
                             }
 
-                            IconButton(onClick = {  }) {
+                            IconButton(onClick = { }) {
                                 Icon(
                                     imageVector = Icons.Filled.ArrowCircleDown,
                                     contentDescription = null,

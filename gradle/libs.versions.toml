@@ -3,8 +3,6 @@ agp = "8.10.0"
 coilNetworkOkhttp = "3.0.4"
 composeThemeAdapter = "1.2.1"
 core = "1.31.0"
-datastoreCore = "1.1.6"
-datastorePreferences = "1.1.6"
 diskLruCache = "1.5"
 gson = "2.12.1"
 hiltAndroid = "2.56.2"
@@ -64,12 +62,6 @@ androidx-media3-ui-leanback = { module = "androidx.media3:media3-ui-leanback", v
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
-
-coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilNetworkOkhttp" }
-coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilNetworkOkhttp" }
-coil-compose-core = { module = "io.coil-kt.coil3:coil-compose-core", version.ref = "coilNetworkOkhttp" }
-coil-network-ktor = { module = "io.coil-kt.coil3:coil-network-ktor", version.ref = "coilNetworkOkhttp" }
-coil-mp = { module = "io.coil-kt.coil3:coil", version.ref = "coilNetworkOkhttp" }
 
 compose-theme-adapter = { module = "com.google.android.material:compose-theme-adapter", version.ref = "composeThemeAdapter" }
 core = { module = "com.composables:core", version.ref = "core" }

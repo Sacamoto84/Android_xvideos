@@ -30,6 +30,8 @@ import androidx.compose.ui.unit.sp
 import com.client.xvideos.App
 import com.client.xvideos.R
 import com.client.xvideos.feature.net.readHtmlFromURL
+import com.client.xvideos.ui.theme.PornHubOrange
+import com.client.xvideos.ui.theme.grayColor
 import com.client.xvideos.urlStart
 import com.composables.core.Menu
 import com.composables.core.MenuButton
@@ -104,17 +106,21 @@ fun ComposeCountry(modifier: Modifier = Modifier) {
                     .padding(bottom = 0.dp)
                     .width(312.dp)
                     //.clip(RoundedCornerShape(26.dp))
-                    .background(Color(0xFF23242A)),
+                    .background(grayColor(0x35)),
                 // exit = fadeOut()
                 //, enter = fadeIn()
             ) {
 
                 LazyColumn {
                     items(countries) {
+
+
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 2.dp)
+                                .padding(vertical = 3.dp)
+                                //.background(if (getFlagEmoji(it.flagClass) == currentCountries) Color(0x20FFFF00) else Color.Transparent)
+                                .padding(start = 8.dp)
                                 //.border(1.dp, Color.Magenta)
                                 .clickable {
                                     GlobalScope.launch {
@@ -134,8 +140,8 @@ fun ComposeCountry(modifier: Modifier = Modifier) {
                                 text = "${getFlagEmoji(it.flagClass)}  ${it.name} ",
                                 style = TextStyle(
                                     fontFamily = emojiFont,
-                                    fontSize = 24.sp,
-                                    color = Color.White
+                                    fontSize = 28.sp,
+                                    color = if (getFlagEmoji(it.flagClass) == currentCountries) PornHubOrange else Color.LightGray
                                 )
                             )
 
