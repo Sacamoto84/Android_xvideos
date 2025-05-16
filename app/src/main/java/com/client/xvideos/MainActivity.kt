@@ -12,19 +12,25 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
+import androidx.room.FtsOptions
 import cafe.adriel.voyager.navigator.Navigator
 import coil.ImageLoader
 import coil.ImageLoaderFactory
 import coil.memory.MemoryCache
 import coil.request.CachePolicy
+import com.client.xvideos.feature.redgifs.API
+import com.client.xvideos.feature.redgifs.ApiClient
+import com.client.xvideos.feature.redgifs.MediaType
+import com.client.xvideos.feature.redgifs.Order
 import com.client.xvideos.screens.dashboards.ScreenDashBoards
-import com.client.xvideos.ui.theme.XvideosTheme
-import dagger.hilt.android.AndroidEntryPoint
 import com.client.xvideos.screens.videoplayer.video.cache.VideoPlayerCacheManager
+import com.client.xvideos.ui.theme.XvideosTheme
+import com.google.android.gms.common.api.Api
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import timber.log.Timber.DebugTree
 import timber.log.Timber.Forest.plant
-import com.client.xvideos.screens.favorites.ScreenFavorites
 
 const val urlStart = "https://www.xv-ru.com"
 
@@ -53,6 +59,26 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+
+
+
+
+        runBlocking {
+            println("2")
+            ApiClient.login() // без логина и пароля — временный токен
+            println("3")
+            val response = API.searchCreator("lilijunex", 1, 80, Order .RECENT, MediaType.GIF)
+            println(response)
+        }
+
+
+
+
+
+
+
+
+
 
 
 

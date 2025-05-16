@@ -1,6 +1,5 @@
 [versions]
 agp = "8.10.0"
-coilNetworkOkhttp = "3.0.4"
 composeThemeAdapter = "1.2.1"
 core = "1.31.0"
 diskLruCache = "1.5"
@@ -14,21 +13,18 @@ junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 
-ktorClientAndroid = "3.1.2"
-ktorClientContentNegotiation = "3.1.2"
-ktorSerializationKotlinxJson = "3.1.2"
+ktor= "3.1.2"
 
 lifecycleRuntimeKtx = "2.9.0"
 activityCompose = "1.10.1"
 composeBom = "2025.05.00"
 material = "1.13.0-alpha13"
 materialVersion = "1.8.1"
-media3 = "1.6.1"
+media3 = "1.7.1"
 room = "2.7.1"
 slf4jApi = "2.0.16"
 slf4jSimple = "2.0.16"
 timber = "5.0.1"
-media3ExoplayerSmoothstreaming = "1.6.1"
 storage = "1.5.0"
 googleGmsGoogleServices = "4.4.2"
 datastoreCoreAndroid = "1.1.6"
@@ -89,26 +85,25 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 
-ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktorClientAndroid" }
-ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktorClientAndroid" }
-ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktorClientContentNegotiation" }
-ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktorClientAndroid" }
-ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktorClientAndroid" }
-ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktorClientAndroid" }
-ktor-network = { module = "io.ktor:ktor-network", version.ref = "ktorClientAndroid" }
-ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktorSerializationKotlinxJson" }
+ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
+ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
+ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
+ktor-network = { module = "io.ktor:ktor-network", version.ref = "ktor" }
+ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-gson", version.ref = "ktor" }
 
 material = { module = "com.google.android.material:material", version.ref = "material" }
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4jApi" }
 slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4jSimple" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
-androidx-media3-exoplayer-smoothstreaming = { group = "androidx.media3", name = "media3-exoplayer-smoothstreaming", version.ref = "media3ExoplayerSmoothstreaming" }
+androidx-media3-exoplayer-smoothstreaming = { group = "androidx.media3", name = "media3-exoplayer-smoothstreaming", version.ref = "media3" }
 androidx-storage = { group = "androidx.test.services", name = "storage", version.ref = "storage" }
 
 androidx-datastore-core-android = { group = "androidx.datastore", name = "datastore-core-android", version.ref = "datastoreCoreAndroid" }
 androidx-datastore-core = { module = "androidx.datastore:datastore-core", version.ref = "datastoreCoreAndroid" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastoreCoreAndroid" }
-
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

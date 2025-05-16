@@ -32,6 +32,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
@@ -51,6 +52,8 @@ import com.client.xvideos.model.GalleryItem
 import com.client.xvideos.parcer.parserListVideo
 import com.client.xvideos.urlStart
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -241,6 +244,8 @@ private fun DropMenu(cell: GalleryItem, vm: ScreenDashBoardsScreenModel) {
 
     val size = if (count) 26.dp else 32.dp
 
+    val scope = rememberCoroutineScope()
+
     Box(
         modifier = Modifier,
         contentAlignment = Alignment.Center
@@ -269,32 +274,35 @@ private fun DropMenu(cell: GalleryItem, vm: ScreenDashBoardsScreenModel) {
 
         )
         {
+
+            val isFavorite = vm.isFavorite(cell.id)
+
             DropdownMenuItem(
                 text = {
-                    Text("Фоварит")
+
+                    Text("Избранное")
                 },
                 onClick = {
-
-                    val a = vm.isFavorite(cell.id)
-
-                    when(a) {
-                        true ->  vm.removeFavorite(cell.id)
-                        false -> {
-                            vm.addFavorite(cell)
+                    expanded = false
+                    scope.launch {
+                        delay(50)
+                        when(isFavorite) {
+                            true ->  vm.removeFavorite(cell.id)
+                            false -> {
+                                vm.addFavorite(cell)
+                            }
                         }
                     }
-
-                    expanded = false
                 },
                 leadingIcon = {
                     Icon(
-                        Icons.Outlined.FavoriteBorder,
+                        if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                         contentDescription = null
                     )
                 }
             )
             DropdownMenuItem(
-                text = { Text("Сохранить") },
+                text = { Text("TODO") },
                 onClick = { /* Handle settings! */ },
                 leadingIcon = {
                     Icon(
@@ -305,7 +313,7 @@ private fun DropMenu(cell: GalleryItem, vm: ScreenDashBoardsScreenModel) {
             )
 
             DropdownMenuItem(
-                text = { Text("Удалить") },
+                text = { Text("TODO") },
                 onClick = { /* Handle settings! */ },
                 leadingIcon = {
                     Icon(
@@ -317,7 +325,7 @@ private fun DropMenu(cell: GalleryItem, vm: ScreenDashBoardsScreenModel) {
 
             HorizontalDivider()
             DropdownMenuItem(
-                text = { Text("Send Feedback") },
+                text = { Text("TODO") },
                 onClick = { /* Handle send feedback! */ },
                 leadingIcon = {
                     Icon(
@@ -325,7 +333,7 @@ private fun DropMenu(cell: GalleryItem, vm: ScreenDashBoardsScreenModel) {
                         contentDescription = null
                     )
                 },
-                trailingIcon = { Text("F11", textAlign = TextAlign.Center) }
+                trailingIcon = { Text(">", textAlign = TextAlign.Center) }
             )
         }
 
