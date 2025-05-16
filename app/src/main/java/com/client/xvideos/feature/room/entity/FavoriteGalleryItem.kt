@@ -1,13 +1,12 @@
-package com.client.xvideos.room.entity
+package com.client.xvideos.feature.room.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-
 @Entity(tableName = "favorite")
 data class FavoriteGalleryItem(
-    @PrimaryKey(autoGenerate = true)
-    val id : Long,                    // - Номер не используем
+    @PrimaryKey//(autoGenerate = true)
+    val id : Long = 0,                // - Номер не используем
     val title : String,               // - Название видео(Зависит от выбранного языка)
     val duration : String,            // * Длинна видео (11 мин.)
     val views : String,               // - Количество просмотров
@@ -19,4 +18,11 @@ data class FavoriteGalleryItem(
 
     val nameProfile: String,          // - Отображаемое название профиля (TODO)
     val linkProfile: String,          // * Путь до профиля путь к каналу (/old4k)
+
+
+    //Свойства
+    val favorite : Boolean = false,
+    val deleted  : Boolean = false,
+    val visible  : Boolean = true
+
 )

@@ -1,6 +1,5 @@
 package com.client.xvideos.screens.favorites
 
-import android.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -39,11 +38,10 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.model.GalleryItem
-import com.client.xvideos.room.entity.FavoriteGalleryItem
+import com.client.xvideos.feature.room.entity.FavoriteGalleryItem
 import com.client.xvideos.screens.dashboards.UrlVideoImageAndLongClick
 import com.client.xvideos.screens.profile.ScreenProfile
 import com.composables.core.HorizontalSeparator
-import com.composeunstyled.Modal
 
 
 class ScreenFavorites() : Screen {
@@ -56,26 +54,7 @@ class ScreenFavorites() : Screen {
 
         val vm: ScreenFavoritesSM = getScreenModel()
 
-        LaunchedEffect(Unit) {
-            vm.addFavorite(
-                FavoriteGalleryItem(
-                    id = 0,
-                    title = "TODO()",
-                    duration = "TODO(),",
-                    views = "TODO()",
-                    channel = "TODO()",
-                    previewImage = "TODO()",
-                    previewVideo = "TODO()",
-                    href = "TODO()",
-                    nameProfile = "TODO()",
-                    linkProfile = "TODO()",
-                )
-            )
-        }
-
-
         val favorites = vm.favorites.collectAsState(initial = emptyList()).value
-
 
         Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
 

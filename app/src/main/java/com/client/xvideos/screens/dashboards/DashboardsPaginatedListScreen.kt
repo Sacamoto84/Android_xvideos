@@ -44,10 +44,12 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.feature.country.currentCountriesUpdate
 import com.client.xvideos.feature.net.readHtmlFromURL
+import com.client.xvideos.feature.room.entity.FavoriteGalleryItem
 import com.client.xvideos.model.GalleryItem
 import com.client.xvideos.parcer.parserListVideo
 import com.client.xvideos.ui.theme.grayColor
@@ -90,6 +92,9 @@ fun DashboardsPaginatedListScreen(pageIndex: Int, vm: ScreenDashBoardsScreenMode
 
     val itemsPerRow =
         if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE) 4 else if (vm.countRow.collectAsState().value) 2 else 1
+
+
+    val favorites = vm.getAll.collectAsStateWithLifecycle(emptyList()).value.filter { it.favorite == true }
 
 
 
@@ -164,161 +169,12 @@ fun DashboardsPaginatedListScreen(pageIndex: Int, vm: ScreenDashBoardsScreenMode
                                 )
                             }
 
-                            var expanded by remember { mutableStateOf(false) }
-
-                            //Индикатор что видео в фаворитах
-                            Box(
-                                modifier = Modifier.align(Alignment.BottomEnd),
-                                contentAlignment = Alignment.Center
-                            ) {
-
-                                IconButton(onClick = { }, enabled = false) {
-                                    Icon(
-                                        imageVector = Icons.Filled.FavoriteBorder,
-                                        contentDescription = "Like",
-                                        tint = grayColor(0xC6),
-                                        modifier = Modifier
-                                            .padding(0.dp)
-                                            .size(32.dp)
-                                    )
-                                }
-
+                            if (favorites.any { it.id == cell.id }) {
+                                //Индикатор что видео в фаворитах
+                                Box(modifier = Modifier.align(Alignment.BottomStart)) { IconFavorite() }
                             }
 
-                            Box(
-                                modifier = Modifier.align(Alignment.BottomStart),
-                                contentAlignment = Alignment.Center
-                            ) {
-
-                                IconButton(onClick = { expanded = true }) {
-                                    Icon(
-                                        Icons.Default.MoreVert,
-                                        contentDescription = "Localized description",
-                                        tint = Color.LightGray
-                                    )
-                                }
-
-                                DropdownMenu(
-                                    expanded = expanded,
-                                    onDismissRequest = { expanded = false },
-                                    containerColor = Color(0xFFF2EDF7),
-                                    shadowElevation = 2.dp, tonalElevation = 16.dp
-
-                                )
-                                {
-                                    DropdownMenuItem(
-                                        text = {
-                                            Text("Фоварит")
-                                        },
-                                        onClick = { expanded = false },
-                                        leadingIcon = {
-                                            Icon(
-                                                Icons.Outlined.FavoriteBorder,
-                                                contentDescription = null
-                                            )
-                                        }
-                                    )
-                                    DropdownMenuItem(
-                                        text = { Text("Сохранить") },
-                                        onClick = { /* Handle settings! */ },
-                                        leadingIcon = {
-                                            Icon(
-                                                Icons.Outlined.Save,
-                                                contentDescription = null
-                                            )
-                                        }
-                                    )
-
-                                    DropdownMenuItem(
-                                        text = { Text("Удалить") },
-                                        onClick = { /* Handle settings! */ },
-                                        leadingIcon = {
-                                            Icon(
-                                                Icons.Outlined.Save,
-                                                contentDescription = null
-                                            )
-                                        }
-                                    )
-
-                                    HorizontalDivider()
-                                    DropdownMenuItem(
-                                        text = { Text("Send Feedback") },
-                                        onClick = { /* Handle send feedback! */ },
-                                        leadingIcon = {
-                                            Icon(
-                                                Icons.Outlined.Email,
-                                                contentDescription = null
-                                            )
-                                        },
-                                        trailingIcon = { Text("F11", textAlign = TextAlign.Center) }
-                                    )
-                                }
-
-                            }
-
-//                            val state = rememberMenuState(expanded = false)
-//
-//                            Menu(
-//                                modifier = Modifier.align(Alignment.BottomStart),
-//                                state = state
-//                            ) {
-//
-//
-//                                //Сама кнопка для вызова диалога
-//                                MenuButton(
-//                                    Modifier
-//                                    //.background(Color(0xFF151515))
-//                                ) {
-//
-//                                    //Индикатор что видео в фаворитах
-//                                    Box(
-//                                        modifier = Modifier.align(Alignment.BottomStart),
-//                                        contentAlignment = Alignment.Center
-//                                    ) {
-//                                        Icon(
-//                                            imageVector = Icons.Filled.FavoriteBorder,
-//                                            contentDescription = "Like",
-//                                            tint = grayColor(0xC6),
-//                                            modifier = Modifier
-//                                                .padding(0.dp)
-//                                                .size(32.dp)
-//                                        )
-//                                    }
-//
-//
-//                                }
-//
-//                                MenuContent(
-//                                    modifier = Modifier
-//                                        .padding(horizontal = 8.dp)
-//                                        .clip(RoundedCornerShape(4.dp))
-//                                        //.border(1.dp, Color(0xFFE0E0E0), RoundedCornerShape(4.dp))
-//                                        //.padding(top = (-16).dp)
-//                                        //.width(312.dp)
-//                                        //.clip(RoundedCornerShape(26.dp))
-//                                        //.alpha(0.9F)
-//                                        .background(Color(0xFFE6E0EC))
-//                                        .padding(4.dp)
-//
-//                                    ,
-//                                    // exit = fadeOut()
-//                                    //, enter = fadeIn()
-//                                ) {
-//
-//                                    MenuItem(onClick = { /* TODO handle click */ }) {
-//                                        Text(
-//                                            "Добавить в фавориты",
-//                                            fontWeight = FontWeight.Bold,
-//                                            fontSize = 18.sp
-//                                            ,color = Color.Black
-//                                        )
-//                                    }
-//
-//                                }
-//
-//
-//                            }
-//
+                            Box(modifier = Modifier.align(Alignment.BottomEnd)) { DropMenu(cell,vm) }
 
                         }
                     }
@@ -331,5 +187,124 @@ fun DashboardsPaginatedListScreen(pageIndex: Int, vm: ScreenDashBoardsScreenMode
                 }
             }
         }
+    }
+}
+
+
+@Composable
+private fun IconFavorite() {
+    //Индикатор что видео в фаворитах
+    Box(
+        modifier = Modifier,
+        contentAlignment = Alignment.Center
+    ) {
+
+        IconButton(onClick = { }, enabled = false) {
+            Icon(
+                imageVector = Icons.Filled.FavoriteBorder,
+                contentDescription = "Like",
+                tint = Color.Red,//grayColor(0xC6),
+                modifier = Modifier
+                    .padding(0.dp)
+                    .size(32.dp)
+            )
+        }
+    }
+
+}
+
+@Composable
+private fun DropMenu(cell: GalleryItem, vm: ScreenDashBoardsScreenModel) {
+
+    var expanded by remember { mutableStateOf(false) }
+
+    Box(
+        modifier = Modifier,
+        contentAlignment = Alignment.Center
+    ) {
+
+        IconButton(onClick = { expanded = true }) {
+            Icon(
+                Icons.Default.MoreVert,
+                contentDescription = "Localized description",
+                tint = Color.LightGray
+            )
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            containerColor = Color(0xFFF2EDF7),
+            shadowElevation = 2.dp, tonalElevation = 16.dp
+
+        )
+        {
+            DropdownMenuItem(
+                text = {
+                    Text("Фоварит")
+                },
+                onClick = {
+
+                    vm.addFavorite(
+                        FavoriteGalleryItem(
+                            id = cell.id,
+                            title = cell.title,
+                            duration = cell.duration,
+                            views = cell.views,
+                            channel = cell.channel,
+                            previewImage = cell.previewImage,
+                            previewVideo = cell.previewVideo,
+                            href = cell.href,
+                            nameProfile = cell.nameProfile,
+                            linkProfile = cell.linkProfile,
+                            favorite = true
+                        )
+                    )
+
+                    expanded = false
+                          },
+                leadingIcon = {
+                    Icon(
+                        Icons.Outlined.FavoriteBorder,
+                        contentDescription = null
+                    )
+                }
+            )
+            DropdownMenuItem(
+                text = { Text("Сохранить") },
+                onClick = { /* Handle settings! */ },
+                leadingIcon = {
+                    Icon(
+                        Icons.Outlined.Save,
+                        contentDescription = null
+                    )
+                }
+            )
+
+            DropdownMenuItem(
+                text = { Text("Удалить") },
+                onClick = { /* Handle settings! */ },
+                leadingIcon = {
+                    Icon(
+                        Icons.Outlined.Save,
+                        contentDescription = null
+                    )
+                }
+            )
+
+            HorizontalDivider()
+            DropdownMenuItem(
+                text = { Text("Send Feedback") },
+                onClick = { /* Handle send feedback! */ },
+                leadingIcon = {
+                    Icon(
+                        Icons.Outlined.Email,
+                        contentDescription = null
+                    )
+                },
+                trailingIcon = { Text("F11", textAlign = TextAlign.Center) }
+            )
+        }
+
     }
 }

@@ -1,4 +1,4 @@
-package com.client.xvideos.room
+package com.client.xvideos.feature.room
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -6,7 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.client.xvideos.room.entity.FavoriteGalleryItem
+import com.client.xvideos.feature.room.entity.FavoriteGalleryItem
 import kotlinx.coroutines.flow.Flow
 
 

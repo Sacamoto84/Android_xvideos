@@ -1,10 +1,10 @@
-package com.client.xvideos.room
+package com.client.xvideos.feature.room
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.client.xvideos.room.entity.FavoriteGalleryItem
+import com.client.xvideos.feature.room.entity.FavoriteGalleryItem
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
