@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
@@ -38,7 +39,6 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.model.GalleryItem
-import com.client.xvideos.feature.room.entity.FavoriteGalleryItem
 import com.client.xvideos.screens.dashboards.UrlVideoImageAndLongClick
 import com.client.xvideos.screens.profile.ScreenProfile
 import com.composables.core.HorizontalSeparator
@@ -54,7 +54,7 @@ class ScreenFavorites() : Screen {
 
         val vm: ScreenFavoritesSM = getScreenModel()
 
-        val favorites = vm.favorites.collectAsState(initial = emptyList()).value
+        val favorites = vm.favorites.collectAsStateWithLifecycle(emptyList()).value
 
         Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
 
@@ -96,7 +96,7 @@ class ScreenFavorites() : Screen {
         }) {
 
             LazyColumn(modifier = Modifier.padding(it)) {
-                items(favorites) { item ->
+                items(favorites) { it ->
 
                     Column(
                         modifier = Modifier
@@ -111,18 +111,20 @@ class ScreenFavorites() : Screen {
                                 //.padding(1.dp)
                                 .background(Color.DarkGray)
                         ) {
+
                             val cell = GalleryItem(
-                                id = item.id,
-                                title = item.title,
-                                duration = item.duration,
-                                views = item.views,
-                                channel = item.channel,
-                                previewImage = item.previewImage,
-                                previewVideo = item.previewVideo,
-                                href = item.href,
-                                nameProfile = item.nameProfile,
-                                linkProfile = item.linkProfile
+                                id = it.item.id,
+                                title = it.item.title,
+                                duration = it.item.duration,
+                                views = it.item.views,
+                                channel = it.item.channel,
+                                previewImage = it.item.previewImage,
+                                previewVideo = it.item.previewVideo,
+                                href = it.item.href,
+                                nameProfile = it.item.nameProfile,
+                                linkProfile = it.item.linkProfile
                             )
+
                             UrlVideoImageAndLongClick(cell, onLongClick = {
                                 //vm.openItem(urlStart + cell.link, navigator)
                             }, onDoubleClick = {}){
@@ -132,7 +134,7 @@ class ScreenFavorites() : Screen {
 
                                     //Продолжительность видео
                                     Text(
-                                        text = item.duration.dropLast(1),
+                                        text = it.item.duration.dropLast(1),
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .offset(1.dp, offsetY + 1.dp),
@@ -142,7 +144,7 @@ class ScreenFavorites() : Screen {
                                     )
 
                                     Text(
-                                        text = item.duration.dropLast(1),
+                                        text = it.item.duration.dropLast(1),
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .offset(0.dp, offsetY),
@@ -163,7 +165,7 @@ class ScreenFavorites() : Screen {
                         ) {
 
 
-                            IconButton(onClick = { vm.removeFavorite(item) }) {
+                            IconButton(onClick = { vm.removeFavorite(it) }) {
                                 Icon(
                                     imageVector = Icons.Filled.Delete,
                                     contentDescription = null,

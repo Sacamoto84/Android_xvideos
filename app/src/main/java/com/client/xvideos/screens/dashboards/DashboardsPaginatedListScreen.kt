@@ -16,13 +16,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Save
-import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
@@ -49,10 +47,8 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.feature.country.currentCountriesUpdate
 import com.client.xvideos.feature.net.readHtmlFromURL
-import com.client.xvideos.feature.room.entity.FavoriteGalleryItem
 import com.client.xvideos.model.GalleryItem
 import com.client.xvideos.parcer.parserListVideo
-import com.client.xvideos.ui.theme.grayColor
 import com.client.xvideos.urlStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -94,7 +90,8 @@ fun DashboardsPaginatedListScreen(pageIndex: Int, vm: ScreenDashBoardsScreenMode
         if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE) 4 else if (vm.countRow.collectAsState().value) 2 else 1
 
 
-    val favorites = vm.getAll.collectAsStateWithLifecycle(emptyList()).value.filter { it.favorite == true }
+    val favorites =
+        vm.getAll.collectAsStateWithLifecycle(emptyList()).value
 
 
 
@@ -169,12 +166,18 @@ fun DashboardsPaginatedListScreen(pageIndex: Int, vm: ScreenDashBoardsScreenMode
                                 )
                             }
 
-                            if (favorites.any { it.id == cell.id }) {
+                            if (favorites.any { it.favorite.id == cell.id }) {
                                 //Индикатор что видео в фаворитах
-                                Box(modifier = Modifier.align(Alignment.BottomStart)) { IconFavorite() }
+
+                                Box(modifier = Modifier.align(Alignment.BottomStart)) { IconFavorite(vm) }
                             }
 
-                            Box(modifier = Modifier.align(Alignment.BottomEnd)) { DropMenu(cell,vm) }
+                            Box(modifier = Modifier.align(Alignment.BottomEnd)) {
+                                DropMenu(
+                                    cell,
+                                    vm
+                                )
+                            }
 
                         }
                     }
@@ -192,7 +195,11 @@ fun DashboardsPaginatedListScreen(pageIndex: Int, vm: ScreenDashBoardsScreenMode
 
 
 @Composable
-private fun IconFavorite() {
+private fun IconFavorite(vm: ScreenDashBoardsScreenModel) {
+
+    val count = vm.countRow.collectAsStateWithLifecycle().value
+    val size = if (count) 26.dp else 32.dp
+
     //Индикатор что видео в фаворитах
     Box(
         modifier = Modifier,
@@ -200,14 +207,26 @@ private fun IconFavorite() {
     ) {
 
         IconButton(onClick = { }, enabled = false) {
+
             Icon(
-                imageVector = Icons.Filled.FavoriteBorder,
+                imageVector = Icons.Filled.Favorite,
                 contentDescription = "Like",
-                tint = Color.Red,//grayColor(0xC6),
+                tint = Color.Black,//grayColor(0xC6),
+                modifier = Modifier
+                    .size(size)
+                    .offset(1.dp, 1.dp)
+            )
+
+            Icon(
+                imageVector = Icons.Filled.Favorite,
+                contentDescription = "Like",
+                tint = Color.White,//grayColor(0xC6),
                 modifier = Modifier
                     .padding(0.dp)
-                    .size(32.dp)
+                    .size(size)
             )
+
+
         }
     }
 
@@ -218,6 +237,10 @@ private fun DropMenu(cell: GalleryItem, vm: ScreenDashBoardsScreenModel) {
 
     var expanded by remember { mutableStateOf(false) }
 
+    val count = vm.countRow.collectAsStateWithLifecycle().value
+
+    val size = if (count) 26.dp else 32.dp
+
     Box(
         modifier = Modifier,
         contentAlignment = Alignment.Center
@@ -227,8 +250,15 @@ private fun DropMenu(cell: GalleryItem, vm: ScreenDashBoardsScreenModel) {
             Icon(
                 Icons.Default.MoreVert,
                 contentDescription = "Localized description",
-                tint = Color.LightGray
+                tint = Color.Black, modifier = Modifier.size(size).offset(1.dp, 1.dp)
             )
+
+            Icon(
+                Icons.Default.MoreVert,
+                contentDescription = "Localized description",
+                tint = Color.White, modifier = Modifier.size(size).offset(0.dp, 0.dp)
+            )
+
         }
 
         DropdownMenu(
@@ -245,24 +275,17 @@ private fun DropMenu(cell: GalleryItem, vm: ScreenDashBoardsScreenModel) {
                 },
                 onClick = {
 
-                    vm.addFavorite(
-                        FavoriteGalleryItem(
-                            id = cell.id,
-                            title = cell.title,
-                            duration = cell.duration,
-                            views = cell.views,
-                            channel = cell.channel,
-                            previewImage = cell.previewImage,
-                            previewVideo = cell.previewVideo,
-                            href = cell.href,
-                            nameProfile = cell.nameProfile,
-                            linkProfile = cell.linkProfile,
-                            favorite = true
-                        )
-                    )
+                    val a = vm.isFavorite(cell.id)
+
+                    when(a) {
+                        true ->  vm.removeFavorite(cell.id)
+                        false -> {
+                            vm.addFavorite(cell)
+                        }
+                    }
 
                     expanded = false
-                          },
+                },
                 leadingIcon = {
                     Icon(
                         Icons.Outlined.FavoriteBorder,

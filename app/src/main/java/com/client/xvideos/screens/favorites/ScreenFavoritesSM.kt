@@ -4,7 +4,7 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import com.client.xvideos.feature.room.AppDatabase
-import com.client.xvideos.feature.room.entity.FavoriteGalleryItem
+import com.client.xvideos.feature.room.entity.FavoriteWithItem
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -19,14 +19,14 @@ class ScreenFavoritesSM @Inject constructor(
     private val db: AppDatabase,
 ) : ScreenModel {
 
-    val favorites: Flow<List<FavoriteGalleryItem>> = db.favoriteDao().getAll()
+    val favorites: Flow<List<FavoriteWithItem>> = db.favoriteDao().getAllFavoritesWithItemsOrderDateDesc()
 
-    fun addFavorite(item: FavoriteGalleryItem) = screenModelScope.launch {
-        db.favoriteDao().insert(item)
+    fun addFavorite(item: FavoriteWithItem) = screenModelScope.launch {
+       //db.favoriteDao().insert(item)
     }
 
-    fun removeFavorite(item: FavoriteGalleryItem) = screenModelScope.launch {
-        db.favoriteDao().delete(item)
+    fun removeFavorite(item: FavoriteWithItem) = screenModelScope.launch {
+        //db.favoriteDao().delete(item)
     }
 
 }

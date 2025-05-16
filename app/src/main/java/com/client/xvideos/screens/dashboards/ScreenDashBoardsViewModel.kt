@@ -1,13 +1,17 @@
 package com.client.xvideos.screens.dashboards
 
 import androidx.compose.foundation.pager.PagerState
+import androidx.room.Transaction
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.navigator.Navigator
 import com.client.xvideos.feature.preference.PreferencesRepository
 import com.client.xvideos.feature.room.AppDatabase
-import com.client.xvideos.feature.room.entity.FavoriteGalleryItem
+import com.client.xvideos.feature.room.entity.FavoriteWithItem
+import com.client.xvideos.feature.room.entity.Favorites
+import com.client.xvideos.feature.room.entity.Items
+import com.client.xvideos.model.GalleryItem
 import com.client.xvideos.screens.videoplayer.ScreenVideoPlayer
 import dagger.Binds
 import dagger.Module
@@ -35,14 +39,38 @@ class ScreenDashBoardsScreenModel @Inject constructor(
         navigator.push(ScreenVideoPlayer(url))
     }
 
-    val getAll: Flow<List<FavoriteGalleryItem>> = db.favoriteDao().getAll().stateIn( screenModelScope, SharingStarted.WhileSubscribed(5000), emptyList() )
+    val getAll: Flow<List<FavoriteWithItem>> = db.favoriteDao().getAllFavoritesWithItemsOrderDateDesc().stateIn( screenModelScope, SharingStarted.WhileSubscribed(5000), emptyList() )
 
-    fun addFavorite(item: FavoriteGalleryItem) = screenModelScope.launch {
-        db.favoriteDao().insert(item)
+    fun addFavorite(cell: GalleryItem) = screenModelScope.launch {
+
+        val item = Items(
+            id = cell.id,
+            title = cell.title,
+            duration = cell.duration,
+            views = cell.views,
+            channel = cell.channel,
+            previewImage = cell.previewImage,
+            previewVideo = cell.previewVideo,
+            href = cell.href,
+            nameProfile = cell.nameProfile,
+            linkProfile = cell.linkProfile,
+        )
+
+        val favorite = Favorites(
+            id = cell.id,
+            itemId = cell.id
+        )
+
+        db.itemsDao().insertItem(item)
+        db.favoriteDao().insertFavorite(favorite)
     }
 
-    fun removeFavorite(item: FavoriteGalleryItem) = screenModelScope.launch {
-        db.favoriteDao().delete(item)
+    fun removeFavorite(item: Long) = screenModelScope.launch {
+        db.favoriteDao().deleteByItemId(item)
+    }
+
+    fun isFavorite(id : Long): Boolean{
+        return db.favoriteDao().isFavorite(id)
     }
 
 
