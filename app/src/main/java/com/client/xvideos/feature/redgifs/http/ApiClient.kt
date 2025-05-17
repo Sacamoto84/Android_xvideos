@@ -1,14 +1,6 @@
 package com.client.xvideos.feature.redgifs.http
 
 import android.annotation.SuppressLint
-import com.client.xvideos.feature.redgifs.types.GifInfoItem
-import com.client.xvideos.feature.redgifs.types.ImageInfoItem
-import com.client.xvideos.feature.redgifs.types.MediaItem
-import com.google.gson.Gson
-import com.google.gson.JsonParser
-import com.google.gson.TypeAdapter
-import com.google.gson.stream.JsonReader
-import com.google.gson.stream.JsonWriter
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.okhttp.OkHttp

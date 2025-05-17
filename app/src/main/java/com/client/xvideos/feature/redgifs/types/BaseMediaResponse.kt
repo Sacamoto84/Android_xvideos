@@ -1,6 +1,6 @@
 package com.client.xvideos.feature.redgifs.types
 
-data class BaseGifResponse(
+data class MediaResponse(
     val page: Int,
     val pages: Int,
     val total: Int,
@@ -9,5 +9,3 @@ data class BaseGifResponse(
     val niches: List<NichesInfo>,
     val tags: List<String>
 )
-
-typealias GifResponse = BaseGifResponse

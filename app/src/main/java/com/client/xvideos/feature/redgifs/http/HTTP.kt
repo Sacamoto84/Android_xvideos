@@ -1,13 +1,10 @@
 package com.client.xvideos.feature.redgifs.http
 
-import com.client.xvideos.feature.redgifs.types.MediaType
-import com.client.xvideos.feature.redgifs.types.Order
 import com.client.xvideos.feature.redgifs.types.CreatorResponse
 import com.client.xvideos.feature.redgifs.types.CreatorsResponse
-import com.client.xvideos.feature.redgifs.types.GetGifResponse
-import com.client.xvideos.feature.redgifs.types.GifResponse
-import com.client.xvideos.feature.redgifs.types.ImageResponse
-import com.client.xvideos.feature.redgifs.types.TrendingImagesResponse
+import com.client.xvideos.feature.redgifs.types.MediaResponse
+import com.client.xvideos.feature.redgifs.types.MediaType
+import com.client.xvideos.feature.redgifs.types.Order
 import com.client.xvideos.feature.redgifs.types.tag.TagSuggestion
 import com.client.xvideos.feature.redgifs.types.tag.TagsResponse
 import com.google.android.gms.common.api.ApiException
@@ -31,9 +28,9 @@ object RedGifs {
 
     //❓❓❓Непонятно как получить номер id
     @Throws(ApiException::class)
-    suspend fun get_gif(id: String): GetGifResponse {
+    suspend fun getGif(id: String): MediaResponse {
         val route = Route("GET", "/v2/gifs/{id}", "id" to id)
-        val res: GetGifResponse = api.request(route)
+        val res: MediaResponse = api.request(route)
         return res
     }
 
@@ -47,7 +44,7 @@ object RedGifs {
         count: Int = 100,               // сколько элементов вернуть.
         page: Int = 1,                  // номер страницы (1-based).
         vararg params: Pair<String, Any> = emptyArray(),
-    ): GifResponse {
+    ): MediaResponse {
 
         val route = Route(
             method = "GET",
@@ -58,7 +55,7 @@ object RedGifs {
             "page" to page,
             *params                     // дополнительные параметры из vararg
         )
-        val res: GifResponse = api.request(route)
+        val res: MediaResponse = api.request(route)
         return res
     }
 
@@ -67,11 +64,11 @@ object RedGifs {
      * Работает
      */
     @Throws(ApiException::class)
-    suspend fun get_top_this_week(
+    suspend fun getTopThisWeek(
         count: Int,                      // количество элементов на страницу.
         page: Int,                       // номер страницы (1-based).
         type: MediaType = MediaType.GIF, // тип медиа (GIF, image и т.д.).
-    ): GifResponse {
+    ): MediaResponse {
 
         val route = Route(
             method = "GET",
@@ -81,7 +78,7 @@ object RedGifs {
             "type" to type.value,
         )
 
-        val res: GifResponse = api.request(route)
+        val res: MediaResponse = api.request(route)
         return res
     }
 
@@ -123,12 +120,12 @@ object RedGifs {
     }
 
 
-    suspend fun search_creator(
+    suspend fun searchCreator(
         username: String = "lilijunex",
         page: Int = 1,
         count: Int = 100,
         order: Order = Order.NEW,
-        type: MediaType = MediaType.IMAGE,
+        type: MediaType = MediaType.GIF,
     ): CreatorResponse {
         val route = Route(
             method = "GET",
@@ -148,22 +145,21 @@ object RedGifs {
      * ## Получить список «в тренде» (Trending GIFs).
      */
     @Throws(ApiException::class)
-    suspend fun get_trending_gifs(): GifResponse {
+    suspend fun getTrendingGifs(): MediaResponse {
         val route = Route(method = "GET", path = "/v2/explore/trending-gifs")
-        val res: GifResponse = api.request(route)
+        val res: MediaResponse = api.request(route)
         return res
     }
 
 
     //--------------------------- Pic methods ---------------------------
 
-    suspend fun search_image(
+    suspend fun searchImage(
         searchText: String,
         order: Order = Order.NEW,
         count: Int = 100,
         page: Int = 1,
-        vararg params: Pair<String, Any> = emptyArray(),
-    ): ImageResponse {
+    ): MediaResponse {
         val route = Route(
             method = "GET",
             path = "/v2/gifs/search?search_text={search_text}&order={order}&count={count}&page={page}&type=i",
@@ -171,20 +167,18 @@ object RedGifs {
             "order" to order.value,
             "count" to count,
             "page" to page,
-            *params
         )
-        val res: TrendingImagesResponse = api.request(route)
+        val res: MediaResponse = api.request(route)
         return res
     }
-
     /**
-     * ## Получить список 10 картинок «в тренде» (Trending Images).
+     * ## Получить список 10 картинок «в тренде»
      * ## ⭐ Работает ⭐
      */
     @Throws(ApiException::class)
-    suspend fun get_trending_images(): TrendingImagesResponse {
+    suspend fun getTrendingImages(): MediaResponse {
         val route = Route(method = "GET", path = "/v2/explore/trending-images")
-        val res: TrendingImagesResponse = api.request(route)
+        val res: MediaResponse = api.request(route)
         return res
     }
 
@@ -195,7 +189,7 @@ object RedGifs {
      * ## ⭐ Работает ⭐
      */
     @Throws(ApiException::class)
-    suspend fun get_trending_tags(): TagsResponse {
+    suspend fun getTrendingTags(): TagsResponse {
         val route = Route(method = "GET", path = "/v2/search/trending")
         val res: TagsResponse = api.request(route)
         return res
@@ -205,7 +199,7 @@ object RedGifs {
      * ## Получить подсказки (suggest) по тегам.
      */
     @Throws(ApiException::class)
-    suspend fun get_tag_suggestions(query: String): List<TagSuggestion> {
+    suspend fun getTagSuggestions(query: String): List<TagSuggestion> {
         val route =
             Route(method = "GET", path = "/v2/search/suggest?query={query}", "query" to query)
         return api.request(route)

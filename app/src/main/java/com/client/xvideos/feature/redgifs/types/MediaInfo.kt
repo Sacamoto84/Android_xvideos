@@ -1,7 +1,6 @@
 package com.client.xvideos.feature.redgifs.types
 
 data class MediaInfo(
-
     val id: String = "id",
     val createDate: Long = 0,
     val likes: Int = 0,
