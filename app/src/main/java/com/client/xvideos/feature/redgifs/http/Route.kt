@@ -2,9 +2,7 @@ package com.client.xvideos.feature.redgifs.http
 
 class Route(method: String, path: String, vararg parameters: Pair<String, Any>) {
 
-    companion object {
-        const val BASE = "https://api.redgifs.com"
-    }
+    val BASE = "https://api.redgifs.com"
 
     val method: String
     val path: String

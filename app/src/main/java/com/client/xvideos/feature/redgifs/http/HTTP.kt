@@ -1,24 +1,26 @@
 package com.client.xvideos.feature.redgifs.http
 
-import com.client.xvideos.feature.redgifs.ApiClient
-import com.client.xvideos.feature.redgifs.MediaType
-import com.client.xvideos.feature.redgifs.Order
+import com.client.xvideos.feature.redgifs.types.MediaType
+import com.client.xvideos.feature.redgifs.types.Order
 import com.client.xvideos.feature.redgifs.types.CreatorResponse
 import com.client.xvideos.feature.redgifs.types.CreatorsResponse
 import com.client.xvideos.feature.redgifs.types.GetGifResponse
 import com.client.xvideos.feature.redgifs.types.GifResponse
 import com.client.xvideos.feature.redgifs.types.ImageResponse
-import com.client.xvideos.feature.redgifs.types.TagSuggestion
-import com.client.xvideos.feature.redgifs.types.TagsResponse
 import com.client.xvideos.feature.redgifs.types.TrendingImagesResponse
+import com.client.xvideos.feature.redgifs.types.tag.TagSuggestion
+import com.client.xvideos.feature.redgifs.types.tag.TagsResponse
 import com.google.android.gms.common.api.ApiException
 
-class HTTP {
+object RedGifs {
 
     val api = ApiClient()
 
     //--------------------------- GIF methods ---------------------------
 
+
+    // Возвращает список всех существующих тегов. 7к штук (имя, количество)
+    // ⭐ Работает
     @Throws(ApiException::class)
     suspend fun getTags(vararg parameters: Pair<String, Any>): TagsResponse {
         val route = Route("GET", "/v1/tags", *parameters)
@@ -26,6 +28,8 @@ class HTTP {
         return res
     }
 
+
+    //❓❓❓Непонятно как получить номер id
     @Throws(ApiException::class)
     suspend fun get_gif(id: String): GetGifResponse {
         val route = Route("GET", "/v2/gifs/{id}", "id" to id)
@@ -60,13 +64,13 @@ class HTTP {
 
     /**
      * ## Получить топ GIF-ов за неделю.
+     * Работает
      */
     @Throws(ApiException::class)
     suspend fun get_top_this_week(
         count: Int,                      // количество элементов на страницу.
-        page: Int,                       //номер страницы (1-based).
-        type: MediaType = MediaType.GIF, //тип медиа (GIF, image и т.д.).
-        vararg params: Pair<String, Any> = emptyArray(),
+        page: Int,                       // номер страницы (1-based).
+        type: MediaType = MediaType.GIF, // тип медиа (GIF, image и т.д.).
     ): GifResponse {
 
         val route = Route(
@@ -75,7 +79,6 @@ class HTTP {
             "count" to count,
             "page" to page,
             "type" to type.value,
-            *params
         )
 
         val res: GifResponse = api.request(route)
@@ -85,12 +88,12 @@ class HTTP {
 
     //--------------------------- User/Creator methods ---------------------------
 
+    //Работает
     suspend fun searchCreators(
-        page: Int,
-        order: Order,
-        verified: Boolean,
-        tags: List<String>? = null,
-        params: Map<String, Any> = emptyMap()
+        page: Int = 1,
+        order: Order = Order.TOP,
+        verified: Boolean = true,
+        tags: List<String>? = listOf("Teen", "Ass"),
     ): CreatorsResponse {
 
         var url = "/v1/creators/search?page={page}&order={order}"
@@ -111,8 +114,7 @@ class HTTP {
             routeParams["tags"] = tags.joinToString(",")
         }
 
-        val route = Route( method = "GET", path = url, *routeParams.toList().toTypedArray()
-        )
+        val route = Route( method = "GET", path = url, *routeParams.toList().toTypedArray() )
 
         val res: CreatorsResponse = api.request(route)
         return res
@@ -122,12 +124,11 @@ class HTTP {
 
 
     suspend fun search_creator(
-        username: String,
-        page: Int,
-        count: Int,
-        order: Order,
-        type: MediaType,
-        params: Map<String, Any> = emptyMap()
+        username: String = "lilijunex",
+        page: Int = 1,
+        count: Int = 100,
+        order: Order = Order.NEW,
+        type: MediaType = MediaType.GIF,
     ): CreatorResponse {
         val route = Route(
             method = "GET",
@@ -177,7 +178,8 @@ class HTTP {
     }
 
     /**
-     * ## Получить список «в тренде» (Trending Images).
+     * ## Получить список 10 картинок «в тренде» (Trending Images).
+     * ## ⭐ Работает ⭐
      */
     @Throws(ApiException::class)
     suspend fun get_trending_images(): TrendingImagesResponse {
@@ -189,7 +191,8 @@ class HTTP {
     //--------------------------- Tag methods ---------------------------
 
     /**
-     * ## Получить список популярных тегов (Trending Tags).
+     * ## Получить список 20 популярных тегов (Trending Tags).
+     * ## ⭐ Работает ⭐
      */
     @Throws(ApiException::class)
     suspend fun get_trending_tags(): TagsResponse {

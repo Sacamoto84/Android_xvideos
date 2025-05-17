@@ -17,7 +17,7 @@ import coil.ImageLoader
 import coil.ImageLoaderFactory
 import coil.memory.MemoryCache
 import coil.request.CachePolicy
-import com.client.xvideos.feature.redgifs.RedGigsAPI
+import com.client.xvideos.feature.redgifs.http.RedGifs
 import com.client.xvideos.screens.dashboards.ScreenDashBoards
 import com.client.xvideos.screens.videoplayer.video.cache.VideoPlayerCacheManager
 import com.client.xvideos.ui.theme.XvideosTheme
@@ -58,7 +58,7 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
 
         runBlocking {
 
-            val a = RedGigsAPI.http.get_trending_gifs()
+            val a = RedGifs.search_creator()
             a
 
 //            ApiClient.login() // без логина и пароля — временный токен

@@ -1,7 +1,6 @@
-package com.client.xvideos.feature.redgifs
+package com.client.xvideos.feature.redgifs.http
 
 import android.annotation.SuppressLint
-import com.client.xvideos.feature.redgifs.http.Route
 import com.client.xvideos.feature.redgifs.types.GifInfo
 import com.client.xvideos.feature.redgifs.types.GifInfoItem
 import com.client.xvideos.feature.redgifs.types.ImageInfo
@@ -22,8 +21,6 @@ import io.ktor.client.request.parameter
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpHeaders
 import io.ktor.serialization.gson.gson
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 
 class ApiClient {
 
