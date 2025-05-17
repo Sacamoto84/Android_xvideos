@@ -1,9 +1,7 @@
 package com.client.xvideos.feature.redgifs.http
 
 import android.annotation.SuppressLint
-import com.client.xvideos.feature.redgifs.types.GifInfo
 import com.client.xvideos.feature.redgifs.types.GifInfoItem
-import com.client.xvideos.feature.redgifs.types.ImageInfo
 import com.client.xvideos.feature.redgifs.types.ImageInfoItem
 import com.client.xvideos.feature.redgifs.types.MediaItem
 import com.google.gson.Gson
@@ -31,7 +29,7 @@ class ApiClient {
     val client = HttpClient(OkHttp) {
         install(ContentNegotiation) {
             gson {
-                this.registerTypeAdapter(MediaItem::class.java, MediaItemTypeAdapter()).create()
+                //this.registerTypeAdapter(MediaItem::class.java, MediaItemTypeAdapter()).create()
             }
         }
     }
@@ -106,24 +104,24 @@ class ApiClient {
 
 }
 
-class MediaItemTypeAdapter : TypeAdapter<MediaItem>() {
-
-    private val gson = Gson()
-
-    override fun write(out: JsonWriter, value: MediaItem?) { }
-
-    override fun read(reader: JsonReader): MediaItem {
-
-        val jsonElement = JsonParser.parseReader(reader).asJsonObject
-        val type = jsonElement.get("type").asInt
-
-        return when (type) {
-            1 -> gson.fromJson(jsonElement, ImageInfo::class.java).let { ImageInfoItem(it) }
-            2 -> gson.fromJson(jsonElement, GifInfo::class.java).let { GifInfoItem(it) }
-            else -> throw IllegalArgumentException("Unknown type: $type")
-        }
-    }
-
-}
+//class MediaItemTypeAdapter : TypeAdapter<MediaItem>() {
+//
+//    private val gson = Gson()
+//
+//    override fun write(out: JsonWriter, value: MediaItem?) { }
+//
+//    override fun read(reader: JsonReader): MediaItem {
+//
+//        val jsonElement = JsonParser.parseReader(reader).asJsonObject
+//        val type = jsonElement.get("type").asInt
+//
+//        return when (type) {
+//            1 -> gson.fromJson(jsonElement, ImageInfo::class.java).let { ImageInfoItem(it) }
+//            2 -> gson.fromJson(jsonElement, GifInfo::class.java).let { GifInfoItem(it) }
+//            else -> throw IllegalArgumentException("Unknown type: $type")
+//        }
+//    }
+//
+//}
 
 

@@ -6,6 +6,6 @@ data class CreatorResult(
     val page: Int = 0,                     // Текущий номер страницы.
     val pages: Int = 0,                    // Общее количество доступных страниц.
     val total: Int = 0,                    // Общее количество GIF, созданных этим автором/пользователем.
-    val gifs: List<GifInfo> = emptyList(),     // Список GIF, загруженных этим автором.
-    val images: List<ImageInfo> = emptyList()  // Список изображений, загруженных этим автором.
+    val gifs: List<MediaInfo> = emptyList(),     // Список GIF, загруженных этим автором.
+    val images: List<MediaInfo> = emptyList()  // Список изображений, загруженных этим автором.
 )

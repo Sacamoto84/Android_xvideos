@@ -128,7 +128,7 @@ object RedGifs {
         page: Int = 1,
         count: Int = 100,
         order: Order = Order.NEW,
-        type: MediaType = MediaType.GIF,
+        type: MediaType = MediaType.IMAGE,
     ): CreatorResponse {
         val route = Route(
             method = "GET",

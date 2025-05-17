@@ -4,7 +4,7 @@ data class BaseGifResponse(
     val page: Int,
     val pages: Int,
     val total: Int,
-    val gifs: List<GifInfo>,
+    val gifs: List<MediaInfo>,
     val users: List<UserInfo>,
     val niches: List<NichesInfo>,
     val tags: List<String>
