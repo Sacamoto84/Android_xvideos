@@ -1,7 +1,9 @@
 package com.client.xvideos.feature.redgifs
 
-import com.client.xvideos.feature.redgifs.model.TagInfo
-import com.client.xvideos.feature.redgifs.model.TagsResponse
+import android.annotation.SuppressLint
+import com.client.xvideos.feature.redgifs.types.CreatorResponse
+import com.client.xvideos.feature.redgifs.types.MediaItem
+import com.google.gson.GsonBuilder
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.okhttp.OkHttp
@@ -18,9 +20,14 @@ object ApiClient {
     val USER_AGENT: String =
         "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3346.8 Safari/537.36 Redgifs/"
 
+    @SuppressLint("CheckResult")
     val client = HttpClient(OkHttp) {
         install(ContentNegotiation) {
-            gson()
+
+            gson {
+                this.registerTypeAdapter(MediaItem::class.java, MediaItemTypeAdapter()).create()
+            }
+
         }
     }
 
@@ -61,25 +68,25 @@ object ApiClient {
         }.body()
     }
 
+    //val res : CreatorResponse  = request(route)
     suspend inline fun <reified T> request(
-        route: Route
+        route: Route, vararg params: Pair<String, Any> = emptyArray(),
     ): T {
-
         return client.get(route.url) {
             bearerToken?.let {
                 headers {
                     append(HttpHeaders.Authorization, "Bearer $it")
                 }
             }
-//            params.forEach { (key, value) ->
-//                parameter(key, value)
-//            }
+            params.forEach { (key, value) ->
+                parameter(key, value)
+            }
         }.body()
     }
 
 
     suspend inline fun requestText(
-        route: Route
+        route: Route,
     ): String {
 
         return client.get(route.url) {
@@ -93,9 +100,6 @@ object ApiClient {
 //            }
         }.bodyAsText()
     }
-
-
-
 
 
 }

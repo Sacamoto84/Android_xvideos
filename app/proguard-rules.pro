@@ -24,3 +24,7 @@
 -keepattributes *Annotation*
 
 -dontobfuscate
+
+#-keep class com.client.xvideos.feature.redgifs.types.MediaItem { *; }
+#-keep class com.client.xvideos.feature.redgifs.types.GifInfoItem { *; }
+#-keep class com.client.xvideos.feature.redgifs.types.ImageInfoItem { *; }

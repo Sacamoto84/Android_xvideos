@@ -61,23 +61,11 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
         super.onCreate(savedInstanceState)
 
 
-
-
         runBlocking {
-            println("2")
             ApiClient.login() // без логина и пароля — временный токен
-            println("3")
             val response = API.searchCreator("lilijunex", 1, 80, Order .RECENT, MediaType.GIF)
             println(response)
         }
-
-
-
-
-
-
-
-
 
 
 
