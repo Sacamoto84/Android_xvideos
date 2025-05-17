@@ -2,6 +2,7 @@ package com.client.xvideos.feature.redgifs
 
 import com.client.xvideos.feature.redgifs.ApiClient.request
 import com.client.xvideos.feature.redgifs.ApiClient.requestText
+import com.client.xvideos.feature.redgifs.HTTP.Route
 import com.client.xvideos.feature.redgifs.types.CreatorResponse
 import com.client.xvideos.feature.redgifs.types.GifInfo
 import com.client.xvideos.feature.redgifs.types.GifInfoItem
@@ -29,19 +30,13 @@ object API {
 
     /**
      * Найдите одного создателя/пользователя RedGifs по имени пользователя.
-     * Параметры:
-     * username — Имя пользователя создателя/пользователя.
-     * page  — Номер текущей страницы профиля создателя/пользователя.
-     * count — Общее количество GIF-файлов для возврата.
-     * order — Заказ на возврат GIF-файлов создателя/пользователя.
-     * type  – Следует ли возвращать изображение или результаты GIF. По умолчанию возвращает GIF-файлы.
      */
-    suspend fun searchCreator(
-        username: String,
-        page: Int = 1,
-        count: Int = 80,
-        order: Order = Order.RECENT,
-        type: MediaType = MediaType.GIF,
+    suspend fun search_creator(
+        username: String,                // Имя пользователя/создателя.
+        page: Int = 1,                   // Номер текущей страницы профиля создателя/пользователя.
+        count: Int = 80,                 // Общее количество GIF-файлов для возврата.
+        order: Order = Order.RECENT,     // Порядок возврата GIF-файлов создателя/пользователя.
+        type: MediaType = MediaType.GIF, // Возвращать ли результаты в виде изображений или GIF. По умолчанию возвращаются GIF-файлы.
     ): CreatorResponse {
         val route = Route(
             "GET",
@@ -59,6 +54,11 @@ object API {
         //val i = gson.fromJson(res, CreatorResponse::class.java)
         return res
     }
+
+
+
+
+
 
 
 }
