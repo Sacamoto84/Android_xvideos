@@ -1,4 +1,4 @@
-package com.client.xvideos.feature.redgifs.HTTP
+package com.client.xvideos.feature.redgifs.http
 
 class Route(method: String, path: String, vararg parameters: Pair<String, Any>) {
 

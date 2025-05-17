@@ -1,10 +1,17 @@
 package com.client.xvideos.feature.redgifs
 
 import android.annotation.SuppressLint
-import com.client.xvideos.feature.redgifs.HTTP.Route
-import com.client.xvideos.feature.redgifs.types.CreatorResponse
+import com.client.xvideos.feature.redgifs.http.Route
+import com.client.xvideos.feature.redgifs.types.GifInfo
+import com.client.xvideos.feature.redgifs.types.GifInfoItem
+import com.client.xvideos.feature.redgifs.types.ImageInfo
+import com.client.xvideos.feature.redgifs.types.ImageInfoItem
 import com.client.xvideos.feature.redgifs.types.MediaItem
-import com.google.gson.GsonBuilder
+import com.google.gson.Gson
+import com.google.gson.JsonParser
+import com.google.gson.TypeAdapter
+import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonWriter
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.okhttp.OkHttp
@@ -15,8 +22,10 @@ import io.ktor.client.request.parameter
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpHeaders
 import io.ktor.serialization.gson.gson
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 
-object ApiClient {
+class ApiClient {
 
     val USER_AGENT: String =
         "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3346.8 Safari/537.36 Redgifs/"
@@ -24,15 +33,14 @@ object ApiClient {
     @SuppressLint("CheckResult")
     val client = HttpClient(OkHttp) {
         install(ContentNegotiation) {
-
             gson {
                 this.registerTypeAdapter(MediaItem::class.java, MediaItemTypeAdapter()).create()
             }
-
         }
     }
 
     var bearerToken: String? = null
+
 
     suspend fun login() {
         data class TokenResponse(val token: String)
@@ -42,21 +50,13 @@ object ApiClient {
         bearerToken = tokenResponse.token
     }
 
-    suspend fun getSomething(): String {
-        return client.get("https://example.com/v2/data") {
-            bearerToken?.let {
-                headers {
-                    append(HttpHeaders.Authorization, "Bearer $it")
-                }
-            }
-        }.bodyAsText()
-    }
-
-
     suspend inline fun <reified T> request(
         url: String,
         params: Map<String, String> = emptyMap(),
     ): T {
+
+        if (bearerToken == null) login()
+
         return client.get(url) {
             bearerToken?.let {
                 headers {
@@ -73,6 +73,9 @@ object ApiClient {
     suspend inline fun <reified T> request(
         route: Route, vararg params: Pair<String, Any> = emptyArray(),
     ): T {
+
+        if (bearerToken == null) login()
+
         return client.get(route.url) {
             bearerToken?.let {
                 headers {
@@ -88,6 +91,7 @@ object ApiClient {
 
     suspend inline fun requestText(
         route: Route,
+        vararg params: Pair<String, Any> = emptyArray(),
     ): String {
 
         return client.get(route.url) {
@@ -96,15 +100,33 @@ object ApiClient {
                     append(HttpHeaders.Authorization, "Bearer $it")
                 }
             }
-//            params.forEach { (key, value) ->
-//                parameter(key, value)
-//            }
+            params.forEach { (key, value) ->
+                parameter(key, value)
+            }
         }.bodyAsText()
     }
 
 
 }
 
+class MediaItemTypeAdapter : TypeAdapter<MediaItem>() {
 
+    private val gson = Gson()
+
+    override fun write(out: JsonWriter, value: MediaItem?) { }
+
+    override fun read(reader: JsonReader): MediaItem {
+
+        val jsonElement = JsonParser.parseReader(reader).asJsonObject
+        val type = jsonElement.get("type").asInt
+
+        return when (type) {
+            1 -> gson.fromJson(jsonElement, ImageInfo::class.java).let { ImageInfoItem(it) }
+            2 -> gson.fromJson(jsonElement, GifInfo::class.java).let { GifInfoItem(it) }
+            else -> throw IllegalArgumentException("Unknown type: $type")
+        }
+    }
+
+}
 
 

@@ -1,7 +1,5 @@
 package com.client.xvideos.feature.redgifs
 
-import java.util.Date
-
 enum class Order(val value: String) {
     TRENDING("trending"),
     TOP("top"),
