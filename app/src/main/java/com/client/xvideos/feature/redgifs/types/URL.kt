@@ -1,12 +1,14 @@
 package com.client.xvideos.feature.redgifs.types
 
+import com.google.gson.annotations.SerializedName
+
 data class URL(
-    val thumbnail: String = "",     // Картинка как SD
-    val silent: String? = null,     // * Полное видео в mp4 !!! Без звука в HD Для скачивания
-    val poster: String? = null,     // Большая картинка Видео как HD
-    val html: String? = null,       // * Ссылка на веб-страницу с медиа. Полноэкранный режим. Типа ссылки
-    val sd: String = "",            // * SD-ссылка на медиафайл.                                 3.5 MB
-    val hd: String? = null,         // * HD-ссылка на медиафайл (может отсутствовать). Со звуком 21MB
+    @SerializedName("thumbnail") val thumbnail: String = "",     // Картинка как SD
+    @SerializedName("silent") val silent: String? = null,     // * Полное видео в mp4 !!! Без звука в HD Для скачивания
+    @SerializedName("poster") val poster: String? = null,     // Большая картинка Видео как HD
+    @SerializedName("html") val html: String? = null,       // * Ссылка на веб-страницу с медиа. Полноэкранный режим. Типа ссылки
+    @SerializedName("sd") val sd: String = "",            // * SD-ссылка на медиафайл.                                 3.5 MB
+    @SerializedName("hd") val hd: String? = null,         // * HD-ссылка на медиафайл (может отсутствовать). Со звуком 21MB
 )
 
 //"urls": {

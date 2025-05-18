@@ -21,7 +21,7 @@ import com.skydoves.landscapist.coil.CoilImage
  * url: строка с адресом изображения
  */
 @Composable
-fun UrlImage(url: String, modifier: Modifier = Modifier) {
+fun UrlImage(url: String, modifier: Modifier = Modifier,  contentScale : ContentScale = ContentScale.FillWidth) {
 
     val context = LocalContext.current
 
@@ -37,7 +37,7 @@ fun UrlImage(url: String, modifier: Modifier = Modifier) {
     CoilImage(
         imageRequest = { imageRequest },
         imageOptions = ImageOptions(
-            contentScale = ContentScale.FillWidth,
+            contentScale = contentScale,
             alignment = Alignment.Center
         ),
         modifier = Modifier.then(modifier),
@@ -54,17 +54,6 @@ fun UrlImage(url: String, modifier: Modifier = Modifier) {
                 Text("Ошибка загрузки", color = Color.Gray)
             }
         }
-//        component = rememberImageComponent {
-//            //+PlaceholderPlugin.Loading(painterResource(id = R.drawable.xvideos_logo))
-//
-//            // displays a shimmering effect when loading an image.
-//            +ShimmerPlugin(
-//                Shimmer.Flash(
-//                    baseColor = Color.Red,
-//                    highlightColor = Color.Blue,
-//                )
-//            )
-//        },
 
     )
 }

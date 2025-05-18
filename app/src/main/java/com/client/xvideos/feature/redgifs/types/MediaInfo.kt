@@ -1,19 +1,21 @@
 package com.client.xvideos.feature.redgifs.types
 
-data class MediaInfo(
-    val id: String = "id",
-    val createDate: Long = 0,
-    val likes: Int = 0,
-    val width: Int = 100,
-    val height: Int = 100,
-    val tags: List<String> = emptyList(),
-    val description: String = "avgColor",
-    val views: Int? = null,
-    val type: Int = 0,  //1-Gif 2-Image
-    val userName: String = "userName",           // "lilijunex"
-    val urls: URL = URL(),                // Вложенный объект
+import com.google.gson.annotations.SerializedName
 
-    val duration: Double? = null,
-    val hls: Boolean? = null,
-    val niches: List<String>? = null,
-    )
+data class MediaInfo(
+    @SerializedName("id") val id: String = "id",
+    @SerializedName("createDate") val createDate: Long = 0,
+    @SerializedName("likes") val likes: Int = 0,
+    @SerializedName("width") val width: Int = 100,
+    @SerializedName("height") val height: Int = 100,
+    @SerializedName("tags") val tags: List<String> = emptyList(),
+    @SerializedName("description") val description: String = "description",
+    @SerializedName("views") val views: Int? = null,
+    @SerializedName("type") val type: Int = 0,  //1-Gif 2-Image
+    @SerializedName("userName") val userName: String = "userName",           // "lilijunex"
+    @SerializedName("urls") val urls: URL = URL(),
+
+    @SerializedName("duration") val duration: Double? = null,
+    @SerializedName("hls") val hls: Boolean? = null,
+    @SerializedName("niches") val niches: List<String>? = null,
+)

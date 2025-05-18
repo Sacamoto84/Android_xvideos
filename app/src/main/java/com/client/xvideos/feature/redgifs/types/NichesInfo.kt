@@ -1,16 +1,18 @@
 package com.client.xvideos.feature.redgifs.types
 
+import com.google.gson.annotations.SerializedName
+
 // Проверен
 data class NichesInfo(
-    val cover: String? = "cover",
-    val description: String = "description",
-    val gifs: Int = 0,
-    val id: String = "id",
-    val name: String = "name",
-    val owner: String = "owner",
-    val subscribers: Int = 0,
-    val thumbnail: String = "thumbnail",
-    val rules: String? = "rules"
+    @SerializedName("cover") val cover: String? = "cover",
+    @SerializedName("description") val description: String = "description",
+    @SerializedName("gifs") val gifs: Int = 0,
+    @SerializedName("id") val id: String = "id",
+    @SerializedName("name") val name: String = "name",
+    @SerializedName("owner") val owner: String = "owner",
+    @SerializedName("subscribers") val subscribers: Int = 0,
+    @SerializedName("thumbnail") val thumbnail: String = "thumbnail",
+    @SerializedName("rules") val rules: String? = "rules",
 )
 
 

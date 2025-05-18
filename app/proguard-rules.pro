@@ -28,3 +28,11 @@
 #-keep class com.client.xvideos.feature.redgifs.types.MediaItem { *; }
 #-keep class com.client.xvideos.feature.redgifs.types.GifInfoItem { *; }
 #-keep class com.client.xvideos.feature.redgifs.types.ImageInfoItem { *; }
+
+# MediaType.Companion is object → keep its ctor
+-keepclassmembers class okhttp3.MediaType$Companion {
+    <init>();
+}
+
+
+
