@@ -7,11 +7,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Scaffold
@@ -25,7 +25,9 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.screens_red.ThemeRed
+import com.client.xvideos.screens_red.profile.atom.RedProfileCreaterInfo
 import com.client.xvideos.screens_red.profile.atom.RedProfileTile
+import com.client.xvideos.screens_red.profile.feedControl.RedProfileFeedControlsContainer
 import com.composables.core.HorizontalSeparator
 
 class ScreenRedProfile() : Screen {
@@ -39,30 +41,53 @@ class ScreenRedProfile() : Screen {
 
         val vm: ScreenRedProfileSM = getScreenModel()
 
-        val list = vm.b?.gifs
+        val list = vm.creator?.gifs
 
         Scaffold(
             bottomBar = { RedBottomBar() },
             containerColor = ThemeRed.colorCommonBackground
-        ) {padding ->
-
+        ) { padding ->
 
 
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
-                modifier = Modifier.padding(padding).fillMaxWidth(),
+                modifier = Modifier
+                    .padding(padding)
+                    .fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp),
                 contentPadding = PaddingValues(4.dp) // Отступы по краям сетки
             ) {
 
-                items(items = list.orEmpty(), key = { it.id }) {itemData ->
+
+                //Описание и теги
+                item(
+                    span = { GridItemSpan(maxLineSpan) } // Заставляет этот item занять все столбцы
+                ) {
+                    // Используем vm.b, если он не null
+                    vm.creator?.let { profileData ->
+                        RedProfileCreaterInfo(profileData)
+                    }
+                }
+
+                //Управление списком
+                item(
+                    span = { GridItemSpan(maxLineSpan) } // Заставляет этот item занять все столбцы
+                ) {
+                    RedProfileFeedControlsContainer()
+                }
+
+
+                items(items = list.orEmpty(), key = { it.id }) { itemData ->
                     Box(
                         modifier = Modifier
                     ) {
                         RedProfileTile(itemData)
                     }
                 }
+
+
+
             }
 
 
@@ -85,7 +110,6 @@ class ScreenRedProfile() : Screen {
 ////                }
 //
 //            }
-
 
 
         }

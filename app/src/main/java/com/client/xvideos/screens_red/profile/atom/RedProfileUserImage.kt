@@ -5,10 +5,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
@@ -19,10 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,12 +35,12 @@ import com.client.xvideos.feature.redgifs.types.CreatorResponse
 import com.client.xvideos.screens.common.urlVideImage.UrlImage
 import com.client.xvideos.screens_red.ThemeRed
 import com.composeunstyled.Text
-import kotlinx.coroutines.delay
 import java.util.Locale
-import kotlin.text.format
 
 @Composable
 fun RedProfileCreaterInfo(item: CreatorResponse) {
+
+    if (item.users.isEmpty()) return
 
     Column(
         modifier = Modifier
@@ -61,11 +55,13 @@ fun RedProfileCreaterInfo(item: CreatorResponse) {
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            UrlImage(
-                item.users[0].profileImageUrl.toString(),
-                modifier = Modifier
-                    .size(128.dp)
-            )
+
+
+                UrlImage(
+                    item.users[0].profileImageUrl.toString(),
+                    modifier = Modifier
+                        .size(128.dp)
+                )
 
             Row(
                 modifier =

@@ -8,6 +8,8 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import com.client.xvideos.feature.redgifs.http.RedGifs
 import com.client.xvideos.feature.redgifs.types.CreatorResponse
+import com.client.xvideos.feature.redgifs.types.MediaType
+import com.client.xvideos.feature.redgifs.types.Order
 import com.client.xvideos.feature.room.AppDatabase
 import dagger.Binds
 import dagger.Module
@@ -23,18 +25,35 @@ class ScreenRedProfileSM @Inject constructor(
     private val db: AppDatabase,
 ) : ScreenModel {
 
-    var b: CreatorResponse? by mutableStateOf(null)
+    var creator: CreatorResponse? by mutableStateOf(null)
+
+    //Выбор сортировки
+    var order by mutableStateOf(Order.NEW)
+
+    val orderList = listOf(Order.TOP, Order.LATEST, Order.OLDEST, Order.TOP28, Order.TRENDING)
+
 
     init {
-        loadProfile()
+        loadProfileGif()
     }
 
-    fun loadProfile() {
-
+    fun loadProfileGif(order: Order = Order.TRENDING) {
         screenModelScope.launch(Dispatchers.IO) {
-            b = RedGifs.searchCreator()
+            creator = RedGifs.searchCreator(order = order)
         }
+    }
 
+    fun loadProfileImage(order: Order = Order.NEW) {
+        screenModelScope.launch(Dispatchers.IO) {
+            creator = RedGifs.searchCreator(type = MediaType.IMAGE)
+        }
+    }
+
+    fun loadProfileGifAndImage(order: Order = Order.NEW) {
+        screenModelScope.launch(Dispatchers.IO) {
+            val images = RedGifs.searchCreator(type = MediaType.IMAGE, order = order)
+            val gifs = RedGifs.searchCreator(type = MediaType.GIF, order = order)
+        }
     }
 
 
