@@ -17,13 +17,11 @@ import coil.ImageLoader
 import coil.ImageLoaderFactory
 import coil.memory.MemoryCache
 import coil.request.CachePolicy
-import com.client.xvideos.feature.redgifs.http.RedGifs
-import com.client.xvideos.screens.dashboards.ScreenDashBoards
 import com.client.xvideos.screens.videoplayer.video.cache.VideoPlayerCacheManager
+import com.client.xvideos.screens_red.profile.ScreenRedProfile
 import com.client.xvideos.ui.theme.XvideosTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
 import timber.log.Timber.DebugTree
 import timber.log.Timber.Forest.plant
 
@@ -56,15 +54,15 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
         super.onCreate(savedInstanceState)
 
 
-        runBlocking {
+        //runBlocking {
 
-            val a = RedGifs.search_creator()
-            a
+            //val a = RedGifs.search_creator()
+           //a
 
 //            ApiClient.login() // без логина и пароля — временный токен
 //            val response = API.searchCreator("lilijunex", 1, 80, Order .RECENT, MediaType.GIF)
 //            println(response)
-        }
+        //}
 
 
 
@@ -96,8 +94,10 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
                     //.systemBarsPadding())
                 )
                 {
-                    Navigator(ScreenDashBoards())
+                    //Navigator(ScreenDashBoards())
                     //Navigator(ScreenFavorites())
+                    //ScreenRedProfile
+                    Navigator(ScreenRedProfile())
                 }
 
             }
