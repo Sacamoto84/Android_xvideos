@@ -1,5 +1,6 @@
 package com.client.xvideos.screens_red.profile.atom
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
@@ -11,10 +12,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.client.xvideos.R
 import com.client.xvideos.feature.redgifs.types.CreatorResponse
 import com.client.xvideos.screens.common.urlVideImage.UrlImage
+import com.client.xvideos.screens_red.ThemeRed
 import com.composeunstyled.Text
 
 @Composable
@@ -35,7 +40,22 @@ fun RedProfileCreaterInfo(item: CreatorResponse) {
                     .size(128.dp)
             )
 
-            Text(item.users[0].username, color = Color.White)
+            Row(verticalAlignment = Alignment.Bottom) {
+                Text(
+                    item.users[0].username,
+                    color = Color.White,
+                    fontFamily = ThemeRed.fontFamilyPopinsMedium,
+                    fontSize = 32.sp
+                )
+                Image(
+                    painter = painterResource(id = R.drawable.verificed),
+                    contentDescription = stringResource(id = R.string.dog_content_description)
+                )
+            }
+
+//            Image(painterResource(R.drawable.verificed),
+//                modifier = Modifier.size(24.dp))
+
         }
 
         Row(
@@ -71,3 +91,6 @@ fun RedProfileCreaterInfo(item: CreatorResponse) {
 
 
 }
+
+
+

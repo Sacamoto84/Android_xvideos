@@ -16,8 +16,10 @@ object ThemeRed {
 
     val colorBottomBarDivider = Color(0xFF323153)
 
-
-    val fontFamilyPopinsRegular = FontFamily(Font(R.font.))
-
+    val fontFamilyPopinsRegular = FontFamily(Font(R.font.poppins_regular))
+    val fontFamilyPopinsMedium= FontFamily(Font(R.font.poppins_medium))
+    val fontFamilyPopinsSemiBold= FontFamily(Font(R.font.poppins_semibold))
+    val fontFamilyPopinsBold = FontFamily(Font(R.font.poppins_bold))
+    val fontFamilyPopinsExtraBold= FontFamily(Font(R.font.poppins_extrabold))
 
 }
