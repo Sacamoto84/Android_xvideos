@@ -37,7 +37,7 @@ class ScreenRedProfileSM @Inject constructor(
         loadProfileGif()
     }
 
-    fun loadProfileGif(order: Order = Order.TRENDING) {
+    fun loadProfileGif(order: Order = Order.LATEST) {
         screenModelScope.launch(Dispatchers.IO) {
             creator = RedGifs.searchCreator(order = order)
         }

@@ -28,6 +28,7 @@ import com.client.xvideos.screens_red.ThemeRed
 import com.client.xvideos.screens_red.profile.atom.RedProfileCreaterInfo
 import com.client.xvideos.screens_red.profile.atom.RedProfileTile
 import com.client.xvideos.screens_red.profile.feedControl.RedProfileFeedControlsContainer
+import com.client.xvideos.screens_red.profile.tags.TagsBlock
 import com.composables.core.HorizontalSeparator
 
 class ScreenRedProfile() : Screen {
@@ -42,6 +43,9 @@ class ScreenRedProfile() : Screen {
         val vm: ScreenRedProfileSM = getScreenModel()
 
         val list = vm.creator?.gifs
+
+
+
 
         Scaffold(
             bottomBar = { RedBottomBar() },
@@ -66,7 +70,38 @@ class ScreenRedProfile() : Screen {
                 ) {
                     // Используем vm.b, если он не null
                     vm.creator?.let { profileData ->
-                        RedProfileCreaterInfo(profileData)
+                        //RedProfileCreaterInfo(profileData)
+
+                        TagsBlock(
+                            listOf(
+                                "1",
+                                "2",
+                                "3",
+                                "4",
+                                "5",
+                                "6",
+                                "7",
+                                "8",
+                                "9",
+                                "10",
+                                "11", "12",
+                                "13",
+                                "14",
+                                "15", "16",
+                                "17",
+                                "18",
+                                "19", "20",
+                                "21",
+                                "22",
+                                "23", "24",
+                                "25",
+                                "26",
+                                "27", "28",
+                                "29",
+                                "30",
+                            )
+                        )
+
                     }
                 }
 
@@ -74,7 +109,7 @@ class ScreenRedProfile() : Screen {
                 item(
                     span = { GridItemSpan(maxLineSpan) } // Заставляет этот item занять все столбцы
                 ) {
-                    RedProfileFeedControlsContainer()
+                    RedProfileFeedControlsContainer(vm)
                 }
 
 

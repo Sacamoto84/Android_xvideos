@@ -48,7 +48,7 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
             .build()
     }
 
-    @RequiresApi(Build.VERSION_CODES.R)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -74,12 +74,12 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
         //false: контент может располагаться на весь экран, включая области под системными панелями (ты сам решаешь, где что рисовать).
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
-
-        window.insetsController?.let {
-            it.hide(WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars())
-            it.systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            window.insetsController?.let {
+                it.hide(WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars())
+                it.systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            }
         }
-
 
         plant(DebugTree())
         VideoPlayerCacheManager.initialize(this, 1024 * 1024 * 1024)    // 1GB

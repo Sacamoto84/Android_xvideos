@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.client.xvideos.screens_red.profile.ScreenRedProfileSM
 
 /**
  * Контейнер выбора All Gifs Images
@@ -14,14 +15,19 @@ import androidx.compose.ui.Modifier
  * Выбор отображения количества столбцов 1 2
  */
 @Composable
-fun RedProfileFeedControlsContainer() {
+fun RedProfileFeedControlsContainer(vm: ScreenRedProfileSM) {
     //--- Feed Gif Types Control ---
     // Выбор типа отображения All Gifs Images
 
 
+
+
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
         //--- Feed Ordering Control ---
-        RedProfileSortBy()
+        RedProfileSortBy(vm.orderList, vm.order) {
+            vm.order = it
+            vm.loadProfileGif(order = vm.order)
+        }
 
         //--- Feed View Mode Control ---
 
