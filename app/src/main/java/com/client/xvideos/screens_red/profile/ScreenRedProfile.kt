@@ -14,9 +14,16 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
@@ -24,6 +31,7 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import coil.imageLoader
 import com.client.xvideos.screens_red.ThemeRed
 import com.client.xvideos.screens_red.profile.atom.RedProfileCreaterInfo
 import com.client.xvideos.screens_red.profile.atom.RedProfileTile
@@ -42,9 +50,27 @@ class ScreenRedProfile() : Screen {
 
         val vm: ScreenRedProfileSM = getScreenModel()
 
-        val list = vm.creator?.gifs
+       // val list = vm.creator?.gifs
+
+        val gridState = rememberLazyGridState()
+        val imgLoader = LocalContext.current.imageLoader
 
 
+        val list  = vm.list.collectAsState()
+
+        val isLoading = vm.isLoading.collectAsState().value
+
+        // триггерим подгрузку, когда остаётся ≤6 элементов до конца
+        LaunchedEffect(gridState) {
+            snapshotFlow { gridState.layoutInfo }
+                .collect { info ->
+                    val lastVisible = info.visibleItemsInfo.lastOrNull()?.index ?: 0
+                    val total       = info.totalItemsCount
+                    if (total - lastVisible <= 6) {
+                        vm.loadNextPage()
+                    }
+                }
+        }
 
 
         Scaffold(
@@ -53,7 +79,10 @@ class ScreenRedProfile() : Screen {
         ) { padding ->
 
 
+
+
             LazyVerticalGrid(
+                state = gridState,
                 columns = GridCells.Fixed(2),
                 modifier = Modifier
                     .padding(padding)
@@ -88,40 +117,30 @@ class ScreenRedProfile() : Screen {
                     RedProfileFeedControlsContainer(vm)
                 }
 
-
-                items(items = list.orEmpty(), key = { it.id }) { itemData ->
-                    Box(
-                        modifier = Modifier
-                    ) {
-                        RedProfileTile(itemData)
-                    }
+                items(list.value, key = { it.id }) { item ->
+                    RedProfileTile(item)
                 }
 
 
+//                items(items = list, key = { it }) { itemData ->
+//                    Box(
+//                        modifier = Modifier
+//                    ) {
+//                        RedProfileTile(itemData)
+//                    }
+//                }
+
+
+                // индикатор загрузки
+                if (isLoading) {
+                    item(span = { GridItemSpan(maxLineSpan) }) {
+                        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator()
+                        }
+                    }
+                }
 
             }
-
-
-//            LazyColumn(modifier = Modifier.fillMaxSize()) {
-//
-////                item {
-////                    if (vm.b != null) {
-////                        RedProfileCreaterInfo(vm.b!!)
-////                    }
-////                }
-//                item {
-//
-//
-//
-//                }
-//
-//
-////                items(items = list.orEmpty(), key = { it.id }) {
-////                    RedProfileTile(it)
-////                }
-//
-//            }
-
 
         }
 

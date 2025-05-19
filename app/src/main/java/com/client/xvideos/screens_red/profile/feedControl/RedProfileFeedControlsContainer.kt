@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.client.xvideos.screens_red.profile.ScreenRedProfileSM
 
@@ -16,22 +17,23 @@ import com.client.xvideos.screens_red.profile.ScreenRedProfileSM
  */
 @Composable
 fun RedProfileFeedControlsContainer(vm: ScreenRedProfileSM) {
-    //--- Feed Gif Types Control ---
-    // Выбор типа отображения All Gifs Images
 
-
-
-
-    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         //--- Feed Ordering Control ---
         RedProfileSortBy(vm.orderList, vm.order) {
             vm.order = it
-            vm.loadProfileGif(order = vm.order)
+            //vm.loadProfileGif(order = vm.order)
         }
 
+        //--- Feed Gif Types Control ---
+        // Выбор типа отображения All Gifs Images
+        RedProfileFeedGifTypesControl(vm)
+
         //--- Feed View Mode Control ---
-
-
 
 
     }

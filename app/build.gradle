@@ -236,6 +236,9 @@ dependencies {
 
 
     implementation("androidx.compose.material3:material3:1.4.0-alpha14")
+
+    implementation ("androidx.paging:paging-runtime:3.3.6")   // core
+    implementation ("androidx.paging:paging-compose:3.3.6")   // compose
 }
 
 ksp {

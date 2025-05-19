@@ -57,11 +57,11 @@ fun RedProfileCreaterInfo(item: CreatorResponse) {
         ) {
 
 
-                UrlImage(
-                    item.users[0].profileImageUrl.toString(),
-                    modifier = Modifier
-                        .size(128.dp)
-                )
+            UrlImage(
+                item.users[0].profileImageUrl.toString(),
+                modifier = Modifier
+                    .size(128.dp)
+            )
 
             Row(
                 modifier =
@@ -211,7 +211,7 @@ fun Int.toPrettyCount(): String {
  */
 fun Double.toMinSec(): String {
     val totalSec = this.toInt()                     // отбрасываем дробную часть
-    val minutes  = totalSec / 60
-    val seconds  = totalSec % 60
+    val minutes = totalSec / 60
+    val seconds = totalSec % 60
     return "%02d:%02d".format(minutes, seconds)     // ведущие нули
 }
