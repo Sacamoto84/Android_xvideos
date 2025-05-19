@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.client.xvideos.screens_red.profile.ScreenRedProfileSM
+import timber.log.Timber
 
 /**
  * Контейнер выбора All Gifs Images
@@ -17,6 +18,8 @@ import com.client.xvideos.screens_red.profile.ScreenRedProfileSM
  */
 @Composable
 fun RedProfileFeedControlsContainer(vm: ScreenRedProfileSM) {
+
+    Timber.d("!!! RedProfileFeedControlsContainer")
 
     Row(
         modifier = Modifier.fillMaxWidth(),

@@ -24,7 +24,8 @@ fun RedProfileFeedGifTypesControl(vm: ScreenRedProfileSM) {
         vm.typeGifsList.forEach {
             TextAndLine(Modifier.weight(1f), it.value, it == vm.typeGifs) {
                 vm.typeGifs = it
-                //vm.loadProfile()
+                vm.clear()
+                vm.loadNextPage()
             }
         }
     }

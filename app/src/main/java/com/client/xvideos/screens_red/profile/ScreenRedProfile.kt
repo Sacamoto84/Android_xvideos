@@ -35,6 +35,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -69,6 +73,11 @@ import com.composeunstyled.Disclosure
 import com.composeunstyled.DisclosureHeading
 import com.composeunstyled.DisclosurePanel
 import com.composeunstyled.rememberDisclosureState
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.withContext
+import timber.log.Timber
+import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.seconds
 
 class ScreenRedProfile() : Screen {
@@ -85,8 +94,8 @@ class ScreenRedProfile() : Screen {
         // val list = vm.creator?.gifs
 
         val gridState = rememberLazyGridState()
-        val imgLoader = LocalContext.current.imageLoader
 
+        //val imgLoader = LocalContext.current.imageLoader
 
         val list = vm.list.collectAsState()
 
@@ -94,21 +103,46 @@ class ScreenRedProfile() : Screen {
 
         val stateDisclosure = rememberDisclosureState()
 
-        val stateDisclosureDescription = rememberDisclosureState()
+        //val stateDisclosureDescription = rememberDisclosureState()
+        //val stateScrollArea = rememberScrollAreaState(gridState)
 
-        val stateScrollArea = rememberScrollAreaState(gridState)
+        var prevIndex by remember { mutableIntStateOf(0) }
+
+        val scrollPercent by rememberVisibleRangePercentIgnoringFirstN(gridState)
+
+
 
 
         // триггерим подгрузку, когда остаётся ≤6 элементов до конца
         LaunchedEffect(gridState) {
-            snapshotFlow { gridState.layoutInfo }
-                .collect { info ->
-                    val lastVisible = info.visibleItemsInfo.lastOrNull()?.index ?: 0
-                    val total = info.totalItemsCount
-                    if (total - lastVisible <= 6) {
-                        vm.loadNextPage()
-                    }
-                }
+
+          withContext(Dispatchers.IO){
+
+              snapshotFlow { gridState.layoutInfo }
+                  .distinctUntilChanged()
+                  .collect { info ->
+                      val last = info.visibleItemsInfo.lastOrNull()?.index ?: 0
+
+
+                      Timber.d("!!! prevIndex = $prevIndex")
+                      Timber.d("!!! last = $last")
+                      Timber.d("!!! info.totalItemsCount = ${info.totalItemsCount}")
+
+                     // vm.percentItemsCount = /(info.totalItemsCount - 1)
+
+                      // Триггер только если движемся ВНИЗ
+                      if (last > prevIndex) {
+                          val total = info.totalItemsCount
+                          if (total - last <= 6)
+                              vm.loadNextPage()
+                      }
+                      prevIndex = last
+                  }
+
+          }
+
+
+
         }
 
         Scaffold(
@@ -117,19 +151,18 @@ class ScreenRedProfile() : Screen {
         ) { padding ->
 
 
-            ScrollArea(
-                state = stateScrollArea,
-                Modifier
-                    .padding(bottom = padding.calculateBottomPadding())
-                    .fillMaxSize()
-            ) {
+//            ScrollArea(
+//                state = stateScrollArea,
+//                Modifier
+//                    .padding(bottom = padding.calculateBottomPadding())
+//                    .fillMaxSize()
+//            ) {
                 LazyVerticalGrid(
                     state = gridState,
                     columns = GridCells.Fixed(2),
                     modifier = Modifier
                         //.padding(bottom = padding.calculateBottomPadding())
-                        .fillMaxWidth()
-                        .fillMaxHeight(),
+                        .fillMaxSize(),
                     horizontalArrangement = Arrangement.spacedBy(4.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                     contentPadding = PaddingValues(4.dp) // Отступы по краям сетки
@@ -137,6 +170,7 @@ class ScreenRedProfile() : Screen {
 
                     //Описание и теги
                     item(
+                        key = "info",
                         span = { GridItemSpan(maxLineSpan) } // Заставляет этот item занять все столбцы
                     ) {
                         vm.creator?.let { profileData ->
@@ -144,8 +178,9 @@ class ScreenRedProfile() : Screen {
                         }
                     }
 
-                    //Описание и теги
+                    //теги
                     item(
+                        key = "tags",
                         span = { GridItemSpan(maxLineSpan) } // Заставляет этот item занять все столбцы
                     ) {
                         vm.creator?.let { profileData ->
@@ -223,6 +258,7 @@ class ScreenRedProfile() : Screen {
 
                     //Управление списком
                     item(
+                        key = "keyboard",
                         span = { GridItemSpan(maxLineSpan) }
                     ) {
                         Box(Modifier
@@ -240,36 +276,34 @@ class ScreenRedProfile() : Screen {
 
 
 
-                VerticalScrollbar(
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .fillMaxHeight()
-                        .width(2.dp)
+//                VerticalScrollbar(
+//                    modifier = Modifier
+//                        .align(Alignment.TopEnd)
+//                        .fillMaxHeight()
+//                        .width(2.dp)
+//
+//                ) {
+//                    Thumb(
+//                        Modifier.clip(RoundedCornerShape(50)).background(Color.Gray),
+//                        thumbVisibility = ThumbVisibility.HideWhileIdle(
+//                            enter = fadeIn(),
+//                            exit = fadeOut(),
+//                            hideDelay = 0.3.seconds
+//                        )
+//                    )
+//                }
 
-                ) {
-                    Thumb(
-                        Modifier.clip(RoundedCornerShape(50)).background(Color.Gray),
-                        thumbVisibility = ThumbVisibility.HideWhileIdle(
-                            enter = fadeIn(),
-                            exit = fadeOut(),
-                            hideDelay = 0.3.seconds
-                        )
-                    )
-                }
-
-            }
+          //  }
 
             if (isLoading) {
-
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(gapSize = 8.dp, color = Color.Yellow)
-
+                    CircularProgressIndicator(modifier = Modifier.size(64.dp), strokeWidth = 8.dp)
                 }
-
-
             }
 
-
+            // Например, выводим в AppBar
+            //Text(text = "${(scrollPercent * 100).roundToInt()} %", color = Color.Magenta)
+            Text(text = "       ${scrollPercent.first * 100.0f} %  ${scrollPercent.second * 100.0f} %", color = Color.Magenta)
         }
 
     }
