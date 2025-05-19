@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -64,9 +65,6 @@ class ScreenRedProfileSM @Inject constructor(
 //    }
     //---------------------------------------
 
-    init {
-        //loadProfile()
-    }
 
     private val _list = MutableStateFlow<List<MediaInfo>>(emptyList())
     val list: StateFlow<List<MediaInfo>> = _list
@@ -79,40 +77,55 @@ class ScreenRedProfileSM @Inject constructor(
         if (isLoading.value) return
         if (_list.value.size >= totalItems) return   // всё скачали
 
-        screenModelScope.launch {
+        screenModelScope.launch(Dispatchers.IO) {
             isLoading.value = true
             try {
                 val nextPage = currentPage + 1
-
-                loadProfileGif(nextPage)
-
-                val resp = creator?.gifs ?: emptyList()
-
-
-
+                val r = loadProfileGif(nextPage)
+                val resp = r.gifs
                 // обновляем данные
                 _list.update { it + resp }
                 currentPage = nextPage
                 totalItems = maxCreatorGifs
-
             } catch (e: Exception) {
                 // TODO: обработка ошибки (Snackbar / Retry)
             } finally {
-                isLoading.value= false
+                isLoading.value = false
             }
         }
     }
 
-        var creator: CreatorResponse? by mutableStateOf(null)
+    var creator: CreatorResponse? by mutableStateOf(null)
 
-        //Выбор сортировки
-        var order by mutableStateOf(Order.NEW)
-        val orderList = listOf(Order.TOP, Order.LATEST, Order.OLDEST, Order.TOP28, Order.TRENDING)
+    private val _tags = MutableStateFlow<Set<String>>(emptySet())
+    val tags: StateFlow<Set<String>> = _tags
 
-        val typeGifsList = listOf(TypeGifs.GIFS, TypeGifs.IMAGES)
-        var typeGifs by mutableStateOf(TypeGifs.GIFS)
 
-        var maxCreatorGifs = 0
+    //Выбор сортировки
+    var order by mutableStateOf(Order.NEW)
+    val orderList = listOf(Order.TOP, Order.LATEST, Order.OLDEST, Order.TOP28, Order.TRENDING)
+
+    val typeGifsList = listOf(TypeGifs.GIFS, TypeGifs.IMAGES)
+    var typeGifs by mutableStateOf(TypeGifs.GIFS)
+
+    /**
+     * Общее количество Gif у профиля
+     */
+    var maxCreatorGifs = 0
+    var maxCreatorImages = 0
+
+    init {
+        runBlocking {
+            creator = RedGifs.searchCreator(
+                page = 1,
+                count = 1,
+                type = MediaType.GIF,
+                order = order
+            )
+            maxCreatorGifs = creator?.users[0]?.publishedGifs ?: 0
+            maxCreatorImages = creator?.pages ?: 0
+        }
+    }
 
 
 //    fun loadProfile(){
@@ -123,25 +136,22 @@ class ScreenRedProfileSM @Inject constructor(
 //        }
 //    }
 
-        suspend fun loadProfileGif(page : Int = 1) {
-            withContext(Dispatchers.IO) {
+    suspend fun loadProfileGif(page: Int = 1): CreatorResponse {
+        val res = RedGifs.searchCreator(
+            count = 100,
+            page = page,
+            type = MediaType.GIF,
+            order = order
+        )
+        _tags.update { it + res.tags }
+        return res
+    }
 
-                maxCreatorGifs= RedGifs.searchCreator(page =1 ,count = 1, type = MediaType.GIF, order = order).users[0].publishedGifs
-
-                creator = RedGifs.searchCreator(
-                    count = 100,
-                    page = page,
-                    type = MediaType.GIF,
-                    order = order
-                )
-            }
+    suspend fun loadProfileImage() {
+        withContext(Dispatchers.IO) {
+            creator = RedGifs.searchCreator(type = MediaType.IMAGE, order = order)
         }
-
-        suspend fun loadProfileImage() {
-            withContext(Dispatchers.IO) {
-                creator = RedGifs.searchCreator(type = MediaType.IMAGE, order = order)
-            }
-        }
+    }
 
 }
 

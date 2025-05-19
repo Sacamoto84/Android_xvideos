@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -110,7 +111,7 @@ fun RedProfileCreaterInfo(item: CreatorResponse) {
 
                 Text(
                     "Подписчиков",
-                    color = Color.White,
+                    color = Color(0xFF9E9DA9),
                     fontFamily = ThemeRed.fontFamilyPopinsRegular
                 )
 
@@ -129,7 +130,7 @@ fun RedProfileCreaterInfo(item: CreatorResponse) {
 
                 Text(
                     "Просмотров",
-                    color = Color.White,
+                    color = Color(0xFF9E9DA9),
                     fontFamily = ThemeRed.fontFamilyPopinsRegular
                 )
             }
@@ -149,21 +150,26 @@ fun RedProfileCreaterInfo(item: CreatorResponse) {
 
                 Text(
                     "Постов",
-                    color = Color.White,
+                    color = Color(0xFF9E9DA9),
                     fontFamily = ThemeRed.fontFamilyPopinsRegular
                 )
 
             }
         }
 
-        Text("About ${item.users[0].username}:", color = Color.White, fontSize = 14.sp)
+        Text(
+            "About ${item.users[0].username}:",
+            color = ThemeRed.colorTextGray,
+            fontSize = 14.sp,
+            fontFamily = ThemeRed.fontFamilyPopinsRegular
+        )
 
-        Spacer(Modifier.width(8.dp))
+        Spacer(Modifier.height(4.dp))
 
         Text(
             item.users[0].description.toString().trimMargin(),
             color = Color.White,
-            fontSize = 14.sp
+            fontSize = 14.sp, fontFamily = ThemeRed.fontFamilyPopinsRegular
         )
 
         Spacer(Modifier.width(8.dp))
