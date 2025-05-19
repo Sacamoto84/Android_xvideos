@@ -63,45 +63,21 @@ class ScreenRedProfile() : Screen {
                 contentPadding = PaddingValues(4.dp) // Отступы по краям сетки
             ) {
 
+                //Описание и теги
+                item(
+                    span = { GridItemSpan(maxLineSpan) } // Заставляет этот item занять все столбцы
+                ) {
+                    vm.creator?.let { profileData ->
+                        RedProfileCreaterInfo(profileData)
+                    }
+                }
 
                 //Описание и теги
                 item(
                     span = { GridItemSpan(maxLineSpan) } // Заставляет этот item занять все столбцы
                 ) {
-                    // Используем vm.b, если он не null
                     vm.creator?.let { profileData ->
-                        //RedProfileCreaterInfo(profileData)
-
-                        TagsBlock(
-                            listOf(
-                                "1",
-                                "2",
-                                "3",
-                                "4",
-                                "5",
-                                "6",
-                                "7",
-                                "8",
-                                "9",
-                                "10",
-                                "11", "12",
-                                "13",
-                                "14",
-                                "15", "16",
-                                "17",
-                                "18",
-                                "19", "20",
-                                "21",
-                                "22",
-                                "23", "24",
-                                "25",
-                                "26",
-                                "27", "28",
-                                "29",
-                                "30",
-                            )
-                        )
-
+                        TagsBlock(vm.creator!!.tags)
                     }
                 }
 

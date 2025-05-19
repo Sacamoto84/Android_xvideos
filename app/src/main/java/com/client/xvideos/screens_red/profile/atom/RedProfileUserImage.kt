@@ -168,47 +168,6 @@ fun RedProfileCreaterInfo(item: CreatorResponse) {
 
         Spacer(Modifier.width(8.dp))
 
-
-        //Теги
-        val t = item.tags.sorted()
-
-        FlowRow(modifier = Modifier.fillMaxWidth()) {
-            for (i in t) {
-
-                var pressed by remember { mutableStateOf(false) }
-
-                val textColor by animateColorAsState(
-                    if (pressed) Color(0xFF652E45) else Color.Transparent,
-                    label = "textAnim"
-                )
-
-                Text(
-                    i,
-                    color = Color.White,
-                    fontSize = 14.sp,
-                    fontFamily = ThemeRed.fontFamilyPopinsRegular,
-                    modifier = Modifier
-                        .padding(2.dp)
-                        .clip(RoundedCornerShape(50))
-                        .background(textColor)
-                        .border(1.dp, Color(0xFFEA616F), RoundedCornerShape(50))
-                        .padding(top = 4.dp, bottom = 4.dp, start = 8.dp, end = 8.dp)
-                        .pointerInput(Unit) {
-                            detectTapGestures(
-                                onPress = { pressPoint ->
-                                    pressed = true
-                                    tryAwaitRelease()   // suspend до UP или cancel
-                                    pressed = false
-                                }
-                            )
-                        }
-                )
-            }
-        }
-
-
-
-
     }
 
 
