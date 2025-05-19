@@ -26,7 +26,8 @@ fun RedProfileFeedControlsContainer(vm: ScreenRedProfileSM) {
         //--- Feed Ordering Control ---
         RedProfileSortBy(vm.orderList, vm.order) {
             vm.order = it
-            //vm.loadProfileGif(order = vm.order)
+            vm.clear()
+            vm.loadNextPage()
         }
 
         //--- Feed Gif Types Control ---

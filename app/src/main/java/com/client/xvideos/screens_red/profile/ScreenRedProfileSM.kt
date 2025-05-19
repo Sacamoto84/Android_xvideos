@@ -81,7 +81,7 @@ class ScreenRedProfileSM @Inject constructor(
             isLoading.value = true
             try {
                 val nextPage = currentPage + 1
-                val r = loadProfileGif(nextPage)
+                val r = loadProfileGif(nextPage, order)
                 val resp = r.gifs
                 // обновляем данные
                 _list.update { it + resp }
@@ -93,6 +93,16 @@ class ScreenRedProfileSM @Inject constructor(
                 isLoading.value = false
             }
         }
+    }
+
+    fun clear(){
+        while( isLoading.value){
+            Thread.sleep(100)
+        }
+        _list.update { emptyList() }
+        _tags.update { emptySet() }
+
+        currentPage = 0
     }
 
     var creator: CreatorResponse? by mutableStateOf(null)
@@ -136,12 +146,12 @@ class ScreenRedProfileSM @Inject constructor(
 //        }
 //    }
 
-    suspend fun loadProfileGif(page: Int = 1): CreatorResponse {
+    suspend fun loadProfileGif(page: Int = 1, ord: Order = Order.NEW): CreatorResponse {
         val res = RedGifs.searchCreator(
             count = 100,
             page = page,
             type = MediaType.GIF,
-            order = order
+            order = ord
         )
         _tags.update { it + res.tags }
         return res
