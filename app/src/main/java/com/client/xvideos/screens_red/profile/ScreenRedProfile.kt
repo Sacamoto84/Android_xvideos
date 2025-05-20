@@ -3,8 +3,6 @@ package com.client.xvideos.screens_red.profile
 import android.annotation.SuppressLint
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -25,8 +23,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AirplanemodeActive
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -36,7 +32,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
@@ -45,7 +40,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -56,19 +50,14 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import coil.imageLoader
 import com.client.xvideos.R
 import com.client.xvideos.screens_red.ThemeRed
 import com.client.xvideos.screens_red.profile.atom.RedProfileCreaterInfo
 import com.client.xvideos.screens_red.profile.atom.RedProfileTile
+import com.client.xvideos.screens_red.profile.atom.VerticalScrollbar
 import com.client.xvideos.screens_red.profile.feedControl.RedProfileFeedControlsContainer
 import com.client.xvideos.screens_red.profile.tags.TagsBlock
 import com.composables.core.HorizontalSeparator
-import com.composables.core.ScrollArea
-import com.composables.core.Thumb
-import com.composables.core.ThumbVisibility
-import com.composables.core.VerticalScrollbar
-import com.composables.core.rememberScrollAreaState
 import com.composeunstyled.Disclosure
 import com.composeunstyled.DisclosureHeading
 import com.composeunstyled.DisclosurePanel
@@ -77,14 +66,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import kotlin.math.roundToInt
-import kotlin.time.Duration.Companion.seconds
 
 class ScreenRedProfile() : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
 
-    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "UnusedBoxWithConstraintsScope")
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -108,39 +95,43 @@ class ScreenRedProfile() : Screen {
 
         var prevIndex by remember { mutableIntStateOf(0) }
 
-        val scrollPercent by rememberVisibleRangePercentIgnoringFirstN(gridState)
+        //val scrollPercent by rememberVisibleRangePercentIgnoringFirstN(gridState)
 
 
+        val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForGrid(
+            gridState = gridState,
+            itemsToIgnore = 3, // Ваши 3 элемента хедера
+            numberOfColumns = 2
+        )
 
 
         // триггерим подгрузку, когда остаётся ≤6 элементов до конца
         LaunchedEffect(gridState) {
 
-          withContext(Dispatchers.IO){
+            withContext(Dispatchers.IO) {
 
-              snapshotFlow { gridState.layoutInfo }
-                  .distinctUntilChanged()
-                  .collect { info ->
-                      val last = info.visibleItemsInfo.lastOrNull()?.index ?: 0
+                snapshotFlow { gridState.layoutInfo }
+                    .distinctUntilChanged()
+                    .collect { info ->
+                        val last = info.visibleItemsInfo.lastOrNull()?.index ?: 0
 
 
-                      Timber.d("!!! prevIndex = $prevIndex")
-                      Timber.d("!!! last = $last")
-                      Timber.d("!!! info.totalItemsCount = ${info.totalItemsCount}")
+                        Timber.d("!!! prevIndex = $prevIndex")
+                        Timber.d("!!! last = $last")
+                        Timber.d("!!! info.totalItemsCount = ${info.totalItemsCount}")
 
-                     // vm.percentItemsCount = /(info.totalItemsCount - 1)
+                        // vm.percentItemsCount = /(info.totalItemsCount - 1)
 
-                      // Триггер только если движемся ВНИЗ
-                      if (last > prevIndex) {
-                          val total = info.totalItemsCount
-                          if (total - last <= 6)
-                              vm.loadNextPage()
-                      }
-                      prevIndex = last
-                  }
+                        // Триггер только если движемся ВНИЗ
+                        if (last > prevIndex) {
+                            val total = info.totalItemsCount
+                            if (total - last <= 6)
+                                vm.loadNextPage()
+                        }
+                        prevIndex = last
+                    }
 
-          }
-
+            }
 
 
         }
@@ -151,12 +142,9 @@ class ScreenRedProfile() : Screen {
         ) { padding ->
 
 
-//            ScrollArea(
-//                state = stateScrollArea,
-//                Modifier
-//                    .padding(bottom = padding.calculateBottomPadding())
-//                    .fillMaxSize()
-//            ) {
+            Box(modifier = Modifier.fillMaxSize()) {
+
+
                 LazyVerticalGrid(
                     state = gridState,
                     columns = GridCells.Fixed(2),
@@ -261,9 +249,11 @@ class ScreenRedProfile() : Screen {
                         key = "keyboard",
                         span = { GridItemSpan(maxLineSpan) }
                     ) {
-                        Box(Modifier
-                            .padding(horizontal = 8.dp)
-                            .fillMaxWidth()) {
+                        Box(
+                            Modifier
+                                .padding(horizontal = 8.dp)
+                                .fillMaxWidth()
+                        ) {
                             RedProfileFeedControlsContainer(vm)
                         }
                     }
@@ -273,7 +263,6 @@ class ScreenRedProfile() : Screen {
                     }
 
                 }
-
 
 
 //                VerticalScrollbar(
@@ -293,17 +282,35 @@ class ScreenRedProfile() : Screen {
 //                    )
 //                }
 
-          //  }
+                //  }
 
-            if (isLoading) {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(modifier = Modifier.size(64.dp), strokeWidth = 8.dp)
+                if (isLoading) {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(64.dp),
+                            strokeWidth = 8.dp
+                        )
+                    }
                 }
-            }
 
-            // Например, выводим в AppBar
-            //Text(text = "${(scrollPercent * 100).roundToInt()} %", color = Color.Magenta)
-            Text(text = "       ${scrollPercent.first * 100.0f} %  ${scrollPercent.second * 100.0f} %", color = Color.Magenta)
+                // Например, выводим в AppBar
+                //Text(text = "${(scrollPercent * 100).roundToInt()} %", color = Color.Magenta)
+                Text(
+                    text = "       ${scrollPercent.first * 100.0f} %  ${scrollPercent.second * 100.0f} %",
+                    color = Color.Magenta
+                )
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .align(Alignment.CenterEnd) // или Alignment.TopEnd
+                        .width(2.dp)
+                ) {
+                    VerticalScrollbar(scrollPercent)
+                }
+
+
+            }
         }
 
     }
