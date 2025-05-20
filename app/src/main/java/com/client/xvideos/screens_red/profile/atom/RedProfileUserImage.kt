@@ -6,6 +6,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
@@ -45,14 +46,14 @@ fun RedProfileCreaterInfo(item: CreatorResponse) {
 
     Column(
         modifier = Modifier
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = 0.dp)
             .fillMaxWidth()
     ) {
 
         //Top info
         Row(
             modifier = Modifier
-                .padding(top = 8.dp)
+                .padding(top = 2.dp)
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -116,6 +117,9 @@ fun RedProfileCreaterInfo(item: CreatorResponse) {
                 )
 
             }
+
+            Box(Modifier.width(1.dp).height(24.dp).background(Color(0xFF3D3C53)))
+
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
@@ -134,6 +138,8 @@ fun RedProfileCreaterInfo(item: CreatorResponse) {
                     fontFamily = ThemeRed.fontFamilyPopinsRegular
                 )
             }
+
+            Box(Modifier.width(1.dp).height(24.dp).background(Color(0xFF3D3C53)))
 
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,

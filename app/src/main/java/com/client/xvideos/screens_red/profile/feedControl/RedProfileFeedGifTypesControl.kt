@@ -2,10 +2,12 @@ package com.client.xvideos.screens_red.profile.feedControl
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
@@ -20,14 +22,33 @@ import com.composeunstyled.Text
 
 @Composable
 fun RedProfileFeedGifTypesControl(vm: ScreenRedProfileSM) {
-    Row {
-        vm.typeGifsList.forEach {
-            TextAndLine(Modifier.weight(1f), it.value, it == vm.typeGifs) {
-                vm.typeGifs = it
-                vm.clear()
-                vm.loadNextPage()
-            }
+    Row(horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+
+        TextAndLine(
+            Modifier
+                .weight(1f), vm.typeGifsList[0].value, vm.typeGifsList[0] == vm.typeGifs
+        ) {
+            vm.typeGifs = vm.typeGifsList[0]
+            vm.clear()
+            vm.loadNextPage()
         }
+
+        Box(Modifier
+            .width(1.dp)
+            .height(48.dp)
+            .background(ThemeRed.colorBorderGray))
+
+
+        TextAndLine(
+            Modifier
+                .weight(1f), vm.typeGifsList[1].value, vm.typeGifsList[1] == vm.typeGifs
+        ) {
+            vm.typeGifs = vm.typeGifsList[1]
+            vm.clear()
+            vm.loadNextPage()
+        }
+
+
     }
 }
 
@@ -39,23 +60,24 @@ private fun TextAndLine(
     onClick: () -> Unit,
 ) {
 
-    Column(
+    Box(
         modifier = Modifier
             .then(modifier)
             .clickable(onClick = onClick),
-        horizontalAlignment = Alignment.CenterHorizontally
+        contentAlignment = Alignment.Center
     ) {
 
         Text(
             str,
-            fontSize = 20.sp,
+            fontSize = 18.sp,
             color = if (select) Color.White else ThemeRed.colorTextGray,
             fontFamily = ThemeRed.fontFamilyPopinsRegular
         )
 
         Box(
             Modifier
-                .padding(top = 2.dp)
+                //.align(Alignment.BottomCenter)
+                .offset(0.dp, 16.dp)
                 .width(48.dp)
                 .height(4.dp)
                 .background(if (select) ThemeRed.colorRed else Color.Transparent)

@@ -10,6 +10,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -19,6 +20,7 @@ import androidx.lifecycle.distinctUntilChanged
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelKey
+import com.client.xvideos.feature.preference.PreferencesRepository
 import com.client.xvideos.feature.redgifs.http.RedGifs
 import com.client.xvideos.feature.redgifs.types.CreatorResponse
 import com.client.xvideos.feature.redgifs.types.MediaInfo
@@ -31,9 +33,14 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -49,33 +56,9 @@ enum class TypeGifs(val value: String) {
 
 class ScreenRedProfileSM @Inject constructor(
     private val db: AppDatabase,
+    private val pref : PreferencesRepository
 ) : ScreenModel//, PagingSource<Int, MediaInfo>() {
 {
-    //------------- Пагинация -------------
-//    override fun getRefreshKey(state: PagingState<Int, MediaInfo>): Int? {
-//        state.anchorPosition?.let { pos ->
-//            state.closestPageToPosition(pos)?.prevKey?.plus(1)
-//                ?: state.closestPageToPosition(pos)?.nextKey?.minus(1)
-//        }
-//    }
-//
-//    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MediaInfo> {
-//        val page = params.key ?: 1
-//        return try {
-//            val resp = api.getCreatorMedia(page)      // → CreatorResponse
-//
-//            LoadResult.Page(
-//                data = resp.gifs,                    // текущая страница
-//                prevKey = if (page == 1) null else page - 1,
-//                nextKey = if (page >= resp.pages) null else page + 1
-//            )
-//
-//        } catch (e: Exception) {
-//            LoadResult.Error(e)
-//        }
-//    }
-    //---------------------------------------
-
 
     private val _list = MutableStateFlow<List<MediaInfo>>(emptyList())
     val list: StateFlow<List<MediaInfo>> = _list
@@ -120,6 +103,8 @@ class ScreenRedProfileSM @Inject constructor(
         currentPage = 0
     }
 
+    //var selector by mutableIntStateOf(0) // 0- 1 елемент  1-2 елемента показывать
+
     var creator: CreatorResponse? by mutableStateOf(null)
 
     private val _tags = MutableStateFlow<Set<String>>(emptySet())
@@ -138,9 +123,21 @@ class ScreenRedProfileSM @Inject constructor(
     var maxCreatorGifs = 0
     var maxCreatorImages = 0
 
+
+    ///////////////////////////////////////////////
+    val selector = pref.flowRedSelector
+        .stateIn(screenModelScope, SharingStarted.WhileSubscribed(5000), 0)
+
+    fun setSelector(value: Int){
+        screenModelScope.launch {
+            pref.setRedSelector(value)
+        }
+    }
+    ///////////////////////////////////////////////
     init {
 
-        runBlocking {
+        screenModelScope.launch {
+
             creator = RedGifs.searchCreator(
                 page = 1,
                 count = 1,
@@ -151,6 +148,13 @@ class ScreenRedProfileSM @Inject constructor(
             maxCreatorImages = creator?.pages ?: 0
 
             loadNextPage()
+
+            //delay(1000)
+
+            repeat(maxCreatorGifs/100) {
+                loadNextPage()
+                delay(1000)
+            }
 
         }
 

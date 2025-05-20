@@ -1,11 +1,20 @@
 package com.client.xvideos.screens_red.profile.feedControl
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.client.xvideos.screens_red.ThemeRed
 import com.client.xvideos.screens_red.profile.ScreenRedProfileSM
 import timber.log.Timber
 
@@ -35,9 +44,16 @@ fun RedProfileFeedControlsContainer(vm: ScreenRedProfileSM) {
 
         //--- Feed Gif Types Control ---
         // Выбор типа отображения All Gifs Images
-        RedProfileFeedGifTypesControl(vm)
+        Box(Modifier.padding(horizontal = 4.dp).weight(1f).border(1.dp, ThemeRed.colorBorderGray,RoundedCornerShape(8.dp)).background(Color.Transparent)){
+            RedProfileFeedGifTypesControl(vm)
+        }
+        RedProfileSelector(vm.selector.collectAsStateWithLifecycle().value) { vm.setSelector(it) }
 
-        //--- Feed View Mode Control ---
+
+
+
+
+    //--- Feed View Mode Control ---
 
 
     }

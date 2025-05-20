@@ -25,7 +25,7 @@ import com.client.xvideos.screens_red.ThemeRed
 import com.composables.core.Icon
 
 @Composable
-fun RedProfileTile(item : MediaInfo) {
+fun RedProfileTile(item : MediaInfo, index: Int) {
 
     Box(
         modifier = Modifier
@@ -40,6 +40,18 @@ fun RedProfileTile(item : MediaInfo) {
             modifier = Modifier
                 .fillMaxSize()
         )
+
+        Box(){
+
+            Text(
+                index.toString(),
+                color = Color.Gray,
+                modifier = Modifier
+                    .padding(start = 8.dp).offset(1.dp, 1.dp),
+                fontFamily = ThemeRed.fontFamilyPopinsMedium
+            )
+
+        }
 
         Row(
             modifier = Modifier

@@ -20,7 +20,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.itemsIndexed
+
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
@@ -104,21 +105,16 @@ class ScreenRedProfile() : Screen {
             numberOfColumns = 2
         )
 
-
         // триггерим подгрузку, когда остаётся ≤6 элементов до конца
         LaunchedEffect(gridState) {
-
             withContext(Dispatchers.IO) {
-
                 snapshotFlow { gridState.layoutInfo }
                     .distinctUntilChanged()
                     .collect { info ->
                         val last = info.visibleItemsInfo.lastOrNull()?.index ?: 0
-
-
-                        Timber.d("!!! prevIndex = $prevIndex")
-                        Timber.d("!!! last = $last")
-                        Timber.d("!!! info.totalItemsCount = ${info.totalItemsCount}")
+                        //Timber.d("!!! prevIndex = $prevIndex")
+                        //Timber.d("!!! last = $last")
+                        //Timber.d("!!! info.totalItemsCount = ${info.totalItemsCount}")
 
                         // vm.percentItemsCount = /(info.totalItemsCount - 1)
 
@@ -130,10 +126,7 @@ class ScreenRedProfile() : Screen {
                         }
                         prevIndex = last
                     }
-
             }
-
-
         }
 
         Scaffold(
@@ -147,7 +140,7 @@ class ScreenRedProfile() : Screen {
 
                 LazyVerticalGrid(
                     state = gridState,
-                    columns = GridCells.Fixed(2),
+                    columns = if (vm.selector.collectAsStateWithLifecycle().value == 2) GridCells.Fixed(2) else GridCells.Fixed(1),
                     modifier = Modifier
                         //.padding(bottom = padding.calculateBottomPadding())
                         .fillMaxSize(),
@@ -176,7 +169,7 @@ class ScreenRedProfile() : Screen {
                             Disclosure(state = stateDisclosure) {
                                 DisclosureHeading(
                                     modifier = Modifier
-                                        .padding(horizontal = 8.dp)
+                                        .padding(horizontal = 2.dp)
                                         .padding(top = 4.dp, bottom = 4.dp)
                                         .fillMaxWidth()
                                         .height(48.dp)
@@ -227,7 +220,7 @@ class ScreenRedProfile() : Screen {
                                     Box(
                                         Modifier
                                             .padding(top = 2.dp)
-                                            .padding(horizontal = 8.dp)
+                                            .padding(horizontal = 2.dp)
                                             .fillMaxWidth()
                                             .clip(RoundedCornerShape(8.dp))
                                             .background(ThemeRed.colorBorderGray)
@@ -251,43 +244,30 @@ class ScreenRedProfile() : Screen {
                     ) {
                         Box(
                             Modifier
-                                .padding(horizontal = 8.dp)
+                                .padding(horizontal = 2.dp)
+                                .padding(bottom = 2.dp)
                                 .fillMaxWidth()
                         ) {
                             RedProfileFeedControlsContainer(vm)
                         }
                     }
 
-                    items(list.value, key = { it.id }) { item ->
-                        RedProfileTile(item)
+                    itemsIndexed(list.value, key = { index, item -> item.id },
+
+
+                        ) { index, item ->
+                        RedProfileTile(item, index)
                     }
 
                 }
 
-
-//                VerticalScrollbar(
-//                    modifier = Modifier
-//                        .align(Alignment.TopEnd)
-//                        .fillMaxHeight()
-//                        .width(2.dp)
-//
-//                ) {
-//                    Thumb(
-//                        Modifier.clip(RoundedCornerShape(50)).background(Color.Gray),
-//                        thumbVisibility = ThumbVisibility.HideWhileIdle(
-//                            enter = fadeIn(),
-//                            exit = fadeOut(),
-//                            hideDelay = 0.3.seconds
-//                        )
-//                    )
-//                }
 
                 //  }
 
                 if (isLoading) {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator(
-                            modifier = Modifier.size(64.dp),
+                            modifier = Modifier.size(56.dp),
                             strokeWidth = 8.dp
                         )
                     }
