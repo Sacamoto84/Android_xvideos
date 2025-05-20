@@ -190,7 +190,7 @@ dependencies {
     implementation "com.github.skydoves:landscapist-placeholder:2.4.8"
     implementation 'com.github.skydoves:landscapist-coil:2.4.8'
 
-    implementation('network.chaintech:compose-multiplatform-media-player:1.0.31')
+    implementation('network.chaintech:compose-multiplatform-media-player:1.0.40')
     implementation 'org.jetbrains.compose.components:components-resources:1.7.3'
 
     //implementation "io.sanghun:compose-video:1.2.0"

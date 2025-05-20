@@ -102,6 +102,23 @@ class ApiClient {
         }.bodyAsText()
     }
 
+    suspend inline fun requestText(
+        route: String,
+        vararg params: Pair<String, Any> = emptyArray(),
+    ): String {
+
+        return client.get(route) {
+            bearerToken?.let {
+                headers {
+                    append(HttpHeaders.Authorization, "Bearer $it")
+                }
+            }
+            params.forEach { (key, value) ->
+                parameter(key, value)
+            }
+        }.bodyAsText()
+    }
+
 
 }
 

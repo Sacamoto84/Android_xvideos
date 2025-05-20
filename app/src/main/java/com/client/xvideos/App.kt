@@ -1,6 +1,7 @@
 package com.client.xvideos
 
 import android.app.Application
+import chaintech.videoplayer.util.PlaybackPreference
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
@@ -9,6 +10,7 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         instance = this
+        PlaybackPreference.initialize(this)
     }
 
     companion object {

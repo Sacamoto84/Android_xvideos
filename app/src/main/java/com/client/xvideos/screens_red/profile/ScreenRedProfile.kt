@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,7 +22,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
-
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
@@ -54,7 +54,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.R
 import com.client.xvideos.screens_red.ThemeRed
 import com.client.xvideos.screens_red.profile.atom.RedProfileCreaterInfo
-import com.client.xvideos.screens_red.profile.atom.RedProfileTile
+import com.client.xvideos.screens_red.profile.atom.RedUrlVideoImageAndLongClick
 import com.client.xvideos.screens_red.profile.atom.VerticalScrollbar
 import com.client.xvideos.screens_red.profile.feedControl.RedProfileFeedControlsContainer
 import com.client.xvideos.screens_red.profile.tags.TagsBlock
@@ -66,7 +66,6 @@ import com.composeunstyled.rememberDisclosureState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 
 class ScreenRedProfile() : Screen {
 
@@ -79,29 +78,22 @@ class ScreenRedProfile() : Screen {
 
         val vm: ScreenRedProfileSM = getScreenModel()
 
-        // val list = vm.creator?.gifs
-
         val gridState = rememberLazyGridState()
-
-        //val imgLoader = LocalContext.current.imageLoader
-
         val list = vm.list.collectAsState()
-
         val isLoading = vm.isLoading.collectAsState().value
-
         val stateDisclosure = rememberDisclosureState()
-
-        //val stateDisclosureDescription = rememberDisclosureState()
-        //val stateScrollArea = rememberScrollAreaState(gridState)
-
         var prevIndex by remember { mutableIntStateOf(0) }
 
-        //val scrollPercent by rememberVisibleRangePercentIgnoringFirstN(gridState)
+
+        //RedUrlVideoLite("https://api.redgifs.com/v2/gifs/easytightibisbill/hd.m3u8")
 
 
+        //🟨🟨🟨🟨🟨🟨🟨🟨⬆️⬆️⬆️⬆️⬆️❗
+
+        //Расчет процентов для скролл
         val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForGrid(
             gridState = gridState,
-            itemsToIgnore = 3, // Ваши 3 элемента хедера
+            itemsToIgnore = 3,
             numberOfColumns = 2
         )
 
@@ -116,182 +108,188 @@ class ScreenRedProfile() : Screen {
                         //Timber.d("!!! last = $last")
                         //Timber.d("!!! info.totalItemsCount = ${info.totalItemsCount}")
 
-                        // vm.percentItemsCount = /(info.totalItemsCount - 1)
-
                         // Триггер только если движемся ВНИЗ
                         if (last > prevIndex) {
                             val total = info.totalItemsCount
-                            if (total - last <= 6)
-                                vm.loadNextPage()
+                            //if (total - last <= 6)
+                            //vm.loadNextPage()
                         }
                         prevIndex = last
                     }
             }
         }
 
-        Scaffold(
-            // bottomBar = { RedBottomBar() },
-            containerColor = ThemeRed.colorCommonBackground
-        ) { padding ->
+        Column()
+        {
 
 
-            Box(modifier = Modifier.fillMaxSize()) {
+            Scaffold(
+                // bottomBar = { RedBottomBar() },
+                containerColor = ThemeRed.colorCommonBackground
+            ) { padding ->
 
+                Box(modifier = Modifier.fillMaxSize()) {
 
-                LazyVerticalGrid(
-                    state = gridState,
-                    columns = if (vm.selector.collectAsStateWithLifecycle().value == 2) GridCells.Fixed(2) else GridCells.Fixed(1),
-                    modifier = Modifier
-                        //.padding(bottom = padding.calculateBottomPadding())
-                        .fillMaxSize(),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                    contentPadding = PaddingValues(4.dp) // Отступы по краям сетки
-                ) {
-
-                    //Описание и теги
-                    item(
-                        key = "info",
-                        span = { GridItemSpan(maxLineSpan) } // Заставляет этот item занять все столбцы
+                    LazyVerticalGrid(
+                        state = gridState,
+                        columns = if (vm.selector.collectAsStateWithLifecycle().value == 2) GridCells.Fixed(
+                            2
+                        ) else GridCells.Fixed(1),
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                        contentPadding = PaddingValues(4.dp) // Отступы по краям сетки
                     ) {
-                        vm.creator?.let { profileData ->
-                            RedProfileCreaterInfo(profileData)
+
+//                        item {
+//                            Box(modifier = Modifier.aspectRatio(1f)) {
+//                                RedUrlVideoLite("https://api.redgifs.com/v2/gifs/easytightibisbill/hd.m3u8")
+//                            }
+//
+//                        }
+
+
+                        //Описание и теги
+                        item(
+                            key = "info",
+                            span = { GridItemSpan(maxLineSpan) } // Заставляет этот item занять все столбцы
+                        ) {
+                            vm.creator?.let { profileData ->
+                                RedProfileCreaterInfo(profileData)
+                            }
                         }
-                    }
 
-                    //теги
-                    item(
-                        key = "tags",
-                        span = { GridItemSpan(maxLineSpan) } // Заставляет этот item занять все столбцы
-                    ) {
-                        vm.creator?.let { profileData ->
-
-                            Disclosure(state = stateDisclosure) {
-                                DisclosureHeading(
-                                    modifier = Modifier
-                                        .padding(horizontal = 2.dp)
-                                        .padding(top = 4.dp, bottom = 4.dp)
-                                        .fillMaxWidth()
-                                        .height(48.dp)
-                                        .clip(RoundedCornerShape(8.dp))
-                                        .background(if (stateDisclosure.expanded) ThemeRed.colorBorderGray else Color.Transparent)
-                                        .border(
-                                            1.dp,
-                                            ThemeRed.colorBorderGray,
-                                            RoundedCornerShape(8.dp)
-                                        ),
-                                    //shape = RoundedCornerShape(8.dp),
-                                    contentPadding = PaddingValues(
-                                        //vertical = 12.dp,
-                                        horizontal = 16.dp
-                                    ),
-                                    onClick = {
-                                        stateDisclosure.expanded = stateDisclosure.expanded.not()
-                                    }) {
-
-                                    val degrees by animateFloatAsState(
-                                        if (stateDisclosure.expanded) -180f else 0f,
-                                        tween()
-                                    )
-
-                                    Row(
-                                        Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Text(
-                                            "Tags",
-                                            color = Color.White,
-                                            fontFamily = ThemeRed.fontFamilyPopinsRegular,
-                                            fontSize = 18.sp
-                                        )
-                                        Icon(
-                                            painter = painterResource(R.drawable.arrow_down),
-                                            contentDescription = null, tint = Color.White,
-                                            modifier = Modifier
-                                                .size(12.dp)
-                                                .rotate(degrees)
-                                        )
-                                    }
-
-
-                                }
-                                DisclosurePanel {
-                                    Box(
-                                        Modifier
-                                            .padding(top = 2.dp)
+                        //Теги
+                        item(
+                            key = "tags",
+                            span = { GridItemSpan(maxLineSpan) } // Заставляет этот item занять все столбцы
+                        ) {
+                            vm.creator?.let { profileData ->
+                                Disclosure(state = stateDisclosure) {
+                                    DisclosureHeading(
+                                        modifier = Modifier
                                             .padding(horizontal = 2.dp)
+                                            .padding(top = 4.dp, bottom = 4.dp)
                                             .fillMaxWidth()
+                                            .height(48.dp)
                                             .clip(RoundedCornerShape(8.dp))
-                                            .background(ThemeRed.colorBorderGray)
-                                            .padding(4.dp)
-                                    ) {
-                                        TagsBlock(vm.tags.collectAsStateWithLifecycle().value.toList())
+                                            .background(if (stateDisclosure.expanded) ThemeRed.colorBorderGray else Color.Transparent)
+                                            .border(
+                                                1.dp,
+                                                ThemeRed.colorBorderGray,
+                                                RoundedCornerShape(8.dp)
+                                            ),
+                                        //shape = RoundedCornerShape(8.dp),
+                                        contentPadding = PaddingValues(
+                                            //vertical = 12.dp,
+                                            horizontal = 16.dp
+                                        ),
+                                        onClick = {
+                                            stateDisclosure.expanded =
+                                                stateDisclosure.expanded.not()
+                                        }) {
+
+                                        val degrees by animateFloatAsState(
+                                            if (stateDisclosure.expanded) -180f else 0f,
+                                            tween()
+                                        )
+
+                                        Row(
+                                            Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text(
+                                                "Tags",
+                                                color = Color.White,
+                                                fontFamily = ThemeRed.fontFamilyPopinsRegular,
+                                                fontSize = 18.sp
+                                            )
+                                            Icon(
+                                                painter = painterResource(R.drawable.arrow_down),
+                                                contentDescription = null, tint = Color.White,
+                                                modifier = Modifier
+                                                    .size(12.dp)
+                                                    .rotate(degrees)
+                                            )
+                                        }
+                                    }
+                                    DisclosurePanel {
+                                        Box(
+                                            Modifier
+                                                .padding(top = 2.dp)
+                                                .padding(horizontal = 2.dp)
+                                                .fillMaxWidth()
+                                                .clip(RoundedCornerShape(8.dp))
+                                                .background(ThemeRed.colorBorderGray)
+                                                .padding(4.dp)
+                                        ) {
+                                            TagsBlock(vm.tags.collectAsStateWithLifecycle().value.toList())
+                                        }
                                     }
                                 }
                             }
+                        }
 
-                            //TagsBlock(vm.tags.collectAsStateWithLifecycle().value.toList())
+                        //Управление списком
+                        item(key = "keyboard", span = { GridItemSpan(maxLineSpan) }) {
+                            Box(
+                                Modifier
+                                    .padding(horizontal = 2.dp)
+                                    .padding(bottom = 2.dp)
+                                    .fillMaxWidth()
+                            ) { RedProfileFeedControlsContainer(vm) }
+                        }
 
+
+                        //Тайлы картинок и видео
+                        itemsIndexed(list.value, key = { index, item -> item.id }) { index, item ->
+
+                            Box(modifier = Modifier
+                                .fillMaxSize()
+                                .aspectRatio(1080f/1920)
+                            ) {
+                        //      RedUrlVideoLite("https://api.redgifs.com/v2/gifs/easytightibisbill/hd.m3u8")
+
+                                RedUrlVideoImageAndLongClick(
+                                    item,
+                                    index,
+                                    onLongClick = {},
+                                    onDoubleClick = {}
+                                )
+
+                            }
 
                         }
+
                     }
 
-                    //Управление списком
-                    item(
-                        key = "keyboard",
-                        span = { GridItemSpan(maxLineSpan) }
-                    ) {
+                    //Индикатор загрузки
+                    if (isLoading) {
                         Box(
-                            Modifier
-                                .padding(horizontal = 2.dp)
-                                .padding(bottom = 2.dp)
-                                .fillMaxWidth()
+                            Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
                         ) {
-                            RedProfileFeedControlsContainer(vm)
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(56.dp),
+                                strokeWidth = 8.dp
+                            )
                         }
                     }
 
-                    itemsIndexed(list.value, key = { index, item -> item.id },
-
-
-                        ) { index, item ->
-                        RedProfileTile(item, index)
-                    }
+                    //Скролл
+                    Box(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .align(Alignment.CenterEnd)
+                            .width(2.dp)
+                    ) { VerticalScrollbar(scrollPercent) }
 
                 }
-
-
-                //  }
-
-                if (isLoading) {
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(56.dp),
-                            strokeWidth = 8.dp
-                        )
-                    }
-                }
-
-                // Например, выводим в AppBar
-                //Text(text = "${(scrollPercent * 100).roundToInt()} %", color = Color.Magenta)
-                Text(
-                    text = "       ${scrollPercent.first * 100.0f} %  ${scrollPercent.second * 100.0f} %",
-                    color = Color.Magenta
-                )
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .align(Alignment.CenterEnd) // или Alignment.TopEnd
-                        .width(2.dp)
-                ) {
-                    VerticalScrollbar(scrollPercent)
-                }
-
-
             }
+
         }
+
 
     }
 }

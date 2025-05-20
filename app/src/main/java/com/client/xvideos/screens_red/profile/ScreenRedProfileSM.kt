@@ -149,7 +149,7 @@ class ScreenRedProfileSM @Inject constructor(
 
             loadNextPage()
 
-            //delay(1000)
+            delay(1000)
 
             repeat(maxCreatorGifs/100) {
                 loadNextPage()
