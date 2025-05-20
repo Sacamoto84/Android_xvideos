@@ -1,76 +1,37 @@
 package com.client.xvideos.screens_red.profile
 
 import android.annotation.SuppressLint
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.client.xvideos.R
 import com.client.xvideos.screens_red.ThemeRed
-import com.client.xvideos.screens_red.profile.atom.RedProfileCreaterInfo
-import com.client.xvideos.screens_red.profile.atom.RedProfileTile
-import com.client.xvideos.screens_red.profile.atom.RedUrlVideoImageAndLongClick
-import com.client.xvideos.screens_red.profile.atom.RedUrlVideoLite
-import com.client.xvideos.screens_red.profile.atom.VerticalScrollbar
+import com.client.xvideos.screens_red.profile.atom.CanvasTimeDurationLine
 import com.client.xvideos.screens_red.profile.feedControl.RedProfileFeedControlsContainer
-import com.client.xvideos.screens_red.profile.tags.TagsBlock
-import com.client.xvideos.screens_red.profile.tags.TikTokStyleVideoFeed
+import com.client.xvideos.screens_red.profile.molecule.TikTokStyleVideoFeed
 import com.composables.core.HorizontalSeparator
-import com.composeunstyled.Disclosure
-import com.composeunstyled.DisclosureHeading
-import com.composeunstyled.DisclosurePanel
 import com.composeunstyled.rememberDisclosureState
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.withContext
 
 class ScreenRedProfile() : Screen {
 
@@ -93,9 +54,7 @@ class ScreenRedProfile() : Screen {
         //RedUrlVideoLite("https://api.redgifs.com/v2/gifs/easytightibisbill/hd.m3u8")
 
 
-        TikTokStyleVideoFeed(list.value)
-
-
+        //TikTokWithCollapsingToolbar(list.value)
 
         //🟨🟨🟨🟨🟨🟨🟨🟨⬆️⬆️⬆️⬆️⬆️❗
 
@@ -106,34 +65,56 @@ class ScreenRedProfile() : Screen {
             numberOfColumns = 2
         )
 
+        /**
+         * ## ⬆️Текущее время видео
+         */
+        var currentTime by remember { mutableIntStateOf(0) }
+        /**
+         * ##Продолжительность видео
+         */
+        var duration by remember { mutableIntStateOf(0) }
 
-        var visibleItems by remember { mutableIntStateOf(0) }
-
-
-        // триггерим подгрузку, когда остаётся ≤6 элементов до конца
-        LaunchedEffect(gridState) {
-            withContext(Dispatchers.IO) {
-                snapshotFlow { gridState.layoutInfo }
-                    .distinctUntilChanged()
-                    .collect { info ->
-                        val last = info.visibleItemsInfo.lastOrNull()?.index ?: 0
-                        visibleItems = last - 3
-                        //Timber.d("!!! prevIndex = $prevIndex")
-                        //Timber.d("!!! last = $last")
-                        //Timber.d("!!! info.totalItemsCount = ${info.totalItemsCount}")
-
-                        // Триггер только если движемся ВНИЗ
-                        if (last > prevIndex) {
-                            val total = info.totalItemsCount
-                            //if (total - last <= 6)
-                            //vm.loadNextPage()
-                        }
-                        prevIndex = last
-                    }
+        Scaffold(
+            bottomBar = {
+                Column {
+                    //Линия продолжительности видео
+                    CanvasTimeDurationLine(currentTime, duration)
+                    RedBottomBar(vm)
+                }
+            },
+            containerColor = Color.Black
+        ) {
+            Box(Modifier.padding(bottom = it.calculateBottomPadding())) {
+                TikTokStyleVideoFeed(list.value, onChangeTime = {
+                    currentTime = it.first
+                    duration = it.second
+                })
             }
         }
 
 
+//        // триггерим подгрузку, когда остаётся ≤6 элементов до конца
+//        LaunchedEffect(gridState) {
+//            withContext(Dispatchers.IO) {
+//                snapshotFlow { gridState.layoutInfo }
+//                    .distinctUntilChanged()
+//                    .collect { info ->
+//                        val last = info.visibleItemsInfo.lastOrNull()?.index ?: 0
+//                        visibleItems = last - 3
+//                        //Timber.d("!!! prevIndex = $prevIndex")
+//                        //Timber.d("!!! last = $last")
+//                        //Timber.d("!!! info.totalItemsCount = ${info.totalItemsCount}")
+//
+//                        // Триггер только если движемся ВНИЗ
+//                        if (last > prevIndex) {
+//                            val total = info.totalItemsCount
+//                            //if (total - last <= 6)
+//                            //vm.loadNextPage()
+//                        }
+//                        prevIndex = last
+//                    }
+//            }
+//        }
 
 
 //        Scaffold(
@@ -317,22 +298,12 @@ class ScreenRedProfile() : Screen {
     }
 }
 
-
 @Composable
-fun RedBottomBar() {
-
+fun RedBottomBar(vm: ScreenRedProfileSM) {
     Column {
         HorizontalSeparator(ThemeRed.colorBottomBarDivider, thickness = 2.dp)
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-                .background(ThemeRed.colorBottomBarBackground)
-        ) {
-
-
-        }
+        RedProfileFeedControlsContainer(vm)
+        HorizontalSeparator(Color.Transparent, thickness = 4.dp)
+        RedProfileFeedControlsContainer(vm)
     }
-
-
 }

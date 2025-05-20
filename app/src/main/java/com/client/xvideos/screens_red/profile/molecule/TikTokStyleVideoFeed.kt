@@ -1,4 +1,4 @@
-package com.client.xvideos.screens_red.profile.tags
+package com.client.xvideos.screens_red.profile.molecule
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -14,15 +14,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
 import com.client.xvideos.feature.redgifs.types.MediaInfo
 import com.client.xvideos.screens_red.ThemeRed
-import com.client.xvideos.screens_red.profile.atom.RedUrlVideoLite
+import com.client.xvideos.screens_red.profile.atom.RedUrlVideoLiteChaintech
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun TikTokStyleVideoFeed(videoItems: List<MediaInfo>) {
+fun TikTokStyleVideoFeed(videoItems: List<MediaInfo>, modifier: Modifier = Modifier, onChangeTime: (Pair<Int, Int>) -> Unit) {
 
     if (videoItems.isEmpty()) {
         Box(modifier = Modifier.fillMaxSize().background(ThemeRed.colorCommonBackground), contentAlignment = Alignment.Center) {
-            Text("Нет видео для отображения", color = Color.White, fontFamily = ThemeRed.fontFamilyPopinsRegular, fontSize = 24.sp)
+            Text("Нет видео для отображения", color = Color.LightGray , fontFamily = ThemeRed.fontFamilyPopinsRegular, fontSize = 20.sp)
         }
         return
     }
@@ -40,10 +40,11 @@ fun TikTokStyleVideoFeed(videoItems: List<MediaInfo>) {
         // и соответствует ли она текущей активной странице в пейджере.
         val isCurrentPage = pagerState.currentPage == pageIndex
 
-        RedUrlVideoLite(
+        RedUrlVideoLiteChaintech(
             "https://api.redgifs.com/v2/gifs/${videoItem.id.lowercase()}/hd.m3u8",
             videoItem.urls.thumbnail,
-            play = isCurrentPage
+            play = isCurrentPage,
+            onChangeTime = onChangeTime
         )
 
     }
