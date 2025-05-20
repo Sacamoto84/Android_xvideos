@@ -31,8 +31,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
@@ -54,10 +56,13 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.R
 import com.client.xvideos.screens_red.ThemeRed
 import com.client.xvideos.screens_red.profile.atom.RedProfileCreaterInfo
+import com.client.xvideos.screens_red.profile.atom.RedProfileTile
 import com.client.xvideos.screens_red.profile.atom.RedUrlVideoImageAndLongClick
+import com.client.xvideos.screens_red.profile.atom.RedUrlVideoLite
 import com.client.xvideos.screens_red.profile.atom.VerticalScrollbar
 import com.client.xvideos.screens_red.profile.feedControl.RedProfileFeedControlsContainer
 import com.client.xvideos.screens_red.profile.tags.TagsBlock
+import com.client.xvideos.screens_red.profile.tags.TikTokStyleVideoFeed
 import com.composables.core.HorizontalSeparator
 import com.composeunstyled.Disclosure
 import com.composeunstyled.DisclosureHeading
@@ -88,6 +93,10 @@ class ScreenRedProfile() : Screen {
         //RedUrlVideoLite("https://api.redgifs.com/v2/gifs/easytightibisbill/hd.m3u8")
 
 
+        TikTokStyleVideoFeed(list.value)
+
+
+
         //🟨🟨🟨🟨🟨🟨🟨🟨⬆️⬆️⬆️⬆️⬆️❗
 
         //Расчет процентов для скролл
@@ -97,6 +106,10 @@ class ScreenRedProfile() : Screen {
             numberOfColumns = 2
         )
 
+
+        var visibleItems by remember { mutableIntStateOf(0) }
+
+
         // триггерим подгрузку, когда остаётся ≤6 элементов до конца
         LaunchedEffect(gridState) {
             withContext(Dispatchers.IO) {
@@ -104,6 +117,7 @@ class ScreenRedProfile() : Screen {
                     .distinctUntilChanged()
                     .collect { info ->
                         val last = info.visibleItemsInfo.lastOrNull()?.index ?: 0
+                        visibleItems = last - 3
                         //Timber.d("!!! prevIndex = $prevIndex")
                         //Timber.d("!!! last = $last")
                         //Timber.d("!!! info.totalItemsCount = ${info.totalItemsCount}")
@@ -119,176 +133,185 @@ class ScreenRedProfile() : Screen {
             }
         }
 
-        Column()
-        {
 
 
-            Scaffold(
-                // bottomBar = { RedBottomBar() },
-                containerColor = ThemeRed.colorCommonBackground
-            ) { padding ->
 
-                Box(modifier = Modifier.fillMaxSize()) {
-
-                    LazyVerticalGrid(
-                        state = gridState,
-                        columns = if (vm.selector.collectAsStateWithLifecycle().value == 2) GridCells.Fixed(
-                            2
-                        ) else GridCells.Fixed(1),
-                        modifier = Modifier.fillMaxSize(),
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp),
-                        contentPadding = PaddingValues(4.dp) // Отступы по краям сетки
-                    ) {
-
-//                        item {
-//                            Box(modifier = Modifier.aspectRatio(1f)) {
-//                                RedUrlVideoLite("https://api.redgifs.com/v2/gifs/easytightibisbill/hd.m3u8")
-//                            }
+//        Scaffold(
+//            //bottomBar = { RedBottomBar() },
+//            containerColor = ThemeRed.colorCommonBackground
+//        ) { padding ->
 //
+//            Box(modifier = Modifier.fillMaxSize()) {
+//
+//                LazyVerticalGrid(
+//                    state = gridState,
+//                    columns = if (vm.selector.collectAsStateWithLifecycle().value == 2) GridCells.Fixed(
+//                        2
+//                    ) else GridCells.Fixed(1),
+//                    modifier = Modifier.fillMaxSize(),
+//                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+//                    verticalArrangement = Arrangement.spacedBy(4.dp),
+//                    contentPadding = PaddingValues(4.dp) // Отступы по краям сетки
+//                ) {
+//
+////                        item {
+////                            Box(modifier = Modifier.aspectRatio(1f)) {
+////                                RedUrlVideoLite("https://api.redgifs.com/v2/gifs/easytightibisbill/hd.m3u8")
+////                            }
+////
+////                        }
+//
+//
+//                    //Описание и теги
+//                    item(
+//                        key = "info",
+//                        span = { GridItemSpan(maxLineSpan) } // Заставляет этот item занять все столбцы
+//                    ) {
+//                        vm.creator?.let { profileData ->
+//                            RedProfileCreaterInfo(profileData)
 //                        }
-
-
-                        //Описание и теги
-                        item(
-                            key = "info",
-                            span = { GridItemSpan(maxLineSpan) } // Заставляет этот item занять все столбцы
-                        ) {
-                            vm.creator?.let { profileData ->
-                                RedProfileCreaterInfo(profileData)
-                            }
-                        }
-
-                        //Теги
-                        item(
-                            key = "tags",
-                            span = { GridItemSpan(maxLineSpan) } // Заставляет этот item занять все столбцы
-                        ) {
-                            vm.creator?.let { profileData ->
-                                Disclosure(state = stateDisclosure) {
-                                    DisclosureHeading(
-                                        modifier = Modifier
-                                            .padding(horizontal = 2.dp)
-                                            .padding(top = 4.dp, bottom = 4.dp)
-                                            .fillMaxWidth()
-                                            .height(48.dp)
-                                            .clip(RoundedCornerShape(8.dp))
-                                            .background(if (stateDisclosure.expanded) ThemeRed.colorBorderGray else Color.Transparent)
-                                            .border(
-                                                1.dp,
-                                                ThemeRed.colorBorderGray,
-                                                RoundedCornerShape(8.dp)
-                                            ),
-                                        //shape = RoundedCornerShape(8.dp),
-                                        contentPadding = PaddingValues(
-                                            //vertical = 12.dp,
-                                            horizontal = 16.dp
-                                        ),
-                                        onClick = {
-                                            stateDisclosure.expanded =
-                                                stateDisclosure.expanded.not()
-                                        }) {
-
-                                        val degrees by animateFloatAsState(
-                                            if (stateDisclosure.expanded) -180f else 0f,
-                                            tween()
-                                        )
-
-                                        Row(
-                                            Modifier.fillMaxWidth(),
-                                            horizontalArrangement = Arrangement.SpaceBetween,
-                                            verticalAlignment = Alignment.CenterVertically
-                                        ) {
-                                            Text(
-                                                "Tags",
-                                                color = Color.White,
-                                                fontFamily = ThemeRed.fontFamilyPopinsRegular,
-                                                fontSize = 18.sp
-                                            )
-                                            Icon(
-                                                painter = painterResource(R.drawable.arrow_down),
-                                                contentDescription = null, tint = Color.White,
-                                                modifier = Modifier
-                                                    .size(12.dp)
-                                                    .rotate(degrees)
-                                            )
-                                        }
-                                    }
-                                    DisclosurePanel {
-                                        Box(
-                                            Modifier
-                                                .padding(top = 2.dp)
-                                                .padding(horizontal = 2.dp)
-                                                .fillMaxWidth()
-                                                .clip(RoundedCornerShape(8.dp))
-                                                .background(ThemeRed.colorBorderGray)
-                                                .padding(4.dp)
-                                        ) {
-                                            TagsBlock(vm.tags.collectAsStateWithLifecycle().value.toList())
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        //Управление списком
-                        item(key = "keyboard", span = { GridItemSpan(maxLineSpan) }) {
-                            Box(
-                                Modifier
-                                    .padding(horizontal = 2.dp)
-                                    .padding(bottom = 2.dp)
-                                    .fillMaxWidth()
-                            ) { RedProfileFeedControlsContainer(vm) }
-                        }
-
-
-                        //Тайлы картинок и видео
-                        itemsIndexed(list.value, key = { index, item -> item.id }) { index, item ->
-
-                            Box(modifier = Modifier
-                                .fillMaxSize()
-                                .aspectRatio(1080f/1920)
-                            ) {
-                        //      RedUrlVideoLite("https://api.redgifs.com/v2/gifs/easytightibisbill/hd.m3u8")
-
-                                RedUrlVideoImageAndLongClick(
-                                    item,
-                                    index,
-                                    onLongClick = {},
-                                    onDoubleClick = {}
-                                )
-
-                            }
-
-                        }
-
-                    }
-
-                    //Индикатор загрузки
-                    if (isLoading) {
-                        Box(
-                            Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(56.dp),
-                                strokeWidth = 8.dp
-                            )
-                        }
-                    }
-
-                    //Скролл
-                    Box(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .align(Alignment.CenterEnd)
-                            .width(2.dp)
-                    ) { VerticalScrollbar(scrollPercent) }
-
-                }
-            }
-
-        }
+//                    }
+//
+//                    //Теги
+//                    item(
+//                        key = "tags",
+//                        span = { GridItemSpan(maxLineSpan) } // Заставляет этот item занять все столбцы
+//                    ) {
+//                        vm.creator?.let { profileData ->
+//                            Disclosure(state = stateDisclosure) {
+//                                DisclosureHeading(
+//                                    modifier = Modifier
+//                                        .padding(horizontal = 2.dp)
+//                                        .padding(top = 4.dp, bottom = 4.dp)
+//                                        .fillMaxWidth()
+//                                        .height(48.dp)
+//                                        .clip(RoundedCornerShape(8.dp))
+//                                        .background(if (stateDisclosure.expanded) ThemeRed.colorBorderGray else Color.Transparent)
+//                                        .border(
+//                                            1.dp,
+//                                            ThemeRed.colorBorderGray,
+//                                            RoundedCornerShape(8.dp)
+//                                        ),
+//                                    //shape = RoundedCornerShape(8.dp),
+//                                    contentPadding = PaddingValues(
+//                                        //vertical = 12.dp,
+//                                        horizontal = 16.dp
+//                                    ),
+//                                    onClick = {
+//                                        stateDisclosure.expanded =
+//                                            stateDisclosure.expanded.not()
+//                                    }) {
+//
+//                                    val degrees by animateFloatAsState(
+//                                        if (stateDisclosure.expanded) -180f else 0f,
+//                                        tween()
+//                                    )
+//
+//                                    Row(
+//                                        Modifier.fillMaxWidth(),
+//                                        horizontalArrangement = Arrangement.SpaceBetween,
+//                                        verticalAlignment = Alignment.CenterVertically
+//                                    ) {
+//                                        Text(
+//                                            "Tags",
+//                                            color = Color.White,
+//                                            fontFamily = ThemeRed.fontFamilyPopinsRegular,
+//                                            fontSize = 18.sp
+//                                        )
+//                                        Icon(
+//                                            painter = painterResource(R.drawable.arrow_down),
+//                                            contentDescription = null, tint = Color.White,
+//                                            modifier = Modifier
+//                                                .size(12.dp)
+//                                                .rotate(degrees)
+//                                        )
+//                                    }
+//                                }
+//                                DisclosurePanel {
+//                                    Box(
+//                                        Modifier
+//                                            .padding(top = 2.dp)
+//                                            .padding(horizontal = 2.dp)
+//                                            .fillMaxWidth()
+//                                            .clip(RoundedCornerShape(8.dp))
+//                                            .background(ThemeRed.colorBorderGray)
+//                                            .padding(4.dp)
+//                                    ) {
+//                                        TagsBlock(vm.tags.collectAsStateWithLifecycle().value.toList())
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+//
+//                    //Управление списком
+//                    item(key = "keyboard", span = { GridItemSpan(maxLineSpan) }) {
+//                        Box(
+//                            Modifier
+//                                .padding(horizontal = 2.dp)
+//                                .padding(bottom = 2.dp)
+//                                .fillMaxWidth()
+//                        ) { RedProfileFeedControlsContainer(vm) }
+//                    }
+//
+//
+//                    //Тайлы картинок и видео
+//                    itemsIndexed(list.value, key = { index, item -> item.id }) { index, item ->
+//
+//                        Box(
+//                            modifier = Modifier
+//                                .fillMaxSize()
+//                                .aspectRatio(1080f / 1920)
+//                        ) {
+//                            //      RedUrlVideoLite("https://api.redgifs.com/v2/gifs/easytightibisbill/hd.m3u8")
+//                            if ((visibleItems - 1) == index || (visibleItems - 2) == index || (visibleItems + 1) == index || (visibleItems) == index) {
+//
+//                                RedUrlVideoLite(
+//                                    "https://api.redgifs.com/v2/gifs/${item.id.lowercase()}/hd.m3u8",
+//                                    item.urls.thumbnail,
+//                                    play = (visibleItems - 1) == index
+//                                )
+//                                //                                RedUrlVideoImageAndLongClick(
+////                                    item,
+////                                    index,
+////                                    onLongClick = {},
+////                                    onDoubleClick = {}
+////                                )
+//                            } else {
+//                                RedProfileTile(item, index)
+//                            }
+//                        }
+//
+//                    }
+//
+//                }
+//
+//                //Индикатор загрузки
+//                if (isLoading) {
+//                    Box(
+//                        Modifier.fillMaxSize(),
+//                        contentAlignment = Alignment.Center
+//                    ) {
+//                        CircularProgressIndicator(
+//                            modifier = Modifier.size(56.dp),
+//                            strokeWidth = 8.dp
+//                        )
+//                    }
+//                }
+//
+//                Text("      " + visibleItems.toString(), color = Color.White)
+//
+//
+//                //Скролл
+//                Box(
+//                    modifier = Modifier
+//                        .fillMaxHeight()
+//                        .align(Alignment.CenterEnd)
+//                        .width(2.dp)
+//                ) { VerticalScrollbar(scrollPercent) }
+//
+//            }
+//        }
 
 
     }

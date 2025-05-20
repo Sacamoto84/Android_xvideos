@@ -62,23 +62,23 @@ fun RedUrlVideoImageAndLongClick(
         contentAlignment = Alignment.Center
 
     ) {
-
-        if (isVideo) {
-            val url = "https://api.redgifs.com/v2/gifs/${item.id.lowercase()}/hd.m3u8"
-            //https://api.redgifs.com/v2/gifs/easytightibisbill/hd.m3u8
-            Timber.i("!!! url = $url")
-            RedUrlVideoLite(url)
-        } else {
-
-            //Показ картинки
-            //UrlImage(item.urls.thumbnail, Modifier.fillMaxWidth())
-
-            RedProfileTile(item, index)
-
-
-            overlay.invoke()
-
-        }
+        //RedUrlVideoLite("https://api.redgifs.com/v2/gifs/${item.id.lowercase()}/hd.m3u8", item.urls.thumbnail)
+//        if (isVideo) {
+//           //val url = "https://api.redgifs.com/v2/gifs/${item.id.lowercase()}/hd.m3u8"
+//            //https://api.redgifs.com/v2/gifs/easytightibisbill/hd.m3u8
+//            //Timber.i("!!! url = $url")
+//            RedUrlVideoLite("https://api.redgifs.com/v2/gifs/${item.id.lowercase()}/hd.m3u8")
+//        } else {
+//
+//            //Показ картинки
+//            //UrlImage(item.urls.thumbnail, Modifier.fillMaxWidth())
+//
+//            RedProfileTile(item, index)
+//
+//
+//            overlay.invoke()
+//
+//        }
 
     }
 
