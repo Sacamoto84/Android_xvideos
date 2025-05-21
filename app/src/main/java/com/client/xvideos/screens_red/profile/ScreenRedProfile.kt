@@ -176,14 +176,16 @@ class ScreenRedProfile() : Screen {
                 Column {
                     AnimatedVisibility(
                         visible = trackVisible && selector == 1,
-                        enter = fadeIn(
-                            animationSpec = tween(durationMillis = 250), //Появление
-                            initialAlpha = 0f
-                        ),
-                        exit = fadeOut(
-                            animationSpec = tween(durationMillis = 250), //Исчезновение
-                            targetAlpha = 0f
-                        ),
+//                        enter = fadeIn(
+//                            animationSpec = tween(durationMillis = 250), //Появление
+//                            initialAlpha = 0f
+//                        )
+//
+//                        ,
+//                        exit = fadeOut(
+//                            animationSpec = tween(durationMillis = 250), //Исчезновение
+//                            targetAlpha = 0f
+//                        ),
                     ) {
                         //Линия продолжительности видео
                         CanvasTimeDurationLine(vm.currentPlayerTime, vm.currentPlayerDuration, vm.timeA, vm.timeB, vm.enableAB)

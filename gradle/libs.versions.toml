@@ -29,6 +29,7 @@ timber = "5.0.1"
 storage = "1.5.0"
 googleGmsGoogleServices = "4.4.2"
 datastoreCoreAndroid = "1.1.6"
+volley = "1.2.1"
 
 [libraries]
 androidx-adaptive = { module = "androidx.compose.material3.adaptive:adaptive" }
@@ -108,6 +109,7 @@ androidx-storage = { group = "androidx.test.services", name = "storage", version
 androidx-datastore-core-android = { group = "androidx.datastore", name = "datastore-core-android", version.ref = "datastoreCoreAndroid" }
 androidx-datastore-core = { module = "androidx.datastore:datastore-core", version.ref = "datastoreCoreAndroid" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastoreCoreAndroid" }
+volley = { group = "com.android.volley", name = "volley", version.ref = "volley" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

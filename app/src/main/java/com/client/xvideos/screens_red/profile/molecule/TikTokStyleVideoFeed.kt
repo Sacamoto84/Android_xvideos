@@ -30,7 +30,7 @@ fun TikTokStyleVideoFeed(
     vm : ScreenRedProfileSM,
     videoItems: List<MediaInfo>,
     modifier: Modifier = Modifier,
-    onChangeTime: (Pair<Int, Int>) -> Unit,
+    onChangeTime: (Pair<Float, Int>) -> Unit,
     onPageUIElementsVisibilityChange: (Boolean) -> Unit, // Новый колбэк
 
     onLongClick: (MediaInfo) -> Unit = {},

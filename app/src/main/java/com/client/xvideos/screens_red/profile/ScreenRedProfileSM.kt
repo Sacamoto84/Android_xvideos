@@ -11,6 +11,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -180,14 +181,14 @@ class ScreenRedProfileSM @Inject constructor(
     /**
      * Текущее время плеера
      */
-    var currentPlayerTime by mutableIntStateOf(0)
+    var currentPlayerTime by mutableStateOf(0f)
     var currentPlayerDuration by mutableIntStateOf(0)
     var isPaused by mutableStateOf(false)
     //---- AB ----
     var play by mutableStateOf(true)
     var enableAB by mutableStateOf(false)
-    var timeA  by mutableIntStateOf(2)
-    var timeB by mutableIntStateOf(6)
+    var timeA  by mutableFloatStateOf(3f)
+    var timeB by mutableFloatStateOf(6f)
     val listABbyId = mutableListOf<String>()
 
 }

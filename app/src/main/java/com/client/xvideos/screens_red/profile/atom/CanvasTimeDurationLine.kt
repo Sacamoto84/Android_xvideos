@@ -9,10 +9,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 
 @Composable
-fun CanvasTimeDurationLine(currentTime: Int, duration: Int, timeA: Int = 0, timeB: Int = 1 , timeABEnable : Boolean = false) {
+fun CanvasTimeDurationLine(currentTime: Float, duration: Int, timeA: Float = 0f, timeB: Float = 1f , timeABEnable : Boolean = false) {
 
     Canvas(
         modifier = Modifier

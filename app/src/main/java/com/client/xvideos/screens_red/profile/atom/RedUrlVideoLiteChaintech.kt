@@ -1,6 +1,8 @@
 package com.client.xvideos.screens_red.profile.atom
 
+import android.os.Build
 import androidx.annotation.OptIn
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -8,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -19,7 +22,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.media3.common.util.UnstableApi
 import chaintech.videoplayer.ui.video.VideoPlayerComposable
 import coil.request.CachePolicy
 import coil.request.ImageRequest
@@ -36,26 +38,24 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@OptIn(UnstableApi::class, DelicateCoroutinesApi::class, DelicateCoroutinesApi::class,
-    DelicateCoroutinesApi::class, DelicateCoroutinesApi::class, DelicateCoroutinesApi::class
-)
+@RequiresApi(Build.VERSION_CODES.R)
 @Composable
 fun RedUrlVideoLiteChaintech(
     url: String,
     thumnailUrl: String = "",
     play: Boolean,
-    onChangeTime: (Pair<Int, Int>) -> Unit,
+    onChangeTime: (Pair<Float, Int>) -> Unit,
     onLongClick: () -> Unit = {},
     isMute: Boolean = false,
     onPlayerControlsReady: (PlayerControls) -> Unit = {},
-    timeA: Int = 0,
-    timeB: Int = 0,
+    timeA: Float = 0f,
+    timeB: Float = 0f,
     enableAB: Boolean = false,
     onPaused: (Boolean) -> Unit = {}
     ) {
 
     var isBuffering by remember { mutableStateOf(false) }
-    var currentTime by remember { mutableIntStateOf(0) }
+    var currentTime by remember { mutableFloatStateOf(0f) }
     var duration by remember { mutableIntStateOf(0) }
 
     val playerHost = remember {
@@ -85,23 +85,23 @@ fun RedUrlVideoLiteChaintech(
     LaunchedEffect(playerHost, onPlayerControlsReady) {
         val controls = object : PlayerControls {
 
-            override fun forward(seconds: Int) {
-                val currentPosition = (currentTime + seconds).coerceAtMost(duration).toFloat()
+            override fun forward(seconds: Float) {
+                val currentPosition = (currentTime + seconds).coerceAtMost(duration.toFloat()).toFloat()
                 playerHost.seekTo(currentPosition)
             }
 
-            override fun rewind(seconds: Int) {
-                val currentPosition = (currentTime - seconds).coerceAtLeast(0).toFloat()
+            override fun rewind(seconds: Float) {
+                val currentPosition = (currentTime - seconds).coerceAtLeast(0f).toFloat()
                 playerHost.seekTo(currentPosition)
             }
 
-            override fun seekTo(positionSeconds: Int) {
+            override fun seekTo(positionSeconds: Float) {
                 playerHost.seekTo(
-                    positionSeconds.coerceIn(0, duration).toFloat()
-                ) // Уточните, принимает ли Long или Int, секунды или мс
+                    positionSeconds.coerceIn(0f, duration.toFloat()).toFloat()
+                )
             }
 
-            override fun stop(positionSeconds: Int) {
+            override fun stop() {
                 playerHost.pause()
                 playerHost.seekTo(0f)
             }
@@ -151,7 +151,7 @@ fun RedUrlVideoLiteChaintech(
 
                 is MediaPlayerEvent.CurrentTimeChange -> {
                     println("!!!Current playback time: ${event.currentTime}s")
-                    currentTime = event.currentTime.toInt()
+                    currentTime = event.currentTime
                     if (enableAB && currentTime >= timeB) {
                         println("!!! playerHost.seekTo(${timeA}) ")
 

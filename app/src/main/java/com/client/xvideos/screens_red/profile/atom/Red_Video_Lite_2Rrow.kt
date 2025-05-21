@@ -1,5 +1,7 @@
 package com.client.xvideos.screens_red.profile.atom
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
@@ -10,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -30,12 +33,13 @@ import com.client.xvideos.screens_red.ThemeRed
 /**
  * Превьюшка для режима в два столбика
  */
+@RequiresApi(Build.VERSION_CODES.R)
 @Composable
 fun Red_Video_Lite_2Rrow(
     url: String,
     thumnailUrl: String = "",
     play: Boolean = true,
-    onChangeTime: (Pair<Int, Int>) -> Unit,
+    onChangeTime: (Pair<Float, Int>) -> Unit,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
@@ -58,9 +62,7 @@ fun Red_Video_Lite_2Rrow(
             if (play) playerHost.play() else playerHost.pause()
         }
 
-
-
-        var time by remember { mutableIntStateOf(0) }
+        var time by remember { mutableFloatStateOf(0f) }
         var duration by remember { mutableIntStateOf(0) }
 
         onChangeTime(time to duration)
@@ -83,7 +85,7 @@ fun Red_Video_Lite_2Rrow(
 
                 is MediaPlayerEvent.CurrentTimeChange -> {
                     println("!!!Current playback time: ${event.currentTime}s")
-                    time = event.currentTime.toInt()
+                    time = event.currentTime
                 }
 
                 is MediaPlayerEvent.TotalTimeChange -> {
@@ -167,7 +169,7 @@ fun Red_Video_Lite_2Rrow(
 
         overlay
 
-        CanvasTimeDurationLine(time, duration,)
+        CanvasTimeDurationLine(time, duration)
 
     }
 }

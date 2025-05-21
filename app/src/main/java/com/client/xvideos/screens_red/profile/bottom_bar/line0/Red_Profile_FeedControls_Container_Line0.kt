@@ -140,7 +140,7 @@ fun Red_Profile_FeedControls_Container_Line0(vm: ScreenRedProfileSM) {
 
 
         IconButton(onClick = {
-            vm.currentPlayerControls?.rewind(1)
+            vm.currentPlayerControls?.rewind(1f)
         }) {
             Icon(
                 painter = painterResource(R.drawable.exo_icon_rewind),
@@ -150,7 +150,7 @@ fun Red_Profile_FeedControls_Container_Line0(vm: ScreenRedProfileSM) {
         }
 
         IconButton(onClick = {
-            vm.currentPlayerControls?.forward(1)
+            vm.currentPlayerControls?.forward(1f)
         }) {
             Icon(
                 painter = painterResource(R.drawable.exo_icon_fastforward),

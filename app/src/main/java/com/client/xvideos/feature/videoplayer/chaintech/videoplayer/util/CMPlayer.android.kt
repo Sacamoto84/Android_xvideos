@@ -75,9 +75,12 @@ fun CMPPlayer(
     LaunchedEffect(exoPlayer) {
         while (isActive) {
             currentTime(
-                TimeUnit.MILLISECONDS.toSeconds(exoPlayer.currentPosition).coerceAtLeast(0L).toFloat()
+                //TimeUnit.MILLISECONDS.toSeconds(exoPlayer.currentPosition).coerceAtLeast(0L).toFloat()
+                (exoPlayer.currentPosition/1000f).coerceAtLeast(0f)
             )
-            delay(200) // Delay for 1 second
+            delay(16) // Delay for 1 second
+            //println("!!! ${exoPlayer.currentPosition}")
+            //println("!!! ${TimeUnit.MILLISECONDS.toSeconds(exoPlayer.currentPosition/1000).coerceAtLeast(0L).toFloat()}")
         }
     }
 
