@@ -1,4 +1,4 @@
-package com.client.xvideos.screens_red.profile.feedControl
+package com.client.xvideos.screens_red.profile.bottom_bar.feedControl
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -10,15 +10,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,12 +24,11 @@ import com.client.xvideos.screens_red.ThemeRed
 @Preview
 @Composable
 fun DefaultPreview() {
-
-    RedProfileSelector(1, onSelect = {})
+    Red_Profile_Selector(1, onSelect = {})
 }
 
 @Composable
-fun RedProfileSelector(selectedIndex: Int, onSelect: (Int) -> Unit) {
+fun Red_Profile_Selector(selectedIndex: Int, onSelect: (Int) -> Unit) {
 
     val colorSelect = Color(0xFF1B1A33)
 

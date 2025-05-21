@@ -1,17 +1,10 @@
 package com.client.xvideos.screens_red.profile.atom
 
-import android.widget.Toast
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,22 +15,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.zIndex
 import chaintech.videoplayer.host.MediaPlayerEvent
 import chaintech.videoplayer.host.MediaPlayerHost
 import chaintech.videoplayer.model.ScreenResize
 import chaintech.videoplayer.model.VideoPlayerConfig
 import chaintech.videoplayer.ui.video.VideoPlayerComposable
-import com.client.xvideos.App
 import com.client.xvideos.screens_red.ThemeRed
-import java.nio.file.Files.size
 
 
 /**
@@ -71,10 +58,14 @@ fun Red_Video_Lite_2Rrow(
             if (play) playerHost.play() else playerHost.pause()
         }
 
+
+
         var time by remember { mutableIntStateOf(0) }
         var duration by remember { mutableIntStateOf(0) }
 
         onChangeTime(time to duration)
+
+
 
         playerHost.onEvent = { event ->
             when (event) {
@@ -144,17 +135,11 @@ fun Red_Video_Lite_2Rrow(
                         modifier = Modifier
                             .fillMaxSize()
                             .background(Color.Transparent)
-                            //.zIndex(1f) // убедиться, что над видео
+                        //.zIndex(1f) // убедиться, что над видео
                     )
 
-                    Box(
-                        Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(
-                            //modifier = Modifier.size(56.dp),
-                            //strokeWidth = 8.dp
-                        )
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
                     }
 
                 }
@@ -162,32 +147,27 @@ fun Red_Video_Lite_2Rrow(
         )
 
         Text(
-            "%02d:%02d".format(time, duration), modifier = Modifier
-                .align(Alignment.TopEnd)
-            , color = Color.White, fontFamily = ThemeRed.fontFamilyPopinsRegular, fontSize = 8.sp)
+            "%02d:%02d".format(time, duration),
+            modifier = Modifier
+                .align(Alignment.TopEnd),
+            color = Color.White,
+            fontFamily = ThemeRed.fontFamilyPopinsRegular,
+            fontSize = 8.sp
+        )
 
 
-        Box(modifier = Modifier.fillMaxSize().combinedClickable(
-            onClick = onClick,
-            onLongClick = onLongClick
-        ))
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .combinedClickable(
+                    onClick = onClick,
+                    onLongClick = onLongClick
+                )
+        )
 
         overlay
 
-//        Button(onClick = {
-//            Toast.makeText(
-//                App.instance.applicationContext,
-//                "Click",
-//                Toast.LENGTH_SHORT
-//            ).show()
-//
-//        }) {
-//
-//
-//
-//        }
-
-        CanvasTimeDurationLine(time, duration)
+        CanvasTimeDurationLine(time, duration,)
 
     }
 }

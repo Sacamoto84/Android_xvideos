@@ -21,15 +21,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.client.xvideos.feature.redgifs.types.MediaInfo
 import com.client.xvideos.screens_red.ThemeRed
+import com.client.xvideos.screens_red.profile.ScreenRedProfileSM
 import com.client.xvideos.screens_red.profile.atom.RedUrlVideoLiteChaintech
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TikTokStyleVideoFeed(
+    vm : ScreenRedProfileSM,
     videoItems: List<MediaInfo>,
     modifier: Modifier = Modifier,
     onChangeTime: (Pair<Int, Int>) -> Unit,
     onPageUIElementsVisibilityChange: (Boolean) -> Unit, // Новый колбэк
+
+    onLongClick: (MediaInfo) -> Unit = {},
+
+    isMute: Boolean,
 ) {
 
     val pagerState = rememberPagerState(pageCount = { videoItems.size })
@@ -86,8 +92,22 @@ fun TikTokStyleVideoFeed(
         RedUrlVideoLiteChaintech(
             "https://api.redgifs.com/v2/gifs/${videoItem.id.lowercase()}/hd.m3u8",
             videoItem.urls.thumbnail,
-            play = isCurrentPage,
-            onChangeTime = onChangeTime
+            play = isCurrentPage and vm.play,
+            onChangeTime = onChangeTime,
+            isMute = isMute,
+            onPlayerControlsReady = { controls ->
+                // Этот колбэк вызовется для КАЖДОЙ страницы пейджера,
+                // когда её плеер будет готов. Нам нужен контроллер только для ТЕКУЩЕЙ страницы.
+                if (isCurrentPage) {
+                    vm.currentPlayerControls = controls
+                }
+            }
+            , timeA = vm.timeA,
+            timeB = vm.timeB,
+            enableAB = vm.enableAB
+            , onPaused = {
+                vm.isPaused = it
+            }
         )
 
         // Пример ВНУТРЕННЕГО UI элемента страницы

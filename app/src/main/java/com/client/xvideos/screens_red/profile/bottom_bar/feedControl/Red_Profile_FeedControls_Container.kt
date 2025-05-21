@@ -1,4 +1,4 @@
-package com.client.xvideos.screens_red.profile.feedControl
+package com.client.xvideos.screens_red.profile.bottom_bar.feedControl
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -26,7 +26,7 @@ import timber.log.Timber
  * Выбор отображения количества столбцов 1 2
  */
 @Composable
-fun RedProfileFeedControlsContainer(vm: ScreenRedProfileSM) {
+fun Red_Profile_FeedControls_Container(vm: ScreenRedProfileSM) {
 
     Timber.d("!!! RedProfileFeedControlsContainer")
 
@@ -36,7 +36,7 @@ fun RedProfileFeedControlsContainer(vm: ScreenRedProfileSM) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         //--- Feed Ordering Control ---
-        RedProfileSortBy(vm.orderList, vm.order) {
+        Red_Profile_SortBy(vm.orderList, vm.order) {
             vm.order = it
             vm.clear()
             vm.loadNextPage()
@@ -44,17 +44,18 @@ fun RedProfileFeedControlsContainer(vm: ScreenRedProfileSM) {
 
         //--- Feed Gif Types Control ---
         // Выбор типа отображения All Gifs Images
-        Box(Modifier.padding(horizontal = 4.dp).weight(1f).border(1.dp, ThemeRed.colorBorderGray,RoundedCornerShape(8.dp)).background(Color.Transparent)){
-            RedProfileFeedGifTypesControl(vm)
+        Box(
+            Modifier
+                .padding(horizontal = 4.dp)
+                .weight(1f)
+                .border(1.dp, ThemeRed.colorBorderGray, RoundedCornerShape(8.dp))
+                .background(Color.Transparent)
+        ) {
+            Red_Profile_Feed_GifTypes_Control(vm)
         }
-        RedProfileSelector(vm.selector.collectAsStateWithLifecycle().value) { vm.setSelector(it) }
+        Red_Profile_Selector(vm.selector.collectAsStateWithLifecycle().value) { vm.setSelector(it) }
 
-
-
-
-
-    //--- Feed View Mode Control ---
-
+        //--- Feed View Mode Control ---
 
     }
 

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -171,7 +172,27 @@ class ScreenRedProfileSM @Inject constructor(
         return res
     }
 
+
+    var currentPlayerControls by  mutableStateOf<PlayerControls?>(null)
+
+    var mute by mutableStateOf(true)
+
+    /**
+     * Текущее время плеера
+     */
+    var currentPlayerTime by mutableIntStateOf(0)
+    var currentPlayerDuration by mutableIntStateOf(0)
+    var isPaused by mutableStateOf(false)
+    //---- AB ----
+    var play by mutableStateOf(true)
+    var enableAB by mutableStateOf(false)
+    var timeA  by mutableIntStateOf(2)
+    var timeB by mutableIntStateOf(6)
+    val listABbyId = mutableListOf<String>()
+
 }
+
+data class ControlAB(var enableAB : MutableState<Boolean>, var timeA  : MutableState<Int>, var timeB : MutableState<Int>)
 
 @Module
 @InstallIn(SingletonComponent::class)

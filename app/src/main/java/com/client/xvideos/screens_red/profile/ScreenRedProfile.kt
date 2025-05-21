@@ -2,14 +2,10 @@ package com.client.xvideos.screens_red.profile
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,13 +15,16 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -40,9 +39,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
@@ -51,18 +50,23 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.client.xvideos.screens_red.ThemeRed
 import com.client.xvideos.screens_red.profile.atom.CanvasTimeDurationLine
 import com.client.xvideos.screens_red.profile.atom.RedUrlVideoImageAndLongClick
 import com.client.xvideos.screens_red.profile.atom.VerticalScrollbar
-import com.client.xvideos.screens_red.profile.feedControl.RedProfileFeedControlsContainer
+import com.client.xvideos.screens_red.profile.bottom_bar.Red_Profile_Bottom_Bar
 import com.client.xvideos.screens_red.profile.molecule.TikTokStyleVideoFeed
-import com.composables.core.HorizontalSeparator
+import com.composables.core.DragIndication
+import com.composables.core.ModalBottomSheet
+import com.composables.core.Scrim
+import com.composables.core.Sheet
+import com.composables.core.SheetDetent.Companion.FullyExpanded
+import com.composables.core.SheetDetent.Companion.Hidden
+import com.composables.core.rememberModalBottomSheetState
+
 import com.composeunstyled.rememberDisclosureState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.withContext
-import kotlin.Float
 
 class ScreenRedProfile() : Screen {
 
@@ -97,16 +101,6 @@ class ScreenRedProfile() : Screen {
             numberOfColumns = 2
         )
 
-        /**
-         * Текущее время видео
-         */
-        var currentTime by remember { mutableIntStateOf(0) }
-
-        /**
-         * Продолжительность видео
-         */
-        var duration by remember { mutableIntStateOf(0) }
-
         var trackVisible by remember { mutableStateOf(false) }
 
         var visibleItems by remember { mutableIntStateOf(0) }
@@ -134,14 +128,52 @@ class ScreenRedProfile() : Screen {
             }
         }
 
+        val sheetState = rememberModalBottomSheetState(
+            initialDetent = Hidden,
+            animationSpec = tween(
+               200
+            )
+        )
 
+        ModalBottomSheet(state = sheetState) {
+            Scrim()
+            Sheet(
+                modifier = Modifier
+                    .shadow(4.dp, RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
+                    .clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
+                    .background(Color.White)
+                    .widthIn(max = 640.dp)
+                    .fillMaxWidth()
+                    .imePadding(),
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    DragIndication(
+                        modifier = Modifier
+                            .padding(top = 22.dp)
+                            .background(Color.Black.copy(0.4f), RoundedCornerShape(100))
+                            .width(32.dp)
+                            .height(4.dp)
+                    )
+
+                    Text("Here is some content")
+                    Text("Here is some content")
+                    Text("Here is some content")
+                    Text("Here is some content")
+
+
+
+                }
+            }
+        }
 
         Scaffold(
             bottomBar = {
-
                 Column {
-
-
                     AnimatedVisibility(
                         visible = trackVisible && selector == 1,
                         enter = fadeIn(
@@ -154,28 +186,34 @@ class ScreenRedProfile() : Screen {
                         ),
                     ) {
                         //Линия продолжительности видео
-                        CanvasTimeDurationLine(currentTime, duration)
+                        CanvasTimeDurationLine(vm.currentPlayerTime, vm.currentPlayerDuration, vm.timeA, vm.timeB, vm.enableAB)
                     }
-
-
-                    RedBottomBar(vm)
+                    Red_Profile_Bottom_Bar(vm)
                 }
             },
             containerColor = Color.Black
         ) {
             Box(Modifier.padding(bottom = it.calculateBottomPadding())) {
 
-
                 //Тикток при одном селекторе
                 if (selector == 1) {
+
                     TikTokStyleVideoFeed(
-                        list.value, onChangeTime = {
-                            currentTime = it.first
-                            duration = it.second
+                        vm,
+                        list.value,
+                        onChangeTime = {
+                            vm.currentPlayerTime = it.first
+                            vm.currentPlayerDuration= it.second
                         },
                         onPageUIElementsVisibilityChange = {
                             trackVisible = it
-                        })
+                        },
+                        isMute = vm.mute,
+                        onLongClick = {
+
+                        } ,
+                    )
+
                 } else {
 
                     Box(modifier = Modifier.fillMaxSize()) {
@@ -193,12 +231,20 @@ class ScreenRedProfile() : Screen {
                             itemsIndexed( list.value, key = { index, item -> item.id }) { index, item ->
 
                                 Box(
-                                    modifier = Modifier.fillMaxSize().aspectRatio(1080f / 1920)
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .aspectRatio(1080f / 1920)
                                 ) {
+
                                     RedUrlVideoImageAndLongClick(
                                         item,
                                         index,
-                                        onLongClick = {},
+                                        onLongClick = {
+
+                                            sheetState.currentDetent = FullyExpanded
+
+
+                                        },
                                         onDoubleClick = {})
                                 }
 
@@ -212,10 +258,7 @@ class ScreenRedProfile() : Screen {
                                 Modifier.fillMaxSize(),
                                 contentAlignment = Alignment.Center
                             ) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(56.dp),
-                                    strokeWidth = 8.dp
-                                )
+                                CircularProgressIndicator( modifier = Modifier.size(56.dp), strokeWidth = 8.dp )
                             }
                         }
 
@@ -445,12 +488,3 @@ class ScreenRedProfile() : Screen {
     }
 }
 
-@Composable
-fun RedBottomBar(vm: ScreenRedProfileSM) {
-    Column {
-        HorizontalSeparator(ThemeRed.colorBottomBarDivider, thickness = 2.dp)
-        RedProfileFeedControlsContainer(vm)
-        HorizontalSeparator(Color.Transparent, thickness = 4.dp)
-        RedProfileFeedControlsContainer(vm)
-    }
-}
