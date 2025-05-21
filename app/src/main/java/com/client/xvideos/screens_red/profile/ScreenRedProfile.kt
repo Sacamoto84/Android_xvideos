@@ -1,25 +1,50 @@
 package com.client.xvideos.screens_red.profile
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
@@ -28,10 +53,16 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.screens_red.ThemeRed
 import com.client.xvideos.screens_red.profile.atom.CanvasTimeDurationLine
+import com.client.xvideos.screens_red.profile.atom.RedUrlVideoImageAndLongClick
+import com.client.xvideos.screens_red.profile.atom.VerticalScrollbar
 import com.client.xvideos.screens_red.profile.feedControl.RedProfileFeedControlsContainer
 import com.client.xvideos.screens_red.profile.molecule.TikTokStyleVideoFeed
 import com.composables.core.HorizontalSeparator
 import com.composeunstyled.rememberDisclosureState
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.withContext
+import kotlin.Float
 
 class ScreenRedProfile() : Screen {
 
@@ -50,6 +81,7 @@ class ScreenRedProfile() : Screen {
         val stateDisclosure = rememberDisclosureState()
         var prevIndex by remember { mutableIntStateOf(0) }
 
+        val selector = vm.selector.collectAsStateWithLifecycle().value
 
         //RedUrlVideoLite("https://api.redgifs.com/v2/gifs/easytightibisbill/hd.m3u8")
 
@@ -66,29 +98,144 @@ class ScreenRedProfile() : Screen {
         )
 
         /**
-         * ## ⬆️Текущее время видео
+         * Текущее время видео
          */
         var currentTime by remember { mutableIntStateOf(0) }
+
         /**
-         * ##Продолжительность видео
+         * Продолжительность видео
          */
         var duration by remember { mutableIntStateOf(0) }
 
+        var trackVisible by remember { mutableStateOf(false) }
+
+        var visibleItems by remember { mutableIntStateOf(0) }
+
+        // триггерим подгрузку, когда остаётся ≤6 элементов до конца
+        LaunchedEffect(gridState) {
+            withContext(Dispatchers.IO) {
+                snapshotFlow { gridState.layoutInfo }
+                    .distinctUntilChanged()
+                    .collect { info ->
+                        val last = info.visibleItemsInfo.lastOrNull()?.index ?: 0
+                        visibleItems = last
+                        //Timber.d("!!! prevIndex = $prevIndex")
+                        //Timber.d("!!! last = $last")
+                        //Timber.d("!!! info.totalItemsCount = ${info.totalItemsCount}")
+
+                        // Триггер только если движемся ВНИЗ
+                        if (last > prevIndex) {
+                            val total = info.totalItemsCount
+                            //if (total - last <= 6)
+                            //vm.loadNextPage()
+                        }
+                        prevIndex = last
+                    }
+            }
+        }
+
+
+
         Scaffold(
             bottomBar = {
+
                 Column {
-                    //Линия продолжительности видео
-                    CanvasTimeDurationLine(currentTime, duration)
+
+
+                    AnimatedVisibility(
+                        visible = trackVisible && selector == 1,
+                        enter = fadeIn(
+                            animationSpec = tween(durationMillis = 250), //Появление
+                            initialAlpha = 0f
+                        ),
+                        exit = fadeOut(
+                            animationSpec = tween(durationMillis = 250), //Исчезновение
+                            targetAlpha = 0f
+                        ),
+                    ) {
+                        //Линия продолжительности видео
+                        CanvasTimeDurationLine(currentTime, duration)
+                    }
+
+
                     RedBottomBar(vm)
                 }
             },
             containerColor = Color.Black
         ) {
             Box(Modifier.padding(bottom = it.calculateBottomPadding())) {
-                TikTokStyleVideoFeed(list.value, onChangeTime = {
-                    currentTime = it.first
-                    duration = it.second
-                })
+
+
+                //Тикток при одном селекторе
+                if (selector == 1) {
+                    TikTokStyleVideoFeed(
+                        list.value, onChangeTime = {
+                            currentTime = it.first
+                            duration = it.second
+                        },
+                        onPageUIElementsVisibilityChange = {
+                            trackVisible = it
+                        })
+                } else {
+
+                    Box(modifier = Modifier.fillMaxSize()) {
+
+                        LazyVerticalGrid(
+                            state = gridState,
+                            columns = GridCells.Fixed(2),
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            verticalArrangement = Arrangement.spacedBy(4.dp),
+                            contentPadding = PaddingValues(4.dp) // Отступы по краям сетки
+                        ) {
+
+                            //Тайлы картинок и видео
+                            itemsIndexed( list.value, key = { index, item -> item.id }) { index, item ->
+
+                                Box(
+                                    modifier = Modifier.fillMaxSize().aspectRatio(1080f / 1920)
+                                ) {
+                                    RedUrlVideoImageAndLongClick(
+                                        item,
+                                        index,
+                                        onLongClick = {},
+                                        onDoubleClick = {})
+                                }
+
+                            }
+
+                        }
+
+                        //Индикатор загрузки
+                        if (isLoading) {
+                            Box(
+                                Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(56.dp),
+                                    strokeWidth = 8.dp
+                                )
+                            }
+                        }
+
+                        Text("      " + visibleItems.toString(), color = Color.White)
+
+
+                        //Скролл
+                        Box(
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .align(Alignment.CenterEnd)
+                                .width(2.dp)
+                        ) { VerticalScrollbar(scrollPercent) }
+
+                    }
+
+
+                }
+
+
             }
         }
 

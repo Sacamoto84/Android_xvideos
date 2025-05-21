@@ -24,7 +24,7 @@ fun CanvasTimeDurationLine(currentTime: Int, duration: Int) {
 
         // 1. Рисуем фон (полная длительность)
         drawLine(
-            color = Color.LightGray, // Цвет фона прогресс-бара
+            color = Color(0xFF909090), // Цвет фона прогресс-бара
             start = Offset(x = 0f, y = canvasHeight / 2),
             end = Offset(x = canvasWidth, y = canvasHeight / 2),
             strokeWidth = canvasHeight,
@@ -40,7 +40,7 @@ fun CanvasTimeDurationLine(currentTime: Int, duration: Int) {
             ) // Ограничиваем от 0 до 1
 
             drawLine(
-                color = Color.Red, // Цвет активного прогресса
+                color = Color(0xFFE73538), // Цвет активного прогресса
                 start = Offset(x = 0f, y = canvasHeight / 2),
                 end = Offset(x = progressWidth, y = canvasHeight / 2),
                 strokeWidth = canvasHeight,

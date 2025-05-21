@@ -40,7 +40,7 @@ fun RedUrlVideoImageAndLongClick(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .aspectRatio(1080f/1920)
+            .aspectRatio(1080f / 1920)
             //.aspectRatio(1f)
             .combinedClickable(
                 onDoubleClick = {
@@ -63,22 +63,29 @@ fun RedUrlVideoImageAndLongClick(
 
     ) {
         //RedUrlVideoLite("https://api.redgifs.com/v2/gifs/${item.id.lowercase()}/hd.m3u8", item.urls.thumbnail)
-//        if (isVideo) {
-//           //val url = "https://api.redgifs.com/v2/gifs/${item.id.lowercase()}/hd.m3u8"
-//            //https://api.redgifs.com/v2/gifs/easytightibisbill/hd.m3u8
-//            //Timber.i("!!! url = $url")
-//            RedUrlVideoLite("https://api.redgifs.com/v2/gifs/${item.id.lowercase()}/hd.m3u8")
-//        } else {
-//
-//            //Показ картинки
-//            //UrlImage(item.urls.thumbnail, Modifier.fillMaxWidth())
-//
-//            RedProfileTile(item, index)
-//
-//
-//            overlay.invoke()
-//
-//        }
+        if (isVideo) {
+            //val url = "https://api.redgifs.com/v2/gifs/${item.id.lowercase()}/hd.m3u8"
+            //https://api.redgifs.com/v2/gifs/easytightibisbill/hd.m3u8
+            //Timber.i("!!! url = $url")
+            //RedUrlVideoLiteAndroid("https://api.redgifs.com/v2/gifs/${item.id.lowercase()}/hd.m3u8")
+            //RedUrlVideoLite("https://api.redgifs.com/v2/gifs/${item.id.lowercase()}/hd.m3u8")
+
+            Red_Video_Lite_2Rrow(
+                "https://api.redgifs.com/v2/gifs/${item.id.lowercase()}/hd.m3u8",
+                item.urls.thumbnail,
+                true,
+                onChangeTime = {},
+                Modifier,
+                onClick = {isVideo = isVideo.not()},
+                onLongClick = {}
+            )
+
+
+        } else {
+            //Показ картинки
+            RedProfileTile(item, index)
+            overlay.invoke()
+        }
 
     }
 
