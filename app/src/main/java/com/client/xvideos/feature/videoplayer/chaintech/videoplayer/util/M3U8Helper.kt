@@ -1,10 +1,9 @@
-package chaintech.videoplayer.util
+package com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util
 
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 
 data class VideoQuality(val bitrate: Double, val resolution: String, val url: String)

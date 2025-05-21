@@ -13,8 +13,8 @@ import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPl
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPlayerHost
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.ScreenResize
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.VideoPlayerConfig
-import chaintech.videoplayer.ui.video.VideoPlayerWithControl
-import chaintech.videoplayer.util.isDesktop
+import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.ui.video.VideoPlayerWithControl
+import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.isDesktop
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 

@@ -246,7 +246,7 @@ dependencies {
     implementation "net.engawapg.lib:zoomable:2.4.0"
 
     implementation ("androidx.lifecycle:lifecycle-process:2.9.0")
-
+    implementation ("io.github.qdsfdhvh:image-loader:1.7.0")
 }
 
 ksp {

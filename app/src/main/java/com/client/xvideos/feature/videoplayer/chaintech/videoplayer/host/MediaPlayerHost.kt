@@ -1,14 +1,15 @@
 package com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.PlayerSpeed
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.ScreenResize
-import chaintech.videoplayer.util.AudioTrack
-import chaintech.videoplayer.util.M3U8Helper
-import chaintech.videoplayer.util.SubtitleTrack
-import chaintech.videoplayer.util.VideoQuality
+import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.AudioTrack
+import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.M3U8Helper
+import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.SubtitleTrack
+import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.VideoQuality
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -37,7 +38,7 @@ class MediaPlayerHost(
     internal var isMuted by mutableStateOf(isMuted)
     internal var isLooping by mutableStateOf(isLooping)
     internal var totalTime by mutableStateOf(0) // Total video duration
-    internal var currentTime by mutableStateOf(0) // Current playback position
+    internal var currentTime by mutableFloatStateOf(0f) // Current playback position
     internal var isBuffering by mutableStateOf(true)
     internal var playFromTime: Float? by mutableStateOf(startTimeInSeconds)
     internal var volumeLevel by mutableStateOf(if (isMuted) 0f else 1f) // Range 0.0 to 1.0
@@ -202,7 +203,7 @@ class MediaPlayerHost(
         }
     }
 
-    internal fun updateCurrentTime(time: Int) {
+    internal fun updateCurrentTime(time: Float) {
         if(currentTime != time) {
             currentTime = time
             onEvent?.invoke(MediaPlayerEvent.CurrentTimeChange(currentTime))

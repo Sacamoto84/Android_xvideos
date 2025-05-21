@@ -6,7 +6,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import chaintech.videoplayer.util.PlatformDrawable
+import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.PlatformDrawable
 
 
 data class AudioPlayerConfig(

@@ -32,13 +32,13 @@ import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.ui.component
 internal fun BottomControls(
     playerConfig: VideoPlayerConfig, // Configuration object for the player, includes styling options
     paddingValues: PaddingValues,
-    currentTime: Int, // Current playback time in seconds
+    currentTime: Float, // Current playback time in seconds
     totalTime: Int, // Total duration of the media in seconds
     showControls: Boolean, // Flag to determine if controls should be visible
     isFullScreen: Boolean,
     onFullScreenToggle: (() -> Unit),
     onChangeSliderTime: ((Int?) -> Unit), // Callback for slider value change
-    onChangeCurrentTime: ((Int) -> Unit), // Callback for current time change
+    onChangeCurrentTime: ((Float) -> Unit), // Callback for current time change
     onChangeSliding: ((Boolean) -> Unit) // Callback for slider sliding state change
 ) {
     var slideTime = currentTime
@@ -81,7 +81,7 @@ internal fun BottomControls(
                                             ?.firstOrNull { currentTime * 1000 >= it.startTime }
 
                                         val durationText = buildAnnotatedString {
-                                            append("${currentTime.formatMinSec()}/${totalTime.formatMinSec()}")
+                                            append("${currentTime.toInt().formatMinSec()}/${totalTime.formatMinSec()}")
                                             if (activeChapter != null) {
                                                 append(" • ${activeChapter.title}")
                                             }
@@ -122,14 +122,14 @@ internal fun BottomControls(
                                 progress = currentTime.toFloat(),
                                 maxProgress = totalTime.toFloat(),
                                 onValueChange = {
-                                    slideTime = it.toInt()
+                                    slideTime = it
                                     onChangeSliding(true)
                                     onChangeSliderTime(null)
-                                    onChangeCurrentTime(it.toInt())
+                                    onChangeCurrentTime(it)
                                 },
                                 onValueChangeFinished = {
                                     onChangeSliding(false)
-                                    onChangeSliderTime(slideTime)
+                                    onChangeSliderTime(slideTime.toInt())
                                 },
                                 thumbRadius = playerConfig.seekBarThumbRadius,
                                 trackHeight = playerConfig.seekBarTrackHeight,

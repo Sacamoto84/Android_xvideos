@@ -2,7 +2,6 @@
   InternalResourceApi::class,
   ExperimentalResourceApi::class,
 )
-
 package com.client.xvideos.feature.videoplayer.reelsdemo.composemultiplatformmediaplayer.generated.resources
 
 import kotlin.ByteArray

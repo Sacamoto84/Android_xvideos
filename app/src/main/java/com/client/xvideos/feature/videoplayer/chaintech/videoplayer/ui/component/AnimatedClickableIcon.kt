@@ -22,7 +22,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
-import chaintech.videoplayer.util.PlatformDrawable
+import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.PlatformDrawable
 import kotlinx.coroutines.delay
 
 @Composable

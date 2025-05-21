@@ -36,7 +36,7 @@ import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.Player
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.ScreenResize
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.VideoPlayerConfig
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.ui.component.AnimatedClickableIcon
-import chaintech.videoplayer.util.ComposeResourceDrawable
+import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.ComposeResourceDrawable
 import com.client.xvideos.feature.videoplayer.reelsdemo.composemultiplatformmediaplayer.generated.resources.Res
 import com.client.xvideos.feature.videoplayer.reelsdemo.composemultiplatformmediaplayer.generated.resources.resize_fill
 import com.client.xvideos.feature.videoplayer.reelsdemo.composemultiplatformmediaplayer.generated.resources.resize_fit
@@ -72,7 +72,7 @@ internal fun DesktopControlPanel(
                 onClick = {
                     playerHost.isSliding = true
                     val newTime =
-                        maxOf(0, playerHost.currentTime - playerConfig.fastForwardBackwardIntervalSeconds)
+                        maxOf(0f, playerHost.currentTime - playerConfig.fastForwardBackwardIntervalSeconds)
                     playerHost.seekToTime = newTime.toFloat()
                     playerHost.isSliding = false
                 }
@@ -105,8 +105,7 @@ internal fun DesktopControlPanel(
                 animationDuration = playerConfig.controlClickAnimationDuration,
                 onClick = {
                     playerHost.isSliding = true
-                    val newTime = minOf(
-                        playerHost.totalTime,
+                    val newTime = minOf(  playerHost.totalTime.toFloat(),
                         playerHost.currentTime + playerConfig.fastForwardBackwardIntervalSeconds
                     )
                     playerHost.seekToTime = newTime.toFloat()

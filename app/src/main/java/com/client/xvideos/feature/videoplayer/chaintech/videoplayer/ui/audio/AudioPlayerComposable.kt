@@ -3,7 +3,6 @@ package com.client.xvideos.feature.videoplayer.chaintech.videoplayer.ui.audio
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -27,11 +26,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,215 +34,211 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.extension.formatMinSec
-import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPlayerHost
-import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.AudioFile
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.AudioPlayerConfig
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.ui.component.AnimatedClickableIcon
-import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.ui.component.CustomSeekBar
-import chaintech.videoplayer.util.CMPAudioPlayer
-import chaintech.videoplayer.util.ImageFromUrl
-import kotlin.random.Random
+import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.ImageFromUrl
 
 
-@Composable
-fun AudioPlayerComposable(
-    modifier: Modifier = Modifier, // Modifier for the composable
-    audios: List<AudioFile>, // URL of the video
-    playerHost: MediaPlayerHost,
-    audioPlayerConfig: AudioPlayerConfig = AudioPlayerConfig(), // Configuration for the player
-    currentItemIndex: ((Int) -> Unit)? = null
-) {
-    var currentIndex by remember { mutableStateOf(0) }
-    var isShuffle by remember { mutableStateOf(false) } // State for Shuffle
-
-    LaunchedEffect(playerHost.totalTime) {
-        if (playerHost.totalTime > 0 ) {
-            playerHost.playFromTime?.let {
-                playerHost.isSliding = true
-                playerHost.seekToTime = it
-                playerHost.isSliding = false
-                playerHost.playFromTime = null
-            }
-        }
-    }
-
-    fun changeAudio(isNext: Boolean) {
-        // Function to get a random index for shuffling
-        fun getNextShuffleIndex(): Int {
-            if (audios.size <= 1) return Random.nextInt(0, audios.size)
-
-            var newIndex: Int
-            do {
-                newIndex = Random.nextInt(0, audios.size)
-            } while (newIndex == currentIndex)
-
-            return newIndex
-        }
-
-        // Change audio index based on whether moving to the next or previous audio
-        if (isNext) {
-            currentIndex = if (isShuffle) {
-                getNextShuffleIndex() // Get a random index if shuffling
-            } else {
-                (currentIndex + 1) % audios.size // Move to the next audio
-            }
-        } else {
-            // Move to the previous audio or reset slider time if at the start
-            if (currentIndex > 0) {
-                currentIndex -= 1 // Move to previous audio
-            } else {
-                playerHost.seekTo(0f)
-            }
-        }
-
-        // Update player state
-        playerHost.play()
-        playerHost.setBufferingStatus(true)
-    }
-
-    LaunchedEffect(currentIndex) {
-        playerHost.loadUrl(audios[currentIndex].audioUrl)
-        currentItemIndex?.let {
-            it(currentIndex)
-        }
-    }
-
-    // Container for the audio player and control components
-    Box(
-        modifier = modifier
-    ) {
-        // Check if there are any audios to play
-        if (audios.isNotEmpty()) {
-            // Audio player component
-            CMPAudioPlayer(
-                modifier = modifier,
-                url = playerHost.url,
-                isPause = playerHost.isPaused,
-                totalTime = { playerHost.updateTotalTime(it)}, // Update total time of the audio
-                currentTime = {
-                    if (!playerHost.isSliding) {
-                        playerHost.updateCurrentTime(it)
-                        playerHost.seekToTime = null
-                    }
-                },
-                isSliding = playerHost.isSliding, // Pass seek bar sliding state
-                seekToTime = playerHost.seekToTime, // Pass seek bar slider time
-                loop = playerHost.isLooping,
-                loadingState = { playerHost.setBufferingStatus(it) },
-                speed = playerHost.speed,
-                volume = playerHost.volumeLevel,
-                didEndAudio = {
-                    if (!playerHost.isLooping) {
-                        if (audios.size > 1) {
-                            changeAudio(true)
-                        } else {
-                            playerHost.togglePlayPause()
-                        }
-                    }
-                    playerHost.triggerMediaEnd()
-                },
-                error = { playerHost.triggerError(it)}
-            )
-        }
-        if(audioPlayerConfig.showControl) {
-            Box(modifier = Modifier.fillMaxSize()
-                .background(audioPlayerConfig.backgroundColor)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .align(Alignment.BottomStart) // Align the column to the bottom
-                        .padding(bottom = audioPlayerConfig.controlsBottomPadding),
-                    verticalArrangement = Arrangement.spacedBy(30.dp)
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(0.5f)
-                            .padding(horizontal = 25.dp),
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Spacer(modifier = Modifier.weight(0.25f))
-
-                        // Display album art
-                        AlbumArt(
-                            audioPlayerConfig = audioPlayerConfig,
-                            thumbnailUrl = audios[currentIndex].thumbnailUrl
-                        )
-
-                        // Display audio title if it's not empty
-                        if (audios[currentIndex].audioTitle.isNotEmpty()) {
-                            Text(
-                                modifier = Modifier.padding(top = 25.dp),
-                                text = audios[currentIndex].audioTitle,
-                                color = audioPlayerConfig.fontColor,
-                                style = audioPlayerConfig.titleTextStyle,
-                                maxLines = 1
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.weight(0.05f))
-                    }
-
-                    // Show controls if they are visible in configuration
-                    if (audioPlayerConfig.isControlsVisible) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp),
-                            verticalAlignment = Alignment.Top
-                        ) {
-                            Column(
-                                modifier = Modifier.weight(1f) // Occupy remaining horizontal space
-                            ) {
-                                CustomSeekBar(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    progress = playerHost.currentTime.toFloat(),
-                                    maxProgress = playerHost.totalTime.toFloat(),
-                                    onValueChange = {
-                                        playerHost.updateCurrentTime(it.toInt())
-                                        playerHost.isSliding = true
-                                        playerHost.seekToTime = null
-                                    },
-                                    onValueChangeFinished = {
-                                        playerHost.isSliding = false
-                                        playerHost.seekToTime = playerHost.currentTime.toFloat()
-                                    },
-                                    thumbRadius = audioPlayerConfig.seekBarThumbRadius,
-                                    trackHeight = audioPlayerConfig.seekBarTrackHeight,
-                                    activeTrackColor = audioPlayerConfig.seekBarActiveTrackColor, // Active color
-                                    inactiveTrackColor = audioPlayerConfig.seekBarInactiveTrackColor, // Inactive color
-                                    thumbColor = audioPlayerConfig.seekBarThumbColor,
-                                    showThumbAlways = true
-                                )
-
-                                // Display time details (current and total time)
-                                TimeDetails(
-                                    audioPlayerConfig = audioPlayerConfig,
-                                    currentTime = playerHost.currentTime,
-                                    totalTime = playerHost.totalTime
-                                )
-                            }
-                        }
-
-                        // Control panel for playback controls (play, pause, next, previous, shuffle, repeat)
-                        ControlPanel(
-                            audioPlayerConfig = audioPlayerConfig,
-                            isPause = playerHost.isPaused,
-                            isRepeat = playerHost.isLooping,
-                            isLoading = playerHost.isBuffering,
-                            isShuffle = isShuffle,
-                            onPlayPauseClick = { playerHost.togglePlayPause() },
-                            onNextClick = { changeAudio(isNext = true) },
-                            onPreviousClick = { changeAudio(isNext = false) },
-                            onShuffleClick = { isShuffle = !isShuffle },
-                            onRepeatClick = { playerHost.toggleLoop() }
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
+//@Composable
+//fun AudioPlayerComposable(
+//    modifier: Modifier = Modifier, // Modifier for the composable
+//    audios: List<AudioFile>, // URL of the video
+//    playerHost: MediaPlayerHost,
+//    audioPlayerConfig: AudioPlayerConfig = AudioPlayerConfig(), // Configuration for the player
+//    currentItemIndex: ((Int) -> Unit)? = null
+//) {
+//    var currentIndex by remember { mutableStateOf(0) }
+//    var isShuffle by remember { mutableStateOf(false) } // State for Shuffle
+//
+//    LaunchedEffect(playerHost.totalTime) {
+//        if (playerHost.totalTime > 0 ) {
+//            playerHost.playFromTime?.let {
+//                playerHost.isSliding = true
+//                playerHost.seekToTime = it
+//                playerHost.isSliding = false
+//                playerHost.playFromTime = null
+//            }
+//        }
+//    }
+//
+//    fun changeAudio(isNext: Boolean) {
+//        // Function to get a random index for shuffling
+//        fun getNextShuffleIndex(): Int {
+//            if (audios.size <= 1) return Random.nextInt(0, audios.size)
+//
+//            var newIndex: Int
+//            do {
+//                newIndex = Random.nextInt(0, audios.size)
+//            } while (newIndex == currentIndex)
+//
+//            return newIndex
+//        }
+//
+//        // Change audio index based on whether moving to the next or previous audio
+//        if (isNext) {
+//            currentIndex = if (isShuffle) {
+//                getNextShuffleIndex() // Get a random index if shuffling
+//            } else {
+//                (currentIndex + 1) % audios.size // Move to the next audio
+//            }
+//        } else {
+//            // Move to the previous audio or reset slider time if at the start
+//            if (currentIndex > 0) {
+//                currentIndex -= 1 // Move to previous audio
+//            } else {
+//                playerHost.seekTo(0f)
+//            }
+//        }
+//
+//        // Update player state
+//        playerHost.play()
+//        playerHost.setBufferingStatus(true)
+//    }
+//
+//    LaunchedEffect(currentIndex) {
+//        playerHost.loadUrl(audios[currentIndex].audioUrl)
+//        currentItemIndex?.let {
+//            it(currentIndex)
+//        }
+//    }
+//
+//    // Container for the audio player and control components
+//    Box(
+//        modifier = modifier
+//    ) {
+//        // Check if there are any audios to play
+//        if (audios.isNotEmpty()) {
+//            // Audio player component
+//
+//            CMPAudioPlayer(
+//                modifier = modifier,
+//                url = playerHost.url,
+//                isPause = playerHost.isPaused,
+//                totalTime = { playerHost.updateTotalTime(it)}, // Update total time of the audio
+//                currentTime = {
+//                    if (!playerHost.isSliding) {
+//                        playerHost.updateCurrentTime(it)
+//                        playerHost.seekToTime = null
+//                    }
+//                },
+//                isSliding = playerHost.isSliding, // Pass seek bar sliding state
+//                seekToTime = playerHost.seekToTime, // Pass seek bar slider time
+//                loop = playerHost.isLooping,
+//                loadingState = { playerHost.setBufferingStatus(it) },
+//                speed = playerHost.speed,
+//                volume = playerHost.volumeLevel,
+//                didEndAudio = {
+//                    if (!playerHost.isLooping) {
+//                        if (audios.size > 1) {
+//                            changeAudio(true)
+//                        } else {
+//                            playerHost.togglePlayPause()
+//                        }
+//                    }
+//                    playerHost.triggerMediaEnd()
+//                },
+//                error = { playerHost.triggerError(it)}
+//            )
+//        }
+//        if(audioPlayerConfig.showControl) {
+//            Box(modifier = Modifier.fillMaxSize()
+//                .background(audioPlayerConfig.backgroundColor)
+//            ) {
+//                Column(
+//                    modifier = Modifier
+//                        .align(Alignment.BottomStart) // Align the column to the bottom
+//                        .padding(bottom = audioPlayerConfig.controlsBottomPadding),
+//                    verticalArrangement = Arrangement.spacedBy(30.dp)
+//                ) {
+//                    Column(
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .weight(0.5f)
+//                            .padding(horizontal = 25.dp),
+//                        verticalArrangement = Arrangement.Center
+//                    ) {
+//                        Spacer(modifier = Modifier.weight(0.25f))
+//
+//                        // Display album art
+//                        AlbumArt(
+//                            audioPlayerConfig = audioPlayerConfig,
+//                            thumbnailUrl = audios[currentIndex].thumbnailUrl
+//                        )
+//
+//                        // Display audio title if it's not empty
+//                        if (audios[currentIndex].audioTitle.isNotEmpty()) {
+//                            Text(
+//                                modifier = Modifier.padding(top = 25.dp),
+//                                text = audios[currentIndex].audioTitle,
+//                                color = audioPlayerConfig.fontColor,
+//                                style = audioPlayerConfig.titleTextStyle,
+//                                maxLines = 1
+//                            )
+//                        }
+//
+//                        Spacer(modifier = Modifier.weight(0.05f))
+//                    }
+//
+//                    // Show controls if they are visible in configuration
+//                    if (audioPlayerConfig.isControlsVisible) {
+//                        Row(
+//                            modifier = Modifier
+//                                .fillMaxWidth()
+//                                .padding(horizontal = 16.dp),
+//                            verticalAlignment = Alignment.Top
+//                        ) {
+//                            Column(
+//                                modifier = Modifier.weight(1f) // Occupy remaining horizontal space
+//                            ) {
+//                                CustomSeekBar(
+//                                    modifier = Modifier.fillMaxWidth(),
+//                                    progress = playerHost.currentTime.toFloat(),
+//                                    maxProgress = playerHost.totalTime.toFloat(),
+//                                    onValueChange = {
+//                                        playerHost.updateCurrentTime(it.toInt())
+//                                        playerHost.isSliding = true
+//                                        playerHost.seekToTime = null
+//                                    },
+//                                    onValueChangeFinished = {
+//                                        playerHost.isSliding = false
+//                                        playerHost.seekToTime = playerHost.currentTime.toFloat()
+//                                    },
+//                                    thumbRadius = audioPlayerConfig.seekBarThumbRadius,
+//                                    trackHeight = audioPlayerConfig.seekBarTrackHeight,
+//                                    activeTrackColor = audioPlayerConfig.seekBarActiveTrackColor, // Active color
+//                                    inactiveTrackColor = audioPlayerConfig.seekBarInactiveTrackColor, // Inactive color
+//                                    thumbColor = audioPlayerConfig.seekBarThumbColor,
+//                                    showThumbAlways = true
+//                                )
+//
+//                                // Display time details (current and total time)
+//                                TimeDetails(
+//                                    audioPlayerConfig = audioPlayerConfig,
+//                                    currentTime = playerHost.currentTime,
+//                                    totalTime = playerHost.totalTime
+//                                )
+//                            }
+//                        }
+//
+//                        // Control panel for playback controls (play, pause, next, previous, shuffle, repeat)
+//                        ControlPanel(
+//                            audioPlayerConfig = audioPlayerConfig,
+//                            isPause = playerHost.isPaused,
+//                            isRepeat = playerHost.isLooping,
+//                            isLoading = playerHost.isBuffering,
+//                            isShuffle = isShuffle,
+//                            onPlayPauseClick = { playerHost.togglePlayPause() },
+//                            onNextClick = { changeAudio(isNext = true) },
+//                            onPreviousClick = { changeAudio(isNext = false) },
+//                            onShuffleClick = { isShuffle = !isShuffle },
+//                            onRepeatClick = { playerHost.toggleLoop() }
+//                        )
+//                    }
+//                }
+//            }
+//        }
+//    }
+//}
 
 @Composable
 private fun AlbumArt(

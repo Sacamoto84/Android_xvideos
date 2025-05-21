@@ -19,11 +19,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import chaintech.videoplayer.ui.video.VideoPlayerComposable
+import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPlayerEvent
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPlayerHost
-import com.client.xvideos.feature.videoplayer.host.MediaPlayerEvent
-import com.client.xvideos.feature.videoplayer.model.ScreenResize
-import com.client.xvideos.feature.videoplayer.model.VideoPlayerConfig
-import com.client.xvideos.feature.videoplayer.ui.video.VideoPlayerComposable
+import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.ScreenResize
+import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.VideoPlayerConfig
 import com.client.xvideos.screens_red.ThemeRed
 
 

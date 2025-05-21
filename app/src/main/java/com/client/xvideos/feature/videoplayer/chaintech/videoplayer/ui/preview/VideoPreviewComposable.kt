@@ -22,8 +22,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import chaintech.videoplayer.util.extractFrames
-import chaintech.videoplayer.util.rememberAppBackgroundObserver
+import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.extractFrames
+import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.rememberAppBackgroundObserver
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 

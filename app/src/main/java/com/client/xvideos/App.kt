@@ -1,7 +1,7 @@
 package com.client.xvideos
 
 import android.app.Application
-import com.client.xvideos.feature.videoplayer.util.PlaybackPreference
+import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.PlaybackPreference
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp

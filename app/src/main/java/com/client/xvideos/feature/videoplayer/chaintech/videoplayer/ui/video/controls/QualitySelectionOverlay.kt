@@ -32,7 +32,7 @@ import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.select
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.unselectedSpeedButtonColor
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.unselectedTextColor
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.ui.component.PlayerSpeedButton
-import chaintech.videoplayer.util.VideoQuality
+import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.VideoQuality
 import kotlinx.coroutines.delay
 
 @Composable

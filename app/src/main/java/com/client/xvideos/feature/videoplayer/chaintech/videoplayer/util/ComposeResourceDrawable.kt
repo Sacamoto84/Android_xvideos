@@ -1,4 +1,4 @@
-package chaintech.videoplayer.util
+package com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter

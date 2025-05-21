@@ -1,15 +1,19 @@
 package chaintech.videoplayer.ui.video
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPlayerHost
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.VideoPlayerConfig
-import chaintech.videoplayer.ui.youtube.YouTubePlayerComposable
-import chaintech.videoplayer.util.LandscapeOrientation
-import chaintech.videoplayer.util.extractYouTubeVideoId
-import chaintech.videoplayer.util.isDesktop
+import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.ui.youtube.YouTubePlayerComposable
+import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.LandscapeOrientation
+import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.ui.video.VideoPlayerWithControl
+import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.extractYouTubeVideoId
+import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.isDesktop
 
+@RequiresApi(Build.VERSION_CODES.R)
 @Composable
 fun VideoPlayerComposable(
     modifier: Modifier = Modifier, // Modifier for the composable
@@ -22,17 +26,7 @@ fun VideoPlayerComposable(
             enableFullEdgeToEdge = playerConfig.enableFullEdgeToEdge,
             isLandscape = playerHost.isFullScreen
         ) {
-            if (isDesktop()) {
-                DesktopVideoPlayer(
-                    modifier = if (playerHost.isFullScreen) {
-                        Modifier.fillMaxSize()
-                    } else {
-                        modifier
-                    },
-                    playerHost = playerHost,
-                    playerConfig = playerConfig
-                )
-            } else {
+
                 VideoPlayerWithControl(
                     modifier = if (playerHost.isFullScreen) {
                         Modifier.fillMaxSize()
@@ -42,7 +36,7 @@ fun VideoPlayerComposable(
                     playerHost = playerHost,
                     playerConfig = playerConfig
                 )
-            }
+
         }
     } else {
         YouTubePlayerComposable(

@@ -1,4 +1,4 @@
-package chaintech.videoplayer.ui.video
+package com.client.xvideos.feature.videoplayer.chaintech.videoplayer.ui.video
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
@@ -25,9 +25,9 @@ import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.Player
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.VideoPlayerConfig
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.ui.video.controls.FullControlComposable
 import chaintech.videoplayer.ui.video.controls.MovingWatermark
-import chaintech.videoplayer.util.CMPPlayer
-import chaintech.videoplayer.util.getSeekTime
-import chaintech.videoplayer.util.saveCurrentPosition
+import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.CMPPlayer
+import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.getSeekTime
+import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.saveCurrentPosition
 import kotlinx.coroutines.delay
 import net.engawapg.lib.zoomable.rememberZoomState
 import net.engawapg.lib.zoomable.zoomable
@@ -200,15 +200,12 @@ internal fun VideoPlayerWithControl(
             activeOptionCallBack = { activeOption = it },
             onBackwardToggle = {
                 playerHost.isSliding = true
-                playerHost.seekToTime =
-                    maxOf(0, playerHost.currentTime - playerConfig.fastForwardBackwardIntervalSeconds).toFloat()
+                playerHost.seekToTime = maxOf(0f, playerHost.currentTime - playerConfig.fastForwardBackwardIntervalSeconds.toFloat()).toFloat()
                 playerHost.isSliding = false
             },
             onForwardToggle = {
                 playerHost.isSliding = true
-                playerHost.seekToTime = minOf(
-                    playerHost.totalTime,
-                    playerHost.currentTime + playerConfig.fastForwardBackwardIntervalSeconds
+                playerHost.seekToTime = minOf( playerHost.totalTime.toFloat(), playerHost.currentTime + playerConfig.fastForwardBackwardIntervalSeconds.toFloat()
                 ).toFloat()
                 playerHost.isSliding = false
             },
