@@ -1,7 +1,6 @@
 package com.client.xvideos.screens_red.profile.atom
 
 import androidx.annotation.OptIn
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,11 +20,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.media3.common.util.UnstableApi
-import chaintech.videoplayer.host.MediaPlayerEvent
-import chaintech.videoplayer.host.MediaPlayerHost
-import chaintech.videoplayer.model.ScreenResize
-import chaintech.videoplayer.model.VideoPlayerConfig
-import chaintech.videoplayer.ui.video.VideoPlayerComposable
+import com.client.xvideos.feature.videoplayer.host.MediaPlayerEvent
+import com.client.xvideos.feature.videoplayer.host.MediaPlayerHost
+import com.client.xvideos.feature.videoplayer.model.ScreenResize
+import com.client.xvideos.feature.videoplayer.model.VideoPlayerConfig
+import com.client.xvideos.feature.videoplayer.ui.video.VideoPlayerComposable
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.client.xvideos.screens_red.ThemeRed
@@ -33,7 +32,6 @@ import com.client.xvideos.screens_red.profile.PlayerControls
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil.CoilImage
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

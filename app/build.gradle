@@ -190,7 +190,8 @@ dependencies {
     implementation "com.github.skydoves:landscapist-placeholder:2.4.8"
     implementation 'com.github.skydoves:landscapist-coil:2.4.8'
 
-    implementation('network.chaintech:compose-multiplatform-media-player:1.0.40')
+    //implementation('network.chaintech:compose-multiplatform-media-player:1.0.40')
+
     implementation 'org.jetbrains.compose.components:components-resources:1.7.3'
 
     //implementation "io.sanghun:compose-video:1.2.0"
@@ -239,6 +240,13 @@ dependencies {
 
     implementation ("androidx.paging:paging-runtime:3.3.6")   // core
     implementation ("androidx.paging:paging-compose:3.3.6")   // compose
+
+    //implementation("network.chaintech:sdp-ssp-compose-multiplatform:1.0.6")
+
+    implementation "net.engawapg.lib:zoomable:2.4.0"
+
+    implementation ("androidx.lifecycle:lifecycle-process:2.9.0")
+
 }
 
 ksp {
