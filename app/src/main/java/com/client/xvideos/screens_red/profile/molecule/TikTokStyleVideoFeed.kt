@@ -19,6 +19,8 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.client.xvideos.AppPath
+import com.client.xvideos.feature.findVideoOnRedChacheDownload
 import com.client.xvideos.feature.redgifs.types.MediaInfo
 import com.client.xvideos.screens_red.ThemeRed
 import com.client.xvideos.screens_red.profile.ScreenRedProfileSM
@@ -27,7 +29,7 @@ import com.client.xvideos.screens_red.profile.atom.RedUrlVideoLiteChaintech
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TikTokStyleVideoFeed(
-    vm : ScreenRedProfileSM,
+    vm: ScreenRedProfileSM,
     videoItems: List<MediaInfo>,
     modifier: Modifier = Modifier,
     onChangeTime: (Pair<Float, Int>) -> Unit,
@@ -36,6 +38,8 @@ fun TikTokStyleVideoFeed(
     onLongClick: (MediaInfo) -> Unit = {},
 
     isMute: Boolean,
+
+    onChangePagerPage: (Int) -> Unit = {},//выводим текущую страницу для тикета
 ) {
 
     val pagerState = rememberPagerState(pageCount = { videoItems.size })
@@ -67,6 +71,7 @@ fun TikTokStyleVideoFeed(
         // и мы находимся на какой-то конкретной странице (не между страницами).
         val shouldShowGlobalUI = !pagerState.isScrollInProgress
         onPageUIElementsVisibilityChange(shouldShowGlobalUI)
+        onChangePagerPage(pagerState.currentPage)
     }
 
     VerticalPager(
@@ -74,7 +79,8 @@ fun TikTokStyleVideoFeed(
         modifier = Modifier.fillMaxSize(),
         key = { index -> videoItems[index].id } // Ключ для стабильности элементов
     ) { pageIndex ->
-        val videoItem = videoItems[pageIndex] // pageIndex - это индекс текущей отображаемой страницы
+        val videoItem =
+            videoItems[pageIndex] // pageIndex - это индекс текущей отображаемой страницы
 
         // Управляем воспроизведением в зависимости от того, видима ли страница
         // и соответствует ли она текущей активной странице в пейджере.
@@ -88,9 +94,21 @@ fun TikTokStyleVideoFeed(
             label = "internalUiAlpha"
         )
 
+        //Определяем адресс откуда брать видео, из кеша или из сети
+        val url = if (findVideoOnRedChacheDownload(videoItem.id, videoItem.userName))
+        {
+            //"https://api.redgifs.com/v2/gifs/${videoItem.id.lowercase()}/hd.m3u8"
+           "${AppPath.cache_download_red}/${videoItem.userName}/${videoItem.id}.mp4"
+        }
+        else
+        {
+            //"https://api.redgifs.com/v2/gifs/${videoItem.id.lowercase()}/hd.m3u8"
+            ""
+        }
+
 
         RedUrlVideoLiteChaintech(
-            "https://api.redgifs.com/v2/gifs/${videoItem.id.lowercase()}/hd.m3u8",
+            url = url,
             videoItem.urls.thumbnail,
             play = isCurrentPage and vm.play,
             onChangeTime = onChangeTime,
@@ -101,11 +119,10 @@ fun TikTokStyleVideoFeed(
                 if (isCurrentPage) {
                     vm.currentPlayerControls = controls
                 }
-            }
-            , timeA = vm.timeA,
+            },
+            timeA = vm.timeA,
             timeB = vm.timeB,
-            enableAB = vm.enableAB
-            , onPaused = {
+            enableAB = vm.enableAB, onPaused = {
                 vm.isPaused = it
             }
         )
@@ -121,7 +138,6 @@ fun TikTokStyleVideoFeed(
                     .alpha(internalUiAlpha)
             )
         }
-
 
 
     }

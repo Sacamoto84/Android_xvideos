@@ -1,32 +1,17 @@
 package com.client.xvideos.screens_red.profile
 
-import android.util.Log
-import android.widget.Toast
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.grid.LazyGridState
-import androidx.compose.material3.TimeInput
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
-import androidx.compose.ui.geometry.isEmpty
-import androidx.lifecycle.distinctUntilChanged
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelKey
-import com.client.xvideos.App
 import com.client.xvideos.feature.Downloader
 import com.client.xvideos.feature.preference.PreferencesRepository
+import com.client.xvideos.feature.redgifs.extractNameFromUrl
 import com.client.xvideos.feature.redgifs.http.RedGifs
 import com.client.xvideos.feature.redgifs.types.CreatorResponse
 import com.client.xvideos.feature.redgifs.types.MediaInfo
@@ -43,17 +28,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
-import kotlin.math.absoluteValue
 
 enum class TypeGifs(val value: String) {
     ALL("All"),
@@ -64,7 +43,7 @@ enum class TypeGifs(val value: String) {
 class ScreenRedProfileSM @Inject constructor(
     private val db: AppDatabase,
     private val pref : PreferencesRepository,
-    private val downloader: Downloader
+    val downloader: Downloader
 ) : ScreenModel//, PagingSource<Int, MediaInfo>() {
 {
 
@@ -130,7 +109,6 @@ class ScreenRedProfileSM @Inject constructor(
      */
     var maxCreatorGifs = 0
     var maxCreatorImages = 0
-
 
     ///////////////////////////////////////////////
     val selector = pref.flowRedSelector
@@ -200,16 +178,23 @@ class ScreenRedProfileSM @Inject constructor(
 
 
 
+    //Для тикток
+    /**
+     * Индекс текущей страницы которая выводит видео на тикток
+     */
+    var currentTikTokPage by mutableIntStateOf(0)
+
 
     //---- Downloader ----
-    fun downloadItem(item: MediaInfo){
+
+    //Загрузить текущую отображаемую страницу
+    fun downloadCurrentItem(){
         screenModelScope.launch {
+            val item = list.value[currentTikTokPage]
+            val hiName = extractNameFromUrl(item.urls.hd.toString()) //https://media.redgifs.com/HealthyPettyRedhead.mp4 > HealthyPettyRedhead
             Timber.i("!!! downloadItem() id:${item.id} userName:${item.userName} url:${item.urls.hd}")
             downloader.downloadRedName(item.id, item.userName, item.urls.hd.toString())
             Timber.i("!!! downloadItem() ... завершено")
-            withContext(Dispatchers.Main) {
-                Toast.makeText(App.instance.applicationContext, "Скачивание завершено", Toast.LENGTH_SHORT).show()
-            }
         }
     }
 

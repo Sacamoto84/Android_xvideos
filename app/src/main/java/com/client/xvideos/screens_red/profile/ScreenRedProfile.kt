@@ -255,6 +255,11 @@ class ScreenRedProfile() : Screen {
                         onLongClick = {
 
                         },
+
+                        onChangePagerPage = {
+                            vm.currentTikTokPage = it
+                        }
+
                     )
 
                 } else {

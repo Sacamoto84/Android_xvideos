@@ -31,10 +31,6 @@ fun to_embed_url(sdUrl: String): String {
     return "https://api.redgifs.com/v2/embed/discord?name=$filename"
 }
 
-
-
-
-
 val REDGIFS_THUMBS_RE = Regex(
     """https://thumbs\d+?\.redgifs\.com/(?<id>\w+)(?<type>-\w+)?\.(?<ext>\w+)(\?.+(\d|\w))?"""
 )
@@ -42,3 +38,14 @@ val REDGIFS_THUMBS_RE = Regex(
 val REDGIFS_ID_RE = Regex(
     """https://(thumbs(\d+)|api)\.redgifs\.com/(?<id>[a-zA-Z]+)"""
 )
+
+fun extractNameFromUrl(url: String): String? {
+    // Регулярное выражение:
+    // /            - разделитель пути (экранируем, если нужен сам символ)
+    // ([^/.]+)    - захватывающая группа 1:
+    //   [^/.]+    - один или более символов, которые не являются ни '/', ни '.'
+    // \.mp4$       - строка должна заканчиваться на ".mp4"
+    val regex = """/([^/.]+)\.mp4$""".toRegex()
+    val matchResult = regex.find(url)
+    return matchResult?.groups?.get(1)?.value // Получаем значение первой захватывающей группы
+}

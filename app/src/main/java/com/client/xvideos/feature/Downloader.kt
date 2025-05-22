@@ -1,5 +1,6 @@
 package com.client.xvideos.feature
 
+import android.widget.Toast
 import androidx.room.Dao
 import androidx.room.Entity
 import androidx.room.Insert
@@ -13,16 +14,18 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import javax.inject.Singleton
 
 
 //Текущее содержимое готового кеша
-@Entity(tableName = "red_cache_download")
 data class ItemsRedCacheDownload(
-    //val id: Long,
-
-    @PrimaryKey
     val name: String,             //Имя файла уникально
     val creator: String = "",     //Название креатора соответсвует папке
 
@@ -31,31 +34,17 @@ data class ItemsRedCacheDownload(
     //val urlM3u8: String,    //url m3u8 //https://api.redgifs.com/v2/gifs/victoriousglamorousstud/hd.m3u8
     //val filePath: String,         //Файл hd mp4 -> AppPath.cache_download_red/creator/name.mp4
 
-    val isDownloaded: Boolean = false, //признак того что файл уже скачан .. при запуске прилжения пробуем продолжить прошлые скачивания
-
 )
 
-@Dao
-interface RedDownloadDao {
 
-    // Добавить в базу скачанный файл
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(item: ItemsRedCacheDownload)
-
-    // Метод для удаления по PrimaryKey (name)
-    @Query("DELETE FROM red_cache_download WHERE name = :name")
-    suspend fun deleteByName(name: String)
-
-    @Query("SELECT * FROM red_cache_download")
-    suspend fun getAll(): List<ItemsRedCacheDownload>
-
-    // Получить элемент по имени (PrimaryKey)
-    @Query("SELECT * FROM red_cache_download WHERE name = :name LIMIT 1")
-    suspend fun getItemByName(name: String): ItemsRedCacheDownload?
-
-
-    @Query("DELETE FROM red_cache_download") // Метод для удаления всех записей
-    suspend fun clearTable()
+/**
+ * Проверка что данное имя креатор уже есть в кеше
+ */
+fun findVideoOnRedChacheDownload(name: String, creator : String): Boolean
+{
+    val mainPath = AppPath.cache_download_red +"/" + creator +"/" + name + ".mp4"
+    val file = File(mainPath)
+    return file.exists()
 
 }
 
@@ -63,66 +52,112 @@ interface RedDownloadDao {
 
 
 
-class Downloader(
-    val db: AppDatabase,
-) {
+class Downloader() {
 
+    //Процент скачивания 0..1 - начало скачивания, -2 busy, -3 error
+    var percent = MutableStateFlow(-2f)
 
+    @OptIn(DelicateCoroutinesApi::class)
+    suspend fun downloadRedName(name: String, creator: String, url: String) {
 
+        if ((url == "") || (creator == "")){
 
+            GlobalScope.launch {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        App.instance.applicationContext,
+                        "Ошибка в названии файла или креатор",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
 
+            percent.value = -3f
 
-    suspend fun downloadRedName(name: String, creator : String, url: String) {
+            return
 
-        //Проверка того что в базе есть запись с этим именем
-        val a  = db.redDownloadDao().getItemByName(name)
+        }
+
+        percent.value = -2f
+
+        //Проверка того что в кеше есть запись с этим именем и кретором
+        val a = findVideoOnRedChacheDownload(name, creator)
+
         //Записи нет можно скачивать
-        if (a == null){
+        if (a == false) {
 
+            val p = AppPath.cache_download_red + "/" + creator
+            File(p).mkdirs()
 
-
-            val request = App.instance.kDownloader.newRequestBuilder(url, AppPath.cache_download_red, "$name.mp4")
+            val request = App.instance.kDownloader.newRequestBuilder(
+                url,
+                p,
+                "$name.mp4"
+            )
                 .tag("TAG")
                 .build()
 
             App.instance.kDownloader.enqueue(
                 request,
                 onStart = {
-                    println("Запуск закачки")
+                    println("!!! Запуск закачки")
 
                     val b = ItemsRedCacheDownload(
                         name = name,
                         creator = creator,
                         url = url, // Заполняется при реальной закачке, здесь мы его не знаем
-                        isDownloaded = false
-                    )
-                    db.redDownloadDao().insert(b)
 
+                    )
+
+                    percent.value = 0f
+
+                },
+
+                onError = {
+                    println("!!! onError закачки")
+                    percent.value = -3f
                 },
                 onProgress = { it1 ->
-                    println("progress $it1")
-                    //percent.value = it1 / 100f
+                    //println("!!! progress $it1")
+                    percent.value = it1/100f
                 },
                 onCompleted = {
-                    println("onCompleted закачки")
+                    println("!!! onCompleted закачки")
+
+                    percent.value = -2f
+
                     val b = ItemsRedCacheDownload(
                         name = name,
                         creator = creator,
                         url = url, // Заполняется при реальной закачке, здесь мы его не знаем
-                        isDownloaded = true
-                    )
-                    db.redDownloadDao().insert(b)
 
+                    )
+
+                    GlobalScope.launch {
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(
+                                App.instance.applicationContext,
+                                "Скачивание завершено",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
                     //state.value = UPDATESTATE.DOWNLOADED //Загрузка завершена
                 },
             )
-
-
-
         }
-
-
-
+        else
+        {
+            GlobalScope.launch {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        App.instance.applicationContext,
+                        "Файл есть к кеше",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
 
     }
 
@@ -146,7 +181,8 @@ class Downloader(
             return
         }
 
-        val itemsToInsertInDb = mutableMapOf<String, ItemsRedCacheDownload>() // Key: fileName (name), Value: Item
+        val itemsToInsertInDb =
+            mutableMapOf<String, ItemsRedCacheDownload>() // Key: fileName (name), Value: Item
 
         for (creatorDir in creatorDirs) {
 
@@ -167,19 +203,19 @@ class Downloader(
                     name = fileName,
                     creator = creatorName,
                     url = "", // Заполняется при реальной закачке, здесь мы его не знаем
-                    isDownloaded = true
+                    //isDownloaded = true
                 )
 
             }
 
             //Полностью очистить таблицу
-            db.redDownloadDao().clearTable()
+            //db.redDownloadDao().clearTable()
             println("!!! Таблица red_cache_download очищена")
 
 
             if (itemsToInsertInDb.isNotEmpty()) {
                 itemsToInsertInDb.forEach { item ->
-                    db.redDownloadDao().insert(item.value)
+                    //db.redDownloadDao().insert(item.value)
                 }
                 println("В таблицу red_cache_download добавлено ${itemsToInsertInDb.size} записей.")
             } else {
@@ -187,7 +223,6 @@ class Downloader(
             }
             println("!!! Перезаполнение таблицы данными с диска завершено.")
         }
-
 
 
     }
@@ -198,13 +233,13 @@ class Downloader(
 
 @Module
 @InstallIn(SingletonComponent::class)
-object moduleDownloader{
+object moduleDownloader {
 
     @Provides
     @Singleton
-    fun provideDownloader(db :AppDatabase): Downloader {
+    fun provideDownloader(): Downloader {
         println("!!! DI Downloader")
-        return Downloader(db)
+        return Downloader()
     }
 
 }

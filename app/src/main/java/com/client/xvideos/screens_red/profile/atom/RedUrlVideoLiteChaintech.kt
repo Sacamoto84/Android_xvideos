@@ -150,7 +150,7 @@ fun RedUrlVideoLiteChaintech(
                 }
 
                 is MediaPlayerEvent.CurrentTimeChange -> {
-                    println("!!!Current playback time: ${event.currentTime}s")
+                    //println("!!!Current playback time: ${event.currentTime}s")
                     currentTime = event.currentTime
                     if (enableAB && currentTime >= timeB) {
                         println("!!! playerHost.seekTo(${timeA}) ")
