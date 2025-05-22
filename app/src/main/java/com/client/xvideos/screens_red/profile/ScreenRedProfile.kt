@@ -2,9 +2,14 @@ package com.client.xvideos.screens_red.profile
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -39,9 +44,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
@@ -89,6 +97,7 @@ class ScreenRedProfile() : Screen {
 
         //RedUrlVideoLite("https://api.redgifs.com/v2/gifs/easytightibisbill/hd.m3u8")
 
+        val density = LocalDensity.current
 
         //TikTokWithCollapsingToolbar(list.value)
 
@@ -131,7 +140,7 @@ class ScreenRedProfile() : Screen {
         val sheetState = rememberModalBottomSheetState(
             initialDetent = Hidden,
             animationSpec = tween(
-               200
+                200
             )
         )
 
@@ -166,7 +175,6 @@ class ScreenRedProfile() : Screen {
                     Text("Here is some content")
 
 
-
                 }
             }
         }
@@ -174,22 +182,55 @@ class ScreenRedProfile() : Screen {
         Scaffold(
             bottomBar = {
                 Column {
-                    AnimatedVisibility(
-                        visible = trackVisible && selector == 1,
-//                        enter = fadeIn(
-//                            animationSpec = tween(durationMillis = 250), //Появление
-//                            initialAlpha = 0f
-//                        )
-//
-//                        ,
-//                        exit = fadeOut(
-//                            animationSpec = tween(durationMillis = 250), //Исчезновение
-//                            targetAlpha = 0f
+
+
+//                    AnimatedVisibility(
+//                        visible = trackVisible && selector == 1,
+//                        enter = slideInVertically { fullHeight ->
+//                            // Начальная позиция: смещаем вниз на полную высоту элемента,
+//                            // чтобы он "выехал" снизу.
+//                            fullHeight
+//                        } + expandVertically(
+//                            // Расширяем снизу вверх
+//                            expandFrom = Alignment.Bottom
 //                        ),
-                    ) {
+//                        // + fadeIn(       initialAlpha = 0.3f            )
+//                        exit = slideOutVertically { fullHeight ->
+//                            // Конечная позиция: смещаем вниз на полную высоту элемента,
+//                            // чтобы он "уехал" вниз.
+//                            fullHeight
+//                        } + shrinkVertically(
+//                            // Сжимаем снизу вверх (к низу)
+//                            shrinkTowards = Alignment.Bottom
+//                        ), //+ fadeOut()
+//                    ) {
                         //Линия продолжительности видео
-                        CanvasTimeDurationLine(vm.currentPlayerTime, vm.currentPlayerDuration, vm.timeA, vm.timeB, vm.enableAB)
-                    }
+
+                       val al = animateFloatAsState(
+                           if (trackVisible && selector == 1) 1f else 0f,
+                           tween(400)
+                       )
+
+                        Box(
+                            Modifier
+                                .clip(RoundedCornerShape(0))
+                                .height(8.dp)
+                                .fillMaxWidth()
+                                .alpha(al.value)
+                                .background(Color.Black), contentAlignment = Alignment.BottomCenter
+                        ) {
+
+
+                            CanvasTimeDurationLine(
+                                vm.currentPlayerTime,
+                                vm.currentPlayerDuration,
+                                vm.timeA,
+                                vm.timeB,
+                                vm.enableAB, vm.play
+                            )
+
+                        }
+                 //   }
                     Red_Profile_Bottom_Bar(vm)
                 }
             },
@@ -205,7 +246,7 @@ class ScreenRedProfile() : Screen {
                         list.value,
                         onChangeTime = {
                             vm.currentPlayerTime = it.first
-                            vm.currentPlayerDuration= it.second
+                            vm.currentPlayerDuration = it.second
                         },
                         onPageUIElementsVisibilityChange = {
                             trackVisible = it
@@ -213,7 +254,7 @@ class ScreenRedProfile() : Screen {
                         isMute = vm.mute,
                         onLongClick = {
 
-                        } ,
+                        },
                     )
 
                 } else {
@@ -230,7 +271,9 @@ class ScreenRedProfile() : Screen {
                         ) {
 
                             //Тайлы картинок и видео
-                            itemsIndexed( list.value, key = { index, item -> item.id }) { index, item ->
+                            itemsIndexed(
+                                list.value,
+                                key = { index, item -> item.id }) { index, item ->
 
                                 Box(
                                     modifier = Modifier
@@ -260,7 +303,10 @@ class ScreenRedProfile() : Screen {
                                 Modifier.fillMaxSize(),
                                 contentAlignment = Alignment.Center
                             ) {
-                                CircularProgressIndicator( modifier = Modifier.size(56.dp), strokeWidth = 8.dp )
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(56.dp),
+                                    strokeWidth = 8.dp
+                                )
                             }
                         }
 

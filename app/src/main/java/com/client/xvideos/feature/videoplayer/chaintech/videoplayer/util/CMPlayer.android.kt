@@ -21,8 +21,10 @@ import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.DrmConf
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPlayerError
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.PlayerSpeed
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.ScreenResize
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 
 @OptIn(UnstableApi::class)
@@ -73,15 +75,21 @@ fun CMPPlayer(
 
     // Update current time every second
     LaunchedEffect(exoPlayer) {
-        while (isActive) {
-            currentTime(
-                //TimeUnit.MILLISECONDS.toSeconds(exoPlayer.currentPosition).coerceAtLeast(0L).toFloat()
-                (exoPlayer.currentPosition/1000f).coerceAtLeast(0f)
-            )
-            delay(16) // Delay for 1 second
-            //println("!!! ${exoPlayer.currentPosition}")
-            //println("!!! ${TimeUnit.MILLISECONDS.toSeconds(exoPlayer.currentPosition/1000).coerceAtLeast(0L).toFloat()}")
+        withContext(Dispatchers.Main) {
+
+            while (isActive) {
+                currentTime(
+                    //TimeUnit.MILLISECONDS.toSeconds(exoPlayer.currentPosition).coerceAtLeast(0L).toFloat()
+                    (exoPlayer.currentPosition/1000f).coerceAtLeast(0f)
+                )
+                delay(200) // Delay for 1 second
+                //println("!!! ${exoPlayer.currentPosition}")
+                //println("!!! ${TimeUnit.MILLISECONDS.toSeconds(exoPlayer.currentPosition/1000).coerceAtLeast(0L).toFloat()}")
+            }
+
+
         }
+
     }
 
     // Keep screen on while the player view is active

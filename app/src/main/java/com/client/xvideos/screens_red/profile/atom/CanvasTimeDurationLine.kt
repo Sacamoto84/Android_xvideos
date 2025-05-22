@@ -4,6 +4,11 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -11,12 +16,14 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun CanvasTimeDurationLine(currentTime: Float, duration: Int, timeA: Float = 0f, timeB: Float = 1f , timeABEnable : Boolean = false) {
+fun CanvasTimeDurationLine(currentTime: Float, duration: Int, timeA: Float = 0f, timeB: Float = 1f , timeABEnable : Boolean, play : Boolean = false) {
+
+    var last by remember { mutableFloatStateOf(0f) }
 
     Canvas(
         modifier = Modifier
             .fillMaxWidth()
-            .height(1.dp)
+            .height(2.dp)
 
         //.padding(top = 4.dp) // Небольшой отступ от текста времени
     ) {
@@ -56,6 +63,16 @@ fun CanvasTimeDurationLine(currentTime: Float, duration: Int, timeA: Float = 0f,
 
            // if (timeABEnable){
 
+            //Индикатор
+            drawLine(
+                color = Color(0xFFE73538), // Цвет активного прогресса
+                start = Offset(x = progressWidth, y = canvasHeight / 2 - 20),
+                end = Offset(x = progressWidth, y = canvasHeight / 2),
+                strokeWidth = canvasHeight*3,
+                cap = StrokeCap.Round // Закругленные концы
+            )
+
+
                 drawLine(
                     color = Color(0xFF8BC34A), // Цвет активного прогресса
                     start = Offset(x = progressRatioA, y = canvasHeight / 2 - canvasHeight),
@@ -64,14 +81,7 @@ fun CanvasTimeDurationLine(currentTime: Float, duration: Int, timeA: Float = 0f,
                     cap = StrokeCap.Square // Закругленные концы
                 )
 
-            //Индикатор
-            drawLine(
-                color = Color(0xFFE73538), // Цвет активного прогресса
-                start = Offset(x = progressWidth, y = canvasHeight / 2 - 20),
-                end = Offset(x = progressWidth, y = canvasHeight / 2),
-                strokeWidth = canvasHeight*4,
-                cap = StrokeCap.Round // Закругленные концы
-            )
+
 
            // }
 

@@ -6,6 +6,8 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
+import com.client.xvideos.feature.ItemsRedCacheDownload
+import com.client.xvideos.feature.RedDownloadDao
 import com.client.xvideos.feature.room.entity.Favorites
 import com.client.xvideos.feature.room.entity.Items
 import dagger.Module
@@ -16,11 +18,12 @@ import dagger.hilt.components.SingletonComponent
 import java.util.Date
 import javax.inject.Singleton
 
-@Database(entities = [Items::class, Favorites::class], version = 1, exportSchema = true)
+@Database(entities = [Items::class, Favorites::class, ItemsRedCacheDownload::class], version = 1, exportSchema = true)
 @TypeConverters(DateConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun favoriteDao(): FavoriteGalleryDao
     abstract fun itemsDao(): ItemsDao
+    abstract fun redDownloadDao(): RedDownloadDao
 }
 
 class DateConverter {

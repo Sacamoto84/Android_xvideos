@@ -169,7 +169,12 @@ fun Red_Video_Lite_2Rrow(
 
         overlay
 
-        CanvasTimeDurationLine(time, duration)
+        CanvasTimeDurationLine(
+            time, duration,
+            timeA = 1f,
+            timeB = 1f,
+            timeABEnable = false
+        )
 
     }
 }
