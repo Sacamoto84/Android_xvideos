@@ -6,11 +6,16 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Query
+import com.client.xvideos.App
 import com.client.xvideos.AppPath
 import com.client.xvideos.feature.room.AppDatabase
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import java.io.File
+import javax.inject.Singleton
+
 
 //Текущее содержимое готового кеша
 @Entity(tableName = "red_cache_download")
@@ -55,10 +60,71 @@ interface RedDownloadDao {
 }
 
 
+
+
+
 class Downloader(
-   val db : AppDatabase
+    val db: AppDatabase,
 ) {
 
+
+
+
+
+
+    suspend fun downloadRedName(name: String, creator : String, url: String) {
+
+        //Проверка того что в базе есть запись с этим именем
+        val a  = db.redDownloadDao().getItemByName(name)
+        //Записи нет можно скачивать
+        if (a == null){
+
+
+
+            val request = App.instance.kDownloader.newRequestBuilder(url, AppPath.cache_download_red, "$name.mp4")
+                .tag("TAG")
+                .build()
+
+            App.instance.kDownloader.enqueue(
+                request,
+                onStart = {
+                    println("Запуск закачки")
+
+                    val b = ItemsRedCacheDownload(
+                        name = name,
+                        creator = creator,
+                        url = url, // Заполняется при реальной закачке, здесь мы его не знаем
+                        isDownloaded = false
+                    )
+                    db.redDownloadDao().insert(b)
+
+                },
+                onProgress = { it1 ->
+                    println("progress $it1")
+                    //percent.value = it1 / 100f
+                },
+                onCompleted = {
+                    println("onCompleted закачки")
+                    val b = ItemsRedCacheDownload(
+                        name = name,
+                        creator = creator,
+                        url = url, // Заполняется при реальной закачке, здесь мы его не знаем
+                        isDownloaded = true
+                    )
+                    db.redDownloadDao().insert(b)
+
+                    //state.value = UPDATESTATE.DOWNLOADED //Загрузка завершена
+                },
+            )
+
+
+
+        }
+
+
+
+
+    }
 
 
     //Проверка сканирование файлов и одновление таблицы того что уже есть на диске
@@ -80,7 +146,7 @@ class Downloader(
             return
         }
 
-        val foundFilesOnDisk = mutableMapOf<String, ItemsRedCacheDownload>() // Key: fileName (name), Value: Item
+        val itemsToInsertInDb = mutableMapOf<String, ItemsRedCacheDownload>() // Key: fileName (name), Value: Item
 
         for (creatorDir in creatorDirs) {
 
@@ -97,7 +163,7 @@ class Downloader(
                 // Если запись с таким 'name' уже есть в БД, её 'url' будет сохранен при REPLACE.
                 // Если записи нет, 'url' будет пустой строкой, пока не будет обновлен другим процессом.
 
-                foundFilesOnDisk[fileName] = ItemsRedCacheDownload(
+                itemsToInsertInDb[fileName] = ItemsRedCacheDownload(
                     name = fileName,
                     creator = creatorName,
                     url = "", // Заполняется при реальной закачке, здесь мы его не знаем
@@ -106,21 +172,39 @@ class Downloader(
 
             }
 
-
             //Полностью очистить таблицу
             db.redDownloadDao().clearTable()
             println("!!! Таблица red_cache_download очищена")
 
 
-
-
-
-
+            if (itemsToInsertInDb.isNotEmpty()) {
+                itemsToInsertInDb.forEach { item ->
+                    db.redDownloadDao().insert(item.value)
+                }
+                println("В таблицу red_cache_download добавлено ${itemsToInsertInDb.size} записей.")
+            } else {
+                println("На диске не найдено файлов для добавления в таблицу red_cache_download.")
+            }
             println("!!! Перезаполнение таблицы данными с диска завершено.")
         }
 
 
+
     }
 
+
+}
+
+
+@Module
+@InstallIn(SingletonComponent::class)
+object moduleDownloader{
+
+    @Provides
+    @Singleton
+    fun provideDownloader(db :AppDatabase): Downloader {
+        println("!!! DI Downloader")
+        return Downloader(db)
+    }
 
 }

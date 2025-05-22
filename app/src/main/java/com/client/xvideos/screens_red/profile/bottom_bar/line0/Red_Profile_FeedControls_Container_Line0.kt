@@ -34,6 +34,24 @@ fun Red_Profile_FeedControls_Container_Line0(vm: ScreenRedProfileSM) {
     ) {
 
         IconButton(onClick = {
+            vm.downloadItem(vm.creator?.gifs?.get(0)!!)
+        }) {
+            Row {
+
+
+                Icon(
+                    painter = painterResource(R.drawable.exo_ic_subtitle_off),
+                    contentDescription = null,
+                    tint = if (vm.enableAB == true) Color.Green else Color.LightGray
+                )
+
+            }
+
+        }
+
+
+
+        IconButton(onClick = {
             vm.timeA = vm.currentPlayerTime
         }) {
             Row {

@@ -252,7 +252,7 @@ dependencies {
     implementation ("com.github.varungulatii:Kdownloader:1.0.4")
 
     //https://github.com/amitshekhariitbhu/PRDownloader
-    implementation("com.github.amitshekhariitbhu:PRDownloader:1.0.2")
+    //implementation("com.github.amitshekhariitbhu:PRDownloader:1.0.2")
 
     implementation 'com.alexstyl:warden:1.0.0-alpha2'
 

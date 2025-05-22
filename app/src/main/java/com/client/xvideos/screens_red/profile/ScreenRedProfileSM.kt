@@ -1,10 +1,12 @@
 package com.client.xvideos.screens_red.profile
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.material3.TimeInput
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -22,6 +24,8 @@ import androidx.lifecycle.distinctUntilChanged
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelKey
+import com.client.xvideos.App
+import com.client.xvideos.feature.Downloader
 import com.client.xvideos.feature.preference.PreferencesRepository
 import com.client.xvideos.feature.redgifs.http.RedGifs
 import com.client.xvideos.feature.redgifs.types.CreatorResponse
@@ -46,6 +50,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.math.absoluteValue
@@ -58,7 +63,8 @@ enum class TypeGifs(val value: String) {
 
 class ScreenRedProfileSM @Inject constructor(
     private val db: AppDatabase,
-    private val pref : PreferencesRepository
+    private val pref : PreferencesRepository,
+    private val downloader: Downloader
 ) : ScreenModel//, PagingSource<Int, MediaInfo>() {
 {
 
@@ -190,6 +196,30 @@ class ScreenRedProfileSM @Inject constructor(
     var timeA  by mutableFloatStateOf(3f)
     var timeB by mutableFloatStateOf(6f)
     val listABbyId = mutableListOf<String>()
+
+
+
+
+
+    //---- Downloader ----
+    fun downloadItem(item: MediaInfo){
+        screenModelScope.launch {
+            Timber.i("!!! downloadItem() id:${item.id} userName:${item.userName} url:${item.urls.hd}")
+            downloader.downloadRedName(item.id, item.userName, item.urls.hd.toString())
+            Timber.i("!!! downloadItem() ... завершено")
+            withContext(Dispatchers.Main) {
+                Toast.makeText(App.instance.applicationContext, "Скачивание завершено", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    fun scanCacheDowmload(){
+        screenModelScope.launch {
+            downloader.scanRedCacheDowmdoadAndUpdate()
+        }
+    }
+
+
 
 }
 
