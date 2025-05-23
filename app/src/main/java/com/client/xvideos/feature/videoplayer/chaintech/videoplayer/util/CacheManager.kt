@@ -18,8 +18,11 @@ internal object CacheManager {
 
     @Synchronized
     fun getCache(context: Context): SimpleCache {
+
         if (cache == null) {
+
             val cacheSize = 512 * 1024 * 1024 // 100 MB
+
             val cacheDir = File(context.applicationContext.cacheDir, "video_cache").apply {
                 if (!exists()) mkdirs()
             }
@@ -37,6 +40,7 @@ internal object CacheManager {
                 LeastRecentlyUsedCacheEvictor(cacheSize.toLong()),
                 databaseProvider!!
             )
+
         }
         activePlayers++
         return cache!!

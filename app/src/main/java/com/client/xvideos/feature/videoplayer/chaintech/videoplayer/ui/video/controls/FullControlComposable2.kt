@@ -41,7 +41,7 @@ import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.VideoP
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.ui.component.LiveStreamComposable
 
 @Composable
-fun FullControlComposable(
+fun FullControlComposable2(
     playerHost: MediaPlayerHost,
     playerConfig: VideoPlayerConfig,
     showControls: Boolean,

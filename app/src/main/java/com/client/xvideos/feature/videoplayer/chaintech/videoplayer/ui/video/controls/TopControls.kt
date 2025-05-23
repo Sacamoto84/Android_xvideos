@@ -1,4 +1,4 @@
-package chaintech.videoplayer.ui.video.controls
+package com.client.xvideos.feature.videoplayer.chaintech.videoplayer.ui.video.controls
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn

@@ -256,10 +256,15 @@ class ScreenRedProfile() : Screen {
 
                         },
 
+                        //Текущий выбранный элемент в пейджере
                         onChangePagerPage = {
                             vm.currentTikTokPage = it
-                        }
+                        },
+                        modifier = Modifier,
 
+                        timeA = vm.timeA,
+                        timeB = vm.timeB,
+                        enableAB = vm.enableAB
                     )
 
                 } else {

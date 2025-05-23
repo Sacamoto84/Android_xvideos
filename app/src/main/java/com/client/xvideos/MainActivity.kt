@@ -58,21 +58,9 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
-
-        //runBlocking {
-
-        //val a = RedGifs.search_creator()
-        //a
-
-//            ApiClient.login() // без логина и пароля — временный токен
-//            val response = API.searchCreator("lilijunex", 1, 80, Order .RECENT, MediaType.GIF)
-//            println(response)
-        //}
-
-
         //WindowCompat.setDecorFitsSystemWindows(window, false) // Поддержка WindowInsets
 
-        // Прячем системные UI
+        // Прячем системный UI
         // true (по умолчанию): контент не может заходить под системные элементы
         //false: контент может располагаться на весь экран, включая области под системными панелями (ты сам решаешь, где что рисовать).
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -96,6 +84,7 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
 
 
         VideoPlayerCacheManager.initialize(this, 1024 * 1024 * 1024)    // 1GB
+
         setContent {
 
             KeepScreenOn()

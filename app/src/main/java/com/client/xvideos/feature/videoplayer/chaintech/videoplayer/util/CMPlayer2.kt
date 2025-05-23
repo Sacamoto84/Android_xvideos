@@ -12,24 +12,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.media3.common.PlaybackException
-import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.AspectRatioFrameLayout
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.DrmConfig
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPlayerError
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.PlayerSpeed
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.ScreenResize
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
-import kotlinx.coroutines.withContext
-import java.util.concurrent.TimeUnit
 
 @OptIn(UnstableApi::class)
 @Composable
-fun CMPPlayer(
+fun CMPPlayer2(
     modifier: Modifier,
     url: String,
     isPause: Boolean,
@@ -62,7 +56,11 @@ fun CMPPlayer(
         error,
         selectedQuality,
         selectedAudioTrack,
-        selectedSubTitle
+        selectedSubTitle,
+        minBufferMs = 50000,
+        maxBufferMs = 150000,
+        bufferForPlaybackMs = 50,
+        bufferForPlaybackAfterRebufferM = 100
     )
     val playerView = rememberPlayerView(exoPlayer, context)
 
@@ -75,13 +73,13 @@ fun CMPPlayer(
 
     // Update current time every second
     LaunchedEffect(exoPlayer) {
-            while (isActive) {
-                currentTime(
-                    //TimeUnit.MILLISECONDS.toSeconds(exoPlayer.currentPosition).coerceAtLeast(0L).toFloat()
-                    (exoPlayer.currentPosition/1000f).coerceAtLeast(0f)
-                )
-                delay(250) // Delay for 1 second
-            }
+        while (isActive) {
+            currentTime(
+                //TimeUnit.MILLISECONDS.toSeconds(exoPlayer.currentPosition).coerceAtLeast(0L).toFloat()
+                (exoPlayer.currentPosition/1000f).coerceAtLeast(0f)
+            )
+            delay(250) // Delay for 1 second
+        }
     }
 
     // Keep screen on while the player view is active
@@ -96,7 +94,9 @@ fun CMPPlayer(
             update = {
                 exoPlayer.playWhenReady = !isPause
                 exoPlayer.volume = volume
+
                 seekToTime?.let { exoPlayer.seekTo((it * 1000).toLong()) }
+
                 exoPlayer.setPlaybackSpeed(speed.toFloat())
                 playerView.resizeMode = when (size) {
                     ScreenResize.FIT -> AspectRatioFrameLayout.RESIZE_MODE_FIT
@@ -142,55 +142,5 @@ private fun PlayerSpeed.toFloat(): Float {
         PlayerSpeed.X1 -> 1f
         PlayerSpeed.X1_5 -> 1.5f
         PlayerSpeed.X2 -> 2f
-    }
-}
-
-
-internal fun createPlayerListener(
-    isSliding: Boolean,
-    totalTime: (Int) -> Unit,
-    currentTime: (Float) -> Unit,
-    loadingState: (Boolean) -> Unit,
-    didEndVideo: () -> Unit,
-    loop: Boolean,
-    exoPlayer: ExoPlayer,
-    error: (MediaPlayerError) -> Unit
-): Player.Listener {
-
-    return object : Player.Listener {
-        override fun onEvents(player: Player, events: Player.Events) {
-            if (!isSliding) {
-                totalTime(
-                    TimeUnit.MILLISECONDS.toSeconds(player.duration).coerceAtLeast(0L).toInt()
-                )
-                currentTime( TimeUnit.MILLISECONDS.toSeconds(player.currentPosition).coerceAtLeast(0L).toFloat() )
-            }
-        }
-
-        override fun onPlaybackStateChanged(playbackState: Int) {
-            when (playbackState) {
-                Player.STATE_BUFFERING -> {
-                    loadingState(true)
-                }
-
-                Player.STATE_READY -> {
-                    loadingState(false)
-                }
-
-                Player.STATE_ENDED -> {
-                    loadingState(false)
-                    didEndVideo()
-                    exoPlayer.seekTo(0)
-                    if (loop) exoPlayer.play()
-                }
-
-                Player.STATE_IDLE -> {
-                    loadingState(false)
-                }
-            }
-        }
-        override fun onPlayerError(error: PlaybackException) {
-            error(MediaPlayerError.PlaybackError(error.message ?: "Unknown playback error"))
-        }
     }
 }

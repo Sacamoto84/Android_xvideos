@@ -1,10 +1,7 @@
 package com.client.xvideos
 
 import android.app.Application
-import android.content.Context
-import android.content.Intent
 import android.os.Environment
-import androidx.core.content.ContextCompat.startActivity
 import java.io.File
 
 private enum class Folder(val value: String) {

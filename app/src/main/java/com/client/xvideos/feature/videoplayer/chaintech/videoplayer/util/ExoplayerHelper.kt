@@ -77,7 +77,12 @@ fun rememberExoPlayerWithLifecycle(
     error: (MediaPlayerError) -> Unit,
     selectedQuality: VideoQuality?,
     selectedAudioTrack: AudioTrack?,
-    selectedSubtitleTrack: SubtitleTrack?
+    selectedSubtitleTrack: SubtitleTrack?,
+    minBufferMs : Int = 2500,
+    maxBufferMs : Int = 30000,
+    bufferForPlaybackMs : Int = 500,
+    bufferForPlaybackAfterRebufferM : Int = 1000
+
 ): ExoPlayer {
     val lifecycleOwner = LocalLifecycleOwner.current
     val cache = remember(context) { CacheManager.getCache(context) }
@@ -85,10 +90,10 @@ fun rememberExoPlayerWithLifecycle(
 
     val loadControl = DefaultLoadControl.Builder()
         .setBufferDurationsMs(
-            2500,
-            30000,
-            500,
-            1000
+            minBufferMs,
+            maxBufferMs,
+            bufferForPlaybackMs,
+            bufferForPlaybackAfterRebufferM
         )
         .build()
 
@@ -109,6 +114,7 @@ fun rememberExoPlayerWithLifecycle(
     LaunchedEffect(selectedAudioTrack) {
         applyAudioTrackSelection(trackSelector, selectedAudioTrack)
     }
+
     LaunchedEffect(selectedSubtitleTrack) {
         applySubTitleTrackSelection(trackSelector, selectedSubtitleTrack)
     }

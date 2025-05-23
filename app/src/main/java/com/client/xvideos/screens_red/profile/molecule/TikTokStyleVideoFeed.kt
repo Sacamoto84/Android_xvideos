@@ -1,9 +1,12 @@
 package com.client.xvideos.screens_red.profile.molecule
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -12,19 +15,27 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.client.xvideos.App
 import com.client.xvideos.AppPath
-import com.client.xvideos.feature.findVideoOnRedChacheDownload
+import com.client.xvideos.feature.findVideoOnRedCacheDownload
 import com.client.xvideos.feature.redgifs.types.MediaInfo
 import com.client.xvideos.screens_red.ThemeRed
 import com.client.xvideos.screens_red.profile.ScreenRedProfileSM
 import com.client.xvideos.screens_red.profile.atom.RedUrlVideoLiteChaintech
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -35,11 +46,20 @@ fun TikTokStyleVideoFeed(
     onChangeTime: (Pair<Float, Int>) -> Unit,
     onPageUIElementsVisibilityChange: (Boolean) -> Unit, // Новый колбэк
 
+    onClick: (MediaInfo) -> Unit = {},
     onLongClick: (MediaInfo) -> Unit = {},
 
-    isMute: Boolean,
+    timeA: Float = 3f,
+    timeB: Float = 6f,
+    enableAB: Boolean = false,
 
-    onChangePagerPage: (Int) -> Unit = {},//выводим текущую страницу для тикета
+    isMute: Boolean = true, //Глобальный мут
+
+
+    /**
+     * Вызывается при изменении текущей страницы в пейджере.
+     */
+    onChangePagerPage: (Int) -> Unit = {},
 ) {
 
     val pagerState = rememberPagerState(pageCount = { videoItems.size })
@@ -58,19 +78,20 @@ fun TikTokStyleVideoFeed(
                 fontSize = 20.sp
             )
         }
+
         // Сообщаем, что UI не должен быть виден, если список пуст
         // (или решаем это на уровне вызывающего компонента)
         LaunchedEffect(Unit) {
             onPageUIElementsVisibilityChange(false)
         }
+
         return
     }
 
     LaunchedEffect(pagerState.isScrollInProgress, pagerState.currentPage) {
         // Мы хотим, чтобы UI элементы были видны, когда прокрутка НЕ идет
         // и мы находимся на какой-то конкретной странице (не между страницами).
-        val shouldShowGlobalUI = !pagerState.isScrollInProgress
-        onPageUIElementsVisibilityChange(shouldShowGlobalUI)
+        onPageUIElementsVisibilityChange(!pagerState.isScrollInProgress)
         onChangePagerPage(pagerState.currentPage)
     }
 
@@ -79,36 +100,25 @@ fun TikTokStyleVideoFeed(
         modifier = Modifier.fillMaxSize(),
         key = { index -> videoItems[index].id } // Ключ для стабильности элементов
     ) { pageIndex ->
-        val videoItem =
-            videoItems[pageIndex] // pageIndex - это индекс текущей отображаемой страницы
+
+        val videoItem = videoItems[pageIndex] // pageIndex - это индекс текущей отображаемой страницы
 
         // Управляем воспроизведением в зависимости от того, видима ли страница
         // и соответствует ли она текущей активной странице в пейджере.
         val isCurrentPage = pagerState.currentPage == pageIndex
 
-        // Логика для UI элементов ВНУТРИ СТРАНИЦЫ (как в предыдущем примере)
-        val showInternalPageUIElementsTarget = !pagerState.isScrollInProgress && isCurrentPage
-        val internalUiAlpha by animateFloatAsState(
-            targetValue = if (showInternalPageUIElementsTarget) 1f else 0f,
-            animationSpec = tween(durationMillis = 200),
-            label = "internalUiAlpha"
-        )
 
-        //Определяем адресс откуда брать видео, из кеша или из сети
-        val url = if (findVideoOnRedChacheDownload(videoItem.id, videoItem.userName))
-        {
-            //"https://api.redgifs.com/v2/gifs/${videoItem.id.lowercase()}/hd.m3u8"
-           "${AppPath.cache_download_red}/${videoItem.userName}/${videoItem.id}.mp4"
+        val videoUri: String = remember(videoItem.id, videoItem.userName) {
+            Timber.tag("???").i("Перерачсет videoItem.id = ${videoItem.id}")
+            //Определяем адрес откуда брать видео, из кеша или из сети
+            if (findVideoOnRedCacheDownload(videoItem.id, videoItem.userName))
+                "${AppPath.cache_download_red}/${videoItem.userName}/${videoItem.id}.mp4"
+            else
+                "https://api.redgifs.com/v2/gifs/${videoItem.id.lowercase()}/hd.m3u8"
         }
-        else
-        {
-            //"https://api.redgifs.com/v2/gifs/${videoItem.id.lowercase()}/hd.m3u8"
-            ""
-        }
-
 
         RedUrlVideoLiteChaintech(
-            url = url,
+            url = videoUri,
             videoItem.urls.thumbnail,
             play = isCurrentPage and vm.play,
             onChangeTime = onChangeTime,
@@ -120,25 +130,13 @@ fun TikTokStyleVideoFeed(
                     vm.currentPlayerControls = controls
                 }
             },
-            timeA = vm.timeA,
-            timeB = vm.timeB,
-            enableAB = vm.enableAB, onPaused = {
-                vm.isPaused = it
+            timeA = timeA,
+            timeB = timeB,
+            enableAB = enableAB,
+            onClick = {
+                vm.play = !vm.play
             }
         )
-
-        // Пример ВНУТРЕННЕГО UI элемента страницы
-        if (isCurrentPage) { // Показываем только если это активная страница
-            Text(
-                text = "Page ${videoItem.id}",
-                color = Color.White,
-                modifier = Modifier
-                    //.align(Alignment.BottomCenter)
-                    .padding(16.dp)
-                    .alpha(internalUiAlpha)
-            )
-        }
-
 
     }
 }

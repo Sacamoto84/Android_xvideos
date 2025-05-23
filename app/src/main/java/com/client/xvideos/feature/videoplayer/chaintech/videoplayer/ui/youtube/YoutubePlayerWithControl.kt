@@ -1,47 +1,5 @@
 package chaintech.videoplayer.ui.youtube
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectVerticalDragGestures
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.unit.dp
-import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPlayerHost
-import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.PlayerOption
-import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.PlayerSpeed
-import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.VideoPlayerConfig
-import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.ui.video.controls.FullControlComposable
-import chaintech.videoplayer.ui.video.controls.MovingWatermark
-import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.rememberAppBackgroundObserver
-import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.youtubeProgressColor
-import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.youtube.EmbeddedPlayer
-import chaintech.videoplayer.youtube.PlayerEvent
-import chaintech.videoplayer.youtube.VideoPlayerHost
-import chaintech.videoplayer.youtube.VideoState
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import net.engawapg.lib.zoomable.rememberZoomState
-import net.engawapg.lib.zoomable.zoomable
-import kotlin.time.Duration.Companion.seconds
-import kotlin.time.TimeSource
-
 //@Composable
 //internal fun YoutubePlayerWithControl(
 //    modifier: Modifier,

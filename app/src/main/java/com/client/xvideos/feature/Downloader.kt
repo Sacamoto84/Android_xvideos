@@ -1,15 +1,8 @@
 package com.client.xvideos.feature
 
 import android.widget.Toast
-import androidx.room.Dao
-import androidx.room.Entity
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.PrimaryKey
-import androidx.room.Query
 import com.client.xvideos.App
 import com.client.xvideos.AppPath
-import com.client.xvideos.feature.room.AppDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -27,7 +20,7 @@ import javax.inject.Singleton
 //Текущее содержимое готового кеша
 data class ItemsRedCacheDownload(
     val name: String,             //Имя файла уникально
-    val creator: String = "",     //Название креатора соответсвует папке
+    val creator: String = "",     //Название креатора соответствует папке
 
     val url: String = "",          //Создается на этапе закачки, и после успешной закачки не используется url mp4  //https://media.redgifs.com/VictoriousGlamorousStud.m4s
 
@@ -40,16 +33,12 @@ data class ItemsRedCacheDownload(
 /**
  * Проверка что данное имя креатор уже есть в кеше
  */
-fun findVideoOnRedChacheDownload(name: String, creator : String): Boolean
-{
-    val mainPath = AppPath.cache_download_red +"/" + creator +"/" + name + ".mp4"
+fun findVideoOnRedCacheDownload(name: String, creator: String): Boolean {
+    val mainPath = AppPath.cache_download_red + "/" + creator + "/" + name + ".mp4"
     val file = File(mainPath)
     return file.exists()
 
 }
-
-
-
 
 
 class Downloader() {
@@ -60,16 +49,14 @@ class Downloader() {
     @OptIn(DelicateCoroutinesApi::class)
     suspend fun downloadRedName(name: String, creator: String, url: String) {
 
-        if ((url == "") || (creator == "")){
+        if ((url == "") || (creator == "")) {
 
-            GlobalScope.launch {
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(
-                        App.instance.applicationContext,
-                        "Ошибка в названии файла или креатор",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
+            withContext(Dispatchers.Main) {
+                Toast.makeText(
+                    App.instance.applicationContext,
+                    "Ошибка в названии файла или креатор",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
 
             percent.value = -3f
@@ -81,7 +68,7 @@ class Downloader() {
         percent.value = -2f
 
         //Проверка того что в кеше есть запись с этим именем и кретором
-        val a = findVideoOnRedChacheDownload(name, creator)
+        val a = findVideoOnRedCacheDownload(name, creator)
 
         //Записи нет можно скачивать
         if (a == false) {
@@ -119,7 +106,7 @@ class Downloader() {
                 },
                 onProgress = { it1 ->
                     //println("!!! progress $it1")
-                    percent.value = it1/100f
+                    percent.value = it1 / 100f
                 },
                 onCompleted = {
                     println("!!! onCompleted закачки")
@@ -145,9 +132,7 @@ class Downloader() {
                     //state.value = UPDATESTATE.DOWNLOADED //Загрузка завершена
                 },
             )
-        }
-        else
-        {
+        } else {
             GlobalScope.launch {
                 withContext(Dispatchers.Main) {
                     Toast.makeText(

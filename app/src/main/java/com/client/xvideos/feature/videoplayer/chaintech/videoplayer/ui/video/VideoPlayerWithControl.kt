@@ -24,7 +24,7 @@ import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPl
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.PlayerOption
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.VideoPlayerConfig
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.ui.video.controls.FullControlComposable
-import chaintech.videoplayer.ui.video.controls.MovingWatermark
+import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.ui.video.controls.MovingWatermark
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.CMPPlayer
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.getSeekTime
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.saveCurrentPosition

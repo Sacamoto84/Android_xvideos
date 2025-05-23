@@ -127,7 +127,7 @@ class PermissionScreenActivity : ComponentActivity() {
         }
 
         @OptIn(DelicateCoroutinesApi::class, DelicateCoroutinesApi::class,
-            DelicateCoroutinesApi::class
+            DelicateCoroutinesApi::class, DelicateCoroutinesApi::class
         )
         fun requestPermissions(context: Context) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {

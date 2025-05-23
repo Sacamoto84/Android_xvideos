@@ -167,7 +167,9 @@ class ScreenRedProfileSM @Inject constructor(
      */
     var currentPlayerTime by mutableStateOf(0f)
     var currentPlayerDuration by mutableIntStateOf(0)
-    var isPaused by mutableStateOf(false)
+
+    //var isPaused by mutableStateOf(false)
+
     //---- AB ----
     var play by mutableStateOf(true)
     var enableAB by mutableStateOf(false)
