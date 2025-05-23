@@ -135,12 +135,14 @@ fun FullControlComposable2(
                 )
 
                 if (playerConfig.isLiveStream) {
+
                     LiveStreamComposable(
                         playerConfig = playerConfig,
                         paddingValues = if(playerHost.isFullScreen) PaddingValues(start = startPadding, end = endPadding) else PaddingValues(),
                         isFullScreen = playerHost.isFullScreen,
                         onFullScreenToggle = { playerHost.toggleFullScreen() },
                     )
+
                 } else {
                     // Bottom control view for seek bar and time duration display
                     BottomControls(
@@ -211,6 +213,7 @@ fun FullControlComposable2(
                         }
                     }
                 }
+
             } else {
                 if (playerConfig.isScreenLockEnabled) {
                     LockScreenComponent(
@@ -233,6 +236,7 @@ fun FullControlComposable2(
             activeOptionCallBack = activeOptionCallBack,
             paddingValues = PaddingValues(start = startPadding, end = endPadding)
         )
+
     }
 }
 

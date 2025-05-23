@@ -9,7 +9,6 @@ import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPl
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.VideoPlayerConfig
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.LandscapeOrientation
 
-@RequiresApi(Build.VERSION_CODES.R)
 @Composable
 fun VideoPlayerComposable(
     modifier: Modifier = Modifier, // Modifier for the composable

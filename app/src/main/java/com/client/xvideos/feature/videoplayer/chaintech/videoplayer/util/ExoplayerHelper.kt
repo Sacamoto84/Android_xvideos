@@ -78,12 +78,13 @@ fun rememberExoPlayerWithLifecycle(
     selectedQuality: VideoQuality?,
     selectedAudioTrack: AudioTrack?,
     selectedSubtitleTrack: SubtitleTrack?,
-    minBufferMs : Int = 2500,
-    maxBufferMs : Int = 30000,
-    bufferForPlaybackMs : Int = 500,
-    bufferForPlaybackAfterRebufferM : Int = 1000
+    minBufferMs: Int = 2500,
+    maxBufferMs: Int = 30000,
+    bufferForPlaybackMs: Int = 500,
+    bufferForPlaybackAfterRebufferM: Int = 1000,
+    onFramerate: (Float) -> Unit = {},
 
-): ExoPlayer {
+    ): ExoPlayer {
     val lifecycleOwner = LocalLifecycleOwner.current
     val cache = remember(context) { CacheManager.getCache(context) }
     val trackSelector = remember { DefaultTrackSelector(context) }
@@ -101,6 +102,8 @@ fun rememberExoPlayerWithLifecycle(
         ExoPlayer.Builder(context)
             .setLoadControl(loadControl)
             .setTrackSelector(trackSelector)
+            .setSeekForwardIncrementMs(1000L) // Устанавливаем приращение для перемотки вперед на 1000 мс (1 секунда)
+            .setSeekBackIncrementMs(1000L)    // Опционально: Устанавливаем приращение для перемотки назад на 1000 мс
             .build().apply {
                 videoScalingMode = C.VIDEO_SCALING_MODE_SCALE_TO_FIT
                 repeatMode = Player.REPEAT_MODE_OFF
@@ -125,7 +128,11 @@ fun rememberExoPlayerWithLifecycle(
 
             val mediaSource = when {
                 drmConfig != null -> createHlsMediaSourceWithDrm(mediaItem, headers, drmConfig)
-                isLiveStream || url.endsWith(".m3u8", ignoreCase = true) -> createHlsMediaSource(mediaItem, headers)
+                isLiveStream || url.endsWith(".m3u8", ignoreCase = true) -> createHlsMediaSource(
+                    mediaItem,
+                    headers
+                )
+
                 else -> createProgressiveMediaSource(mediaItem, cache, context, headers)
             }
 
@@ -135,6 +142,7 @@ fun rememberExoPlayerWithLifecycle(
                 setMediaSource(mediaSource)
                 prepare()
                 seekTo(0, 0)
+                onFramerate(videoFormat?.frameRate ?: -1f)
             }
         } catch (e: Exception) {
             error(MediaPlayerError.PlaybackError(e.message ?: "Failed to load media"))
@@ -159,7 +167,10 @@ fun rememberExoPlayerWithLifecycle(
 }
 
 @OptIn(UnstableApi::class)
-private fun applyQualitySelection(trackSelector: DefaultTrackSelector, selectedQuality: VideoQuality?) {
+private fun applyQualitySelection(
+    trackSelector: DefaultTrackSelector,
+    selectedQuality: VideoQuality?
+) {
     trackSelector.setParameters(
         trackSelector.buildUponParameters().apply {
             selectedQuality?.let {
@@ -179,7 +190,10 @@ private fun applyAudioTrackSelection(trackSelector: DefaultTrackSelector, audioT
 }
 
 @OptIn(UnstableApi::class)
-private fun applySubTitleTrackSelection(trackSelector: DefaultTrackSelector, subtitleTrack: SubtitleTrack?) {
+private fun applySubTitleTrackSelection(
+    trackSelector: DefaultTrackSelector,
+    subtitleTrack: SubtitleTrack?
+) {
     trackSelector.setParameters(
         trackSelector.buildUponParameters().apply {
             if (subtitleTrack != null) {

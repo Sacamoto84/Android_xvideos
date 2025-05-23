@@ -6,27 +6,17 @@ import android.content.pm.ActivityInfo
 import android.os.Build
 import android.util.Base64
 import android.view.WindowManager
-import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.DrmConfig
-import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.Platform
 import java.nio.charset.StandardCharsets
 
 fun isDesktop(): Boolean  = false
-
-fun extractYouTubeVideoId(url: String): String? {
-    val regex = Regex(
-        "https?:\\/\\/(?:www\\.|m\\.)?youtu(?:\\.be\\/|be\\.com\\/(?:watch\\?v=|embed\\/|v\\/|e\\/|live\\/|shorts\\/|user\\/))([^&#?\\n]+)"
-    )
-    return regex.find(url)?.groups?.get(1)?.value
-}
 
 @SuppressLint("DefaultLocale")
 fun formatMinSec(value: Int): String {
@@ -47,7 +37,7 @@ fun formatMinSec(value: Int): String {
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.R)
+
 @Composable
 fun LandscapeOrientation(
     enableFullEdgeToEdge: Boolean,
@@ -68,9 +58,11 @@ fun LandscapeOrientation(
     fun reset() {
         if (enableFullEdgeToEdge) {
             window?.let {  WindowCompat.setDecorFitsSystemWindows(window, true) }
-            window?.attributes = window?.attributes?.apply {
-                layoutInDisplayCutoutMode =
-                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT
+            window?.attributes = window.attributes?.apply {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    layoutInDisplayCutoutMode =
+                        WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT
+                }
             }
         }
         windowInsetsController?.show(WindowInsetsCompat.Type.systemBars())
@@ -81,9 +73,11 @@ fun LandscapeOrientation(
         if (isLandscape) {
             if (enableFullEdgeToEdge) {
                 window?.let {  WindowCompat.setDecorFitsSystemWindows(window, false) }
-                window?.attributes = window?.attributes?.apply {
-                    layoutInDisplayCutoutMode =
-                        WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+                window?.attributes = window.attributes?.apply {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                        layoutInDisplayCutoutMode =
+                            WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+                    }
                 }
             }
             windowInsetsController?.hide(WindowInsetsCompat.Type.systemBars())
@@ -99,14 +93,6 @@ fun LandscapeOrientation(
         }
     }
     content()
-}
-
-val youtubeProgressColor: Color
-    get() = Color(0xFF343434)
-
-
-fun isPlatform(): Platform {
-    return Platform.Android
 }
 
 internal object VideoUtils {

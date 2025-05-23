@@ -1,9 +1,5 @@
 package com.client.xvideos.screens_red.profile.atom
 
-import android.os.Build
-import android.widget.Toast
-import androidx.annotation.RequiresApi
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,7 +9,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -24,27 +19,22 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.ui.video.VideoPlayerComposable
 import coil.request.CachePolicy
 import coil.request.ImageRequest
-import com.client.xvideos.App
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPlayerEvent
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPlayerHost
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.ScreenResize
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.VideoPlayerConfig
+import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.ui.video.VideoPlayerComposable
 import com.client.xvideos.screens_red.ThemeRed
 import com.client.xvideos.screens_red.profile.PlayerControls
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil.CoilImage
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @OptIn(DelicateCoroutinesApi::class)
-@RequiresApi(Build.VERSION_CODES.R)
 @Composable
 fun RedUrlVideoLiteChaintech(
     url: String,
@@ -192,31 +182,8 @@ fun RedUrlVideoLiteChaintech(
 //        }
 
         VideoPlayerComposable(
-            onClick = onClick
-
-
-//                GlobalScope.launch {
-//                    withContext(Dispatchers.Main) {
-//                        Toast.makeText(App.instance.applicationContext, "Клик", Toast.LENGTH_SHORT)
-//                            .show()
-//                    }
-//                }
-            ,
-
-
+            onClick = onClick,
             modifier = Modifier.fillMaxSize(),
-
-//                .clickable(
-//                onClick = {
-//
-//                            GlobalScope.launch {
-//            withContext(Dispatchers.Main) {
-//                Toast.makeText(App.instance.applicationContext, "Клик", Toast.LENGTH_SHORT).show()
-//            }
-//        }
-//
-//                }
-
             playerHost = playerHost,
             playerConfig = VideoPlayerConfig(
                 isPauseResumeEnabled = true,
@@ -232,9 +199,9 @@ fun RedUrlVideoLiteChaintech(
                 isAutoHideControlEnabled = true,
                 controlHideIntervalSeconds = 5,
                 isFastForwardBackwardEnabled = true,
-                isGestureVolumeControlEnabled = false,
+                isGestureVolumeControlEnabled = true,
                 showAudioTracksOptions = false,
-                showControls = false,
+                showControls = true,
 
                 loaderView = {
 

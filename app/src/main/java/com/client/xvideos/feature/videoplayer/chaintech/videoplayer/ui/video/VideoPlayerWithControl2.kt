@@ -1,22 +1,35 @@
 package com.client.xvideos.feature.videoplayer.chaintech.videoplayer.ui.video
 
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.TimeInput
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPlayerHost
+import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.PlayerOption
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.VideoPlayerConfig
+import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.ui.video.controls.FullControlComposable2
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.CMPPlayer
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.CMPPlayer2
 import net.engawapg.lib.zoomable.rememberZoomState
 import net.engawapg.lib.zoomable.zoomable
+import timber.log.Timber
+import kotlin.math.absoluteValue
 
 @Composable
 internal fun VideoPlayerWithControl2(
@@ -29,9 +42,13 @@ internal fun VideoPlayerWithControl2(
     var showControls by remember { mutableStateOf(playerConfig.showControls) } // State for showing/hiding controls
 
 //    var showVolumeControl by remember { mutableStateOf(false) }
-//    var volumeDragAmount by remember { mutableStateOf(0f) }
+    var volumeDragAmount by remember { mutableFloatStateOf(0f) }
 
-//    var activeOption by remember { mutableStateOf(PlayerOption.NONE) }
+   var activeOption by remember { mutableStateOf(PlayerOption.NONE) }
+
+    var frameRate by remember { mutableFloatStateOf(0f) }
+
+    var exoPlayer by remember { mutableStateOf<androidx.media3.exoplayer.ExoPlayer?>(null) }
 
 //    val timeSource = remember { TimeSource.Monotonic }
 //    var lastInteractionMark by remember { mutableStateOf(timeSource.markNow()) }
@@ -55,7 +72,30 @@ internal fun VideoPlayerWithControl2(
 //        }
 //    }
 
-//    val volumeDragModifier = Modifier.pointerInput(Unit) {
+    val volumeDragModifier = Modifier.pointerInput(Unit) {
+        detectHorizontalDragGestures(
+            onDragStart = {
+                volumeDragAmount = 0f
+            },
+            onDragEnd = {
+                val dx = if (volumeDragAmount.absoluteValue > 400 ) 1f else 1/30f
+
+//                //if (dx == 1f){
+//                    exoPlayer?.seekForward()
+//                //}
+
+                playerHost.seekTo((playerHost.currentTime + (if(volumeDragAmount > 0) dx else -dx)).coerceIn(0f,playerHost.totalTime.toFloat()))
+            },
+            onDragCancel = {
+
+            },
+            onHorizontalDrag = { _, dragAmount ->
+                volumeDragAmount += dragAmount
+
+            }
+        )
+
+
 //        detectVerticalDragGestures(
 //            onDragStart = {
 //                showVolumeControl = true
@@ -71,7 +111,7 @@ internal fun VideoPlayerWithControl2(
 //                showVolumeControl = false // Hide immediately when finger is lifted
 //            }
 //        )
-//    }
+    }
 
 //    //Get Last saved time from preference for resume video
 //    LaunchedEffect(playerHost.totalTime) {
@@ -113,8 +153,7 @@ internal fun VideoPlayerWithControl2(
                         onClick.invoke()
                         if(playerConfig.showControls) {
                             showControls = !showControls // Toggle show/hide controls on tap
-                            //activeOption = PlayerOption.NONE
-
+                            activeOption = PlayerOption.NONE
                         }
                     }
                 )
@@ -153,7 +192,14 @@ internal fun VideoPlayerWithControl2(
                 drmConfig = playerHost.drmConfig,
                 selectedQuality = playerHost.selectedQuality,
                 selectedAudioTrack = playerHost.selectedAudioTrack,
-                selectedSubTitle = playerHost.selectedsubTitle
+                selectedSubTitle = playerHost.selectedsubTitle,
+                onFramerate = {
+                    frameRate = it
+                    Timber.i("!?! framerate: $it")
+                },
+                onExoPlayer = {
+                    exoPlayer = it
+                }
             )
 
 //            playerConfig.watermarkConfig?.let {
@@ -171,17 +217,16 @@ internal fun VideoPlayerWithControl2(
 //            )
 
 
-//            if (!isScreenLocked && playerConfig.isGestureVolumeControlEnabled) {
-//                // Detect right-side drag gestures
-//                Box(
-//                    modifier = Modifier
-//                        .fillMaxHeight()
-//                        .fillMaxWidth(0.3f) // Occupy 30% of the right side dynamically
-//                        .align(Alignment.CenterEnd)
-//                        //.then(volumeDragModifier) // Apply drag gesture detection only on the right side
-//
-//                )
-//            }
+            if (!isScreenLocked && playerConfig.isGestureVolumeControlEnabled) {
+                // Detect right-side drag gestures
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight(0.3f)
+                        .fillMaxWidth() // Occupy 30% of the right side dynamically
+                        .align(Alignment.BottomCenter)
+                        .then(volumeDragModifier) // Apply drag gesture detection only on the right side
+                )
+            }
 
         }
 
@@ -191,7 +236,7 @@ internal fun VideoPlayerWithControl2(
 //            playerConfig = playerConfig,
 //            showControls = showControls,
 //            isScreenLocked = isScreenLocked,
-//            showVolumeControl = showVolumeControl,
+//            showVolumeControl = false,
 //            activeOption = activeOption,
 //            activeOptionCallBack = { activeOption = it },
 //            onBackwardToggle = {
@@ -209,29 +254,33 @@ internal fun VideoPlayerWithControl2(
 //                playerHost.seekToTime = it?.toFloat()
 //            },
 //            onLockScreenToggle = { isScreenLocked = it },
-//            userInteractionCallback = { handleControlInteraction() }
+//            userInteractionCallback = {
+//                //handleControlInteraction()
+//            }
 //        )
 
-//        if (playerHost.isBuffering) {
-//
-//            Box(
-//                modifier = Modifier.fillMaxSize(),
-//                contentAlignment = Alignment.Center
-//            ) {
-//                if (playerConfig.loaderView != null) {
-//                    playerConfig.loaderView?.invoke()
-//                } else {
-//
-//                    CircularProgressIndicator(
-//                        modifier = Modifier.align(Alignment.Center)
-//                            .size(playerConfig.pauseResumeIconSize),
-//                        color = playerConfig.loadingIndicatorColor
-//                    )
-//
-//                }
-//            }
-//
-//        }
+        if (playerHost.isBuffering) {
+
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                if (playerConfig.loaderView != null) {
+                    playerConfig.loaderView?.invoke()
+                } else {
+
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .size(playerConfig.pauseResumeIconSize),
+                        color = playerConfig.loadingIndicatorColor
+                    )
+
+                }
+            }
+
+        }
 
     }
+
 }

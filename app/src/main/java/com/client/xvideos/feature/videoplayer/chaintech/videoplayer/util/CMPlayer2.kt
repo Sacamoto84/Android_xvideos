@@ -43,9 +43,17 @@ fun CMPPlayer2(
     drmConfig: DrmConfig?,
     selectedQuality: VideoQuality?,
     selectedAudioTrack: AudioTrack?,
-    selectedSubTitle: SubtitleTrack?
+    selectedSubTitle: SubtitleTrack?,
+
+    onFramerate: (Float) -> Unit = {},
+
+    //isForward : Boolean = false,
+    //isBack: Boolean = false,
+    onExoPlayer : (androidx.media3.exoplayer.ExoPlayer) -> Unit = {}
+
 ) {
     val context = LocalContext.current
+
     val exoPlayer = rememberExoPlayerWithLifecycle(
         url,
         context,
@@ -61,8 +69,27 @@ fun CMPPlayer2(
         maxBufferMs = 150000,
         bufferForPlaybackMs = 50,
         bufferForPlaybackAfterRebufferM = 100
+        , onFramerate = onFramerate
     )
+
+    LaunchedEffect(exoPlayer) {
+        onExoPlayer(exoPlayer)
+    }
+
+//    LaunchedEffect(isForward) {
+//        if (isForward) {
+//            exoPlayer.seekForward()
+//        }
+//    }
+//
+//    LaunchedEffect(isBack) {
+//        if (isForward) {
+//            exoPlayer.seekForward()
+//        }
+//    }
+
     val playerView = rememberPlayerView(exoPlayer, context)
+
 
     var isBuffering by remember { mutableStateOf(false) }
 
