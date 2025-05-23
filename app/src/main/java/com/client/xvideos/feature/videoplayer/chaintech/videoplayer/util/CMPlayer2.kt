@@ -105,7 +105,7 @@ fun CMPPlayer2(
                 //TimeUnit.MILLISECONDS.toSeconds(exoPlayer.currentPosition).coerceAtLeast(0L).toFloat()
                 (exoPlayer.currentPosition/1000f).coerceAtLeast(0f)
             )
-            delay(250) // Delay for 1 second
+            delay(500) // Delay for 1 second
         }
     }
 

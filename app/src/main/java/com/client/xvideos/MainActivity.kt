@@ -66,14 +66,15 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+
             window.insetsController?.let {
                 it.hide(WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars())
                 it.systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
             }
+
         }
 
         plant(DebugTree())
-
 
         if (!PermissionStorage.hasPermissions(this)) {
             val intent = Intent(this, PermissionScreenActivity::class.java)
@@ -81,7 +82,6 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
             startActivity(intent)
             finish()
         }
-
 
         VideoPlayerCacheManager.initialize(this, 1024 * 1024 * 1024)    // 1GB
 

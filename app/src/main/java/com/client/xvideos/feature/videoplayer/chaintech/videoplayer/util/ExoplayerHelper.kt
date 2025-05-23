@@ -101,7 +101,7 @@ fun rememberExoPlayerWithLifecycle(
     val exoPlayer = remember(context) {
         ExoPlayer.Builder(context)
             .setLoadControl(loadControl)
-            .setTrackSelector(trackSelector)
+            //.setTrackSelector(trackSelector)
             .setSeekForwardIncrementMs(1000L) // Устанавливаем приращение для перемотки вперед на 1000 мс (1 секунда)
             .setSeekBackIncrementMs(1000L)    // Опционально: Устанавливаем приращение для перемотки назад на 1000 мс
             .build().apply {
@@ -114,13 +114,13 @@ fun rememberExoPlayerWithLifecycle(
     LaunchedEffect(selectedQuality) {
         applyQualitySelection(trackSelector, selectedQuality)
     }
-    LaunchedEffect(selectedAudioTrack) {
-        applyAudioTrackSelection(trackSelector, selectedAudioTrack)
-    }
+//    LaunchedEffect(selectedAudioTrack) {
+//        applyAudioTrackSelection(trackSelector, selectedAudioTrack)
+//    }
 
-    LaunchedEffect(selectedSubtitleTrack) {
-        applySubTitleTrackSelection(trackSelector, selectedSubtitleTrack)
-    }
+//    LaunchedEffect(selectedSubtitleTrack) {
+//        applySubTitleTrackSelection(trackSelector, selectedSubtitleTrack)
+//    }
 
     LaunchedEffect(url) {
         try {
@@ -132,7 +132,6 @@ fun rememberExoPlayerWithLifecycle(
                     mediaItem,
                     headers
                 )
-
                 else -> createProgressiveMediaSource(mediaItem, cache, context, headers)
             }
 
@@ -142,7 +141,6 @@ fun rememberExoPlayerWithLifecycle(
                 setMediaSource(mediaSource)
                 prepare()
                 seekTo(0, 0)
-                onFramerate(videoFormat?.frameRate ?: -1f)
             }
         } catch (e: Exception) {
             error(MediaPlayerError.PlaybackError(e.message ?: "Failed to load media"))

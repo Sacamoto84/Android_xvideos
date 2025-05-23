@@ -181,6 +181,7 @@ class ScreenRedProfileSM @Inject constructor(
 
 
     //Для тикток
+
     /**
      * Индекс текущей страницы которая выводит видео на тикток
      */
@@ -209,8 +210,6 @@ class ScreenRedProfileSM @Inject constructor(
 
 
 }
-
-data class ControlAB(var enableAB : MutableState<Boolean>, var timeA  : MutableState<Int>, var timeB : MutableState<Int>)
 
 @Module
 @InstallIn(SingletonComponent::class)

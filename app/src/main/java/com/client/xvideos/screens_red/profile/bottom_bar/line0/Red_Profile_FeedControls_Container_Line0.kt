@@ -1,12 +1,17 @@
 package com.client.xvideos.screens_red.profile.bottom_bar.line0
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
@@ -31,33 +36,42 @@ import java.util.Locale
 @Composable
 fun Red_Profile_FeedControls_Container_Line0(vm: ScreenRedProfileSM) {
 
+    val border = Modifier.border(1.dp, ThemeRed.colorBorderGray)
+
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .horizontalScroll(state = rememberScrollState()),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
 
-        IconButton(onClick = {
-            vm.downloadCurrentItem()
-        }) {
-            Row {
 
-                Icon(
-                    painter = painterResource(R.drawable.exo_ic_subtitle_off),
-                    contentDescription = null,
-                    tint = if (vm.enableAB == true) Color.Green else Color.LightGray
-                )
+        Box(
+            modifier = Modifier
+                .height(48.dp)
+                .width(32.dp)
+                .border(1.dp, ThemeRed.colorBorderGray, RoundedCornerShape(8.dp))
+                .clickable(onClick = {
+                    vm.downloadCurrentItem()
+                }), contentAlignment = Alignment.Center
+        ) {
 
-            }
-
+            Icon(
+                painter = painterResource(R.drawable.exo_ic_subtitle_off),
+                contentDescription = null,
+                tint = if (vm.enableAB == true) Color.Green else Color.LightGray
+            )
         }
 
 
 
         Box(
             modifier = Modifier
-                .height(40.dp)
+                .padding(horizontal = 4.dp)
+                .height(48.dp)
                 .width(48.dp)//.border(1.dp, Color.White)
+                .border(1.dp, ThemeRed.colorBorderGray, RoundedCornerShape(8.dp))
                 .clickable { vm.timeA = vm.currentPlayerTime }
         ) {
             Text(
@@ -66,7 +80,7 @@ fun Red_Profile_FeedControls_Container_Line0(vm: ScreenRedProfileSM) {
                 fontSize = 20.sp,
                 fontFamily = ThemeRed.fontFamilyPopinsRegular,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.align(Alignment.Center)
+                modifier = Modifier.align(Alignment.BottomCenter)
             )
             //Spacer(Modifier.width(4.dp)) // Небольшой отступ
             BasicText(
@@ -80,14 +94,15 @@ fun Red_Profile_FeedControls_Container_Line0(vm: ScreenRedProfileSM) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.TopStart)
-                    //.background(Color.Green)
+                //.background(Color.Green)
             )
         }
 
         Box(
             modifier = Modifier
-                .height(40.dp)
+                .height(48.dp)
                 .width(48.dp)//.border(1.dp, Color.White)
+                .border(1.dp, ThemeRed.colorBorderGray, RoundedCornerShape(8.dp))
                 .clickable { vm.timeB = vm.currentPlayerTime }
         ) {
             Text(
@@ -116,9 +131,11 @@ fun Red_Profile_FeedControls_Container_Line0(vm: ScreenRedProfileSM) {
 
 
 
-        IconButton(onClick = {
-            vm.enableAB = vm.enableAB.not()
-        }) {
+        IconButton(
+            onClick = {
+                vm.enableAB = vm.enableAB.not()
+            }, modifier = Modifier.border(1.dp, ThemeRed.colorBorderGray, RoundedCornerShape(8.dp))
+        ) {
             Box(contentAlignment = Alignment.Center) {
 
                 Icon(
@@ -140,44 +157,17 @@ fun Red_Profile_FeedControls_Container_Line0(vm: ScreenRedProfileSM) {
             if (vm.play) {
                 vm.play = false
                 vm.currentPlayerControls?.pause()
+            } else {
+                vm.play = true
+                vm.currentPlayerControls?.play()
             }
-            else{
-            vm.play = true
-            vm.currentPlayerControls?.play()}
         }) {
             Icon(
-                painter = painterResource( if (vm.play) R.drawable.select_1  else R.drawable.rg_button),
+                painter = painterResource(if (vm.play) R.drawable.select_1 else R.drawable.rg_button),
                 contentDescription = null,
-                tint = Color.White, modifier = Modifier.rotate(if(vm.play == true) 90f else 0f)
+                tint = Color.White, modifier = Modifier.rotate(if (vm.play == true) 90f else 0f)
             )
         }
-
-
-
-//
-//        IconButton(onClick = {
-//            vm.play = true
-//            vm.currentPlayerControls?.play()
-//        }) {
-//            Icon(
-//                painter = painterResource(R.drawable.rg_button),
-//                contentDescription = null,
-//                tint = if( vm.play == true) Color.Green else Color.White, modifier = Modifier
-//            )
-//        }
-//
-//        IconButton(onClick = {
-//            vm.play = false
-//            vm.currentPlayerControls?.pause()
-//        }) {
-//            Icon(
-//                painter = painterResource(R.drawable.select_1),
-//                contentDescription = null,
-//                tint = Color.White, modifier = Modifier.rotate(90f)
-//            )
-//        }
-
-
 
         IconButton(onClick = {
             vm.currentPlayerControls?.rewind(1f)
@@ -189,16 +179,18 @@ fun Red_Profile_FeedControls_Container_Line0(vm: ScreenRedProfileSM) {
             )
         }
 
-        IconButton(onClick = {
-            vm.currentPlayerControls?.forward(1f)
-        }) {
-            Icon(
-                painter = painterResource(R.drawable.exo_icon_fastforward),
-                contentDescription = null,
-                tint = Color.White
-            )
-        }
 
+        repeat(4) {
+            IconButton(onClick = {
+                vm.currentPlayerControls?.forward(1f)
+            }) {
+                Icon(
+                    painter = painterResource(R.drawable.exo_icon_fastforward),
+                    contentDescription = null,
+                    tint = Color.White
+                )
+            }
+        }
 
     }
 

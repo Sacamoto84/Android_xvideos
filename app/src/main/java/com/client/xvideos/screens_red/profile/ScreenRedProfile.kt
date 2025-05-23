@@ -1,5 +1,6 @@
 package com.client.xvideos.screens_red.profile
 
+import android.R
 import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
@@ -21,6 +22,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -30,6 +32,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -46,11 +49,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
@@ -58,6 +66,7 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.client.xvideos.screens_red.ThemeRed
 import com.client.xvideos.screens_red.profile.atom.CanvasTimeDurationLine
 import com.client.xvideos.screens_red.profile.atom.RedUrlVideoImageAndLongClick
 import com.client.xvideos.screens_red.profile.atom.VerticalScrollbar
@@ -204,33 +213,74 @@ class ScreenRedProfile() : Screen {
 //                            shrinkTowards = Alignment.Bottom
 //                        ), //+ fadeOut()
 //                    ) {
-                        //Линия продолжительности видео
+                    //Линия продолжительности видео
 
-                       val al = animateFloatAsState(
-                           if (trackVisible && selector == 1) 1f else 0f,
-                           tween(400)
-                       )
+                    val al = animateFloatAsState(
+                        if (trackVisible && selector == 1) 1f else 0f,
+                        tween(400)
+                    )
 
-                        Box(
-                            Modifier
-                                .clip(RoundedCornerShape(0))
-                                .height(8.dp)
-                                .fillMaxWidth()
-                                .alpha(al.value)
-                                .background(Color.Black), contentAlignment = Alignment.BottomCenter
-                        ) {
+                    Box(
+                        Modifier
+                            .padding(bottom = 4.dp)
+                            .clip(RoundedCornerShape(0))
+                            .height(16.dp)
+                            .fillMaxWidth()
+                            .alpha(al.value)
+                            .background(Color.Black)
+
+                        // Позволяет детям выходить за границы
+                        , contentAlignment = Alignment.BottomCenter
+                    ) {
+
+//                        CanvasTimeDurationLine(
+//                            vm.currentPlayerTime,
+//                            vm.currentPlayerDuration,
+//                            vm.timeA,
+//                            vm.timeB,
+//                            vm.enableAB, vm.play
+//                        )
+
+                        CanvasTimeDurationLine(
+                            vm.currentPlayerTime,
+                            vm.currentPlayerDuration,
+                            vm.timeA,
+                            vm.timeB,
+                            vm.enableAB,
+                            vm.play,
+                            onSeek = {
+
+                                if (vm.currentPlayerControls != null) {
+                                    vm.currentPlayerControls!!.seekTo(it)
+                                }
+                            },
+                            onSeekFinished = {
 
 
-                            CanvasTimeDurationLine(
-                                vm.currentPlayerTime,
-                                vm.currentPlayerDuration,
-                                vm.timeA,
-                                vm.timeB,
-                                vm.enableAB, vm.play
-                            )
+                            }
 
-                        }
-                 //   }
+                        )
+
+                        BasicText(
+                            "12/233",
+                            style = TextStyle(
+                                color = Color.White,
+                                fontFamily = ThemeRed.fontFamilyPopinsRegular,
+                                fontSize = 12.sp
+                            ),
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .offset(x = 0.dp, y = (-0).dp) // Смещаем вверх
+//                                .graphicsLayer(
+//                                    translationY = -10f
+//                                )
+//                                .zIndex(1f)
+                        )
+
+                    }
+
+
+                    //   }
                     Red_Profile_Bottom_Bar(vm)
                 }
             },
