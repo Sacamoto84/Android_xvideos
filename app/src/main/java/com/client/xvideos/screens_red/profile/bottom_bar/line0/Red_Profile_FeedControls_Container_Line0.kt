@@ -13,6 +13,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.FileDownload
+import androidx.compose.material.icons.filled.Fullscreen
+import androidx.compose.material.icons.filled.MoreHoriz
+import androidx.compose.material.icons.filled.VolumeMute
+import androidx.compose.material.icons.filled.VolumeOff
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -179,8 +186,6 @@ fun Red_Profile_FeedControls_Container_Line0(vm: ScreenRedProfileSM) {
             )
         }
 
-
-        repeat(4) {
             IconButton(onClick = {
                 vm.currentPlayerControls?.forward(1f)
             }) {
@@ -190,7 +195,87 @@ fun Red_Profile_FeedControls_Container_Line0(vm: ScreenRedProfileSM) {
                     tint = Color.White
                 )
             }
+
+
+
+        Box(
+            modifier = Modifier
+                .height(48.dp)
+                .width(48.dp)
+                .border(1.dp, ThemeRed.colorBorderGray, RoundedCornerShape(8.dp))
+                .clickable(onClick = {
+                    vm.downloadCurrentItem()
+                }), contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                Icons.Filled.VolumeOff,
+                contentDescription = null,
+                tint = if (vm.enableAB == true) Color.Green else Color.LightGray
+            )
         }
+
+
+
+
+        Box(
+            modifier = Modifier
+                .height(48.dp)
+                .width(48.dp)
+                .border(1.dp, ThemeRed.colorBorderGray, RoundedCornerShape(8.dp))
+                .clickable(onClick = {
+                    vm.downloadCurrentItem()
+                }), contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                Icons.Filled.FileDownload,
+                contentDescription = null,
+                tint = if (vm.enableAB == true) Color.Green else Color.LightGray
+            )
+        }
+
+
+
+
+
+
+
+
+
+        Box(
+            modifier = Modifier
+                .height(48.dp)
+                .width(48.dp)
+                .border(1.dp, ThemeRed.colorBorderGray, RoundedCornerShape(8.dp))
+                .clickable(onClick = {
+                    vm.downloadCurrentItem()
+                }), contentAlignment = Alignment.Center
+        ) {
+            Icon(
+              Icons.Filled.Fullscreen,
+                contentDescription = null,
+                tint = if (vm.enableAB == true) Color.Green else Color.LightGray
+            )
+        }
+
+
+        Box(
+            modifier = Modifier
+                .height(48.dp)
+                .width(48.dp)
+                .border(1.dp, ThemeRed.colorBorderGray, RoundedCornerShape(8.dp))
+                .clickable(onClick = {
+                    vm.downloadCurrentItem()
+                }), contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                Icons.Filled.Block,
+                contentDescription = null,
+                tint = if (vm.enableAB == true) Color.Green else Color.LightGray
+            )
+        }
+
+
+
 
     }
 

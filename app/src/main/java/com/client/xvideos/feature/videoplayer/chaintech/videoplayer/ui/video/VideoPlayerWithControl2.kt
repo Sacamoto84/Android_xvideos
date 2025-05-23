@@ -1,12 +1,20 @@
 package com.client.xvideos.feature.videoplayer.chaintech.videoplayer.ui.video
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.FractionalThreshold
+import androidx.compose.material.rememberSwipeableState
+import androidx.compose.material.swipeable
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
 import androidx.compose.material3.TimeInput
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -17,9 +25,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPlayerHost
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.PlayerOption
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.VideoPlayerConfig
@@ -30,7 +43,9 @@ import net.engawapg.lib.zoomable.rememberZoomState
 import net.engawapg.lib.zoomable.zoomable
 import timber.log.Timber
 import kotlin.math.absoluteValue
+import kotlin.math.roundToInt
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun VideoPlayerWithControl2(
     modifier: Modifier,
@@ -49,6 +64,14 @@ internal fun VideoPlayerWithControl2(
     var frameRate by remember { mutableFloatStateOf(0f) }
 
     var exoPlayer by remember { mutableStateOf<androidx.media3.exoplayer.ExoPlayer?>(null) }
+
+    val width = 350.dp
+    val squareSize = 50.dp
+    val swipeableState = rememberSwipeableState("A")
+    val sizePx = with(LocalDensity.current) { (width - squareSize).toPx() }
+    val anchors = mapOf(0f to "A", sizePx / 2 to "B", sizePx to "C")
+
+
 
 //    val timeSource = remember { TimeSource.Monotonic }
 //    var lastInteractionMark by remember { mutableStateOf(timeSource.markNow()) }
@@ -221,11 +244,47 @@ internal fun VideoPlayerWithControl2(
                 // Detect right-side drag gestures
                 Box(
                     modifier = Modifier
-                        .fillMaxHeight(0.3f)
+                        .fillMaxHeight(1/3f)
                         .fillMaxWidth() // Occupy 30% of the right side dynamically
                         .align(Alignment.BottomCenter)
                         .then(volumeDragModifier) // Apply drag gesture detection only on the right side
+                        .alpha(0.5f).background(Color.Magenta)
+
                 )
+
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight(1/3f)
+                        .swipeable(
+                            state = swipeableState,
+                            anchors = anchors,
+                            thresholds = { _, _ -> FractionalThreshold(0.5f) },
+                            orientation = Orientation.Horizontal
+                        )
+                        .fillMaxWidth() // Occupy 30% of the right side dynamically
+                        .align(Alignment.TopCenter)
+                        //.then(volumeDragModifier)
+                        .alpha(0.5f).background(Color.Green)
+
+                // Apply drag gesture detection only on the right side
+                )
+                {
+                    //Text(swipeableState.currentValue, color = Color.White, fontSize = 24.sp)
+
+                    Box(
+                        Modifier.offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
+                            .size(squareSize)
+                            .background(Color.Red),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(swipeableState.currentValue, color = Color.White, fontSize = 24.sp)
+                    }
+
+
+                }
+
+
             }
 
         }
