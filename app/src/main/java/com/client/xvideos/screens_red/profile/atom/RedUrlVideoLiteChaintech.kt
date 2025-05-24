@@ -1,8 +1,17 @@
 package com.client.xvideos.screens_red.profile.atom
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Preview
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -214,8 +223,41 @@ fun RedUrlVideoLiteChaintech(
 //                        //.zIndex(1f) // убедиться, что над видео
 //                    )
 
+                },
+            ),
+            menuContent = {
+
+                Row(modifier = Modifier,
+                    //horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically)
+                {
+                    IconButton(onClick={}, modifier = Modifier.size(48.dp)) {
+                        Icon(Icons.Filled.Preview, contentDescription = null, tint = Color.White)
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    IconButton(onClick={},modifier = Modifier.size(48.dp)) {
+                        Icon(Icons.Filled.Preview, contentDescription = null, tint = Color.White)
+                    }
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    IconButton(onClick={},modifier = Modifier.size(48.dp)) {
+                        Icon(Icons.Filled.Preview, contentDescription = null, tint = Color.White)
+                    }
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    IconButton(onClick={},modifier = Modifier.size(48.dp)) {
+                        Icon(Icons.Filled.Preview, contentDescription = null, tint = Color.White)
+                    }
+
                 }
-            )
+
+
+            }
+
+
         )
 
         Text(

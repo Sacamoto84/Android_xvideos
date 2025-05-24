@@ -16,7 +16,7 @@
         android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
 
-
+    <uses-permission android:name="android.permission.EXPAND_STATUS_BAR"/>
 
 
     <application
@@ -32,6 +32,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Xvideos"
         tools:targetApi="31">
+
+
 
         <activity android:name=".PermissionScreenActivity"
             android:theme="@style/Theme.Xvideos"
@@ -49,7 +51,11 @@
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+
+                <category android:name="android.intent.category.HOME" />
             </intent-filter>
+
+
         </activity>
 
 

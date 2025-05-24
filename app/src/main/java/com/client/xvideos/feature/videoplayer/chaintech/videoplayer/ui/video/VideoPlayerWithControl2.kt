@@ -1,5 +1,6 @@
 package com.client.xvideos.feature.videoplayer.chaintech.videoplayer.ui.video
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.AnchoredDraggableDefaults
@@ -8,15 +9,18 @@ import androidx.compose.foundation.gestures.DraggableAnchors
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.anchoredDraggable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FractionalThreshold
 import androidx.compose.material.rememberSwipeableState
@@ -33,9 +37,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -50,13 +56,17 @@ import timber.log.Timber
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
+@SuppressLint("UnusedBoxWithConstraintsScope")
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun VideoPlayerWithControl2(
     modifier: Modifier,
     playerHost: MediaPlayerHost,
     playerConfig: VideoPlayerConfig,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit = {},
+
+    menuContent: @Composable () -> Unit = {}
+
 ) {
     var isScreenLocked by remember { mutableStateOf(false) }
     var showControls by remember { mutableStateOf(playerConfig.showControls) } // State for showing/hiding controls
@@ -259,23 +269,25 @@ internal fun VideoPlayerWithControl2(
                 )
 
 
-                val squareSize = 300.dp
-                val swappableState = rememberSwipeableState("A")
+                //val squareSize = 300.dp
+                var squareSize by remember { mutableStateOf(0.dp) }
+                val density = LocalDensity.current
+
                 BoxWithConstraints(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(Color.Magenta),
+                        //.background(Color.Magenta),
+                            ,
                     contentAlignment = Alignment.Center
                 )
                 {
-
                     val width = maxWidth
                     val maxWidthPx = with(LocalDensity.current) { (width).toPx() }
                     val startPx = with(LocalDensity.current) { (width - squareSize).toPx() / 2.0f }
 
                     val anchors = DraggableAnchors {
                         SwipeState.Center at startPx
-                        SwipeState.Right at maxWidthPx
+                        SwipeState.Right at -maxWidthPx
                     }
 
                     val swipeState = remember {
@@ -302,7 +314,22 @@ internal fun VideoPlayerWithControl2(
 
                     ) {
 
-                        Row(
+                        if (swipeState.currentValue == SwipeState.Right && !swipeState.isAnimationRunning)
+                        {
+
+                            Box(
+                                Modifier
+                                    .width(2.dp).height(48.dp).align(Alignment.CenterStart)
+                                    .alpha(0.3f)
+                                    .background(
+                                        color = Color(0xFFFFFFFF),
+                                        shape = RoundedCornerShape(1.dp)
+                                    )
+                            )
+
+                        }
+
+                        Box(
                             modifier = Modifier
                                 //.offset { IntOffset(swappableState.offset.value.roundToInt(), 0) }
                                 .offset {
@@ -311,23 +338,21 @@ internal fun VideoPlayerWithControl2(
                                         y = 0
                                     )
                                 }
-                                .width(squareSize)
-                                .background(Color.Red),
-                           verticalAlignment = Alignment.CenterVertically
+                                //.width(squareSize)
+                                .height(56.dp)
+                                .onGloballyPositioned { coordinates ->
+                                    squareSize = with(density) { coordinates.size.width.toDp() }
+                                }
+                                .background(Color(0x80FFFFFF), shape = RoundedCornerShape(16.dp))
+                           , contentAlignment = Alignment.Center
+
                         ) {
-
-                            Text(
-                                swipeState.targetValue.name,
-                                color = Color.White,
-                                fontSize = 24.sp
-                            )
-
-
-
+                            menuContent.invoke()
                         }
 
                     }
                 }
+
 
 
             }

@@ -1,7 +1,5 @@
 package com.client.xvideos.feature.videoplayer.chaintech.videoplayer.ui.video
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -15,13 +13,13 @@ fun VideoPlayerComposable(
     playerHost: MediaPlayerHost,
     playerConfig: VideoPlayerConfig = VideoPlayerConfig(), // Configuration for the player
     newWersion : Boolean = true,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit = {},
+    menuContent: @Composable () -> Unit = {}
 ) {
     LandscapeOrientation(
         enableFullEdgeToEdge = playerConfig.enableFullEdgeToEdge,
         isLandscape = playerHost.isFullScreen
     ) {
-
 
         if (newWersion){
             VideoPlayerWithControl2(
@@ -30,7 +28,8 @@ fun VideoPlayerComposable(
                 } else { modifier },
                 playerHost = playerHost,
                 playerConfig = playerConfig,
-                onClick = onClick
+                onClick = onClick,
+                menuContent
             )
         }
         else {
@@ -45,7 +44,7 @@ fun VideoPlayerComposable(
                 playerConfig = playerConfig
             )
         }
-    }
+    //}
 }
 
 
