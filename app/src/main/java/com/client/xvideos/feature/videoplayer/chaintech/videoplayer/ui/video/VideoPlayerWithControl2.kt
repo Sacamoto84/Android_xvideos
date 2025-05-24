@@ -1,21 +1,28 @@
 package com.client.xvideos.feature.videoplayer.chaintech.videoplayer.ui.video
 
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.AnchoredDraggableDefaults
+import androidx.compose.foundation.gestures.AnchoredDraggableState
+import androidx.compose.foundation.gestures.DraggableAnchors
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.anchoredDraggable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FractionalThreshold
 import androidx.compose.material.rememberSwipeableState
 import androidx.compose.material.swipeable
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
-import androidx.compose.material3.TimeInput
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -36,8 +43,6 @@ import androidx.compose.ui.unit.sp
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPlayerHost
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.PlayerOption
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.VideoPlayerConfig
-import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.ui.video.controls.FullControlComposable2
-import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.CMPPlayer
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.CMPPlayer2
 import net.engawapg.lib.zoomable.rememberZoomState
 import net.engawapg.lib.zoomable.zoomable
@@ -59,18 +64,11 @@ internal fun VideoPlayerWithControl2(
 //    var showVolumeControl by remember { mutableStateOf(false) }
     var volumeDragAmount by remember { mutableFloatStateOf(0f) }
 
-   var activeOption by remember { mutableStateOf(PlayerOption.NONE) }
+    var activeOption by remember { mutableStateOf(PlayerOption.NONE) }
 
     var frameRate by remember { mutableFloatStateOf(0f) }
 
     var exoPlayer by remember { mutableStateOf<androidx.media3.exoplayer.ExoPlayer?>(null) }
-
-    val width = 350.dp
-    val squareSize = 50.dp
-    val swipeableState = rememberSwipeableState("A")
-    val sizePx = with(LocalDensity.current) { (width - squareSize).toPx() }
-    val anchors = mapOf(0f to "A", sizePx / 2 to "B", sizePx to "C")
-
 
 
 //    val timeSource = remember { TimeSource.Monotonic }
@@ -101,13 +99,18 @@ internal fun VideoPlayerWithControl2(
                 volumeDragAmount = 0f
             },
             onDragEnd = {
-                val dx = if (volumeDragAmount.absoluteValue > 400 ) 1f else 1/30f
+                val dx = if (volumeDragAmount.absoluteValue > 400) 1f else 1 / 30f
 
 //                //if (dx == 1f){
 //                    exoPlayer?.seekForward()
 //                //}
 
-                playerHost.seekTo((playerHost.currentTime + (if(volumeDragAmount > 0) dx else -dx)).coerceIn(0f,playerHost.totalTime.toFloat()))
+                playerHost.seekTo(
+                    (playerHost.currentTime + (if (volumeDragAmount > 0) dx else -dx)).coerceIn(
+                        0f,
+                        playerHost.totalTime.toFloat()
+                    )
+                )
             },
             onDragCancel = {
 
@@ -174,14 +177,14 @@ internal fun VideoPlayerWithControl2(
                     enableOneFingerZoom = false,
                     onTap = {
                         onClick.invoke()
-                        if(playerConfig.showControls) {
+                        if (playerConfig.showControls) {
                             showControls = !showControls // Toggle show/hide controls on tap
                             activeOption = PlayerOption.NONE
                         }
                     }
                 )
 
-        ){
+        ) {
 
             // Video player component
             CMPPlayer2(
@@ -210,7 +213,7 @@ internal fun VideoPlayerWithControl2(
                 loop = playerHost.isLooping,
                 volume = playerHost.volumeLevel,
                 isLiveStream = playerConfig.isLiveStream,
-                error = { playerHost.triggerError(it)},
+                error = { playerHost.triggerError(it) },
                 headers = playerHost.headers,
                 drmConfig = playerHost.drmConfig,
                 selectedQuality = playerHost.selectedQuality,
@@ -240,48 +243,90 @@ internal fun VideoPlayerWithControl2(
 //            )
 
 
+            //val sizePx = with(LocalDensity.current) { (width - squareSize).toPx() }
+            //val anchors = mapOf(0f to "A", sizePx / 2 to "B", sizePx to "C")
+
             if (!isScreenLocked && playerConfig.isGestureVolumeControlEnabled) {
                 // Detect right-side drag gestures
                 Box(
                     modifier = Modifier
-                        .fillMaxHeight(1/3f)
+                        .fillMaxHeight(1 / 3f)
                         .fillMaxWidth() // Occupy 30% of the right side dynamically
                         .align(Alignment.BottomCenter)
                         .then(volumeDragModifier) // Apply drag gesture detection only on the right side
-                        .alpha(0.5f).background(Color.Magenta)
-
+                        .alpha(0.5f)
+                        .background(Color.Magenta)
                 )
 
 
-                Box(
+                val squareSize = 300.dp
+                val swappableState = rememberSwipeableState("A")
+                BoxWithConstraints(
                     modifier = Modifier
-                        .fillMaxHeight(1/3f)
-                        .swipeable(
-                            state = swipeableState,
-                            anchors = anchors,
-                            thresholds = { _, _ -> FractionalThreshold(0.5f) },
-                            orientation = Orientation.Horizontal
-                        )
-                        .fillMaxWidth() // Occupy 30% of the right side dynamically
-                        .align(Alignment.TopCenter)
-                        //.then(volumeDragModifier)
-                        .alpha(0.5f).background(Color.Green)
-
-                // Apply drag gesture detection only on the right side
+                        .fillMaxWidth()
+                        .background(Color.Magenta),
+                    contentAlignment = Alignment.Center
                 )
                 {
-                    //Text(swipeableState.currentValue, color = Color.White, fontSize = 24.sp)
 
-                    Box(
-                        Modifier.offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
-                            .size(squareSize)
-                            .background(Color.Red),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(swipeableState.currentValue, color = Color.White, fontSize = 24.sp)
+                    val width = maxWidth
+                    val maxWidthPx = with(LocalDensity.current) { (width).toPx() }
+                    val startPx = with(LocalDensity.current) { (width - squareSize).toPx() / 2.0f }
+
+                    val anchors = DraggableAnchors {
+                        SwipeState.Center at startPx
+                        SwipeState.Right at maxWidthPx
                     }
 
+                    val swipeState = remember {
+                        AnchoredDraggableState(
+                            initialValue = SwipeState.Right,
+                            anchors = anchors
+                        )
+                    }
 
+                    Box(
+                        modifier = Modifier
+                            .fillMaxHeight(1 / 3f)
+                            .fillMaxWidth()
+                            //.alpha(0.5f)
+                            .anchoredDraggable(
+                                swipeState,
+                                Orientation.Horizontal,
+                                flingBehavior =
+                                    AnchoredDraggableDefaults.flingBehavior(
+                                        swipeState,
+                                        positionalThreshold = { distance -> distance * 0.25f }
+                                    )
+                            ), contentAlignment = Alignment.CenterStart
+
+                    ) {
+
+                        Row(
+                            modifier = Modifier
+                                //.offset { IntOffset(swappableState.offset.value.roundToInt(), 0) }
+                                .offset {
+                                    IntOffset(
+                                        x = swipeState.requireOffset().roundToInt(),
+                                        y = 0
+                                    )
+                                }
+                                .width(squareSize)
+                                .background(Color.Red),
+                           verticalAlignment = Alignment.CenterVertically
+                        ) {
+
+                            Text(
+                                swipeState.targetValue.name,
+                                color = Color.White,
+                                fontSize = 24.sp
+                            )
+
+
+
+                        }
+
+                    }
                 }
 
 
@@ -343,3 +388,5 @@ internal fun VideoPlayerWithControl2(
     }
 
 }
+
+enum class SwipeState { Left, Center, Right }
