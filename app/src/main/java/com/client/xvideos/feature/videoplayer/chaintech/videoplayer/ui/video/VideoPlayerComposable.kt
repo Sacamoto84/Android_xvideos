@@ -23,15 +23,15 @@ fun VideoPlayerComposable(
 //    ) {
 
         if (newWersion){
-            VideoPlayerWithControl2(
-                modifier = if (playerHost.isFullScreen) {
-                    Modifier.fillMaxSize()
-                } else { modifier },
-                playerHost = playerHost,
-                playerConfig = playerConfig,
-                onClick = onClick,
-                menuContent
-            )
+//            VideoPlayerWithControl2(
+//                modifier = if (playerHost.isFullScreen) {
+//                    Modifier.fillMaxSize()
+//                } else { modifier },
+//                playerHost = playerHost,
+//                playerConfig = playerConfig,
+//                onClick = onClick,
+//                menuContent
+//            )
         }
         else {
 

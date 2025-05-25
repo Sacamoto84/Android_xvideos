@@ -68,7 +68,9 @@ fun RedUrlVideoLiteChaintech(
     enableAB: Boolean = false,
     onClick: () -> Unit = {},
     menuContent: @Composable () -> Unit = {},
-    menuContentWidth: Dp = 192.dp
+    menuContentWidth: Dp = 192.dp,
+    menuDefaultOpen : Boolean = false,
+    menuOpenChanged : (Boolean) -> Unit
 ) {
 
     val scope = rememberCoroutineScope()
@@ -230,8 +232,10 @@ fun RedUrlVideoLiteChaintech(
                 },
             ),
             menuContent = menuContent,
-            menuContentWidth = menuContentWidth
-    )
+            menuContentWidth = menuContentWidth,
+            menuDefaultOpen = menuDefaultOpen,
+            menuOpenChanged = menuOpenChanged
+        )
 
     Text(
         "${currentTime} / ${duration}",

@@ -210,6 +210,9 @@ class ScreenRedProfileSM @Inject constructor(
         get() = list.value.getOrNull(currentTikTokPage)
 
 
+    //---- Меню верхнее----
+    var menuCenter by mutableStateOf(false)
+
     //---- Downloader ----
 
     //Загрузить текущую отображаемую страницу
@@ -234,6 +237,7 @@ class ScreenRedProfileSM @Inject constructor(
     //--- Блокировка ---
 
     var blockVisibleDialog by mutableStateOf(false) //Показ диалога на добавление в блок лист
+
     /**
      * Выполняет блокировку GIF-элемента, используя [useCaseBlockItem].
      *
@@ -257,7 +261,6 @@ class ScreenRedProfileSM @Inject constructor(
             Timber.e(exception, "Не удалось заблокировать GIF")
             Toast.makeText(App.instance.applicationContext, "Ошибка блокировки: $errorMsg", Toast.LENGTH_SHORT).show()
         }
-        blockVisibleDialog = false
     }
     //!--- Блокировка ---
 

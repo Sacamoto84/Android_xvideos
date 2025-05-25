@@ -57,7 +57,9 @@ internal fun VideoPlayerWithControl2(
     playerConfig: VideoPlayerConfig,
     onClick: () -> Unit = {},
     menuContent: @Composable () -> Unit = {},
-    menuContentWidth: Dp = 192.dp
+    menuContentWidth: Dp = 192.dp,
+    menuDefaultOpen : Boolean = false,
+    menuOpenChanged : (Boolean) -> Unit
 ) {
     var isScreenLocked by remember { mutableStateOf(false) }
     var showControls by remember { mutableStateOf(playerConfig.showControls) } // State for showing/hiding controls
@@ -265,7 +267,12 @@ internal fun VideoPlayerWithControl2(
                         SwipeState.Right at maxWidthPx
                     }
 
-                    val swipeState = remember { AnchoredDraggableState( initialValue = SwipeState.Right, anchors = anchors ) }
+                    val swipeState = remember { AnchoredDraggableState( initialValue = if (menuDefaultOpen) SwipeState.Center else SwipeState.Right, anchors = anchors ) }
+
+                    LaunchedEffect(swipeState) {
+                        menuOpenChanged(swipeState.currentValue == SwipeState.Center)
+                    }
+
 
                     Box(
                         modifier = Modifier

@@ -49,7 +49,9 @@ fun TikTokStyleVideoFeed(
     onChangePagerPage: (Int) -> Unit = {},
 
     menuContent: @Composable () -> Unit = {},
-    menuContentWidth: Dp = 192.dp
+    menuContentWidth: Dp = 192.dp,
+    menuDefaultOpen : Boolean = false,
+    menuOpenChanged : (Boolean) -> Unit
 
 ) {
 
@@ -92,7 +94,8 @@ fun TikTokStyleVideoFeed(
         key = { index -> videoItems[index].id } // Ключ для стабильности элементов
     ) { pageIndex ->
 
-        val videoItem = videoItems[pageIndex] // pageIndex - это индекс текущей отображаемой страницы
+        val videoItem =
+            videoItems[pageIndex] // pageIndex - это индекс текущей отображаемой страницы
 
         // Управляем воспроизведением в зависимости от того, видима ли страница
         // и соответствует ли она текущей активной странице в пейджере.
@@ -128,7 +131,9 @@ fun TikTokStyleVideoFeed(
                 vm.play = !vm.play
             },
             menuContent = menuContent,
-            menuContentWidth = menuContentWidth
+            menuContentWidth = menuContentWidth,
+            menuDefaultOpen = menuDefaultOpen,
+            menuOpenChanged = menuOpenChanged
         )
 
     }

@@ -100,7 +100,7 @@ class ScreenRedProfile() : Screen {
         //TikTokWithCollapsingToolbar(list.value)
 
 
-        DialogBlock(vm) {
+        DialogBlock(visible = vm.blockVisibleDialog, onDismiss = {vm.blockVisibleDialog = false}) {
             val a = vm.currentTikTokGifInfo
             if (a != null) {
                 vm.blockItem(a)
@@ -261,7 +261,13 @@ class ScreenRedProfile() : Screen {
                         enableAB = vm.enableAB,
 
                         menuContent = {MenuContent(vm)},
-                        menuContentWidth = 192.dp
+                        menuContentWidth = 192.dp,
+                        menuDefaultOpen = vm.menuCenter,
+                        menuOpenChanged = {
+                            vm.menuCenter = it
+                        }
+
+
 
                         )
 
