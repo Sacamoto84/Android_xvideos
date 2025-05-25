@@ -3,7 +3,7 @@ package com.client.xvideos.feature.redgifs.types
 import com.google.gson.annotations.SerializedName
 
 data class CreatorResponse(
-    @SerializedName("gifs") val gifs: List<MediaInfo> = emptyList(), //MediaItems = emptyList(), MediaItem ImageInfo
+    @SerializedName("gifs") val gifs: List<GifsInfo> = emptyList(), //MediaItems = emptyList(), MediaItem ImageInfo
     @SerializedName("users") val users: List<UserInfo> = emptyList(), //
     @SerializedName("niches") val niches: List<NichesInfo> = emptyList(),//
     @SerializedName("tags") val tags: List<String> = emptyList(),

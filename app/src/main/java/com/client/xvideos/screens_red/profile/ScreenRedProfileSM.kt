@@ -1,6 +1,6 @@
 package com.client.xvideos.screens_red.profile
 
-import androidx.compose.runtime.MutableState
+import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -9,15 +9,18 @@ import androidx.compose.runtime.setValue
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelKey
+import com.client.xvideos.App
+import com.client.xvideos.AppPath
 import com.client.xvideos.feature.Downloader
 import com.client.xvideos.feature.preference.PreferencesRepository
 import com.client.xvideos.feature.redgifs.extractNameFromUrl
 import com.client.xvideos.feature.redgifs.http.RedGifs
 import com.client.xvideos.feature.redgifs.types.CreatorResponse
-import com.client.xvideos.feature.redgifs.types.MediaInfo
+import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.redgifs.types.MediaType
 import com.client.xvideos.feature.redgifs.types.Order
 import com.client.xvideos.feature.room.AppDatabase
+import com.client.xvideos.screens_red.use_case.useCaseBlockItem
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -32,6 +35,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
 
 enum class TypeGifs(val value: String) {
@@ -42,13 +46,13 @@ enum class TypeGifs(val value: String) {
 
 class ScreenRedProfileSM @Inject constructor(
     private val db: AppDatabase,
-    private val pref : PreferencesRepository,
+    private val pref: PreferencesRepository,
     val downloader: Downloader
 ) : ScreenModel//, PagingSource<Int, MediaInfo>() {
 {
 
-    private val _list = MutableStateFlow<List<MediaInfo>>(emptyList())
-    val list: StateFlow<List<MediaInfo>> = _list
+    private val _list = MutableStateFlow<List<GifsInfo>>(emptyList())
+    val list: StateFlow<List<GifsInfo>> = _list
 
     private var currentPage = 0
     private var totalItems = Int.MAX_VALUE   // узнаём после 1-го ответа
@@ -65,7 +69,11 @@ class ScreenRedProfileSM @Inject constructor(
             isLoading.value = true
             try {
                 val nextPage = currentPage + 1
-                val r = loadProfileGif(nextPage, order, if (typeGifs == TypeGifs.GIFS) MediaType.GIF else MediaType.IMAGE)
+                val r = loadProfileGif(
+                    nextPage,
+                    order,
+                    if (typeGifs == TypeGifs.GIFS) MediaType.GIF else MediaType.IMAGE
+                )
                 val resp = r.gifs
                 // обновляем данные
                 _list.update { it + resp }
@@ -80,8 +88,8 @@ class ScreenRedProfileSM @Inject constructor(
         }
     }
 
-    fun clear(){
-        while( isLoading.value){
+    fun clear() {
+        while (isLoading.value) {
             Thread.sleep(100)
         }
         _list.update { emptyList() }
@@ -114,11 +122,12 @@ class ScreenRedProfileSM @Inject constructor(
     val selector = pref.flowRedSelector
         .stateIn(screenModelScope, SharingStarted.WhileSubscribed(5000), 0)
 
-    fun setSelector(value: Int){
+    fun setSelector(value: Int) {
         screenModelScope.launch {
             pref.setRedSelector(value)
         }
     }
+
     ///////////////////////////////////////////////
     init {
 
@@ -137,7 +146,7 @@ class ScreenRedProfileSM @Inject constructor(
 
             delay(1000)
 
-            repeat(maxCreatorGifs/100) {
+            repeat(maxCreatorGifs / 100) {
                 loadNextPage()
                 delay(1000)
             }
@@ -146,7 +155,11 @@ class ScreenRedProfileSM @Inject constructor(
 
     }
 
-    suspend fun loadProfileGif(page: Int = 1, ord: Order = Order.NEW, type: MediaType = MediaType.GIF): CreatorResponse {
+    suspend fun loadProfileGif(
+        page: Int = 1,
+        ord: Order = Order.NEW,
+        type: MediaType = MediaType.GIF
+    ): CreatorResponse {
         val res = RedGifs.searchCreator(
             count = 100,
             page = page,
@@ -158,7 +171,7 @@ class ScreenRedProfileSM @Inject constructor(
     }
 
 
-    var currentPlayerControls by  mutableStateOf<PlayerControls?>(null)
+    var currentPlayerControls by mutableStateOf<PlayerControls?>(null)
 
     var mute by mutableStateOf(true)
 
@@ -173,11 +186,9 @@ class ScreenRedProfileSM @Inject constructor(
     //---- AB ----
     var play by mutableStateOf(true)
     var enableAB by mutableStateOf(false)
-    var timeA  by mutableFloatStateOf(3f)
+    var timeA by mutableFloatStateOf(3f)
     var timeB by mutableFloatStateOf(6f)
     val listABbyId = mutableListOf<String>()
-
-
 
 
     //Для тикток
@@ -191,21 +202,57 @@ class ScreenRedProfileSM @Inject constructor(
     //---- Downloader ----
 
     //Загрузить текущую отображаемую страницу
-    fun downloadCurrentItem(){
+    fun downloadCurrentItem() {
         screenModelScope.launch {
             val item = list.value[currentTikTokPage]
-            val hiName = extractNameFromUrl(item.urls.hd.toString()) //https://media.redgifs.com/HealthyPettyRedhead.mp4 > HealthyPettyRedhead
+            val hiName =
+                extractNameFromUrl(item.urls.hd.toString()) //https://media.redgifs.com/HealthyPettyRedhead.mp4 > HealthyPettyRedhead
             Timber.i("!!! downloadItem() id:${item.id} userName:${item.userName} url:${item.urls.hd}")
             downloader.downloadRedName(item.id, item.userName, item.urls.hd.toString())
             Timber.i("!!! downloadItem() ... завершено")
         }
     }
 
-    fun scanCacheDowmload(){
+    fun scanCacheDowmload() {
         screenModelScope.launch {
             downloader.scanRedCacheDowmdoadAndUpdate()
         }
     }
+
+
+    //--- Блокировка ---
+
+    var blockVisibleDialog by mutableStateOf(false) //Показ диалога на добавление в блок лист
+
+    /**
+     * Выполняет блокировку GIF-элемента, используя [useCaseBlockItem].
+     *
+     * Функция вызывает `useCaseBlockItem` для создания файла блокировки,
+     * затем выводит лог и показывает пользователю Toast с результатом операции.
+     * В случае ошибки — логирует исключение с помощью Timber и показывает
+     * сообщение об ошибке.
+     *
+     * @param item Объект [GifsInfo], описывающий GIF, который нужно заблокировать.
+     *
+     * @see useCaseBlockItem
+     */
+    fun blockItem(item: GifsInfo) {
+        val result = useCaseBlockItem(item)
+        if (result.isSuccess) {
+            Timber.i("!!! GIF успешно заблокирован")
+            Toast.makeText(App.instance.applicationContext, "GIFs заблокирован", Toast.LENGTH_SHORT).show()
+        } else {
+            val exception = result.exceptionOrNull()
+            val errorMsg = exception?.localizedMessage ?: "Неизвестная ошибка"
+            Timber.e(exception, "Не удалось заблокировать GIF")
+            Toast.makeText(App.instance.applicationContext, "Ошибка блокировки: $errorMsg", Toast.LENGTH_SHORT).show()
+        }
+        blockVisibleDialog = false
+    }
+    //!--- Блокировка ---
+
+
+
 
 
 

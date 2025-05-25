@@ -2,7 +2,7 @@ package com.client.xvideos.feature.redgifs.types
 
 import com.google.gson.annotations.SerializedName
 
-data class MediaInfo(
+data class GifsInfo(
     @SerializedName("id") val id: String = "id",
     @SerializedName("createDate") val createDate: Long = 0,
     @SerializedName("likes") val likes: Int = 0,

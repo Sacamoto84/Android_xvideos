@@ -36,6 +36,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPlayerHost
@@ -55,7 +56,8 @@ internal fun VideoPlayerWithControl2(
     playerHost: MediaPlayerHost,
     playerConfig: VideoPlayerConfig,
     onClick: () -> Unit = {},
-    menuContent: @Composable () -> Unit = {}
+    menuContent: @Composable () -> Unit = {},
+    menuContentWidth: Dp = 192.dp
 ) {
     var isScreenLocked by remember { mutableStateOf(false) }
     var showControls by remember { mutableStateOf(playerConfig.showControls) } // State for showing/hiding controls
@@ -248,7 +250,7 @@ internal fun VideoPlayerWithControl2(
                 )
 
 
-                val squareSize = 192.dp
+                val squareSize = menuContentWidth
                 //var squareSize by remember { mutableStateOf(0.dp) }
                 val density = LocalDensity.current
 
@@ -269,10 +271,10 @@ internal fun VideoPlayerWithControl2(
                         modifier = Modifier
                             //.fillMaxHeight(1/3f)
                             .padding(top = 100.dp)
-                            .height(56.dp)
+                            .height(64.dp)
                             .fillMaxWidth()
                             //.alpha(0.5f)
-                            .background(color = Color.Magenta)
+                            //.background(color = Color.Magenta)
                             .anchoredDraggable( swipeState, Orientation.Horizontal,
                                 flingBehavior =
                                     AnchoredDraggableDefaults.flingBehavior(
@@ -281,7 +283,7 @@ internal fun VideoPlayerWithControl2(
                             ), contentAlignment = Alignment.CenterStart) {
 
                         if (swipeState.currentValue == SwipeState.Right && !swipeState.isAnimationRunning) {
-                            Box( Modifier.width(2.dp).height(48.dp).align(Alignment.CenterEnd).alpha(0.3f)
+                            Box( Modifier.width(2.dp).height(48.dp).align(Alignment.CenterEnd).alpha(0.6f)
                                     .background( color = Color(0xFFFFFFFF), shape = RoundedCornerShape(1.dp)) )
                         }
 
@@ -290,8 +292,8 @@ internal fun VideoPlayerWithControl2(
                                 //.offset { IntOffset(swappableState.offset.value.roundToInt(), 0) }
                                 .offset { IntOffset( x = swipeState.requireOffset().roundToInt(), y = 0 ) }
                                 .width(squareSize)
-                                .height(48.dp)
-                                .background(Color(0x80FFFFFF), shape = RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp)),
+                                .height(64.dp)
+                                .background(Color(0xA1969696), shape = RoundedCornerShape(topStart = 12.dp, bottomStart = 12.dp)),
                             contentAlignment = Alignment.Center
                         ) {
                             menuContent.invoke()

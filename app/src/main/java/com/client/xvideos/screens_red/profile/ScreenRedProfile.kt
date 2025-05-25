@@ -146,48 +146,6 @@ class ScreenRedProfile() : Screen {
             }
         }
 
-        val sheetState = rememberModalBottomSheetState(
-            initialDetent = Hidden,
-            animationSpec = tween(
-                200
-            )
-        )
-
-        ModalBottomSheet(state = sheetState) {
-            Scrim()
-            Sheet(
-                modifier = Modifier
-                    .shadow(4.dp, RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
-                    .clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
-                    .background(Color.White)
-                    .widthIn(max = 640.dp)
-                    .fillMaxWidth()
-                    .imePadding(),
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    DragIndication(
-                        modifier = Modifier
-                            .padding(top = 22.dp)
-                            .background(Color.Black.copy(0.4f), RoundedCornerShape(100))
-                            .width(32.dp)
-                            .height(4.dp)
-                    )
-
-                    Text("Here is some content")
-                    Text("Here is some content")
-                    Text("Here is some content")
-                    Text("Here is some content")
-
-
-                }
-            }
-        }
-
         Scaffold(
             bottomBar = {
                 Column {
@@ -223,33 +181,20 @@ class ScreenRedProfile() : Screen {
                     Box(
                         Modifier
                             .padding(bottom = 4.dp)
+                            .padding(horizontal = 16.dp)
                             .clip(RoundedCornerShape(0))
-                            .height(16.dp)
-                            .fillMaxWidth()
-                            .alpha(al.value)
-                            .background(Color.Black)
-
-                        // Позволяет детям выходить за границы
-                        , contentAlignment = Alignment.BottomCenter
+                            .height(16.dp).fillMaxWidth().alpha(al.value).background(Color.Black)
+                        ,contentAlignment = Alignment.BottomCenter
                     ) {
 
-//                        CanvasTimeDurationLine(
-//                            vm.currentPlayerTime,
-//                            vm.currentPlayerDuration,
-//                            vm.timeA,
-//                            vm.timeB,
-//                            vm.enableAB, vm.play
-//                        )
-
                         CanvasTimeDurationLine(
-                            vm.currentPlayerTime,
-                            vm.currentPlayerDuration,
-                            vm.timeA,
-                            vm.timeB,
-                            vm.enableAB,
-                            vm.play,
+                            currentTime = vm.currentPlayerTime,
+                            duration = vm.currentPlayerDuration,
+                            timeA =  vm.timeA,
+                            timeB = vm.timeB,
+                            timeABEnable = vm.enableAB,
+                            play = vm.play,
                             onSeek = {
-
                                 if (vm.currentPlayerControls != null) {
                                     vm.currentPlayerControls!!.seekTo(it)
                                 }
@@ -258,7 +203,6 @@ class ScreenRedProfile() : Screen {
 
 
                             }
-
                         )
 
                         BasicText(
@@ -346,7 +290,7 @@ class ScreenRedProfile() : Screen {
                                         index,
                                         onLongClick = {
 
-                                            sheetState.currentDetent = FullyExpanded
+                                          
 
 
                                         },

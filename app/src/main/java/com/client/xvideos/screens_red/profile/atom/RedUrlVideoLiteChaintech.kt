@@ -1,15 +1,23 @@
 package com.client.xvideos.screens_red.profile.atom
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.Preview
+import androidx.compose.material.icons.filled.VolumeOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -220,48 +228,86 @@ fun RedUrlVideoLiteChaintech(
             ),
             menuContent = {
 
-                Row(modifier = Modifier,
+                Row(
+                    modifier = Modifier,
                     //horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically)
+                    verticalAlignment = Alignment.CenterVertically
+                )
                 {
-                    IconButton(onClick={}, modifier = Modifier.size(48.dp)) {
-                        Icon(Icons.Filled.Preview, contentDescription = null, tint = Color.White)
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Box(
+                        modifier = Modifier
+                            .height(48.dp)
+                            .width(48.dp)
+                            .border(2.dp, Color.White, RoundedCornerShape(8.dp))
+                            .clickable(onClick = {
+
+                            }), contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            Icons.Filled.FileDownload,
+                            contentDescription = null,
+                            tint = Color.White
+                        )
                     }
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    Box(
+                        modifier = Modifier
+                            .height(48.dp)
+                            .width(48.dp)
+                            .border(2.dp, Color.White, RoundedCornerShape(8.dp))
+                            .clickable(onClick = {
+
+                            }), contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            Icons.Filled.VolumeOff,
+                            contentDescription = null,
+                            tint = Color.White
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    Box(
+                        modifier = Modifier
+                            .height(48.dp)
+                            .width(48.dp)
+                            .border(2.dp, Color.White, RoundedCornerShape(8.dp))
+                            .clickable(onClick = {
+
+                            }), contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            Icons.Filled.Block,
+                            contentDescription = null,
+                            tint = Color.White
+                        )
+                    }
+
                     //Spacer(modifier = Modifier.width(8.dp))
 
-                    IconButton(onClick={},modifier = Modifier.size(48.dp)) {
-                        Icon(Icons.Filled.Preview, contentDescription = null, tint = Color.White)
-                    }
 
-                    //Spacer(modifier = Modifier.width(8.dp))
 
-                    IconButton(onClick={},modifier = Modifier.size(48.dp)) {
-                        Icon(Icons.Filled.Preview, contentDescription = null, tint = Color.White)
-                    }
-
-                    //Spacer(modifier = Modifier.width(8.dp))
-
-                    IconButton(onClick={},modifier = Modifier.size(48.dp)) {
-                        Icon(Icons.Filled.Preview, contentDescription = null, tint = Color.White)
-                    }
-
+                    Spacer(modifier = Modifier.width(48.dp))
                 }
+            },
+            menuContentWidth = 192.dp
+    )
 
+    Text(
+        "${currentTime} / ${duration}",
+        color = Color.White,
+        modifier = Modifier.align(Alignment.BottomStart),
+        fontFamily = ThemeRed.fontFamilyPopinsRegular,
+        fontSize = 10.sp
+    )
 
-            }
-
-
-        )
-
-        Text(
-            "${currentTime} / ${duration}",
-            color = Color.White,
-            modifier = Modifier.align(Alignment.BottomStart),
-            fontFamily = ThemeRed.fontFamilyPopinsRegular,
-            fontSize = 10.sp
-        )
-
-    }
+}
 }
 
 

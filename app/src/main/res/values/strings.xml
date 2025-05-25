@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">xvideos</string>
     <string name="your_web_client_id">AIzaSyC03OfRjD4vKdRUHde_Jmi-pXkgkZ7zInU</string>
-    <!-- TODO: Remove or change this placeholder text -->
+
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="dog_content_description">Golden Retriever in fall leaves</string>
     <string name="shopping_cart_content_desc">Shopping cart</string>

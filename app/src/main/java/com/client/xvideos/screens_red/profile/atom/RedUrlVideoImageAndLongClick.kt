@@ -16,14 +16,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
-import com.client.xvideos.feature.redgifs.types.MediaInfo
+import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.vibrate.vibrateWithPatternAndAmplitude
-import timber.log.Timber
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RedUrlVideoImageAndLongClick(
-    item: MediaInfo,
+    item: GifsInfo,
     index: Int,
     modifier: Modifier = Modifier,
     onLongClick: () -> Unit,
