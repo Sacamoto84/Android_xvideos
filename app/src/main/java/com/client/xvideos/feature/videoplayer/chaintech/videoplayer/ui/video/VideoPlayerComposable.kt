@@ -16,10 +16,11 @@ fun VideoPlayerComposable(
     onClick: () -> Unit = {},
     menuContent: @Composable () -> Unit = {}
 ) {
-    LandscapeOrientation(
-        enableFullEdgeToEdge = playerConfig.enableFullEdgeToEdge,
-        isLandscape = playerHost.isFullScreen
-    ) {
+
+//    LandscapeOrientation(
+//        enableFullEdgeToEdge = playerConfig.enableFullEdgeToEdge,
+//        isLandscape = playerHost.isFullScreen
+//    ) {
 
         if (newWersion){
             VideoPlayerWithControl2(

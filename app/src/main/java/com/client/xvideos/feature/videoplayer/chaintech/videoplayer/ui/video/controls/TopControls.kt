@@ -31,9 +31,9 @@ import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.Screen
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.VideoPlayerConfig
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.ui.component.AnimatedClickableIcon
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.ComposeResourceDrawable
-import com.client.xvideos.feature.videoplayer.reelsdemo.composemultiplatformmediaplayer.generated.resources.Res
-import com.client.xvideos.feature.videoplayer.reelsdemo.composemultiplatformmediaplayer.generated.resources.resize_fill
-import com.client.xvideos.feature.videoplayer.reelsdemo.composemultiplatformmediaplayer.generated.resources.resize_fit
+//import com.client.xvideos.feature.videoplayer.reelsdemo.composemultiplatformmediaplayer.generated.resources.Res
+//import com.client.xvideos.feature.videoplayer.reelsdemo.composemultiplatformmediaplayer.generated.resources.resize_fill
+//import com.client.xvideos.feature.videoplayer.reelsdemo.composemultiplatformmediaplayer.generated.resources.resize_fit
 
 
 @Composable
@@ -157,20 +157,20 @@ internal fun TopControls(
                     }
 
                     if (playerConfig.isScreenResizeEnabled) {
-                        selectedSize?.let {
-                            AnimatedClickableIcon(
-                                painterRes = when (selectedSize) {
-                                    ScreenResize.FIT -> ComposeResourceDrawable(Res.drawable.resize_fit)
-                                    ScreenResize.FILL -> ComposeResourceDrawable(Res.drawable.resize_fill)
-                                },
-                                contentDescription = "Resize",
-                                tint = playerConfig.iconsTintColor,
-                                iconSize = playerConfig.topControlSize,
-                                colorFilter = ColorFilter.tint(playerConfig.iconsTintColor),
-                                animationDuration = playerConfig.controlClickAnimationDuration,
-                                onClick = { onResizeScreenToggle() }
-                            )
-                        }
+//                        selectedSize?.let {
+//                            AnimatedClickableIcon(
+//                                painterRes = when (selectedSize) {
+//                                    ScreenResize.FIT -> ComposeResourceDrawable(Res.drawable.resize_fit)
+//                                    ScreenResize.FILL -> ComposeResourceDrawable(Res.drawable.resize_fill)
+//                                },
+//                                contentDescription = "Resize",
+//                                tint = playerConfig.iconsTintColor,
+//                                iconSize = playerConfig.topControlSize,
+//                                colorFilter = ColorFilter.tint(playerConfig.iconsTintColor),
+//                                animationDuration = playerConfig.controlClickAnimationDuration,
+//                                onClick = { onResizeScreenToggle() }
+//                            )
+//                        }
                     }
                     if (playerConfig.isScreenLockEnabled) {
                         AnimatedClickableIcon(

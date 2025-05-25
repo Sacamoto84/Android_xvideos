@@ -37,6 +37,7 @@ internal fun PlayerSpeedButton(
             .clickable { onClick() }, // Clickable area for changing playback speed
         contentAlignment = Alignment.Center
     ) {
+
         // Calculate maximum font size based on height
         val maxFontSize = (maxHeight.value / 2.25).sp
 

@@ -164,12 +164,7 @@ internal fun VideoPlayerWithControl(
                 selectedAudioTrack = playerHost.selectedAudioTrack,
                 selectedSubTitle = playerHost.selectedsubTitle
             )
-            playerConfig.watermarkConfig?.let {
-                MovingWatermark(
-                    config = it,
-                    modifier = Modifier.matchParentSize()
-                )
-            }
+
             Box(
                 modifier = Modifier
                     .matchParentSize() // Covers the WebView entirely

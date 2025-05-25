@@ -9,6 +9,7 @@ interface PlatformDrawable {
     @Composable
     fun asPainter(): Painter
 }
+
 class ComposeResourceDrawable(private val drawable: DrawableResource) : PlatformDrawable {
     @Composable
     override fun asPainter(): Painter = painterResource(drawable)

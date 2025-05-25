@@ -44,9 +44,6 @@ fun CMPPlayer2(
     selectedQuality: VideoQuality?,
     selectedAudioTrack: AudioTrack?,
     selectedSubTitle: SubtitleTrack?,
-
-    onFramerate: (Float) -> Unit = {},
-
     //isForward : Boolean = false,
     //isBack: Boolean = false,
     onExoPlayer : (androidx.media3.exoplayer.ExoPlayer) -> Unit = {}
@@ -69,7 +66,6 @@ fun CMPPlayer2(
         maxBufferMs = 150000,
         bufferForPlaybackMs = 50,
         bufferForPlaybackAfterRebufferM = 100
-        , onFramerate = onFramerate
     )
 
     LaunchedEffect(exoPlayer) {

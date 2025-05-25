@@ -1,4 +1,4 @@
-package chaintech.videoplayer.ui.video
+package com.client.xvideos.feature.videoplayer.chaintech.videoplayer.ui.video
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

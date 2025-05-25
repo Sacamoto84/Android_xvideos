@@ -21,10 +21,8 @@ import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.DrmConf
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPlayerError
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.PlayerSpeed
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.ScreenResize
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
-import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 
 @OptIn(UnstableApi::class)

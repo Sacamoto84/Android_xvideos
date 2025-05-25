@@ -35,6 +35,7 @@ import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPl
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.ScreenResize
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.VideoPlayerConfig
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.ui.video.VideoPlayerComposable
+import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.ui.video.VideoPlayerWithControl2
 import com.client.xvideos.screens_red.ThemeRed
 import com.client.xvideos.screens_red.profile.PlayerControls
 import com.skydoves.landscapist.ImageOptions
@@ -56,10 +57,7 @@ fun RedUrlVideoLiteChaintech(
     timeA: Float = 0f,
     timeB: Float = 0f,
     enableAB: Boolean = false,
-
-
     onClick: () -> Unit = {}
-
 ) {
 
     val scope = rememberCoroutineScope()
@@ -184,13 +182,8 @@ fun RedUrlVideoLiteChaintech(
 
         playerHost.setVideoFitMode(ScreenResize.FIT)
 
-//        GlobalScope.launch {
-//            withContext(Dispatchers.Main) {
-//                Toast.makeText(App.instance.applicationContext, "Клик", Toast.LENGTH_SHORT).show()
-//            }
-//        }
 
-        VideoPlayerComposable(
+        VideoPlayerWithControl2(
             onClick = onClick,
             modifier = Modifier.fillMaxSize(),
             playerHost = playerHost,
@@ -234,19 +227,19 @@ fun RedUrlVideoLiteChaintech(
                     IconButton(onClick={}, modifier = Modifier.size(48.dp)) {
                         Icon(Icons.Filled.Preview, contentDescription = null, tint = Color.White)
                     }
-                    Spacer(modifier = Modifier.width(8.dp))
+                    //Spacer(modifier = Modifier.width(8.dp))
 
                     IconButton(onClick={},modifier = Modifier.size(48.dp)) {
                         Icon(Icons.Filled.Preview, contentDescription = null, tint = Color.White)
                     }
 
-                    Spacer(modifier = Modifier.width(8.dp))
+                    //Spacer(modifier = Modifier.width(8.dp))
 
                     IconButton(onClick={},modifier = Modifier.size(48.dp)) {
                         Icon(Icons.Filled.Preview, contentDescription = null, tint = Color.White)
                     }
 
-                    Spacer(modifier = Modifier.width(8.dp))
+                    //Spacer(modifier = Modifier.width(8.dp))
 
                     IconButton(onClick={},modifier = Modifier.size(48.dp)) {
                         Icon(Icons.Filled.Preview, contentDescription = null, tint = Color.White)

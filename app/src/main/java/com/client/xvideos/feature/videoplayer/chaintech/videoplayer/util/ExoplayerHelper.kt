@@ -82,8 +82,6 @@ fun rememberExoPlayerWithLifecycle(
     maxBufferMs: Int = 30000,
     bufferForPlaybackMs: Int = 500,
     bufferForPlaybackAfterRebufferM: Int = 1000,
-    onFramerate: (Float) -> Unit = {},
-
     ): ExoPlayer {
     val lifecycleOwner = LocalLifecycleOwner.current
     val cache = remember(context) { CacheManager.getCache(context) }

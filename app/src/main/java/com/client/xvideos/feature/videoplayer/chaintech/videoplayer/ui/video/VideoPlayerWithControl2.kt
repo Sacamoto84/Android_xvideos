@@ -1,7 +1,6 @@
 package com.client.xvideos.feature.videoplayer.chaintech.videoplayer.ui.video
 
 import android.annotation.SuppressLint
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.AnchoredDraggableDefaults
 import androidx.compose.foundation.gestures.AnchoredDraggableState
@@ -9,24 +8,19 @@ import androidx.compose.foundation.gestures.DraggableAnchors
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.anchoredDraggable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.FractionalThreshold
-import androidx.compose.material.rememberSwipeableState
-import androidx.compose.material.swipeable
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -37,7 +31,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
@@ -45,14 +38,12 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPlayerHost
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.PlayerOption
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.VideoPlayerConfig
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.CMPPlayer2
 import net.engawapg.lib.zoomable.rememberZoomState
 import net.engawapg.lib.zoomable.zoomable
-import timber.log.Timber
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
@@ -64,20 +55,15 @@ internal fun VideoPlayerWithControl2(
     playerHost: MediaPlayerHost,
     playerConfig: VideoPlayerConfig,
     onClick: () -> Unit = {},
-
     menuContent: @Composable () -> Unit = {}
-
 ) {
     var isScreenLocked by remember { mutableStateOf(false) }
     var showControls by remember { mutableStateOf(playerConfig.showControls) } // State for showing/hiding controls
 
 //    var showVolumeControl by remember { mutableStateOf(false) }
     var volumeDragAmount by remember { mutableFloatStateOf(0f) }
-
     var activeOption by remember { mutableStateOf(PlayerOption.NONE) }
-
     var frameRate by remember { mutableFloatStateOf(0f) }
-
     var exoPlayer by remember { mutableStateOf<androidx.media3.exoplayer.ExoPlayer?>(null) }
 
 
@@ -229,10 +215,6 @@ internal fun VideoPlayerWithControl2(
                 selectedQuality = playerHost.selectedQuality,
                 selectedAudioTrack = playerHost.selectedAudioTrack,
                 selectedSubTitle = playerHost.selectedsubTitle,
-                onFramerate = {
-                    frameRate = it
-                    Timber.i("!?! framerate: $it")
-                },
                 onExoPlayer = {
                     exoPlayer = it
                 }
@@ -257,102 +239,66 @@ internal fun VideoPlayerWithControl2(
             //val anchors = mapOf(0f to "A", sizePx / 2 to "B", sizePx to "C")
 
             if (!isScreenLocked && playerConfig.isGestureVolumeControlEnabled) {
-                // Detect right-side drag gestures
+
+                //Нижняя сенсорная часть
                 Box(
                     modifier = Modifier
-                        .fillMaxHeight(1 / 3f)
-                        .fillMaxWidth() // Occupy 30% of the right side dynamically
-                        .align(Alignment.BottomCenter)
-                        .then(volumeDragModifier) // Apply drag gesture detection only on the right side
-                        .alpha(0.5f)
-                        .background(Color.Magenta)
+                        .fillMaxHeight(1/3f).fillMaxWidth().align(Alignment.BottomCenter)
+                        .then(volumeDragModifier).alpha(0.5f).background(Color.Magenta)
                 )
 
 
-                //val squareSize = 300.dp
-                var squareSize by remember { mutableStateOf(0.dp) }
+                val squareSize = 192.dp
+                //var squareSize by remember { mutableStateOf(0.dp) }
                 val density = LocalDensity.current
 
-                BoxWithConstraints(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        //.background(Color.Magenta),
-                            ,
-                    contentAlignment = Alignment.Center
-                )
+                BoxWithConstraints( modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center)
                 {
                     val width = maxWidth
-                    val maxWidthPx = with(LocalDensity.current) { (width).toPx() }
-                    val startPx = with(LocalDensity.current) { (width - squareSize).toPx() / 2.0f }
+                    val maxWidthPx = with(density) { (width).toPx() }
+                    val startPx = with(density) { (width - squareSize).toPx() }
 
                     val anchors = DraggableAnchors {
                         SwipeState.Center at startPx
-                        SwipeState.Right at -maxWidthPx
+                        SwipeState.Right at maxWidthPx
                     }
 
-                    val swipeState = remember {
-                        AnchoredDraggableState(
-                            initialValue = SwipeState.Right,
-                            anchors = anchors
-                        )
-                    }
+                    val swipeState = remember { AnchoredDraggableState( initialValue = SwipeState.Right, anchors = anchors ) }
 
                     Box(
                         modifier = Modifier
-                            .fillMaxHeight(1 / 3f)
+                            //.fillMaxHeight(1/3f)
+                            .padding(top = 100.dp)
+                            .height(56.dp)
                             .fillMaxWidth()
                             //.alpha(0.5f)
-                            .anchoredDraggable(
-                                swipeState,
-                                Orientation.Horizontal,
+                            .background(color = Color.Magenta)
+                            .anchoredDraggable( swipeState, Orientation.Horizontal,
                                 flingBehavior =
                                     AnchoredDraggableDefaults.flingBehavior(
-                                        swipeState,
-                                        positionalThreshold = { distance -> distance * 0.25f }
+                                        swipeState, positionalThreshold = { distance -> distance * 0.25f }
                                     )
-                            ), contentAlignment = Alignment.CenterStart
+                            ), contentAlignment = Alignment.CenterStart) {
 
-                    ) {
-
-                        if (swipeState.currentValue == SwipeState.Right && !swipeState.isAnimationRunning)
-                        {
-
-                            Box(
-                                Modifier
-                                    .width(2.dp).height(48.dp).align(Alignment.CenterStart)
-                                    .alpha(0.3f)
-                                    .background(
-                                        color = Color(0xFFFFFFFF),
-                                        shape = RoundedCornerShape(1.dp)
-                                    )
-                            )
-
+                        if (swipeState.currentValue == SwipeState.Right && !swipeState.isAnimationRunning) {
+                            Box( Modifier.width(2.dp).height(48.dp).align(Alignment.CenterEnd).alpha(0.3f)
+                                    .background( color = Color(0xFFFFFFFF), shape = RoundedCornerShape(1.dp)) )
                         }
 
                         Box(
                             modifier = Modifier
                                 //.offset { IntOffset(swappableState.offset.value.roundToInt(), 0) }
-                                .offset {
-                                    IntOffset(
-                                        x = swipeState.requireOffset().roundToInt(),
-                                        y = 0
-                                    )
-                                }
-                                //.width(squareSize)
-                                .height(56.dp)
-                                .onGloballyPositioned { coordinates ->
-                                    squareSize = with(density) { coordinates.size.width.toDp() }
-                                }
-                                .background(Color(0x80FFFFFF), shape = RoundedCornerShape(16.dp))
-                           , contentAlignment = Alignment.Center
-
+                                .offset { IntOffset( x = swipeState.requireOffset().roundToInt(), y = 0 ) }
+                                .width(squareSize)
+                                .height(48.dp)
+                                .background(Color(0x80FFFFFF), shape = RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp)),
+                            contentAlignment = Alignment.Center
                         ) {
                             menuContent.invoke()
                         }
 
                     }
                 }
-
 
 
             }
