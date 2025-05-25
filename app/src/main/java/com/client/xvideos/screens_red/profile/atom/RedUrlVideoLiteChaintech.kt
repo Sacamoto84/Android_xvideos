@@ -34,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.request.CachePolicy
@@ -65,7 +66,9 @@ fun RedUrlVideoLiteChaintech(
     timeA: Float = 0f,
     timeB: Float = 0f,
     enableAB: Boolean = false,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit = {},
+    menuContent: @Composable () -> Unit = {},
+    menuContentWidth: Dp = 192.dp
 ) {
 
     val scope = rememberCoroutineScope()
@@ -226,77 +229,8 @@ fun RedUrlVideoLiteChaintech(
 
                 },
             ),
-            menuContent = {
-
-                Row(
-                    modifier = Modifier,
-                    //horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                )
-                {
-
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    Box(
-                        modifier = Modifier
-                            .height(48.dp)
-                            .width(48.dp)
-                            .border(2.dp, Color.White, RoundedCornerShape(8.dp))
-                            .clickable(onClick = {
-
-                            }), contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            Icons.Filled.FileDownload,
-                            contentDescription = null,
-                            tint = Color.White
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.width(16.dp))
-
-                    Box(
-                        modifier = Modifier
-                            .height(48.dp)
-                            .width(48.dp)
-                            .border(2.dp, Color.White, RoundedCornerShape(8.dp))
-                            .clickable(onClick = {
-
-                            }), contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            Icons.Filled.VolumeOff,
-                            contentDescription = null,
-                            tint = Color.White
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.width(16.dp))
-
-                    Box(
-                        modifier = Modifier
-                            .height(48.dp)
-                            .width(48.dp)
-                            .border(2.dp, Color.White, RoundedCornerShape(8.dp))
-                            .clickable(onClick = {
-
-                            }), contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            Icons.Filled.Block,
-                            contentDescription = null,
-                            tint = Color.White
-                        )
-                    }
-
-                    //Spacer(modifier = Modifier.width(8.dp))
-
-
-
-                    Spacer(modifier = Modifier.width(48.dp))
-                }
-            },
-            menuContentWidth = 192.dp
+            menuContent = menuContent,
+            menuContentWidth = menuContentWidth
     )
 
     Text(

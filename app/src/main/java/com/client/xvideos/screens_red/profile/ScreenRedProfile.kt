@@ -1,39 +1,38 @@
 package com.client.xvideos.screens_red.profile
 
-import android.R
 import android.annotation.SuppressLint
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.FileDownload
+import androidx.compose.material.icons.filled.VolumeOff
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -49,16 +48,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
@@ -70,15 +64,10 @@ import com.client.xvideos.screens_red.ThemeRed
 import com.client.xvideos.screens_red.profile.atom.CanvasTimeDurationLine
 import com.client.xvideos.screens_red.profile.atom.RedUrlVideoImageAndLongClick
 import com.client.xvideos.screens_red.profile.atom.VerticalScrollbar
+import com.client.xvideos.screens_red.profile.block.DialogBlock
 import com.client.xvideos.screens_red.profile.bottom_bar.Red_Profile_Bottom_Bar
-import com.client.xvideos.screens_red.profile.molecule.TikTokStyleVideoFeed
-import com.composables.core.DragIndication
-import com.composables.core.ModalBottomSheet
-import com.composables.core.Scrim
-import com.composables.core.Sheet
-import com.composables.core.SheetDetent.Companion.FullyExpanded
-import com.composables.core.SheetDetent.Companion.Hidden
-import com.composables.core.rememberModalBottomSheetState
+import com.client.xvideos.screens_red.profile.tikTok.MenuContent
+import com.client.xvideos.screens_red.profile.tikTok.TikTokStyleVideoFeed
 
 import com.composeunstyled.rememberDisclosureState
 import kotlinx.coroutines.Dispatchers
@@ -109,6 +98,15 @@ class ScreenRedProfile() : Screen {
         val density = LocalDensity.current
 
         //TikTokWithCollapsingToolbar(list.value)
+
+
+        DialogBlock(vm) {
+            val a = vm.currentTikTokGifInfo
+            if (a != null) {
+                vm.blockItem(a)
+            }
+        }
+
 
         //🟨🟨🟨🟨🟨🟨🟨🟨⬆️⬆️⬆️⬆️⬆️❗
 
@@ -183,14 +181,16 @@ class ScreenRedProfile() : Screen {
                             .padding(bottom = 4.dp)
                             .padding(horizontal = 16.dp)
                             .clip(RoundedCornerShape(0))
-                            .height(16.dp).fillMaxWidth().alpha(al.value).background(Color.Black)
-                        ,contentAlignment = Alignment.BottomCenter
+                            .height(16.dp)
+                            .fillMaxWidth()
+                            .alpha(al.value)
+                            .background(Color.Black), contentAlignment = Alignment.BottomCenter
                     ) {
 
                         CanvasTimeDurationLine(
                             currentTime = vm.currentPlayerTime,
                             duration = vm.currentPlayerDuration,
-                            timeA =  vm.timeA,
+                            timeA = vm.timeA,
                             timeB = vm.timeB,
                             timeABEnable = vm.enableAB,
                             play = vm.play,
@@ -258,8 +258,12 @@ class ScreenRedProfile() : Screen {
 
                         timeA = vm.timeA,
                         timeB = vm.timeB,
-                        enableAB = vm.enableAB
-                    )
+                        enableAB = vm.enableAB,
+
+                        menuContent = {MenuContent(vm)},
+                        menuContentWidth = 192.dp
+
+                        )
 
                 } else {
 
@@ -289,8 +293,6 @@ class ScreenRedProfile() : Screen {
                                         item,
                                         index,
                                         onLongClick = {
-
-                                          
 
 
                                         },

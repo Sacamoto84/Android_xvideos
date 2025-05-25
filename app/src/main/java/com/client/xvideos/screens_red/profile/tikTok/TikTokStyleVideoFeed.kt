@@ -1,4 +1,4 @@
-package com.client.xvideos.screens_red.profile.molecule
+package com.client.xvideos.screens_red.profile.tikTok
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -13,6 +13,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.client.xvideos.AppPath
 import com.client.xvideos.feature.findVideoOnRedCacheDownload
@@ -45,6 +47,10 @@ fun TikTokStyleVideoFeed(
      * Вызывается при изменении текущей страницы в пейджере.
      */
     onChangePagerPage: (Int) -> Unit = {},
+
+    menuContent: @Composable () -> Unit = {},
+    menuContentWidth: Dp = 192.dp
+
 ) {
 
     val pagerState = rememberPagerState(pageCount = { videoItems.size })
@@ -120,7 +126,9 @@ fun TikTokStyleVideoFeed(
             enableAB = enableAB,
             onClick = {
                 vm.play = !vm.play
-            }
+            },
+            menuContent = menuContent,
+            menuContentWidth = menuContentWidth
         )
 
     }

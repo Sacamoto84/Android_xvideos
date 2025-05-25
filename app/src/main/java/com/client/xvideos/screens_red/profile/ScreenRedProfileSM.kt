@@ -21,6 +21,7 @@ import com.client.xvideos.feature.redgifs.types.MediaType
 import com.client.xvideos.feature.redgifs.types.Order
 import com.client.xvideos.feature.room.AppDatabase
 import com.client.xvideos.screens_red.use_case.useCaseBlockItem
+import com.composables.core.DialogState
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -198,6 +199,16 @@ class ScreenRedProfileSM @Inject constructor(
      */
     var currentTikTokPage by mutableIntStateOf(0)
 
+    /**
+     * Возвращает текущий GIF из списка `list` по индексу `currentTikTokPage`.
+     *
+     * Если индекс выходит за пределы списка, возвращается `null`, чтобы избежать ошибки `IndexOutOfBoundsException`.
+     *
+     * @return Объект [GifsInfo] для текущей страницы или `null`, если индекс некорректен.
+     */
+    val currentTikTokGifInfo: GifsInfo?
+        get() = list.value.getOrNull(currentTikTokPage)
+
 
     //---- Downloader ----
 
@@ -223,7 +234,6 @@ class ScreenRedProfileSM @Inject constructor(
     //--- Блокировка ---
 
     var blockVisibleDialog by mutableStateOf(false) //Показ диалога на добавление в блок лист
-
     /**
      * Выполняет блокировку GIF-элемента, используя [useCaseBlockItem].
      *

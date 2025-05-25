@@ -10,8 +10,8 @@ import java.io.File
  * Блокирует GIF-элемент путём создания специального файла-флага `.block`.
  *
  * Блокировка осуществляется путём создания файла с именем `<id>.block`
- * внутри директории `<cache_download_red>/<userName>`. Наличие такого файла
- * считается признаком того, что GIF заблокирован.
+ * внутри директории `<cache_download_red>/<userName>/block`.
+ * Наличие такого файла считается признаком того, что GIF заблокирован.
  *
  * @param item Объект [GifsInfo], содержащий информацию о GIF: ID, имя пользователя, URL и пр.
  * @return [Result.success(true)] — если файл успешно создан или уже существует.
@@ -24,18 +24,18 @@ fun useCaseBlockItem(item: GifsInfo): Result<Boolean> {
     return try {
         Timber.i("!!! Блокировка GIFS -> useCaseBlockItem() id:${item.id} userName:${item.userName} url:${item.urls.hd}")
 
-        // Создаем директорию, если её нет
-        val dir = File(AppPath.cache_download_red, item.userName)
-        if (!dir.exists()) {
-            val created = dir.mkdirs()
+        // Создаем директорию <userName>/block, если её нет
+        val blockDir = File(AppPath.cache_download_red, "${item.userName}/block")
+        if (!blockDir.exists()) {
+            val created = blockDir.mkdirs()
             if (!created) {
-                return Result.failure(IOException("Не удалось создать директорию: ${dir.absolutePath}"))
+                return Result.failure(IOException("Не удалось создать директорию: ${blockDir.absolutePath}"))
             }
         }
 
         // Создаем файл-блокировку
-        val blockFile = File(dir, "${item.id}.block")
-        val fileCreated = blockFile.createNewFile() || blockFile.exists() // `exists` на случай, если файл уже есть
+        val blockFile = File(blockDir, "${item.id}.block")
+        val fileCreated = blockFile.createNewFile() || blockFile.exists()
 
         if (fileCreated) {
             Result.success(true)
