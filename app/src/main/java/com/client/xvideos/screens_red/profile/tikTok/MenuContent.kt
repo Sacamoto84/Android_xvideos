@@ -11,17 +11,21 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.FileDownload
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.VolumeOff
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.client.xvideos.screens_red.profile.ScreenRedProfileSM
 
 @Composable
 fun MenuContent(vm: ScreenRedProfileSM) {
+
+    val context = LocalContext.current
 
     Row(
         modifier = Modifier,
@@ -39,10 +43,14 @@ fun MenuContent(vm: ScreenRedProfileSM) {
                 .border(2.dp, Color.White, RoundedCornerShape(8.dp))
                 .clickable(onClick = {
 
+                    if (vm.currentTikTokGifInfo != null) {
+                        vm.shareGifs(context = context, vm.currentTikTokGifInfo!!)
+                    }
+
                 }), contentAlignment = Alignment.Center
         ) {
             Icon(
-                Icons.Filled.FileDownload,
+                Icons.Filled.Share,//Icons.Filled.FileDownload,
                 contentDescription = null,
                 tint = Color.White
             )

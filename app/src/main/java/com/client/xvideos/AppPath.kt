@@ -1,7 +1,7 @@
 package com.client.xvideos
 
-import android.app.Application
 import android.os.Environment
+import kotlinx.io.IOException
 import java.io.File
 
 private enum class Folder(val value: String) {
@@ -9,46 +9,42 @@ private enum class Folder(val value: String) {
 
 }
 
-enum class EnvironmentStorage {
-    INTERNAL,
-    EXTERNAL,
-    EXTERNAL_STORAGE,
-}
-
 /**
  * Предоставляет пути хранения файлов
  */
 object AppPath {
 
-    val root: EnvironmentStorage = EnvironmentStorage.EXTERNAL_STORAGE
-
-    private val appMain = "xvideos"
-
-    private val envoriment = when (root) {
-        EnvironmentStorage.INTERNAL -> Environment.getDataDirectory() // /data
-        EnvironmentStorage.EXTERNAL -> (App.instance.applicationContext as Application).getExternalFilesDir(null) // /storage/sdcard0/Android/data/package/files
-        EnvironmentStorage.EXTERNAL_STORAGE -> Environment.getExternalStorageDirectory() // /storage/sdcard0
-    }
+    private const val appMain = "xvideos"
 
     /**
-     * Путь до sdcard
+     * Путь до внешнего хранилища
      */
-    val sdcard = Environment.getExternalStorageDirectory().absolutePath.toString()
+    val sdcard: String = Environment.getExternalStorageDirectory().toString()
 
-    val main = envoriment?.absolutePath + "/" + appMain
+    val main : String = "$sdcard/$appMain"
 
     /**
      * Пусть к папке с кешем загруженных файлов для предросмотра
      */
-    val cache_download_red = envoriment?.absolutePath  + "/${appMain}/${Folder.CACHE_DOWNLOAD_RED.value}"
-
-    val assets = "file:///android_asset/"
+    val cache_download_red : String = main + "/${Folder.CACHE_DOWNLOAD_RED.value}"
 
     init {
+
         println("---AppPath---")
         println("sdcard: $sdcard")
 
         File(main).mkdirs()
+
+        // Создание .nomedia
+        val nomedia = File(main, ".nomedia")
+        if (!nomedia.exists()) {
+            try {
+                nomedia.createNewFile()
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
+
         File(cache_download_red).mkdirs()
     }
 

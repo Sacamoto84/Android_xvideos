@@ -1,5 +1,6 @@
 package com.client.xvideos.screens_red.profile
 
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -21,6 +22,7 @@ import com.client.xvideos.feature.redgifs.types.MediaType
 import com.client.xvideos.feature.redgifs.types.Order
 import com.client.xvideos.feature.room.AppDatabase
 import com.client.xvideos.screens_red.use_case.useCaseBlockItem
+import com.client.xvideos.screens_red.use_case.useCaseShareFile
 import com.composables.core.DialogState
 import dagger.Binds
 import dagger.Module
@@ -265,9 +267,23 @@ class ScreenRedProfileSM @Inject constructor(
     //!--- Блокировка ---
 
 
+    //--- Поделиться ---
 
+    fun shareGifs(context : Context, item: GifsInfo){
 
+        val path = "${AppPath.cache_download_red}/${item.userName}/${item.id}.mp4"
+        val file = File(path)
 
+        if (file.exists()) {
+            useCaseShareFile(context, file)
+        } else {
+            Toast.makeText(context, "Файл не найден: $path", Toast.LENGTH_SHORT).show()
+            Timber.w("shareGifs -> Файл не существует: $path")
+        }
+
+    }
+
+    //!--- Поделиться ---
 
 }
 

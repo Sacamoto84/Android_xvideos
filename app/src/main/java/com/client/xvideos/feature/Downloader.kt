@@ -101,7 +101,7 @@ class Downloader() {
                 },
 
                 onError = {
-                    println("!!! onError закачки")
+                    println("!!! onError закачки: $it")
                     percent.value = -3f
                 },
                 onProgress = { it1 ->
