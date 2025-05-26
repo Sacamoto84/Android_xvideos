@@ -2,6 +2,7 @@ package com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util
 
 import android.content.Context
 import android.media.MediaDrm
+import android.view.TextureView
 import android.view.ViewGroup
 import androidx.annotation.OptIn
 import androidx.compose.runtime.Composable
@@ -22,6 +23,7 @@ import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.datasource.cache.Cache
 import androidx.media3.datasource.cache.CacheDataSource
+import androidx.media3.effect.ScaleAndRotateTransformation
 import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.drm.DefaultDrmSessionManager
@@ -36,6 +38,40 @@ import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.DrmConfig
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPlayerError
+
+@OptIn(UnstableApi::class)
+@Composable
+fun rememberPlayerView(
+    exoPlayer: ExoPlayer,
+    context: Context,
+    rotateDegrees: Float = 90f
+): PlayerView {
+    val playerView = remember(context) {
+        PlayerView(context).apply {
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+            useController = false
+            resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+            setShowBuffering(PlayerView.SHOW_BUFFERING_NEVER)
+        }
+    }
+    val currentPlayer by rememberUpdatedState(exoPlayer)
+
+    LaunchedEffect(currentPlayer) {
+        playerView.player = currentPlayer
+        // Поворачиваем TextureView на нужный угол
+        (playerView.videoSurfaceView as? TextureView)?.rotation = rotateDegrees
+    }
+
+    DisposableEffect(playerView) {
+        onDispose {
+            playerView.player = null
+        }
+    }
+    return playerView
+}
 
 @OptIn(UnstableApi::class)
 @Composable
@@ -124,6 +160,9 @@ fun rememberExoPlayerWithLifecycle(
         try {
             val mediaItem = MediaItem.fromUri(url.toUri())
 
+            // Создаем трансформацию для поворота на 90 градусов
+            val rotateEffect = ScaleAndRotateTransformation.Builder().setRotationDegrees(-90f).build()
+
             val mediaSource = when {
                 drmConfig != null -> createHlsMediaSourceWithDrm(mediaItem, headers, drmConfig)
                 isLiveStream || url.endsWith(".m3u8", ignoreCase = true) -> createHlsMediaSource(
@@ -134,6 +173,7 @@ fun rememberExoPlayerWithLifecycle(
             }
 
             exoPlayer.apply {
+                setVideoEffects(listOf(rotateEffect))
                 stop()
                 clearMediaItems()
                 setMediaSource(mediaSource)

@@ -1,6 +1,5 @@
 package com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util
 
-import android.view.TextureView
 import androidx.annotation.OptIn
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
@@ -11,17 +10,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.AspectRatioFrameLayout
+import androidx.media3.ui.PlayerView
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.DrmConfig
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPlayerError
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.PlayerSpeed
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.ScreenResize
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
+import androidx.media3.ui.R as Media3UiR
 
 @OptIn(UnstableApi::class)
 @Composable
@@ -87,7 +87,7 @@ fun CMPPlayer2(
 //        }
 //    }
 
-    val playerView = rememberPlayerView(exoPlayer, context)
+    val playerView = rememberPlayerView(exoPlayer, context, 90f)
 
 
     var isBuffering by remember { mutableStateOf(false) }
@@ -115,7 +115,7 @@ fun CMPPlayer2(
 
     Box {
         AndroidView(
-            factory = { playerView},
+            factory = {playerView},
             modifier = modifier,
             update = {
                 exoPlayer.playWhenReady = !isPause
@@ -128,7 +128,6 @@ fun CMPPlayer2(
                     ScreenResize.FIT -> AspectRatioFrameLayout.RESIZE_MODE_FIT
                     ScreenResize.FILL -> AspectRatioFrameLayout.RESIZE_MODE_ZOOM
                 }
-
             }
         )
 
@@ -162,6 +161,28 @@ fun CMPPlayer2(
         }
     }
 }
+
+
+
+
+
+
+// Вспомогательная функция для установки surface_type (рефлексия, если API недоступен)
+private fun PlayerView.setSurfaceType(type: Int) {
+    try {
+        val field = PlayerView::class.java.getDeclaredField("surfaceType")
+        field.isAccessible = true
+        field.setInt(this, type)
+        // Обновляем поверхность
+        val method = PlayerView::class.java.getDeclaredMethod("updateSurfaceType")
+        method.isAccessible = true
+        method.invoke(this)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        // Логирование ошибки, если рефлексия не сработала
+    }
+}
+
 
 private fun PlayerSpeed.toFloat(): Float {
     return when (this) {
