@@ -1,6 +1,7 @@
 package com.client.xvideos.feature.videoplayer.chaintech.videoplayer.ui.video
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.AnchoredDraggableDefaults
 import androidx.compose.foundation.gestures.AnchoredDraggableState
@@ -23,6 +24,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -39,12 +41,14 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import com.client.xvideos.BuildConfig
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPlayerHost
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.PlayerOption
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.VideoPlayerConfig
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.CMPPlayer2
 import net.engawapg.lib.zoomable.rememberZoomState
 import net.engawapg.lib.zoomable.zoomable
+import timber.log.Timber
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
@@ -56,11 +60,19 @@ internal fun VideoPlayerWithControl2(
     playerHost: MediaPlayerHost,
     playerConfig: VideoPlayerConfig,
     onClick: () -> Unit = {},
+
     menuContent: @Composable () -> Unit = {},
     menuContentWidth: Dp = 192.dp,
-    menuDefaultOpen : Boolean = false,
+    menuDefaultOpen : Boolean,
     menuOpenChanged : (Boolean) -> Unit
 ) {
+
+    if (BuildConfig.DEBUG) {
+        SideEffect {
+            Timber.i("@@@ VideoPlayerWithControl2() menuDefaultOpen:$menuDefaultOpen")
+        }
+    }
+
     var isScreenLocked by remember { mutableStateOf(false) }
     var showControls by remember { mutableStateOf(playerConfig.showControls) } // State for showing/hiding controls
 
@@ -267,9 +279,12 @@ internal fun VideoPlayerWithControl2(
                         SwipeState.Right at maxWidthPx
                     }
 
+                    //Timber.i("@@@ menuDefaultOpen $menuDefaultOpen")
+
                     val swipeState = remember { AnchoredDraggableState( initialValue = if (menuDefaultOpen) SwipeState.Center else SwipeState.Right, anchors = anchors ) }
 
-                    LaunchedEffect(swipeState) {
+                    LaunchedEffect(swipeState.currentValue) {
+                        Timber.i("@@@ LaunchedEffect(swipeState)")
                         menuOpenChanged(swipeState.currentValue == SwipeState.Center)
                     }
 
@@ -285,7 +300,7 @@ internal fun VideoPlayerWithControl2(
                             .anchoredDraggable( swipeState, Orientation.Horizontal,
                                 flingBehavior =
                                     AnchoredDraggableDefaults.flingBehavior(
-                                        swipeState, positionalThreshold = { distance -> distance * 0.25f }
+                                        swipeState, positionalThreshold = { distance -> distance * 0.125f }, animationSpec = tween(100)
                                     )
                             ), contentAlignment = Alignment.CenterStart) {
 
@@ -301,7 +316,7 @@ internal fun VideoPlayerWithControl2(
                                 .width(squareSize)
                                 .height(64.dp)
                                 .background(Color(0xA1969696), shape = RoundedCornerShape(topStart = 12.dp, bottomStart = 12.dp)),
-                            contentAlignment = Alignment.Center
+                            contentAlignment = Alignment.CenterStart
                         ) {
                             menuContent.invoke()
                         }

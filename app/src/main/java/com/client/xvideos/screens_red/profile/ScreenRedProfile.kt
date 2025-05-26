@@ -73,6 +73,7 @@ import com.composeunstyled.rememberDisclosureState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 class ScreenRedProfile() : Screen {
 
@@ -261,10 +262,12 @@ class ScreenRedProfile() : Screen {
                         enableAB = vm.enableAB,
 
                         menuContent = {MenuContent(vm)},
-                        menuContentWidth = 192.dp,
+                        menuContentWidth = 256.dp,
+
                         menuDefaultOpen = vm.menuCenter,
                         menuOpenChanged = {
                             vm.menuCenter = it
+                            Timber.i("@@@ menuOpenChanged vm.menuCenter = it $it")
                         }
 
 

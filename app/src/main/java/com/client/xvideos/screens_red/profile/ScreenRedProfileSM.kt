@@ -236,8 +236,8 @@ class ScreenRedProfileSM @Inject constructor(
     }
 
 
-    //--- Блокировка ---
 
+    //--- Блокировка ---
     var blockVisibleDialog by mutableStateOf(false) //Показ диалога на добавление в блок лист
 
     /**
@@ -268,21 +268,24 @@ class ScreenRedProfileSM @Inject constructor(
 
 
     //--- Поделиться ---
-
     fun shareGifs(context : Context, item: GifsInfo){
 
         val path = "${AppPath.cache_download_red}/${item.userName}/${item.id}.mp4"
         val file = File(path)
 
-        if (file.exists()) {
-            useCaseShareFile(context, file)
-        } else {
-            Toast.makeText(context, "Файл не найден: $path", Toast.LENGTH_SHORT).show()
-            Timber.w("shareGifs -> Файл не существует: $path")
+        try {
+            if (file.exists()) {
+                useCaseShareFile(context, file)
+            } else {
+                Toast.makeText(context, "Файл не найден: $path", Toast.LENGTH_SHORT).show()
+                Timber.w("shareGifs -> Файл не существует: $path")
+            }
+        } catch (e: Exception) {
+            Toast.makeText(context, "Ошибка при попытке поделиться файлом", Toast.LENGTH_SHORT).show()
+            Timber.e(e, "shareGifs -> Ошибка при работе с файлом: $path")
         }
 
     }
-
     //!--- Поделиться ---
 
 }

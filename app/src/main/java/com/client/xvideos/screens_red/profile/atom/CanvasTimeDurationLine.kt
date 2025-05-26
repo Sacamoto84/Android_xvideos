@@ -109,6 +109,7 @@ fun CanvasTimeDurationLine(
     onSeek: (Float) -> Unit,              // 🔹 при перетаскивании
     onSeekFinished: (() -> Unit)? = null  // 🔹 когда отпустили
 ) {
+
     var isDragging by remember { mutableStateOf(false) }
 
     Box(

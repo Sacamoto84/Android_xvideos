@@ -23,12 +23,15 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.request.CachePolicy
 import coil.request.ImageRequest
+import com.client.xvideos.BuildConfig
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPlayerEvent
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPlayerHost
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.ScreenResize
@@ -51,7 +55,9 @@ import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil.CoilImage
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @OptIn(DelicateCoroutinesApi::class)
 @Composable
@@ -69,16 +75,25 @@ fun RedUrlVideoLiteChaintech(
     onClick: () -> Unit = {},
     menuContent: @Composable () -> Unit = {},
     menuContentWidth: Dp = 192.dp,
-    menuDefaultOpen : Boolean = false,
-    menuOpenChanged : (Boolean) -> Unit
+    menuDefaultOpen: Boolean = false,
+    menuOpenChanged: (Boolean) -> Unit = {}
 ) {
+
+    if (BuildConfig.DEBUG) {
+        SideEffect {
+            Timber.i("@@@ RedUrlVideoLiteChaintech() play:$play isMute:$isMute timeA:$timeA menuDefaultOpen:$menuDefaultOpen")
+        }
+    }
 
     val scope = rememberCoroutineScope()
 
-    //var isBuffering by remember { mutableStateOf(false) }
-
     var currentTime by remember { mutableFloatStateOf(0f) }
     var duration by remember { mutableIntStateOf(0) }
+
+    LaunchedEffect(Unit) {
+        snapshotFlow { currentTime to duration }
+            .collectLatest { onChangeTime(it) }
+    }
 
     val playerHost = remember { MediaPlayerHost(mediaUrl = url, isPaused = true) }
 
@@ -140,7 +155,12 @@ fun RedUrlVideoLiteChaintech(
                 playerHost.unmute()
         }
 
-        onChangeTime(currentTime to duration)
+//        LaunchedEffect(currentTime, duration) {
+//            Timber.d("@@@ RedUrlVideoLiteChaintech onChangeTime($currentTime, $duration)")
+//
+//            //onChangeTime(currentTime to duration)
+//        }
+
 
         playerHost.onEvent = { event ->
             when (event) {
@@ -162,11 +182,9 @@ fun RedUrlVideoLiteChaintech(
                     currentTime = event.currentTime
                     if (enableAB && currentTime >= timeB) {
                         println("!!! playerHost.seekTo(${timeA}) ")
-
                         scope.launch {
                             playerHost.seekTo(timeA.toFloat())
                         }
-
                     }
                 }
 
@@ -237,15 +255,15 @@ fun RedUrlVideoLiteChaintech(
             menuOpenChanged = menuOpenChanged
         )
 
-    Text(
-        "${currentTime} / ${duration}",
-        color = Color.White,
-        modifier = Modifier.align(Alignment.BottomStart),
-        fontFamily = ThemeRed.fontFamilyPopinsRegular,
-        fontSize = 10.sp
-    )
+//    Text(
+//        "${currentTime} / ${duration}",
+//        color = Color.White,
+//        modifier = Modifier.align(Alignment.BottomStart),
+//        fontFamily = ThemeRed.fontFamilyPopinsRegular,
+//        fontSize = 10.sp
+//    )
 
-}
+    }
 }
 
 

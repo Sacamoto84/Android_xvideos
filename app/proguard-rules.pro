@@ -33,6 +33,3 @@
 -keepclassmembers class okhttp3.MediaType$Companion {
     <init>();
 }
-
-
-
