@@ -1,5 +1,6 @@
 package com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util
 
+import android.view.TextureView
 import androidx.annotation.OptIn
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
@@ -10,6 +11,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.media3.common.util.UnstableApi
@@ -46,7 +48,8 @@ fun CMPPlayer2(
     selectedSubTitle: SubtitleTrack?,
     //isForward : Boolean = false,
     //isBack: Boolean = false,
-    onExoPlayer : (androidx.media3.exoplayer.ExoPlayer) -> Unit = {}
+    onExoPlayer : (androidx.media3.exoplayer.ExoPlayer) -> Unit = {} ,
+    rotateDegrees: Float = 90f // можно менять как нужно
 
 ) {
     val context = LocalContext.current
@@ -112,7 +115,7 @@ fun CMPPlayer2(
 
     Box {
         AndroidView(
-            factory = { playerView },
+            factory = { playerView},
             modifier = modifier,
             update = {
                 exoPlayer.playWhenReady = !isPause
@@ -125,6 +128,7 @@ fun CMPPlayer2(
                     ScreenResize.FIT -> AspectRatioFrameLayout.RESIZE_MODE_FIT
                     ScreenResize.FILL -> AspectRatioFrameLayout.RESIZE_MODE_ZOOM
                 }
+
             }
         )
 
