@@ -39,39 +39,39 @@ import androidx.media3.ui.PlayerView
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.DrmConfig
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPlayerError
 
-@OptIn(UnstableApi::class)
-@Composable
-fun rememberPlayerView(
-    exoPlayer: ExoPlayer,
-    context: Context,
-    rotateDegrees: Float = 90f
-): PlayerView {
-    val playerView = remember(context) {
-        PlayerView(context).apply {
-            layoutParams = ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-            )
-            useController = false
-            resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
-            setShowBuffering(PlayerView.SHOW_BUFFERING_NEVER)
-        }
-    }
-    val currentPlayer by rememberUpdatedState(exoPlayer)
-
-    LaunchedEffect(currentPlayer) {
-        playerView.player = currentPlayer
-        // Поворачиваем TextureView на нужный угол
-        (playerView.videoSurfaceView as? TextureView)?.rotation = rotateDegrees
-    }
-
-    DisposableEffect(playerView) {
-        onDispose {
-            playerView.player = null
-        }
-    }
-    return playerView
-}
+//@OptIn(UnstableApi::class)
+//@Composable
+//fun rememberPlayerView(
+//    exoPlayer: ExoPlayer,
+//    context: Context,
+//    rotateDegrees: Float = 90f
+//): PlayerView {
+//    val playerView = remember(context) {
+//        PlayerView(context).apply {
+//            layoutParams = ViewGroup.LayoutParams(
+//                ViewGroup.LayoutParams.MATCH_PARENT,
+//                ViewGroup.LayoutParams.MATCH_PARENT
+//            )
+//            useController = false
+//            resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+//            setShowBuffering(PlayerView.SHOW_BUFFERING_NEVER)
+//        }
+//    }
+//    val currentPlayer by rememberUpdatedState(exoPlayer)
+//
+//    LaunchedEffect(currentPlayer) {
+//        playerView.player = currentPlayer
+//        // Поворачиваем TextureView на нужный угол
+//        (playerView.videoSurfaceView as? TextureView)?.rotation = rotateDegrees
+//    }
+//
+//    DisposableEffect(playerView) {
+//        onDispose {
+//            playerView.player = null
+//        }
+//    }
+//    return playerView
+//}
 
 @OptIn(UnstableApi::class)
 @Composable
@@ -118,6 +118,7 @@ fun rememberExoPlayerWithLifecycle(
     maxBufferMs: Int = 30000,
     bufferForPlaybackMs: Int = 500,
     bufferForPlaybackAfterRebufferM: Int = 1000,
+    rotate : Float = 0f // 0f -90f
     ): ExoPlayer {
     val lifecycleOwner = LocalLifecycleOwner.current
     val cache = remember(context) { CacheManager.getCache(context) }
@@ -161,7 +162,7 @@ fun rememberExoPlayerWithLifecycle(
             val mediaItem = MediaItem.fromUri(url.toUri())
 
             // Создаем трансформацию для поворота на 90 градусов
-            val rotateEffect = ScaleAndRotateTransformation.Builder().setRotationDegrees(-90f).build()
+            //val rotateEffect = ScaleAndRotateTransformation.Builder().setRotationDegrees(rotate).build()
 
             val mediaSource = when {
                 drmConfig != null -> createHlsMediaSourceWithDrm(mediaItem, headers, drmConfig)
@@ -173,7 +174,7 @@ fun rememberExoPlayerWithLifecycle(
             }
 
             exoPlayer.apply {
-                setVideoEffects(listOf(rotateEffect))
+                //setVideoEffects(listOf(rotateEffect))
                 stop()
                 clearMediaItems()
                 setMediaSource(mediaSource)

@@ -64,7 +64,9 @@ internal fun VideoPlayerWithControl2(
     menuContent: @Composable () -> Unit = {},
     menuContentWidth: Dp = 192.dp,
     menuDefaultOpen : Boolean,
-    menuOpenChanged : (Boolean) -> Unit
+    menuOpenChanged : (Boolean) -> Unit,
+
+    rotate : Float
 ) {
 
     if (BuildConfig.DEBUG) {
@@ -233,7 +235,8 @@ internal fun VideoPlayerWithControl2(
                 selectedSubTitle = playerHost.selectedsubTitle,
                 onExoPlayer = {
                     exoPlayer = it
-                }
+                },
+                rotate = rotate
             )
 
 //            playerConfig.watermarkConfig?.let {

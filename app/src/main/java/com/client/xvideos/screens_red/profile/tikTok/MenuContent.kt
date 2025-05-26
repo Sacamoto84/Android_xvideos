@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.FileDownload
+import androidx.compose.material.icons.filled.RotateRight
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.VolumeOff
 import androidx.compose.material.icons.filled.VolumeUp
@@ -33,6 +34,23 @@ fun MenuContent(vm: ScreenRedProfileSM) {
 
     Row(modifier = Modifier, verticalAlignment = Alignment.CenterVertically)
     {
+
+        //Скачать
+        Box( modifier = Modifier.then(themeButton)
+            .clickable(onClick = {
+
+                if(vm.roatateDeagle == 0f) {
+                    vm.roatateDeagle = -90f
+                }
+                else
+                {
+                    vm.roatateDeagle = 0f
+                }
+
+            }), contentAlignment = Alignment.Center
+        ) {
+            Icon( Icons.Filled.RotateRight, contentDescription = null, tint = Color.White )
+        }
 
         //Скачать
         Box( modifier = Modifier.then(themeButton)

@@ -76,7 +76,8 @@ fun RedUrlVideoLiteChaintech(
     menuContent: @Composable () -> Unit = {},
     menuContentWidth: Dp = 192.dp,
     menuDefaultOpen: Boolean = false,
-    menuOpenChanged: (Boolean) -> Unit = {}
+    menuOpenChanged: (Boolean) -> Unit = {},
+    rotate : Float
 ) {
 
     if (BuildConfig.DEBUG) {
@@ -252,16 +253,17 @@ fun RedUrlVideoLiteChaintech(
             menuContent = menuContent,
             menuContentWidth = menuContentWidth,
             menuDefaultOpen = menuDefaultOpen,
-            menuOpenChanged = menuOpenChanged
+            menuOpenChanged = menuOpenChanged,
+            rotate = rotate
         )
 
-//    Text(
-//        "${currentTime} / ${duration}",
-//        color = Color.White,
-//        modifier = Modifier.align(Alignment.BottomStart),
-//        fontFamily = ThemeRed.fontFamilyPopinsRegular,
-//        fontSize = 10.sp
-//    )
+    Text(
+        "${currentTime} / ${duration}",
+        color = Color.White,
+        modifier = Modifier.align(Alignment.BottomStart),
+        fontFamily = ThemeRed.fontFamilyPopinsRegular,
+        fontSize = 10.sp
+    )
 
     }
 }

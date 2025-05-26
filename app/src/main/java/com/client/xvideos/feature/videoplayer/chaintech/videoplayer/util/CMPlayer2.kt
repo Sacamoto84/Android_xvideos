@@ -6,22 +6,30 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.media3.common.Player
+import androidx.media3.common.VideoSize
 import androidx.media3.common.util.UnstableApi
+import androidx.media3.effect.ScaleAndRotateTransformation
 import androidx.media3.ui.AspectRatioFrameLayout
-import androidx.media3.ui.PlayerView
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.DrmConfig
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPlayerError
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.PlayerSpeed
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.ScreenResize
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
-import androidx.media3.ui.R as Media3UiR
+import androidx.compose.runtime.produceState
+import androidx.media3.common.Metadata
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @OptIn(UnstableApi::class)
 @Composable
@@ -48,13 +56,12 @@ fun CMPPlayer2(
     selectedSubTitle: SubtitleTrack?,
     //isForward : Boolean = false,
     //isBack: Boolean = false,
-    onExoPlayer : (androidx.media3.exoplayer.ExoPlayer) -> Unit = {} ,
-    rotateDegrees: Float = 90f // можно менять как нужно
-
+    onExoPlayer: (androidx.media3.exoplayer.ExoPlayer) -> Unit = {},
+    rotate: Float // можно менять как нужно
 ) {
     val context = LocalContext.current
 
-    val exoPlayer = rememberExoPlayerWithLifecycle(
+    var exoPlayer = rememberExoPlayerWithLifecycle(
         url,
         context,
         isPause,
@@ -68,8 +75,63 @@ fun CMPPlayer2(
         minBufferMs = 50000,
         maxBufferMs = 150000,
         bufferForPlaybackMs = 50,
-        bufferForPlaybackAfterRebufferM = 100
+        bufferForPlaybackAfterRebufferM = 100,
+        rotate = rotate
     )
+
+    var currentRotate by remember { mutableFloatStateOf(0f) }
+
+    LaunchedEffect(currentRotate) {
+        Timber.i("@@@! currentRotate $currentRotate")
+        val rotateEffect = ScaleAndRotateTransformation.Builder().setRotationDegrees(currentRotate).build()
+        exoPlayer.setVideoEffects(listOf(rotateEffect))
+    }
+
+
+
+    DisposableEffect(exoPlayer) {
+
+        val listener1 = object : Player.Listener {
+
+
+            override fun onVideoSizeChanged(videoSize: VideoSize) {
+                val width = videoSize.width
+                val height = videoSize.height
+
+                Timber.i("@@@! width:$width height:$height")
+
+                // Пример логики: если портретное — повернуть на -90, если альбомное — оставить
+                //currentRotate = if (height > width) -90f else 0f
+
+//                GlobalScope.launch(Dispatchers.Main) {
+//                    delay(500)
+//                    val rotateEffect = ScaleAndRotateTransformation.Builder().setRotationDegrees(-90f).build()
+//                    exoPlayer.setVideoEffects(listOf(rotateEffect))
+//                }
+
+
+//                if (currentRotate.floatValue != calculatedRotate) {
+//                    currentRotate.floatValue = calculatedRotate
+//                    exoPlayer.setVideoEffects(
+//                        listOf(
+//                            ScaleAndRotateTransformation.Builder()
+//                                .setRotationDegrees(calculatedRotate)
+//                                .build()
+//                        )
+//                    )
+//                }
+
+
+            }
+        }
+
+        exoPlayer.addListener(listener1)
+
+        // Очистка при уничтожении Composable
+        onDispose  {
+            exoPlayer.removeListener(listener1)
+        }
+    }
 
     LaunchedEffect(exoPlayer) {
         onExoPlayer(exoPlayer)
@@ -87,7 +149,7 @@ fun CMPPlayer2(
 //        }
 //    }
 
-    val playerView = rememberPlayerView(exoPlayer, context, 90f)
+    val playerView = rememberPlayerView(exoPlayer, context)
 
 
     var isBuffering by remember { mutableStateOf(false) }
@@ -102,7 +164,7 @@ fun CMPPlayer2(
         while (isActive) {
             currentTime(
                 //TimeUnit.MILLISECONDS.toSeconds(exoPlayer.currentPosition).coerceAtLeast(0L).toFloat()
-                (exoPlayer.currentPosition/1000f).coerceAtLeast(0f)
+                (exoPlayer.currentPosition / 1000f).coerceAtLeast(0f)
             )
             delay(500) // Delay for 1 second
         }
@@ -115,19 +177,22 @@ fun CMPPlayer2(
 
     Box {
         AndroidView(
-            factory = {playerView},
+            factory = { playerView },
             modifier = modifier,
             update = {
                 exoPlayer.playWhenReady = !isPause
+
                 exoPlayer.volume = volume
 
                 seekToTime?.let { exoPlayer.seekTo((it * 1000).toLong()) }
 
                 exoPlayer.setPlaybackSpeed(speed.toFloat())
+
                 playerView.resizeMode = when (size) {
                     ScreenResize.FIT -> AspectRatioFrameLayout.RESIZE_MODE_FIT
                     ScreenResize.FILL -> AspectRatioFrameLayout.RESIZE_MODE_ZOOM
                 }
+
             }
         )
 
@@ -161,28 +226,6 @@ fun CMPPlayer2(
         }
     }
 }
-
-
-
-
-
-
-// Вспомогательная функция для установки surface_type (рефлексия, если API недоступен)
-private fun PlayerView.setSurfaceType(type: Int) {
-    try {
-        val field = PlayerView::class.java.getDeclaredField("surfaceType")
-        field.isAccessible = true
-        field.setInt(this, type)
-        // Обновляем поверхность
-        val method = PlayerView::class.java.getDeclaredMethod("updateSurfaceType")
-        method.isAccessible = true
-        method.invoke(this)
-    } catch (e: Exception) {
-        e.printStackTrace()
-        // Логирование ошибки, если рефлексия не сработала
-    }
-}
-
 
 private fun PlayerSpeed.toFloat(): Float {
     return when (this) {

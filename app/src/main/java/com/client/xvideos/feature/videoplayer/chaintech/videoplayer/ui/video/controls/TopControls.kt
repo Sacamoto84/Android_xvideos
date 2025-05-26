@@ -30,7 +30,7 @@ import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.Player
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.ScreenResize
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.VideoPlayerConfig
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.ui.component.AnimatedClickableIcon
-import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.ComposeResourceDrawable
+
 //import com.client.xvideos.feature.videoplayer.reelsdemo.composemultiplatformmediaplayer.generated.resources.Res
 //import com.client.xvideos.feature.videoplayer.reelsdemo.composemultiplatformmediaplayer.generated.resources.resize_fill
 //import com.client.xvideos.feature.videoplayer.reelsdemo.composemultiplatformmediaplayer.generated.resources.resize_fit

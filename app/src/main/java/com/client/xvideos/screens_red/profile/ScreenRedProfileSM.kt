@@ -288,6 +288,11 @@ class ScreenRedProfileSM @Inject constructor(
     }
     //!--- Поделиться ---
 
+
+    //--- Поворот
+    var roatateDeagle by mutableFloatStateOf(0f)
+
+
 }
 
 @Module

@@ -133,7 +133,8 @@ fun TikTokStyleVideoFeed(
             menuContent = menuContent,
             menuContentWidth = menuContentWidth,
             menuDefaultOpen = menuDefaultOpen,
-            menuOpenChanged = menuOpenChanged
+            menuOpenChanged = menuOpenChanged,
+            rotate = vm.roatateDeagle
         )
 
     }
