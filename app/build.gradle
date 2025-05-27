@@ -17,7 +17,7 @@ android {
 
     defaultConfig {
         applicationId "com.client.xvideos"
-        minSdk 26
+        minSdk 24
         targetSdk 35
         versionCode 1
         versionName "1.0"
@@ -114,9 +114,9 @@ dependencies {
     implementation(libs.ktor.serialization.kotlinx.json)
 
     //Ебанное логирование
-    implementation(libs.ktor.client.logging)
-    implementation libs.slf4j.api
-    implementation libs.slf4j.simple
+    //implementation(libs.ktor.client.logging)
+    //implementation libs.slf4j.api
+    //implementation libs.slf4j.simple
 
     // jsoup HTML parser library @ https://jsoup.org/
     implementation libs.jsoup
@@ -264,6 +264,8 @@ dependencies {
 
     //implementation("androidx.compose.runtime:runtime-tracing:1.8.1")
     //implementation("androidx.compose.runtime:runtime-tracing")
+
+
 
 }
 

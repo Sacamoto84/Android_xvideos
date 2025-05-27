@@ -4,8 +4,6 @@ import com.client.xvideos.urlStart
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.HttpTimeout
-import io.ktor.client.plugins.logging.LogLevel
-import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import timber.log.Timber
@@ -14,9 +12,9 @@ suspend fun getSearchResults(query: String): String? {
 
     val client = HttpClient(OkHttp)
     {
-        install(Logging) {
-            level = LogLevel.INFO
-        }
+//        install(Logging) {
+//            level = LogLevel.INFO
+//        }
         install(HttpTimeout)
         {
             requestTimeoutMillis = Long.MAX_VALUE

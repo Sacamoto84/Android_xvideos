@@ -32,6 +32,7 @@ class ApiClient {
 
             }
         }
+        expectSuccess = true
     }
 
     var bearerToken: String? = null

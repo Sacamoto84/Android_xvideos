@@ -32,7 +32,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import timber.log.Timber.DebugTree
 import timber.log.Timber.Forest.plant
-
+import java.security.SecureRandom
+import java.security.cert.X509Certificate
+import javax.net.ssl.HttpsURLConnection
+import javax.net.ssl.SSLContext
+import javax.net.ssl.TrustManager
+import javax.net.ssl.X509TrustManager
 
 const val urlStart = "https://www.xv-ru.com"
 
@@ -79,7 +84,6 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
         }
 
         windowInsetsController?.hide(WindowInsetsCompat.Type.systemBars())
-
 
 //        WindowCompat.setDecorFitsSystemWindows(window, false)
 //

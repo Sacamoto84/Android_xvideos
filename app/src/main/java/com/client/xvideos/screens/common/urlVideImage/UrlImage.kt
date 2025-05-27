@@ -16,6 +16,7 @@ import coil.request.ImageRequest
 import com.composeunstyled.Text
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil.CoilImage
+import timber.log.Timber
 
 /**
  * url: строка с адресом изображения
@@ -50,6 +51,7 @@ fun UrlImage(url: String, modifier: Modifier = Modifier,  contentScale : Content
             }
         },
         failure = {
+            Timber.e(">>>>>>>>>>>>"+it.reason)
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text("Ошибка загрузки", color = Color.Gray)
             }

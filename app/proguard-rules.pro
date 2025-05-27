@@ -33,3 +33,12 @@
 -keepclassmembers class okhttp3.MediaType$Companion {
     <init>();
 }
+
+-keep class org.slf4j.** { *; }
+-keep class **$$ExternalSyntheticLambda* { *; }
+
+# Ktor
+-keep class io.ktor.** { *; }
+-keep class kotlin.** { *; }
+-keep class kotlinx.** { *; }
+-keep class io.ktor.util.collections.** { *; }
