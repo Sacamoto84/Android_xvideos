@@ -66,7 +66,7 @@ internal fun VideoPlayerWithControl2(
     menuDefaultOpen : Boolean,
     menuOpenChanged : (Boolean) -> Unit,
 
-    rotate : Float
+    autoRotate : Boolean
 ) {
 
     if (BuildConfig.DEBUG) {
@@ -231,12 +231,10 @@ internal fun VideoPlayerWithControl2(
                 headers = playerHost.headers,
                 drmConfig = playerHost.drmConfig,
                 selectedQuality = playerHost.selectedQuality,
-                selectedAudioTrack = playerHost.selectedAudioTrack,
-                selectedSubTitle = playerHost.selectedsubTitle,
                 onExoPlayer = {
                     exoPlayer = it
                 },
-                rotate = rotate
+                autoRotate = autoRotate
             )
 
 //            playerConfig.watermarkConfig?.let {

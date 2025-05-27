@@ -26,6 +26,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import androidx.compose.runtime.produceState
 import androidx.media3.common.Metadata
+import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.rememberExoPlayerWithLifecycle
+import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.rememberPlayerView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -52,12 +54,10 @@ fun CMPPlayer2(
     headers: Map<String, String>?,
     drmConfig: DrmConfig?,
     selectedQuality: VideoQuality?,
-    selectedAudioTrack: AudioTrack?,
-    selectedSubTitle: SubtitleTrack?,
     //isForward : Boolean = false,
     //isBack: Boolean = false,
     onExoPlayer: (androidx.media3.exoplayer.ExoPlayer) -> Unit = {},
-    rotate: Float // можно менять как нужно
+    autoRotate: Boolean // можно менять как нужно
 ) {
     val context = LocalContext.current
 
@@ -70,87 +70,19 @@ fun CMPPlayer2(
         drmConfig,
         error,
         selectedQuality,
-        selectedAudioTrack,
-        selectedSubTitle,
         minBufferMs = 50000,
         maxBufferMs = 150000,
         bufferForPlaybackMs = 50,
         bufferForPlaybackAfterRebufferM = 100,
-        rotate = rotate
     )
 
     var currentRotate by remember { mutableFloatStateOf(0f) }
 
-    LaunchedEffect(currentRotate) {
-        Timber.i("@@@! currentRotate $currentRotate")
-        val rotateEffect = ScaleAndRotateTransformation.Builder().setRotationDegrees(currentRotate).build()
-        exoPlayer.setVideoEffects(listOf(rotateEffect))
-    }
 
 
-
-    DisposableEffect(exoPlayer) {
-
-        val listener1 = object : Player.Listener {
-
-
-            override fun onVideoSizeChanged(videoSize: VideoSize) {
-                val width = videoSize.width
-                val height = videoSize.height
-
-                Timber.i("@@@! width:$width height:$height")
-
-                // Пример логики: если портретное — повернуть на -90, если альбомное — оставить
-                //currentRotate = if (height > width) -90f else 0f
-
-//                GlobalScope.launch(Dispatchers.Main) {
-//                    delay(500)
-//                    val rotateEffect = ScaleAndRotateTransformation.Builder().setRotationDegrees(-90f).build()
-//                    exoPlayer.setVideoEffects(listOf(rotateEffect))
-//                }
-
-
-//                if (currentRotate.floatValue != calculatedRotate) {
-//                    currentRotate.floatValue = calculatedRotate
-//                    exoPlayer.setVideoEffects(
-//                        listOf(
-//                            ScaleAndRotateTransformation.Builder()
-//                                .setRotationDegrees(calculatedRotate)
-//                                .build()
-//                        )
-//                    )
-//                }
-
-
-            }
-        }
-
-        exoPlayer.addListener(listener1)
-
-        // Очистка при уничтожении Composable
-        onDispose  {
-            exoPlayer.removeListener(listener1)
-        }
-    }
-
-    LaunchedEffect(exoPlayer) {
-        onExoPlayer(exoPlayer)
-    }
-
-//    LaunchedEffect(isForward) {
-//        if (isForward) {
-//            exoPlayer.seekForward()
-//        }
-//    }
-//
-//    LaunchedEffect(isBack) {
-//        if (isForward) {
-//            exoPlayer.seekForward()
-//        }
-//    }
+    LaunchedEffect(exoPlayer) { onExoPlayer(exoPlayer) }
 
     val playerView = rememberPlayerView(exoPlayer, context)
-
 
     var isBuffering by remember { mutableStateOf(false) }
 
@@ -162,12 +94,43 @@ fun CMPPlayer2(
     // Update current time every second
     LaunchedEffect(exoPlayer) {
         while (isActive) {
-            currentTime(
-                //TimeUnit.MILLISECONDS.toSeconds(exoPlayer.currentPosition).coerceAtLeast(0L).toFloat()
-                (exoPlayer.currentPosition / 1000f).coerceAtLeast(0f)
-            )
-            delay(500) // Delay for 1 second
+            currentTime((exoPlayer.currentPosition / 1000f).coerceAtLeast(0f))
+            delay(50) // Delay for 1 second
         }
+    }
+
+    LaunchedEffect(exoPlayer) {
+        while (isActive) {
+
+            if (exoPlayer.videoFormat != null){
+                currentRotate =
+                    if (exoPlayer.videoFormat!!.height >= exoPlayer.videoFormat!!.width) 0f else -90f
+                Timber.i("@@@! H:${exoPlayer.videoFormat?.height}  W:${exoPlayer.videoFormat?.width} $exoPlayer")
+                break
+            }
+            else{
+                delay(100)
+            }
+        }
+    }
+
+//    LaunchedEffect(currentRotate) {
+//        Timber.i("@@@! 777 LaunchedEffect currentRotate:$currentRotate autoRotate:$autoRotate")
+//        if (autoRotate) {
+//            val rotateEffect =
+//                ScaleAndRotateTransformation.Builder().setRotationDegrees(currentRotate).build()
+//            exoPlayer.setVideoEffects(listOf(rotateEffect))
+//        }
+//    }
+
+    LaunchedEffect(autoRotate) {
+        Timber.i("@@@! 888 LaunchedEffect currentRotate:$currentRotate autoRotate:$autoRotate")
+        //if (autoRotate) {
+
+            val rotateEffect =
+                ScaleAndRotateTransformation.Builder().setRotationDegrees(if (autoRotate) -90f else 0f).build()
+            exoPlayer.setVideoEffects(listOf(rotateEffect))
+        //}
     }
 
     // Keep screen on while the player view is active
@@ -181,18 +144,13 @@ fun CMPPlayer2(
             modifier = modifier,
             update = {
                 exoPlayer.playWhenReady = !isPause
-
                 exoPlayer.volume = volume
-
                 seekToTime?.let { exoPlayer.seekTo((it * 1000).toLong()) }
-
                 exoPlayer.setPlaybackSpeed(speed.toFloat())
-
                 playerView.resizeMode = when (size) {
                     ScreenResize.FIT -> AspectRatioFrameLayout.RESIZE_MODE_FIT
                     ScreenResize.FILL -> AspectRatioFrameLayout.RESIZE_MODE_ZOOM
                 }
-
             }
         )
 
@@ -201,12 +159,12 @@ fun CMPPlayer2(
             val listener = createPlayerListener(
                 isSliding,
                 totalTime,
-                currentTime,
+                currentTime = {},
                 loadingState = { isBuffering = it },
                 didEndVideo,
                 loop,
                 exoPlayer,
-                error
+                error,
             )
 
             exoPlayer.addListener(listener)

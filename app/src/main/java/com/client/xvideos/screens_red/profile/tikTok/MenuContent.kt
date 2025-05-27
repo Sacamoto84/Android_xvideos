@@ -38,15 +38,7 @@ fun MenuContent(vm: ScreenRedProfileSM) {
         //Скачать
         Box( modifier = Modifier.then(themeButton)
             .clickable(onClick = {
-
-                if(vm.roatateDeagle == 0f) {
-                    vm.roatateDeagle = -90f
-                }
-                else
-                {
-                    vm.roatateDeagle = 0f
-                }
-
+                vm.autoRotate = !vm.autoRotate
             }), contentAlignment = Alignment.Center
         ) {
             Icon( Icons.Filled.RotateRight, contentDescription = null, tint = Color.White )

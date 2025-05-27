@@ -14,6 +14,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
+import androidx.media3.common.VideoSize
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.AspectRatioFrameLayout
@@ -21,8 +22,11 @@ import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.DrmConf
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPlayerError
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.PlayerSpeed
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.ScreenResize
+import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.rememberExoPlayerWithLifecycle
+import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.rememberPlayerView
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 @OptIn(UnstableApi::class)
@@ -59,8 +63,6 @@ fun CMPPlayer(
         drmConfig,
         error,
         selectedQuality,
-        selectedAudioTrack,
-        selectedSubTitle
     )
     val playerView = rememberPlayerView(exoPlayer, context)
 
@@ -113,7 +115,7 @@ fun CMPPlayer(
                 didEndVideo,
                 loop,
                 exoPlayer,
-                error
+                error,
             )
 
             exoPlayer.addListener(listener)
@@ -152,10 +154,12 @@ internal fun createPlayerListener(
     didEndVideo: () -> Unit,
     loop: Boolean,
     exoPlayer: ExoPlayer,
-    error: (MediaPlayerError) -> Unit
+    error: (MediaPlayerError) -> Unit,
 ): Player.Listener {
 
     return object : Player.Listener {
+
+        //
         override fun onEvents(player: Player, events: Player.Events) {
             if (!isSliding) {
                 totalTime(
@@ -165,6 +169,7 @@ internal fun createPlayerListener(
             }
         }
 
+        //
         override fun onPlaybackStateChanged(playbackState: Int) {
             when (playbackState) {
                 Player.STATE_BUFFERING -> {
@@ -187,8 +192,11 @@ internal fun createPlayerListener(
                 }
             }
         }
+
+        //
         override fun onPlayerError(error: PlaybackException) {
             error(MediaPlayerError.PlaybackError(error.message ?: "Unknown playback error"))
         }
+
     }
 }

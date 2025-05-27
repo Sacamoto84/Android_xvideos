@@ -77,7 +77,7 @@ fun RedUrlVideoLiteChaintech(
     menuContentWidth: Dp = 192.dp,
     menuDefaultOpen: Boolean = false,
     menuOpenChanged: (Boolean) -> Unit = {},
-    rotate : Float
+    autoRotate : Boolean
 ) {
 
     if (BuildConfig.DEBUG) {
@@ -254,7 +254,7 @@ fun RedUrlVideoLiteChaintech(
             menuContentWidth = menuContentWidth,
             menuDefaultOpen = menuDefaultOpen,
             menuOpenChanged = menuOpenChanged,
-            rotate = rotate
+            autoRotate = autoRotate
         )
 
     Text(
