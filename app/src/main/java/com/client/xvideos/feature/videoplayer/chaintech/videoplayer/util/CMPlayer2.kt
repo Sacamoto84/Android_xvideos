@@ -25,11 +25,14 @@ import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.Screen
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.snapshotFlow
 import androidx.media3.common.Metadata
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.rememberExoPlayerWithLifecycle
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.rememberPlayerView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -78,8 +81,6 @@ fun CMPPlayer2(
 
     var currentRotate by remember { mutableFloatStateOf(0f) }
 
-
-
     LaunchedEffect(exoPlayer) { onExoPlayer(exoPlayer) }
 
     val playerView = rememberPlayerView(exoPlayer, context)
@@ -91,24 +92,27 @@ fun CMPPlayer2(
         bufferCallback(isBuffering)
     }
 
-    // Update current time every second
     LaunchedEffect(exoPlayer) {
-        while (isActive) {
-            currentTime((exoPlayer.currentPosition / 1000f).coerceAtLeast(0f))
-            delay(50) // Delay for 1 second
+        flow {
+            while (isActive) {
+                emit((exoPlayer.currentPosition / 1000f).coerceAtLeast(0f))
+                delay(50)
+            }
+        }.collectLatest {
+            currentTime(it)
         }
+
     }
 
     LaunchedEffect(exoPlayer) {
         while (isActive) {
 
-            if (exoPlayer.videoFormat != null){
+            if (exoPlayer.videoFormat != null) {
                 currentRotate =
                     if (exoPlayer.videoFormat!!.height >= exoPlayer.videoFormat!!.width) 0f else -90f
                 Timber.i("@@@! H:${exoPlayer.videoFormat?.height}  W:${exoPlayer.videoFormat?.width} $exoPlayer")
                 break
-            }
-            else{
+            } else {
                 delay(100)
             }
         }
@@ -127,9 +131,10 @@ fun CMPPlayer2(
         Timber.i("@@@! 888 LaunchedEffect currentRotate:$currentRotate autoRotate:$autoRotate")
         //if (autoRotate) {
 
-            val rotateEffect =
-                ScaleAndRotateTransformation.Builder().setRotationDegrees(if (autoRotate) -90f else 0f).build()
-            exoPlayer.setVideoEffects(listOf(rotateEffect))
+        val rotateEffect =
+            ScaleAndRotateTransformation.Builder().setRotationDegrees(if (autoRotate) -90f else 0f)
+                .build()
+        exoPlayer.setVideoEffects(listOf(rotateEffect))
         //}
     }
 

@@ -36,7 +36,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
@@ -63,49 +62,21 @@ internal fun VideoPlayerWithControl2(
 
     menuContent: @Composable () -> Unit = {},
     menuContentWidth: Dp = 192.dp,
-    menuDefaultOpen : Boolean,
-    menuOpenChanged : (Boolean) -> Unit,
+    menuDefaultOpen: Boolean,
+    menuOpenChanged: (Boolean) -> Unit,
 
-    autoRotate : Boolean
+    autoRotate: Boolean
 ) {
 
-    if (BuildConfig.DEBUG) {
-        SideEffect {
-            Timber.i("@@@ VideoPlayerWithControl2() menuDefaultOpen:$menuDefaultOpen")
-        }
-    }
+   if (BuildConfig.DEBUG) { SideEffect { Timber.i("@@@ VideoPlayerWithControl2() menuDefaultOpen:$menuDefaultOpen") } }
 
     var isScreenLocked by remember { mutableStateOf(false) }
     var showControls by remember { mutableStateOf(playerConfig.showControls) } // State for showing/hiding controls
 
-//    var showVolumeControl by remember { mutableStateOf(false) }
     var volumeDragAmount by remember { mutableFloatStateOf(0f) }
     var activeOption by remember { mutableStateOf(PlayerOption.NONE) }
-    var frameRate by remember { mutableFloatStateOf(0f) }
     var exoPlayer by remember { mutableStateOf<androidx.media3.exoplayer.ExoPlayer?>(null) }
 
-
-//    val timeSource = remember { TimeSource.Monotonic }
-//    var lastInteractionMark by remember { mutableStateOf(timeSource.markNow()) }
-//    val handleControlInteraction = {
-//        if (playerConfig.showControls) {
-//            lastInteractionMark = timeSource.markNow()  // Reset the interaction timer
-//            showControls = true
-//        }
-//    }
-
-//    // Auto-hide controls if enabled
-//    if (playerConfig.showControls && playerConfig.isAutoHideControlEnabled) {
-//        LaunchedEffect(showControls, lastInteractionMark) {
-//            if (showControls) {
-//                val timeoutDuration = playerConfig.controlHideIntervalSeconds.seconds
-//                delay(timeoutDuration.inWholeMilliseconds) // Delay hiding controls
-//                if (!playerHost.isSliding && lastInteractionMark.elapsedNow() >= timeoutDuration) {
-//                    showControls = false // Hide controls if seek bar is not being slid
-//                }
-//            }
-//        }
-//    }
 
     val volumeDragModifier = Modifier.pointerInput(Unit) {
         detectHorizontalDragGestures(
@@ -119,59 +90,23 @@ internal fun VideoPlayerWithControl2(
 //                    exoPlayer?.seekForward()
 //                //}
 
+                playerHost.isSliding = true
                 playerHost.seekTo(
                     (playerHost.currentTime + (if (volumeDragAmount > 0) dx else -dx)).coerceIn(
                         0f,
                         playerHost.totalTime.toFloat()
                     )
                 )
+                playerHost.isSliding = false
             },
-            onDragCancel = {
-
-            },
+            onDragCancel = { },
             onHorizontalDrag = { _, dragAmount ->
                 volumeDragAmount += dragAmount
 
             }
         )
-
-
-//        detectVerticalDragGestures(
-//            onDragStart = {
-//                showVolumeControl = true
-//                volumeDragAmount = 0f
-//            },
-//            onVerticalDrag = { _, dragAmount ->
-//                volumeDragAmount += dragAmount
-//                val volumeChange = volumeDragAmount / 4000f // Adjust sensitivity
-//                playerHost.setVolume((playerHost.volumeLevel - volumeChange).coerceIn(0f, 1f))
-//                if (playerHost.volumeLevel > 0) playerHost.unmute() else playerHost.mute()
-//            },
-//            onDragEnd = {
-//                showVolumeControl = false // Hide immediately when finger is lifted
-//            }
-//        )
     }
 
-//    //Get Last saved time from preference for resume video
-//    LaunchedEffect(playerHost.totalTime) {
-//        getSeekTime(playerHost, playerConfig)?.let {
-//            playerHost.isSliding = true
-//            playerHost.seekToTime = it
-//            playerHost.isSliding = false
-//        }
-//    }
-
-//    //Save video last position into preference
-//    var previousUrl by remember { mutableStateOf(playerHost.url) }
-//    DisposableEffect(playerHost.url) {
-//        onDispose {
-//            if(playerConfig.enableResumePlayback) {
-//                saveCurrentPosition(playerHost, previousUrl)
-//                previousUrl = playerHost.url
-//            }
-//        }
-//    }
 
     val zoomState = rememberZoomState(maxScale = 3f)
     LaunchedEffect(playerHost.videoFitMode) {
@@ -260,8 +195,12 @@ internal fun VideoPlayerWithControl2(
                 //Нижняя сенсорная часть
                 Box(
                     modifier = Modifier
-                        .fillMaxHeight(1/3f).fillMaxWidth().align(Alignment.BottomCenter)
-                        .then(volumeDragModifier).alpha(0.5f).background(Color.Magenta)
+                        .fillMaxHeight(1 / 3f)
+                        .fillMaxWidth()
+                        .align(Alignment.BottomCenter)
+                        .then(volumeDragModifier)
+                        .alpha(0.5f)
+                        .background(Color.Magenta)
                 )
 
 
@@ -269,7 +208,10 @@ internal fun VideoPlayerWithControl2(
                 //var squareSize by remember { mutableStateOf(0.dp) }
                 val density = LocalDensity.current
 
-                BoxWithConstraints( modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center)
+                BoxWithConstraints(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                )
                 {
                     val width = maxWidth
                     val maxWidthPx = with(density) { (width).toPx() }
@@ -282,7 +224,12 @@ internal fun VideoPlayerWithControl2(
 
                     //Timber.i("@@@ menuDefaultOpen $menuDefaultOpen")
 
-                    val swipeState = remember { AnchoredDraggableState( initialValue = if (menuDefaultOpen) SwipeState.Center else SwipeState.Right, anchors = anchors ) }
+                    val swipeState = remember {
+                        AnchoredDraggableState(
+                            initialValue = if (menuDefaultOpen) SwipeState.Center else SwipeState.Right,
+                            anchors = anchors
+                        )
+                    }
 
                     LaunchedEffect(swipeState.currentValue) {
                         Timber.i("@@@ LaunchedEffect(swipeState)")
@@ -298,25 +245,49 @@ internal fun VideoPlayerWithControl2(
                             .fillMaxWidth()
                             //.alpha(0.5f)
                             //.background(color = Color.Magenta)
-                            .anchoredDraggable( swipeState, Orientation.Horizontal,
+                            .anchoredDraggable(
+                                swipeState, Orientation.Horizontal,
                                 flingBehavior =
                                     AnchoredDraggableDefaults.flingBehavior(
-                                        swipeState, positionalThreshold = { distance -> distance * 0.125f }, animationSpec = tween(100)
+                                        swipeState,
+                                        positionalThreshold = { distance -> distance * 0.125f },
+                                        animationSpec = tween(100)
                                     )
-                            ), contentAlignment = Alignment.CenterStart) {
+                            ), contentAlignment = Alignment.CenterStart
+                    ) {
 
                         if (swipeState.currentValue == SwipeState.Right && !swipeState.isAnimationRunning) {
-                            Box( Modifier.width(2.dp).height(48.dp).align(Alignment.CenterEnd).alpha(0.6f)
-                                    .background( color = Color(0xFFFFFFFF), shape = RoundedCornerShape(1.dp)) )
+                            Box(
+                                Modifier
+                                    .width(2.dp)
+                                    .height(48.dp)
+                                    .align(Alignment.CenterEnd)
+                                    .alpha(0.6f)
+                                    .background(
+                                        color = Color(0xFFFFFFFF),
+                                        shape = RoundedCornerShape(1.dp)
+                                    )
+                            )
                         }
 
                         Box(
                             modifier = Modifier
                                 //.offset { IntOffset(swappableState.offset.value.roundToInt(), 0) }
-                                .offset { IntOffset( x = swipeState.requireOffset().roundToInt(), y = 0 ) }
+                                .offset {
+                                    IntOffset(
+                                        x = swipeState.requireOffset().roundToInt(),
+                                        y = 0
+                                    )
+                                }
                                 .width(squareSize)
                                 .height(64.dp)
-                                .background(Color(0xA1969696), shape = RoundedCornerShape(topStart = 12.dp, bottomStart = 12.dp)),
+                                .background(
+                                    Color(0xA1969696),
+                                    shape = RoundedCornerShape(
+                                        topStart = 12.dp,
+                                        bottomStart = 12.dp
+                                    )
+                                ),
                             contentAlignment = Alignment.CenterStart
                         ) {
                             menuContent.invoke()

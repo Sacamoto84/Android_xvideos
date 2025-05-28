@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -77,7 +78,7 @@ fun RedUrlVideoLiteChaintech(
     menuContentWidth: Dp = 192.dp,
     menuDefaultOpen: Boolean = false,
     menuOpenChanged: (Boolean) -> Unit = {},
-    autoRotate : Boolean
+    autoRotate: Boolean
 ) {
 
     if (BuildConfig.DEBUG) {
@@ -257,17 +258,28 @@ fun RedUrlVideoLiteChaintech(
             autoRotate = autoRotate
         )
 
-    Text(
-        "${currentTime} / ${duration}",
-        color = Color.White,
-        modifier = Modifier.align(Alignment.BottomStart),
-        fontFamily = ThemeRed.fontFamilyPopinsRegular,
-        fontSize = 10.sp
-    )
-
     }
+
 }
 
+
+@Composable
+fun CurrentTimeText(
+    currentTime: Float,
+    duration: Int
+) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        Text(
+            "${currentTime} / ${duration}",
+            color = Color.White,
+            modifier = Modifier
+                .align(Alignment.Center)
+                .padding(8.dp),
+            fontFamily = ThemeRed.fontFamilyPopinsRegular,
+            fontSize = 10.sp
+        )
+    }
+}
 
 @Composable
 fun UrlImage1(
