@@ -302,8 +302,6 @@ class ScreenRedProfile() : Screen {
                                         item,
                                         index,
                                         onLongClick = {
-
-
                                         },
                                         onDoubleClick = {})
                                 }
@@ -328,7 +326,7 @@ class ScreenRedProfile() : Screen {
                         Text("      " + visibleItems.toString(), color = Color.White)
 
 
-                        //Скролл
+                        //---- Скролл ----
                         Box(
                             modifier = Modifier
                                 .fillMaxHeight()

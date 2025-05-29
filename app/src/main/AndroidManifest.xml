@@ -19,7 +19,11 @@
 
     <uses-permission android:name="android.permission.EXPAND_STATUS_BAR"/>
 
+    <uses-sdk
+        tools:overrideLibrary="com.kdownloader" />
+
     <application
+        android:networkSecurityConfig="@xml/network_security_config"
         android:requestLegacyExternalStorage="true"
         android:hapticFeedbackEnabled="true"
         android:largeHeap="true"

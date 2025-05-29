@@ -1,16 +1,14 @@
 package com.client.xvideos.screens_red.profile.atom
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -21,53 +19,42 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.ui.video.VideoPlayerComposable
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPlayerEvent
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPlayerHost
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.ScreenResize
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.VideoPlayerConfig
-import com.client.xvideos.screens_red.ThemeRed
+import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.ui.video.VideoPlayerWithControl
+import kotlinx.coroutines.launch
+import timber.log.Timber
 
 
 /**
  * Превьюшка для режима в два столбика
  */
-@RequiresApi(Build.VERSION_CODES.R)
 @Composable
 fun Red_Video_Lite_2Rrow(
     url: String,
     thumnailUrl: String = "",
     play: Boolean = true,
-    onChangeTime: (Pair<Float, Int>) -> Unit,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
     overlay: @Composable () -> Unit = {},
 ) {
 
-    Box(
-        modifier = Modifier.fillMaxWidth()
-    ) {
+    SideEffect {
+        Timber.i("@@@ Red_Video_Lite_2Rrow() play = $play, url = $url")
+    }
 
-        val playerHost = remember {
-            MediaPlayerHost(
-                mediaUrl = url,
-                isPaused = true,
-                isMuted = true
-            )
-        }
+    val playerHost = remember { MediaPlayerHost(mediaUrl = url, isPaused = false, isMuted = true) }
 
-        LaunchedEffect(play) {
-            if (play) playerHost.play() else playerHost.pause()
-        }
+    var time by remember { mutableFloatStateOf(0f) }
+    var duration by remember { mutableIntStateOf(0) }
 
-        var time by remember { mutableFloatStateOf(0f) }
-        var duration by remember { mutableIntStateOf(0) }
+    LaunchedEffect(play) { if (play) playerHost.play() else playerHost.pause() }
+    LaunchedEffect(Unit) { playerHost.setVideoFitMode(ScreenResize.FIT); playerHost.mute() }
 
-        onChangeTime(time to duration)
-
-
+    LaunchedEffect(Unit) {
 
         playerHost.onEvent = { event ->
             when (event) {
@@ -80,11 +67,12 @@ fun Red_Video_Lite_2Rrow(
                 }
 
                 is MediaPlayerEvent.BufferChange -> {
-                    println("!!!Buffering status: ${event.isBuffering}")
+                    println("???Buffering status: ${event.isBuffering}")
+                    //isBuffering = event.isBuffering
                 }
 
                 is MediaPlayerEvent.CurrentTimeChange -> {
-                    println("!!!Current playback time: ${event.currentTime}s")
+                    //println("!!!Current playback time: ${event.currentTime}s")
                     time = event.currentTime
                 }
 
@@ -102,12 +90,12 @@ fun Red_Video_Lite_2Rrow(
                 }
             }
         }
+    }
 
-        playerHost.setVideoFitMode(ScreenResize.FIT)
 
-        playerHost.mute()
+    Box(modifier = Modifier.fillMaxWidth()) {
 
-        VideoPlayerComposable(
+        VideoPlayerWithControl(
             modifier = Modifier.fillMaxSize(),
             playerHost = playerHost,
             playerConfig = VideoPlayerConfig(
@@ -131,14 +119,14 @@ fun Red_Video_Lite_2Rrow(
                 showControls = false,
                 loaderView = {
 
-                    UrlImage1(
-                        url = thumnailUrl,
-                        contentScale = ContentScale.Fit,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(Color.Transparent)
-                        //.zIndex(1f) // убедиться, что над видео
-                    )
+//                    UrlImage1(
+//                        url = thumnailUrl,
+//                        contentScale = ContentScale.Fit,
+//                        modifier = Modifier
+//                            .fillMaxSize()
+//                            .background(Color.Transparent)
+//                        //.zIndex(1f) // убедиться, что над видео
+//                    )
 
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator()
@@ -148,14 +136,14 @@ fun Red_Video_Lite_2Rrow(
             )
         )
 
-        Text(
-            "%02d:%02d".format(time, duration),
-            modifier = Modifier
-                .align(Alignment.TopEnd),
-            color = Color.White,
-            fontFamily = ThemeRed.fontFamilyPopinsRegular,
-            fontSize = 8.sp
-        )
+//        Text(
+//            "%02d:%02d".format(time, duration),
+//            modifier = Modifier
+//                .align(Alignment.TopEnd),
+//            color = Color.White,
+//            fontFamily = ThemeRed.fontFamilyPopinsRegular,
+//            fontSize = 8.sp
+//        )
 
 
         Box(

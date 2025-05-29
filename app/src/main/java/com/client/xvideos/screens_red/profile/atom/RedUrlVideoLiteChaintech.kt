@@ -48,7 +48,6 @@ import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPl
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPlayerHost
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.ScreenResize
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.VideoPlayerConfig
-import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.ui.video.VideoPlayerComposable
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.ui.video.VideoPlayerWithControl2
 import com.client.xvideos.screens_red.ThemeRed
 import com.client.xvideos.screens_red.profile.PlayerControls
