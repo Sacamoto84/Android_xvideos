@@ -1,11 +1,11 @@
 package com.client.xvideos.screens_red.profile.atom
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
@@ -17,14 +17,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.client.xvideos.BuildConfig
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPlayerEvent
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPlayerHost
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.ScreenResize
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.VideoPlayerConfig
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.ui.video.VideoPlayerWithControl
-import kotlinx.coroutines.launch
+import com.client.xvideos.screens_red.ThemeRed
 import timber.log.Timber
 
 
@@ -42,14 +43,16 @@ fun Red_Video_Lite_2Rrow(
     overlay: @Composable () -> Unit = {},
 ) {
 
-    SideEffect {
-        Timber.i("@@@ Red_Video_Lite_2Rrow() play = $play, url = $url")
+    var time by remember { mutableFloatStateOf(0f) }
+    var duration by remember { mutableIntStateOf(0) }
+
+    if (BuildConfig.DEBUG) {
+        SideEffect {
+            Timber.i("@@@ Red_Video_Lite_2Rrow() play = $play, url = $url time = $time, duration = $duration")
+        }
     }
 
     val playerHost = remember { MediaPlayerHost(mediaUrl = url, isPaused = false, isMuted = true) }
-
-    var time by remember { mutableFloatStateOf(0f) }
-    var duration by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(play) { if (play) playerHost.play() else playerHost.pause() }
     LaunchedEffect(Unit) { playerHost.setVideoFitMode(ScreenResize.FIT); playerHost.mute() }
@@ -95,74 +98,49 @@ fun Red_Video_Lite_2Rrow(
 
     Box(modifier = Modifier.fillMaxWidth()) {
 
-        VideoPlayerWithControl(
-            modifier = Modifier.fillMaxSize(),
-            playerHost = playerHost,
-            playerConfig = VideoPlayerConfig(
-                isZoomEnabled = false,
-                reelVerticalScrolling = false,
-                isPauseResumeEnabled = true,
-                isSeekBarVisible = true,
-                isMuteControlEnabled = true,
-                isDurationVisible = true,
-                seekBarThumbColor = Color.Red,
-                seekBarActiveTrackColor = Color.Red,
-                seekBarInactiveTrackColor = Color.White,
-                durationTextColor = Color.White,
-                seekBarBottomPadding = 10.dp,
-                pauseResumeIconSize = 40.dp,
-                isAutoHideControlEnabled = true,
-                controlHideIntervalSeconds = 5,
-                isFastForwardBackwardEnabled = true,
-                isGestureVolumeControlEnabled = false,
-                showAudioTracksOptions = false,
-                showControls = false,
-                loaderView = {
+        StaticVideoPlayer(playerHost)
 
-//                    UrlImage1(
-//                        url = thumnailUrl,
-//                        contentScale = ContentScale.Fit,
-//                        modifier = Modifier
-//                            .fillMaxSize()
-//                            .background(Color.Transparent)
-//                        //.zIndex(1f) // убедиться, что над видео
-//                    )
-
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator()
-                    }
-
-                }
-            )
+        Text(
+            "%02d:%02d".format(time.toInt(), duration), modifier = Modifier.align(Alignment.TopEnd), color = Color.White, fontFamily = ThemeRed.fontFamilyPopinsRegular,
+            fontSize = 8.sp
         )
 
-//        Text(
-//            "%02d:%02d".format(time, duration),
-//            modifier = Modifier
-//                .align(Alignment.TopEnd),
-//            color = Color.White,
-//            fontFamily = ThemeRed.fontFamilyPopinsRegular,
-//            fontSize = 8.sp
-//        )
-
-
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .combinedClickable(
-                    onClick = onClick,
-                    onLongClick = onLongClick
-                )
-        )
-
+        Box(modifier = Modifier.fillMaxSize().combinedClickable(onClick = onClick, onLongClick = onLongClick))
         overlay
-
-        CanvasTimeDurationLine(
-            time, duration,
-            timeA = 1f,
-            timeB = 1f,
-            timeABEnable = false
-        )
+        CanvasTimeDurationLine(time, duration, timeA = 1f, timeB = 1f, timeABEnable = false)
 
     }
+}
+
+@Composable
+private fun StaticVideoPlayer(playerHost: MediaPlayerHost) {
+    VideoPlayerWithControl(
+        modifier = Modifier.fillMaxSize(),
+        playerHost = playerHost,
+        playerConfig = VideoPlayerConfig(
+            showControls = true,
+            isZoomEnabled = false,
+            reelVerticalScrolling = false,
+            isPauseResumeEnabled = true,
+            isSeekBarVisible = true,
+            isMuteControlEnabled = true,
+            isDurationVisible = true,
+            seekBarThumbColor = Color.Red,
+            seekBarActiveTrackColor = Color.Red,
+            seekBarInactiveTrackColor = Color.White,
+            durationTextColor = Color.White,
+            seekBarBottomPadding = 10.dp,
+            pauseResumeIconSize = 40.dp,
+            isAutoHideControlEnabled = true,
+            controlHideIntervalSeconds = 5,
+            isFastForwardBackwardEnabled = true,
+            isGestureVolumeControlEnabled = false,
+            showAudioTracksOptions = false,
+            loaderView = {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            }
+        )
+    )
 }

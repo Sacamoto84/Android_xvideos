@@ -1,31 +1,13 @@
 package com.client.xvideos.screens_red.profile.atom
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Block
-import androidx.compose.material.icons.filled.FileDownload
-import androidx.compose.material.icons.filled.Preview
-import androidx.compose.material.icons.filled.VolumeOff
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -48,7 +30,7 @@ import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPl
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPlayerHost
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.ScreenResize
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.VideoPlayerConfig
-import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.ui.video.VideoPlayerWithControl2
+import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.ui.video.VideoPlayerWithMenuContent
 import com.client.xvideos.screens_red.ThemeRed
 import com.client.xvideos.screens_red.profile.PlayerControls
 import com.skydoves.landscapist.ImageOptions
@@ -215,7 +197,7 @@ fun RedUrlVideoLiteChaintech(
         playerHost.setVideoFitMode(ScreenResize.FIT)
 
 
-        VideoPlayerWithControl2(
+        VideoPlayerWithMenuContent(
             onClick = onClick,
             modifier = Modifier.fillMaxSize(),
             playerHost = playerHost,

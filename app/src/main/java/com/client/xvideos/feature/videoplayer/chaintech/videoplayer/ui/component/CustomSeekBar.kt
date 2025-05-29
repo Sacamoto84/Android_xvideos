@@ -22,8 +22,28 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.Chapter
+
+
+@Preview
+@Composable
+fun CustomSeekBarPreview() {
+    CustomSeekBar(
+        progress = 0.5f,
+        maxProgress = 1f,
+        onValueChange = {},
+        onValueChangeFinished = {},
+        trackHeight = 32.dp,
+        thumbRadius = 32.dp,
+        showThumbAlways = true,
+    )
+}
+
+
+
 
 @Composable
 fun CustomSeekBar(

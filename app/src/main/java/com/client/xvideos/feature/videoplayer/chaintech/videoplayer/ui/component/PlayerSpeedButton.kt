@@ -1,5 +1,6 @@
 package com.client.xvideos.feature.videoplayer.chaintech.videoplayer.ui.component
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -15,10 +16,27 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+
+@Preview
+@Composable
+fun PlayerSpeedButtonPreview() {
+    PlayerSpeedButton(
+        title =  "String",
+        size = 48.dp,
+        backgroundColor= Color.White,
+        titleColor = Color.Gray,
+        onClick= {}
+    )
+}
+
+
+
+@SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 internal fun PlayerSpeedButton(
     title: String,

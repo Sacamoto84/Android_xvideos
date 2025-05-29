@@ -59,7 +59,6 @@ fun CMPPlayer2(
     selectedQuality: VideoQuality?,
     //isForward : Boolean = false,
     //isBack: Boolean = false,
-    onExoPlayer: (androidx.media3.exoplayer.ExoPlayer) -> Unit = {},
     autoRotate: Boolean // можно менять как нужно
 ) {
     val context = LocalContext.current
@@ -81,7 +80,7 @@ fun CMPPlayer2(
 
     var currentRotate by remember { mutableFloatStateOf(0f) }
 
-    LaunchedEffect(exoPlayer) { onExoPlayer(exoPlayer) }
+    //LaunchedEffect(exoPlayer) { onExoPlayer(exoPlayer) }
 
     val playerView = rememberPlayerView(exoPlayer, context)
 

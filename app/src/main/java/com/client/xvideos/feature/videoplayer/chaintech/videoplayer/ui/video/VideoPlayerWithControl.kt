@@ -11,6 +11,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -20,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import com.client.xvideos.BuildConfig
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPlayerHost
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.PlayerOption
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.VideoPlayerConfig
@@ -31,6 +33,7 @@ import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.saveCur
 import kotlinx.coroutines.delay
 import net.engawapg.lib.zoomable.rememberZoomState
 import net.engawapg.lib.zoomable.zoomable
+import timber.log.Timber
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.TimeSource
 
@@ -40,6 +43,13 @@ internal fun VideoPlayerWithControl(
     playerHost: MediaPlayerHost,
     playerConfig: VideoPlayerConfig
 ) {
+
+    if (BuildConfig.DEBUG) {
+        SideEffect {
+            Timber.i("@@@ VideoPlayerWithControl()")
+        }
+    }
+
     var isScreenLocked by remember { mutableStateOf(false) }
     var showControls by remember { mutableStateOf(playerConfig.showControls) } // State for showing/hiding controls
     var showVolumeControl by remember { mutableStateOf(false) }

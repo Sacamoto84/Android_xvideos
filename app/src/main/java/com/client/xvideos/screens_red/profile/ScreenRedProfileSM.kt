@@ -289,10 +289,14 @@ class ScreenRedProfileSM @Inject constructor(
     //!--- Поделиться ---
 
 
+
+
+
     /**
      * --- Вкллючить автоматический поворот ---
      */
     var autoRotate by mutableStateOf(false)
+
 
 
 }
