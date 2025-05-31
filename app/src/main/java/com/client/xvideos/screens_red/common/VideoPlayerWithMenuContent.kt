@@ -65,15 +65,10 @@ fun VideoPlayerWithMenuContent(
     autoRotate: Boolean
 ) {
 
-    if (BuildConfig.DEBUG) {
-        SideEffect { Timber.i("@@@ VideoPlayerWithMenuContent() menuDefaultOpen:$menuDefaultOpen") }
-    }
+    if (BuildConfig.DEBUG) { SideEffect { Timber.i("@@@ VideoPlayerWithMenuContent() menuDefaultOpen:$menuDefaultOpen") } }
 
     val zoomState = rememberZoomState(maxScale = 3f)
     LaunchedEffect(playerHost.videoFitMode) { zoomState.reset() }
-
-    val squareSize = menuContentWidth
-    val density = LocalDensity.current
 
     var volumeDragAmount by remember { mutableFloatStateOf(0f) }
     val volumeDragModifier = Modifier.pointerInput(Unit) {

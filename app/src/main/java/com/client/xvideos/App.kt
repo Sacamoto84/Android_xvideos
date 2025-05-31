@@ -44,12 +44,6 @@ class App : Application() {
 
         kDownloader = KDownloader.create(applicationContext)
 
-//        val config = PRDownloaderConfig.newBuilder()
-//            .setReadTimeout(30_000)
-//            .setConnectTimeout(30_000)
-//            .setDatabaseEnabled(true)
-//            .build()
-//        PRDownloader.initialize(this, config)
     }
 
     companion object {
