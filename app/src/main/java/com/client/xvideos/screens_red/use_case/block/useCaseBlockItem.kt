@@ -1,4 +1,4 @@
-package com.client.xvideos.screens_red.use_case
+package com.client.xvideos.screens_red.use_case.block
 
 import com.client.xvideos.AppPath
 import com.client.xvideos.feature.redgifs.types.GifsInfo
@@ -17,7 +17,7 @@ import java.io.File
  * @return [Result.success(true)] — если файл успешно создан или уже существует.
  *         [Result.failure] — если произошла ошибка при создании директории или файла.
  *
- * @see java.io.File.createNewFile
+ * @see File.createNewFile
  * @see Result
  */
 fun useCaseBlockItem(item: GifsInfo): Result<Boolean> {

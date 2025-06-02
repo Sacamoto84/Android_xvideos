@@ -41,7 +41,6 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.client.xvideos.BuildConfig
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPlayerHost
-import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.VideoPlayerConfig
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.CMPPlayer2
 import net.engawapg.lib.zoomable.rememberZoomState
 import net.engawapg.lib.zoomable.zoomable

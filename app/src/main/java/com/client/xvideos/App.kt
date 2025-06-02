@@ -2,6 +2,7 @@ package com.client.xvideos
 
 import android.app.Application
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.PlaybackPreference
+import com.client.xvideos.screens_red.use_case.block.useCaseGetAllBlockedGifs
 import com.kdownloader.KDownloader
 import dagger.hilt.android.HiltAndroidApp
 import java.security.SecureRandom
@@ -37,11 +38,8 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         instance = this
-
         allowAllSSL()
-
         PlaybackPreference.initialize(this)
-
         kDownloader = KDownloader.create(applicationContext)
 
     }

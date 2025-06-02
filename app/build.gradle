@@ -74,6 +74,8 @@ android {
 
 dependencies {
 
+
+    //implementation "androidx.core:core:1.16.0" // или последнюю доступную версию
     implementation libs.androidx.core.ktx
     implementation libs.androidx.lifecycle.runtime.ktx
     implementation libs.androidx.activity.compose
@@ -264,6 +266,9 @@ dependencies {
 
     //implementation("androidx.compose.runtime:runtime-tracing:1.8.1")
     //implementation("androidx.compose.runtime:runtime-tracing")
+
+
+
 
 
 

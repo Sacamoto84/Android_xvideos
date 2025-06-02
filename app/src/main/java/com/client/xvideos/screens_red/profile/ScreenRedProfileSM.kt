@@ -5,8 +5,10 @@ import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelKey
@@ -21,9 +23,9 @@ import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.redgifs.types.MediaType
 import com.client.xvideos.feature.redgifs.types.Order
 import com.client.xvideos.feature.room.AppDatabase
-import com.client.xvideos.screens_red.use_case.useCaseBlockItem
+import com.client.xvideos.screens_red.use_case.block.useCaseBlockItem
+import com.client.xvideos.screens_red.use_case.block.useCaseGetAllBlockedGifs
 import com.client.xvideos.screens_red.use_case.useCaseShareFile
-import com.composables.core.DialogState
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -57,30 +59,29 @@ class ScreenRedProfileSM @Inject constructor(
     private val _list = MutableStateFlow<List<GifsInfo>>(emptyList())
     val list: StateFlow<List<GifsInfo>> = _list
 
-    private var currentPage = 0
+    //private var currentPage = 0
     private var totalItems = Int.MAX_VALUE   // узнаём после 1-го ответа
     var isLoading = MutableStateFlow(false)
 
-    fun loadNextPage() {
+    suspend fun loadNextPage(items : Int = 100, page : Int = 1) {
 
         Timber.d("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! loadNextPage isLoading.value ${isLoading.value}")
 
         if (isLoading.value) return
         if (_list.value.size >= totalItems) return   // всё скачали
 
-        screenModelScope.launch(Dispatchers.IO) {
             isLoading.value = true
             try {
-                val nextPage = currentPage + 1
+                //val nextPage = currentPage + 1
                 val r = loadProfileGif(
-                    nextPage,
+                    page,
                     order,
                     if (typeGifs == TypeGifs.GIFS) MediaType.GIF else MediaType.IMAGE
                 )
                 val resp = r.gifs
                 // обновляем данные
                 _list.update { it + resp }
-                currentPage = nextPage
+                //currentPage = nextPage
                 totalItems = maxCreatorGifs
             } catch (e: Exception) {
                 // TODO: обработка ошибки (Snackbar / Retry)
@@ -88,7 +89,7 @@ class ScreenRedProfileSM @Inject constructor(
                 isLoading.value = false
             }
 
-        }
+
     }
 
     fun clear() {
@@ -96,9 +97,10 @@ class ScreenRedProfileSM @Inject constructor(
             Thread.sleep(100)
         }
         _list.update { emptyList() }
+
         _tags.update { emptySet() }
 
-        currentPage = 0
+        //currentPage = 0
     }
 
     //var selector by mutableIntStateOf(0) // 0- 1 елемент  1-2 елемента показывать
@@ -119,7 +121,6 @@ class ScreenRedProfileSM @Inject constructor(
      * Общее количество Gif у профиля
      */
     var maxCreatorGifs = 0
-    var maxCreatorImages = 0
 
     ///////////////////////////////////////////////
     val selector = pref.flowRedSelector
@@ -136,23 +137,22 @@ class ScreenRedProfileSM @Inject constructor(
 
         screenModelScope.launch {
 
-            creator = RedGifs.searchCreator(
-                page = 1,
-                count = 1,
-                type = MediaType.GIF,
-                order = order
-            )
-            maxCreatorGifs = creator?.users[0]?.publishedGifs ?: 0
-            maxCreatorImages = creator?.pages ?: 0
+            creator = RedGifs.searchCreator( page = 1,  count = 1, type = MediaType.GIF,  order = order )
+            //maxCreatorGifs = creator?.users[0]?.publishedGifs ?: 0
+            maxCreatorGifs = creator?.pages ?: 0
 
-            loadNextPage()
+            val repeats = maxCreatorGifs / 100 + 1
 
-            delay(1000)
-
-            repeat(maxCreatorGifs / 100) {
-                loadNextPage()
-                delay(1000)
+            repeat(repeats) {
+                loadNextPage(100, it+1)
+                delay(100)
             }
+
+            //Фильтруем список тегов убрав из списка блокируемые gif
+            blockList.clear()
+            blockList.addAll(useCaseGetAllBlockedGifs())
+            val blockedSet = blockList.toSet()
+            _list.value = _list.value.filterNot { it.id in blockedSet }
 
         }
 
@@ -240,6 +240,9 @@ class ScreenRedProfileSM @Inject constructor(
     //--- Блокировка ---
     var blockVisibleDialog by mutableStateOf(false) //Показ диалога на добавление в блок лист
 
+    var blockList = mutableStateListOf<String>()
+
+
     /**
      * Выполняет блокировку GIF-элемента, используя [useCaseBlockItem].
      *
@@ -263,7 +266,14 @@ class ScreenRedProfileSM @Inject constructor(
             Timber.e(exception, "Не удалось заблокировать GIF")
             Toast.makeText(App.instance.applicationContext, "Ошибка блокировки: $errorMsg", Toast.LENGTH_SHORT).show()
         }
+
+        blockList.clear()
+        blockList.addAll(useCaseGetAllBlockedGifs())
+
     }
+
+
+
     //!--- Блокировка ---
 
 

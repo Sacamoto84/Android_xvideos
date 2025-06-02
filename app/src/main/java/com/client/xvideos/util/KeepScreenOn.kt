@@ -1,4 +1,4 @@
-package com.client.xvideos
+package com.client.xvideos.util
 
 import android.app.Activity
 import android.content.Context

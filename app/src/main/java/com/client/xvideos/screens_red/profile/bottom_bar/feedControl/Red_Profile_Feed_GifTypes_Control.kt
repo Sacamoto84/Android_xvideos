@@ -22,30 +22,19 @@ import com.composeunstyled.Text
 fun Red_Profile_Feed_GifTypes_Control(vm: ScreenRedProfileSM) {
     Row(horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
 
-        TextAndLine(
-            Modifier
-                .weight(1f), vm.typeGifsList[0].value, vm.typeGifsList[0] == vm.typeGifs
-        ) {
+        TextAndLine(Modifier.weight(1f), vm.typeGifsList[0].value, vm.typeGifsList[0] == vm.typeGifs) {
             vm.typeGifs = vm.typeGifsList[0]
             vm.clear()
-            vm.loadNextPage()
+            //vm.loadNextPage()
         }
 
-        Box(Modifier
-            .width(1.dp)
-            .height(48.dp)
-            .background(ThemeRed.colorBorderGray))
+        Box(Modifier.width(1.dp).height(48.dp).background(ThemeRed.colorBorderGray))
 
-
-        TextAndLine(
-            Modifier
-                .weight(1f), vm.typeGifsList[1].value, vm.typeGifsList[1] == vm.typeGifs
-        ) {
+        TextAndLine(Modifier.weight(1f), vm.typeGifsList[1].value, vm.typeGifsList[1] == vm.typeGifs) {
             vm.typeGifs = vm.typeGifsList[1]
             vm.clear()
-            vm.loadNextPage()
+            //vm.loadNextPage()
         }
-
 
     }
 }
