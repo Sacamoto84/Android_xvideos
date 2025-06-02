@@ -149,7 +149,6 @@ class ScreenRedProfile() : Screen {
             bottomBar = {
                 Column {
 
-
 //                    AnimatedVisibility(
 //                        visible = trackVisible && selector == 1,
 //                        enter = slideInVertically { fullHeight ->
@@ -172,21 +171,11 @@ class ScreenRedProfile() : Screen {
 //                    ) {
                     //Линия продолжительности видео
 
-                    val al = animateFloatAsState(
-                        if (trackVisible && selector == 1) 1f else 0f,
-                        tween(400)
-                    )
+                    val al = animateFloatAsState(if (trackVisible && selector == 1) 1f else 0f, tween(400))
 
                     Box(
-                        Modifier
-                            .padding(bottom = 4.dp)
-                            .padding(horizontal = 16.dp)
-                            .clip(RoundedCornerShape(0))
-                            .height(16.dp)
-                            .fillMaxWidth()
-                            .alpha(al.value)
-                            .background(Color.Black), contentAlignment = Alignment.BottomCenter
-                    ) {
+                        Modifier.padding(bottom = 4.dp).padding(horizontal = 16.dp).clip(RoundedCornerShape(0)).height(16.dp)
+                            .fillMaxWidth().alpha(al.value).background(Color.Black), contentAlignment = Alignment.BottomCenter) {
 
                         CanvasTimeDurationLine(
                             currentTime = vm.currentPlayerTime,
@@ -200,26 +189,12 @@ class ScreenRedProfile() : Screen {
                                     vm.currentPlayerControls!!.seekTo(it)
                                 }
                             },
-                            onSeekFinished = {
-
-
-                            }
+                            onSeekFinished = { }
                         )
 
-                        BasicText(
-                            "12/233",
-                            style = TextStyle(
-                                color = Color.White,
-                                fontFamily = ThemeRed.fontFamilyPopinsRegular,
-                                fontSize = 12.sp
-                            ),
-                            modifier = Modifier
-                                .align(Alignment.TopEnd)
-                                .offset(x = 0.dp, y = (-0).dp) // Смещаем вверх
-//                                .graphicsLayer(
-//                                    translationY = -10f
-//                                )
-//                                .zIndex(1f)
+                        BasicText( "12/233",
+                            style = TextStyle(color = Color.White, fontFamily = ThemeRed.fontFamilyPopinsRegular, fontSize = 12.sp),
+                            modifier = Modifier.align(Alignment.TopEnd).offset(x = 0.dp, y = (-0).dp)
                         )
 
                     }
@@ -243,18 +218,12 @@ class ScreenRedProfile() : Screen {
                             vm.currentPlayerTime = it.first
                             vm.currentPlayerDuration = it.second
                         },
-                        onPageUIElementsVisibilityChange = {
-                            trackVisible = it
-                        },
+                        onPageUIElementsVisibilityChange = { trackVisible = it },
                         isMute = vm.mute,
-                        onLongClick = {
-
-                        },
+                        onLongClick = { },
 
                         //Текущий выбранный элемент в пейджере
-                        onChangePagerPage = {
-                            vm.currentTikTokPage = it
-                        },
+                        onChangePagerPage = { vm.currentTikTokPage = it },
                         modifier = Modifier,
 
                         timeA = vm.timeA,
@@ -262,16 +231,13 @@ class ScreenRedProfile() : Screen {
                         enableAB = vm.enableAB,
 
                         menuContent = {MenuContent(vm)},
-                        menuContentWidth = 256.dp,
+                        menuContentWidth = 300.dp,
 
                         menuDefaultOpen = vm.menuCenter,
                         menuOpenChanged = {
-                            vm.menuCenter = it
-                            Timber.i("@@@ menuOpenChanged vm.menuCenter = it $it")
-                        }
-
-
-
+                                vm.menuCenter = it
+                                Timber.i("@@@ menuOpenChanged vm.menuCenter = it $it")
+                            }
                         )
 
                 } else {
@@ -286,53 +252,27 @@ class ScreenRedProfile() : Screen {
                             verticalArrangement = Arrangement.spacedBy(4.dp),
                             contentPadding = PaddingValues(4.dp) // Отступы по краям сетки
                         ) {
-
                             //Тайлы картинок и видео
                             itemsIndexed(
                                 list.value,
                                 key = { index, item -> item.id }) { index, item ->
-
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .aspectRatio(1080f / 1920)
-                                ) {
-
-                                    RedUrlVideoImageAndLongClick(
-                                        item,
-                                        index,
-                                        onLongClick = {
-                                        },
-                                        onDoubleClick = {})
+                                Box(modifier = Modifier.fillMaxSize().aspectRatio(1080f / 1920)) {
+                                    RedUrlVideoImageAndLongClick(item, index, onLongClick = {}, onDoubleClick = {})
                                 }
-
                             }
-
                         }
 
                         //Индикатор загрузки
                         if (isLoading) {
-                            Box(
-                                Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(56.dp),
-                                    strokeWidth = 8.dp
-                                )
+                            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                CircularProgressIndicator(modifier = Modifier.size(56.dp), strokeWidth = 8.dp)
                             }
                         }
 
                         Text("      " + visibleItems.toString(), color = Color.White)
 
-
                         //---- Скролл ----
-                        Box(
-                            modifier = Modifier
-                                .fillMaxHeight()
-                                .align(Alignment.CenterEnd)
-                                .width(2.dp)
-                        ) { VerticalScrollbar(scrollPercent) }
+                        Box(modifier = Modifier.fillMaxHeight().align(Alignment.CenterEnd).width(2.dp)) { VerticalScrollbar(scrollPercent) }
 
                     }
 

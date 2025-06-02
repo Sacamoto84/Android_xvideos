@@ -1,9 +1,10 @@
-package com.client.xvideos.screens_red.use_case
+package com.client.xvideos.screens_red.use_case.share
 
 import android.content.Context
 import android.content.Intent
 import androidx.core.content.FileProvider
 import java.io.File
+
 
 fun useCaseShareFile(context: Context, file: File) {
 
@@ -21,3 +22,5 @@ fun useCaseShareFile(context: Context, file: File) {
 
     context.startActivity(Intent.createChooser(shareIntent, "Поделиться через"))
 }
+
+

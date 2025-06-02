@@ -8,7 +8,6 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelKey
@@ -25,13 +24,14 @@ import com.client.xvideos.feature.redgifs.types.Order
 import com.client.xvideos.feature.room.AppDatabase
 import com.client.xvideos.screens_red.use_case.block.useCaseBlockItem
 import com.client.xvideos.screens_red.use_case.block.useCaseGetAllBlockedGifs
-import com.client.xvideos.screens_red.use_case.useCaseShareFile
+import com.client.xvideos.screens_red.use_case.network.userCaseLoadGifs
+import com.client.xvideos.screens_red.use_case.share.useCaseShareFile
+import com.client.xvideos.screens_red.use_case.share.useCaseShareGifs
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -56,39 +56,28 @@ class ScreenRedProfileSM @Inject constructor(
 ) : ScreenModel//, PagingSource<Int, MediaInfo>() {
 {
 
+
     private val _list = MutableStateFlow<List<GifsInfo>>(emptyList())
     val list: StateFlow<List<GifsInfo>> = _list
 
-    //private var currentPage = 0
-    private var totalItems = Int.MAX_VALUE   // узнаём после 1-го ответа
+
     var isLoading = MutableStateFlow(false)
 
     suspend fun loadNextPage(items : Int = 100, page : Int = 1) {
-
-        Timber.d("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! loadNextPage isLoading.value ${isLoading.value}")
-
+        Timber.d("!!! loadNextPage isLoading.value ${isLoading.value}")
         if (isLoading.value) return
-        if (_list.value.size >= totalItems) return   // всё скачали
 
             isLoading.value = true
             try {
-                //val nextPage = currentPage + 1
-                val r = loadProfileGif(
-                    page,
-                    order,
-                    if (typeGifs == TypeGifs.GIFS) MediaType.GIF else MediaType.IMAGE
-                )
+                val r = userCaseLoadGifs(items = items, page = page, ord = order, type = if (typeGifs == TypeGifs.GIFS) MediaType.GIF else MediaType.IMAGE)
+                _tags.update { it + r.tags }
                 val resp = r.gifs
-                // обновляем данные
                 _list.update { it + resp }
-                //currentPage = nextPage
-                totalItems = maxCreatorGifs
             } catch (e: Exception) {
-                // TODO: обработка ошибки (Snackbar / Retry)
+
             } finally {
                 isLoading.value = false
             }
-
 
     }
 
@@ -97,16 +86,14 @@ class ScreenRedProfileSM @Inject constructor(
             Thread.sleep(100)
         }
         _list.update { emptyList() }
-
         _tags.update { emptySet() }
-
-        //currentPage = 0
     }
 
     //var selector by mutableIntStateOf(0) // 0- 1 елемент  1-2 елемента показывать
 
     var creator: CreatorResponse? by mutableStateOf(null)
 
+    //Список тегов
     private val _tags = MutableStateFlow<Set<String>>(emptySet())
     val tags: StateFlow<Set<String>> = _tags
 
@@ -117,14 +104,10 @@ class ScreenRedProfileSM @Inject constructor(
     val typeGifsList = listOf(TypeGifs.GIFS, TypeGifs.IMAGES)
     var typeGifs by mutableStateOf(TypeGifs.GIFS)
 
-    /**
-     * Общее количество Gif у профиля
-     */
-    var maxCreatorGifs = 0
+    var maxCreatorGifs = 0 //Общее количество Gif у профиля
 
     ///////////////////////////////////////////////
-    val selector = pref.flowRedSelector
-        .stateIn(screenModelScope, SharingStarted.WhileSubscribed(5000), 0)
+    val selector = pref.flowRedSelector.stateIn(screenModelScope, SharingStarted.WhileSubscribed(5000), 0)
 
     fun setSelector(value: Int) {
         screenModelScope.launch {
@@ -144,8 +127,8 @@ class ScreenRedProfileSM @Inject constructor(
             val repeats = maxCreatorGifs / 100 + 1
 
             repeat(repeats) {
-                loadNextPage(100, it+1)
-                delay(100)
+                loadNextPage(items = 100, page = it+1)
+                delay(10)
             }
 
             //Фильтруем список тегов убрав из списка блокируемые gif
@@ -158,48 +141,29 @@ class ScreenRedProfileSM @Inject constructor(
 
     }
 
-    suspend fun loadProfileGif(
-        page: Int = 1,
-        ord: Order = Order.NEW,
-        type: MediaType = MediaType.GIF
-    ): CreatorResponse {
-        val res = RedGifs.searchCreator(
-            count = 100,
-            page = page,
-            type = type,
-            order = ord
-        )
-        _tags.update { it + res.tags }
-        return res
-    }
-
-
     var currentPlayerControls by mutableStateOf<PlayerControls?>(null)
-
-    var mute by mutableStateOf(true)
 
     /**
      * Текущее время плеера
      */
-    var currentPlayerTime by mutableStateOf(0f)
+    var currentPlayerTime by mutableFloatStateOf(0f)
     var currentPlayerDuration by mutableIntStateOf(0)
 
     //var isPaused by mutableStateOf(false)
 
     //---- AB ----
     var play by mutableStateOf(true)
+    var mute by mutableStateOf(true)
+    var autoRotate by mutableStateOf(false) //Включить автоматический поворот
+
     var enableAB by mutableStateOf(false)
     var timeA by mutableFloatStateOf(3f)
     var timeB by mutableFloatStateOf(6f)
-    val listABbyId = mutableListOf<String>()
 
 
     //Для тикток
 
-    /**
-     * Индекс текущей страницы которая выводит видео на тикток
-     */
-    var currentTikTokPage by mutableIntStateOf(0)
+    var currentTikTokPage by mutableIntStateOf(0) //Индекс текущей страницы которая выводит видео на тикток
 
     /**
      * Возвращает текущий GIF из списка `list` по индексу `currentTikTokPage`.
@@ -216,7 +180,6 @@ class ScreenRedProfileSM @Inject constructor(
     var menuCenter by mutableStateOf(false)
 
     //---- Downloader ----
-
     //Загрузить текущую отображаемую страницу
     fun downloadCurrentItem() {
         screenModelScope.launch {
@@ -237,12 +200,11 @@ class ScreenRedProfileSM @Inject constructor(
 
 
 
-    //--- Блокировка ---
-    var blockVisibleDialog by mutableStateOf(false) //Показ диалога на добавление в блок лист
 
-    var blockList = mutableStateListOf<String>()
-
-
+    //════════════════ Блокировка ═════════════════════╦══════════════════════════════════════════════════════════════╗
+    var blockVisibleDialog by mutableStateOf(false)  //║ Показ диалога на добавление в блок лист                      ║
+    var blockList = mutableStateListOf<String>()     //║                                                              ║
+    //═════════════════════════════════════════════════╬══════════════════════════════════════════════════════════════╣
     /**
      * Выполняет блокировку GIF-элемента, используя [useCaseBlockItem].
      *
@@ -271,42 +233,13 @@ class ScreenRedProfileSM @Inject constructor(
         blockList.addAll(useCaseGetAllBlockedGifs())
 
     }
+    //                                                                                                                  ║
+    //══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
-
-
-    //!--- Блокировка ---
-
-
-    //--- Поделиться ---
-    fun shareGifs(context : Context, item: GifsInfo){
-
-        val path = "${AppPath.cache_download_red}/${item.userName}/${item.id}.mp4"
-        val file = File(path)
-
-        try {
-            if (file.exists()) {
-                useCaseShareFile(context, file)
-            } else {
-                Toast.makeText(context, "Файл не найден: $path", Toast.LENGTH_SHORT).show()
-                Timber.w("shareGifs -> Файл не существует: $path")
-            }
-        } catch (e: Exception) {
-            Toast.makeText(context, "Ошибка при попытке поделиться файлом", Toast.LENGTH_SHORT).show()
-            Timber.e(e, "shareGifs -> Ошибка при работе с файлом: $path")
-        }
-
-    }
-    //!--- Поделиться ---
-
-
-
-
-
-    /**
-     * --- Вкллючить автоматический поворот ---
-     */
-    var autoRotate by mutableStateOf(false)
-
+    // Методы
+    //════════════════ Поделиться ═══════════════════════════════════════════════════════╗
+    fun shareGifs(context : Context, item: GifsInfo){useCaseShareGifs(context, item)}  //║
+    //═══════════════════════════════════════════════════════════════════════════════════╝
 
 
 }
@@ -319,4 +252,3 @@ abstract class ScreenModuleRedProfile {
     @ScreenModelKey(ScreenRedProfileSM::class)
     abstract fun bindScreenRedProfileScreenModel(hiltListScreenModel: ScreenRedProfileSM): ScreenModel
 }
-

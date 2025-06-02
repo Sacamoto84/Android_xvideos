@@ -121,7 +121,7 @@ object RedGifs {
 
 
     suspend fun searchCreator(
-        username: String = "lilijunex",
+        userName: String = "lilijunex",
         page: Int = 1,
         count: Int = 100,
         order: Order = Order.NEW,
@@ -130,7 +130,7 @@ object RedGifs {
         val route = Route(
             method = "GET",
             path = "/v2/users/{username}/search?page={page}&count={count}&order={order}&type={type}",
-            "username" to username,
+            "username" to userName,
             "page" to page,
             "count" to count,
             "order" to order.value,
