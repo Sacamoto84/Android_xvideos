@@ -24,6 +24,7 @@ import com.client.xvideos.screens_red.profile.ScreenRedProfileSM
 import com.client.xvideos.screens_red.profile.atom.RedUrlVideoLiteChaintech
 import timber.log.Timber
 
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TikTokStyleVideoFeed(
@@ -51,11 +52,15 @@ fun TikTokStyleVideoFeed(
     menuContent: @Composable () -> Unit = {},
     menuContentWidth: Dp = 192.dp,
     menuDefaultOpen : Boolean = false,
-    menuOpenChanged : (Boolean) -> Unit
+    menuOpenChanged : (Boolean) -> Unit,
+
+    initialPage : Int
 
 ) {
 
-    val pagerState = rememberPagerState(pageCount = { videoItems.size })
+    var pagerState = rememberPagerState(pageCount = { videoItems.size })
+
+    LaunchedEffect(initialPage) { pagerState.scrollToPage(initialPage) }
 
     if (videoItems.isEmpty()) {
         Box(

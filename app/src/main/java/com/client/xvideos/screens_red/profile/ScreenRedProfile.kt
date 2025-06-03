@@ -1,17 +1,14 @@
 package com.client.xvideos.screens_red.profile
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,12 +24,7 @@ import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Block
-import androidx.compose.material.icons.filled.FileDownload
-import androidx.compose.material.icons.filled.VolumeOff
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -43,13 +35,10 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -60,19 +49,17 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.client.xvideos.App
 import com.client.xvideos.screens_red.ThemeRed
 import com.client.xvideos.screens_red.profile.atom.CanvasTimeDurationLine
 import com.client.xvideos.screens_red.profile.atom.RedUrlVideoImageAndLongClick
 import com.client.xvideos.screens_red.profile.atom.VerticalScrollbar
 import com.client.xvideos.screens_red.profile.block.DialogBlock
-import com.client.xvideos.screens_red.profile.bottom_bar.Red_Profile_Bottom_Bar
+import com.client.xvideos.screens_red.profile.bottom_bar.BottomBar
 import com.client.xvideos.screens_red.profile.tikTok.MenuContent
 import com.client.xvideos.screens_red.profile.tikTok.TikTokStyleVideoFeed
 
 import com.composeunstyled.rememberDisclosureState
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 class ScreenRedProfile() : Screen {
@@ -149,9 +136,6 @@ class ScreenRedProfile() : Screen {
             bottomBar = {
                 Column {
 
-                    //Линия продолжительности видео
-                    val al = animateFloatAsState(if (trackVisible && selector == 1) 1f else 0f, tween(400))
-
                     Box(
                         Modifier.padding(bottom = 4.dp).padding(horizontal = 16.dp).clip(RoundedCornerShape(0)).height(16.dp)
                             .fillMaxWidth()
@@ -177,9 +161,8 @@ class ScreenRedProfile() : Screen {
 
                     }
 
-
                     //   }
-                    Red_Profile_Bottom_Bar(vm)
+                    BottomBar(vm)
                 }
             },
             containerColor = Color.Black
@@ -212,12 +195,17 @@ class ScreenRedProfile() : Screen {
                         menuOpenChanged = {
                                 vm.menuCenter = it
                                 Timber.i("@@@ menuOpenChanged vm.menuCenter = it $it")
-                            }
+                            },
+                        initialPage = vm.tictikStartIndex
                         )
 
                 } else {
 
                     Box(modifier = Modifier.fillMaxSize()) {
+
+                        LaunchedEffect(vm.currentTikTokPage) {
+                            gridState.scrollToItem(vm.currentTikTokPage)
+                        }
 
                         LazyVerticalGrid(
                             state = gridState,
@@ -232,7 +220,12 @@ class ScreenRedProfile() : Screen {
                                 list.value,
                                 key = { index, item -> item.id }) { index, item ->
                                 Box(modifier = Modifier.fillMaxSize().aspectRatio(1080f / 1920)) {
-                                    RedUrlVideoImageAndLongClick(item, index, onLongClick = {}, onDoubleClick = {})
+                                    RedUrlVideoImageAndLongClick(item, index, onLongClick = {
+                                        vm.openFullScreen(index)
+                                    }, onDoubleClick = {}, onFullScreen = {
+                                            vm.openFullScreen(index)
+                                        }
+                                    )
                                 }
                             }
                         }

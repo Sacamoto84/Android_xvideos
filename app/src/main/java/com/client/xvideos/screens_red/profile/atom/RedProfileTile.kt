@@ -10,9 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,39 +26,22 @@ import com.composables.core.Icon
 @Composable
 fun RedProfileTile(item: GifsInfo, index: Int) {
 
-    val isVideo by remember{ mutableStateOf(false) }
+    Box(modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp))) {
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            //.aspectRatio(1f)
-            .clip(RoundedCornerShape(8.dp))
-    ) {
-
-        UrlImage(
-            url = item.urls.thumbnail,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .fillMaxSize()
-        )
-
+        UrlImage(url = item.urls.thumbnail, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
 
         //Индекс картинки
         Text(
             index.toString(),
             color = Color.Gray,
-            modifier = Modifier
-                .padding(start = 8.dp)
-                .offset(1.dp, 1.dp),
+            modifier = Modifier.padding(start = 8.dp).offset(1.dp, 1.dp),
             fontFamily = ThemeRed.fontFamilyPopinsMedium
         )
 
 
         //Нижний ряд с лайками и длительностью
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.BottomCenter),
+            modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {

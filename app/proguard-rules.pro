@@ -42,3 +42,5 @@
 -keep class kotlin.** { *; }
 -keep class kotlinx.** { *; }
 -keep class io.ktor.util.collections.** { *; }
+
+-dontwarn java.lang.management.**

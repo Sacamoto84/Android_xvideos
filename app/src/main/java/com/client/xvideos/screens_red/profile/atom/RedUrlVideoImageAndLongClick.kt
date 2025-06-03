@@ -2,10 +2,21 @@ package com.client.xvideos.screens_red.profile.atom
 
 import androidx.annotation.OptIn
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Fullscreen
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -13,11 +24,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.vibrate.vibrateWithPatternAndAmplitude
+import com.client.xvideos.screens.itemFullScreen.ScreenVideoPlayerFullScreen
+import com.client.xvideos.screens_red.ThemeRed
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -28,6 +44,7 @@ fun RedUrlVideoImageAndLongClick(
     onLongClick: () -> Unit,
     onDoubleClick: () -> Unit,
     overlay: @Composable () -> Unit = {},
+    onFullScreen: () -> Unit //Запуск фуллскрин
 ) {
     val haptic = LocalHapticFeedback.current
     val context = LocalContext.current
@@ -60,11 +77,21 @@ fun RedUrlVideoImageAndLongClick(
         if (isVideo) {
             Red_Video_Lite_2Rrow(
                 "https://api.redgifs.com/v2/gifs/${item.id.lowercase()}/hd.m3u8",
-                item.urls.thumbnail,
-                true,
+                play = true,
                 Modifier,
-                onClick = {isVideo = isVideo.not()},
-                onLongClick = {}
+                onClick = {
+                    isVideo = isVideo.not()
+                },
+                onLongClick = {},
+                overlayBottomEnd ={
+
+                    IconButton (
+                        modifier = Modifier.height(48.dp).width(48.dp), onClick = {
+                            onFullScreen.invoke()
+                        }
+                    ) { Icon(Icons.Filled.Fullscreen,  contentDescription = null, tint =  Color.White) }
+
+                }
             )
         } else {
             //Показ картинки

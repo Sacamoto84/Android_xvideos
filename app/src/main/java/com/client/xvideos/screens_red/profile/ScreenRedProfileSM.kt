@@ -137,7 +137,7 @@ class ScreenRedProfileSM @Inject constructor(
     //════════════════════════════════════════════════════╬═════════════════════════════════════════════════════════════════════════════════════╣
     var menuCenter by mutableStateOf(false)             //║ Отобразить в центре меню контент                                                    ║
     //════════════════════════════════════════════════════╩═════════════════════════════════════════════════════════════════════════════════════╝
-
+    var tictikStartIndex by mutableIntStateOf(0)
 
 
     //---- Downloader ----
@@ -235,6 +235,19 @@ class ScreenRedProfileSM @Inject constructor(
         _list.update { emptyList() }
         _tags.update { emptySet() }
     }
+
+
+
+
+
+    fun openFullScreen(index : Int){
+        setSelector(1)
+        tictikStartIndex = index
+
+
+    }
+
+
 
 }
 

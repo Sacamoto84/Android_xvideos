@@ -17,9 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.Fullscreen
-import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.VolumeMute
 import androidx.compose.material.icons.filled.VolumeOff
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
@@ -45,7 +43,7 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun Red_Profile_FeedControls_Container_Line0(vm: ScreenRedProfileSM) {
+fun FeedControls_Container_Line0(vm: ScreenRedProfileSM) {
 
     val border = Modifier.border(1.dp, ThemeRed.colorBorderGray)
 
@@ -56,26 +54,6 @@ fun Red_Profile_FeedControls_Container_Line0(vm: ScreenRedProfileSM) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-
-
-        Box(
-            modifier = Modifier
-                .height(48.dp)
-                .width(32.dp)
-                .border(1.dp, ThemeRed.colorBorderGray, RoundedCornerShape(8.dp))
-                .clickable(onClick = {
-                    vm.downloadCurrentItem()
-                }), contentAlignment = Alignment.Center
-        ) {
-
-            Icon(
-                painter = painterResource(R.drawable.exo_ic_subtitle_off),
-                contentDescription = null,
-                tint = if (vm.enableAB == true) Color.Green else Color.LightGray
-            )
-        }
-
-
 
         Box(
             modifier = Modifier
@@ -110,10 +88,7 @@ fun Red_Profile_FeedControls_Container_Line0(vm: ScreenRedProfileSM) {
         }
 
         Box(
-            modifier = Modifier
-                .height(48.dp)
-                .width(48.dp)//.border(1.dp, Color.White)
-                .border(1.dp, ThemeRed.colorBorderGray, RoundedCornerShape(8.dp))
+            modifier = Modifier.height(48.dp).width(48.dp).border(1.dp, ThemeRed.colorBorderGray, RoundedCornerShape(8.dp))
                 .clickable { vm.timeB = vm.currentPlayerTime }
         ) {
             Text(
@@ -276,12 +251,12 @@ fun Red_Profile_FeedControls_Container_Line0(vm: ScreenRedProfileSM) {
             Icon(
                 Icons.Filled.Block,
                 contentDescription = null,
-                tint = Color.LightGray
+                tint = Color.Gray
             )
             Icon(
                 Icons.Filled.MoreVert,
                 contentDescription = null,
-                tint = Color.LightGray
+                tint = Color.White
             )
         }
 

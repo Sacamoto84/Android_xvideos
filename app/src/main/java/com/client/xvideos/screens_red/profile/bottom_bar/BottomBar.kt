@@ -13,12 +13,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.client.xvideos.screens_red.ThemeRed
 import com.client.xvideos.screens_red.profile.ScreenRedProfileSM
-import com.client.xvideos.screens_red.profile.bottom_bar.feedControl.Red_Profile_FeedControls_Container
-import com.client.xvideos.screens_red.profile.bottom_bar.line0.Red_Profile_FeedControls_Container_Line0
+import com.client.xvideos.screens_red.profile.bottom_bar.line1.FeedControls_Container_Line1
+import com.client.xvideos.screens_red.profile.bottom_bar.line0.FeedControls_Container_Line0
 import com.composables.core.HorizontalSeparator
 
 @Composable
-fun Red_Profile_Bottom_Bar(vm: ScreenRedProfileSM) {
+fun BottomBar(vm: ScreenRedProfileSM) {
     val percentDownload = vm.downloader.percent.collectAsStateWithLifecycle().value
 
     Column {
@@ -30,8 +30,8 @@ fun Red_Profile_Bottom_Bar(vm: ScreenRedProfileSM) {
           -3f -> Box(modifier = Modifier.fillMaxWidth().height(2.dp).background(Color.Red))
         }
 
-        Red_Profile_FeedControls_Container_Line0(vm)
+        FeedControls_Container_Line0(vm)
         HorizontalSeparator(Color.Transparent, thickness = 4.dp)
-        Red_Profile_FeedControls_Container(vm)
+        FeedControls_Container_Line1(vm)
     }
 }

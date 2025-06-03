@@ -1,4 +1,4 @@
-package com.client.xvideos.screens_red.profile.bottom_bar.feedControl
+package com.client.xvideos.screens_red.profile.bottom_bar.line1
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,7 +19,7 @@ import com.client.xvideos.screens_red.profile.ScreenRedProfileSM
 import com.composeunstyled.Text
 
 @Composable
-fun Red_Profile_Feed_GifTypes_Control(vm: ScreenRedProfileSM) {
+fun GifTypes_Control(vm: ScreenRedProfileSM) {
     Row(horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
 
         TextAndLine(Modifier.weight(1f), vm.typeGifsList[0].value, vm.typeGifsList[0] == vm.typeGifs) {

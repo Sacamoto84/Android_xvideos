@@ -4,6 +4,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.magnifier
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,12 +36,11 @@ import timber.log.Timber
 @Composable
 fun Red_Video_Lite_2Rrow(
     url: String,
-    thumnailUrl: String = "",
     play: Boolean = true,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
-    overlay: @Composable () -> Unit = {},
+    overlayBottomEnd: @Composable () -> Unit = {},
 ) {
 
     var time by remember { mutableFloatStateOf(0f) }
@@ -84,13 +84,7 @@ fun Red_Video_Lite_2Rrow(
                     duration = event.totalTime.toInt()
                 }
 
-                is MediaPlayerEvent.FullScreenChange -> {
-                    println("!!!FullScreen status changed: ${event.isFullScreen}")
-                }
-
-                MediaPlayerEvent.MediaEnd -> {
-                    println("!!!Video playback ended")
-                }
+                else -> {}
             }
         }
     }
@@ -106,7 +100,9 @@ fun Red_Video_Lite_2Rrow(
         )
 
         Box(modifier = Modifier.fillMaxSize().combinedClickable(onClick = onClick, onLongClick = onLongClick))
-        overlay
+
+        Box(Modifier.align(Alignment.BottomEnd)){ overlayBottomEnd.invoke() }
+
         CanvasTimeDurationLine(time, duration, timeA = 1f, timeB = 1f, timeABEnable = false)
 
     }
@@ -118,7 +114,7 @@ private fun StaticVideoPlayer(playerHost: MediaPlayerHost) {
         modifier = Modifier.fillMaxSize(),
         playerHost = playerHost,
         playerConfig = VideoPlayerConfig(
-            showControls = true,
+            showControls = false,
             isZoomEnabled = false,
             reelVerticalScrolling = false,
             isPauseResumeEnabled = true,

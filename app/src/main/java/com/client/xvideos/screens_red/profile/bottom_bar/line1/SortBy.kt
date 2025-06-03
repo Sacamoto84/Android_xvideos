@@ -1,4 +1,4 @@
-package com.client.xvideos.screens_red.profile.bottom_bar.feedControl
+package com.client.xvideos.screens_red.profile.bottom_bar.line1
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -39,7 +39,7 @@ import com.client.xvideos.screens_red.ThemeRed
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Red_Profile_SortBy(list: List<Order>, selected: Order, onSelect: (Order) -> Unit) {
+fun SortBy(list: List<Order>, selected: Order, onSelect: (Order) -> Unit) {
 
     var expanded by remember { mutableStateOf(false) }
 
