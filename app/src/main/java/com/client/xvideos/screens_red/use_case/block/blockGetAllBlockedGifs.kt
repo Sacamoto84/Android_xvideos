@@ -10,7 +10,7 @@ import java.io.File
  *
  * @return Список всех ID заблокированных GIF-файлов.
  */
-fun useCaseGetAllBlockedGifs(): List<String> {
+fun blockGetAllBlockedGifs(): List<String> {
 
     val rootDir = File(AppPath.cache_download_red)
 
@@ -20,6 +20,6 @@ fun useCaseGetAllBlockedGifs(): List<String> {
     }
 
     return rootDir.listFiles { file -> file.isDirectory }
-        ?.flatMap { userDir -> useCaseGetBlockedGifIds(userDir.name) }
+        ?.flatMap { userDir -> blockGetGifsByUserNameAsListString(userDir.name) }
         ?: emptyList()
 }
