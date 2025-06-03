@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.icons.filled.MoreHoriz
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.VolumeMute
 import androidx.compose.material.icons.filled.VolumeOff
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -34,8 +35,11 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.R
 import com.client.xvideos.screens_red.ThemeRed
+import com.client.xvideos.screens_red.manager_block.ScreenRedManageBlock
 import com.client.xvideos.screens_red.profile.ScreenRedProfileSM
 import java.util.Locale
 
@@ -257,6 +261,8 @@ fun Red_Profile_FeedControls_Container_Line0(vm: ScreenRedProfileSM) {
             )
         }
 
+        val navigator = LocalNavigator.currentOrThrow
+
 
         Box(
             modifier = Modifier
@@ -264,13 +270,18 @@ fun Red_Profile_FeedControls_Container_Line0(vm: ScreenRedProfileSM) {
                 .width(48.dp)
                 .border(1.dp, ThemeRed.colorBorderGray, RoundedCornerShape(8.dp))
                 .clickable(onClick = {
-                    vm.downloadCurrentItem()
+                    navigator.push(ScreenRedManageBlock())
                 }), contentAlignment = Alignment.Center
         ) {
             Icon(
                 Icons.Filled.Block,
                 contentDescription = null,
-                tint = if (vm.enableAB == true) Color.Green else Color.LightGray
+                tint = Color.LightGray
+            )
+            Icon(
+                Icons.Filled.MoreVert,
+                contentDescription = null,
+                tint = Color.LightGray
             )
         }
 

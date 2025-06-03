@@ -56,31 +56,7 @@ class ScreenRedProfileSM @Inject constructor(
     val list: StateFlow<List<GifsInfo>> = _list
 
 
-    suspend fun loadNextPage(items : Int = 100, page : Int = 1) {
-        Timber.d("!!! loadNextPage isLoading.value ${isLoading.value}")
-        if (isLoading.value) return
 
-            isLoading.value = true
-            try {
-                val r = userCaseLoadGifs(items = items, page = page, ord = order, type = if (typeGifs == TypeGifs.GIFS) MediaType.GIF else MediaType.IMAGE)
-                _tags.update { it + r.tags }
-                val resp = r.gifs
-                _list.update { it + resp }
-            } catch (e: Exception) {
-
-            } finally {
-                isLoading.value = false
-            }
-
-    }
-
-    fun clear() {
-        while (isLoading.value) {
-            Thread.sleep(100)
-        }
-        _list.update { emptyList() }
-        _tags.update { emptySet() }
-    }
 
     //var selector by mutableIntStateOf(0) // 0- 1 елемент  1-2 елемента показывать
 
@@ -233,6 +209,32 @@ class ScreenRedProfileSM @Inject constructor(
         _list.value = _list.value.filterNot { it.id in blockedSet }                    //║
     }                                                                                  //║
     //═══════════════════════════════════════════════════════════════════════════════════╝
+
+    suspend fun loadNextPage(items : Int = 100, page : Int = 1) {
+        Timber.d("!!! loadNextPage isLoading.value ${isLoading.value}")
+        if (isLoading.value) return
+
+        isLoading.value = true
+        try {
+            val r = userCaseLoadGifs(items = items, page = page, ord = order, type = if (typeGifs == TypeGifs.GIFS) MediaType.GIF else MediaType.IMAGE)
+            _tags.update { it + r.tags }
+            val resp = r.gifs
+            _list.update { it + resp }
+        } catch (e: Exception) {
+
+        } finally {
+            isLoading.value = false
+        }
+
+    }
+
+    fun clear() {
+        while (isLoading.value) {
+            Thread.sleep(100)
+        }
+        _list.update { emptyList() }
+        _tags.update { emptySet() }
+    }
 
 }
 
