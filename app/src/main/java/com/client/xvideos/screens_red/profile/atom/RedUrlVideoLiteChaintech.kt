@@ -30,6 +30,7 @@ import com.client.xvideos.screens_red.profile.PlayerControls
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -37,31 +38,31 @@ import timber.log.Timber
 @Composable
 fun RedUrlVideoLiteChaintech(
     url: String,
-    thumnailUrl: String = "",
     play: Boolean,
     onChangeTime: (Pair<Float, Int>) -> Unit,
-    onLongClick: () -> Unit = {},
     isMute: Boolean = false,
     onPlayerControlsReady: (PlayerControls) -> Unit = {},
     timeA: Float = 0f,
     timeB: Float = 0f,
-    enableAB: Boolean = false,
+    enableAB: Boolean,
     onClick: () -> Unit = {},
     menuContent: @Composable () -> Unit = {},
     menuContentWidth: Dp = 192.dp,
     menuDefaultOpen: Boolean = false,
     menuOpenChanged: (Boolean) -> Unit = {},
-    autoRotate: Boolean
+    autoRotate: Boolean,
+    isCurrentPage : Boolean
 ) {
 
-    if (BuildConfig.DEBUG) { SideEffect { Timber.i("@@@ RedUrlVideoLiteChaintech() play:$play isMute:$isMute timeA:$timeA menuDefaultOpen:$menuDefaultOpen") } }
+    if (BuildConfig.DEBUG) { SideEffect {
+        Timber.i("@@@ RedUrlVideoLiteChaintech() play:$play isMute:$isMute") } }
 
     val scope = rememberCoroutineScope()
 
     var currentTime by remember { mutableFloatStateOf(0f) }
     var duration by remember { mutableIntStateOf(0) }
 
-    LaunchedEffect(Unit) { snapshotFlow { currentTime to duration }.collectLatest { onChangeTime(it) } }
+    LaunchedEffect(isCurrentPage) { snapshotFlow { currentTime to duration }.distinctUntilChanged().collectLatest {if (isCurrentPage) onChangeTime(it)}}
 
     val playerHost = remember { MediaPlayerHost(mediaUrl = url, isPaused = true) }
 
@@ -72,23 +73,20 @@ fun RedUrlVideoLiteChaintech(
     }
 
     LaunchedEffect(enableAB) { if (enableAB) { playerHost.seekTo(timeA.toFloat()) } }
-
     LaunchedEffect(play) { if (play) playerHost.play() else playerHost.pause() }
-
     LaunchedEffect(isMute) { if (isMute) playerHost.mute() else playerHost.unmute() }
 
-    LaunchedEffect(playerHost) {
+    LaunchedEffect(playerHost, enableAB, timeA, timeB) {
         playerHost.setVideoFitMode(ScreenResize.FIT)
         playerHost.onEvent = { event ->
             when (event) {
                 is MediaPlayerEvent.CurrentTimeChange -> {
                     //println("!!!Current playback time: ${event.currentTime}s")
                     currentTime = event.currentTime
+                    Timber.i("!!! Current playback time: ${event.currentTime}s enableAB:$enableAB timeA:$timeA timeB:$timeB")
                     if (enableAB && currentTime >= timeB) {
                         println("!!! playerHost.seekTo(${timeA}) ")
-                        scope.launch {
-                            playerHost.seekTo(timeA.toFloat())
-                        }
+                        scope.launch { playerHost.seekTo(timeA.toFloat()) }
                     }
                 }
                 is MediaPlayerEvent.TotalTimeChange -> { println("!!!Video duration updated: ${event.totalTime}s"); duration = event.totalTime.toInt() }
@@ -107,7 +105,6 @@ fun RedUrlVideoLiteChaintech(
             override fun pause() { playerHost.pause() }
             override fun play()  { playerHost.play() }
         }
-
         onPlayerControlsReady(controls)
 
     }

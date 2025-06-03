@@ -53,15 +53,12 @@ class ScreenRedProfileSM @Inject constructor(
     private val db: AppDatabase,
     private val pref: PreferencesRepository,
     val downloader: Downloader
-) : ScreenModel//, PagingSource<Int, MediaInfo>() {
+) : ScreenModel
 {
-
 
     private val _list = MutableStateFlow<List<GifsInfo>>(emptyList())
     val list: StateFlow<List<GifsInfo>> = _list
 
-
-    var isLoading = MutableStateFlow(false)
 
     suspend fun loadNextPage(items : Int = 100, page : Int = 1) {
         Timber.d("!!! loadNextPage isLoading.value ${isLoading.value}")
@@ -93,28 +90,29 @@ class ScreenRedProfileSM @Inject constructor(
 
     var creator: CreatorResponse? by mutableStateOf(null)
 
-    //Список тегов
-    private val _tags = MutableStateFlow<Set<String>>(emptySet())
-    val tags: StateFlow<Set<String>> = _tags
+    //═════════════════════════════════════════════════════════════════════════════════════════════════════╗
+    //* Список тегов                                                                                       ║
+    //══════════════════════════════════════════════════════════════╦══════════════════════════════════════╣
+    private val _tags = MutableStateFlow<Set<String>>(emptySet()) //║                                      ║
+    val tags: StateFlow<Set<String>> = _tags                      //║                                      ║
+    //══════════════════════════════════════════════════════════════╩══════════════════════════════════════╝
 
-    //Выбор сортировки
-    var order by mutableStateOf(Order.NEW)
-    val orderList = listOf(Order.TOP, Order.LATEST, Order.OLDEST, Order.TOP28, Order.TRENDING)
+    //═════════════════════════════════════════════════════════════════════════════════════════════════════╗
+    //* Выбор сортировки                                                                                   ║
+    //═════════════════════════════════════════════════════════════════════════════════════════════════════╣
+    val orderList = listOf(Order.TOP, Order.LATEST, Order.OLDEST, Order.TOP28, Order.TRENDING)           //║
+    var order by mutableStateOf(Order.NEW)                         //║ Текущий вид сортировки              ║
+    //═══════════════════════════════════════════════════════════════╩═════════════════════════════════════╝
 
     val typeGifsList = listOf(TypeGifs.GIFS, TypeGifs.IMAGES)
     var typeGifs by mutableStateOf(TypeGifs.GIFS)
 
-    var maxCreatorGifs = 0 //Общее количество Gif у профиля
+    var maxCreatorGifs = 0                  //║ Общее количество Gif у профиля не важно Gif или Images
+    var isLoading = MutableStateFlow(false) //║ Запрос к серверу п процессе
 
     ///////////////////////////////////////////////
     val selector = pref.flowRedSelector.stateIn(screenModelScope, SharingStarted.WhileSubscribed(5000), 0)
-
-    fun setSelector(value: Int) {
-        screenModelScope.launch {
-            pref.setRedSelector(value)
-        }
-    }
-
+    fun setSelector(value: Int) { screenModelScope.launch { pref.setRedSelector(value) } }
     ///////////////////////////////////////////////
     init {
 
@@ -141,8 +139,9 @@ class ScreenRedProfileSM @Inject constructor(
 
 
 
-
-    //═══ Управление плеером ═══════════════════════════╦══════════════════════════════════════════════════╗
+    //═════════════════════════════════════════════════════════════════════════════════════════════════════╗
+    // Управление плеером                                                                                  ║
+    //══════════════════════════════════════════════════╦══════════════════════════════════════════════════╣
     var play by mutableStateOf(true)                  //║                                                  ║
     var mute by mutableStateOf(true)                  //║                                                  ║
     var autoRotate by mutableStateOf(false)           //║ Включить автоматический поворот                  ║
@@ -157,17 +156,17 @@ class ScreenRedProfileSM @Inject constructor(
     var currentPlayerTime by mutableFloatStateOf(0f)  //║ Текущее время                                    ║
     var currentPlayerDuration by mutableIntStateOf(0) //║ Продолжительность видео                          ║
     //══════════════════════════════════════════════════╩══════════════════════════════════════════════════╝
-    
 
     //═══ Тикток ═════════════════════════════════════════╦═════════════════════════════════════════════════════════════════════════════════════╗
     var currentTikTokPage by mutableIntStateOf(0)       //║ Индекс текущей страницы которая выводит видео на тикток                             ║
     //════════════════════════════════════════════════════╬═════════════════════════════════════════════════════════════════════════════════════╣
     val currentTikTokGifInfo: GifsInfo?                 //║ Возвращает текущий GIF из списка `list` по индексу `currentTikTokPage               ║
         get() = list.value.getOrNull(currentTikTokPage) //║ @return Объект [GifsInfo] для текущей страницы или `null`, если индекс некорректен. ║
+    //════════════════════════════════════════════════════╬═════════════════════════════════════════════════════════════════════════════════════╣
+    var menuCenter by mutableStateOf(false)             //║ Отобразить в центре меню контент                                                    ║
     //════════════════════════════════════════════════════╩═════════════════════════════════════════════════════════════════════════════════════╝
 
-    //---- Меню верхнее----
-    var menuCenter by mutableStateOf(false)
+
 
     //---- Downloader ----
     //Загрузить текущую отображаемую страницу
@@ -193,7 +192,7 @@ class ScreenRedProfileSM @Inject constructor(
     var blockVisibleDialog by mutableStateOf(false)  //║ Показ диалога на добавление в блок лист                      ║
     var blockList = mutableStateListOf<String>()     //║                                                              ║
     //═════════════════════════════════════════════════╬══════════════════════════════════════════════════════════════╣
-    /**
+    /*
      * Выполняет блокировку GIF-элемента, используя [useCaseBlockItem].
      *
      * Функция вызывает `useCaseBlockItem` для создания файла блокировки,
@@ -226,7 +225,11 @@ class ScreenRedProfileSM @Inject constructor(
     fun shareGifs(context : Context, item: GifsInfo){useCaseShareGifs(context, item)}  //║
     //═══════════════════════════════════════════════════════════════════════════════════╝
 
+
     //═══════════════════════════════════════════════════════════════════════════════════╗
+    //                                                                                   ║
+    //                                                                                   ║
+    //═══════════════════════════════════════════════════════════════════════════════════╣
     fun refreshListAndBlock(){                                                         //║
         blockList.clear()                                                              //║
         blockList.addAll(useCaseGetAllBlockedGifs())                                   //║

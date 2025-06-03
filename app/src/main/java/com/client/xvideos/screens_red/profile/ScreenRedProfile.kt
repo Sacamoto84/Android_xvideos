@@ -88,102 +88,80 @@ class ScreenRedProfile() : Screen {
 
         val gridState = rememberLazyGridState()
         val list = vm.list.collectAsState()
+
         val isLoading = vm.isLoading.collectAsState().value
+
         val stateDisclosure = rememberDisclosureState()
         var prevIndex by remember { mutableIntStateOf(0) }
 
         val selector = vm.selector.collectAsStateWithLifecycle().value
 
-        //RedUrlVideoLite("https://api.redgifs.com/v2/gifs/easytightibisbill/hd.m3u8")
+        var trackVisible by remember { mutableStateOf(false) }
+        var visibleItems by remember { mutableIntStateOf(0) }
 
-        val density = LocalDensity.current
+        //Расчет процентов для скролл
+        val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForGrid(
+            gridState = gridState, itemsToIgnore = 3,  numberOfColumns = 2 )
 
-        //TikTokWithCollapsingToolbar(list.value)
 
+        //🟨🟨🟨🟨🟨🟨🟨🟨🎨🎨🎨🟨🟨🟨🟨🟨🟨🟨🟨
 
+        //╭┈┈ Диалог блокировки ┈┈╮
+        //│ Отмена    Блокировать │
+        //╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈╯
         DialogBlock(visible = vm.blockVisibleDialog, onDismiss = {vm.blockVisibleDialog = false}) {
-            val a = vm.currentTikTokGifInfo
-            if (a != null) {
-                vm.blockItem(a)
-            }
-        }
+            val a = vm.currentTikTokGifInfo; if (a != null) { vm.blockItem(a) }}
+
 
 
         //🟨🟨🟨🟨🟨🟨🟨🟨⬆️⬆️⬆️⬆️⬆️❗
 
-        //Расчет процентов для скролл
-        val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForGrid(
-            gridState = gridState,
-            itemsToIgnore = 3,
-            numberOfColumns = 2
-        )
 
-        var trackVisible by remember { mutableStateOf(false) }
 
-        var visibleItems by remember { mutableIntStateOf(0) }
 
-        // триггерим подгрузку, когда остаётся ≤6 элементов до конца
-        LaunchedEffect(gridState) {
-            withContext(Dispatchers.IO) {
-                snapshotFlow { gridState.layoutInfo }
-                    .distinctUntilChanged()
-                    .collect { info ->
-                        val last = info.visibleItemsInfo.lastOrNull()?.index ?: 0
-                        visibleItems = last
-                        //Timber.d("!!! prevIndex = $prevIndex")
-                        //Timber.d("!!! last = $last")
-                        //Timber.d("!!! info.totalItemsCount = ${info.totalItemsCount}")
 
-                        // Триггер только если движемся ВНИЗ
-                        if (last > prevIndex) {
-                            val total = info.totalItemsCount
-                            //if (total - last <= 6)
-                            //vm.loadNextPage()
-                        }
-                        prevIndex = last
-                    }
-            }
-        }
+
+
+//        // триггерим подгрузку, когда остаётся ≤6 элементов до конца
+//        LaunchedEffect(gridState) {
+//            withContext(Dispatchers.IO) {
+//                snapshotFlow { gridState.layoutInfo }
+//                    .distinctUntilChanged()
+//                    .collect { info ->
+//                        val last = info.visibleItemsInfo.lastOrNull()?.index ?: 0
+//                        visibleItems = last
+//                        //Timber.d("!!! prevIndex = $prevIndex")
+//                        //Timber.d("!!! last = $last")
+//                        //Timber.d("!!! info.totalItemsCount = ${info.totalItemsCount}")
+//
+//                        // Триггер только если движемся ВНИЗ
+//                        if (last > prevIndex) {
+//                            val total = info.totalItemsCount
+//                            //if (total - last <= 6)
+//                            //vm.loadNextPage()
+//                        }
+//                        prevIndex = last
+//                    }
+//            }
+//        }
 
         Scaffold(
             bottomBar = {
                 Column {
 
-//                    AnimatedVisibility(
-//                        visible = trackVisible && selector == 1,
-//                        enter = slideInVertically { fullHeight ->
-//                            // Начальная позиция: смещаем вниз на полную высоту элемента,
-//                            // чтобы он "выехал" снизу.
-//                            fullHeight
-//                        } + expandVertically(
-//                            // Расширяем снизу вверх
-//                            expandFrom = Alignment.Bottom
-//                        ),
-//                        // + fadeIn(       initialAlpha = 0.3f            )
-//                        exit = slideOutVertically { fullHeight ->
-//                            // Конечная позиция: смещаем вниз на полную высоту элемента,
-//                            // чтобы он "уехал" вниз.
-//                            fullHeight
-//                        } + shrinkVertically(
-//                            // Сжимаем снизу вверх (к низу)
-//                            shrinkTowards = Alignment.Bottom
-//                        ), //+ fadeOut()
-//                    ) {
                     //Линия продолжительности видео
-
                     val al = animateFloatAsState(if (trackVisible && selector == 1) 1f else 0f, tween(400))
 
                     Box(
                         Modifier.padding(bottom = 4.dp).padding(horizontal = 16.dp).clip(RoundedCornerShape(0)).height(16.dp)
-                            .fillMaxWidth().alpha(al.value).background(Color.Black), contentAlignment = Alignment.BottomCenter) {
+                            .fillMaxWidth()
+                            //.alpha(al.value)
+                            .background(Color.Black), contentAlignment = Alignment.BottomCenter) {
 
                         CanvasTimeDurationLine(
-                            currentTime = vm.currentPlayerTime,
-                            duration = vm.currentPlayerDuration,
-                            timeA = vm.timeA,
-                            timeB = vm.timeB,
-                            timeABEnable = vm.enableAB,
-                            play = vm.play,
+                            currentTime = vm.currentPlayerTime, duration = vm.currentPlayerDuration,
+                            timeA = vm.timeA, timeB = vm.timeB,
+                            timeABEnable = vm.enableAB, play = vm.play,
                             onSeek = {
                                 if (vm.currentPlayerControls != null) {
                                     vm.currentPlayerControls!!.seekTo(it)
@@ -192,7 +170,7 @@ class ScreenRedProfile() : Screen {
                             onSeekFinished = { }
                         )
 
-                        BasicText( "12/233",
+                        BasicText( vm.currentTikTokPage.toString()+"/"+vm.list.collectAsState().value.lastIndex,
                             style = TextStyle(color = Color.White, fontFamily = ThemeRed.fontFamilyPopinsRegular, fontSize = 12.sp),
                             modifier = Modifier.align(Alignment.TopEnd).offset(x = 0.dp, y = (-0).dp)
                         )
@@ -225,10 +203,7 @@ class ScreenRedProfile() : Screen {
                         //Текущий выбранный элемент в пейджере
                         onChangePagerPage = { vm.currentTikTokPage = it },
                         modifier = Modifier,
-
-                        timeA = vm.timeA,
-                        timeB = vm.timeB,
-                        enableAB = vm.enableAB,
+                        timeA = vm.timeA, timeB = vm.timeB, enableAB = vm.enableAB,
 
                         menuContent = {MenuContent(vm)},
                         menuContentWidth = 300.dp,

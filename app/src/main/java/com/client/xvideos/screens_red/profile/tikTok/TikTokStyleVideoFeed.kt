@@ -74,9 +74,7 @@ fun TikTokStyleVideoFeed(
 
         // Сообщаем, что UI не должен быть виден, если список пуст
         // (или решаем это на уровне вызывающего компонента)
-        LaunchedEffect(Unit) {
-            onPageUIElementsVisibilityChange(false)
-        }
+        LaunchedEffect(Unit) { onPageUIElementsVisibilityChange(false) }
 
         return
     }
@@ -94,8 +92,7 @@ fun TikTokStyleVideoFeed(
         key = { index -> videoItems[index].id } // Ключ для стабильности элементов
     ) { pageIndex ->
 
-        val videoItem =
-            videoItems[pageIndex] // pageIndex - это индекс текущей отображаемой страницы
+        val videoItem = videoItems[pageIndex] // pageIndex - это индекс текущей отображаемой страницы
 
         // Управляем воспроизведением в зависимости от того, видима ли страница
         // и соответствует ли она текущей активной странице в пейджере.
@@ -113,7 +110,6 @@ fun TikTokStyleVideoFeed(
 
         RedUrlVideoLiteChaintech(
             url = videoUri,
-            videoItem.urls.thumbnail,
             play = isCurrentPage and vm.play,
             onChangeTime = onChangeTime,
             isMute = isMute,
@@ -127,14 +123,13 @@ fun TikTokStyleVideoFeed(
             timeA = timeA,
             timeB = timeB,
             enableAB = enableAB,
-            onClick = {
-                vm.play = !vm.play
-            },
+            onClick = { vm.play = !vm.play },
             menuContent = menuContent,
             menuContentWidth = menuContentWidth,
             menuDefaultOpen = menuDefaultOpen,
             menuOpenChanged = menuOpenChanged,
-            autoRotate = vm.autoRotate
+            autoRotate = vm.autoRotate,
+            isCurrentPage = isCurrentPage
         )
 
     }
