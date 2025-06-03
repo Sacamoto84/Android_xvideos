@@ -132,49 +132,39 @@ class ScreenRedProfileSM @Inject constructor(
             }
 
             //Фильтруем список тегов убрав из списка блокируемые gif
-            blockList.clear()
-            blockList.addAll(useCaseGetAllBlockedGifs())
-            val blockedSet = blockList.toSet()
-            _list.value = _list.value.filterNot { it.id in blockedSet }
+            refreshListAndBlock()
 
         }
 
     }
 
-    var currentPlayerControls by mutableStateOf<PlayerControls?>(null)
-
-    /**
-     * Текущее время плеера
-     */
-    var currentPlayerTime by mutableFloatStateOf(0f)
-    var currentPlayerDuration by mutableIntStateOf(0)
-
-    //var isPaused by mutableStateOf(false)
-
-    //---- AB ----
-    var play by mutableStateOf(true)
-    var mute by mutableStateOf(true)
-    var autoRotate by mutableStateOf(false) //Включить автоматический поворот
-
-    var enableAB by mutableStateOf(false)
-    var timeA by mutableFloatStateOf(3f)
-    var timeB by mutableFloatStateOf(6f)
 
 
-    //Для тикток
 
-    var currentTikTokPage by mutableIntStateOf(0) //Индекс текущей страницы которая выводит видео на тикток
 
-    /**
-     * Возвращает текущий GIF из списка `list` по индексу `currentTikTokPage`.
-     *
-     * Если индекс выходит за пределы списка, возвращается `null`, чтобы избежать ошибки `IndexOutOfBoundsException`.
-     *
-     * @return Объект [GifsInfo] для текущей страницы или `null`, если индекс некорректен.
-     */
-    val currentTikTokGifInfo: GifsInfo?
-        get() = list.value.getOrNull(currentTikTokPage)
+    //═══ Управление плеером ═══════════════════════════╦══════════════════════════════════════════════════╗
+    var play by mutableStateOf(true)                  //║                                                  ║
+    var mute by mutableStateOf(true)                  //║                                                  ║
+    var autoRotate by mutableStateOf(false)           //║ Включить автоматический поворот                  ║
+    //══════════════════════════════════════════════════╬══════════════════════════════════════════════════╣
+    var enableAB by mutableStateOf(false)             //║                                                  ║
+    var timeA by mutableFloatStateOf(3f)              //║                                                  ║
+    var timeB by mutableFloatStateOf(6f)              //║                                                  ║
+    //══════════════════════════════════════════════════╩══════════════════════════════════════════════════╣
+    var currentPlayerControls by mutableStateOf<PlayerControls?>(null)                                   //║
+    //═════════════════════════════════════════════════════════════════════════════════════════════════════╝
+    //═══ Состояния плеера ═════════════════════════════╦══════════════════════════════════════════════════╗
+    var currentPlayerTime by mutableFloatStateOf(0f)  //║ Текущее время                                    ║
+    var currentPlayerDuration by mutableIntStateOf(0) //║ Продолжительность видео                          ║
+    //══════════════════════════════════════════════════╩══════════════════════════════════════════════════╝
+    
 
+    //═══ Тикток ═════════════════════════════════════════╦═════════════════════════════════════════════════════════════════════════════════════╗
+    var currentTikTokPage by mutableIntStateOf(0)       //║ Индекс текущей страницы которая выводит видео на тикток                             ║
+    //════════════════════════════════════════════════════╬═════════════════════════════════════════════════════════════════════════════════════╣
+    val currentTikTokGifInfo: GifsInfo?                 //║ Возвращает текущий GIF из списка `list` по индексу `currentTikTokPage               ║
+        get() = list.value.getOrNull(currentTikTokPage) //║ @return Объект [GifsInfo] для текущей страницы или `null`, если индекс некорректен. ║
+    //════════════════════════════════════════════════════╩═════════════════════════════════════════════════════════════════════════════════════╝
 
     //---- Меню верхнее----
     var menuCenter by mutableStateOf(false)
@@ -184,8 +174,7 @@ class ScreenRedProfileSM @Inject constructor(
     fun downloadCurrentItem() {
         screenModelScope.launch {
             val item = list.value[currentTikTokPage]
-            val hiName =
-                extractNameFromUrl(item.urls.hd.toString()) //https://media.redgifs.com/HealthyPettyRedhead.mp4 > HealthyPettyRedhead
+            val hiName = extractNameFromUrl(item.urls.hd.toString()) //https://media.redgifs.com/HealthyPettyRedhead.mp4 > HealthyPettyRedhead
             Timber.i("!!! downloadItem() id:${item.id} userName:${item.userName} url:${item.urls.hd}")
             downloader.downloadRedName(item.id, item.userName, item.urls.hd.toString())
             Timber.i("!!! downloadItem() ... завершено")
@@ -200,8 +189,7 @@ class ScreenRedProfileSM @Inject constructor(
 
 
 
-
-    //════════════════ Блокировка ═════════════════════╦══════════════════════════════════════════════════════════════╗
+    //Region══════════ Блокировка ═════════════════════╦══════════════════════════════════════════════════════════════╗
     var blockVisibleDialog by mutableStateOf(false)  //║ Показ диалога на добавление в блок лист                      ║
     var blockList = mutableStateListOf<String>()     //║                                                              ║
     //═════════════════════════════════════════════════╬══════════════════════════════════════════════════════════════╣
@@ -228,19 +216,24 @@ class ScreenRedProfileSM @Inject constructor(
             Timber.e(exception, "Не удалось заблокировать GIF")
             Toast.makeText(App.instance.applicationContext, "Ошибка блокировки: $errorMsg", Toast.LENGTH_SHORT).show()
         }
-
-        blockList.clear()
-        blockList.addAll(useCaseGetAllBlockedGifs())
-
+        refreshListAndBlock()
     }
     //                                                                                                                  ║
-    //══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+    //End ══════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
     // Методы
     //════════════════ Поделиться ═══════════════════════════════════════════════════════╗
     fun shareGifs(context : Context, item: GifsInfo){useCaseShareGifs(context, item)}  //║
     //═══════════════════════════════════════════════════════════════════════════════════╝
 
+    //═══════════════════════════════════════════════════════════════════════════════════╗
+    fun refreshListAndBlock(){                                                         //║
+        blockList.clear()                                                              //║
+        blockList.addAll(useCaseGetAllBlockedGifs())                                   //║
+        val blockedSet = blockList.toSet()                                             //║
+        _list.value = _list.value.filterNot { it.id in blockedSet }                    //║
+    }                                                                                  //║
+    //═══════════════════════════════════════════════════════════════════════════════════╝
 
 }
 
