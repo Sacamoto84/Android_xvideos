@@ -59,15 +59,8 @@ class ScreenRedManageBlock() : Screen {
 
                 items(blockList) { item ->
                     Row(
-                        modifier = Modifier
-                            .padding(vertical = 4.dp)
-                            .fillMaxWidth()
-                            .height(128.dp)
-                            .background(Color.Transparent)
-                            .border(
-                                1.dp,
-                                ThemeRed.colorBorderGray, RoundedCornerShape(8.dp)
-                            )
+                        modifier = Modifier.padding(vertical = 4.dp).fillMaxWidth().height(128.dp).background(Color.Transparent)
+                            .border(1.dp, ThemeRed.colorBorderGray, RoundedCornerShape(8.dp))
                     ) {
 
                         UrlImage(

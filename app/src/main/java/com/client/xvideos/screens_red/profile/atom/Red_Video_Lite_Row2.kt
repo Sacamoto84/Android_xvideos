@@ -4,7 +4,6 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.magnifier
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,7 +33,7 @@ import timber.log.Timber
  * Превьюшка для режима в два столбика
  */
 @Composable
-fun Red_Video_Lite_2Rrow(
+fun Red_Video_Lite_Row2(
     url: String,
     play: Boolean = true,
     modifier: Modifier = Modifier,

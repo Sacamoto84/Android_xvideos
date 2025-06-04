@@ -1,4 +1,4 @@
-package com.client.xvideos.screens_red.profile.atom
+package com.client.xvideos.screens_red.common.video
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,7 +25,6 @@ import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPl
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPlayerHost
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.ScreenResize
 import com.client.xvideos.screens_red.ThemeRed
-import com.client.xvideos.screens_red.common.VideoPlayerWithMenuContent
 import com.client.xvideos.screens_red.profile.PlayerControls
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.delay
@@ -36,7 +35,7 @@ import timber.log.Timber
 
 @OptIn(DelicateCoroutinesApi::class)
 @Composable
-fun RedUrlVideoLiteChaintech(
+fun RedVideoPlayerWithMenuContent(
     url: String,
     play: Boolean,
     onChangeTime: (Pair<Float, Int>) -> Unit,

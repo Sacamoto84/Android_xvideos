@@ -1,4 +1,4 @@
-package com.client.xvideos.screens_red.common
+package com.client.xvideos.screens_red.common.video
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.core.tween

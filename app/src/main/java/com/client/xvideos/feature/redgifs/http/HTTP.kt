@@ -26,7 +26,6 @@ object RedGifs {
     }
 
 
-    //❓❓❓Непонятно как получить номер id
     @Throws(ApiException::class)
     suspend fun getGif(id: String): MediaResponse {
         val route = Route("GET", "/v2/gifs/{id}", "id" to id)
@@ -142,7 +141,7 @@ object RedGifs {
 
 
     /**
-     * ## Получить список «в тренде» (Trending GIFs).
+     * ## Получить список «в тренде» (Trending GIFs). Возвращает 10 Gifs
      */
     @Throws(ApiException::class)
     suspend fun getTrendingGifs(): MediaResponse {

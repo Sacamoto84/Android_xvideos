@@ -18,6 +18,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
+
+
+
+
+
 
 @Composable
 fun CanvasTimeDurationLine(currentTime: Float, duration: Int, timeA: Float = 0f, timeB: Float = 1f , timeABEnable : Boolean, play : Boolean = false) {
@@ -97,6 +103,12 @@ fun CanvasTimeDurationLine(currentTime: Float, duration: Int, timeA: Float = 0f,
     }
 
 }
+@Preview
+@Composable
+fun CanvasTimeDurationLinePreview() {
+    CanvasTimeDurationLine(currentTime = 50f, duration = 100, timeA = 20f, timeB = 80f, timeABEnable = true, play = false)
+}
+
 
 @Composable
 fun CanvasTimeDurationLine(

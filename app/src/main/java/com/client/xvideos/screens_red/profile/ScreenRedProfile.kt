@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
@@ -52,10 +53,12 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.App
 import com.client.xvideos.screens_red.ThemeRed
 import com.client.xvideos.screens_red.profile.atom.CanvasTimeDurationLine
+import com.client.xvideos.screens_red.profile.atom.RedProfileCreaterInfo
 import com.client.xvideos.screens_red.profile.atom.RedUrlVideoImageAndLongClick
 import com.client.xvideos.screens_red.profile.atom.VerticalScrollbar
 import com.client.xvideos.screens_red.profile.block.DialogBlock
 import com.client.xvideos.screens_red.profile.bottom_bar.BottomBar
+import com.client.xvideos.screens_red.profile.tags.TagsBlock
 import com.client.xvideos.screens_red.profile.tikTok.MenuContent
 import com.client.xvideos.screens_red.profile.tikTok.TikTokStyleVideoFeed
 
@@ -92,25 +95,22 @@ class ScreenRedProfile(val profileName: String) : Screen {
 
         //Расчет процентов для скролл
         val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForGrid(
-            gridState = gridState, itemsToIgnore = 3,  numberOfColumns = 2 )
+            gridState = gridState, itemsToIgnore = 3, numberOfColumns = 2
+        )
 
 
         //🟨🟨🟨🟨🟨🟨🟨🟨🎨🎨🎨🟨🟨🟨🟨🟨🟨🟨🟨
-
         //╭┈┈ Диалог блокировки ┈┈╮
         //│ Отмена    Блокировать │
         //╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈╯
-        DialogBlock(visible = vm.blockVisibleDialog, onDismiss = {vm.blockVisibleDialog = false}) {
-            val a = vm.currentTikTokGifInfo; if (a != null) { vm.blockItem(a) }}
-
-
-
+        DialogBlock(
+            visible = vm.blockVisibleDialog,
+            onDismiss = { vm.blockVisibleDialog = false }) {
+            val a = vm.currentTikTokGifInfo; if (a != null) {
+            vm.blockItem(a)
+        }
+        }
         //🟨🟨🟨🟨🟨🟨🟨🟨⬆️⬆️⬆️⬆️⬆️❗
-
-
-
-
-
 
 
 //        // триггерим подгрузку, когда остаётся ≤6 элементов до конца
@@ -141,10 +141,15 @@ class ScreenRedProfile(val profileName: String) : Screen {
                 Column {
 
                     Box(
-                        Modifier.padding(bottom = 4.dp).padding(horizontal = 16.dp).clip(RoundedCornerShape(0)).height(16.dp)
+                        Modifier
+                            .padding(bottom = 4.dp)
+                            .padding(horizontal = 16.dp)
+                            .clip(RoundedCornerShape(0))
+                            .height(16.dp)
                             .fillMaxWidth()
                             //.alpha(al.value)
-                            .background(Color.Black), contentAlignment = Alignment.BottomCenter) {
+                            .background(Color.Black), contentAlignment = Alignment.BottomCenter
+                    ) {
 
                         CanvasTimeDurationLine(
                             currentTime = vm.currentPlayerTime, duration = vm.currentPlayerDuration,
@@ -158,9 +163,16 @@ class ScreenRedProfile(val profileName: String) : Screen {
                             onSeekFinished = { }
                         )
 
-                        BasicText( vm.currentTikTokPage.toString()+"/"+vm.list.collectAsState().value.lastIndex,
-                            style = TextStyle(color = Color.White, fontFamily = ThemeRed.fontFamilyPopinsRegular, fontSize = 12.sp),
-                            modifier = Modifier.align(Alignment.TopEnd).offset(x = 0.dp, y = (-0).dp)
+                        BasicText(
+                            vm.currentTikTokPage.toString() + "/" + vm.list.collectAsState().value.lastIndex,
+                            style = TextStyle(
+                                color = Color.White,
+                                fontFamily = ThemeRed.fontFamilyPopinsRegular,
+                                fontSize = 12.sp
+                            ),
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .offset(x = 0.dp, y = (-0).dp)
                         )
 
                     }
@@ -179,29 +191,29 @@ class ScreenRedProfile(val profileName: String) : Screen {
                     TikTokStyleVideoFeed(
                         vm,
                         list.value,
-                        onChangeTime = {
-                            vm.currentPlayerTime = it.first
-                            vm.currentPlayerDuration = it.second
+                        onChangeTime = { it1 ->
+                            vm.currentPlayerTime = it1.first
+                            vm.currentPlayerDuration = it1.second
                         },
-                        onPageUIElementsVisibilityChange = { trackVisible = it },
+                        onPageUIElementsVisibilityChange = { it1 -> trackVisible = it1 },
                         isMute = vm.mute,
                         onLongClick = { },
 
                         //Текущий выбранный элемент в пейджере
-                        onChangePagerPage = { vm.currentTikTokPage = it },
+                        onChangePagerPage = { it1 -> vm.currentTikTokPage = it1 },
                         modifier = Modifier,
                         timeA = vm.timeA, timeB = vm.timeB, enableAB = vm.enableAB,
 
-                        menuContent = {MenuContent(vm)},
+                        menuContent = { MenuContent(vm) },
                         menuContentWidth = 300.dp,
 
                         menuDefaultOpen = vm.menuCenter,
-                        menuOpenChanged = {
-                                vm.menuCenter = it
-                                Timber.i("@@@ menuOpenChanged vm.menuCenter = it $it")
-                            },
+                        menuOpenChanged = { it1 ->
+                            vm.menuCenter = it1
+                            Timber.i("@@@ menuOpenChanged vm.menuCenter = it $it1")
+                        },
                         initialPage = vm.tictikStartIndex
-                        )
+                    )
 
                 } else {
 
@@ -219,16 +231,33 @@ class ScreenRedProfile(val profileName: String) : Screen {
                             verticalArrangement = Arrangement.spacedBy(4.dp),
                             contentPadding = PaddingValues(4.dp) // Отступы по краям сетки
                         ) {
+
+                            item(key = "info", span = { GridItemSpan(maxLineSpan) }) {
+                                if (vm.creator != null){
+                                    RedProfileCreaterInfo(vm.creator!!)
+                                }
+                            }
+
+                            item(key = "tags", span = { GridItemSpan(maxLineSpan) }) {
+                                if (vm.creator != null){
+                                    TagsBlock(vm.tags.collectAsStateWithLifecycle().value.toList())
+                                }
+                            }
+
+
+
                             //Тайлы картинок и видео
                             itemsIndexed(
                                 list.value,
                                 key = { index, item -> item.id }) { index, item ->
-                                Box(modifier = Modifier.fillMaxSize().aspectRatio(1080f / 1920)) {
+                                Box(modifier = Modifier
+                                    .fillMaxSize()
+                                    .aspectRatio(1080f / 1920)) {
                                     RedUrlVideoImageAndLongClick(item, index, onLongClick = {
                                         vm.openFullScreen(index)
                                     }, onDoubleClick = {}, onFullScreen = {
-                                            vm.openFullScreen(index)
-                                        }
+                                        vm.openFullScreen(index)
+                                    }
                                     )
                                 }
                             }
@@ -237,14 +266,22 @@ class ScreenRedProfile(val profileName: String) : Screen {
                         //Индикатор загрузки
                         if (isLoading) {
                             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                                CircularProgressIndicator(modifier = Modifier.size(56.dp), strokeWidth = 8.dp)
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(56.dp),
+                                    strokeWidth = 8.dp
+                                )
                             }
                         }
 
                         Text("      " + visibleItems.toString(), color = Color.White)
 
                         //---- Скролл ----
-                        Box(modifier = Modifier.fillMaxHeight().align(Alignment.CenterEnd).width(2.dp)) { VerticalScrollbar(scrollPercent) }
+                        Box(
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .align(Alignment.CenterEnd)
+                                .width(2.dp)
+                        ) { VerticalScrollbar(scrollPercent) }
 
                     }
 

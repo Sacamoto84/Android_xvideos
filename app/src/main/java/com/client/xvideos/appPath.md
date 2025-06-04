@@ -25,10 +25,23 @@ name1 --- id
 
 style id fill:#3f,stroke:#3,stroke-width:4px
     
-subgraph folder 
+subgraph folderх[Папка]
     id --- mp4[id.mp4]
     id --- info[id.gifinfo]
     id --- thumb[id.thumb]
 end
+
+red --- favorite[Favorite]
+favorite --- nameFavoriteN[nameN]
+nameFavoriteN --- idN[idN]
+
+subgraph folderFavorite[Папка]
+        idN --- mp4F[id.mp4]
+        idN --- infoF[id.gifinfo]
+        idN --- thumbF[id.thumb]
+end
+
+
+
 
 ```

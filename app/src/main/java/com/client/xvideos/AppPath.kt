@@ -7,8 +7,7 @@ import java.io.File
 private enum class Folder(val value: String) {
     CACHE_DOWNLOAD_RED("CacheDownloadRed"),
     RED("Red"),
-    OFFLINE("Offline"),
-    BLOCK("Block")
+
 }
 
 /**
@@ -29,10 +28,9 @@ object AppPath {
      * Пусть к папке с кешем загруженных файлов для предросмотра
      */
     val cache_download_red : String = "${main}/${Folder.RED.value}/${Folder.CACHE_DOWNLOAD_RED.value}"
-
-    val offline_red : String = "${main}/${Folder.RED.value}/${Folder.OFFLINE.value}"
-    
-    val block_red : String = "${main}/${Folder.RED.value}/${Folder.BLOCK.value}"
+    val offline_red : String = "${main}/${Folder.RED.value}/Offline"
+    val block_red : String = "${main}/${Folder.RED.value}/Block"
+    val favorite_red : String = "${main}/${Folder.RED.value}/Favorite"
 
     init {
 
@@ -54,6 +52,7 @@ object AppPath {
         File(cache_download_red).mkdirs()
         File(offline_red).mkdirs()
         File(block_red).mkdirs()
+        File(favorite_red).mkdirs()
     }
 
 }

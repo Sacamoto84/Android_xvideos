@@ -59,16 +59,10 @@ fun RedProfileCreaterInfo(item: CreatorResponse) {
         ) {
 
 
-            UrlImage(
-                item.users[0].profileImageUrl.toString(),
-                modifier = Modifier
-                    .size(128.dp)
-            )
+            UrlImage( item.users[0].profileImageUrl.toString(), modifier = Modifier.size(128.dp) )
 
             Row(
-                modifier =
-                    Modifier
-                        .wrapContentHeight(), verticalAlignment = Alignment.CenterVertically
+                modifier = Modifier.wrapContentHeight(), verticalAlignment = Alignment.CenterVertically
             ) {
                 Spacer(Modifier.width(8.dp))
                 Text(
@@ -100,9 +94,7 @@ fun RedProfileCreaterInfo(item: CreatorResponse) {
 
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
+                modifier = Modifier.fillMaxWidth().weight(1f)
             ) {
                 Text(
                     item.users[0].followers.toPrettyCount().toString(),

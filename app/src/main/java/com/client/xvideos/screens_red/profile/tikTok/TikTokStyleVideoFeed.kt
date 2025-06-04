@@ -21,7 +21,7 @@ import com.client.xvideos.feature.findVideoOnRedCacheDownload
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.screens_red.ThemeRed
 import com.client.xvideos.screens_red.profile.ScreenRedProfileSM
-import com.client.xvideos.screens_red.profile.atom.RedUrlVideoLiteChaintech
+import com.client.xvideos.screens_red.common.video.RedVideoPlayerWithMenuContent
 import timber.log.Timber
 
 
@@ -43,7 +43,6 @@ fun TikTokStyleVideoFeed(
 
     isMute: Boolean = true, //Глобальный мут
 
-
     /**
      * Вызывается при изменении текущей страницы в пейджере.
      */
@@ -58,7 +57,7 @@ fun TikTokStyleVideoFeed(
 
 ) {
 
-    var pagerState = rememberPagerState(pageCount = { videoItems.size })
+    val pagerState = rememberPagerState(pageCount = { videoItems.size })
 
     LaunchedEffect(initialPage) { pagerState.scrollToPage(initialPage) }
 
@@ -113,7 +112,7 @@ fun TikTokStyleVideoFeed(
                 "https://api.redgifs.com/v2/gifs/${videoItem.id.lowercase()}/hd.m3u8"
         }
 
-        RedUrlVideoLiteChaintech(
+        RedVideoPlayerWithMenuContent(
             url = videoUri,
             play = isCurrentPage and vm.play,
             onChangeTime = onChangeTime,
