@@ -46,18 +46,35 @@ class ScreenRedManageBlock() : Screen {
 
         val blockList = vm.blockList.collectAsState().value
 
-        Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = {BottomrBar()}) { padding ->
+        Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = { BottomrBar() }) { padding ->
 
             val state = rememberLazyListState()
 
-            LazyColumn(state = state, modifier = Modifier.padding(bottom = padding.calculateBottomPadding()).fillMaxSize()) {
+            LazyColumn(
+                state = state,
+                modifier = Modifier
+                    .padding(bottom = padding.calculateBottomPadding())
+                    .fillMaxSize()
+            ) {
 
                 items(blockList) { item ->
-                    Row(modifier = Modifier.padding(vertical = 4.dp).fillMaxWidth().height(128.dp).background(Color.Transparent).border(1.dp,
-                        ThemeRed.colorBorderGray, RoundedCornerShape(8.dp)
-                    )){
+                    Row(
+                        modifier = Modifier
+                            .padding(vertical = 4.dp)
+                            .fillMaxWidth()
+                            .height(128.dp)
+                            .background(Color.Transparent)
+                            .border(
+                                1.dp,
+                                ThemeRed.colorBorderGray, RoundedCornerShape(8.dp)
+                            )
+                    ) {
 
-                        UrlImage(item.urls.thumbnail, modifier = Modifier.aspectRatio(1f), contentScale = ContentScale.Fit)
+                        UrlImage(
+                            item.urls.thumbnail,
+                            modifier = Modifier.aspectRatio(1f),
+                            contentScale = ContentScale.Fit
+                        )
 
                         Column {
                             Text(item.userName)
@@ -65,18 +82,7 @@ class ScreenRedManageBlock() : Screen {
                         }
                     }
                 }
-
-
-
-
-
-
             }
-
-
-
-
         }
-
     }
 }

@@ -10,6 +10,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
+import cafe.adriel.voyager.hilt.ScreenModelFactory
+import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import com.client.xvideos.App
 import com.client.xvideos.feature.Downloader
@@ -26,6 +28,9 @@ import com.client.xvideos.screens_red.use_case.network.loadGifs
 import com.client.xvideos.screens_red.use_case.share.useCaseShareGifs
 import dagger.Binds
 import dagger.Module
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
@@ -45,12 +50,18 @@ enum class TypeGifs(val value: String) {
     IMAGES("Images"),
 }
 
-class ScreenRedProfileSM @Inject constructor(
+class ScreenRedProfileSM @AssistedInject constructor(
+    @Assisted val profileName: String,
     private val db: AppDatabase,
     private val pref: PreferencesRepository,
     val downloader: Downloader
-) : ScreenModel
-{
+) : ScreenModel {
+
+    @AssistedFactory
+    interface Factory : ScreenModelFactory {
+        fun create(profileName: String): ScreenRedProfileSM
+    }
+
 
     private val _list = MutableStateFlow<List<GifsInfo>>(emptyList())
     val list: StateFlow<List<GifsInfo>> = _list
@@ -90,7 +101,7 @@ class ScreenRedProfileSM @Inject constructor(
 
         screenModelScope.launch {
 
-            creator = RedGifs.searchCreator( page = 1,  count = 1, type = MediaType.GIF,  order = order )
+            creator = RedGifs.searchCreator(userName = profileName, page = 1,  count = 1, type = MediaType.GIF,  order = order )
             //maxCreatorGifs = creator?.users[0]?.publishedGifs ?: 0
             maxCreatorGifs = creator?.pages ?: 0
 
@@ -236,26 +247,22 @@ class ScreenRedProfileSM @Inject constructor(
         _tags.update { emptySet() }
     }
 
-
-
-
-
     fun openFullScreen(index : Int){
         setSelector(1)
         tictikStartIndex = index
-
-
     }
-
-
 
 }
 
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class ScreenModuleRedProfile {
+
     @Binds
     @IntoMap
-    @ScreenModelKey(ScreenRedProfileSM::class)
-    abstract fun bindScreenRedProfileScreenModel(hiltListScreenModel: ScreenRedProfileSM): ScreenModel
+    @ScreenModelFactoryKey(ScreenRedProfileSM.Factory::class)
+    abstract fun bindHiltProfilesScreenModelFactory(
+        hiltDetailsScreenModelFactory: ScreenRedProfileSM.Factory
+    ): ScreenModelFactory
+
 }

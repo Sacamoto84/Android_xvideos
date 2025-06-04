@@ -116,7 +116,7 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
                     //Navigator(ScreenDashBoards())
                     //Navigator(ScreenFavorites())
                     //ScreenRedProfile
-                    Navigator(ScreenRedProfile())
+                    Navigator(ScreenRedProfile("lilijunex"))
                 }
 
             }

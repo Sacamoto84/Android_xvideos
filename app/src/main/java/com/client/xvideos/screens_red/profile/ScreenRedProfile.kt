@@ -62,7 +62,7 @@ import com.client.xvideos.screens_red.profile.tikTok.TikTokStyleVideoFeed
 import com.composeunstyled.rememberDisclosureState
 import timber.log.Timber
 
-class ScreenRedProfile() : Screen {
+class ScreenRedProfile(val profileName: String) : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
 
@@ -71,7 +71,11 @@ class ScreenRedProfile() : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
 
-        val vm: ScreenRedProfileSM = getScreenModel()
+        //val vm: ScreenRedProfileSM = getScreenModel()
+
+        val vm = getScreenModel<ScreenRedProfileSM, ScreenRedProfileSM.Factory> { factory ->
+            factory.create(profileName)
+        }
 
         val gridState = rememberLazyGridState()
         val list = vm.list.collectAsState()
