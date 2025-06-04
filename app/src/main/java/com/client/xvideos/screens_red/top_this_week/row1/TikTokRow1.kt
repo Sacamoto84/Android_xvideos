@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.paging.compose.LazyPagingItems
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.feature.redgifs.types.GifsInfo
@@ -39,12 +40,15 @@ import kotlin.Int
 
 @Composable
 fun TikTokPow1(
-    listGifs: List<GifsInfo>, listUsers: List<UserInfo>, modifier: Modifier = Modifier,
+    listGifs: LazyPagingItems<GifsInfo>,
+    //listGifs: List<GifsInfo>,
+    listUsers: List<UserInfo>, modifier: Modifier = Modifier,
     initialPage: Int = 0,
     onClickOpenProfile: (String) -> Unit = {}
 ) {
 
-    val pagerState = rememberPagerState(pageCount = { listGifs.size })
+
+    val pagerState = rememberPagerState(pageCount = { listGifs.itemCount })
 
     //LaunchedEffect(initialPage) { pagerState.scrollToPage(initialPage) }
 
@@ -52,76 +56,79 @@ fun TikTokPow1(
         beyondViewportPageCount = 2,
         state = pagerState,
         modifier = Modifier.then(modifier),
-        key = { index -> listGifs[index].id } // Ключ для стабильности элементов
+        //key = { index -> listGifs[index].id } // Ключ для стабильности элементов
     ) { pageIndex ->
 
         val videoItem = listGifs[pageIndex]
+
         val isCurrentPage = pagerState.currentPage == pageIndex
 
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
 
-            UrlImage(
-                videoItem.urls.poster!!,
-                modifier = Modifier.aspectRatio(1080f / 1920),
-                contentScale = ContentScale.Crop
-            )
+            if (videoItem != null) {
 
-
-            Row(
-                modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .background(Color(0x0CFFFFFF))
-                    .clickable(
-                        onClick = {
-                            onClickOpenProfile(videoItem.userName)
-                        }
-                    ), verticalAlignment = Alignment.CenterVertically) {
-
-                val a = listUsers.firstOrNull { it1 -> it1.username == videoItem.userName }
-
-                if ((a != null) && (a.profileImageUrl != null)) {
-                    Box(
-                        modifier = Modifier
-                            .clip(CircleShape)
-                            .size(48.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        UrlImage(
-                            a.profileImageUrl,
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop
-                        )
-                    }
-                } else {
-
-                    Box(
-                        modifier = Modifier
-                            .clip(CircleShape)
-                            .size(48.dp)
-                            .background(Color.DarkGray),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            Icons.Default.AssignmentInd,
-                            contentDescription = null,
-                            modifier = Modifier.size(24.dp),
-                            tint = Color.Green
-                        )
-                    }
-
-                }
-
-                ////////////
-                Text(
-                    videoItem.userName,
-                    color = Color.White,
-                    fontFamily = ThemeRed.fontFamilyPopinsRegular,
-                    fontSize = 22.sp,
-                    modifier = Modifier.padding(start = 8.dp)
+                UrlImage(
+                    videoItem.urls.poster!!,
+                    modifier = Modifier.aspectRatio(1080f / 1920),
+                    contentScale = ContentScale.Crop
                 )
 
-            }
 
+                Row(
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .background(Color(0x0CFFFFFF))
+                        .clickable(
+                            onClick = {
+                                onClickOpenProfile(videoItem.userName)
+                            }
+                        ), verticalAlignment = Alignment.CenterVertically) {
+
+                    val a = listUsers.firstOrNull { it1 -> it1.username == videoItem.userName }
+
+                    if ((a != null) && (a.profileImageUrl != null)) {
+                        Box(
+                            modifier = Modifier
+                                .clip(CircleShape)
+                                .size(48.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            UrlImage(
+                                a.profileImageUrl,
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+                    } else {
+
+                        Box(
+                            modifier = Modifier
+                                .clip(CircleShape)
+                                .size(48.dp)
+                                .background(Color.DarkGray),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                Icons.Default.AssignmentInd,
+                                contentDescription = null,
+                                modifier = Modifier.size(24.dp),
+                                tint = Color.Green
+                            )
+                        }
+
+                    }
+
+                    ////////////
+                    Text(
+                        videoItem.userName,
+                        color = Color.White,
+                        fontFamily = ThemeRed.fontFamilyPopinsRegular,
+                        fontSize = 22.sp,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+
+                }
+            }
         }
     }
 
@@ -133,7 +140,7 @@ fun TikTokPow1(
         contentAlignment = Alignment.BottomEnd
     ) {
         Text(
-            "${pagerState.currentPage} / ${listGifs.size} ",
+            "${pagerState.currentPage} / ${listGifs.itemCount} ",
             color = Color.White,
             fontFamily = ThemeRed.fontFamilyPopinsRegular,
             fontSize = 14.sp
