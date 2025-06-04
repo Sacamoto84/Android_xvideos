@@ -101,6 +101,10 @@ class ScreenRedProfileSM @AssistedInject constructor(
 
         screenModelScope.launch {
 
+            clear()
+
+            setSelector(2)
+
             creator = RedGifs.searchCreator(userName = profileName, page = 1,  count = 1, type = MediaType.GIF,  order = order )
             //maxCreatorGifs = creator?.users[0]?.publishedGifs ?: 0
             maxCreatorGifs = creator?.pages ?: 0
@@ -108,8 +112,8 @@ class ScreenRedProfileSM @AssistedInject constructor(
             val repeats = maxCreatorGifs / 100 + 1
 
             repeat(repeats) {
-                loadNextPage(items = 100, page = it+1)
-                delay(10)
+                loadNextPage(userName = profileName, items = 100, page = it+1)
+                delay(1000)
             }
 
             //Фильтруем список тегов убрав из списка блокируемые gif
@@ -221,13 +225,13 @@ class ScreenRedProfileSM @AssistedInject constructor(
     }                                                                                  //║
     //═══════════════════════════════════════════════════════════════════════════════════╝
 
-    suspend fun loadNextPage(items : Int = 100, page : Int = 1) {
+    suspend fun loadNextPage(userName : String, items : Int = 100, page : Int = 1) {
         Timber.d("!!! loadNextPage isLoading.value ${isLoading.value}")
         if (isLoading.value) return
 
         isLoading.value = true
         try {
-            val r = loadGifs(items = items, page = page, ord = order, type = if (typeGifs == TypeGifs.GIFS) MediaType.GIF else MediaType.IMAGE)
+            val r = loadGifs(userName = userName, items = items, page = page, ord = order, type = if (typeGifs == TypeGifs.GIFS) MediaType.GIF else MediaType.IMAGE)
             _tags.update { it + r.tags }
             val resp = r.gifs
             _list.update { it + resp }

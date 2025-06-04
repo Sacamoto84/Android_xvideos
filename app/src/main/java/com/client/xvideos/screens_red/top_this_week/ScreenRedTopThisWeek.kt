@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -31,6 +32,9 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.screens.common.urlVideImage.UrlImage
 import com.client.xvideos.screens_red.ThemeRed
+import com.client.xvideos.screens_red.profile.ScreenRedProfile
+import com.client.xvideos.screens_red.top_this_week.row1.LazyRow1
+import com.client.xvideos.screens_red.top_this_week.row1.TikTokPow1
 import timber.log.Timber
 
 class ScreenRedTopThisWeek : Screen {
@@ -45,45 +49,20 @@ class ScreenRedTopThisWeek : Screen {
         val list = vm.listGifs.collectAsStateWithLifecycle().value
         val listUsers = vm.listUsers.collectAsStateWithLifecycle().value
 
-        val state = rememberLazyListState()
-
-        Scaffold(containerColor = ThemeRed.colorCommonBackground) { padding ->
-
-            LazyColumn(state = state, modifier = Modifier.fillMaxSize()) {
 
 
-                items(list, key = {it.id}){
+        Scaffold(
+            containerColor = ThemeRed.colorCommonBackground,
+            modifier = Modifier.fillMaxSize()
+        ) { padding ->
 
-                    UrlImage(it.urls.thumbnail, modifier = Modifier.size(300.dp), contentScale = ContentScale.Fit)
-
-
-                    Row {
-
-                        val a = listUsers.firstOrNull { it1 -> it1.username == it.userName }
-                        if ((a != null) && (a.profileImageUrl != null)) {
-                            Box(
-                                modifier = Modifier.clip(CircleShape).size(48.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                UrlImage(
-                                    a.profileImageUrl,
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentScale = ContentScale.Crop
-                                )
-                            }
-                        }else{
-                            Icon(Icons.Default.AssignmentInd, contentDescription = null, modifier = Modifier.size(24.dp), tint = Color.Green)
-                        }
-
-                        ////////////
-                        Text(it.userName, color = Color.White, fontFamily = ThemeRed.fontFamilyPopinsRegular)
-
-                    }
-
-                }
-
-            }
-
+            TikTokPow1(list, listUsers, Modifier
+                .padding()
+                .fillMaxSize(), onClickOpenProfile = {
+                navigator.push(
+                    ScreenRedProfile(it)
+                )
+            })
 
         }
 
