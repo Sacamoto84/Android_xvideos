@@ -1,17 +1,17 @@
 package com.client.xvideos.screens_red.use_case.block
 
 import com.client.xvideos.AppPath
+import com.client.xvideos.feature.redgifs.types.GifsInfo
 import timber.log.Timber
 import java.io.File
 
 /**
  * Сканирует все директории пользователей в `AppPath.block_red` и собирает
- * ID всех заблокированных GIF-файлов, используя `useCaseGetBlockedGifIds`.
+ * все объекты GifsInfo, восстановленные из .block файлов.
  *
- * @return Список всех ID заблокированных GIF-файлов.
+ * @return Список всех GifsInfo, считанных из .block файлов во всех пользовательских директориях.
  */
-fun blockGetAllBlockedGifs(): List<String> {
-
+fun blockGetAllBlockedGifsInfo(): List<GifsInfo> {
     val rootDir = File(AppPath.block_red)
 
     if (!rootDir.exists() || !rootDir.isDirectory) {
@@ -20,6 +20,7 @@ fun blockGetAllBlockedGifs(): List<String> {
     }
 
     return rootDir.listFiles { file -> file.isDirectory }
-        ?.flatMap { userDir -> blockGetGifsByUserNameAsListString(userDir.name) }
-        ?: emptyList()
+        ?.flatMap { userDir ->
+            blockGetGifsInfoByUserName(userDir.name)
+        } ?: emptyList()
 }

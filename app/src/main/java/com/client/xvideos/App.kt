@@ -44,6 +44,7 @@ class App : Application() {
         kDownloader = KDownloader.create(applicationContext)
        val a : List<GifsInfo> =  blockGetGifsInfoByUserName()
         a
+
     }
 
     companion object {

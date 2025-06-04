@@ -5,7 +5,7 @@ import com.client.xvideos.feature.redgifs.types.CreatorResponse
 import com.client.xvideos.feature.redgifs.types.MediaType
 import com.client.xvideos.feature.redgifs.types.Order
 
-suspend fun userCaseLoadGifs(
+suspend fun loadGifs(
     userName: String = "lilijunex",
     items: Int = 100,
     page: Int = 1,

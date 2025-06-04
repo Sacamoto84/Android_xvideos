@@ -1,21 +1,16 @@
 package com.client.xvideos.feature
 
-import android.widget.Toast
 import com.client.xvideos.App
 import com.client.xvideos.AppPath
+import com.client.xvideos.util.Toast
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.File
 import javax.inject.Singleton
-
 
 //Текущее содержимое готового кеша
 data class ItemsRedCacheDownload(
@@ -33,11 +28,10 @@ data class ItemsRedCacheDownload(
 /**
  * Проверка что данное имя креатор уже есть в кеше
  */
-fun findVideoOnRedCacheDownload(name: String, creator: String): Boolean {
-    val mainPath = AppPath.cache_download_red + "/" + creator + "/" + name + ".mp4"
+fun findVideoOnRedCacheDownload(id: String, name: String): Boolean {
+    val mainPath = AppPath.offline_red + "/" + name + "/" + id + ".mp4"
     val file = File(mainPath)
     return file.exists()
-
 }
 
 
@@ -47,108 +41,51 @@ class Downloader() {
     var percent = MutableStateFlow(-2f)
 
     @OptIn(DelicateCoroutinesApi::class)
-    suspend fun downloadRedName(name: String, creator: String, url: String) {
+    fun downloadRedName(id: String, name: String, url: String) {
 
-        if ((url == "") || (creator == "")) {
-
-            withContext(Dispatchers.Main) {
-                Toast.makeText(
-                    App.instance.applicationContext,
-                    "Ошибка в названии файла или креатор",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-
+        if ((url == "") || (name == "")) {
+                     Toast("Ошибка в названии файла или креатор")
             percent.value = -3f
-
             return
-
         }
 
         percent.value = -2f
 
         //Проверка того что в кеше есть запись с этим именем и кретором
-        val a = findVideoOnRedCacheDownload(name, creator)
+        val a = findVideoOnRedCacheDownload(id, name)
 
         //Записи нет можно скачивать
-        if (a == false) {
+        if (!a) {
 
-            val p = AppPath.cache_download_red + "/" + creator
+            val p = AppPath.cache_download_red + "/" + name
             File(p).mkdirs()
 
-            val request = App.instance.kDownloader.newRequestBuilder(
-                url,
-                p,
-                "$name.mp4"
-            )
-                .tag("TAG")
-                .build()
+            val request = App.instance.kDownloader.newRequestBuilder(url, p, "$id.mp4").tag(id).build()
 
             App.instance.kDownloader.enqueue(
                 request,
                 onStart = {
                     println("!!! Запуск закачки")
-
-                    val b = ItemsRedCacheDownload(
-                        name = name,
-                        creator = creator,
-                        url = url, // Заполняется при реальной закачке, здесь мы его не знаем
-
-                    )
-
                     percent.value = 0f
-
                 },
 
-                onError = {
-                    println("!!! onError закачки: $it")
-                    percent.value = -3f
-                },
-                onProgress = { it1 ->
-                    //println("!!! progress $it1")
-                    percent.value = it1 / 100f
-                },
+                onError = {println("!!! onError закачки: $it"); percent.value = -3f},
+                onProgress = {it1 -> percent.value = it1 / 100f},
                 onCompleted = {
                     println("!!! onCompleted закачки")
-
                     percent.value = -2f
-
-                    val b = ItemsRedCacheDownload(
-                        name = name,
-                        creator = creator,
-                        url = url, // Заполняется при реальной закачке, здесь мы его не знаем
-
-                    )
-
-                    GlobalScope.launch {
-                        withContext(Dispatchers.Main) {
-                            Toast.makeText(
-                                App.instance.applicationContext,
-                                "Скачивание завершено",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    }
-                    //state.value = UPDATESTATE.DOWNLOADED //Загрузка завершена
+                    Toast("Скачивание завершено")
                 },
             )
         } else {
-            GlobalScope.launch {
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(
-                        App.instance.applicationContext,
-                        "Файл есть к кеше",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
+            Toast("Файл есть к кеше")
         }
 
     }
 
 
     //Проверка сканирование файлов и одновление таблицы того что уже есть на диске
-    suspend fun scanRedCacheDowmdoadAndUpdate() {
+    fun scanRedCacheDowmdoadAndUpdate() {
 
         val mainPath = AppPath.cache_download_red //Путь до базовой папки для скачивания
 
@@ -218,7 +155,7 @@ class Downloader() {
 
 @Module
 @InstallIn(SingletonComponent::class)
-object moduleDownloader {
+object ModuleDownloader {
 
     @Provides
     @Singleton

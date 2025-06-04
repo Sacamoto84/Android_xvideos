@@ -22,7 +22,7 @@ import com.client.xvideos.feature.redgifs.types.MediaType
 import com.client.xvideos.feature.redgifs.types.Order
 import com.client.xvideos.feature.room.AppDatabase
 import com.client.xvideos.screens_red.use_case.block.blockGetAllBlockedGifs
-import com.client.xvideos.screens_red.use_case.network.userCaseLoadGifs
+import com.client.xvideos.screens_red.use_case.network.loadGifs
 import com.client.xvideos.screens_red.use_case.share.useCaseShareGifs
 import dagger.Binds
 import dagger.Module
@@ -204,7 +204,7 @@ class ScreenRedProfileSM @Inject constructor(
     //═══════════════════════════════════════════════════════════════════════════════════╣
     fun refreshListAndBlock(){                                                         //║
         blockList.clear()                                                              //║
-        blockList.addAll(blockGetAllBlockedGifs())                                   //║
+        blockList.addAll(blockGetAllBlockedGifs())                                     //║
         val blockedSet = blockList.toSet()                                             //║
         _list.value = _list.value.filterNot { it.id in blockedSet }                    //║
     }                                                                                  //║
@@ -216,7 +216,7 @@ class ScreenRedProfileSM @Inject constructor(
 
         isLoading.value = true
         try {
-            val r = userCaseLoadGifs(items = items, page = page, ord = order, type = if (typeGifs == TypeGifs.GIFS) MediaType.GIF else MediaType.IMAGE)
+            val r = loadGifs(items = items, page = page, ord = order, type = if (typeGifs == TypeGifs.GIFS) MediaType.GIF else MediaType.IMAGE)
             _tags.update { it + r.tags }
             val resp = r.gifs
             _list.update { it + resp }
