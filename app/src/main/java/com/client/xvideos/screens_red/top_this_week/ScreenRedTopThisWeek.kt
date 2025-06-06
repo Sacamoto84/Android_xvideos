@@ -52,7 +52,8 @@ class ScreenRedTopThisWeek : Screen {
 
         val visibleType by vm.visibleType.collectAsState()
 
-        var currentIndex by remember { mutableIntStateOf(0) }
+        var currentIndexLazy by remember { mutableIntStateOf(0) }
+        var currentIndexTikTok by remember { mutableIntStateOf(0) }
 
         Scaffold(
             bottomBar = {
@@ -92,7 +93,10 @@ class ScreenRedTopThisWeek : Screen {
                         onScrollToTopIntentConsumed = { vm.consumedScrollToTopIntent() },
                         modifier = Modifier.fillMaxSize(),
                         onClickOpenProfile = { navigator.push(ScreenRedProfile(it)) },
-                        gotoPosition = currentIndex
+                        onCurrentPosition = { index ->
+                            currentIndexTikTok = index
+                        },
+                        gotoPosition = currentIndexLazy
                     )
                 }
 
@@ -104,12 +108,29 @@ class ScreenRedTopThisWeek : Screen {
                         modifier = Modifier.fillMaxSize(),
                         onClickOpenProfile = { navigator.push(ScreenRedProfile(it)) },
                         onCurrentPosition = { index ->
-                            currentIndex = index
+                            currentIndexLazy = index
                         },
-                        gotoPosition = 0
+                        gotoPosition = currentIndexTikTok
                     )
 
                 }
+
+                if (visibleType == VisibleType.TWO) {
+
+                    LazyRow1(
+                        listGifs = items.itemSnapshotList.items,
+                        listUsers = listAllUsers,
+                        modifier = Modifier.fillMaxSize(),
+                        onClickOpenProfile = { navigator.push(ScreenRedProfile(it)) },
+                        onCurrentPosition = { index ->
+                            currentIndexLazy = index
+                        },
+                        gotoPosition = currentIndexTikTok
+                    )
+
+                }
+
+
 
 
 

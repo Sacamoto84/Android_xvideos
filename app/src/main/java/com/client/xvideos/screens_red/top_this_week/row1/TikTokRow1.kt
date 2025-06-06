@@ -46,12 +46,11 @@ fun TikTokPow1(
     shouldScrollToTopAfterSortChange: Boolean = false,
     onScrollToTopIntentConsumed: () -> Unit, // Лямбда для сброса флага в SM
     onClickOpenProfile: (String) -> Unit = {},
+    onCurrentPosition : (Int) -> Unit = {}, //Вывести текущую позицию
     gotoPosition : Int = 0
 ) {
 
     val pagerState = rememberPagerState(pageCount = { lazyPagingItems.itemCount })
-
-
 
     LaunchedEffect(currentSortType, lazyPagingItems.itemCount) {
         if (shouldScrollToTopAfterSortChange) {
@@ -76,6 +75,10 @@ fun TikTokPow1(
 
     LaunchedEffect(gotoPosition) {
         pagerState.scrollToPage(gotoPosition)
+    }
+
+    LaunchedEffect(pagerState.currentPage) {
+        onCurrentPosition(pagerState.currentPage)
     }
 
     VerticalPager(
