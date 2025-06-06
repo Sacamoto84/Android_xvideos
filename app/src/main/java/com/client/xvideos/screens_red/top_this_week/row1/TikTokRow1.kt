@@ -74,7 +74,9 @@ fun TikTokPow1(
     }
 
     LaunchedEffect(gotoPosition) {
-        pagerState.scrollToPage(gotoPosition)
+        if (gotoPosition >= 0 && gotoPosition < lazyPagingItems.itemCount+1) {
+            pagerState.scrollToPage(gotoPosition)
+        }
     }
 
     LaunchedEffect(pagerState.currentPage) {

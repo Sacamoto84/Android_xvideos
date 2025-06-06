@@ -6,15 +6,17 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,10 +25,12 @@ import androidx.compose.ui.unit.dp
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.redgifs.types.UserInfo
 import com.client.xvideos.screens_red.profile.atom.RedUrlVideoImageAndLongClick
+import kotlinx.coroutines.flow.collectLatest
+import kotlin.collections.filter
 
 
 @Composable
-fun LazyRow1(
+fun LazyRow2(
     listGifs: List<GifsInfo>,
     listUsers: List<UserInfo>,
     modifier: Modifier = Modifier,
@@ -35,21 +39,19 @@ fun LazyRow1(
     gotoPosition: Int
 ) {
 
-    val state = rememberLazyListState()
+    val state = rememberLazyGridState()
 
     // Отслеживаем текущую позицию (верхний видимый элемент)
     val firstVisibleItemIndex by remember {
-        derivedStateOf {
-            val layoutInfo = state.layoutInfo.visibleItemsInfo
-            layoutInfo.maxByOrNull { item ->
-                val visibleHeight = item.size + minOf(item.offset, 0)
-                visibleHeight
-            }?.index ?: 0 }
+        derivedStateOf { state.firstVisibleItemIndex }
     }
 
     // Эффект при изменении позиции
-    LaunchedEffect(firstVisibleItemIndex) {
-        onCurrentPosition(firstVisibleItemIndex)
+    LaunchedEffect(state) { // Ключ - сам state
+        snapshotFlow { state.firstVisibleItemIndex } // Превращаем свойство в Flow
+            .collectLatest { visibleIndex -> // Собираем только последние значения
+                onCurrentPosition(visibleIndex)
+            }
     }
 
     LaunchedEffect(gotoPosition) {
@@ -58,10 +60,9 @@ fun LazyRow1(
         }
     }
 
-
-
-    LazyColumn(
+    LazyVerticalGrid(
         state = state,
+        columns = GridCells.Fixed(2),
         modifier = Modifier.then(modifier),
         contentPadding = PaddingValues(8.dp)
     ) {

@@ -31,6 +31,7 @@ import com.client.xvideos.screens_red.profile.ScreenRedProfile
 import com.client.xvideos.screens_red.top_this_week.model.SortTop
 import com.client.xvideos.screens_red.top_this_week.model.VisibleType
 import com.client.xvideos.screens_red.top_this_week.row1.LazyRow1
+import com.client.xvideos.screens_red.top_this_week.row1.LazyRow2
 import com.client.xvideos.screens_red.top_this_week.row1.TikTokPow1
 import com.client.xvideos.screens_red.top_this_week.state.ErrorState
 import com.client.xvideos.screens_red.top_this_week.state.FullScreenLoading
@@ -62,6 +63,7 @@ class ScreenRedTopThisWeek : Screen {
                     onClickMonth = { vm.changeSortType(SortTop.MONTH) },
                     onClickLazy = { vm.changeVisibleType(VisibleType.LAZY) },
                     onClickTiktok = { vm.changeVisibleType(VisibleType.PAGER) },
+                    onClickLazy2 = { vm.changeVisibleType(VisibleType.TWO) }
                 )
             },
 
@@ -117,7 +119,7 @@ class ScreenRedTopThisWeek : Screen {
 
                 if (visibleType == VisibleType.TWO) {
 
-                    LazyRow1(
+                    LazyRow2(
                         listGifs = items.itemSnapshotList.items,
                         listUsers = listAllUsers,
                         modifier = Modifier.fillMaxSize(),

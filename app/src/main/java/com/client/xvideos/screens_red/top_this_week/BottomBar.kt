@@ -6,7 +6,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 
 @Composable
-fun BottomBar(onClickWeek: () -> Unit, onClickMonth: () -> Unit, onClickLazy:()-> Unit, onClickTiktok:()-> Unit,) {
+fun BottomBar(onClickWeek: () -> Unit, onClickMonth: () -> Unit, onClickLazy:()-> Unit, onClickTiktok:()-> Unit, onClickLazy2:()-> Unit,) {
     Row {
 
         Button(onClick = onClickWeek) {
@@ -25,5 +25,8 @@ fun BottomBar(onClickWeek: () -> Unit, onClickMonth: () -> Unit, onClickLazy:()-
             Text("Tiktok")
         }
 
+        Button(onClick = onClickLazy2) {
+            Text("2")
+        }
     }
 }
