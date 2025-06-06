@@ -2,28 +2,19 @@ package com.client.xvideos.screens_red.top_this_week
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AssignmentInd
-import androidx.compose.material.icons.filled.Crop
-import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.semantics.error
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
@@ -31,13 +22,16 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.client.xvideos.screens.common.urlVideImage.UrlImage
 import com.client.xvideos.screens_red.ThemeRed
 import com.client.xvideos.screens_red.listAllUsers
 import com.client.xvideos.screens_red.profile.ScreenRedProfile
-import com.client.xvideos.screens_red.top_this_week.row1.LazyRow1
+import com.client.xvideos.screens_red.top_this_week.pagin3.SortTop
 import com.client.xvideos.screens_red.top_this_week.row1.TikTokPow1
+import com.client.xvideos.screens_red.top_this_week.state.ErrorState
+import com.client.xvideos.screens_red.top_this_week.state.FullScreenLoading
+import com.client.xvideos.screens_red.top_this_week.state.LoadingNextPageIndicator
 import timber.log.Timber
+import kotlin.text.append
 
 class ScreenRedTopThisWeek : Screen {
     override val key: ScreenKey = uniqueScreenKey
@@ -50,23 +44,84 @@ class ScreenRedTopThisWeek : Screen {
 
         val items = vm.pager.collectAsLazyPagingItems()
 
+        val shouldScrollToTop by vm.scrollToTopAfterSortChange.collectAsState() // Подписываемся на флаг
+
         Scaffold(
+            bottomBar = {
+                BottomBar(
+                    onClickWeek = {
+                        vm.changeSortType(SortTop.WEEK)
+                                  },
+                    onClickMonth = {
+                        vm.changeSortType(SortTop.MONTH)
+                    })
+            },
+
             containerColor = ThemeRed.colorCommonBackground,
             modifier = Modifier.fillMaxSize()
         ) { padding ->
 
             Timber.d("!!! items.itemCount = ${items.itemCount}")
 
-            TikTokPow1(
-                items, listAllUsers,
-                Modifier
-                    .padding()
-                    .fillMaxSize(), onClickOpenProfile = {
-                    navigator.push(
-                        ScreenRedProfile(it)
+            // Отображаем индикатор загрузки поверх контента, если это первая загрузка
+            val isLoadingInitial = items.loadState.refresh is LoadState.Loading// && items.itemCount == 0
+            val isErrorInitial = items.loadState.refresh is LoadState.Error
+
+
+            Box(modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = padding.calculateBottomPadding())) {
+
+                TikTokPow1(
+                    lazyPagingItems = items,
+                    currentSortType = vm.sortType.collectAsState().value,
+                    listUsers = listAllUsers,
+                    shouldScrollToTopAfterSortChange = shouldScrollToTop,
+                    onScrollToTopIntentConsumed = { vm.consumedScrollToTopIntent() },
+                    modifier = Modifier.fillMaxSize(),
+                    onClickOpenProfile = {
+                        navigator.push(
+                            ScreenRedProfile(it)
+                        )
+                    })
+
+
+                if (isLoadingInitial) { FullScreenLoading(modifier = Modifier.align(Alignment.Center)) }
+
+                if (isErrorInitial) {
+                    val errorState = items.loadState.refresh as LoadState.Error
+                    ErrorState(
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .padding(16.dp),
+                        message = "Ошибка загрузки: ${errorState.error.localizedMessage}",
+                        onRetry = { items.retry() }
                     )
-                })
+                }
+
+                // Индикатор загрузки для следующих страниц можно отобразить внутри TikTokPow1
+                // или как оверлей, если append state is Loading.
+                if (items.loadState.append is LoadState.Loading && items.itemCount > 0) {
+                    LoadingNextPageIndicator(modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(16.dp))
+                }
+
+                if (items.loadState.append is LoadState.Error && items.itemCount > 0) {
+                    val errorState = items.loadState.append as LoadState.Error
+                    // Можно показать маленькое сообщение об ошибке внизу
+                    Text(
+                        "Ошибка загрузки ленты: ${errorState.error.localizedMessage}",
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(16.dp),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+
+            }
 
         }
     }
 }
+

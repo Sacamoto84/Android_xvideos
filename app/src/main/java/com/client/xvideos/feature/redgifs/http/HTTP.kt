@@ -81,6 +81,24 @@ object RedGifs {
         return res
     }
 
+    @Throws(ApiException::class)
+    suspend fun getTopThisMounth(
+        count: Int,                      // количество элементов на страницу.
+        page: Int,                       // номер страницы (1-based).
+        type: MediaType = MediaType.GIF, // тип медиа (GIF, image и т.д.).
+    ): MediaResponse {
+
+        val route = Route(
+            method = "GET",
+            path = "/v2/gifs/search?order=top28&count={count}&page={page}&type={type}",
+            "count" to count,
+            "page" to page,
+            "type" to type.value,
+        )
+
+        val res: MediaResponse = api.request(route)
+        return res
+    }
 
     //--------------------------- User/Creator methods ---------------------------
 
@@ -110,7 +128,7 @@ object RedGifs {
             routeParams["tags"] = tags.joinToString(",")
         }
 
-        val route = Route( method = "GET", path = url, *routeParams.toList().toTypedArray() )
+        val route = Route(method = "GET", path = url, *routeParams.toList().toTypedArray())
 
         val res: CreatorsResponse = api.request(route)
         return res
@@ -170,6 +188,7 @@ object RedGifs {
         val res: MediaResponse = api.request(route)
         return res
     }
+
     /**
      * ## Получить список 10 картинок «в тренде»
      * ## ⭐ Работает ⭐
