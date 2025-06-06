@@ -1,13 +1,25 @@
 package com.client.xvideos.screens_red.top_this_week
 
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 
 @Composable
-fun BottomBar(onClickWeek: () -> Unit, onClickMonth: () -> Unit, onClickLazy:()-> Unit, onClickTiktok:()-> Unit, onClickLazy2:()-> Unit,) {
-    Row {
+fun BottomBar(
+    onClickWeek: () -> Unit,
+    onClickMonth: () -> Unit,
+    onClickLazy: () -> Unit,
+    onClickTiktok: () -> Unit,
+    onClickLazyOne: () -> Unit,
+    onClickLazy2: () -> Unit,
+    onClickLazy3: () -> Unit,
+) {
+    Row(modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())) {
 
         Button(onClick = onClickWeek) {
             Text("Week")
@@ -25,8 +37,16 @@ fun BottomBar(onClickWeek: () -> Unit, onClickMonth: () -> Unit, onClickLazy:()-
             Text("Tiktok")
         }
 
+        Button(onClick = onClickLazyOne) {
+            Text("1")
+        }
+
         Button(onClick = onClickLazy2) {
             Text("2")
+        }
+
+        Button(onClick = onClickLazy3) {
+            Text("3")
         }
     }
 }

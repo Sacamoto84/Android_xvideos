@@ -1,5 +1,10 @@
 package com.client.xvideos.screens_red.top_this_week
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -29,7 +34,7 @@ import javax.inject.Inject
 class ScreenRedTopThisWeekSM @Inject constructor() : ScreenModel {
 
     //Тип отображения Lazy, Pager, две колонки три колонки
-    private val _visibleType = MutableStateFlow(VisibleType.PAGER)
+    private val _visibleType = MutableStateFlow(VisibleType.ONE)
     val visibleType: StateFlow<VisibleType> = _visibleType.asStateFlow()
 
     fun changeVisibleType(newSort: VisibleType) {
@@ -58,18 +63,22 @@ class ScreenRedTopThisWeekSM @Inject constructor() : ScreenModel {
         Timber.d("!!! SM: scrollToTopAfterSortChange set to false (consumed)")
     }
 
-    fun getPhotos(sort: SortTop): Pager<Int, GifsInfo> = Pager(
-        config = PagingConfig(pageSize = 10),
+    fun getPhotos(sort: SortTop) = Pager(
+        config = PagingConfig(
+            pageSize = 109,
+            prefetchDistance = 1,
+            initialLoadSize = 109)
+        ,
         pagingSourceFactory = {
             ItemTopThisWeekPagingSource(sort)
         }
-    )
+    ).flow
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val pager: Flow<PagingData<GifsInfo>> = sortType
         .flatMapLatest { sort ->
             Timber.d("!!! ScreenRedTopThisWeekSM::pager sort = $sort")
-            getPhotos(sort).flow
+            getPhotos(sort)
         }
         .cachedIn(screenModelScope)
 
@@ -120,6 +129,15 @@ class ScreenRedTopThisWeekSM @Inject constructor() : ScreenModel {
 //
 //        }
 //   }
+
+
+    var columns by mutableIntStateOf(1) //Количество колонок
+    var currentIndex by  mutableIntStateOf(0)
+    var currentIndexGoto by  mutableIntStateOf(0)
+
+    override fun onDispose() {
+        Timber.d("!!!--------------- ScreenRedTopThisWeekSM::onDispose ///////////////////")
+    }
 
 
 }

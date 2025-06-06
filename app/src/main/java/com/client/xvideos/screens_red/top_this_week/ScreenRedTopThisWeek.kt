@@ -1,21 +1,26 @@
 package com.client.xvideos.screens_red.top_this_week
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TimeInput
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -46,15 +51,34 @@ class ScreenRedTopThisWeek : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val vm: ScreenRedTopThisWeekSM = getScreenModel()
-
         val items = vm.pager.collectAsLazyPagingItems()
-
         val shouldScrollToTop by vm.scrollToTopAfterSortChange.collectAsState() // Подписываемся на флаг
-
         val visibleType by vm.visibleType.collectAsState()
 
-        var currentIndexLazy by remember { mutableIntStateOf(0) }
-        var currentIndexTikTok by remember { mutableIntStateOf(0) }
+
+        Timber.i("!!! --- currentIndex:${vm.currentIndex} currentIndexGoto:${vm.currentIndexGoto}")
+
+
+
+//        LaunchedEffect(Unit) {
+//            Timber.d("!!! LaunchedEffect(Unit) currentIndexGoto:$currentIndexGoto currentIndex:$currentIndex")
+//            currentIndexGoto = currentIndex
+//        }
+
+        LaunchedEffect(visibleType) {
+            //vm.currentIndexGoto =  vm.currentIndex
+
+            vm.columns = with(visibleType) {
+                when (this) {
+                    VisibleType.ONE -> 1
+                    VisibleType.TWO -> 2
+                    VisibleType.THREE -> 3
+                    else -> 2
+                }
+            }
+
+        }
+
 
         Scaffold(
             bottomBar = {
@@ -63,7 +87,9 @@ class ScreenRedTopThisWeek : Screen {
                     onClickMonth = { vm.changeSortType(SortTop.MONTH) },
                     onClickLazy = { vm.changeVisibleType(VisibleType.LAZY) },
                     onClickTiktok = { vm.changeVisibleType(VisibleType.PAGER) },
-                    onClickLazy2 = { vm.changeVisibleType(VisibleType.TWO) }
+                    onClickLazyOne = { vm.changeVisibleType(VisibleType.ONE) },
+                    onClickLazy2 = { vm.changeVisibleType(VisibleType.TWO) },
+                    onClickLazy3 = { vm.changeVisibleType(VisibleType.THREE) }
                 )
             },
 
@@ -96,46 +122,45 @@ class ScreenRedTopThisWeek : Screen {
                         modifier = Modifier.fillMaxSize(),
                         onClickOpenProfile = { navigator.push(ScreenRedProfile(it)) },
                         onCurrentPosition = { index ->
-                            currentIndexTikTok = index
+                            vm.currentIndex = index
                         },
-                        gotoPosition = currentIndexLazy
+                        gotoPosition = vm.currentIndexGoto
                     )
                 }
 
-                if (visibleType == VisibleType.LAZY) {
+//                if (visibleType == VisibleType.LAZY) {
+//
+//                    LazyRow1(
+//                        listGifs = items.itemSnapshotList.items,
+//                        listUsers = listAllUsers,
+//                        modifier = Modifier.fillMaxSize(),
+//                        onClickOpenProfile = { navigator.push(ScreenRedProfile(it)) },
+//                        onCurrentPosition = { index ->
+//                            currentIndex = index
+//                        },
+//                        gotoPosition = currentIndexGoto
+//                    )
+//
+//                }
 
-                    LazyRow1(
-                        listGifs = items.itemSnapshotList.items,
-                        listUsers = listAllUsers,
-                        modifier = Modifier.fillMaxSize(),
-                        onClickOpenProfile = { navigator.push(ScreenRedProfile(it)) },
-                        onCurrentPosition = { index ->
-                            currentIndexLazy = index
-                        },
-                        gotoPosition = currentIndexTikTok
-                    )
-
-                }
-
-                if (visibleType == VisibleType.TWO) {
+                if ((visibleType == VisibleType.ONE) || (visibleType == VisibleType.TWO) || (visibleType == VisibleType.THREE)) {
 
                     LazyRow2(
-                        listGifs = items.itemSnapshotList.items,
+                        columns = vm.columns,
+                        listGifs = items,
                         listUsers = listAllUsers,
                         modifier = Modifier.fillMaxSize(),
-                        onClickOpenProfile = { navigator.push(ScreenRedProfile(it)) },
+                        onClickOpenProfile = {
+                            vm.currentIndexGoto =  vm.currentIndex
+                            navigator.push(ScreenRedProfile(it))
+                                             },
                         onCurrentPosition = { index ->
-                            currentIndexLazy = index
+                            vm.currentIndex = index
                         },
-                        gotoPosition = currentIndexTikTok
+                        gotoPosition = vm.currentIndexGoto
                     )
 
                 }
-
-
-
-
-
 
                 if (isLoadingInitial) {
                     FullScreenLoading(modifier = Modifier.align(Alignment.Center))
@@ -152,8 +177,6 @@ class ScreenRedTopThisWeek : Screen {
                     )
                 }
 
-                // Индикатор загрузки для следующих страниц можно отобразить внутри TikTokPow1
-                // или как оверлей, если append state is Loading.
                 if (items.loadState.append is LoadState.Loading && items.itemCount > 0) {
                     LoadingNextPageIndicator(
                         modifier = Modifier
@@ -169,10 +192,13 @@ class ScreenRedTopThisWeek : Screen {
                         "Ошибка загрузки ленты: ${errorState.error.localizedMessage}",
                         modifier = Modifier
                             .align(Alignment.BottomCenter)
-                            .padding(16.dp),
+                            .padding(16.dp)
+                            .background(Color.Red),
                         color = MaterialTheme.colorScheme.error
                     )
                 }
+
+                Text( vm.currentIndex.toString(), modifier = Modifier.align(Alignment.CenterEnd), color = Color.White)
 
             }
 

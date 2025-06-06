@@ -19,6 +19,10 @@ class ItemTopThisWeekPagingSource (val sortTop : SortTop): PagingSource<Int, Gif
 
             val response = if (sortTop == SortTop.WEEK) RedGifs.getTopThisWeek(100, page) else RedGifs.getTopThisMounth(100, page)
 
+            val isEndReached = response.gifs.isEmpty() // или, если ты знаешь, что сервер вернул всё
+
+            val nextKey = if (isEndReached) { null } else { page + 1 }
+
             Timber.d("!!! load() a.gif.size = ${response.gifs.size}")
 
             val gifs = response.gifs.distinctBy { it.id }
@@ -33,7 +37,7 @@ class ItemTopThisWeekPagingSource (val sortTop : SortTop): PagingSource<Int, Gif
             LoadResult.Page(
                 data = gifs,
                 prevKey = null,
-                nextKey = page + 1
+                nextKey = nextKey
             )
 
         } catch (e: Exception) {

@@ -109,7 +109,7 @@ class ScreenRedProfileSM @AssistedInject constructor(
             //maxCreatorGifs = creator?.users[0]?.publishedGifs ?: 0
             maxCreatorGifs = creator?.pages ?: 0
 
-            val repeats = maxCreatorGifs / 100 + 1
+            val repeats = 1//maxCreatorGifs / 100 + 1
 
             repeat(repeats) {
                 loadNextPage(userName = profileName, items = 100, page = it+1)
