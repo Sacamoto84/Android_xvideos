@@ -1,70 +1,96 @@
 package com.client.xvideos.screens_red.top_this_week.row1
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AssignmentInd
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.redgifs.types.UserInfo
-import com.client.xvideos.screens.common.urlVideImage.UrlImage
-import com.client.xvideos.screens_red.ThemeRed
+import com.client.xvideos.screens_red.profile.atom.RedUrlVideoImageAndLongClick
+
 
 @Composable
-fun LazyRow1(listGifs: List<GifsInfo>, listUsers: List<UserInfo>, modifier: Modifier = Modifier) {
+fun LazyRow1(
+    listGifs: List<GifsInfo>,
+    listUsers: List<UserInfo>,
+    modifier: Modifier = Modifier,
+    onClickOpenProfile: (String) -> Unit = {},
+    onCurrentPosition : (Int) -> Unit = {}, //Вывести текущую позицию
+    gotoPosition: Int
+) {
 
     val state = rememberLazyListState()
 
-    LazyColumn(state = state, modifier = Modifier.then(modifier)) {
+    // Отслеживаем текущую позицию (верхний видимый элемент)
+    val firstVisibleItemIndex by remember {
+        derivedStateOf {
+            val layoutInfo = state.layoutInfo.visibleItemsInfo
+            layoutInfo.maxByOrNull { item ->
+                val visibleHeight = item.size + minOf(item.offset, 0)
+                visibleHeight
+            }?.index ?: 0 }
+    }
 
+    // Эффект при изменении позиции
+    LaunchedEffect(firstVisibleItemIndex) {
+        onCurrentPosition(firstVisibleItemIndex)
+    }
 
-        items(listGifs, key = {it.id}){
+    LaunchedEffect(gotoPosition) {
+        state.scrollToItem(gotoPosition)
+    }
 
+    LazyColumn(
+        state = state,
+        modifier = Modifier.then(modifier),
+        contentPadding = PaddingValues(8.dp)
+    ) {
 
-            UrlImage(it.urls.thumbnail, modifier = Modifier.aspectRatio(1080f/1920), contentScale = ContentScale.Fit)
+        itemsIndexed(listGifs, key = { index, item -> item.id }) { index, item ->
+            Box(
+                modifier = Modifier
+                    .padding(vertical = 8.dp)
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(16.dp))
+                    .border(1.dp, Color.DarkGray, RoundedCornerShape(16.dp)),
+                contentAlignment = Alignment.Center
+            ) {
 
-
-            Row {
-
-                val a = listUsers.firstOrNull { it1 -> it1.username == it.userName }
-                if ((a != null) && (a.profileImageUrl != null)) {
-                    Box(
-                        modifier = Modifier.clip(CircleShape).size(48.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        UrlImage(
-                            a.profileImageUrl,
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop
-                        )
-                    }
-                }else{
-                    Icon(Icons.Default.AssignmentInd, contentDescription = null, modifier = Modifier.size(24.dp), tint = Color.Green)
+                RedUrlVideoImageAndLongClick(item, index, onLongClick = {
+                    //vm.openFullScreen(index)
+                }, onDoubleClick = {}, onFullScreen = {
+                    //vm.openFullScreen(index)
                 }
+                )
 
-                ////////////
-                Text(it.userName, color = Color.White, fontFamily = ThemeRed.fontFamilyPopinsRegular)
+                ProfileInfo1(
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .offset((4).dp, (-4).dp),
+                    onClick = { onClickOpenProfile(item.userName) },
+                    videoItem = item,
+                    listUsers = listUsers
+                )
 
             }
-
         }
 
     }
-
 
 }

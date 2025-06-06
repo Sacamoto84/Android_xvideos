@@ -10,9 +10,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.error
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -25,13 +28,14 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.screens_red.ThemeRed
 import com.client.xvideos.screens_red.listAllUsers
 import com.client.xvideos.screens_red.profile.ScreenRedProfile
-import com.client.xvideos.screens_red.top_this_week.pagin3.SortTop
+import com.client.xvideos.screens_red.top_this_week.model.SortTop
+import com.client.xvideos.screens_red.top_this_week.model.VisibleType
+import com.client.xvideos.screens_red.top_this_week.row1.LazyRow1
 import com.client.xvideos.screens_red.top_this_week.row1.TikTokPow1
 import com.client.xvideos.screens_red.top_this_week.state.ErrorState
 import com.client.xvideos.screens_red.top_this_week.state.FullScreenLoading
 import com.client.xvideos.screens_red.top_this_week.state.LoadingNextPageIndicator
 import timber.log.Timber
-import kotlin.text.append
 
 class ScreenRedTopThisWeek : Screen {
     override val key: ScreenKey = uniqueScreenKey
@@ -46,15 +50,18 @@ class ScreenRedTopThisWeek : Screen {
 
         val shouldScrollToTop by vm.scrollToTopAfterSortChange.collectAsState() // Подписываемся на флаг
 
+        val visibleType by vm.visibleType.collectAsState()
+
+        var currentIndex by remember { mutableIntStateOf(0) }
+
         Scaffold(
             bottomBar = {
                 BottomBar(
-                    onClickWeek = {
-                        vm.changeSortType(SortTop.WEEK)
-                                  },
-                    onClickMonth = {
-                        vm.changeSortType(SortTop.MONTH)
-                    })
+                    onClickWeek = { vm.changeSortType(SortTop.WEEK) },
+                    onClickMonth = { vm.changeSortType(SortTop.MONTH) },
+                    onClickLazy = { vm.changeVisibleType(VisibleType.LAZY) },
+                    onClickTiktok = { vm.changeVisibleType(VisibleType.PAGER) },
+                )
             },
 
             containerColor = ThemeRed.colorCommonBackground,
@@ -64,29 +71,52 @@ class ScreenRedTopThisWeek : Screen {
             Timber.d("!!! items.itemCount = ${items.itemCount}")
 
             // Отображаем индикатор загрузки поверх контента, если это первая загрузка
-            val isLoadingInitial = items.loadState.refresh is LoadState.Loading// && items.itemCount == 0
+            val isLoadingInitial =
+                items.loadState.refresh is LoadState.Loading// && items.itemCount == 0
             val isErrorInitial = items.loadState.refresh is LoadState.Error
 
 
-            Box(modifier = Modifier
-                .fillMaxSize()
-                .padding(bottom = padding.calculateBottomPadding())) {
-
-                TikTokPow1(
-                    lazyPagingItems = items,
-                    currentSortType = vm.sortType.collectAsState().value,
-                    listUsers = listAllUsers,
-                    shouldScrollToTopAfterSortChange = shouldScrollToTop,
-                    onScrollToTopIntentConsumed = { vm.consumedScrollToTopIntent() },
-                    modifier = Modifier.fillMaxSize(),
-                    onClickOpenProfile = {
-                        navigator.push(
-                            ScreenRedProfile(it)
-                        )
-                    })
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bottom = padding.calculateBottomPadding())
+            ) {
 
 
-                if (isLoadingInitial) { FullScreenLoading(modifier = Modifier.align(Alignment.Center)) }
+                if (visibleType == VisibleType.PAGER) {
+                    TikTokPow1(
+                        lazyPagingItems = items,
+                        currentSortType = vm.sortType.collectAsState().value,
+                        listUsers = listAllUsers,
+                        shouldScrollToTopAfterSortChange = shouldScrollToTop,
+                        onScrollToTopIntentConsumed = { vm.consumedScrollToTopIntent() },
+                        modifier = Modifier.fillMaxSize(),
+                        onClickOpenProfile = { navigator.push(ScreenRedProfile(it)) },
+                        gotoPosition = currentIndex
+                    )
+                }
+
+                if (visibleType == VisibleType.LAZY) {
+
+                    LazyRow1(
+                        listGifs = items.itemSnapshotList.items,
+                        listUsers = listAllUsers,
+                        modifier = Modifier.fillMaxSize(),
+                        onClickOpenProfile = { navigator.push(ScreenRedProfile(it)) },
+                        onCurrentPosition = { index ->
+                            currentIndex = index
+                        },
+                        gotoPosition = 0
+                    )
+
+                }
+
+
+
+
+                if (isLoadingInitial) {
+                    FullScreenLoading(modifier = Modifier.align(Alignment.Center))
+                }
 
                 if (isErrorInitial) {
                     val errorState = items.loadState.refresh as LoadState.Error
@@ -102,9 +132,11 @@ class ScreenRedTopThisWeek : Screen {
                 // Индикатор загрузки для следующих страниц можно отобразить внутри TikTokPow1
                 // или как оверлей, если append state is Loading.
                 if (items.loadState.append is LoadState.Loading && items.itemCount > 0) {
-                    LoadingNextPageIndicator(modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(16.dp))
+                    LoadingNextPageIndicator(
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(16.dp)
+                    )
                 }
 
                 if (items.loadState.append is LoadState.Error && items.itemCount > 0) {

@@ -9,20 +9,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.magnifier
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AssignmentInd
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,21 +27,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.distinctUntilChanged
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
-import androidx.paging.filter
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.redgifs.types.UserInfo
 import com.client.xvideos.screens.common.urlVideImage.UrlImage
 import com.client.xvideos.screens_red.ThemeRed
-import com.client.xvideos.screens_red.top_this_week.pagin3.SortTop
+import com.client.xvideos.screens_red.top_this_week.model.SortTop
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import timber.log.Timber
-import kotlin.Int
 
 @Composable
 fun TikTokPow1(
@@ -54,10 +45,13 @@ fun TikTokPow1(
     listUsers: List<UserInfo>, modifier: Modifier = Modifier,
     shouldScrollToTopAfterSortChange: Boolean = false,
     onScrollToTopIntentConsumed: () -> Unit, // Лямбда для сброса флага в SM
-    onClickOpenProfile: (String) -> Unit = {}
+    onClickOpenProfile: (String) -> Unit = {},
+    gotoPosition : Int = 0
 ) {
 
     val pagerState = rememberPagerState(pageCount = { lazyPagingItems.itemCount })
+
+
 
     LaunchedEffect(currentSortType, lazyPagingItems.itemCount) {
         if (shouldScrollToTopAfterSortChange) {
@@ -80,6 +74,10 @@ fun TikTokPow1(
         }
     }
 
+    LaunchedEffect(gotoPosition) {
+        pagerState.scrollToPage(gotoPosition)
+    }
+
     VerticalPager(
         beyondViewportPageCount = 2,
         state = pagerState,
@@ -91,7 +89,7 @@ fun TikTokPow1(
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             if (videoItem != null) {
                 UrlImage(videoItem.urls.poster!!, modifier = Modifier.aspectRatio(1080f / 1920), contentScale = ContentScale.Crop)
-                ProfileInfo(modifier= Modifier.align(Alignment.BottomStart),onClick = { onClickOpenProfile(videoItem.userName)}, videoItem = videoItem, listUsers = listUsers)
+                ProfileInfo1(modifier= Modifier.align(Alignment.BottomStart),onClick = { onClickOpenProfile(videoItem.userName)}, videoItem = videoItem, listUsers = listUsers)
             }
         }
     }
@@ -112,14 +110,14 @@ fun TikTokPow1(
 
 
 @Composable
-private fun ProfileInfo(modifier: Modifier = Modifier, onClick: ()->Unit, videoItem: GifsInfo, listUsers: List<UserInfo>){
+fun ProfileInfo1(modifier: Modifier = Modifier, onClick: ()->Unit, videoItem: GifsInfo, listUsers: List<UserInfo>){
     Row(
         modifier = Modifier.then(modifier).background(Color(0x0CFFFFFF)).clickable(onClick = onClick), verticalAlignment = Alignment.CenterVertically) {
 
         val a = listUsers.firstOrNull { it1 -> it1.username == videoItem.userName }
 
         if ((a != null) && (a.profileImageUrl != null)) {
-            Box(modifier = Modifier.clip(CircleShape).size(48.dp), contentAlignment = Alignment.Center) {
+            Box(modifier = Modifier.clip(RoundedCornerShape(12.dp)).size(48.dp), contentAlignment = Alignment.Center) {
                 UrlImage(a.profileImageUrl, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
             }
         } else {

@@ -5,12 +5,8 @@ import androidx.paging.PagingState
 import com.client.xvideos.feature.redgifs.http.RedGifs
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.screens_red.listAllUsers
+import com.client.xvideos.screens_red.top_this_week.model.SortTop
 import timber.log.Timber
-
-enum class SortTop {
-    WEEK,
-    MONTH
-}
 
 class ItemTopThisWeekPagingSource (val sortTop : SortTop): PagingSource<Int, GifsInfo>() {
 

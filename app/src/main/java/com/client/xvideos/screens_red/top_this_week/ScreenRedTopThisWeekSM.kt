@@ -9,8 +9,9 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.redgifs.types.UserInfo
+import com.client.xvideos.screens_red.top_this_week.model.SortTop
+import com.client.xvideos.screens_red.top_this_week.model.VisibleType
 import com.client.xvideos.screens_red.top_this_week.pagin3.ItemTopThisWeekPagingSource
-import com.client.xvideos.screens_red.top_this_week.pagin3.SortTop
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -26,6 +27,14 @@ import timber.log.Timber
 import javax.inject.Inject
 
 class ScreenRedTopThisWeekSM @Inject constructor() : ScreenModel {
+
+    //Тип отображения Lazy, Pager, две колонки три колонки
+    private val _visibleType = MutableStateFlow(VisibleType.PAGER)
+    val visibleType: StateFlow<VisibleType> = _visibleType.asStateFlow()
+
+    fun changeVisibleType(newSort: VisibleType) {
+        _visibleType.value = newSort
+    }
 
     // StateFlow текущего типа сортировки
     private val _sortType = MutableStateFlow(SortTop.WEEK) // или "popular", "oldest"
