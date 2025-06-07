@@ -17,7 +17,7 @@ class ItemTopThisWeekPagingSource (val sortTop : SortTop): PagingSource<Int, Gif
         return try {
             Timber.d("!!! ItemPagingSource::load() page = $page sortTop:$sortTop")
 
-            val response = if (sortTop == SortTop.WEEK) RedGifs.getTopThisWeek(100, page) else RedGifs.getTopThisMounth(100, page)
+            val response = if (sortTop == SortTop.WEEK) RedGifs.getTopThisWeek(100, page) else RedGifs.getTopThisMonth(100, page)
 
             val isEndReached = response.gifs.isEmpty() // или, если ты знаешь, что сервер вернул всё
 

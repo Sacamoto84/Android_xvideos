@@ -6,7 +6,11 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Query
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 
 /**
  * Таблица с кешем строк ответов от сервера
@@ -16,7 +20,8 @@ data class CacheMedaResponseEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val url: String,
     val content: String,
-    val timeCreate: Long = System.currentTimeMillis()
+    val timeCreate: Long = System.currentTimeMillis(),
+    val timeCreateText: String = getCurrentTimeText()// добавляем поле для времени в текстовом формате = getCurrentTimeText()
 )
 
 @Dao
@@ -51,3 +56,10 @@ suspend fun clearOldCache(cacheDao: CacheMedaResponseDao) {
     val todayStartMillis = getStartOfTodayMillis()
     cacheDao.deleteOld(todayStartMillis)
 }
+
+fun getCurrentTimeText(): String {
+    val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US)
+    sdf.timeZone = TimeZone.getTimeZone("UTC")
+    return sdf.format(Date())
+}
+

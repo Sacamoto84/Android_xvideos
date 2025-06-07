@@ -2,6 +2,8 @@ package com.client.xvideos.feature.redgifs.http
 
 import com.client.xvideos.App
 import com.client.xvideos.feature.redgifs.db.CacheMedaResponseEntity
+import com.client.xvideos.feature.redgifs.db.getCurrentTimeText
+import com.client.xvideos.feature.redgifs.http.RedGifs.api
 import com.client.xvideos.feature.redgifs.types.CreatorResponse
 import com.client.xvideos.feature.redgifs.types.CreatorsResponse
 import com.client.xvideos.feature.redgifs.types.MediaResponse
@@ -33,8 +35,7 @@ object RedGifs {
     @Throws(ApiException::class)
     suspend fun getGif(id: String): MediaResponse {
         val route = Route("GET", "/v2/gifs/{id}", "id" to id)
-        val res: MediaResponse = api.request(route)
-        return res
+        return cacheMediaResponse(route)
     }
 
     /**
@@ -48,7 +49,6 @@ object RedGifs {
         page: Int = 1,                  // номер страницы (1-based).
         vararg params: Pair<String, Any> = emptyArray(),
     ): MediaResponse {
-
         val route = Route(
             method = "GET",
             path = "/v2/gifs/search?search_text={search_text}&order={order}&count={count}&page={page}",
@@ -58,8 +58,7 @@ object RedGifs {
             "page" to page,
             *params                     // дополнительные параметры из vararg
         )
-        val res: MediaResponse = api.request(route)
-        return res
+        return cacheMediaResponse(route)
     }
 
     /**
@@ -72,7 +71,6 @@ object RedGifs {
         page: Int,                       // номер страницы (1-based).
         type: MediaType = MediaType.GIF, // тип медиа (GIF, image и т.д.).
     ): MediaResponse {
-
         val route = Route(
             method = "GET",
             path = "/v2/gifs/search?order=top7&count={count}&page={page}&type={type}",
@@ -80,38 +78,15 @@ object RedGifs {
             "page" to page,
             "type" to type.value,
         )
-
-        val cacheDao = App.instance.db.cacheMedaResponseDao()
-        val cachedEntity = cacheDao.get(route.url)
-
-        if (cachedEntity != null) {
-            // Десериализуем JSON из кеша
-            Timber.i("!!! getTopThisWeek() Берем данные из кеша ${route.url}")
-            val gson = Gson()
-            return gson.fromJson(cachedEntity.content, MediaResponse::class.java)
-        } else {
-            Timber.i("!!! getTopThisWeek() Берем данные из Сети ${route.url}")
-            // Запрос из сети
-            val res: MediaResponse = api.request(route)
-            // Сохраняем в кеш (с текущим временем)
-            val jsonContent = Gson().toJson(res)
-            val entity = CacheMedaResponseEntity(
-                url = route.url,
-                content = jsonContent,
-                timeCreate = System.currentTimeMillis()
-            )
-            cacheDao.insert(entity)
-            return res
-        }
+        return cacheMediaResponse(route)
     }
 
     @Throws(ApiException::class)
-    suspend fun getTopThisMounth(
+    suspend fun getTopThisMonth(
         count: Int,                      // количество элементов на страницу.
         page: Int,                       // номер страницы (1-based).
         type: MediaType = MediaType.GIF, // тип медиа (GIF, image и т.д.).
     ): MediaResponse {
-
         val route = Route(
             method = "GET",
             path = "/v2/gifs/search?order=top28&count={count}&page={page}&type={type}",
@@ -119,9 +94,7 @@ object RedGifs {
             "page" to page,
             "type" to type.value,
         )
-
-        val res: MediaResponse = api.request(route)
-        return res
+        return cacheMediaResponse(route)
     }
 
     //--------------------------- User/Creator methods ---------------------------
@@ -188,8 +161,7 @@ object RedGifs {
     @Throws(ApiException::class)
     suspend fun getTrendingGifs(): MediaResponse {
         val route = Route(method = "GET", path = "/v2/explore/trending-gifs")
-        val res: MediaResponse = api.request(route)
-        return res
+        return cacheMediaResponse(route)
     }
 
 
@@ -209,8 +181,7 @@ object RedGifs {
             "count" to count,
             "page" to page,
         )
-        val res: MediaResponse = api.request(route)
-        return res
+        return cacheMediaResponse(route)
     }
 
     /**
@@ -220,8 +191,7 @@ object RedGifs {
     @Throws(ApiException::class)
     suspend fun getTrendingImages(): MediaResponse {
         val route = Route(method = "GET", path = "/v2/explore/trending-images")
-        val res: MediaResponse = api.request(route)
-        return res
+        return cacheMediaResponse(route)
     }
 
     //--------------------------- Tag methods ---------------------------
@@ -247,5 +217,33 @@ object RedGifs {
         return api.request(route)
     }
 
+
+}
+
+private suspend fun cacheMediaResponse(route : Route) : MediaResponse {
+
+    val cacheDao = App.instance.db.cacheMedaResponseDao()
+    val cachedEntity = cacheDao.get(route.url)
+
+    if (cachedEntity != null) {
+        // Десериализуем JSON из кеша
+        Timber.i("!!! Берем данные из кеша ${route.url}")
+        val gson = Gson()
+        return gson.fromJson(cachedEntity.content, MediaResponse::class.java)
+    } else {
+        Timber.i("!!! Берем данные из Сети ${route.url}")
+        // Запрос из сети
+        val res: MediaResponse = api.request(route)
+        // Сохраняем в кеш (с текущим временем)
+        val jsonContent = Gson().toJson(res)
+        val entity = CacheMedaResponseEntity(
+            url = route.url,
+            content = jsonContent,
+            timeCreate = System.currentTimeMillis(),
+            timeCreateText = getCurrentTimeText()
+        )
+        cacheDao.insert(entity)
+        return res
+    }
 
 }

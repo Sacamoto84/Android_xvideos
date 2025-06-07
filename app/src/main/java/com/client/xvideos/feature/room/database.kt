@@ -18,7 +18,7 @@ import dagger.hilt.components.SingletonComponent
 import java.util.Date
 import javax.inject.Singleton
 
-@Database(entities = [Items::class, Favorites::class, CacheMedaResponseEntity::class], version = 1, exportSchema = true)
+@Database(entities = [Items::class, Favorites::class, CacheMedaResponseEntity::class], version = 2, exportSchema = true)
 @TypeConverters(DateConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun favoriteDao(): FavoriteGalleryDao
@@ -49,7 +49,7 @@ object RoomPrefs {
     fun provideStockDatabase(@ApplicationContext context: Context): AppDatabase {
         println("!!! DI ROOM")
         return Room.databaseBuilder(context, AppDatabase::class.java, "database")
-            .fallbackToDestructiveMigration(false)
+            .fallbackToDestructiveMigration()
             .allowMainThreadQueries()
             .build()
     }

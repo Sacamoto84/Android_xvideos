@@ -33,22 +33,17 @@ import javax.inject.Inject
 
 class ScreenRedTopThisWeekSM @Inject constructor() : ScreenModel {
 
+    ///////////////////////////
     //Тип отображения Lazy, Pager, две колонки три колонки
     private val _visibleType = MutableStateFlow(VisibleType.ONE)
     val visibleType: StateFlow<VisibleType> = _visibleType.asStateFlow()
+    fun changeVisibleType(newSort: VisibleType) {_visibleType.value = newSort}
+    //////////////
 
-    fun changeVisibleType(newSort: VisibleType) {
-        _visibleType.value = newSort
-    }
-
+    //////////////
     // StateFlow текущего типа сортировки
     private val _sortType = MutableStateFlow(SortTop.WEEK) // или "popular", "oldest"
     val sortType: StateFlow<SortTop> = _sortType.asStateFlow()
-
-    // Новый State для отслеживания необходимости сброса
-    private val _scrollToTopAfterSortChange = MutableStateFlow(false)
-    val scrollToTopAfterSortChange: StateFlow<Boolean> = _scrollToTopAfterSortChange.asStateFlow()
-
     fun changeSortType(newSort: SortTop) {
         if (_sortType.value != newSort) { // Меняем, только если тип действительно новый
             _sortType.value = newSort
@@ -56,6 +51,13 @@ class ScreenRedTopThisWeekSM @Inject constructor() : ScreenModel {
             Timber.d("!!! SM: Sort type changed to $newSort, scrollToTopAfterSortChange set to true")
         }
     }
+    //////////////
+
+    // Новый State для отслеживания необходимости сброса
+    private val _scrollToTopAfterSortChange = MutableStateFlow(false)
+    val scrollToTopAfterSortChange: StateFlow<Boolean> = _scrollToTopAfterSortChange.asStateFlow()
+
+
 
     // Вызовите это после того, как скролл был выполнен в UI
     fun consumedScrollToTopIntent() {
@@ -64,7 +66,7 @@ class ScreenRedTopThisWeekSM @Inject constructor() : ScreenModel {
     }
 
     fun getPhotos(sort: SortTop) = Pager(
-        config = PagingConfig(pageSize = 109, prefetchDistance = 1, initialLoadSize = 109),
+        config = PagingConfig(pageSize = 109, prefetchDistance = 10, initialLoadSize = 109),
         pagingSourceFactory = { ItemTopThisWeekPagingSource(sort)  }
     ).flow
 
@@ -72,20 +74,14 @@ class ScreenRedTopThisWeekSM @Inject constructor() : ScreenModel {
     val pager: Flow<PagingData<GifsInfo>> = sortType
         .flatMapLatest { sort ->
             Timber.d("!!! ScreenRedTopThisWeekSM::pager sort = $sort")
-            getPhotos(sort)
+            Pager(
+                config = PagingConfig(pageSize = 109, prefetchDistance = 10, initialLoadSize = 109),
+                pagingSourceFactory = { ItemTopThisWeekPagingSource(sort)  }
+            ).flow
+
         }
         .cachedIn(screenModelScope)
 
-//    val pager = Pager(
-//        config = PagingConfig(pageSize = 1),
-//        pagingSourceFactory = { ItemTopThisWeekPagingSource() }
-//    ).flow.cachedIn(screenModelScope)
-
-    private val _listGifs = MutableStateFlow<List<GifsInfo>>(emptyList())
-    val listGifs: StateFlow<List<GifsInfo>> = _listGifs
-
-    private val _listUsers = MutableStateFlow<List<UserInfo>>(emptyList())
-    val listUsers: StateFlow<List<UserInfo>> = _listUsers
 
 //    init {
 //        screenModelScope.launch {
@@ -125,14 +121,13 @@ class ScreenRedTopThisWeekSM @Inject constructor() : ScreenModel {
 //   }
 
 
-    var columns by mutableIntStateOf(1) //Количество колонок
+    var columns by mutableIntStateOf(1)             //Количество колонок
     var currentIndex by  mutableIntStateOf(0)
     var currentIndexGoto by  mutableIntStateOf(0)
 
     override fun onDispose() {
         Timber.d("!!!--------------- ScreenRedTopThisWeekSM::onDispose ///////////////////")
     }
-
 
 }
 
