@@ -26,10 +26,8 @@ class ApiClient {
     val client = HttpClient(OkHttp) {
         install(ContentNegotiation) {
             gson {
-                //this.registerTypeAdapter(MediaItem::class.java, MediaItemTypeAdapter()).create()
                 this.registerTypeAdapter(UInt::class.java, UIntAdapter()).create()
                 this.registerTypeAdapter(ULong::class.java, ULongAdapter()).create()
-
             }
         }
         expectSuccess = true
@@ -40,10 +38,8 @@ class ApiClient {
     data class TokenResponse(  @SerializedName("token") val token: String)
 
     suspend fun login() {
-
         // Получить временный токен
-        val tokenResponse =
-            client.get("https://api.redgifs.com/v2/auth/temporary").body<TokenResponse>()
+        val tokenResponse = client.get("https://api.redgifs.com/v2/auth/temporary").body<TokenResponse>()
         bearerToken = tokenResponse.token
     }
 
@@ -51,22 +47,14 @@ class ApiClient {
         url: String,
         params: Map<String, String> = emptyMap(),
     ): T {
-
         if (bearerToken == null) login()
-
         return client.get(url) {
-            bearerToken?.let {
-                headers {
-                    append(HttpHeaders.Authorization, "Bearer $it")
-                }
-            }
-            params.forEach { (key, value) ->
-                parameter(key, value)
-            }
+            bearerToken?.let { headers { append(HttpHeaders.Authorization, "Bearer $it") } }
+            params.forEach { (key, value) -> parameter(key, value) }
         }.body()
     }
 
-    //val res : CreatorResponse  = request(route)
+
     suspend inline fun <reified T> request(
         route: Route, vararg params: Pair<String, Any> = emptyArray(),
     ): T {
@@ -160,26 +148,3 @@ class ULongAdapter : TypeAdapter<ULong>() {
         return input?.nextLong()?.toULong()
     }
 }
-
-
-//class MediaItemTypeAdapter : TypeAdapter<MediaItem>() {
-//
-//    private val gson = Gson()
-//
-//    override fun write(out: JsonWriter, value: MediaItem?) { }
-//
-//    override fun read(reader: JsonReader): MediaItem {
-//
-//        val jsonElement = JsonParser.parseReader(reader).asJsonObject
-//        val type = jsonElement.get("type").asInt
-//
-//        return when (type) {
-//            1 -> gson.fromJson(jsonElement, ImageInfo::class.java).let { ImageInfoItem(it) }
-//            2 -> gson.fromJson(jsonElement, GifInfo::class.java).let { GifInfoItem(it) }
-//            else -> throw IllegalArgumentException("Unknown type: $type")
-//        }
-//    }
-//
-//}
-
-

@@ -1,5 +1,7 @@
 package com.client.xvideos.feature.redgifs.http
 
+import com.client.xvideos.App
+import com.client.xvideos.feature.redgifs.db.CacheMedaResponseEntity
 import com.client.xvideos.feature.redgifs.types.CreatorResponse
 import com.client.xvideos.feature.redgifs.types.CreatorsResponse
 import com.client.xvideos.feature.redgifs.types.MediaResponse
@@ -8,6 +10,8 @@ import com.client.xvideos.feature.redgifs.types.Order
 import com.client.xvideos.feature.redgifs.types.tag.TagSuggestion
 import com.client.xvideos.feature.redgifs.types.tag.TagsResponse
 import com.google.android.gms.common.api.ApiException
+import com.google.gson.Gson
+import timber.log.Timber
 
 object RedGifs {
 
@@ -77,8 +81,28 @@ object RedGifs {
             "type" to type.value,
         )
 
-        val res: MediaResponse = api.request(route)
-        return res
+        val cacheDao = App.instance.db.cacheMedaResponseDao()
+        val cachedEntity = cacheDao.get(route.url)
+
+        if (cachedEntity != null) {
+            // Десериализуем JSON из кеша
+            Timber.i("!!! getTopThisWeek() Берем данные из кеша ${route.url}")
+            val gson = Gson()
+            return gson.fromJson(cachedEntity.content, MediaResponse::class.java)
+        } else {
+            Timber.i("!!! getTopThisWeek() Берем данные из Сети ${route.url}")
+            // Запрос из сети
+            val res: MediaResponse = api.request(route)
+            // Сохраняем в кеш (с текущим временем)
+            val jsonContent = Gson().toJson(res)
+            val entity = CacheMedaResponseEntity(
+                url = route.url,
+                content = jsonContent,
+                timeCreate = System.currentTimeMillis()
+            )
+            cacheDao.insert(entity)
+            return res
+        }
     }
 
     @Throws(ApiException::class)

@@ -64,14 +64,8 @@ class ScreenRedTopThisWeekSM @Inject constructor() : ScreenModel {
     }
 
     fun getPhotos(sort: SortTop) = Pager(
-        config = PagingConfig(
-            pageSize = 109,
-            prefetchDistance = 1,
-            initialLoadSize = 109)
-        ,
-        pagingSourceFactory = {
-            ItemTopThisWeekPagingSource(sort)
-        }
+        config = PagingConfig(pageSize = 109, prefetchDistance = 1, initialLoadSize = 109),
+        pagingSourceFactory = { ItemTopThisWeekPagingSource(sort)  }
     ).flow
 
     @OptIn(ExperimentalCoroutinesApi::class)
