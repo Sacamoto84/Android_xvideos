@@ -1,7 +1,7 @@
 package com.client.xvideos.feature.redgifs.http
 
 import com.client.xvideos.App
-import com.client.xvideos.feature.redgifs.db.CacheMedaResponseEntity
+import com.client.xvideos.feature.redgifs.db.CacheMediaResponseEntity
 import com.client.xvideos.feature.redgifs.db.getCurrentTimeText
 import com.client.xvideos.feature.redgifs.http.RedGifs.api
 import com.client.xvideos.feature.redgifs.types.CreatorResponse
@@ -95,6 +95,44 @@ object RedGifs {
             "type" to type.value,
         )
         return cacheMediaResponse(route)
+    }
+
+    @Throws(ApiException::class)
+    suspend fun getTopTrending(
+        count: Int,                      // количество элементов на страницу.
+        page: Int,                       // номер страницы (1-based).
+        type: MediaType = MediaType.GIF, // тип медиа (GIF, image и т.д.).
+    ): MediaResponse {
+        val route = Route(
+            method = "GET",
+            path = "/v2/gifs/search?order=trending&count={count}&page={page}&type={type}",
+            "count" to count,
+            "page" to page,
+            "type" to type.value,
+        )
+        return cacheMediaResponse(route)
+    }
+
+    //Последние, новые посты, не нужно кешировать
+    @Throws(ApiException::class)
+    suspend fun getTopLatest(
+        count: Int,                      // количество элементов на страницу.
+        page: Int,                       // номер страницы (1-based).
+        type: MediaType = MediaType.GIF, // тип медиа (GIF, image и т.д.).
+    ): MediaResponse {
+        val route = Route(
+            method = "GET",
+            path = "/v2/gifs/search?order=new&count={count}&page={page}&type={type}",
+            "count" to count,
+            "page" to page,
+            "type" to type.value,
+        )
+
+        Timber.i("!!! getTopLatest ${route.url}")
+        // Запрос из сети
+        val res: MediaResponse = api.request(route)
+
+        return res
     }
 
     //--------------------------- User/Creator methods ---------------------------
@@ -236,7 +274,7 @@ private suspend fun cacheMediaResponse(route : Route) : MediaResponse {
         val res: MediaResponse = api.request(route)
         // Сохраняем в кеш (с текущим временем)
         val jsonContent = Gson().toJson(res)
-        val entity = CacheMedaResponseEntity(
+        val entity = CacheMediaResponseEntity(
             url = route.url,
             content = jsonContent,
             timeCreate = System.currentTimeMillis(),

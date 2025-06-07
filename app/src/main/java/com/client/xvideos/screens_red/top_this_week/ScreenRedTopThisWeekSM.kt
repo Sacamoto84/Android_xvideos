@@ -2,6 +2,7 @@ package com.client.xvideos.screens_red.top_this_week
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -13,6 +14,7 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import com.client.xvideos.feature.redgifs.types.GifsInfo
+import com.client.xvideos.feature.redgifs.types.Order
 import com.client.xvideos.feature.redgifs.types.UserInfo
 import com.client.xvideos.screens_red.top_this_week.model.SortTop
 import com.client.xvideos.screens_red.top_this_week.model.VisibleType
@@ -58,17 +60,11 @@ class ScreenRedTopThisWeekSM @Inject constructor() : ScreenModel {
     val scrollToTopAfterSortChange: StateFlow<Boolean> = _scrollToTopAfterSortChange.asStateFlow()
 
 
-
     // Вызовите это после того, как скролл был выполнен в UI
     fun consumedScrollToTopIntent() {
         _scrollToTopAfterSortChange.value = false
         Timber.d("!!! SM: scrollToTopAfterSortChange set to false (consumed)")
     }
-
-    fun getPhotos(sort: SortTop) = Pager(
-        config = PagingConfig(pageSize = 109, prefetchDistance = 10, initialLoadSize = 109),
-        pagingSourceFactory = { ItemTopThisWeekPagingSource(sort)  }
-    ).flow
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val pager: Flow<PagingData<GifsInfo>> = sortType

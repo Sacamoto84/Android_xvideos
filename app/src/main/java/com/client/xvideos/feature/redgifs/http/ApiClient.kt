@@ -16,6 +16,7 @@ import io.ktor.serialization.gson.gson
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
+import io.ktor.client.plugins.cache.HttpCache
 
 class ApiClient {
 
@@ -78,6 +79,8 @@ class ApiClient {
         route: Route,
         vararg params: Pair<String, Any> = emptyArray(),
     ): String {
+
+        if (bearerToken == null) login()
 
         return client.get(route.url) {
             bearerToken?.let {

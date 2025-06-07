@@ -186,7 +186,7 @@ fun RedProfileCreaterInfo(item: CreatorResponse) {
  * 900     -> "900"
  */
 @SuppressLint("DefaultLocale")
-fun Int.toPrettyCount(): String {
+fun Long.toPrettyCount(): String {
     val absValue = kotlin.math.abs(this)
 
     return when {

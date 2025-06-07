@@ -8,9 +8,14 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.client.xvideos.feature.redgifs.types.Order
+import com.client.xvideos.screens_red.profile.bottom_bar.line1.SortBy
+import com.client.xvideos.screens_red.top_this_week.model.SortTop
 
 @Composable
 fun BottomBar(
+    vm : ScreenRedTopThisWeekSM,
     onClickWeek: () -> Unit,
     onClickMonth: () -> Unit,
     onClickLazy: () -> Unit,
@@ -20,6 +25,10 @@ fun BottomBar(
     onClickLazy3: () -> Unit,
 ) {
     Row(modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())) {
+
+        SortTopBy(listOf(SortTop.WEEK, SortTop.MONTH, SortTop.TRENDING, SortTop.LATEST) , vm.sortType.collectAsStateWithLifecycle().value) {
+            vm.changeSortType(it)
+        }
 
         Button(onClick = onClickWeek) {
             Text("Week")

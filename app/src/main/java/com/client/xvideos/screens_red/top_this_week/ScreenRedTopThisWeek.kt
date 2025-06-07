@@ -83,6 +83,7 @@ class ScreenRedTopThisWeek : Screen {
         Scaffold(
             bottomBar = {
                 BottomBar(
+                    vm = vm,
                     onClickWeek = { vm.changeSortType(SortTop.WEEK) },
                     onClickMonth = { vm.changeSortType(SortTop.MONTH) },
                     onClickLazy = { vm.changeVisibleType(VisibleType.LAZY) },

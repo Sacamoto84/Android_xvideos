@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import com.client.xvideos.feature.redgifs.db.CacheMedaResponseDao
-import com.client.xvideos.feature.redgifs.db.CacheMedaResponseEntity
+import com.client.xvideos.feature.redgifs.db.CacheMediaResponseEntity
 import com.client.xvideos.feature.room.entity.Favorites
 import com.client.xvideos.feature.room.entity.Items
 import dagger.Module
@@ -18,7 +18,7 @@ import dagger.hilt.components.SingletonComponent
 import java.util.Date
 import javax.inject.Singleton
 
-@Database(entities = [Items::class, Favorites::class, CacheMedaResponseEntity::class], version = 2, exportSchema = true)
+@Database(entities = [Items::class, Favorites::class, CacheMediaResponseEntity::class], version = 2, exportSchema = true)
 @TypeConverters(DateConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun favoriteDao(): FavoriteGalleryDao

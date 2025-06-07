@@ -16,7 +16,7 @@ import java.util.TimeZone
  * Таблица с кешем строк ответов от сервера
  */
 @Entity(tableName = "cache_media_response")
-data class CacheMedaResponseEntity(
+data class CacheMediaResponseEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val url: String,
     val content: String,
@@ -27,10 +27,10 @@ data class CacheMedaResponseEntity(
 @Dao
 interface CacheMedaResponseDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(doc: CacheMedaResponseEntity)
+    suspend fun insert(doc: CacheMediaResponseEntity)
 
     @Query("SELECT * FROM cache_media_response WHERE url = :url")
-    suspend fun get(url: String): CacheMedaResponseEntity?
+    suspend fun get(url: String): CacheMediaResponseEntity?
 
     @Query("DELETE FROM cache_media_response WHERE timeCreate < :time")
     suspend fun deleteOld(time: Long)
