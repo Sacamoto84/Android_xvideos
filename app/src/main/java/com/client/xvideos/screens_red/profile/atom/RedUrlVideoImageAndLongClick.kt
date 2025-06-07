@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,16 +37,28 @@ fun RedUrlVideoImageAndLongClick(
     onLongClick: () -> Unit,
     onDoubleClick: () -> Unit,
     overlay: @Composable () -> Unit = {},
-    onFullScreen: () -> Unit //Запуск фуллскрин
+    onFullScreen: () -> Unit = {}, //Запуск фуллскрин
+    onVideo: (Boolean) -> Unit = {},
+
+
+    isVisibleView : Boolean = true,
+    isVisibleDuration : Boolean = true,
+
+    play: Boolean = false
+
 ) {
     val haptic = LocalHapticFeedback.current
     val context = LocalContext.current
     var isVideo by remember { mutableStateOf(false) }
+
+    LaunchedEffect(isVideo) { onVideo(isVideo) }
+
+    LaunchedEffect(play) { isVideo = play }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .aspectRatio(1080f / 1920)
-            //.aspectRatio(1f)
             .combinedClickable(
                 onDoubleClick = {
                     vibrateWithPatternAndAmplitude(context = context)
@@ -83,7 +96,7 @@ fun RedUrlVideoImageAndLongClick(
             )
         } else {
             //Показ картинки
-            RedProfileTile(item, index)
+            RedProfileTile(item, index, isVisibleView = isVisibleView, isVisibleDuration = isVisibleDuration)
             overlay.invoke()
         }
 

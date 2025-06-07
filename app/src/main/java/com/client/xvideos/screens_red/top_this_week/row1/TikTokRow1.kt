@@ -33,6 +33,7 @@ import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.redgifs.types.UserInfo
 import com.client.xvideos.screens.common.urlVideImage.UrlImage
 import com.client.xvideos.screens_red.ThemeRed
+import com.client.xvideos.screens_red.top_this_week.ProfileInfo1
 import com.client.xvideos.screens_red.top_this_week.model.SortTop
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
@@ -114,22 +115,4 @@ fun TikTokPow1(
 }
 
 
-@Composable
-fun ProfileInfo1(modifier: Modifier = Modifier, onClick: ()->Unit, videoItem: GifsInfo, listUsers: List<UserInfo>){
-    Row(
-        modifier = Modifier.then(modifier).background(Color(0x0CFFFFFF)).clickable(onClick = onClick), verticalAlignment = Alignment.CenterVertically) {
 
-        val a = listUsers.firstOrNull { it1 -> it1.username == videoItem.userName }
-
-        if ((a != null) && (a.profileImageUrl != null)) {
-            Box(modifier = Modifier.clip(RoundedCornerShape(12.dp)).size(48.dp), contentAlignment = Alignment.Center) {
-                UrlImage(a.profileImageUrl, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
-            }
-        } else {
-            Box(modifier = Modifier.clip(CircleShape).size(48.dp).background(Color.DarkGray), contentAlignment = Alignment.Center)
-            { Icon(Icons.Default.AssignmentInd, contentDescription = null, modifier = Modifier.size(24.dp), tint = Color.White) }
-        }
-        ////////////
-        Text(videoItem.userName, color = Color.White, fontFamily = ThemeRed.fontFamilyPopinsRegular, fontSize = 22.sp, modifier = Modifier.padding(start = 8.dp))
-    }
-}

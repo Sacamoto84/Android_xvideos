@@ -37,7 +37,7 @@ class ScreenRedTopThisWeekSM @Inject constructor() : ScreenModel {
 
     ///////////////////////////
     //Тип отображения Lazy, Pager, две колонки три колонки
-    private val _visibleType = MutableStateFlow(VisibleType.ONE)
+    private val _visibleType = MutableStateFlow(VisibleType.TWO)
     val visibleType: StateFlow<VisibleType> = _visibleType.asStateFlow()
     fun changeVisibleType(newSort: VisibleType) {_visibleType.value = newSort}
     //////////////

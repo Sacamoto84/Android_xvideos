@@ -24,7 +24,7 @@ import com.client.xvideos.screens_red.ThemeRed
 import com.composables.core.Icon
 
 @Composable
-fun RedProfileTile(item: GifsInfo, index: Int) {
+fun RedProfileTile(item: GifsInfo, index: Int, isVisibleView : Boolean = true, isVisibleDuration : Boolean = true) {
 
     Box(modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp))) {
 
@@ -38,67 +38,77 @@ fun RedProfileTile(item: GifsInfo, index: Int) {
             fontFamily = ThemeRed.fontFamilyPopinsMedium
         )
 
-
         //Нижний ряд с лайками и длительностью
         Row(
             modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                modifier = Modifier.padding(8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box {
-                    Icon(
-                        painter = painterResource(R.drawable.rg_button),
-                        contentDescription = null,
-                        tint = Color.Black, modifier = Modifier.offset(1.dp, 1.dp)
-                    )
-                    Icon(
-                        painter = painterResource(R.drawable.rg_button),
-                        contentDescription = null,
-                        tint = Color.White
-                    )
+
+            if (isVisibleView) {
+                Row(
+                    modifier = Modifier.padding(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+
+                    Box {
+                        Icon(
+                            painter = painterResource(R.drawable.rg_button),
+                            contentDescription = null,
+                            tint = Color.Black, modifier = Modifier.offset(1.dp, 1.dp)
+                        )
+                        Icon(
+                            painter = painterResource(R.drawable.rg_button),
+                            contentDescription = null,
+                            tint = Color.White
+                        )
+                    }
+
+                    Box {
+                        Text(
+                            item.views?.toPrettyCount() ?: "-",
+                            color = Color.Black,
+                            modifier = Modifier
+                                .padding(start = 8.dp)
+                                .offset(1.dp, 1.dp),
+                            fontFamily = ThemeRed.fontFamilyPopinsMedium
+                        )
+
+                        Text(
+                            item.views?.toPrettyCount() ?: "-",
+                            color = Color.White,
+                            modifier = Modifier
+                                .padding(start = 8.dp),
+                            fontFamily = ThemeRed.fontFamilyPopinsMedium
+                        )
+                    }
+
                 }
+            }
+
+            if (isVisibleDuration) {
                 Box {
+
                     Text(
-                        item.views?.toPrettyCount() ?: "-",
+                        item.duration?.toMinSec() ?: "-",
                         color = Color.Black,
                         modifier = Modifier
-                            .padding(start = 8.dp)
+                            .padding(8.dp)
                             .offset(1.dp, 1.dp),
                         fontFamily = ThemeRed.fontFamilyPopinsMedium
                     )
 
                     Text(
-                        item.views?.toPrettyCount() ?: "-",
+                        item.duration?.toMinSec() ?: "-",
                         color = Color.White,
                         modifier = Modifier
-                            .padding(start = 8.dp),
+                            .padding(8.dp),
                         fontFamily = ThemeRed.fontFamilyPopinsMedium
                     )
                 }
             }
-            Box {
 
-                Text(
-                    item.duration?.toMinSec() ?: "-",
-                    color = Color.Black,
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .offset(1.dp, 1.dp),
-                    fontFamily = ThemeRed.fontFamilyPopinsMedium
-                )
-
-                Text(
-                    item.duration?.toMinSec() ?: "-",
-                    color = Color.White,
-                    modifier = Modifier
-                        .padding(8.dp),
-                    fontFamily = ThemeRed.fontFamilyPopinsMedium
-                )
-            }
         }
 
 

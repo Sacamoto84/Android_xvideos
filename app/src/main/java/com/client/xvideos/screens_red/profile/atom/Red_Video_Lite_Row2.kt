@@ -97,13 +97,9 @@ fun Red_Video_Lite_Row2(
             "%02d:%02d".format(time.toInt(), duration), modifier = Modifier.align(Alignment.TopEnd), color = Color.White, fontFamily = ThemeRed.fontFamilyPopinsRegular,
             fontSize = 8.sp
         )
-
         Box(modifier = Modifier.fillMaxSize().combinedClickable(onClick = onClick, onLongClick = onLongClick))
-
         Box(Modifier.align(Alignment.BottomEnd)){ overlayBottomEnd.invoke() }
-
         CanvasTimeDurationLine(time, duration, timeA = 1f, timeB = 1f, timeABEnable = false)
-
     }
 }
 

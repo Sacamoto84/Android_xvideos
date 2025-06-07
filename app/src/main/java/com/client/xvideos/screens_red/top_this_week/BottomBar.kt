@@ -3,11 +3,13 @@ package com.client.xvideos.screens_red.top_this_week
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.client.xvideos.feature.redgifs.types.Order
 import com.client.xvideos.screens_red.profile.bottom_bar.line1.SortBy
@@ -24,19 +26,12 @@ fun BottomBar(
     onClickLazy2: () -> Unit,
     onClickLazy3: () -> Unit,
 ) {
-    Row(modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())) {
+    Row(modifier = Modifier.padding(start = 8.dp, top = 2.dp).fillMaxWidth().horizontalScroll(rememberScrollState())) {
 
         SortTopBy(listOf(SortTop.WEEK, SortTop.MONTH, SortTop.TRENDING, SortTop.LATEST) , vm.sortType.collectAsStateWithLifecycle().value) {
             vm.changeSortType(it)
         }
 
-        Button(onClick = onClickWeek) {
-            Text("Week")
-        }
-
-        Button(onClick = onClickMonth) {
-            Text("Month")
-        }
 
         Button(onClick = onClickLazy) {
             Text("Lazy")
