@@ -1,6 +1,7 @@
 package com.client.xvideos.screens_red.top_this_week
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Crop
 import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.Share
@@ -15,6 +16,7 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import com.client.xvideos.feature.redgifs.types.GifsInfo
+import com.client.xvideos.screens_red.common.block.BlockRed
 import com.client.xvideos.screens_red.common.expand_menu_video.ExpandMenuVideoModel
 import com.client.xvideos.screens_red.top_this_week.model.SortTop
 import com.client.xvideos.screens_red.top_this_week.model.VisibleType
@@ -49,6 +51,7 @@ class ScreenRedTopThisWeekSM @Inject constructor() : ScreenModel {
     // StateFlow текущего типа сортировки
     private val _sortType = MutableStateFlow(SortTop.WEEK) // или "popular", "oldest"
     val sortType: StateFlow<SortTop> = _sortType.asStateFlow()
+
     fun changeSortType(newSort: SortTop) {
         if (_sortType.value != newSort) { // Меняем, только если тип действительно новый
             _sortType.value = newSort
@@ -126,7 +129,12 @@ class ScreenRedTopThisWeekSM @Inject constructor() : ScreenModel {
                 if (it == null) return@ExpandMenuVideoModel
                 downloadItem(it)
             }),
-            ExpandMenuVideoModel("Поделиться", Icons.Default.Share)
+            ExpandMenuVideoModel("Поделиться", Icons.Default.Share),
+            ExpandMenuVideoModel("Блокировать", Icons.Default.Block, onClick = {
+                if (it == null) return@ExpandMenuVideoModel
+                BlockRed.blockVisibleDialog = true
+
+            })
         )
     //////////////////////////////////////////////////////////////////////////////////////////
 

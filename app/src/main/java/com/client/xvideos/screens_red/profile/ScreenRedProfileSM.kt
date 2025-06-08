@@ -1,7 +1,6 @@
 package com.client.xvideos.screens_red.profile
 
 import android.content.Context
-import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -11,7 +10,6 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
-import com.client.xvideos.App
 import com.client.xvideos.feature.Downloader
 import com.client.xvideos.feature.preference.PreferencesRepository
 import com.client.xvideos.feature.redgifs.extractNameFromUrl
@@ -21,8 +19,7 @@ import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.redgifs.types.MediaType
 import com.client.xvideos.feature.redgifs.types.Order
 import com.client.xvideos.feature.room.AppDatabase
-import com.client.xvideos.screens_red.GlobalRed.blockList
-import com.client.xvideos.screens_red.use_case.block.blockGetAllBlockedGifs
+import com.client.xvideos.screens_red.common.block.BlockRed
 import com.client.xvideos.screens_red.use_case.network.loadGifs
 import com.client.xvideos.screens_red.use_case.share.useCaseShareGifs
 import dagger.Binds
@@ -60,7 +57,7 @@ class ScreenRedProfileSM @AssistedInject constructor(
     }
 
 
-    private val _list = MutableStateFlow<List<GifsInfo>>(emptyList())
+    val _list = MutableStateFlow<List<GifsInfo>>(emptyList())
     val list: StateFlow<List<GifsInfo>> = _list
 
 
@@ -114,7 +111,7 @@ class ScreenRedProfileSM @AssistedInject constructor(
             }
 
             //Фильтруем список тегов убрав из списка блокируемые gif
-            refreshListAndBlock()
+            BlockRed.refreshListAndBlock(_list)
 
         }
 
@@ -170,43 +167,9 @@ class ScreenRedProfileSM @AssistedInject constructor(
         }
     }
 
-
-
-    //Region══════════ Блокировка ═════════════════════╦══════════════════════════════════════════════════════════════╗
-
-    //═════════════════════════════════════════════════╬══════════════════════════════════════════════════════════════╣
-    fun blockItem(item: GifsInfo) {
-        val result = com.client.xvideos.screens_red.use_case.block.blockItem(item)
-        if (result.isSuccess) {
-            Timber.i("!!! GIF успешно заблокирован")
-            Toast.makeText(App.instance.applicationContext, "GIFs заблокирован", Toast.LENGTH_SHORT).show()
-        } else {
-            val exception = result.exceptionOrNull()
-            val errorMsg = exception?.localizedMessage ?: "Неизвестная ошибка"
-            Timber.e(exception, "Не удалось заблокировать GIF")
-            Toast.makeText(App.instance.applicationContext, "Ошибка блокировки: $errorMsg", Toast.LENGTH_SHORT).show()
-        }
-        refreshListAndBlock()
-    }
-    //                                                                                                                  ║
-    //End ══════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
-
     // Методы
     //════════════════ Поделиться ═══════════════════════════════════════════════════════╗
     fun shareGifs(context : Context, item: GifsInfo){useCaseShareGifs(context, item)}  //║
-    //═══════════════════════════════════════════════════════════════════════════════════╝
-
-
-    //═══════════════════════════════════════════════════════════════════════════════════╗
-    //                                                                                   ║
-    //                                                                                   ║
-    //═══════════════════════════════════════════════════════════════════════════════════╣
-    fun refreshListAndBlock(){                                                         //║
-        blockList.clear()                                                              //║
-        blockList.addAll(blockGetAllBlockedGifs())                                     //║
-        val blockedSet = blockList.toSet()                                             //║
-        _list.value = _list.value.filterNot { it.id in blockedSet }                    //║
-    }                                                                                  //║
     //═══════════════════════════════════════════════════════════════════════════════════╝
 
     suspend fun loadNextPage(userName : String, items : Int = 100, page : Int = 1) {

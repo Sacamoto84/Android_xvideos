@@ -4,5 +4,7 @@ enum class SortTop {
     WEEK,
     MONTH,
     TRENDING,
-    LATEST
+    LATEST,
+
+    FORCE_TEMP
 }

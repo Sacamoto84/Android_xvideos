@@ -93,8 +93,7 @@ object Downloader {
             return
         }
 
-        val itemsToInsertInDb =
-            mutableMapOf<String, ItemsRedDownload>() // Key: fileName (name), Value: Item
+        val itemsToInsertInDb = mutableListOf<ItemsRedDownload>() // Key: fileName (name), Value: Item
 
         for (creatorDir in creatorDirs) {
 
@@ -111,11 +110,11 @@ object Downloader {
                 // Если запись с таким 'name' уже есть в БД, её 'url' будет сохранен при REPLACE.
                 // Если записи нет, 'url' будет пустой строкой, пока не будет обновлен другим процессом.
 
-                itemsToInsertInDb[fileName] = ItemsRedDownload(
+                itemsToInsertInDb.add(ItemsRedDownload(
                     id = fileName,
                     name = creatorName,
                     url = "", // Заполняется при реальной закачке, здесь мы его не знаем
-                )
+                ))
 
             }
 

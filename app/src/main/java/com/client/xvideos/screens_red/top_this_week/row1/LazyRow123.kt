@@ -28,6 +28,8 @@ import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.redgifs.types.UserInfo
+import com.client.xvideos.screens_red.common.block.BlockRed
+import com.client.xvideos.screens_red.common.block.dialogBlock.DialogBlock
 import com.client.xvideos.screens_red.profile.atom.RedUrlVideoImageAndLongClick
 import com.client.xvideos.screens_red.common.expand_menu_video.ExpandMenuVideo
 import com.client.xvideos.screens_red.top_this_week.ProfileInfo1
@@ -46,7 +48,8 @@ fun LazyRow123(
     onClickOpenProfile: (String) -> Unit = {},
     onCurrentPosition: (Int) -> Unit = {}, //Вывести текущую позицию
     gotoPosition: Int,
-    option: List<ExpandMenuVideoModel> = emptyList()
+    option: List<ExpandMenuVideoModel> = emptyList(),
+    onRefresh: () -> Unit
 ) {
     if (listGifs.itemCount == 0) return
 
@@ -94,6 +97,21 @@ fun LazyRow123(
 
     LaunchedEffect(gotoPosition) {if (gotoPosition >= 0 && gotoPosition < listGifs.itemCount) {state.scrollToItem(gotoPosition)}}
 
+    var blockItem by remember { mutableStateOf<GifsInfo?>(null) }
+
+    if(BlockRed.blockVisibleDialog) {
+        DialogBlock(
+            visible = BlockRed.blockVisibleDialog,
+            onDismiss = { BlockRed.blockVisibleDialog = false },
+            onBlockConfirmed = {
+                if ((blockItem != null)) {
+                    BlockRed.blockItem(blockItem!!)
+                    onRefresh.invoke()
+                }
+            }
+        )
+    }
+
     LazyVerticalGrid(
         state = state,
         columns = GridCells.Fixed(columns.coerceIn(1..3)),
@@ -131,7 +149,11 @@ fun LazyRow123(
                     )
 
                     //Меню на 3 точки
-                    ExpandMenuVideo(modifier = Modifier.align(Alignment.TopEnd), option = option, item)
+                    ExpandMenuVideo(modifier = Modifier.align(Alignment.TopEnd), option = option, item, onClick = {
+                        blockItem = item
+                    })
+
+
 
                     ProfileInfo1(
                         modifier = Modifier.fillMaxWidth().align(Alignment.BottomStart).offset((4).dp, (-4).dp),

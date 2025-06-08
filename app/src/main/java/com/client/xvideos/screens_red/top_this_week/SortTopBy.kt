@@ -72,6 +72,7 @@ fun SortTopBy(list: List<SortTop>, selected: SortTop, onSelect: (SortTop) -> Uni
                 SortTop.MONTH -> "TOP28"
                 SortTop.TRENDING -> "Trending"
                 SortTop.LATEST -> "New"
+                SortTop.FORCE_TEMP -> "Refresh"
             }
 
             BasicText(
@@ -114,10 +115,7 @@ fun SortTopBy(list: List<SortTop>, selected: SortTop, onSelect: (SortTop) -> Uni
                     text = {
 
                         Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(32.dp)
-                                .clip(RoundedCornerShape(8.dp))
+                            modifier = Modifier.fillMaxWidth().height(32.dp).clip(RoundedCornerShape(8.dp))
                                 .background(if (option == selected) ThemeRed.colorBorderGray else Color.Transparent)
                                 .padding(start = 8.dp), contentAlignment = Alignment.CenterStart
                         ) {
@@ -127,6 +125,7 @@ fun SortTopBy(list: List<SortTop>, selected: SortTop, onSelect: (SortTop) -> Uni
                                 SortTop.MONTH -> "TOP28"
                                 SortTop.TRENDING -> "Trending"
                                 SortTop.LATEST -> "New"
+                                SortTop.FORCE_TEMP -> "Refresh"
                             }
 
                             Text(

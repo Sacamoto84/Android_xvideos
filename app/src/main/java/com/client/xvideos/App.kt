@@ -6,6 +6,7 @@ import com.client.xvideos.feature.redgifs.http.RedGifs
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.room.AppDatabase
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.PlaybackPreference
+import com.client.xvideos.screens_red.common.block.BlockRed
 import com.client.xvideos.screens_red.use_case.block.blockGetGifsInfoByUserName
 import com.kdownloader.KDownloader
 import dagger.hilt.android.HiltAndroidApp
@@ -64,6 +65,8 @@ class App : Application() {
         allowAllSSL()
         PlaybackPreference.initialize(this)
         kDownloader = KDownloader.create(applicationContext)
+
+        BlockRed.refreshBlockList()
 
         GlobalScope.launch {
             clearOldCache( db.cacheMedaResponseDao())

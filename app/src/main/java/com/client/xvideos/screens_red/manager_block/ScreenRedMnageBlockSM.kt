@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 class ScreenRedManageBlockSM @Inject constructor() : ScreenModel {
 
-    private val _blockList = MutableStateFlow<List<GifsInfo>>(emptyList())
+    val _blockList = MutableStateFlow<List<GifsInfo>>(emptyList())
     val blockList: StateFlow<List<GifsInfo>> = _blockList
 
     init {

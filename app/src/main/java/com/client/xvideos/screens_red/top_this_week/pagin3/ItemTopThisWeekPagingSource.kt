@@ -5,6 +5,7 @@ import androidx.paging.PagingState
 import com.client.xvideos.feature.redgifs.http.RedGifs
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.screens_red.GlobalRed
+import com.client.xvideos.screens_red.common.block.BlockRed
 import com.client.xvideos.screens_red.top_this_week.model.SortTop
 import timber.log.Timber
 
@@ -22,6 +23,9 @@ class ItemTopThisWeekPagingSource (val sortTop : SortTop): PagingSource<Int, Gif
                 SortTop.MONTH -> RedGifs.getTopThisMonth(100, page)
                 SortTop.TRENDING -> RedGifs.getTopTrending(100, page)
                 SortTop.LATEST -> RedGifs.getTopLatest(100, page)
+                else -> {
+                    RedGifs.getTopThisWeek(100, page)
+                }
             }
 
             val isEndReached = response.gifs.isEmpty() // или, если ты знаешь, что сервер вернул всё
@@ -30,17 +34,18 @@ class ItemTopThisWeekPagingSource (val sortTop : SortTop): PagingSource<Int, Gif
 
             Timber.d("!!! load() a.gif.size = ${response.gifs.size}")
 
-            val gifs = response.gifs.distinctBy { it.id }
+            val gifs : List<GifsInfo> = response.gifs.distinctBy { it.id }
+            val blockedSet = BlockRed.blockList.value.map{it.id}.toSet()
+            val gifs1 = gifs.filterNot { it.id in blockedSet }
 
             val user = response.users.distinctBy { it.username }
 
             val existingUsernames = GlobalRed.listAllUsers.map { it.username }.toSet()
             val newUsers = user.filter { it.username !in existingUsernames }
-
             GlobalRed.listAllUsers.addAll(newUsers)
 
             LoadResult.Page(
-                data = gifs,
+                data = gifs1,
                 prevKey = null,
                 nextKey = nextKey
             )

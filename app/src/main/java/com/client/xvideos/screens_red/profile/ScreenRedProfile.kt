@@ -49,11 +49,12 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.screens_red.GlobalRed
 import com.client.xvideos.screens_red.ThemeRed
+import com.client.xvideos.screens_red.common.block.BlockRed
 import com.client.xvideos.screens_red.profile.atom.CanvasTimeDurationLine
 import com.client.xvideos.screens_red.profile.atom.RedProfileCreaterInfo
 import com.client.xvideos.screens_red.profile.atom.RedUrlVideoImageAndLongClick
 import com.client.xvideos.screens_red.profile.atom.VerticalScrollbar
-import com.client.xvideos.screens_red.common.dialogBlock.DialogBlock
+import com.client.xvideos.screens_red.common.block.dialogBlock.DialogBlock
 import com.client.xvideos.screens_red.profile.bottom_bar.BottomBar
 import com.client.xvideos.screens_red.profile.tags.TagsBlock
 import com.client.xvideos.screens_red.profile.tikTok.MenuContent
@@ -101,10 +102,11 @@ class ScreenRedProfile(val profileName: String) : Screen {
         //│ Отмена    Блокировать │
         //╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈╯
         DialogBlock(
-            visible = GlobalRed.blockVisibleDialog,
-            onDismiss = { GlobalRed.blockVisibleDialog = false }) {
+            visible = BlockRed.blockVisibleDialog,
+            onDismiss = { BlockRed.blockVisibleDialog = false }) {
             val a = vm.currentTikTokGifInfo; if (a != null) {
-            vm.blockItem(a)
+            BlockRed.blockItem(a)
+            BlockRed.refreshListAndBlock(vm._list)
         }
         }
         //🟨🟨🟨🟨🟨🟨🟨🟨⬆️⬆️⬆️⬆️⬆️❗

@@ -30,22 +30,19 @@ import com.client.xvideos.screens_red.ThemeRed
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExpandMenuVideo(modifier: Modifier = Modifier, option : List<ExpandMenuVideoModel> = emptyList(), item: GifsInfo? = null) {
+fun ExpandMenuVideo(modifier: Modifier = Modifier, option : List<ExpandMenuVideoModel> = emptyList(), item: GifsInfo? = null,  onClick : ()->Unit = {}) {
 
     var expanded by remember { mutableStateOf(false) }
 
     ExposedDropdownMenuBox(
         expanded = expanded,
-        onExpandedChange = { expanded = it },
+        onExpandedChange = { if (it) onClick.invoke(); expanded = it },
         modifier = Modifier.then(modifier)
     )
     {
         IconButton(
-            modifier = Modifier
-                .size(48.dp)
-                .menuAnchor(ExposedDropdownMenuAnchorType.SecondaryEditable)
-            ,
-            onClick = { expanded = true }) {
+            modifier = Modifier.size(48.dp).menuAnchor(ExposedDropdownMenuAnchorType.SecondaryEditable),
+            onClick = {}) {
             Icon(
                 Icons.Default.MoreVert,
                 contentDescription = "",

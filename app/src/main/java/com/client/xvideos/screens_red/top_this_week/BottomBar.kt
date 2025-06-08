@@ -20,8 +20,6 @@ import com.client.xvideos.screens_red.top_this_week.model.SortTop
 @Composable
 fun BottomBar(
     vm : ScreenRedTopThisWeekSM,
-    onClickWeek: () -> Unit,
-    onClickMonth: () -> Unit,
     onClickLazy: () -> Unit,
     onClickTiktok: () -> Unit,
     onClickLazyOne: () -> Unit,

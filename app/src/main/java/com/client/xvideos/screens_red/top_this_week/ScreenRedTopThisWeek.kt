@@ -77,8 +77,6 @@ class ScreenRedTopThisWeek : Screen {
             bottomBar = {
                 BottomBar(
                     vm = vm,
-                    onClickWeek = { vm.changeSortType(SortTop.WEEK) },
-                    onClickMonth = { vm.changeSortType(SortTop.MONTH) },
                     onClickLazy = { vm.changeVisibleType(VisibleType.LAZY) },
                     onClickTiktok = { vm.changeVisibleType(VisibleType.PAGER) },
                     onClickLazyOne = { vm.changeVisibleType(VisibleType.ONE) },
@@ -134,7 +132,12 @@ class ScreenRedTopThisWeek : Screen {
                             vm.currentIndex = index
                         },
                         gotoPosition = vm.currentIndexGoto,
-                        option = vm.expandMenuVideoList
+                        option = vm.expandMenuVideoList,
+                        onRefresh = {
+                            val temp = vm.sortType.value
+                            vm.changeSortType(SortTop.FORCE_TEMP)
+                            vm.changeSortType(temp)
+                        }
                     )
 
                 }

@@ -1,4 +1,4 @@
-package com.client.xvideos.screens_red.common.dialogBlock
+package com.client.xvideos.screens_red.common.block.dialogBlock
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

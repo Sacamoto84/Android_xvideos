@@ -103,6 +103,7 @@ fun CanvasTimeDurationLine(currentTime: Float, duration: Int, timeA: Float = 0f,
     }
 
 }
+
 @Preview
 @Composable
 fun CanvasTimeDurationLinePreview() {

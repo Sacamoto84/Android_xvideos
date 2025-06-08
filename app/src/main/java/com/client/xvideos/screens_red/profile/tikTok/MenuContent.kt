@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.client.xvideos.screens_red.GlobalRed
+import com.client.xvideos.screens_red.common.block.BlockRed
 import com.client.xvideos.screens_red.profile.ScreenRedProfileSM
 
 @Composable
@@ -77,15 +78,12 @@ fun MenuContent(vm: ScreenRedProfileSM) {
 
 
         Box(
-            modifier = Modifier.then(themeButton)
-                .clickable(onClick = {
-                    GlobalRed.blockVisibleDialog = true
-                }),
+            modifier = Modifier.then(themeButton).clickable(onClick = {BlockRed.blockVisibleDialog = true}),
             contentAlignment = Alignment.Center
         ) {
             Icon(Icons.Filled.Block, contentDescription = null, tint = Color.White)
         }
-        //Spacer(modifier = Modifier.width(8.dp))
+
         Spacer(modifier = Modifier.width(48.dp))
     }
 }
