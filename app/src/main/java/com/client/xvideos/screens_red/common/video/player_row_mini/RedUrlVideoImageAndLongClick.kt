@@ -19,6 +19,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,30 +32,43 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import com.client.xvideos.AppPath
+import com.client.xvideos.BuildConfig
 import com.client.xvideos.feature.findVideoOnRedCacheDownload
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.vibrate.vibrateWithPatternAndAmplitude
+import com.client.xvideos.screens_red.common.video.player_row_mini.atom.RedProfileTile
+import com.client.xvideos.screens_red.common.video.player_row_mini.atom.Red_Video_Lite_Row2
 import timber.log.Timber
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RedUrlVideoImageAndLongClick(
-    item: GifsInfo,
+    item: GifsInfo,                      //Текущий элемент
     index: Int,
     modifier: Modifier = Modifier,
+
+    overlay: @Composable () -> Unit = {},
+
+    //--- Свойства ---
+    isVisibleView : Boolean = true,       // Показать количество просмотров
+    isVisibleDuration : Boolean = true,   // Показать продолжительность видео
+
+    play: Boolean = false,                //Запуск видео или картинка, управление из вне
+
+    //-= Колбеки =-
+
+    //--- Нажатия на кнопки ---
+    onFullScreen: () -> Unit = {},         //Нажатие на кнопку FullScreen
     onLongClick: () -> Unit,
     onDoubleClick: () -> Unit,
-    overlay: @Composable () -> Unit = {},
-    onFullScreen: () -> Unit = {}, //Запуск фуллскрин
-    onVideo: (Boolean) -> Unit = {},
 
-
-    isVisibleView : Boolean = true,
-    isVisibleDuration : Boolean = true,
-
-    play: Boolean = false
+    onVideo: (Boolean) -> Unit = {},       //true - видео, false - картинка
 
 ) {
+
+    if (BuildConfig.DEBUG) { SideEffect {
+        Timber.i("@@@ RedUrlVideoImageAndLongClick() play:$play") } }
+
     val haptic = LocalHapticFeedback.current
     val context = LocalContext.current
     var isVideo by remember { mutableStateOf(false) }
@@ -81,7 +95,6 @@ fun RedUrlVideoImageAndLongClick(
                     vibrateWithPatternAndAmplitude(context = context)
                     onDoubleClick.invoke()
                 },
-
                 onLongClick = {
                     //haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                     vibrateWithPatternAndAmplitude(context = context)
@@ -106,25 +119,14 @@ fun RedUrlVideoImageAndLongClick(
                 onLongClick = {},
                 overlayBottomEnd = {
                     IconButton(
-                        modifier = Modifier.height(48.dp).width(48.dp), onClick = {
-                            onFullScreen.invoke()
-                        }
-                    ) {
-                        Icon(
-                            Icons.Filled.Fullscreen,
-                            contentDescription = null,
-                            tint = Color.White
-                        )
-                    }
+                        modifier = Modifier.height(48.dp).width(48.dp), onClick = { onFullScreen.invoke() }
+                    ) {Icon(Icons.Filled.Fullscreen, contentDescription = null, tint = Color.White)}
                 }
             )
         } else {
             //Показ картинки
             RedProfileTile(
-                item,
-                index,
-                isVisibleView = isVisibleView,
-                isVisibleDuration = isVisibleDuration
+                item, index, isVisibleView = isVisibleView, isVisibleDuration = isVisibleDuration
             )
             Row(modifier = Modifier.fillMaxSize().align(Alignment.BottomCenter), verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.End) {
                 if (!videoUri.contains("https"))

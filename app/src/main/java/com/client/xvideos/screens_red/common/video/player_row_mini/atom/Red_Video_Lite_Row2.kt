@@ -1,4 +1,4 @@
-package com.client.xvideos.screens_red.common.video.player_row_mini
+package com.client.xvideos.screens_red.common.video.player_row_mini.atom
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.combinedClickable
