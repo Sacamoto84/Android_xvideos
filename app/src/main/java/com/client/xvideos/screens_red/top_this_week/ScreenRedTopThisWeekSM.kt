@@ -15,6 +15,7 @@ import androidx.paging.cachedIn
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelKey
+import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.screens_red.common.block.BlockRed
 import com.client.xvideos.screens_red.common.expand_menu_video.ExpandMenuVideoModel
@@ -30,13 +31,27 @@ import dagger.multibindings.IntoMap
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.stateIn
 import timber.log.Timber
 import javax.inject.Inject
 
-class ScreenRedTopThisWeekSM @Inject constructor() : ScreenModel {
+class ScreenRedTopThisWeekSM @Inject constructor(
+    connectivityObserver: ConnectivityObserver
+) : ScreenModel {
+
+
+    val isConnected = connectivityObserver
+        .isConnected
+        .stateIn(
+            screenModelScope,
+            SharingStarted.WhileSubscribed(5000L),
+            false
+        )
+
 
     ///////////////////////////
     //Тип отображения Lazy, Pager, две колонки три колонки

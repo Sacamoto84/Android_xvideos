@@ -44,12 +44,13 @@ import timber.log.Timber
 @Composable
 fun RedUrlVideoImageAndLongClick(
     item: GifsInfo,                      //Текущий элемент
-    index: Int,
+    index: Int,                          //Индекс элемента, отображается в режиме картинка
     modifier: Modifier = Modifier,
 
     overlay: @Composable () -> Unit = {},
 
     //--- Свойства ---
+    isNetConnected : Boolean,             // Состояние сети
     isVisibleView : Boolean = true,       // Показать количество просмотров
     isVisibleDuration : Boolean = true,   // Показать продолжительность видео
 
@@ -59,8 +60,8 @@ fun RedUrlVideoImageAndLongClick(
 
     //--- Нажатия на кнопки ---
     onFullScreen: () -> Unit = {},         //Нажатие на кнопку FullScreen
-    onLongClick: () -> Unit,
-    onDoubleClick: () -> Unit,
+    onLongClick: () -> Unit= {},
+    onDoubleClick: () -> Unit= {},
 
     onVideo: (Boolean) -> Unit = {},       //true - видео, false - картинка
 
@@ -82,8 +83,12 @@ fun RedUrlVideoImageAndLongClick(
         //Определяем адрес откуда брать видео, из кеша или из сети
         if (findVideoOnRedCacheDownload(item.id, item.userName))
             "${AppPath.cache_download_red}/${item.userName}/${item.id}.mp4"
-        else
-            "https://api.redgifs.com/v2/gifs/${item.id.lowercase()}/hd.m3u8"
+        else {
+            if (isNetConnected)
+                "https://api.redgifs.com/v2/gifs/${item.id.lowercase()}/hd.m3u8"
+            else
+                "android.resource://${context.packageName}/raw/q"
+        }
     }
 
     Box(
@@ -123,6 +128,7 @@ fun RedUrlVideoImageAndLongClick(
                     ) {Icon(Icons.Filled.Fullscreen, contentDescription = null, tint = Color.White)}
                 }
             )
+
         } else {
             //Показ картинки
             RedProfileTile(

@@ -49,7 +49,8 @@ fun LazyRow123(
     onCurrentPosition: (Int) -> Unit = {}, //Вывести текущую позицию
     gotoPosition: Int,
     option: List<ExpandMenuVideoModel> = emptyList(),
-    onRefresh: () -> Unit
+    onRefresh: () -> Unit,
+    isConnected : Boolean
 ) {
     if (listGifs.itemCount == 0) return
 
@@ -146,6 +147,7 @@ fun LazyRow123(
                         isVisibleView = false,
                         isVisibleDuration = false,
                         play = centrallyLocatedOrMostVisibleItemIndex == index && columns == 1,
+                        isNetConnected = isConnected
                     )
 
                     //Меню на 3 точки

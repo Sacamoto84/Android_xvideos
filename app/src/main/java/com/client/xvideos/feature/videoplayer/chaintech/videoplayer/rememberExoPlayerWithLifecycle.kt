@@ -107,6 +107,7 @@ fun rememberExoPlayerWithLifecycle(
                 prepare()
                 seekTo(0, 0)
             }
+
         } catch (e: Exception) {
             error(MediaPlayerError.PlaybackError(e.message ?: "Failed to load media"))
         }

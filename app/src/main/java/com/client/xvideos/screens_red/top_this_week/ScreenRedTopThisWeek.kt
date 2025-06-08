@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import cafe.adriel.voyager.core.screen.Screen
@@ -48,6 +49,7 @@ class ScreenRedTopThisWeek : Screen {
         val shouldScrollToTop by vm.scrollToTopAfterSortChange.collectAsState() // Подписываемся на флаг
         val visibleType by vm.visibleType.collectAsState()
 
+        val isConnected by vm.isConnected.collectAsStateWithLifecycle()
 
         Timber.i("!!! --- currentIndex:${vm.currentIndex} currentIndexGoto:${vm.currentIndexGoto}")
 
@@ -137,7 +139,8 @@ class ScreenRedTopThisWeek : Screen {
                             val temp = vm.sortType.value
                             vm.changeSortType(SortTop.FORCE_TEMP)
                             vm.changeSortType(temp)
-                        }
+                        },
+                        isConnected = isConnected
                     )
 
                 }

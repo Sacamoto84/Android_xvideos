@@ -255,7 +255,7 @@ class ScreenRedProfile(val profileName: String) : Screen {
                                         vm.openFullScreen(index)
                                     }, onDoubleClick = {}, onFullScreen = {
                                         vm.openFullScreen(index)
-                                    }
+                                    }, isNetConnected = true //!!!
                                     )
                                 }
                             }

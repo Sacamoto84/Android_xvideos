@@ -81,7 +81,7 @@ fun LazyRow1(
                     //vm.openFullScreen(index)
                 }, onDoubleClick = {}, onFullScreen = {
                     //vm.openFullScreen(index)
-                }
+                }, isNetConnected = true //!!!
                 )
 
                 ProfileInfo1(

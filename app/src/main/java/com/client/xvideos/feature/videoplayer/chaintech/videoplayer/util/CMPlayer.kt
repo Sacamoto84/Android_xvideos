@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -18,6 +19,7 @@ import androidx.media3.common.VideoSize
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.AspectRatioFrameLayout
+import com.client.xvideos.BuildConfig
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.DrmConfig
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPlayerError
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.PlayerSpeed
@@ -53,6 +55,13 @@ fun CMPPlayer(
     selectedAudioTrack: AudioTrack?,
     selectedSubTitle: SubtitleTrack?
 ) {
+
+    if (BuildConfig.DEBUG) {
+        SideEffect {
+            Timber.i("@@@ CMPPlayer()")
+        }
+    }
+
     val context = LocalContext.current
     val exoPlayer = rememberExoPlayerWithLifecycle(
         url,
@@ -64,6 +73,8 @@ fun CMPPlayer(
         error,
         selectedQuality,
     )
+
+
     val playerView = rememberPlayerView(exoPlayer, context)
 
     var isBuffering by remember { mutableStateOf(false) }
