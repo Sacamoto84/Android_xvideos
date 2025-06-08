@@ -5,7 +5,7 @@ import kotlinx.io.IOException
 import java.io.File
 
 private enum class Folder(val value: String) {
-    CACHE_DOWNLOAD_RED("CacheDownloadRed"),
+    CACHE_DOWNLOAD_RED("Download"),
     RED("Red"),
 
 }

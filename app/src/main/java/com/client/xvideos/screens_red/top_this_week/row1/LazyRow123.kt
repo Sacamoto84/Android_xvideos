@@ -25,31 +25,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.max
-import androidx.compose.ui.unit.min
-import androidx.lifecycle.distinctUntilChanged
 import androidx.paging.compose.LazyPagingItems
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.redgifs.types.UserInfo
 import com.client.xvideos.screens_red.profile.atom.RedUrlVideoImageAndLongClick
-import com.client.xvideos.screens_red.top_this_week.ExpandMenuVideo
+import com.client.xvideos.screens_red.common.expand_menu_video.ExpandMenuVideo
 import com.client.xvideos.screens_red.top_this_week.ProfileInfo1
-import com.client.xvideos.screens_red.top_this_week.model.VisibleType
+import com.client.xvideos.screens_red.common.expand_menu_video.ExpandMenuVideoModel
 import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
-import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
 @Composable
-fun LazyRow2(
+fun LazyRow123(
     columns: Int,
     listGifs: LazyPagingItems<GifsInfo>,
     listUsers: List<UserInfo>,
     modifier: Modifier = Modifier,
     onClickOpenProfile: (String) -> Unit = {},
     onCurrentPosition: (Int) -> Unit = {}, //Вывести текущую позицию
-    gotoPosition: Int
+    gotoPosition: Int,
+    option: List<ExpandMenuVideoModel> = emptyList()
 ) {
     if (listGifs.itemCount == 0) return
 
@@ -93,7 +90,6 @@ fun LazyRow2(
         }
     }
 
-
     LaunchedEffect(Unit) { snapshotFlow { centrallyLocatedOrMostVisibleItemIndex }.collectLatest { visibleIndex -> if (visibleIndex != -1) { onCurrentPosition(visibleIndex) }}}
 
     LaunchedEffect(gotoPosition) {if (gotoPosition >= 0 && gotoPosition < listGifs.itemCount) {state.scrollToItem(gotoPosition)}}
@@ -131,18 +127,14 @@ fun LazyRow2(
                         onVideo = {  isVideo = it  },
                         isVisibleView = false,
                         isVisibleDuration = false,
-
                         play = centrallyLocatedOrMostVisibleItemIndex == index && columns == 1,
-
-
                     )
 
-
-                    ExpandMenuVideo(modifier = Modifier.align(Alignment.TopEnd))
+                    //Меню на 3 точки
+                    ExpandMenuVideo(modifier = Modifier.align(Alignment.TopEnd), option = option, item)
 
                     ProfileInfo1(
-                        modifier = Modifier.fillMaxWidth()
-                            .align(Alignment.BottomStart).offset((4).dp, (-4).dp),
+                        modifier = Modifier.fillMaxWidth().align(Alignment.BottomStart).offset((4).dp, (-4).dp),
                         onClick = { onClickOpenProfile(item.userName) },
                         videoItem = item,
                         listUsers = listUsers,

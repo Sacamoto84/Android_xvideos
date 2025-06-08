@@ -4,7 +4,7 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.client.xvideos.feature.redgifs.http.RedGifs
 import com.client.xvideos.feature.redgifs.types.GifsInfo
-import com.client.xvideos.screens_red.listAllUsers
+import com.client.xvideos.screens_red.GlobalRed
 import com.client.xvideos.screens_red.top_this_week.model.SortTop
 import timber.log.Timber
 
@@ -34,10 +34,10 @@ class ItemTopThisWeekPagingSource (val sortTop : SortTop): PagingSource<Int, Gif
 
             val user = response.users.distinctBy { it.username }
 
-            val existingUsernames = listAllUsers.map { it.username }.toSet()
+            val existingUsernames = GlobalRed.listAllUsers.map { it.username }.toSet()
             val newUsers = user.filter { it.username !in existingUsernames }
 
-            listAllUsers.addAll(newUsers)
+            GlobalRed.listAllUsers.addAll(newUsers)
 
             LoadResult.Page(
                 data = gifs,

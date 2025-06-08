@@ -1,9 +1,6 @@
 package com.client.xvideos.screens_red.profile
 
 import android.annotation.SuppressLint
-import android.widget.Toast
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -50,13 +47,13 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.client.xvideos.App
+import com.client.xvideos.screens_red.GlobalRed
 import com.client.xvideos.screens_red.ThemeRed
 import com.client.xvideos.screens_red.profile.atom.CanvasTimeDurationLine
 import com.client.xvideos.screens_red.profile.atom.RedProfileCreaterInfo
 import com.client.xvideos.screens_red.profile.atom.RedUrlVideoImageAndLongClick
 import com.client.xvideos.screens_red.profile.atom.VerticalScrollbar
-import com.client.xvideos.screens_red.profile.block.DialogBlock
+import com.client.xvideos.screens_red.common.dialogBlock.DialogBlock
 import com.client.xvideos.screens_red.profile.bottom_bar.BottomBar
 import com.client.xvideos.screens_red.profile.tags.TagsBlock
 import com.client.xvideos.screens_red.profile.tikTok.MenuContent
@@ -104,8 +101,8 @@ class ScreenRedProfile(val profileName: String) : Screen {
         //│ Отмена    Блокировать │
         //╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈╯
         DialogBlock(
-            visible = vm.blockVisibleDialog,
-            onDismiss = { vm.blockVisibleDialog = false }) {
+            visible = GlobalRed.blockVisibleDialog,
+            onDismiss = { GlobalRed.blockVisibleDialog = false }) {
             val a = vm.currentTikTokGifInfo; if (a != null) {
             vm.blockItem(a)
         }

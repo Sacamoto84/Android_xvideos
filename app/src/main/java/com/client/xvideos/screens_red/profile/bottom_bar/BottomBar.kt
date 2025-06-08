@@ -11,7 +11,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.client.xvideos.feature.Downloader
 import com.client.xvideos.screens_red.ThemeRed
+import com.client.xvideos.screens_red.common.downloaderIndicator.DownloadIndicator
 import com.client.xvideos.screens_red.profile.ScreenRedProfileSM
 import com.client.xvideos.screens_red.profile.bottom_bar.line1.FeedControls_Container_Line1
 import com.client.xvideos.screens_red.profile.bottom_bar.line0.FeedControls_Container_Line0
@@ -19,16 +21,11 @@ import com.composables.core.HorizontalSeparator
 
 @Composable
 fun BottomBar(vm: ScreenRedProfileSM) {
-    val percentDownload = vm.downloader.percent.collectAsStateWithLifecycle().value
 
     Column {
 
         //Индикатор загрузки
-        when(percentDownload) {
-          in  0f..1f -> LinearProgressIndicator(progress = percentDownload,  modifier = Modifier.fillMaxWidth().height(2.dp), color = Color.Green)
-          -2f -> HorizontalSeparator(ThemeRed.colorBottomBarDivider, thickness = 2.dp)
-          -3f -> Box(modifier = Modifier.fillMaxWidth().height(2.dp).background(Color.Red))
-        }
+        DownloadIndicator()
 
         FeedControls_Container_Line0(vm)
         HorizontalSeparator(Color.Transparent, thickness = 4.dp)

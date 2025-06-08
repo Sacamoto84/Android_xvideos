@@ -5,14 +5,12 @@ import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
-import cafe.adriel.voyager.hilt.ScreenModelKey
 import com.client.xvideos.App
 import com.client.xvideos.feature.Downloader
 import com.client.xvideos.feature.preference.PreferencesRepository
@@ -23,6 +21,7 @@ import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.redgifs.types.MediaType
 import com.client.xvideos.feature.redgifs.types.Order
 import com.client.xvideos.feature.room.AppDatabase
+import com.client.xvideos.screens_red.GlobalRed.blockList
 import com.client.xvideos.screens_red.use_case.block.blockGetAllBlockedGifs
 import com.client.xvideos.screens_red.use_case.network.loadGifs
 import com.client.xvideos.screens_red.use_case.share.useCaseShareGifs
@@ -42,7 +41,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 enum class TypeGifs(val value: String) {
     ALL("All"),
@@ -54,7 +52,6 @@ class ScreenRedProfileSM @AssistedInject constructor(
     @Assisted val profileName: String,
     private val db: AppDatabase,
     private val pref: PreferencesRepository,
-    val downloader: Downloader
 ) : ScreenModel {
 
     @AssistedFactory
@@ -162,35 +159,22 @@ class ScreenRedProfileSM @AssistedInject constructor(
             val item = list.value[currentTikTokPage]
             val hiName = extractNameFromUrl(item.urls.hd.toString()) //https://media.redgifs.com/HealthyPettyRedhead.mp4 > HealthyPettyRedhead
             Timber.i("!!! downloadItem() id:${item.id} userName:${item.userName} url:${item.urls.hd}")
-            downloader.downloadRedName(item.id, item.userName, item.urls.hd.toString())
+            Downloader.downloadRedName(item.id, item.userName, item.urls.hd.toString())
             Timber.i("!!! downloadItem() ... завершено")
         }
     }
 
     fun scanCacheDowmload() {
         screenModelScope.launch {
-            downloader.scanRedCacheDowmdoadAndUpdate()
+            Downloader.scanRedCacheDownloadAndUpdate()
         }
     }
 
 
 
     //Region══════════ Блокировка ═════════════════════╦══════════════════════════════════════════════════════════════╗
-    var blockVisibleDialog by mutableStateOf(false)  //║ Показ диалога на добавление в блок лист                      ║
-    var blockList = mutableStateListOf<String>()     //║                                                              ║
+
     //═════════════════════════════════════════════════╬══════════════════════════════════════════════════════════════╣
-    /*
-     * Выполняет блокировку GIF-элемента, используя [useCaseBlockItem].
-     *
-     * Функция вызывает `useCaseBlockItem` для создания файла блокировки,
-     * затем выводит лог и показывает пользователю Toast с результатом операции.
-     * В случае ошибки — логирует исключение с помощью Timber и показывает
-     * сообщение об ошибке.
-     *
-     * @param item Объект [GifsInfo], описывающий GIF, который нужно заблокировать.
-     *
-     * @see useCaseBlockItem
-     */
     fun blockItem(item: GifsInfo) {
         val result = com.client.xvideos.screens_red.use_case.block.blockItem(item)
         if (result.isSuccess) {

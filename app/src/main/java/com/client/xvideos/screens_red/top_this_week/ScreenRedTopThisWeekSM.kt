@@ -1,10 +1,11 @@
 package com.client.xvideos.screens_red.top_this_week
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Crop
+import androidx.compose.material.icons.filled.FileDownload
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -14,11 +15,11 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import com.client.xvideos.feature.redgifs.types.GifsInfo
-import com.client.xvideos.feature.redgifs.types.Order
-import com.client.xvideos.feature.redgifs.types.UserInfo
+import com.client.xvideos.screens_red.common.expand_menu_video.ExpandMenuVideoModel
 import com.client.xvideos.screens_red.top_this_week.model.SortTop
 import com.client.xvideos.screens_red.top_this_week.model.VisibleType
 import com.client.xvideos.screens_red.top_this_week.pagin3.ItemTopThisWeekPagingSource
+import com.client.xvideos.screens_red.use_case.download.downloadItem
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -39,7 +40,9 @@ class ScreenRedTopThisWeekSM @Inject constructor() : ScreenModel {
     //Тип отображения Lazy, Pager, две колонки три колонки
     private val _visibleType = MutableStateFlow(VisibleType.TWO)
     val visibleType: StateFlow<VisibleType> = _visibleType.asStateFlow()
-    fun changeVisibleType(newSort: VisibleType) {_visibleType.value = newSort}
+    fun changeVisibleType(newSort: VisibleType) {
+        _visibleType.value = newSort
+    }
     //////////////
 
     //////////////
@@ -72,7 +75,7 @@ class ScreenRedTopThisWeekSM @Inject constructor() : ScreenModel {
             Timber.d("!!! ScreenRedTopThisWeekSM::pager sort = $sort")
             Pager(
                 config = PagingConfig(pageSize = 109, prefetchDistance = 10, initialLoadSize = 109),
-                pagingSourceFactory = { ItemTopThisWeekPagingSource(sort)  }
+                pagingSourceFactory = { ItemTopThisWeekPagingSource(sort) }
             ).flow
 
         }
@@ -116,10 +119,21 @@ class ScreenRedTopThisWeekSM @Inject constructor() : ScreenModel {
 //        }
 //   }
 
+    //////////////////////////////////////////////////////////////////////////////////////////
+    val expandMenuVideoList =
+        listOf(
+            ExpandMenuVideoModel("Скачать", Icons.Filled.FileDownload, onClick = {
+                if (it == null) return@ExpandMenuVideoModel
+                downloadItem(it)
+            }),
+            ExpandMenuVideoModel("Поделиться", Icons.Default.Share)
+        )
+    //////////////////////////////////////////////////////////////////////////////////////////
+
 
     var columns by mutableIntStateOf(1)             //Количество колонок
-    var currentIndex by  mutableIntStateOf(0)
-    var currentIndexGoto by  mutableIntStateOf(0)
+    var currentIndex by mutableIntStateOf(0)
+    var currentIndexGoto by mutableIntStateOf(0)
 
     override fun onDispose() {
         Timber.d("!!!--------------- ScreenRedTopThisWeekSM::onDispose ///////////////////")

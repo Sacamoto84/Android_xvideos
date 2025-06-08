@@ -8,16 +8,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TimeInput
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,12 +25,11 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.screens_red.ThemeRed
-import com.client.xvideos.screens_red.listAllUsers
+import com.client.xvideos.screens_red.GlobalRed.listAllUsers
 import com.client.xvideos.screens_red.profile.ScreenRedProfile
 import com.client.xvideos.screens_red.top_this_week.model.SortTop
 import com.client.xvideos.screens_red.top_this_week.model.VisibleType
-import com.client.xvideos.screens_red.top_this_week.row1.LazyRow1
-import com.client.xvideos.screens_red.top_this_week.row1.LazyRow2
+import com.client.xvideos.screens_red.top_this_week.row1.LazyRow123
 import com.client.xvideos.screens_red.top_this_week.row1.TikTokPow1
 import com.client.xvideos.screens_red.top_this_week.state.ErrorState
 import com.client.xvideos.screens_red.top_this_week.state.FullScreenLoading
@@ -129,36 +122,19 @@ class ScreenRedTopThisWeek : Screen {
                     )
                 }
 
-//                if (visibleType == VisibleType.LAZY) {
-//
-//                    LazyRow1(
-//                        listGifs = items.itemSnapshotList.items,
-//                        listUsers = listAllUsers,
-//                        modifier = Modifier.fillMaxSize(),
-//                        onClickOpenProfile = { navigator.push(ScreenRedProfile(it)) },
-//                        onCurrentPosition = { index ->
-//                            currentIndex = index
-//                        },
-//                        gotoPosition = currentIndexGoto
-//                    )
-//
-//                }
-
                 if ((visibleType == VisibleType.ONE) || (visibleType == VisibleType.TWO) || (visibleType == VisibleType.THREE)) {
 
-                    LazyRow2(
+                    LazyRow123(
                         columns = vm.columns,
                         listGifs = items,
                         listUsers = listAllUsers,
                         modifier = Modifier.fillMaxSize(),
-                        onClickOpenProfile = {
-                            vm.currentIndexGoto =  vm.currentIndex
-                            navigator.push(ScreenRedProfile(it))
-                                             },
+                        onClickOpenProfile = { vm.currentIndexGoto =  vm.currentIndex; navigator.push(ScreenRedProfile(it)) },
                         onCurrentPosition = { index ->
                             vm.currentIndex = index
                         },
-                        gotoPosition = vm.currentIndexGoto
+                        gotoPosition = vm.currentIndexGoto,
+                        option = vm.expandMenuVideoList
                     )
 
                 }
