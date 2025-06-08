@@ -1,4 +1,4 @@
-package com.client.xvideos.screens_red.profile.atom
+package com.client.xvideos.screens_red.common.video.player_row_mini
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,6 +21,8 @@ import com.client.xvideos.R
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.screens.common.urlVideImage.UrlImage
 import com.client.xvideos.screens_red.ThemeRed
+import com.client.xvideos.screens_red.profile.atom.toMinSec
+import com.client.xvideos.screens_red.profile.atom.toPrettyCount
 import com.composables.core.Icon
 
 @Composable

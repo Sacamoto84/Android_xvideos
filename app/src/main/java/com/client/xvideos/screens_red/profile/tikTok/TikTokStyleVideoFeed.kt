@@ -21,7 +21,7 @@ import com.client.xvideos.feature.findVideoOnRedCacheDownload
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.screens_red.ThemeRed
 import com.client.xvideos.screens_red.profile.ScreenRedProfileSM
-import com.client.xvideos.screens_red.common.video.RedVideoPlayerWithMenuContent
+import com.client.xvideos.screens_red.common.video.player_with_menu.RedVideoPlayerWithMenuContent
 import timber.log.Timber
 
 

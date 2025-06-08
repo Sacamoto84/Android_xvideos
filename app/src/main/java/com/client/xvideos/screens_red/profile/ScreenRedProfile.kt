@@ -47,12 +47,11 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.client.xvideos.screens_red.GlobalRed
 import com.client.xvideos.screens_red.ThemeRed
 import com.client.xvideos.screens_red.common.block.BlockRed
 import com.client.xvideos.screens_red.profile.atom.CanvasTimeDurationLine
 import com.client.xvideos.screens_red.profile.atom.RedProfileCreaterInfo
-import com.client.xvideos.screens_red.profile.atom.RedUrlVideoImageAndLongClick
+import com.client.xvideos.screens_red.common.video.player_row_mini.RedUrlVideoImageAndLongClick
 import com.client.xvideos.screens_red.profile.atom.VerticalScrollbar
 import com.client.xvideos.screens_red.common.block.dialogBlock.DialogBlock
 import com.client.xvideos.screens_red.profile.bottom_bar.BottomBar

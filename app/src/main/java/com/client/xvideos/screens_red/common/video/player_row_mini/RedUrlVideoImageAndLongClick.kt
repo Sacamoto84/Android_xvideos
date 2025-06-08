@@ -1,6 +1,5 @@
-package com.client.xvideos.screens_red.profile.atom
+package com.client.xvideos.screens_red.common.video.player_row_mini
 
-import android.graphics.drawable.Icon
 import androidx.annotation.OptIn
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
@@ -14,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCard
 import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.Icon
@@ -104,19 +102,30 @@ fun RedUrlVideoImageAndLongClick(
                 videoUri,//"https://api.redgifs.com/v2/gifs/${item.id.lowercase()}/hd.m3u8",
                 play = true,
                 Modifier,
-                onClick = {isVideo = isVideo.not()},
+                onClick = { isVideo = isVideo.not() },
                 onLongClick = {},
-                overlayBottomEnd ={
-                    IconButton (
+                overlayBottomEnd = {
+                    IconButton(
                         modifier = Modifier.height(48.dp).width(48.dp), onClick = {
                             onFullScreen.invoke()
                         }
-                    ) { Icon(Icons.Filled.Fullscreen,  contentDescription = null, tint =  Color.White) }
+                    ) {
+                        Icon(
+                            Icons.Filled.Fullscreen,
+                            contentDescription = null,
+                            tint = Color.White
+                        )
+                    }
                 }
             )
         } else {
             //Показ картинки
-            RedProfileTile(item, index, isVisibleView = isVisibleView, isVisibleDuration = isVisibleDuration)
+            RedProfileTile(
+                item,
+                index,
+                isVisibleView = isVisibleView,
+                isVisibleDuration = isVisibleDuration
+            )
             Row(modifier = Modifier.fillMaxSize().align(Alignment.BottomCenter), verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.End) {
                 if (!videoUri.contains("https"))
                     Icon( Icons.Default.Save, contentDescription = null, tint = Color.LightGray,  modifier = Modifier.padding(bottom = 9.dp, end = 9.dp).size(18.dp))

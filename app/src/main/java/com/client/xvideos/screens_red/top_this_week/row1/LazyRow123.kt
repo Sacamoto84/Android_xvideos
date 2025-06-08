@@ -30,7 +30,7 @@ import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.redgifs.types.UserInfo
 import com.client.xvideos.screens_red.common.block.BlockRed
 import com.client.xvideos.screens_red.common.block.dialogBlock.DialogBlock
-import com.client.xvideos.screens_red.profile.atom.RedUrlVideoImageAndLongClick
+import com.client.xvideos.screens_red.common.video.player_row_mini.RedUrlVideoImageAndLongClick
 import com.client.xvideos.screens_red.common.expand_menu_video.ExpandMenuVideo
 import com.client.xvideos.screens_red.top_this_week.ProfileInfo1
 import com.client.xvideos.screens_red.common.expand_menu_video.ExpandMenuVideoModel
