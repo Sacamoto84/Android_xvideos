@@ -1,16 +1,24 @@
 package com.client.xvideos.screens_red.top_this_week.row1
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.StarOutline
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
@@ -24,12 +32,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
+import com.client.xvideos.R
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.redgifs.types.UserInfo
+import com.client.xvideos.screens_red.GlobalRed
 import com.client.xvideos.screens_red.common.block.BlockRed
-import com.client.xvideos.screens_red.common.block.dialogBlock.DialogBlock
 import com.client.xvideos.screens_red.common.video.player_row_mini.RedUrlVideoImageAndLongClick
 import com.client.xvideos.screens_red.common.expand_menu_video.ExpandMenuVideo
 import com.client.xvideos.screens_red.top_this_week.ProfileInfo1
@@ -129,6 +139,8 @@ fun LazyRow123(
 
             val item = listGifs[index]
 
+            var videoUri by remember { mutableStateOf("") }
+
             if (item != null) {
 
                 Box(
@@ -138,24 +150,19 @@ fun LazyRow123(
                     contentAlignment = Alignment.Center
                 ) {
 
-                    RedUrlVideoImageAndLongClick(item, index, onLongClick = {
-                        //vm.openFullScreen(index)
-                    }, onDoubleClick = {}, onFullScreen = {
-                        //vm.openFullScreen(index)
-                    },
+                    RedUrlVideoImageAndLongClick(item, index, onLongClick = {},
                         onVideo = {  isVideo = it  },
                         isVisibleView = false,
                         isVisibleDuration = false,
                         play = centrallyLocatedOrMostVisibleItemIndex == index && columns == 1,
-                        isNetConnected = isConnected
+                        isNetConnected = isConnected,
+                        onVideoUri = {videoUri = it}
                     )
 
                     //Меню на 3 точки
                     ExpandMenuVideo(modifier = Modifier.align(Alignment.TopEnd), option = option, item, onClick = {
                         blockItem = item
                     })
-
-
 
                     ProfileInfo1(
                         modifier = Modifier.fillMaxWidth().align(Alignment.BottomStart).offset((4).dp, (-4).dp),
@@ -165,6 +172,33 @@ fun LazyRow123(
                         visibleUserName = columns <= 2 && !isVideo,
                         visibleIcon = !isVideo
                     )
+
+                    Row(modifier = Modifier.fillMaxSize().align(Alignment.BottomCenter), verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.End) {
+
+                        //⚠️Фаворит не реализован⚠️
+                        if (!videoUri.contains("https") && !isVideo && videoUri != "") {
+                            Icon(Icons.Filled.StarOutline, contentDescription = null, tint = Color.Yellow, modifier = Modifier.padding(bottom = 6.dp, end = 6.dp).size(18.dp))
+                        }
+
+//                        if (!videoUri.contains("https") && !isVideo && videoUri != "") {
+//                            Icon(Icons.Default.Star, contentDescription = null, tint = Color.Yellow, modifier = Modifier.padding(bottom = 6.dp, end = 6.dp).size(18.dp))
+//                        }
+
+                        //✅Иконка верифицированного пользователя
+                        if (GlobalRed.listAllUsers.first{ it.username == item.userName }.verified) {
+                            Image(painter = painterResource(id = R.drawable.verificed),
+                                contentDescription = null, modifier = Modifier.padding(bottom = 6.dp, end = 6.dp).size(18.dp)
+                            )
+                        }
+
+                        //✅Иконка того что видео скачано
+                        if (!videoUri.contains("https") && !isVideo && videoUri != "") {
+                            Icon(Icons.Default.Save, contentDescription = null, tint = Color.LightGray, modifier = Modifier.padding(bottom = 6.dp, end = 6.dp).size(18.dp))
+                        }
+
+
+
+                    }
 
                 }
             }

@@ -12,9 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.client.xvideos.feature.redgifs.types.Order
-import com.client.xvideos.screens_red.common.downloaderIndicator.DownloadIndicator
-import com.client.xvideos.screens_red.profile.bottom_bar.line1.SortBy
+import com.client.xvideos.screens_red.common.downloader.ui.DownloadIndicator
 import com.client.xvideos.screens_red.top_this_week.model.SortTop
 
 @Composable

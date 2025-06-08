@@ -20,8 +20,8 @@ import com.client.xvideos.feature.redgifs.types.MediaType
 import com.client.xvideos.feature.redgifs.types.Order
 import com.client.xvideos.feature.room.AppDatabase
 import com.client.xvideos.screens_red.common.block.BlockRed
-import com.client.xvideos.screens_red.use_case.network.loadGifs
-import com.client.xvideos.screens_red.use_case.share.useCaseShareGifs
+import com.client.xvideos.screens_red.common.network.loadGifs
+import com.client.xvideos.screens_red.common.share.useCaseShareGifs
 import dagger.Binds
 import dagger.Module
 import dagger.assisted.Assisted

@@ -1,4 +1,4 @@
-package com.client.xvideos.screens_red.use_case.download
+package com.client.xvideos.screens_red.common.downloader.useCase
 
 import com.client.xvideos.feature.Downloader
 import com.client.xvideos.feature.redgifs.types.GifsInfo

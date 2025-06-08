@@ -2,7 +2,6 @@ package com.client.xvideos.screens_red.top_this_week
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Block
-import androidx.compose.material.icons.filled.Crop
 import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.getValue
@@ -22,7 +21,7 @@ import com.client.xvideos.screens_red.common.expand_menu_video.ExpandMenuVideoMo
 import com.client.xvideos.screens_red.top_this_week.model.SortTop
 import com.client.xvideos.screens_red.top_this_week.model.VisibleType
 import com.client.xvideos.screens_red.top_this_week.pagin3.ItemTopThisWeekPagingSource
-import com.client.xvideos.screens_red.use_case.download.downloadItem
+import com.client.xvideos.screens_red.common.downloader.useCase.downloadItem
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

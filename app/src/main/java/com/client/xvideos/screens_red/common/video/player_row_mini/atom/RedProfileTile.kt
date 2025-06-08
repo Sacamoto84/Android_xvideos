@@ -30,7 +30,7 @@ fun RedProfileTile(item: GifsInfo, index: Int, isVisibleView : Boolean = true, i
 
     Box(modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp))) {
 
-        UrlImage(url = item.urls.thumbnail, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
+        UrlImage(url = item.urls.thumbnail, contentScale = ContentScale.Fit, modifier = Modifier.fillMaxSize())
 
         //Индекс картинки
         Text(

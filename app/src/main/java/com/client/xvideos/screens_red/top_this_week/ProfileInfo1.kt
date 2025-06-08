@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AssignmentInd
 import androidx.compose.material.icons.filled.Person
@@ -28,6 +29,7 @@ import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.redgifs.types.UserInfo
 import com.client.xvideos.screens.common.urlVideImage.UrlImage
 import com.client.xvideos.screens_red.ThemeRed
+import kotlin.math.min
 
 @Composable
 fun ProfileInfo1(modifier: Modifier = Modifier, onClick: ()->Unit, videoItem: GifsInfo, listUsers: List<UserInfo>, visibleUserName:Boolean = true, visibleIcon:Boolean = true){
@@ -64,7 +66,7 @@ fun ProfileInfo1(modifier: Modifier = Modifier, onClick: ()->Unit, videoItem: Gi
         }
         ////////////
         AnimatedVisibility(visibleUserName) {
-            Text(videoItem.userName, color = Color.White, fontFamily = ThemeRed.fontFamilyPopinsRegular, fontSize = 22.sp, modifier = Modifier.height(48.dp).padding(start = 8.dp))
+            Text(videoItem.userName,  autoSize = TextAutoSize.StepBased(minFontSize = 6.sp, maxFontSize = 20.sp), minLines = 1, maxLines = 1, color = Color.White, fontFamily = ThemeRed.fontFamilyPopinsRegular, fontSize = 20.sp, modifier = Modifier.height(48.dp).padding(start = 8.dp))
         }
 
 

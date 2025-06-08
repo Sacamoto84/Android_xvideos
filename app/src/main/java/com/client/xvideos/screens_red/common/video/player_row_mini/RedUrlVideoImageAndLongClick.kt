@@ -65,6 +65,8 @@ fun RedUrlVideoImageAndLongClick(
 
     onVideo: (Boolean) -> Unit = {},       //true - видео, false - картинка
 
+    onVideoUri : (String)-> Unit = {}
+
 ) {
 
     if (BuildConfig.DEBUG) { SideEffect {
@@ -90,6 +92,13 @@ fun RedUrlVideoImageAndLongClick(
                 "android.resource://${context.packageName}/raw/q"
         }
     }
+
+    SideEffect {
+        onVideoUri(videoUri)
+        Timber.i("@@@ RedUrlVideoImageAndLongClick() >> videoUri: $videoUri")
+    }
+
+
 
     Box(
         modifier = Modifier
@@ -134,10 +143,7 @@ fun RedUrlVideoImageAndLongClick(
             RedProfileTile(
                 item, index, isVisibleView = isVisibleView, isVisibleDuration = isVisibleDuration
             )
-            Row(modifier = Modifier.fillMaxSize().align(Alignment.BottomCenter), verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.End) {
-                if (!videoUri.contains("https"))
-                    Icon( Icons.Default.Save, contentDescription = null, tint = Color.LightGray,  modifier = Modifier.padding(bottom = 9.dp, end = 9.dp).size(18.dp))
-            }
+
             overlay.invoke()
         }
 

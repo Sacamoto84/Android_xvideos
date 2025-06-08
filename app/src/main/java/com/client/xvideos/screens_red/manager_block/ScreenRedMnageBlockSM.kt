@@ -3,7 +3,7 @@ package com.client.xvideos.screens_red.manager_block
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import com.client.xvideos.feature.redgifs.types.GifsInfo
-import com.client.xvideos.screens_red.use_case.block.blockGetAllBlockedGifsInfo
+import com.client.xvideos.screens_red.common.block.useCase.blockGetAllBlockedGifsInfo
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

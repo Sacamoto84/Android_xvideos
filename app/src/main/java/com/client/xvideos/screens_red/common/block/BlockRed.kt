@@ -7,8 +7,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.client.xvideos.App
 import com.client.xvideos.feature.redgifs.types.GifsInfo
-import com.client.xvideos.screens_red.use_case.block.blockGetAllBlockedGifs
-import com.client.xvideos.screens_red.use_case.block.blockGetAllBlockedGifsInfo
+import com.client.xvideos.screens_red.common.block.useCase.blockGetAllBlockedGifs
+import com.client.xvideos.screens_red.common.block.useCase.blockGetAllBlockedGifsInfo
 import kotlinx.coroutines.flow.MutableStateFlow
 import timber.log.Timber
 
@@ -44,7 +44,7 @@ object BlockRed {
     //═══════════════════════════════════════════════════════╝
 
     fun blockItem(item: GifsInfo) {
-        val result = com.client.xvideos.screens_red.use_case.block.blockItem(item)
+        val result = com.client.xvideos.screens_red.common.block.useCase.blockItem(item)
         if (result.isSuccess) {
             Timber.i("!!! GIF успешно заблокирован")
             Toast.makeText(App.instance.applicationContext, "GIFs заблокирован", Toast.LENGTH_SHORT).show()

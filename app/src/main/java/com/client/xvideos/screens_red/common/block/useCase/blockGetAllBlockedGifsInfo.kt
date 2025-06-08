@@ -1,4 +1,4 @@
-package com.client.xvideos.screens_red.use_case.block
+package com.client.xvideos.screens_red.common.block.useCase
 
 import com.client.xvideos.AppPath
 import com.client.xvideos.feature.redgifs.types.GifsInfo

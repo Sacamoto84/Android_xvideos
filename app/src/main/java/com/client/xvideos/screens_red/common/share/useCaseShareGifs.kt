@@ -1,4 +1,4 @@
-package com.client.xvideos.screens_red.use_case.share
+package com.client.xvideos.screens_red.common.share
 
 import android.content.Context
 import android.widget.Toast

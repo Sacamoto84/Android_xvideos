@@ -1,4 +1,4 @@
-package com.client.xvideos.screens_red.use_case.network
+package com.client.xvideos.screens_red.common.network
 
 import com.client.xvideos.feature.redgifs.http.RedGifs
 import com.client.xvideos.feature.redgifs.types.CreatorResponse
