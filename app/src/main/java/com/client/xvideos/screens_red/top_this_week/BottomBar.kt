@@ -1,19 +1,42 @@
 package com.client.xvideos.screens_red.top_this_week
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.StarOutline
+import androidx.compose.material.icons.filled.Token
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.client.xvideos.R
 import com.client.xvideos.screens_red.common.downloader.ui.DownloadIndicator
 import com.client.xvideos.screens_red.top_this_week.model.SortTop
+import com.composeunstyled.Checkbox
 
 @Composable
 fun BottomBar(
@@ -43,6 +66,65 @@ fun BottomBar(
             }
 
 
+
+
+
+Column {
+    Row(
+        modifier = Modifier.height(24.dp)//.background(Brush.linearGradient(listOf(Color(0xFF8E2DE2), Color(0xFF4A00E0))))
+        , verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        Image(
+            painter = painterResource(id = R.drawable.verificed),
+            contentDescription = null,
+            modifier = Modifier.padding().size(24.dp)
+        )
+
+        var checked by remember { mutableStateOf(false) }
+        Checkbox(
+            checked = checked,
+            onCheckedChange = { checked = it },
+            shape = RoundedCornerShape(4.dp),
+            backgroundColor = Color.White,
+            borderWidth = 1.dp,
+            borderColor = Color.Black.copy(0.33f),
+            modifier = Modifier.size(22.dp),
+            contentDescription = "Add olives"
+        ) {
+            Icon(Icons.Filled.Check, contentDescription = null)
+        }
+    }
+
+
+    Row(
+        modifier = Modifier.height(24.dp)//.background(Brush.linearGradient(listOf(Color(0xFF8E2DE2), Color(0xFF4A00E0))))
+        , verticalAlignment = Alignment.CenterVertically
+
+    ) {
+
+        Icon(
+            Icons.Filled.StarOutline,
+            contentDescription = null,
+            tint = Color.Yellow,
+            modifier = Modifier.size(24.dp)
+        )
+
+        var checked by remember { mutableStateOf(false) }
+        Checkbox(
+            checked = checked,
+            onCheckedChange = { checked = it },
+            shape = RoundedCornerShape(4.dp),
+            backgroundColor = Color.White,
+            borderWidth = 1.dp,
+            borderColor = Color.Black.copy(0.33f),
+            modifier = Modifier.size(22.dp),
+            contentDescription = "Add olives"
+        ) {
+            Icon(Icons.Filled.Check, contentDescription = null)
+        }
+    }
+}
             Button(onClick = onClickLazy) {
                 Text("Lazy")
             }

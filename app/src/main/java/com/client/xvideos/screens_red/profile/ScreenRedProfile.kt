@@ -49,6 +49,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.screens_red.ThemeRed
 import com.client.xvideos.screens_red.common.block.BlockRed
+import com.client.xvideos.screens_red.common.block.ui.DialogBlock
 import com.client.xvideos.screens_red.profile.atom.CanvasTimeDurationLine
 import com.client.xvideos.screens_red.profile.atom.RedProfileCreaterInfo
 import com.client.xvideos.screens_red.common.video.player_row_mini.RedUrlVideoImageAndLongClick

@@ -1,5 +1,13 @@
 package com.client.xvideos.screens_red.top_this_week.row1
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandIn
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -40,10 +48,12 @@ import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.redgifs.types.UserInfo
 import com.client.xvideos.screens_red.GlobalRed
 import com.client.xvideos.screens_red.common.block.BlockRed
+import com.client.xvideos.screens_red.common.block.ui.DialogBlock
 import com.client.xvideos.screens_red.common.video.player_row_mini.RedUrlVideoImageAndLongClick
 import com.client.xvideos.screens_red.common.expand_menu_video.ExpandMenuVideo
 import com.client.xvideos.screens_red.top_this_week.ProfileInfo1
 import com.client.xvideos.screens_red.common.expand_menu_video.ExpandMenuVideoModel
+import com.client.xvideos.screens_red.common.favorite.FavoriteRed
 import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
 import kotlin.math.max
@@ -161,7 +171,7 @@ fun LazyRow123(
 
                     //Меню на 3 точки
                     ExpandMenuVideo(modifier = Modifier.align(Alignment.TopEnd), option = option, item, onClick = {
-                        blockItem = item
+                        blockItem = item //Для блока и идентификации и тема
                     })
 
                     ProfileInfo1(
@@ -173,32 +183,41 @@ fun LazyRow123(
                         visibleIcon = !isVideo
                     )
 
-                    Row(modifier = Modifier.fillMaxSize().align(Alignment.BottomCenter), verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.End) {
 
-                        //⚠️Фаворит не реализован⚠️
-                        if (!videoUri.contains("https") && !isVideo && videoUri != "") {
-                            Icon(Icons.Filled.StarOutline, contentDescription = null, tint = Color.Yellow, modifier = Modifier.padding(bottom = 6.dp, end = 6.dp).size(18.dp))
+                    AnimatedVisibility(!isVideo, modifier = Modifier.fillMaxSize().align(Alignment.BottomCenter),
+                        enter = slideInVertically(
+                            initialOffsetY = { fullHeight -> fullHeight }, // снизу вверх
+                            animationSpec = tween(durationMillis = 200)
+                        ),
+                        exit = slideOutVertically(
+                            targetOffsetY = { fullHeight -> fullHeight }, // сверху вниз
+                            animationSpec = tween(durationMillis = 200)
+                        )
+
+                        ) {
+
+                        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.End) {
+                            //✅ Фаворит не реализован
+                            if (FavoriteRed.favoriteList.contains(item.id)) {
+                                Icon(Icons.Filled.StarOutline, contentDescription = null, tint = Color.Yellow, modifier = Modifier.padding(bottom = 6.dp, end = 6.dp).size(18.dp))
+                            }
+
+                            //✅ Иконка верифицированного пользователя
+                            if ((GlobalRed.listAllUsers.first{ it.username == item.userName }.verified) ){
+                                Image(painter = painterResource(id = R.drawable.verificed),
+                                    contentDescription = null, modifier = Modifier.padding(bottom = 6.dp, end = 6.dp).size(18.dp)
+                                )
+                            }
+
+                            //✅ Иконка того что видео скачано
+                            if (!videoUri.contains("https") && videoUri != "") {
+                                Icon(Icons.Default.Save, contentDescription = null, tint = Color.LightGray, modifier = Modifier.padding(bottom = 6.dp, end = 6.dp).size(18.dp))
+                            }
                         }
-
-//                        if (!videoUri.contains("https") && !isVideo && videoUri != "") {
-//                            Icon(Icons.Default.Star, contentDescription = null, tint = Color.Yellow, modifier = Modifier.padding(bottom = 6.dp, end = 6.dp).size(18.dp))
-//                        }
-
-                        //✅Иконка верифицированного пользователя
-                        if (GlobalRed.listAllUsers.first{ it.username == item.userName }.verified) {
-                            Image(painter = painterResource(id = R.drawable.verificed),
-                                contentDescription = null, modifier = Modifier.padding(bottom = 6.dp, end = 6.dp).size(18.dp)
-                            )
-                        }
-
-                        //✅Иконка того что видео скачано
-                        if (!videoUri.contains("https") && !isVideo && videoUri != "") {
-                            Icon(Icons.Default.Save, contentDescription = null, tint = Color.LightGray, modifier = Modifier.padding(bottom = 6.dp, end = 6.dp).size(18.dp))
-                        }
-
-
 
                     }
+
+
 
                 }
             }

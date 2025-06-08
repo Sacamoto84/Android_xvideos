@@ -4,6 +4,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
@@ -22,6 +23,7 @@ import com.client.xvideos.screens_red.top_this_week.model.SortTop
 import com.client.xvideos.screens_red.top_this_week.model.VisibleType
 import com.client.xvideos.screens_red.top_this_week.pagin3.ItemTopThisWeekPagingSource
 import com.client.xvideos.screens_red.common.downloader.useCase.downloadItem
+import com.client.xvideos.screens_red.common.favorite.FavoriteRed
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -98,6 +100,9 @@ class ScreenRedTopThisWeekSM @Inject constructor(
         }
         .cachedIn(screenModelScope)
 
+    init{
+        FavoriteRed.refreshFavoriteList()
+    }
 
 //    init {
 //        screenModelScope.launch {
@@ -147,8 +152,14 @@ class ScreenRedTopThisWeekSM @Inject constructor(
             ExpandMenuVideoModel("Блокировать", Icons.Default.Block, onClick = {
                 if (it == null) return@ExpandMenuVideoModel
                 BlockRed.blockVisibleDialog = true
+            }),
 
-            })
+            ExpandMenuVideoModel("Фаворит", Icons.Default.StarBorder, onClick = {
+                if (it == null) return@ExpandMenuVideoModel
+                FavoriteRed.invertFavorite(it)
+            }),
+
+
         )
     //////////////////////////////////////////////////////////////////////////////////////////
 
