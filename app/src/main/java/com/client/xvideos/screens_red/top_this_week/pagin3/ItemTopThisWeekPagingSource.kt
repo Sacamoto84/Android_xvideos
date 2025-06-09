@@ -6,6 +6,7 @@ import com.client.xvideos.feature.redgifs.http.RedGifs
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.screens_red.GlobalRed
 import com.client.xvideos.screens_red.common.block.BlockRed
+import com.client.xvideos.screens_red.common.users.UsersRed
 import com.client.xvideos.screens_red.top_this_week.model.SortTop
 import timber.log.Timber
 
@@ -40,9 +41,9 @@ class ItemTopThisWeekPagingSource (val sortTop : SortTop): PagingSource<Int, Gif
 
             val user = response.users.distinctBy { it.username }
 
-            val existingUsernames = GlobalRed.listAllUsers.map { it.username }.toSet()
+            val existingUsernames = UsersRed.listAllUsers.map { it.username }.toSet()
             val newUsers = user.filter { it.username !in existingUsernames }
-            GlobalRed.listAllUsers.addAll(newUsers)
+            UsersRed.listAllUsers.addAll(newUsers)
 
             LoadResult.Page(
                 data = gifs1,

@@ -1,6 +1,5 @@
 package com.client.xvideos.screens_red.common.favorite
 
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateSetOf
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.screens_red.common.favorite.useCase.getAllFavoriteFileNames

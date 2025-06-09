@@ -49,6 +49,7 @@ import com.client.xvideos.feature.redgifs.types.UserInfo
 import com.client.xvideos.screens_red.GlobalRed
 import com.client.xvideos.screens_red.common.block.BlockRed
 import com.client.xvideos.screens_red.common.block.ui.DialogBlock
+import com.client.xvideos.screens_red.common.downloader.DownloadRed
 import com.client.xvideos.screens_red.common.video.player_row_mini.RedUrlVideoImageAndLongClick
 import com.client.xvideos.screens_red.common.expand_menu_video.ExpandMenuVideo
 import com.client.xvideos.screens_red.top_this_week.ProfileInfo1
@@ -193,11 +194,9 @@ fun LazyRow123(
                             targetOffsetY = { fullHeight -> fullHeight }, // сверху вниз
                             animationSpec = tween(durationMillis = 200)
                         )
-
                         ) {
-
                         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.End) {
-                            //✅ Фаворит не реализован
+                            //✅ Фаворит
                             if (FavoriteRed.favoriteList.contains(item.id)) {
                                 Icon(Icons.Filled.StarOutline, contentDescription = null, tint = Color.Yellow, modifier = Modifier.padding(bottom = 6.dp, end = 6.dp).size(18.dp))
                             }
@@ -210,14 +209,13 @@ fun LazyRow123(
                             }
 
                             //✅ Иконка того что видео скачано
-                            if (!videoUri.contains("https") && videoUri != "") {
-                                Icon(Icons.Default.Save, contentDescription = null, tint = Color.LightGray, modifier = Modifier.padding(bottom = 6.dp, end = 6.dp).size(18.dp))
+                            if (DownloadRed.downloadList.contains(item.id)) {
+                                Icon(Icons.Default.Save, contentDescription = null, tint = Color.White, modifier = Modifier.padding(bottom = 6.dp, end = 6.dp).size(18.dp))
                             }
+
                         }
 
                     }
-
-
 
                 }
             }
@@ -226,3 +224,4 @@ fun LazyRow123(
     }
 
 }
+

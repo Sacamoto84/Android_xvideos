@@ -18,11 +18,11 @@ import cafe.adriel.voyager.hilt.ScreenModelKey
 import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.screens_red.common.block.BlockRed
+import com.client.xvideos.screens_red.common.downloader.DownloadRed
 import com.client.xvideos.screens_red.common.expand_menu_video.ExpandMenuVideoModel
 import com.client.xvideos.screens_red.top_this_week.model.SortTop
 import com.client.xvideos.screens_red.top_this_week.model.VisibleType
 import com.client.xvideos.screens_red.top_this_week.pagin3.ItemTopThisWeekPagingSource
-import com.client.xvideos.screens_red.common.downloader.useCase.downloadItem
 import com.client.xvideos.screens_red.common.favorite.FavoriteRed
 import dagger.Binds
 import dagger.Module
@@ -146,7 +146,7 @@ class ScreenRedTopThisWeekSM @Inject constructor(
         listOf(
             ExpandMenuVideoModel("Скачать", Icons.Filled.FileDownload, onClick = {
                 if (it == null) return@ExpandMenuVideoModel
-                downloadItem(it)
+                DownloadRed.downloadItem(it)
             }),
             ExpandMenuVideoModel("Поделиться", Icons.Default.Share),
             ExpandMenuVideoModel("Блокировать", Icons.Default.Block, onClick = {

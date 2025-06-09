@@ -3,18 +3,13 @@ package com.client.xvideos.screens_red.common.video.player_row_mini
 import androidx.annotation.OptIn
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Fullscreen
-import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
@@ -33,9 +28,9 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import com.client.xvideos.AppPath
 import com.client.xvideos.BuildConfig
-import com.client.xvideos.feature.findVideoOnRedCacheDownload
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.vibrate.vibrateWithPatternAndAmplitude
+import com.client.xvideos.screens_red.common.downloader.DownloadRed
 import com.client.xvideos.screens_red.common.video.player_row_mini.atom.RedProfileTile
 import com.client.xvideos.screens_red.common.video.player_row_mini.atom.Red_Video_Lite_Row2
 import timber.log.Timber
@@ -83,7 +78,7 @@ fun RedUrlVideoImageAndLongClick(
     val videoUri: String = remember(item.id, item.userName) {
         Timber.tag("???").i("Перерачсет videoItem.id = ${item.id}")
         //Определяем адрес откуда брать видео, из кеша или из сети
-        if (findVideoOnRedCacheDownload(item.id, item.userName))
+        if (DownloadRed.findVideoInDownload(item.id, item.userName))
             "${AppPath.cache_download_red}/${item.userName}/${item.id}.mp4"
         else {
             if (isNetConnected)
@@ -97,8 +92,6 @@ fun RedUrlVideoImageAndLongClick(
         onVideoUri(videoUri)
         Timber.i("@@@ RedUrlVideoImageAndLongClick() >> videoUri: $videoUri")
     }
-
-
 
     Box(
         modifier = Modifier

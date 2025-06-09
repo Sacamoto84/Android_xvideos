@@ -2,6 +2,7 @@ package com.client.xvideos.feature
 
 import com.client.xvideos.App
 import com.client.xvideos.AppPath
+import com.client.xvideos.screens_red.common.downloader.DownloadRed
 import com.client.xvideos.util.Toast
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,11 +19,7 @@ data class ItemsRedDownload(
 /**
  * Проверка что данное имя креатор уже есть в кеше
  */
-fun findVideoOnRedCacheDownload(id: String, name: String): Boolean {
-    val mainPath = AppPath.cache_download_red + "/" + name + "/" + id + ".mp4"
-    val file = File(mainPath)
-    return file.exists()
-}
+
 
 
 object Downloader {
@@ -42,7 +39,7 @@ object Downloader {
         percent.value = -2f
 
         //Проверка того что в кеше есть запись с этим именем и кретором
-        val a = findVideoOnRedCacheDownload(id, name)
+        val a = DownloadRed.findVideoInDownload(id, name)
 
         //Записи нет можно скачивать
         if (!a) {
@@ -65,6 +62,7 @@ object Downloader {
                     println("!!! onCompleted закачки")
                     percent.value = -2f
                     Toast("Скачивание завершено")
+                    DownloadRed.refreshDownloadList()
                 },
             )
         } else {

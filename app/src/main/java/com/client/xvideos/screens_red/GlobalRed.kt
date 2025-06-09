@@ -4,7 +4,7 @@ import com.client.xvideos.feature.redgifs.types.UserInfo
 
 object GlobalRed {
 
-    val listAllUsers = mutableListOf<UserInfo>()
+
 
 
 

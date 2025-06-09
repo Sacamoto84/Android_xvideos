@@ -57,7 +57,7 @@ fun SortTopBy(list: List<SortTop>, selected: SortTop, onSelect: (SortTop) -> Uni
                 .height(48.dp)
                 .menuAnchor(ExposedDropdownMenuAnchorType.SecondaryEditable)
                 .border(
-                    1.dp, ThemeRed.colorBorderGray,
+                    1.dp, ThemeRed.colorBottomBarDivider,
                     RoundedCornerShape(8.dp)
                 )
                 .clickable(

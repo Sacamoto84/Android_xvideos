@@ -17,9 +17,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.client.xvideos.AppPath
-import com.client.xvideos.feature.findVideoOnRedCacheDownload
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.screens_red.ThemeRed
+import com.client.xvideos.screens_red.common.downloader.DownloadRed
 import com.client.xvideos.screens_red.profile.ScreenRedProfileSM
 import com.client.xvideos.screens_red.common.video.player_with_menu.RedVideoPlayerWithMenuContent
 import timber.log.Timber
@@ -106,7 +106,7 @@ fun TikTokStyleVideoFeed(
         val videoUri: String = remember(videoItem.id, videoItem.userName) {
             Timber.tag("???").i("Перерачсет videoItem.id = ${videoItem.id}")
             //Определяем адрес откуда брать видео, из кеша или из сети
-            if (findVideoOnRedCacheDownload(videoItem.id, videoItem.userName))
+            if (DownloadRed.findVideoInDownload(videoItem.id, videoItem.userName))
                 "${AppPath.cache_download_red}/${videoItem.userName}/${videoItem.id}.mp4"
             else
                 "https://api.redgifs.com/v2/gifs/${videoItem.id.lowercase()}/hd.m3u8"
