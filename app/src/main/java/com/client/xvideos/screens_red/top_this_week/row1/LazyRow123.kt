@@ -46,7 +46,6 @@ import androidx.paging.compose.LazyPagingItems
 import com.client.xvideos.R
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.redgifs.types.UserInfo
-import com.client.xvideos.screens_red.GlobalRed
 import com.client.xvideos.screens_red.common.block.BlockRed
 import com.client.xvideos.screens_red.common.block.ui.DialogBlock
 import com.client.xvideos.screens_red.common.downloader.DownloadRed
@@ -55,6 +54,7 @@ import com.client.xvideos.screens_red.common.expand_menu_video.ExpandMenuVideo
 import com.client.xvideos.screens_red.top_this_week.ProfileInfo1
 import com.client.xvideos.screens_red.common.expand_menu_video.ExpandMenuVideoModel
 import com.client.xvideos.screens_red.common.favorite.FavoriteRed
+import com.client.xvideos.screens_red.common.users.UsersRed
 import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
 import kotlin.math.max
@@ -202,7 +202,7 @@ fun LazyRow123(
                             }
 
                             //✅ Иконка верифицированного пользователя
-                            if ((GlobalRed.listAllUsers.first{ it.username == item.userName }.verified) ){
+                            if ((UsersRed.listAllUsers.first{ it.username == item.userName }.verified) ){
                                 Image(painter = painterResource(id = R.drawable.verificed),
                                     contentDescription = null, modifier = Modifier.padding(bottom = 6.dp, end = 6.dp).size(18.dp)
                                 )

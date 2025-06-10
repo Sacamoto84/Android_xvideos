@@ -10,6 +10,8 @@ import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
+import timber.log.Timber.DebugTree
 import java.security.SecureRandom
 import java.security.cert.X509Certificate
 import javax.inject.Inject
@@ -58,6 +60,7 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         instance = this
+        if (BuildConfig.DEBUG) Timber.plant(DebugTree())
         allowAllSSL()
         PlaybackPreference.initialize(this)
         kDownloader = KDownloader.create(applicationContext)

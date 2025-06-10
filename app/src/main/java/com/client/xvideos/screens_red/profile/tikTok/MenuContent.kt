@@ -23,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.client.xvideos.screens_red.GlobalRed
 import com.client.xvideos.screens_red.common.block.BlockRed
 import com.client.xvideos.screens_red.profile.ScreenRedProfileSM
 

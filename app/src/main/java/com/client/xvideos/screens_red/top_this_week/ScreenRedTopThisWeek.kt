@@ -25,8 +25,9 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.client.xvideos.feature.redgifs.types.UserInfo
 import com.client.xvideos.screens_red.ThemeRed
-import com.client.xvideos.screens_red.GlobalRed.listAllUsers
+import com.client.xvideos.screens_red.common.users.UsersRed
 import com.client.xvideos.screens_red.profile.ScreenRedProfile
 import com.client.xvideos.screens_red.top_this_week.model.SortTop
 import com.client.xvideos.screens_red.top_this_week.model.VisibleType
@@ -110,7 +111,7 @@ class ScreenRedTopThisWeek : Screen {
                     TikTokPow1(
                         lazyPagingItems = items,
                         currentSortType = vm.sortType.collectAsState().value,
-                        listUsers = listAllUsers,
+                        listUsers = UsersRed.listAllUsers,
                         shouldScrollToTopAfterSortChange = shouldScrollToTop,
                         onScrollToTopIntentConsumed = { vm.consumedScrollToTopIntent() },
                         modifier = Modifier.fillMaxSize(),
@@ -127,7 +128,7 @@ class ScreenRedTopThisWeek : Screen {
                     LazyRow123(
                         columns = vm.columns,
                         listGifs = items,
-                        listUsers = listAllUsers,
+                        listUsers = UsersRed.listAllUsers,
                         modifier = Modifier.fillMaxSize(),
                         onClickOpenProfile = { vm.currentIndexGoto =  vm.currentIndex; navigator.push(ScreenRedProfile(it)) },
                         onCurrentPosition = { index ->
