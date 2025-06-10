@@ -44,10 +44,6 @@ class ItemTopThisWeekPagingSource (val sortTop : SortTop): PagingSource<Int, Gif
                 UsersRed.addUser(info)
             }
 
-//            val existingUsernames = UsersRed.listAllUsers.map { it.username }.toSet()
-//            val newUsers = user.filter { it.username !in existingUsernames }
-//            UsersRed.listAllUsers.addAll(newUsers)
-
             LoadResult.Page(
                 data = gifs1,
                 prevKey = null,

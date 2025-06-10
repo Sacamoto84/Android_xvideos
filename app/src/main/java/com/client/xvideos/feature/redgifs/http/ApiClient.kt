@@ -23,6 +23,16 @@ class ApiClient {
     val USER_AGENT: String =
         "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3346.8 Safari/537.36 Redgifs/"
 
+//    // Set up the user's device information
+//    val deviceInfo = "
+//        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.3',
+//        'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+//        'accept-language': 'en-US,en;q=0.8',
+//        'accept-encoding': 'gzip, deflate, br',
+//        'connection': 'keep-alive',
+//        'upgrade-insecure-requests': '1'"
+//    };
+
     @SuppressLint("CheckResult")
     val client = HttpClient(OkHttp) {
         install(ContentNegotiation) {

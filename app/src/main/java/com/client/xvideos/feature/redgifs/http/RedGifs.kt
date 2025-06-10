@@ -8,11 +8,14 @@ import com.client.xvideos.feature.redgifs.types.CreatorResponse
 import com.client.xvideos.feature.redgifs.types.CreatorsResponse
 import com.client.xvideos.feature.redgifs.types.MediaResponse
 import com.client.xvideos.feature.redgifs.types.MediaType
+import com.client.xvideos.feature.redgifs.types.NicheResponse
 import com.client.xvideos.feature.redgifs.types.Order
+import com.client.xvideos.feature.redgifs.types.TopCreatorsResponse
 import com.client.xvideos.feature.redgifs.types.tag.TagSuggestion
 import com.client.xvideos.feature.redgifs.types.tag.TagsResponse
 import com.google.android.gms.common.api.ApiException
 import com.google.gson.Gson
+import com.google.gson.annotations.SerializedName
 import timber.log.Timber
 
 object RedGifs {
@@ -255,6 +258,75 @@ object RedGifs {
         return api.request(route)
     }
 
+
+
+    //niches
+    //https://api.redgifs.com/v2/niches/cowgirl-pov/gifs?count=30&page=1&order=new
+    @Throws(ApiException::class)
+    suspend fun getNiches(
+        niches: String = "pumped-pussy",
+        page: Int = 1,
+        count: Int = 100,
+        order: Order = Order.NEW,
+    ): MediaResponse {
+
+        val route = Route(
+            method = "GET",
+            path = "/v2/niches/{niches}/gifs?page={page}&count={count}&order={order}",
+            "niches" to niches,
+            "page" to page,
+            "count" to count,
+            "order" to order.value,
+        )
+
+        return cacheMediaResponse(route)
+    }
+
+    //Похожее
+    //https://api.redgifs.com/v2/niches/pumped-pussy/related
+    @Throws(ApiException::class)
+    suspend fun getNichesRelated(
+        niches: String = "pumped-pussy",
+    ): NicheResponse {
+        val route = Route(
+            method = "GET",
+            path = "/v2/niches/{niches}/related",
+            "niches" to niches,
+        )
+        val r = api.request<NicheResponse>(route)
+        return r
+    }
+
+    //https://api.redgifs.com/v2/niches/pumped-pussy/top-creators
+    @Throws(ApiException::class)
+    suspend fun getNichesTopCreators(
+        niches: String = "pumped-pussy",
+    ): TopCreatorsResponse {
+        val route = Route(
+            method = "GET",
+            path = "/v2/niches/{niches}/top-creators",
+            "niches" to niches,
+        )
+        val r = api.request<TopCreatorsResponse>(route)
+        return r
+    }
+
+    data class TagsContainerGson(
+        @SerializedName("tags") val tags: List<String>
+    )
+
+    //https://api.redgifs.com/v2/niches/pumped-pussy/top-tags
+    @Throws(ApiException::class)
+    suspend fun getNichesTopTags(
+        niches: String = "pumped-pussy",
+    ): List<String> {
+        val route = Route(
+            method = "GET",
+            path = "/v2/niches/{niches}/top-tags",
+            "niches" to niches,
+        )
+        return api.request<TagsContainerGson>(route).tags
+    }
 
 }
 
