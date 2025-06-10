@@ -69,7 +69,7 @@ class App : Application() {
         BlockRed.refreshBlockList()
 
         GlobalScope.launch {
-         val a =   RedGifs.getNichesTopTags()
+         val a =   RedGifs.getNiche()
             a
 
             clearOldCache( db.cacheMedaResponseDao())

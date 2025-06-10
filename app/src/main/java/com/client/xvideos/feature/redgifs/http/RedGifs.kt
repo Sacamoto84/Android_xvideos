@@ -9,6 +9,8 @@ import com.client.xvideos.feature.redgifs.types.CreatorsResponse
 import com.client.xvideos.feature.redgifs.types.MediaResponse
 import com.client.xvideos.feature.redgifs.types.MediaType
 import com.client.xvideos.feature.redgifs.types.NicheResponse
+import com.client.xvideos.feature.redgifs.types.NichesInfo
+import com.client.xvideos.feature.redgifs.types.NichesResponse
 import com.client.xvideos.feature.redgifs.types.Order
 import com.client.xvideos.feature.redgifs.types.TopCreatorsResponse
 import com.client.xvideos.feature.redgifs.types.tag.TagSuggestion
@@ -28,11 +30,7 @@ object RedGifs {
     // Возвращает список всех существующих тегов. 7к штук (имя, количество)
     // ⭐ Работает
     @Throws(ApiException::class)
-    suspend fun getTags(vararg parameters: Pair<String, Any>): TagsResponse {
-        val route = Route("GET", "/v1/tags", *parameters)
-        val res: TagsResponse = api.request(route)
-        return res
-    }
+    suspend fun getTags(vararg parameters: Pair<String, Any>): TagsResponse {return api.request(Route("GET", "/v1/tags", *parameters))}
 
 
     @Throws(ApiException::class)
@@ -90,13 +88,8 @@ object RedGifs {
         page: Int,                       // номер страницы (1-based).
         type: MediaType = MediaType.GIF, // тип медиа (GIF, image и т.д.).
     ): MediaResponse {
-        val route = Route(
-            method = "GET",
-            path = "/v2/gifs/search?order=top28&count={count}&page={page}&type={type}",
-            "count" to count,
-            "page" to page,
-            "type" to type.value,
-        )
+        val route = Route(method = "GET", path = "/v2/gifs/search?order=top28&count={count}&page={page}&type={type}",
+            "count" to count, "page" to page, "type" to type.value)
         return cacheMediaResponse(route)
     }
 
@@ -106,13 +99,8 @@ object RedGifs {
         page: Int,                       // номер страницы (1-based).
         type: MediaType = MediaType.GIF, // тип медиа (GIF, image и т.д.).
     ): MediaResponse {
-        val route = Route(
-            method = "GET",
-            path = "/v2/gifs/search?order=trending&count={count}&page={page}&type={type}",
-            "count" to count,
-            "page" to page,
-            "type" to type.value,
-        )
+        val route = Route(method = "GET", path = "/v2/gifs/search?order=trending&count={count}&page={page}&type={type}",
+            "count" to count, "page" to page, "type" to type.value)
         return cacheMediaResponse(route)
     }
 
@@ -123,13 +111,8 @@ object RedGifs {
         page: Int,                       // номер страницы (1-based).
         type: MediaType = MediaType.GIF, // тип медиа (GIF, image и т.д.).
     ): MediaResponse {
-        val route = Route(
-            method = "GET",
-            path = "/v2/gifs/search?order=new&count={count}&page={page}&type={type}",
-            "count" to count,
-            "page" to page,
-            "type" to type.value,
-        )
+        val route = Route(method = "GET", path = "/v2/gifs/search?order=new&count={count}&page={page}&type={type}",
+            "count" to count, "page" to page, "type" to type.value)
 
         Timber.i("!!! getTopLatest ${route.url}")
         // Запрос из сети
@@ -153,21 +136,20 @@ object RedGifs {
         if (verified) {
             url += "&verified={verified}"
         }
+
         if (tags != null && tags.isNotEmpty()) {
             url += "&tags={tags}"
         }
 
         val routeParams = mutableMapOf<String, Any>(
-            "page" to page,
-            "order" to order.value,
-            "verified" to if (verified) "y" else "n"
+            "page" to page, "order" to order.value, "verified" to if (verified) "y" else "n"
         )
+
         if (tags != null && tags.isNotEmpty()) {
             routeParams["tags"] = tags.joinToString(",")
         }
 
         val route = Route(method = "GET", path = url, *routeParams.toList().toTypedArray())
-
         val res: CreatorsResponse = api.request(route)
         return res
 
@@ -208,20 +190,9 @@ object RedGifs {
 
     //--------------------------- Pic methods ---------------------------
 
-    suspend fun searchImage(
-        searchText: String,
-        order: Order = Order.NEW,
-        count: Int = 100,
-        page: Int = 1,
-    ): MediaResponse {
-        val route = Route(
-            method = "GET",
-            path = "/v2/gifs/search?search_text={search_text}&order={order}&count={count}&page={page}&type=i",
-            "search_text" to searchText,
-            "order" to order.value,
-            "count" to count,
-            "page" to page,
-        )
+    suspend fun searchImage(searchText: String, order: Order = Order.NEW, count: Int = 100, page: Int = 1): MediaResponse {
+        val route = Route(method = "GET", path = "/v2/gifs/search?search_text={search_text}&order={order}&count={count}&page={page}&type=i",
+            "search_text" to searchText, "order" to order.value, "count" to count, "page" to page)
         return cacheMediaResponse(route)
     }
 
@@ -253,78 +224,50 @@ object RedGifs {
      */
     @Throws(ApiException::class)
     suspend fun getTagSuggestions(query: String): List<TagSuggestion> {
-        val route =
-            Route(method = "GET", path = "/v2/search/suggest?query={query}", "query" to query)
+        val route = Route(method = "GET", path = "/v2/search/suggest?query={query}", "query" to query)
         return api.request(route)
     }
 
 
 
+
     //niches
+
+    @Throws(ApiException::class)
+    suspend fun getNiche(niches: String = "pumped-pussy"): NichesInfo {
+        val route = Route(method = "GET", path = "/v2/niches/{niches}", "niches" to niches)
+        return api.request<NicheResponse>(route).niche
+    }
+
     //https://api.redgifs.com/v2/niches/cowgirl-pov/gifs?count=30&page=1&order=new
     @Throws(ApiException::class)
-    suspend fun getNiches(
-        niches: String = "pumped-pussy",
-        page: Int = 1,
-        count: Int = 100,
-        order: Order = Order.NEW,
-    ): MediaResponse {
-
-        val route = Route(
-            method = "GET",
-            path = "/v2/niches/{niches}/gifs?page={page}&count={count}&order={order}",
-            "niches" to niches,
-            "page" to page,
-            "count" to count,
-            "order" to order.value,
-        )
-
+    suspend fun getNiches(niches: String = "pumped-pussy", page: Int = 1, count: Int = 100, order: Order = Order.NEW): MediaResponse {
+        val route = Route(method = "GET", path = "/v2/niches/{niches}/gifs?page={page}&count={count}&order={order}",
+            "niches" to niches, "page" to page, "count" to count, "order" to order.value)
         return cacheMediaResponse(route)
     }
 
     //Похожее
     //https://api.redgifs.com/v2/niches/pumped-pussy/related
     @Throws(ApiException::class)
-    suspend fun getNichesRelated(
-        niches: String = "pumped-pussy",
-    ): NicheResponse {
-        val route = Route(
-            method = "GET",
-            path = "/v2/niches/{niches}/related",
-            "niches" to niches,
-        )
-        val r = api.request<NicheResponse>(route)
-        return r
+    suspend fun getNichesRelated(niches: String = "pumped-pussy"): NichesResponse {
+        val route = Route(method = "GET", path = "/v2/niches/{niches}/related", "niches" to niches)
+        return api.request<NichesResponse>(route)
     }
 
     //https://api.redgifs.com/v2/niches/pumped-pussy/top-creators
     @Throws(ApiException::class)
-    suspend fun getNichesTopCreators(
-        niches: String = "pumped-pussy",
-    ): TopCreatorsResponse {
-        val route = Route(
-            method = "GET",
-            path = "/v2/niches/{niches}/top-creators",
-            "niches" to niches,
-        )
-        val r = api.request<TopCreatorsResponse>(route)
-        return r
+    suspend fun getNichesTopCreators(niches: String = "pumped-pussy"): TopCreatorsResponse {
+        val route = Route(method = "GET", path = "/v2/niches/{niches}/top-creators", "niches" to niches)
+        return api.request<TopCreatorsResponse>(route)
     }
 
-    data class TagsContainerGson(
-        @SerializedName("tags") val tags: List<String>
-    )
+    data class TagsContainerGson(@SerializedName("tags") val tags: List<String>)
 
     //https://api.redgifs.com/v2/niches/pumped-pussy/top-tags
     @Throws(ApiException::class)
-    suspend fun getNichesTopTags(
-        niches: String = "pumped-pussy",
-    ): List<String> {
-        val route = Route(
-            method = "GET",
-            path = "/v2/niches/{niches}/top-tags",
-            "niches" to niches,
-        )
+    suspend fun getNichesTopTags(niches: String = "pumped-pussy"): List<String> {
+        val route = Route(method = "GET", path = "/v2/niches/{niches}/top-tags", "niches" to niches)
         return api.request<TagsContainerGson>(route).tags
     }
 

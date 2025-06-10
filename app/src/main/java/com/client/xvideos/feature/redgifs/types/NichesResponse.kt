@@ -2,7 +2,7 @@ package com.client.xvideos.feature.redgifs.types
 
 import com.google.gson.annotations.SerializedName
 
-data class NicheResponse(
+data class NichesResponse(
     @SerializedName("niches") val niches: List<Niche>
 )
 

@@ -2,6 +2,10 @@ package com.client.xvideos.feature.redgifs.types
 
 import com.google.gson.annotations.SerializedName
 
+data class NicheResponse(
+    val niche: NichesInfo
+)
+
 // Проверен
 data class NichesInfo(
     @SerializedName("cover") val cover: String? = "cover",
