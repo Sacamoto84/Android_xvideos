@@ -23,6 +23,7 @@ import coil.memory.MemoryCache
 import coil.request.CachePolicy
 import com.client.xvideos.PermissionScreenActivity.PermissionStorage
 import com.client.xvideos.screens.videoplayer.video.cache.VideoPlayerCacheManager
+import com.client.xvideos.screens_red.niche.ScreenRedNiche
 import com.client.xvideos.screens_red.profile.ScreenRedProfile
 import com.client.xvideos.screens_red.top_this_week.ScreenRedTopThisWeek
 import com.client.xvideos.ui.theme.XvideosTheme
@@ -117,10 +118,11 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
                     //Navigator(ScreenDashBoards())
                     //Navigator(ScreenFavorites())
                     //ScreenRedProfile
-                    //Navigator(ScreenRedProfile("lilijunex"))
+                    //Navigator(ScreenRedProfile("lilijunex")
 
-                    Navigator(ScreenRedTopThisWeek())
+                    //Navigator(ScreenRedTopThisWeek())
 
+                    Navigator(ScreenRedNiche())
                 }
 
             }
