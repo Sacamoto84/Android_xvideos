@@ -44,3 +44,6 @@
 -keep class io.ktor.util.collections.** { *; }
 
 -dontwarn java.lang.management.**
+
+# Не обфусцировать и не удалять androidx.tracing.Trace
+-keep class androidx.tracing.Trace { *; }

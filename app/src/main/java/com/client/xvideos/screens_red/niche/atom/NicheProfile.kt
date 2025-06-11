@@ -26,6 +26,7 @@ import com.client.xvideos.screens.common.urlVideImage.UrlImage
 fun NicheProfile(niche: NichesInfo) {
 
     Box {
+
         UrlImage(
             "https://www.redgifs.com/static/DEFAULT_NICHE_BACKGROUND-BmUEhMGK.png",
             modifier = Modifier.height(110.dp),
@@ -63,15 +64,8 @@ fun NicheProfile(niche: NichesInfo) {
                     modifier = Modifier.weight(1f),
                     textAlign = TextAlign.End
                 )
-
-                UrlImage(
-                    niche.thumbnail, modifier = Modifier.size(128.dp).clip(
-                        RoundedCornerShape(8.dp)
-                    )
-                )
-
+                UrlImage(niche.thumbnail, modifier = Modifier.size(128.dp).clip(RoundedCornerShape(8.dp)))
                 Text(niche.gifs.toString(), color = Color.White, modifier = Modifier.weight(1f))
-
             }
 
         }

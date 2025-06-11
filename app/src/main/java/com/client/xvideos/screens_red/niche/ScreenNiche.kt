@@ -142,21 +142,20 @@ class ScreenRedNiche(val nicheName: String = "pumped-pussy") : Screen {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .background(MaterialTheme.colorScheme.primaryContainer)) {
+                                .background(Color(0xFF0F0F0F))) {
 
                             NicheProfile(vm.niche)
-
+                            Text("Related Niches", color = Color.White, modifier = Modifier.padding(start = 16.dp, top = 16.dp))
                             LazyRow {
                                 items(vm.related.niches.size) {
                                     NichePreview(vm.related.niches[it])
                                 }
                             }
 
+                            Text("✨ Top Creators in ${vm.niche.name}", color = Color.White, modifier = Modifier.padding(start = 16.dp, top = 16.dp))
                             LazyRow {
                                 items(vm.topCreator.creators) {
-                                    NicheTopCreator(
-                                        it,
-                                        onClick = { navigator.push(ScreenRedProfile(it.username)) })
+                                    NicheTopCreator(it, onClick = { navigator.push(ScreenRedProfile(it.username)) })
                                 }
                             }
 

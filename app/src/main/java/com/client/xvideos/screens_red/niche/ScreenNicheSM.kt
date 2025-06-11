@@ -69,12 +69,10 @@ class ScreenNicheSM @AssistedInject constructor(
 
     init {
         screenModelScope.launch {
-            niche = RedGifs.getNiche(nicheName)                  //Нужно кешировать
+            niche = RedGifs.getNiche(nicheName).niche                  //Нужно кешировать
 
             related = RedGifs.getNichesRelated(nicheName)        //Нужно кешировать
             topCreator = RedGifs.getNichesTopCreators(nicheName) //Нужно кешировать
-
-            //val aa = RedGifs.getNiches(nicheName) //Не кешировать Padding3
 
         }
     }

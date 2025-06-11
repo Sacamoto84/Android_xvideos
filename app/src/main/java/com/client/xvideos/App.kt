@@ -61,17 +61,15 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         instance = this
-        if (BuildConfig.DEBUG) Timber.plant(DebugTree())
-        allowAllSSL()
+        //if (BuildConfig.DEBUG)
+            Timber.plant(DebugTree())
+        //allowAllSSL()
         PlaybackPreference.initialize(this)
         kDownloader = KDownloader.create(applicationContext)
 
         BlockRed.refreshBlockList()
 
         GlobalScope.launch {
-       //  val a =   RedGifs.getNiche()
-       //     a
-
             clearOldCache( db.cacheMedaResponseDao())
         }
 

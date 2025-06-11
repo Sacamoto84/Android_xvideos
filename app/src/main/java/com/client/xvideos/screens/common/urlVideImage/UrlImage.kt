@@ -67,7 +67,7 @@ fun UrlImage(url: String, modifier: Modifier = Modifier,  contentScale : Content
         .build()
 
     CoilImage(
-        imageLoader = {  imageLoader  },
+        //imageLoader = {  imageLoader  },
 
         imageRequest = { imageRequest },
         imageOptions = ImageOptions(

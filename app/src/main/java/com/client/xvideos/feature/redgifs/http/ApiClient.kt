@@ -39,6 +39,7 @@ class ApiClient {
             gson {
                 this.registerTypeAdapter(UInt::class.java, UIntAdapter()).create()
                 this.registerTypeAdapter(ULong::class.java, ULongAdapter()).create()
+                this.registerTypeAdapter(Long::class.java, LongAdapter()).create()
             }
         }
         expectSuccess = true
@@ -159,5 +160,24 @@ class ULongAdapter : TypeAdapter<ULong>() {
             return null
         }
         return input?.nextLong()?.toULong()
+    }
+}
+
+class LongAdapter : TypeAdapter<Long>() {
+
+    override fun write(out: JsonWriter?, value: Long?) {
+        if (value == null) {
+            out?.nullValue()
+        } else {
+            out?.value(value) // Сохраняем как Long в JSON
+        }
+    }
+
+    override fun read(input: JsonReader?): Long? {
+        if (input?.peek() == JsonToken.NULL) {
+            input.nextNull()
+            return null
+        }
+        return input?.nextLong()
     }
 }

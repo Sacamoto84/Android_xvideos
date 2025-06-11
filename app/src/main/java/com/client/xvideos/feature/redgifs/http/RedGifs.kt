@@ -1,5 +1,6 @@
 package com.client.xvideos.feature.redgifs.http
 
+import androidx.tracing.Trace
 import com.client.xvideos.App
 import com.client.xvideos.feature.redgifs.db.CacheMediaResponseEntity
 import com.client.xvideos.feature.redgifs.db.getCurrentTimeText
@@ -17,8 +18,16 @@ import com.client.xvideos.feature.redgifs.types.tag.TagSuggestion
 import com.client.xvideos.feature.redgifs.types.tag.TagsResponse
 import com.google.android.gms.common.api.ApiException
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonDeserializer
+import com.google.gson.JsonPrimitive
+import com.google.gson.JsonSerializationContext
+import com.google.gson.JsonSerializer
 import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.json.JsonElement
 import timber.log.Timber
+import java.lang.reflect.Modifier
+import java.lang.reflect.Type
 
 object RedGifs {
 
@@ -234,9 +243,9 @@ object RedGifs {
     //niches
 
     @Throws(ApiException::class)
-    suspend fun getNiche(niches: String = "pumped-pussy"): NichesInfo {
+    suspend fun getNiche(niches: String = "pumped-pussy"): NicheResponse {
         val route = Route(method = "GET", path = "/v2/niches/{niches}", "niches" to niches)
-        return api.request<NicheResponse>(route).niche
+        return api.request(route)
     }
 
     //https://api.redgifs.com/v2/niches/cowgirl-pov/gifs?count=30&page=1&order=new
@@ -278,17 +287,24 @@ private suspend fun cacheMediaResponse(route : Route) : MediaResponse {
     val cacheDao = App.instance.db.cacheMedaResponseDao()
     val cachedEntity = cacheDao.get(route.url)
 
+    val gson = GsonBuilder()
+        //.registerTypeAdapter(Trace::class.java, TraceInstanceCreator())
+        .registerTypeAdapter(UInt::class.java, UIntAdapter())
+        .registerTypeAdapter(ULong::class.java, ULongAdapter())
+        .registerTypeAdapter(Long::class.java, LongAdapter())
+        .excludeFieldsWithModifiers(Modifier.ABSTRACT)
+        .create()
+
     if (cachedEntity != null) {
         // Десериализуем JSON из кеша
         Timber.i("!!! Берем данные из кеша ${route.url}")
-        val gson = Gson()
         return gson.fromJson(cachedEntity.content, MediaResponse::class.java)
     } else {
         Timber.i("!!! Берем данные из Сети ${route.url}")
         // Запрос из сети
         val res: MediaResponse = api.request(route)
         // Сохраняем в кеш (с текущим временем)
-        val jsonContent = Gson().toJson(res)
+        val jsonContent = gson.toJson(res)
         val entity = CacheMediaResponseEntity(
             url = route.url,
             content = jsonContent,
@@ -300,3 +316,4 @@ private suspend fun cacheMediaResponse(route : Route) : MediaResponse {
     }
 
 }
+
