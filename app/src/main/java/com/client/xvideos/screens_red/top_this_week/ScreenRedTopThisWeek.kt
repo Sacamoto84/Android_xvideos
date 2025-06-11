@@ -25,13 +25,12 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.client.xvideos.feature.redgifs.types.UserInfo
 import com.client.xvideos.screens_red.ThemeRed
 import com.client.xvideos.screens_red.common.users.UsersRed
 import com.client.xvideos.screens_red.profile.ScreenRedProfile
 import com.client.xvideos.screens_red.top_this_week.model.SortTop
 import com.client.xvideos.screens_red.top_this_week.model.VisibleType
-import com.client.xvideos.screens_red.top_this_week.row1.LazyRow123
+import com.client.xvideos.screens_red.common.lazyrow123.LazyRow123
 import com.client.xvideos.screens_red.top_this_week.row1.TikTokPow1
 import com.client.xvideos.screens_red.top_this_week.state.ErrorState
 import com.client.xvideos.screens_red.top_this_week.state.FullScreenLoading
