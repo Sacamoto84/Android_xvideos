@@ -7,25 +7,16 @@ import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.redgifs.types.Order
 import com.client.xvideos.screens_red.common.block.BlockRed
 import com.client.xvideos.screens_red.common.users.UsersRed
-import com.client.xvideos.screens_red.niche.model.SortByNiches
-import com.client.xvideos.screens_red.top_this_week.model.SortTop
 import timber.log.Timber
 
-class ItemNailsPagingSource (val sortTop : SortByNiches, val nichesName : String): PagingSource<Int, GifsInfo>() {
+class ItemNailsPagingSource (val order : Order, val nichesName : String): PagingSource<Int, GifsInfo>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int,  GifsInfo> {
 
         val page = params.key ?: 1 // API нумерует страницы с 1
 
         return try {
-            Timber.d("!!! ItemNailsPagingSource::load() page = $page sortTop:$sortTop")
-
-            val order = when (sortTop) {
-                SortByNiches.TRENDING -> Order.TRENDING
-                SortByNiches.TOP -> Order.TOP
-                SortByNiches.LATEST -> Order.LATEST
-                else ->  Order.LATEST
-            }
+            Timber.d("!!! ItemNailsPagingSource::load() page = $page sortTop:$order")
 
             val response = RedGifs.getNiches(niches = nichesName, page = page, order = order)
 

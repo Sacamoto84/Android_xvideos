@@ -31,4 +31,6 @@ object ThemeRed {
     val fontFamilyPopinsBold = FontFamily(Font(R.font.poppins_bold))
     val fontFamilyPopinsExtraBold= FontFamily(Font(R.font.poppins_extrabold))
 
+    val fontFamilyDMsanss= FontFamily(Font(R.font.dm_sans))
+
 }

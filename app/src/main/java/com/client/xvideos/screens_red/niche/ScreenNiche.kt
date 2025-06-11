@@ -50,13 +50,14 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.client.xvideos.feature.redgifs.types.Order
 import com.client.xvideos.screens.common.urlVideImage.UrlImage
 import com.client.xvideos.screens_red.common.lazyrow123.LazyRow123
+import com.client.xvideos.screens_red.common.sortByOrder.SortByOrder
 import com.client.xvideos.screens_red.common.users.UsersRed
 import com.client.xvideos.screens_red.niche.atom.NichePreview
 import com.client.xvideos.screens_red.niche.atom.NicheProfile
 import com.client.xvideos.screens_red.niche.atom.NicheTopCreator
-import com.client.xvideos.screens_red.niche.model.SortByNiches
 import com.client.xvideos.screens_red.profile.ScreenRedProfile
 import com.client.xvideos.screens_red.profile.ScreenRedProfileSM
 import com.client.xvideos.screens_red.profile.atom.RedProfileCreaterInfo
@@ -132,7 +133,7 @@ class ScreenRedNiche(val nicheName: String = "pumped-pussy") : Screen {
                     option = vm.expandMenuVideoList,
                     onRefresh = {
                         val temp = vm.sortType.value
-                        vm.changeSortType(SortByNiches.FORCE_TEMP)
+                        vm.changeSortType(Order.FORCE_TEMP)
                         vm.changeSortType(temp)
                     },
                     isConnected = isConnected,
@@ -175,10 +176,10 @@ class ScreenRedNiche(val nicheName: String = "pumped-pussy") : Screen {
                 .offset { IntOffset(x = 0, y = offsetY.floatValue.roundToInt()) }
                 .background(MaterialTheme.colorScheme.primaryContainer)) {
 
-            SortNichesByTop(
+            SortByOrder(
                 listOf(
-                    SortByNiches.TRENDING, SortByNiches.TOP,
-                    SortByNiches.LATEST,
+                    Order.TRENDING, Order.TOP,
+                    Order.LATEST,
                 ), sort, onSelect = { vm.changeSortType(it) })
 
         }

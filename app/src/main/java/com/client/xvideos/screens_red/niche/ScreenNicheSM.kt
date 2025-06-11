@@ -23,13 +23,13 @@ import com.client.xvideos.feature.redgifs.http.RedGifs
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.redgifs.types.NichesInfo
 import com.client.xvideos.feature.redgifs.types.NichesResponse
+import com.client.xvideos.feature.redgifs.types.Order
 import com.client.xvideos.feature.redgifs.types.TopCreatorsResponse
 import com.client.xvideos.feature.room.AppDatabase
 import com.client.xvideos.screens_red.common.block.BlockRed
 import com.client.xvideos.screens_red.common.downloader.DownloadRed
 import com.client.xvideos.screens_red.common.expand_menu_video.ExpandMenuVideoModel
 import com.client.xvideos.screens_red.common.favorite.FavoriteRed
-import com.client.xvideos.screens_red.niche.model.SortByNiches
 import com.client.xvideos.screens_red.niche.pagin3.ItemNailsPagingSource
 import com.client.xvideos.screens_red.profile.ScreenRedProfileSM
 import com.client.xvideos.screens_red.top_this_week.model.SortTop
@@ -86,10 +86,10 @@ class ScreenNicheSM @AssistedInject constructor(
 
     //////////////
     // StateFlow текущего типа сортировки
-    private val _sortType = MutableStateFlow(SortByNiches.LATEST) // или "popular", "oldest"
-    val sortType: StateFlow<SortByNiches> = _sortType.asStateFlow()
+    private val _sortType = MutableStateFlow(Order.LATEST) // или "popular", "oldest"
+    val sortType: StateFlow<Order> = _sortType.asStateFlow()
 
-    fun changeSortType(newSort: SortByNiches) {
+    fun changeSortType(newSort: Order) {
         if (_sortType.value != newSort) { // Меняем, только если тип действительно новый
             _sortType.value = newSort
             _scrollToTopAfterSortChange.value = true // Устанавливаем флаг, что нужен сброс
@@ -117,7 +117,7 @@ class ScreenNicheSM @AssistedInject constructor(
                 config = PagingConfig(pageSize = 109, prefetchDistance = 10, initialLoadSize = 109),
                 pagingSourceFactory = {
                     ItemNailsPagingSource(
-                        sortTop = sort,
+                        order = sort,
                         nichesName = nicheName
                     )
                 }
