@@ -8,6 +8,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,6 +17,8 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -67,7 +70,10 @@ fun LazyRow123(
     gotoPosition: Int,
     option: List<ExpandMenuVideoModel> = emptyList(),
     onRefresh: () -> Unit,
-    isConnected : Boolean
+    isConnected : Boolean,
+    contentPadding : PaddingValues = PaddingValues(0.dp),
+
+    contentBeforeList: @Composable (() -> Unit) = {}
 ) {
     if (listGifs.itemCount == 0) return
 
@@ -134,8 +140,12 @@ fun LazyRow123(
         state = state,
         columns = GridCells.Fixed(columns.coerceIn(1..3)),
         modifier = Modifier.then(modifier),
-        contentPadding = PaddingValues(8.dp)
+        contentPadding = contentPadding,
     ) {
+
+        item(key = "before", span = { GridItemSpan(maxLineSpan) }) {
+            contentBeforeList()
+        }
 
         items(
             count = listGifs.itemCount,

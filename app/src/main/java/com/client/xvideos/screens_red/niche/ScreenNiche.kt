@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -19,16 +21,26 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -49,6 +61,7 @@ import com.client.xvideos.screens_red.profile.ScreenRedProfile
 import com.client.xvideos.screens_red.profile.ScreenRedProfileSM
 import com.client.xvideos.screens_red.profile.atom.RedProfileCreaterInfo
 import com.client.xvideos.screens_red.top_this_week.model.SortTop
+import kotlin.math.roundToInt
 
 
 class ScreenRedNiche(val nicheName: String = "pumped-pussy") : Screen {
@@ -71,96 +84,105 @@ class ScreenRedNiche(val nicheName: String = "pumped-pussy") : Screen {
         val items = vm.pager.collectAsLazyPagingItems()
         val isConnected by vm.isConnected.collectAsStateWithLifecycle()
 
+
+        val toolbarHeight = 50.dp
+        val minToolbarHeight = 0.dp // высота лишь третьей строки
+        val toolbarHeightPx = with(LocalDensity.current) { toolbarHeight.toPx() }
+        val minToolbarHeightPx = with(LocalDensity.current) { minToolbarHeight.toPx() }
+
+        val offsetY = remember { mutableFloatStateOf(0f) }
+
+        val nestedScrollConnection = remember {
+            object : NestedScrollConnection {
+                override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                    val delta = available.y
+                    val newOffset = (offsetY.value + delta).coerceIn(
+                        -(toolbarHeightPx - minToolbarHeightPx),
+                        0f
+                    )
+                    offsetY.value = newOffset
+                    return Offset.Zero
+                }
+            }
+        }
+
         Scaffold(modifier = Modifier.fillMaxSize(), containerColor = Color(0xFF0F0F0F)) {
 
-            LazyVerticalGrid(
-                state = gridState,
-                columns = GridCells.Fixed(2),
-                modifier = Modifier.fillMaxSize(),
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
-                contentPadding = PaddingValues(4.dp) // Отступы по краям сетки
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .nestedScroll(nestedScrollConnection)
             ) {
 
-                item(key = "profile", span = { GridItemSpan(maxLineSpan) }) {
+                LazyRow123(
+                    columns = 2,
+                    listGifs = items,
+                    listUsers = UsersRed.listAllUsers,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                    ,
+                    onClickOpenProfile = {
+                        vm.currentIndexGoto = vm.currentIndex;
+                        navigator.push(ScreenRedProfile(it))
+                    },
+                    onCurrentPosition = { index ->
+                        vm.currentIndex = index
+                    },
+                    gotoPosition = vm.currentIndexGoto,
+                    option = vm.expandMenuVideoList,
+                    onRefresh = {
+                        val temp = vm.sortType.value
+                        vm.changeSortType(SortByNiches.FORCE_TEMP)
+                        vm.changeSortType(temp)
+                    },
+                    isConnected = isConnected,
+                    contentPadding = PaddingValues(top = toolbarHeight),
+                    contentBeforeList = {
 
-                    UrlImage(
-                        "https://www.redgifs.com/static/DEFAULT_NICHE_BACKGROUND-BmUEhMGK.png",
-                        modifier = Modifier.height(110.dp),
-                        contentScale = ContentScale.FillHeight
-                    )
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(110.dp)
-                            .background(
-                                brush = Brush.verticalGradient(
-                                    colors = listOf(Color(0xFF0F0F0F), Color.Transparent),
-                                    startY = Float.POSITIVE_INFINITY, // снизу
-                                    endY = 0f // вверх
-                                )
-                            )
-                    )
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(MaterialTheme.colorScheme.primaryContainer)) {
 
-                    NicheProfile(vm.niche)
-                }
+                            NicheProfile(vm.niche)
 
-                item(key = "profile1", span = { GridItemSpan(maxLineSpan) }) {
-                    LazyRow {
-                        items(vm.related.niches.size) {
-                            NichePreview(vm.related.niches[it])
+                            LazyRow {
+                                items(vm.related.niches.size) {
+                                    NichePreview(vm.related.niches[it])
+                                }
+                            }
+
+                            LazyRow {
+                                items(vm.topCreator.creators) {
+                                    NicheTopCreator(
+                                        it,
+                                        onClick = { navigator.push(ScreenRedProfile(it.username)) })
+                                }
+                            }
+
                         }
                     }
-                }
-
-                item(key = "topCreator", span = { GridItemSpan(maxLineSpan) }) {
-                    LazyRow {
-                        items(vm.topCreator.creators) {
-                            NicheTopCreator(
-                                it,
-                                onClick = { navigator.push(ScreenRedProfile(it.username)) })
-                        }
-                    }
-                }
-
-                item(key = "info", span = { GridItemSpan(maxLineSpan) }) {
-                    SortNichesByTop(
-                        listOf(
-                            SortByNiches.TRENDING,
-                            SortByNiches.TOP,
-                            SortByNiches.LATEST,
-                        ), sort, onSelect = { vm.changeSortType(it) })
-                }
-
-                item(key = "grid", span = { GridItemSpan(maxLineSpan) }) {
-                    LazyRow123(
-                        columns = 2,
-                        listGifs = items,
-                        listUsers = UsersRed.listAllUsers,
-                        modifier = Modifier.fillMaxWidth().height(1000.dp),
-                        onClickOpenProfile = {
-                            vm.currentIndexGoto =  vm.currentIndex;
-                            navigator.push(ScreenRedProfile(it)) },
-                        onCurrentPosition = { index ->
-                            vm.currentIndex = index
-                        },
-                        gotoPosition = vm.currentIndexGoto,
-                        option = vm.expandMenuVideoList,
-                        onRefresh = {
-                            val temp = vm.sortType.value
-                            vm.changeSortType(SortByNiches.FORCE_TEMP)
-                            vm.changeSortType(temp)
-                        },
-                        isConnected = isConnected
-                    )
-                }
-
+                )
 
             }
 
-
         }
 
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(toolbarHeight)
+                .offset { IntOffset(x = 0, y = offsetY.floatValue.roundToInt()) }
+                .background(MaterialTheme.colorScheme.primaryContainer)) {
+
+            SortNichesByTop(
+                listOf(
+                    SortByNiches.TRENDING, SortByNiches.TOP,
+                    SortByNiches.LATEST,
+                ), sort, onSelect = { vm.changeSortType(it) })
+
+        }
 
     }
 
