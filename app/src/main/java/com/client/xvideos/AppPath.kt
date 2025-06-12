@@ -34,6 +34,12 @@ object AppPath {
 
     val users_red : String = "${main}/${Folder.RED.value}/Users"
 
+    val db_red : String = "${main}/${Folder.RED.value}/db"
+
+    val likes_red : String = "${main}/${Folder.RED.value}/Saves/Likes"
+    val collection_red : String = "${main}/${Folder.RED.value}/Saves/Collection"
+    val niches_red : String = "${main}/${Folder.RED.value}/Saves/Niches"
+
     init {
 
         println("---AppPath---")
@@ -56,6 +62,12 @@ object AppPath {
         File(block_red).mkdirs()
         File(favorite_red).mkdirs()
         File(users_red).mkdirs()
+        File(db_red).mkdirs()
+
+        File(likes_red).mkdirs()
+        File(collection_red).mkdirs()
+        File(niches_red).mkdirs()
+
     }
 
 }

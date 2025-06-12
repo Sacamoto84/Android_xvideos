@@ -1,4 +1,4 @@
-package com.client.xvideos.feature.room
+package com.client.xvideos.screens_red.common.db
 
 import android.content.Context
 import androidx.room.Database
@@ -6,25 +6,21 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
-import com.client.xvideos.feature.redgifs.db.CacheMedaResponseDao
-import com.client.xvideos.feature.redgifs.db.CacheMediaResponseEntity
-import com.client.xvideos.feature.room.entity.Favorites
+import com.client.xvideos.AppPath
+import com.client.xvideos.feature.room.ExternalPathSQLiteHelperFactory
 import com.client.xvideos.feature.room.entity.Items
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import java.io.File
 import java.util.Date
 import javax.inject.Singleton
 
-@Database(entities = [Items::class, Favorites::class, CacheMediaResponseEntity::class], version = 2, exportSchema = true)
+@Database(entities = [Items::class], version = 1, exportSchema = true)
 @TypeConverters(DateConverter::class)
-abstract class AppDatabase : RoomDatabase() {
-    abstract fun favoriteDao(): FavoriteGalleryDao
-    abstract fun itemsDao(): ItemsDao
-
-    abstract fun cacheMedaResponseDao() : CacheMedaResponseDao
+abstract class RedDatabase : RoomDatabase() {
 
 }
 
@@ -33,27 +29,27 @@ class DateConverter {
     fun toDate(timestamp: Long?): Date? {
         return timestamp?.let { Date(it) }
     }
-
     @TypeConverter
     fun toTimestamp(date: Date?): Long? {
         return date?.time
     }
 }
 
+val dbFile = File(AppPath.db_red, "red.db")
+
 @Module
 @InstallIn(SingletonComponent::class)
-object RoomPrefs {
+object RedDbModule {
 
     @Provides
     @Singleton
-    fun provideStockDatabase(@ApplicationContext context: Context): AppDatabase {
-        println("!!! DI ROOM")
-        return Room.databaseBuilder(context, AppDatabase::class.java, "database")
+    fun provideRedDatabase(@ApplicationContext context: Context): RedDatabase {
+        println("!!! DI RED ROOM")
+        return Room.databaseBuilder(context, RedDatabase::class.java, "")
+            .openHelperFactory(ExternalPathSQLiteHelperFactory(dbFile))
             .fallbackToDestructiveMigration()
             .allowMainThreadQueries()
             .build()
     }
-
-
 
 }
