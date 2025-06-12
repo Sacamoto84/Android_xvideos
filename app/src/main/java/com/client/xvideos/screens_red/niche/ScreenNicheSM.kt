@@ -2,6 +2,7 @@ package com.client.xvideos.screens_red.niche
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.StarBorder
@@ -30,6 +31,7 @@ import com.client.xvideos.screens_red.common.block.BlockRed
 import com.client.xvideos.screens_red.common.downloader.DownloadRed
 import com.client.xvideos.screens_red.common.expand_menu_video.ExpandMenuVideoModel
 import com.client.xvideos.screens_red.common.favorite.FavoriteRed
+import com.client.xvideos.screens_red.common.saved.SavedRed
 import com.client.xvideos.screens_red.niche.pagin3.ItemNailsPagingSource
 import com.client.xvideos.screens_red.profile.ScreenRedProfileSM
 import com.client.xvideos.screens_red.top_this_week.model.SortTop
@@ -141,6 +143,16 @@ class ScreenNicheSM @AssistedInject constructor(
             ExpandMenuVideoModel("Фаворит", Icons.Default.StarBorder, onClick = {
                 if (it == null) return@ExpandMenuVideoModel
                 FavoriteRed.invertFavorite(it)
+            }),
+
+            ExpandMenuVideoModel("Like", Icons.Default.Favorite, onClick = {
+                if (it == null) return@ExpandMenuVideoModel
+                SavedRed.addLikes(it)
+            }),
+
+            ExpandMenuVideoModel("!Like", Icons.Default.Block, onClick = {
+                if (it == null) return@ExpandMenuVideoModel
+                SavedRed.removeLikes(it)
             }),
 
 

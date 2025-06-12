@@ -47,18 +47,3 @@ fun NichePreview(niches: Niche) {
 
 
 }
-
-@Preview
-@Composable
-fun NichePreviewPreview() {
-    val niche = Niche(
-        id = "sampleId",
-        name = "sampleName",
-        gifs = 100,
-        subscribers = 1000,
-        thumbnail = "https://example.com/thumbnail.jpg",
-        previews = listOf(NichePreviewType(id = "previewId", thumbnail = "https://example.com/preview.jpg"))
-    )
-    NichePreview(niches = niche)
-}
-

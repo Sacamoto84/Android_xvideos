@@ -12,6 +12,11 @@ object ThemeRed {
      */
     val colorCommonBackground = Color(0xFF0C0B28)
 
+    //Новый цвет
+    val colorCommonBackground2 = Color(0xFF0F0F0F)
+    val colorCommonBackground2Dark = Color(0xFF090909)
+    //
+
     val colorBottomBarBackground = Color(0xFF111038)
 
     val colorBottomBarDivider = Color(0xFF323153)

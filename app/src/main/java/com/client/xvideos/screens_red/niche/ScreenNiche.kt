@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -61,6 +62,7 @@ import com.client.xvideos.screens_red.niche.atom.NicheTopCreator
 import com.client.xvideos.screens_red.profile.ScreenRedProfile
 import com.client.xvideos.screens_red.profile.ScreenRedProfileSM
 import com.client.xvideos.screens_red.profile.atom.RedProfileCreaterInfo
+import com.client.xvideos.screens_red.saved.ScreenRedSaved
 import com.client.xvideos.screens_red.top_this_week.model.SortTop
 import kotlin.math.roundToInt
 
@@ -169,7 +171,7 @@ class ScreenRedNiche(val nicheName: String = "pumped-pussy") : Screen {
         }
 
 
-        Column(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(toolbarHeight)
@@ -181,6 +183,9 @@ class ScreenRedNiche(val nicheName: String = "pumped-pussy") : Screen {
                     Order.TRENDING, Order.TOP,
                     Order.LATEST,
                 ), sort, onSelect = { vm.changeSortType(it) })
+
+            Button(onClick = {navigator.push(ScreenRedSaved())}) {
+            }
 
         }
 
