@@ -31,6 +31,8 @@ import com.client.xvideos.screens_red.common.block.BlockRed
 import com.client.xvideos.screens_red.common.downloader.DownloadRed
 import com.client.xvideos.screens_red.common.expand_menu_video.ExpandMenuVideoModel
 import com.client.xvideos.screens_red.common.favorite.FavoriteRed
+import com.client.xvideos.screens_red.common.lazyrow123.LazyRow123Host
+import com.client.xvideos.screens_red.common.lazyrow123.TypePager
 import com.client.xvideos.screens_red.common.saved.SavedRed
 import com.client.xvideos.screens_red.niche.pagin3.ItemNailsPagingSource
 import com.client.xvideos.screens_red.profile.ScreenRedProfileSM
@@ -70,63 +72,20 @@ class ScreenNicheSM @AssistedInject constructor(
     var topCreator by mutableStateOf(TopCreatorsResponse(emptyList()))
 
     init {
+        Timber.d("!!!  ⚠\uFE0F ScreenNicheSM init {...} ")
+
         screenModelScope.launch {
-            niche = RedGifs.getNiche(nicheName).niche                  //Нужно кешировать
-
-            related = RedGifs.getNichesRelated(nicheName)        //Нужно кешировать
-            topCreator = RedGifs.getNichesTopCreators(nicheName) //Нужно кешировать
-
+            niche = RedGifs.getNiche(nicheName).niche            // Нужно кешировать
+            related = RedGifs.getNichesRelated(nicheName)        // Нужно кешировать
+            topCreator = RedGifs.getNichesTopCreators(nicheName) // Нужно кешировать
         }
     }
 
-    val isConnected = connectivityObserver.isConnected.stateIn(
-        screenModelScope,
-        SharingStarted.WhileSubscribed(5000L),
-        false
-    )
-
-
-    //////////////
-    // StateFlow текущего типа сортировки
-    private val _sortType = MutableStateFlow(Order.LATEST) // или "popular", "oldest"
-    val sortType: StateFlow<Order> = _sortType.asStateFlow()
-
-    fun changeSortType(newSort: Order) {
-        if (_sortType.value != newSort) { // Меняем, только если тип действительно новый
-            _sortType.value = newSort
-            _scrollToTopAfterSortChange.value = true // Устанавливаем флаг, что нужен сброс
-            Timber.d("!!! SM: Sort type changed to $newSort, scrollToTopAfterSortChange set to true")
-        }
-    }
-
-    // Новый State для отслеживания необходимости сброса
-    private val _scrollToTopAfterSortChange = MutableStateFlow(false)
-    val scrollToTopAfterSortChange: StateFlow<Boolean> = _scrollToTopAfterSortChange.asStateFlow()
-
-
-    // Вызовите это после того, как скролл был выполнен в UI
-    fun consumedScrollToTopIntent() {
-        _scrollToTopAfterSortChange.value = false
-        Timber.d("!!! SM: scrollToTopAfterSortChange set to false (consumed)")
-    }
-
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val pager: Flow<PagingData<GifsInfo>> = sortType
-        .flatMapLatest { sort ->
-            Timber.d("!!! ScreenNicheSM::pager sort = $sort")
-            Pager(
-                config = PagingConfig(pageSize = 109, prefetchDistance = 10, initialLoadSize = 109),
-                pagingSourceFactory = {
-                    ItemNailsPagingSource(
-                        order = sort,
-                        nichesName = nicheName
-                    )
-                }
-            ).flow
-
-        }
-        .cachedIn(screenModelScope)
+    val lazyHost =
+        LazyRow123Host(
+            connectivityObserver = connectivityObserver, scope = screenModelScope,
+            extraString = nicheName, typePager = TypePager.NICHES
+        )
 
     val expandMenuVideoList =
         listOf(
@@ -154,13 +113,8 @@ class ScreenNicheSM @AssistedInject constructor(
                 if (it == null) return@ExpandMenuVideoModel
                 SavedRed.removeLikes(it)
             }),
+        )
 
-
-            )
-
-    var columns by mutableIntStateOf(1)             //Количество колонок
-    var currentIndex by mutableIntStateOf(0)
-    var currentIndexGoto by mutableIntStateOf(0)
 
 }
 

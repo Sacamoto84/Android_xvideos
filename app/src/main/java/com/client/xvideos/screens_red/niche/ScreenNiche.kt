@@ -2,7 +2,6 @@ package com.client.xvideos.screens_red.niche
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -12,34 +11,23 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.lazy.grid.LazyGridItemInfo
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -52,7 +40,6 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.feature.redgifs.types.Order
-import com.client.xvideos.screens.common.urlVideImage.UrlImage
 import com.client.xvideos.screens_red.common.lazyrow123.LazyRow123
 import com.client.xvideos.screens_red.common.sortByOrder.SortByOrder
 import com.client.xvideos.screens_red.common.users.UsersRed
@@ -60,14 +47,11 @@ import com.client.xvideos.screens_red.niche.atom.NichePreview
 import com.client.xvideos.screens_red.niche.atom.NicheProfile
 import com.client.xvideos.screens_red.niche.atom.NicheTopCreator
 import com.client.xvideos.screens_red.profile.ScreenRedProfile
-import com.client.xvideos.screens_red.profile.ScreenRedProfileSM
-import com.client.xvideos.screens_red.profile.atom.RedProfileCreaterInfo
 import com.client.xvideos.screens_red.saved.ScreenRedSaved
-import com.client.xvideos.screens_red.top_this_week.model.SortTop
+import timber.log.Timber
 import kotlin.math.roundToInt
 
-
-class ScreenRedNiche(val nicheName: String = "pumped-pussy") : Screen {
+data class ScreenRedNiche(val nicheName: String = "pumped-pussy") : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
 
@@ -77,16 +61,13 @@ class ScreenRedNiche(val nicheName: String = "pumped-pussy") : Screen {
         val navigator = LocalNavigator.currentOrThrow
 
         val vm = getScreenModel<ScreenNicheSM, ScreenNicheSM.Factory> { factory ->
+            Timber.d("!!! factory.create(${nicheName})")
             factory.create(nicheName)
         }
 
-        val gridState = rememberLazyGridState()
+        val sort = vm.lazyHost.sortType.collectAsStateWithLifecycle().value
 
-        val sort = vm.sortType.collectAsStateWithLifecycle().value
-
-        val items = vm.pager.collectAsLazyPagingItems()
-        val isConnected by vm.isConnected.collectAsStateWithLifecycle()
-
+        val isConnected by vm.lazyHost.isConnected.collectAsState()
 
         val toolbarHeight = 50.dp
         val minToolbarHeight = 0.dp // высота лишь третьей строки
@@ -99,59 +80,53 @@ class ScreenRedNiche(val nicheName: String = "pumped-pussy") : Screen {
             object : NestedScrollConnection {
                 override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
                     val delta = available.y
-                    val newOffset = (offsetY.value + delta).coerceIn(
-                        -(toolbarHeightPx - minToolbarHeightPx),
-                        0f
-                    )
-                    offsetY.value = newOffset
+                    val newOffset = (offsetY.floatValue + delta).coerceIn(-(toolbarHeightPx - minToolbarHeightPx), 0f)
+                    offsetY.floatValue = newOffset
                     return Offset.Zero
                 }
             }
         }
 
+
+        val items = vm.lazyHost.pagerFlow.collectAsLazyPagingItems()
+
+
         Scaffold(modifier = Modifier.fillMaxSize(), containerColor = Color(0xFF0F0F0F)) {
 
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .nestedScroll(nestedScrollConnection)
-            ) {
+            Box(modifier = Modifier.fillMaxSize().nestedScroll(nestedScrollConnection)) {
+
+                Timber.i("!!! 1 LazyRow123 items:${items}")
 
                 LazyRow123(
                     columns = 2,
                     listGifs = items,
                     listUsers = UsersRed.listAllUsers,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                    ,
+                    modifier = Modifier.fillMaxWidth(),
                     onClickOpenProfile = {
-                        vm.currentIndexGoto = vm.currentIndex;
+                        vm.lazyHost.currentIndexGoto = vm.lazyHost.currentIndex
                         navigator.push(ScreenRedProfile(it))
                     },
-                    onCurrentPosition = { index ->
-                        vm.currentIndex = index
-                    },
-                    gotoPosition = vm.currentIndexGoto,
+                    onCurrentPosition = { index -> vm.lazyHost.currentIndex = index },
+                    gotoPosition = vm.lazyHost.currentIndexGoto,
                     option = vm.expandMenuVideoList,
                     onRefresh = {
-                        val temp = vm.sortType.value
-                        vm.changeSortType(Order.FORCE_TEMP)
-                        vm.changeSortType(temp)
+                        val temp = vm.lazyHost.sortType.value
+                        vm.lazyHost.changeSortType(Order.FORCE_TEMP)
+                        vm.lazyHost.changeSortType(temp)
                     },
                     isConnected = isConnected,
                     contentPadding = PaddingValues(top = toolbarHeight),
                     contentBeforeList = {
 
                         Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(Color(0xFF0F0F0F))) {
+                            modifier = Modifier.fillMaxWidth().background(Color(0xFF0F0F0F))) {
 
                             NicheProfile(vm.niche)
                             Text("Related Niches", color = Color.White, modifier = Modifier.padding(start = 16.dp, top = 16.dp))
                             LazyRow {
                                 items(vm.related.niches.size) {
-                                    NichePreview(vm.related.niches[it])
+                                    NichePreview(vm.related.niches[it], onClick = {navigator.push(
+                                        ScreenRedNiche(vm.related.niches[it].id))})
                                 }
                             }
 
@@ -182,7 +157,7 @@ class ScreenRedNiche(val nicheName: String = "pumped-pussy") : Screen {
                 listOf(
                     Order.TRENDING, Order.TOP,
                     Order.LATEST,
-                ), sort, onSelect = { vm.changeSortType(it) })
+                ), sort, onSelect = { vm.lazyHost.changeSortType(it) })
 
             Button(onClick = {navigator.push(ScreenRedSaved())}) {
             }

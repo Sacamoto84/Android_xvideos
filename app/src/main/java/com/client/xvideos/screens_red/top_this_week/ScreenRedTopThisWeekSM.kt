@@ -44,6 +44,10 @@ class ScreenRedTopThisWeekSM @Inject constructor(
     connectivityObserver: ConnectivityObserver
 ) : ScreenModel {
 
+init {
+        Timber.d("!!!  ⚠\uFE0F ScreenRedTopThisWeekSM init {...} ")
+}
+
 
     val isConnected = connectivityObserver
         .isConnected

@@ -289,10 +289,10 @@ private suspend fun cacheMediaResponse(route : Route) : MediaResponse {
 
     val gson = GsonBuilder()
         //.registerTypeAdapter(Trace::class.java, TraceInstanceCreator())
-        .registerTypeAdapter(UInt::class.java, UIntAdapter())
-        .registerTypeAdapter(ULong::class.java, ULongAdapter())
-        .registerTypeAdapter(Long::class.java, LongAdapter())
-        .excludeFieldsWithModifiers(Modifier.ABSTRACT)
+//        .registerTypeAdapter(UInt::class.java, UIntAdapter())
+//        .registerTypeAdapter(ULong::class.java, ULongAdapter())
+//        .registerTypeAdapter(Long::class.java, LongAdapter())
+//        .excludeFieldsWithModifiers(Modifier.ABSTRACT)
         .create()
 
     if (cachedEntity != null) {

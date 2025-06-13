@@ -75,6 +75,9 @@ fun LazyRow123(
 
     contentBeforeList: @Composable (() -> Unit) = {}
 ) {
+
+    Timber.i("!!! 2 LazyRow123")
+
     if (listGifs.itemCount == 0) return
 
     SideEffect { Timber.d("!!! LazyRow2::SideEffect columns: $columns gotoPosition: $gotoPosition")  }

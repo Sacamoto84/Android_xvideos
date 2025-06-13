@@ -38,7 +38,7 @@ import com.client.xvideos.screens_red.top_this_week.state.LoadingNextPageIndicat
 import timber.log.Timber
 
 class ScreenRedTopThisWeek : Screen {
-    override val key: ScreenKey = uniqueScreenKey
+    override val key: ScreenKey = "ScreenRedTopThisWeek"
 
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
@@ -51,9 +51,12 @@ class ScreenRedTopThisWeek : Screen {
 
         val isConnected by vm.isConnected.collectAsStateWithLifecycle()
 
-        Timber.i("!!! --- currentIndex:${vm.currentIndex} currentIndexGoto:${vm.currentIndexGoto}")
+        Timber.i("!!! key:${key} --- currentIndex:${vm.currentIndex} currentIndexGoto:${vm.currentIndexGoto}")
 
 
+        LaunchedEffect(Unit) {
+            Timber.i("!!! -->>.>..>>. navigator.items.size ${navigator.items.size}")
+        }
 
 //        LaunchedEffect(Unit) {
 //            Timber.d("!!! LaunchedEffect(Unit) currentIndexGoto:$currentIndexGoto currentIndex:$currentIndex")

@@ -16,7 +16,7 @@ class ItemTopThisWeekPagingSource (val sortTop : SortTop): PagingSource<Int, Gif
         val page = params.key ?: 1 // API нумерует страницы с 1
 
         return try {
-            Timber.d("!!! ItemPagingSource::load() page = $page sortTop:$sortTop")
+            Timber.d("!!! ItemTopThisWeekPagingSource::load() page = $page sortTop:$sortTop")
 
             val response =  when(sortTop) {
                 SortTop.WEEK -> RedGifs.getTopThisWeek(100, page)

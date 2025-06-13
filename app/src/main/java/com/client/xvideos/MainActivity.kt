@@ -12,6 +12,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -24,14 +25,12 @@ import coil.request.CachePolicy
 import com.client.xvideos.PermissionScreenActivity.PermissionStorage
 import com.client.xvideos.screens.videoplayer.video.cache.VideoPlayerCacheManager
 import com.client.xvideos.screens_red.niche.ScreenRedNiche
-import com.client.xvideos.screens_red.profile.ScreenRedProfile
 import com.client.xvideos.screens_red.top_this_week.ScreenRedTopThisWeek
 import com.client.xvideos.ui.theme.XvideosTheme
 import com.client.xvideos.util.KeepScreenOn
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
-import timber.log.Timber.DebugTree
-import timber.log.Timber.Forest.plant
+import timber.log.Timber
 
 const val urlStart = "https://www.xv-ru.com"
 
@@ -75,8 +74,6 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
 
         windowInsetsController?.hide(WindowInsetsCompat.Type.systemBars())
 
-        plant(DebugTree())
-
         if (!PermissionStorage.hasPermissions(this)) {
             val intent = Intent(this, PermissionScreenActivity::class.java)
             intent.setFlags(FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
@@ -105,9 +102,12 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
 //                // setStatusBarColor() and setNavigationBarColor() also exist
 //                onDispose {}
 //            }
-
+            val startScreen = remember { ScreenRedTopThisWeek() }
 
             XvideosTheme(darkTheme = true) {
+
+
+
                 //Navigator(ScreenTags("blonde"))
                 Box(
                     modifier = Modifier.fillMaxSize()
@@ -120,8 +120,8 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
                     //ScreenRedProfile
                     //Navigator(ScreenRedProfile("lilijunex")
 
-                    //Navigator(ScreenRedTopThisWeek())
-
+                    //Navigator(startScreen, key = "1")
+                    Timber.d("!!! Navigator(ScreenRedNiche())")
                     Navigator(ScreenRedNiche())
                 }
 

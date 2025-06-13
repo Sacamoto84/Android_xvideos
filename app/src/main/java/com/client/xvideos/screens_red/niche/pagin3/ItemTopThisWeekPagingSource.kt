@@ -16,7 +16,15 @@ class ItemNailsPagingSource (val order : Order, val nichesName : String): Paging
         val page = params.key ?: 1 // API нумерует страницы с 1
 
         return try {
-            Timber.d("!!! ItemNailsPagingSource::load() page = $page sortTop:$order")
+            Timber.d("!!! ItemNailsPagingSource::load() page = $page sortTop:$order nichesName:$nichesName")
+
+            if (order == Order.FORCE_TEMP) {
+                LoadResult.Page(
+                    data = emptyList(),
+                    prevKey = null,
+                    nextKey = page
+                )
+            }
 
             val response = RedGifs.getNiches(niches = nichesName, page = page, order = order)
 
@@ -43,7 +51,7 @@ class ItemNailsPagingSource (val order : Order, val nichesName : String): Paging
             )
 
         } catch (e: Exception) {
-            Timber.e("!!! ItemPagingSource load() page = $page Ошибка = ${e.message}")
+            Timber.e("!!! ItemNailsPagingSource load() page = $page nichesName:$nichesName Ошибка = ${e.message}")
             LoadResult.Error(e)
         }
     }
