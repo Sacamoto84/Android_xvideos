@@ -45,7 +45,9 @@ class ScreenRedTopThisWeek : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val vm: ScreenRedTopThisWeekSM = getScreenModel()
-        val items = vm.pager.collectAsLazyPagingItems()
+
+        val items = vm.lazyHost.pager.collectAsLazyPagingItems()
+
         val shouldScrollToTop by vm.scrollToTopAfterSortChange.collectAsState() // Подписываемся на флаг
         val visibleType by vm.visibleType.collectAsState()
 
@@ -53,10 +55,6 @@ class ScreenRedTopThisWeek : Screen {
 
         Timber.i("!!! key:${key} --- currentIndex:${vm.currentIndex} currentIndexGoto:${vm.currentIndexGoto}")
 
-
-        LaunchedEffect(Unit) {
-            Timber.i("!!! -->>.>..>>. navigator.items.size ${navigator.items.size}")
-        }
 
 //        LaunchedEffect(Unit) {
 //            Timber.d("!!! LaunchedEffect(Unit) currentIndexGoto:$currentIndexGoto currentIndex:$currentIndex")
@@ -128,22 +126,11 @@ class ScreenRedTopThisWeek : Screen {
                 if ((visibleType == VisibleType.ONE) || (visibleType == VisibleType.TWO) || (visibleType == VisibleType.THREE)) {
 
                     LazyRow123(
-                        columns = vm.columns,
-                        listGifs = items,
-                        listUsers = UsersRed.listAllUsers,
+                        vm.lazyHost,
                         modifier = Modifier.fillMaxSize(),
                         onClickOpenProfile = { vm.currentIndexGoto =  vm.currentIndex; navigator.push(ScreenRedProfile(it)) },
-                        onCurrentPosition = { index ->
-                            vm.currentIndex = index
-                        },
                         gotoPosition = vm.currentIndexGoto,
                         option = vm.expandMenuVideoList,
-                        onRefresh = {
-                            val temp = vm.sortType.value
-                            vm.changeSortType(SortTop.FORCE_TEMP)
-                            vm.changeSortType(temp)
-                        },
-                        isConnected = isConnected
                     )
 
                 }

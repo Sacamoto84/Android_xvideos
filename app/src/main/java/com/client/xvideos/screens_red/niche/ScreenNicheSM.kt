@@ -7,26 +7,17 @@ import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
 import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
-import com.client.xvideos.feature.preference.PreferencesRepository
 import com.client.xvideos.feature.redgifs.http.RedGifs
-import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.redgifs.types.NichesInfo
 import com.client.xvideos.feature.redgifs.types.NichesResponse
-import com.client.xvideos.feature.redgifs.types.Order
 import com.client.xvideos.feature.redgifs.types.TopCreatorsResponse
-import com.client.xvideos.feature.room.AppDatabase
 import com.client.xvideos.screens_red.common.block.BlockRed
 import com.client.xvideos.screens_red.common.downloader.DownloadRed
 import com.client.xvideos.screens_red.common.expand_menu_video.ExpandMenuVideoModel
@@ -34,10 +25,6 @@ import com.client.xvideos.screens_red.common.favorite.FavoriteRed
 import com.client.xvideos.screens_red.common.lazyrow123.LazyRow123Host
 import com.client.xvideos.screens_red.common.lazyrow123.TypePager
 import com.client.xvideos.screens_red.common.saved.SavedRed
-import com.client.xvideos.screens_red.niche.pagin3.ItemNailsPagingSource
-import com.client.xvideos.screens_red.profile.ScreenRedProfileSM
-import com.client.xvideos.screens_red.top_this_week.model.SortTop
-import com.client.xvideos.screens_red.top_this_week.pagin3.ItemTopThisWeekPagingSource
 import dagger.Binds
 import dagger.Module
 import dagger.assisted.Assisted
@@ -46,14 +33,6 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -71,8 +50,16 @@ class ScreenNicheSM @AssistedInject constructor(
     var related by mutableStateOf(NichesResponse(emptyList()))
     var topCreator by mutableStateOf(TopCreatorsResponse(emptyList()))
 
+    val lazyHost =
+        LazyRow123Host(
+            connectivityObserver = connectivityObserver, scope = screenModelScope,
+            extraString = nicheName, typePager = TypePager.NICHES
+        )
+
     init {
         Timber.d("!!!  ⚠\uFE0F ScreenNicheSM init {...} ")
+
+        lazyHost.columns = 2
 
         screenModelScope.launch {
             niche = RedGifs.getNiche(nicheName).niche            // Нужно кешировать
@@ -81,11 +68,7 @@ class ScreenNicheSM @AssistedInject constructor(
         }
     }
 
-    val lazyHost =
-        LazyRow123Host(
-            connectivityObserver = connectivityObserver, scope = screenModelScope,
-            extraString = nicheName, typePager = TypePager.NICHES
-        )
+
 
     val expandMenuVideoList =
         listOf(

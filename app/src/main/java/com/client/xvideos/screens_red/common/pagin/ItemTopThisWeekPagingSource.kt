@@ -1,28 +1,36 @@
-package com.client.xvideos.screens_red.top_this_week.pagin3
+package com.client.xvideos.screens_red.common.pagin
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.client.xvideos.feature.redgifs.http.RedGifs
 import com.client.xvideos.feature.redgifs.types.GifsInfo
+import com.client.xvideos.feature.redgifs.types.Order
 import com.client.xvideos.screens_red.common.block.BlockRed
 import com.client.xvideos.screens_red.common.users.UsersRed
-import com.client.xvideos.screens_red.top_this_week.model.SortTop
 import timber.log.Timber
 
-class ItemTopThisWeekPagingSource (val sortTop : SortTop): PagingSource<Int, GifsInfo>() {
+class ItemTopThisWeekPagingSource (val sort : Order): PagingSource<Int, GifsInfo>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int,  GifsInfo> {
 
         val page = params.key ?: 1 // API нумерует страницы с 1
 
         return try {
-            Timber.d("!!! ItemTopThisWeekPagingSource::load() page = $page sortTop:$sortTop")
+            Timber.d("!!! ItemTopThisWeekPagingSource::load() page = $page sortTop:$sort")
 
-            val response =  when(sortTop) {
-                SortTop.WEEK -> RedGifs.getTopThisWeek(100, page)
-                SortTop.MONTH -> RedGifs.getTopThisMonth(100, page)
-                SortTop.TRENDING -> RedGifs.getTopTrending(100, page)
-                SortTop.LATEST -> RedGifs.getTopLatest(100, page)
+            if (sort == Order.FORCE_TEMP) {
+                LoadResult.Page(
+                    data = emptyList(),
+                    prevKey = null,
+                    nextKey = page
+                )
+            }
+
+            val response =  when(sort) {
+                Order.WEEK -> RedGifs.getTopThisWeek(100, page)
+                Order.MONTH -> RedGifs.getTopThisMonth(100, page)
+                Order.TRENDING -> RedGifs.getTopTrending(100, page)
+                Order.LATEST -> RedGifs.getTopLatest(100, page)
                 else -> {
                     RedGifs.getTopThisWeek(100, page)
                 }
@@ -64,4 +72,3 @@ class ItemTopThisWeekPagingSource (val sortTop : SortTop): PagingSource<Int, Gif
         return null
     }
 }
-

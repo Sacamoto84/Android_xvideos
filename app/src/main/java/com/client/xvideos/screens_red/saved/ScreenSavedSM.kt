@@ -1,10 +1,13 @@
 package com.client.xvideos.screens_red.saved
 
 import cafe.adriel.voyager.core.model.ScreenModel
+import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
+import com.client.xvideos.screens_red.common.lazyrow123.LazyRow123Host
+import com.client.xvideos.screens_red.common.lazyrow123.TypePager
 import com.client.xvideos.screens_red.top_this_week.ScreenRedTopThisWeekSM
 import dagger.Binds
 import dagger.Module
@@ -14,15 +17,15 @@ import dagger.multibindings.IntoMap
 import javax.inject.Inject
 
 
-
-
 class ScreenSavedSM @Inject constructor(
     connectivityObserver: ConnectivityObserver
 ) : ScreenModel {
 
+    val likedHost =  LazyRow123Host(connectivityObserver = connectivityObserver, scope = screenModelScope, typePager = TypePager.LIKES)
 
-
-
+    init {
+        likedHost.columns = 2
+    }
 
 }
 

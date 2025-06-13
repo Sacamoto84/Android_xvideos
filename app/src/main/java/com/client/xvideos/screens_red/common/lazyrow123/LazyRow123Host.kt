@@ -8,12 +8,12 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.PagingSource
 import androidx.paging.cachedIn
-import cafe.adriel.voyager.core.model.screenModelScope
 import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.redgifs.types.Order
-import com.client.xvideos.screens_red.common.expand_menu_video.ExpandMenuVideoModel
-import com.client.xvideos.screens_red.niche.pagin3.ItemNailsPagingSource
+import com.client.xvideos.screens_red.common.pagin.ItemLikesPagingSource
+import com.client.xvideos.screens_red.common.pagin.ItemNailsPagingSource
+import com.client.xvideos.screens_red.common.pagin.ItemTopThisWeekPagingSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -23,20 +23,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-
-
 enum class TypePager {
     NICHES,
+    WEEK,
+    LIKES
 }
-
-
-
 
 class LazyRow123Host(
     val connectivityObserver: ConnectivityObserver,
@@ -74,7 +70,7 @@ class LazyRow123Host(
 
     @OptIn(ExperimentalCoroutinesApi::class, DelicateCoroutinesApi::class)
     // ✅ Один общий поток Pager для LazyPagingItems
-    val pagerFlow: Flow<PagingData<GifsInfo>> = sortType
+    val pager: Flow<PagingData<GifsInfo>> = sortType
         .flatMapLatest { sort ->
             Timber.d("!!! pager sort = $sort")
             Pager(
@@ -112,6 +108,13 @@ fun createPager(typePager: TypePager, sort : Order, extraString : String) : Pagi
         TypePager.NICHES -> {
             ItemNailsPagingSource(order = sort, nichesName = extraString)
         }
+        TypePager.WEEK -> {
+            ItemTopThisWeekPagingSource(sort)
+        }
+        TypePager.LIKES -> {
+            ItemLikesPagingSource(sort)
+        }
+
     }
     return pagingSourceFactory
 }

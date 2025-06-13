@@ -75,6 +75,8 @@ fun SortByOrder(list: List<Order>, selected: Order, onSelect: (Order) -> Unit) {
                 Order.BEST -> "Best"
                 Order.TOP28 -> "Top28"
                 Order.NEW -> "New"
+                Order.WEEK -> "Week"
+                Order.MONTH -> "Month"
             }
 
             BasicText(
@@ -124,6 +126,8 @@ fun SortByOrder(list: List<Order>, selected: Order, onSelect: (Order) -> Unit) {
                                 Order.BEST -> " Best"
                                 Order.TOP28 -> " Top28"
                                 Order.NEW -> " New"
+                                Order.WEEK -> "Week"
+                                Order.MONTH -> "Month"
                             }
 
                             Text(

@@ -10,7 +10,11 @@ enum class Order(val value: String) {
     TOP28("top28"),
     NEW("new"),
 
-    FORCE_TEMP("")
+    FORCE_TEMP(""),
+
+    WEEK("week"),
+
+    MONTH("month")
 
 }
 

@@ -88,33 +88,22 @@ data class ScreenRedNiche(val nicheName: String = "pumped-pussy") : Screen {
         }
 
 
-        val items = vm.lazyHost.pagerFlow.collectAsLazyPagingItems()
+
 
 
         Scaffold(modifier = Modifier.fillMaxSize(), containerColor = Color(0xFF0F0F0F)) {
 
             Box(modifier = Modifier.fillMaxSize().nestedScroll(nestedScrollConnection)) {
 
-                Timber.i("!!! 1 LazyRow123 items:${items}")
-
                 LazyRow123(
-                    columns = 2,
-                    listGifs = items,
-                    listUsers = UsersRed.listAllUsers,
+                    host = vm.lazyHost,
                     modifier = Modifier.fillMaxWidth(),
                     onClickOpenProfile = {
                         vm.lazyHost.currentIndexGoto = vm.lazyHost.currentIndex
                         navigator.push(ScreenRedProfile(it))
                     },
-                    onCurrentPosition = { index -> vm.lazyHost.currentIndex = index },
                     gotoPosition = vm.lazyHost.currentIndexGoto,
                     option = vm.expandMenuVideoList,
-                    onRefresh = {
-                        val temp = vm.lazyHost.sortType.value
-                        vm.lazyHost.changeSortType(Order.FORCE_TEMP)
-                        vm.lazyHost.changeSortType(temp)
-                    },
-                    isConnected = isConnected,
                     contentPadding = PaddingValues(top = toolbarHeight),
                     contentBeforeList = {
 

@@ -1,4 +1,4 @@
-package com.client.xvideos.screens_red.niche.pagin3
+package com.client.xvideos.screens_red.common.pagin
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
@@ -64,4 +64,3 @@ class ItemNailsPagingSource (val order : Order, val nichesName : String): Paging
         return null
     }
 }
-

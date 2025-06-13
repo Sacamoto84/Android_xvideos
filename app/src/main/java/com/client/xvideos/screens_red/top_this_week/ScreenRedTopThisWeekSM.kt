@@ -22,8 +22,10 @@ import com.client.xvideos.screens_red.common.downloader.DownloadRed
 import com.client.xvideos.screens_red.common.expand_menu_video.ExpandMenuVideoModel
 import com.client.xvideos.screens_red.top_this_week.model.SortTop
 import com.client.xvideos.screens_red.top_this_week.model.VisibleType
-import com.client.xvideos.screens_red.top_this_week.pagin3.ItemTopThisWeekPagingSource
+import com.client.xvideos.screens_red.common.pagin.ItemTopThisWeekPagingSource
 import com.client.xvideos.screens_red.common.favorite.FavoriteRed
+import com.client.xvideos.screens_red.common.lazyrow123.LazyRow123Host
+import com.client.xvideos.screens_red.common.lazyrow123.TypePager
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -47,6 +49,13 @@ class ScreenRedTopThisWeekSM @Inject constructor(
 init {
         Timber.d("!!!  ⚠\uFE0F ScreenRedTopThisWeekSM init {...} ")
 }
+
+
+    val lazyHost =
+        LazyRow123Host(
+            connectivityObserver = connectivityObserver, scope = screenModelScope,
+           typePager = TypePager.WEEK
+        )
 
 
     val isConnected = connectivityObserver
@@ -91,18 +100,6 @@ init {
         _scrollToTopAfterSortChange.value = false
         Timber.d("!!! SM: scrollToTopAfterSortChange set to false (consumed)")
     }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val pager: Flow<PagingData<GifsInfo>> = sortType
-        .flatMapLatest { sort ->
-            Timber.d("!!! ScreenRedTopThisWeekSM::pager sort = $sort")
-            Pager(
-                config = PagingConfig(pageSize = 109, prefetchDistance = 10, initialLoadSize = 109),
-                pagingSourceFactory = { ItemTopThisWeekPagingSource(sort) }
-            ).flow
-
-        }
-        .cachedIn(screenModelScope)
 
     init{
         FavoriteRed.refreshFavoriteList()
