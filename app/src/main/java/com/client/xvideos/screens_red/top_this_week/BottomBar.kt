@@ -1,14 +1,10 @@
 package com.client.xvideos.screens_red.top_this_week
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -17,12 +13,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.StarOutline
-import androidx.compose.material.icons.filled.Token
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.SegmentedButton
@@ -32,21 +24,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.client.xvideos.R
+import com.client.xvideos.feature.redgifs.types.Order
 import com.client.xvideos.screens_red.ThemeRed
 import com.client.xvideos.screens_red.common.downloader.ui.DownloadIndicator
+import com.client.xvideos.screens_red.common.ui.sortByOrder.SortByOrder
 import com.client.xvideos.screens_red.top_this_week.model.SortTop
-import com.composeunstyled.Checkbox
 
 @Composable
 fun BottomBar(
@@ -68,11 +57,11 @@ fun BottomBar(
                 .horizontalScroll(rememberScrollState()), verticalAlignment = Alignment.CenterVertically
         ) {
 
-            SortTopBy(
-                listOf(SortTop.WEEK, SortTop.MONTH, SortTop.TRENDING, SortTop.LATEST),
-                vm.sortType.collectAsStateWithLifecycle().value
+            SortByOrder(
+                listOf(Order.WEEK, Order.MONTH, Order.TRENDING, Order.LATEST),
+                vm.lazyHost.sortType.collectAsStateWithLifecycle().value
             ) {
-                vm.changeSortType(it)
+                vm.lazyHost.changeSortType(it)
             }
 
             Spacer(modifier = Modifier.width(4.dp))

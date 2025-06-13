@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.sp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import com.client.xvideos.feature.redgifs.types.GifsInfo
+import com.client.xvideos.feature.redgifs.types.Order
 import com.client.xvideos.feature.redgifs.types.UserInfo
 import com.client.xvideos.screens.common.urlVideImage.UrlImage
 import com.client.xvideos.screens_red.ThemeRed
@@ -31,7 +32,7 @@ import timber.log.Timber
 @Composable
 fun TikTokPow1(
     lazyPagingItems: LazyPagingItems<GifsInfo>,
-    currentSortType: SortTop,
+    currentSortType: Order,
     listUsers: List<UserInfo>, modifier: Modifier = Modifier,
     shouldScrollToTopAfterSortChange: Boolean = false,
     onScrollToTopIntentConsumed: () -> Unit, // Лямбда для сброса флага в SM

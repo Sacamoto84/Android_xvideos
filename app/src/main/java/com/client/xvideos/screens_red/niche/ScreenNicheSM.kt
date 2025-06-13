@@ -21,9 +21,8 @@ import com.client.xvideos.feature.redgifs.types.TopCreatorsResponse
 import com.client.xvideos.screens_red.common.block.BlockRed
 import com.client.xvideos.screens_red.common.downloader.DownloadRed
 import com.client.xvideos.screens_red.common.expand_menu_video.ExpandMenuVideoModel
-import com.client.xvideos.screens_red.common.favorite.FavoriteRed
-import com.client.xvideos.screens_red.common.lazyrow123.LazyRow123Host
-import com.client.xvideos.screens_red.common.lazyrow123.TypePager
+import com.client.xvideos.screens_red.common.ui.lazyrow123.LazyRow123Host
+import com.client.xvideos.screens_red.common.ui.lazyrow123.TypePager
 import com.client.xvideos.screens_red.common.saved.SavedRed
 import dagger.Binds
 import dagger.Module
@@ -80,11 +79,6 @@ class ScreenNicheSM @AssistedInject constructor(
             ExpandMenuVideoModel("Блокировать", Icons.Default.Block, onClick = {
                 if (it == null) return@ExpandMenuVideoModel
                 BlockRed.blockVisibleDialog = true
-            }),
-
-            ExpandMenuVideoModel("Фаворит", Icons.Default.StarBorder, onClick = {
-                if (it == null) return@ExpandMenuVideoModel
-                FavoriteRed.invertFavorite(it)
             }),
 
             ExpandMenuVideoModel("Like", Icons.Default.Favorite, onClick = {

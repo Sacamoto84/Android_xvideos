@@ -1,4 +1,4 @@
-package com.client.xvideos.screens_red.profile.bottom_bar.line1
+package com.client.xvideos.screens_red.common.ui.atom
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -30,8 +30,6 @@ fun DefaultPreview() {
 @Composable
 fun Selector(selectedIndex: Int, onSelect: (Int) -> Unit) {
 
-    val colorSelect = Color(0xFF1B1A33)
-
     Row(
 
         modifier = Modifier
@@ -42,7 +40,7 @@ fun Selector(selectedIndex: Int, onSelect: (Int) -> Unit) {
         Box(
             modifier = Modifier
                 .size(48.dp)
-                .background(if (selectedIndex == 2) colorSelect else ThemeRed.colorCommonBackground)
+                .background(if (selectedIndex == 2) ThemeRed.colorBorderSelect else ThemeRed.colorCommonBackground2)
                 .clickable { onSelect(2) },
 
             contentAlignment = Alignment.Center
@@ -51,7 +49,7 @@ fun Selector(selectedIndex: Int, onSelect: (Int) -> Unit) {
             Icon(
                 painter = painterResource(R.drawable.select_2),
                 contentDescription = null,
-                tint = Color.White, modifier = Modifier.size(20.dp)
+                tint = if (selectedIndex == 2) Color.White else ThemeRed.colorTextGray, modifier = Modifier.size(24.dp)
             )
         }
 
@@ -64,14 +62,14 @@ fun Selector(selectedIndex: Int, onSelect: (Int) -> Unit) {
         Box(
             modifier = Modifier
                 .size(48.dp)
-                .background(if (selectedIndex == 1) colorSelect else ThemeRed.colorCommonBackground)
+                .background(if (selectedIndex == 1) ThemeRed.colorBorderSelect else ThemeRed.colorCommonBackground2)
                 .clickable { onSelect(1) }, contentAlignment = Alignment.Center
         )
         {
             Icon(
                 painter = painterResource(R.drawable.select_1),
                 contentDescription = null,
-                tint = Color.White, modifier = Modifier.size(20.dp)
+                tint = if (selectedIndex == 1) Color.White else ThemeRed.colorTextGray, modifier = Modifier.size(24.dp)
             )
         }
 

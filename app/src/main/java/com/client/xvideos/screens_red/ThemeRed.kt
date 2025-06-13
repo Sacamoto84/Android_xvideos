@@ -30,9 +30,14 @@ object ThemeRed {
 
     val colorRed = Color(0xFFEA616F)
 
-    val colorTextGray = Color(0xFF868594)
+    val colorTextGray = Color(0xFF8B8B8B)
 
-    val colorBorderGray = Color(0xFF282740) //Окантовка
+
+
+
+
+    val colorBorderSelect = Color(0xFF272727) //
+    val colorBorderGray   = Color(0xFF3F3F3F) //Окантовка
 
 
 

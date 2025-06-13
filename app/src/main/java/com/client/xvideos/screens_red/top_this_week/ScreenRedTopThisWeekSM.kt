@@ -8,36 +8,26 @@ import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
-import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.screens_red.common.block.BlockRed
 import com.client.xvideos.screens_red.common.downloader.DownloadRed
 import com.client.xvideos.screens_red.common.expand_menu_video.ExpandMenuVideoModel
 import com.client.xvideos.screens_red.top_this_week.model.SortTop
 import com.client.xvideos.screens_red.top_this_week.model.VisibleType
-import com.client.xvideos.screens_red.common.pagin.ItemTopThisWeekPagingSource
-import com.client.xvideos.screens_red.common.favorite.FavoriteRed
-import com.client.xvideos.screens_red.common.lazyrow123.LazyRow123Host
-import com.client.xvideos.screens_red.common.lazyrow123.TypePager
+import com.client.xvideos.screens_red.common.ui.lazyrow123.LazyRow123Host
+import com.client.xvideos.screens_red.common.ui.lazyrow123.TypePager
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import timber.log.Timber
 import javax.inject.Inject
@@ -46,15 +36,14 @@ class ScreenRedTopThisWeekSM @Inject constructor(
     connectivityObserver: ConnectivityObserver
 ) : ScreenModel {
 
-init {
+    init {
         Timber.d("!!!  ⚠\uFE0F ScreenRedTopThisWeekSM init {...} ")
-}
-
+    }
 
     val lazyHost =
         LazyRow123Host(
             connectivityObserver = connectivityObserver, scope = screenModelScope,
-           typePager = TypePager.WEEK
+            typePager = TypePager.WEEK
         )
 
 
@@ -76,34 +65,9 @@ init {
     }
     //////////////
 
-    //////////////
-    // StateFlow текущего типа сортировки
-    private val _sortType = MutableStateFlow(SortTop.WEEK) // или "popular", "oldest"
-    val sortType: StateFlow<SortTop> = _sortType.asStateFlow()
 
-    fun changeSortType(newSort: SortTop) {
-        if (_sortType.value != newSort) { // Меняем, только если тип действительно новый
-            _sortType.value = newSort
-            _scrollToTopAfterSortChange.value = true // Устанавливаем флаг, что нужен сброс
-            Timber.d("!!! SM: Sort type changed to $newSort, scrollToTopAfterSortChange set to true")
-        }
-    }
     //////////////
 
-    // Новый State для отслеживания необходимости сброса
-    private val _scrollToTopAfterSortChange = MutableStateFlow(false)
-    val scrollToTopAfterSortChange: StateFlow<Boolean> = _scrollToTopAfterSortChange.asStateFlow()
-
-
-    // Вызовите это после того, как скролл был выполнен в UI
-    fun consumedScrollToTopIntent() {
-        _scrollToTopAfterSortChange.value = false
-        Timber.d("!!! SM: scrollToTopAfterSortChange set to false (consumed)")
-    }
-
-    init{
-        FavoriteRed.refreshFavoriteList()
-    }
 
 //    init {
 //        screenModelScope.launch {
@@ -155,23 +119,8 @@ init {
                 BlockRed.blockVisibleDialog = true
             }),
 
-            ExpandMenuVideoModel("Фаворит", Icons.Default.StarBorder, onClick = {
-                if (it == null) return@ExpandMenuVideoModel
-                FavoriteRed.invertFavorite(it)
-            }),
-
-
-        )
+            )
     //////////////////////////////////////////////////////////////////////////////////////////
-
-
-    var columns by mutableIntStateOf(1)             //Количество колонок
-    var currentIndex by mutableIntStateOf(0)
-    var currentIndexGoto by mutableIntStateOf(0)
-
-    override fun onDispose() {
-        Timber.d("!!!--------------- ScreenRedTopThisWeekSM::onDispose ///////////////////")
-    }
 
 }
 

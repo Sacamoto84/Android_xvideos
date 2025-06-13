@@ -21,16 +21,14 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
-import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.screens_red.ThemeRed
 import com.client.xvideos.screens_red.common.users.UsersRed
 import com.client.xvideos.screens_red.profile.ScreenRedProfile
-import com.client.xvideos.screens_red.top_this_week.model.SortTop
 import com.client.xvideos.screens_red.top_this_week.model.VisibleType
-import com.client.xvideos.screens_red.common.lazyrow123.LazyRow123
+import com.client.xvideos.screens_red.common.ui.lazyrow123.LazyRow123
 import com.client.xvideos.screens_red.top_this_week.row1.TikTokPow1
 import com.client.xvideos.screens_red.top_this_week.state.ErrorState
 import com.client.xvideos.screens_red.top_this_week.state.FullScreenLoading
@@ -48,12 +46,12 @@ class ScreenRedTopThisWeek : Screen {
 
         val items = vm.lazyHost.pager.collectAsLazyPagingItems()
 
-        val shouldScrollToTop by vm.scrollToTopAfterSortChange.collectAsState() // Подписываемся на флаг
+        val shouldScrollToTop by vm.lazyHost.scrollToTopAfterSortChange.collectAsState() // Подписываемся на флаг
         val visibleType by vm.visibleType.collectAsState()
 
         val isConnected by vm.isConnected.collectAsStateWithLifecycle()
 
-        Timber.i("!!! key:${key} --- currentIndex:${vm.currentIndex} currentIndexGoto:${vm.currentIndexGoto}")
+        Timber.i("!!! key:${key} --- currentIndex:${vm.lazyHost.currentIndex} currentIndexGoto:${vm.lazyHost.currentIndexGoto}")
 
 
 //        LaunchedEffect(Unit) {
@@ -64,7 +62,7 @@ class ScreenRedTopThisWeek : Screen {
         LaunchedEffect(visibleType) {
             //vm.currentIndexGoto =  vm.currentIndex
 
-            vm.columns = with(visibleType) {
+            vm.lazyHost.columns = with(visibleType) {
                 when (this) {
                     VisibleType.ONE -> 1
                     VisibleType.TWO -> 2
@@ -110,16 +108,16 @@ class ScreenRedTopThisWeek : Screen {
                 if (visibleType == VisibleType.PAGER) {
                     TikTokPow1(
                         lazyPagingItems = items,
-                        currentSortType = vm.sortType.collectAsState().value,
+                        currentSortType = vm.lazyHost.sortType.collectAsState().value,
                         listUsers = UsersRed.listAllUsers,
                         shouldScrollToTopAfterSortChange = shouldScrollToTop,
-                        onScrollToTopIntentConsumed = { vm.consumedScrollToTopIntent() },
+                        onScrollToTopIntentConsumed = { vm.lazyHost.consumedScrollToTopIntent() },
                         modifier = Modifier.fillMaxSize(),
                         onClickOpenProfile = { navigator.push(ScreenRedProfile(it)) },
                         onCurrentPosition = { index ->
-                            vm.currentIndex = index
+                            vm.lazyHost.currentIndex = index
                         },
-                        gotoPosition = vm.currentIndexGoto
+                        gotoPosition = vm.lazyHost.currentIndexGoto
                     )
                 }
 
@@ -128,8 +126,8 @@ class ScreenRedTopThisWeek : Screen {
                     LazyRow123(
                         vm.lazyHost,
                         modifier = Modifier.fillMaxSize(),
-                        onClickOpenProfile = { vm.currentIndexGoto =  vm.currentIndex; navigator.push(ScreenRedProfile(it)) },
-                        gotoPosition = vm.currentIndexGoto,
+                        onClickOpenProfile = { vm.lazyHost.currentIndexGoto =  vm.lazyHost.currentIndex; navigator.push(ScreenRedProfile(it)) },
+                        gotoPosition = vm.lazyHost.currentIndexGoto,
                         option = vm.expandMenuVideoList,
                     )
 
@@ -171,7 +169,7 @@ class ScreenRedTopThisWeek : Screen {
                     )
                 }
 
-                Text( vm.currentIndex.toString(), modifier = Modifier.align(Alignment.CenterEnd), color = Color.White)
+                Text( vm.lazyHost.currentIndex.toString(), modifier = Modifier.align(Alignment.CenterEnd), color = Color.White)
 
             }
 

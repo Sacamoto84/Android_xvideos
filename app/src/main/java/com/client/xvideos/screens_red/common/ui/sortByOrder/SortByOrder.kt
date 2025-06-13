@@ -1,5 +1,6 @@
-package com.client.xvideos.screens_red.profile.bottom_bar.line1
+package com.client.xvideos.screens_red.common.ui.sortByOrder
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -39,7 +40,7 @@ import com.client.xvideos.screens_red.ThemeRed
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SortBy(list: List<Order>, selected: Order, onSelect: (Order) -> Unit) {
+fun SortByOrder(list: List<Order>, selected: Order, onSelect: (Order) -> Unit) {
 
     var expanded by remember { mutableStateOf(false) }
 
@@ -56,26 +57,30 @@ fun SortBy(list: List<Order>, selected: Order, onSelect: (Order) -> Unit) {
                 .height(48.dp)
                 .menuAnchor(ExposedDropdownMenuAnchorType.SecondaryEditable)
                 .border(
-                    1.dp, ThemeRed.colorBorderGray,
+                    1.dp, Color(0xFF3A3A3A),
                     RoundedCornerShape(8.dp)
                 )
-                .clickable(
-                    onClick = {
-                        expanded = true
-                    }
-                ), horizontalArrangement = Arrangement.SpaceAround
+                .clickable(onClick = { expanded = true }), horizontalArrangement = Arrangement.SpaceAround
         ) {
 
+            val text = when (selected) {
+                Order.TOP -> "Top"
+                Order.LATEST -> "Latest"
+                Order.TRENDING -> "Trending"
+                Order.FORCE_TEMP -> "Refresh"
+                Order.OLDEST -> "Oldest"
+                Order.RECENT -> "Recent"
+                Order.BEST -> "Best"
+                Order.TOP28 -> "Top28"
+                Order.NEW -> "New"
+                Order.WEEK -> "Week"
+                Order.MONTH -> "Month"
+            }
+
             BasicText(
-                selected.value,
-                modifier = Modifier
-                    .padding(start = 8.dp)
-                    .align(Alignment.CenterVertically),
-                style = TextStyle(
-                    color = Color.White,
-                    fontFamily = ThemeRed.fontFamilyPopinsRegular,
-                    fontSize = 18.sp
-                )
+                text,
+                modifier = Modifier.padding(start = 8.dp).align(Alignment.CenterVertically),
+                style = TextStyle( color = Color.White, fontFamily = ThemeRed.fontFamilyDMsanss, fontSize = 18.sp)
             )
 
             Icon(
@@ -94,11 +99,8 @@ fun SortBy(list: List<Order>, selected: Order, onSelect: (Order) -> Unit) {
             expanded = expanded,
             onDismissRequest = { expanded = false },
             modifier = Modifier
-                //.width(120.dp)
-                .border(
-                    1.dp, ThemeRed.colorBorderGray,
-                    RoundedCornerShape(4.dp)
-                ), containerColor = ThemeRed.colorCommonBackground
+            , containerColor = Color(0xFF090909),
+            shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, ThemeRed.colorBorderGray)
         ) {
             list.forEach { option ->
 
@@ -106,30 +108,35 @@ fun SortBy(list: List<Order>, selected: Order, onSelect: (Order) -> Unit) {
                     text = {
 
                         Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(32.dp)
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(if (option.value == selected.value) ThemeRed.colorBorderGray else Color.Transparent)
-                                .padding(start = 8.dp), contentAlignment = Alignment.CenterStart
+                            modifier = Modifier.fillMaxWidth().height(32.dp).clip(RoundedCornerShape(8.dp))
+                                .background(if (option == selected) Color(0xFF222222) else Color.Transparent)
+                                //.padding(start = 8.dp)
+                            , contentAlignment = Alignment.CenterStart
                         ) {
 
+                            val text = when (option) {
+                                Order.TOP -> " Top"
+                                Order.LATEST -> " Latest"
+                                Order.TRENDING -> " Trending"
+                                Order.FORCE_TEMP -> " Refresh"
+                                Order.OLDEST -> " Oldest"
+                                Order.RECENT -> " Recent"
+                                Order.BEST -> " Best"
+                                Order.TOP28 -> " Top28"
+                                Order.NEW -> " New"
+                                Order.WEEK -> "Week"
+                                Order.MONTH -> "Month"
+                            }
+
                             Text(
-                                option.value,
-                                style = TextStyle(
-                                    color = Color.White,
-                                    fontFamily = ThemeRed.fontFamilyPopinsRegular,
-                                    fontSize = 18.sp,
-                                ),
+                                text,
+                                style = TextStyle(color = Color.White, fontFamily = ThemeRed.fontFamilyDMsanss, fontSize = 18.sp),
                                 modifier = Modifier
                             )
                         }
                     },
-                    onClick = {
-                        onSelect(option)
-                        expanded = false
-                    },
-                    //contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                    onClick = {onSelect(option); expanded = false},
+
                 )
             }
         }

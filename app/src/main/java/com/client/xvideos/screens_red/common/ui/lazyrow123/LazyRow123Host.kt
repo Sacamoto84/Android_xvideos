@@ -1,4 +1,4 @@
-package com.client.xvideos.screens_red.common.lazyrow123
+package com.client.xvideos.screens_red.common.ui.lazyrow123
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -97,7 +97,7 @@ class LazyRow123Host(
         Timber.d("!!! SM: scrollToTopAfterSortChange set to false (consumed)")
     }
 
-    var columns by mutableIntStateOf(1)             //Количество колонок
+    var columns by mutableIntStateOf(2)             //Количество колонок
     var currentIndex by mutableIntStateOf(0)
     var currentIndexGoto by mutableIntStateOf(0)
 

@@ -1,16 +1,14 @@
-package com.client.xvideos.screens_red.common.lazyrow123
+package com.client.xvideos.screens_red.common.ui.lazyrow123
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,15 +18,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.ProductionQuantityLimits
 import androidx.compose.material.icons.filled.Save
-import androidx.compose.material.icons.filled.StarOutline
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -44,15 +39,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import cafe.adriel.voyager.navigator.internal.BackHandler
-import com.client.xvideos.R
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.redgifs.types.Order
-import com.client.xvideos.feature.redgifs.types.UserInfo
 import com.client.xvideos.screens_red.common.block.BlockRed
 import com.client.xvideos.screens_red.common.block.ui.DialogBlock
 import com.client.xvideos.screens_red.common.downloader.DownloadRed
@@ -60,10 +50,8 @@ import com.client.xvideos.screens_red.common.video.player_row_mini.RedUrlVideoIm
 import com.client.xvideos.screens_red.common.expand_menu_video.ExpandMenuVideo
 import com.client.xvideos.screens_red.top_this_week.ProfileInfo1
 import com.client.xvideos.screens_red.common.expand_menu_video.ExpandMenuVideoModel
-import com.client.xvideos.screens_red.common.favorite.FavoriteRed
 import com.client.xvideos.screens_red.common.saved.SavedRed
 import com.client.xvideos.screens_red.common.users.UsersRed
-import com.client.xvideos.screens_red.top_this_week.model.SortTop
 import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
 import kotlin.math.max
@@ -85,10 +73,7 @@ fun LazyRow123(
 
     var fullScreen by remember { mutableStateOf(false) }
 
-    BackHandler {
-        if (fullScreen) fullScreen = false
-    }
-
+    BackHandler { if (fullScreen) fullScreen = false }
 
     val listGifs = host.pager.collectAsLazyPagingItems()
 
@@ -208,7 +193,7 @@ fun LazyRow123(
                         onVideo = { isVideo = it },
                         isVisibleView = false,
                         isVisibleDuration = false,
-                        play = centrallyLocatedOrMostVisibleItemIndex == index && host.columns == 1,
+                        play = false,//centrallyLocatedOrMostVisibleItemIndex == index && host.columns == 1,
                         isNetConnected = isConnected,
                         onVideoUri = { videoUri = it },
                         onFullScreen = {
@@ -241,8 +226,7 @@ fun LazyRow123(
 
                     AnimatedVisibility(
                         !isVideo, modifier = Modifier
-                            .fillMaxSize()
-                            .align(Alignment.BottomCenter),
+                            .fillMaxSize().align(Alignment.BottomCenter),
                         enter = slideInVertically(
                             initialOffsetY = { fullHeight -> fullHeight }, // снизу вверх
                             animationSpec = tween(durationMillis = 200)
@@ -260,42 +244,14 @@ fun LazyRow123(
 
                             //✅ Лайк
                             if (SavedRed.likesList.any { it.id == item.id }) {
-                                Icon(
-                                    Icons.Filled.FavoriteBorder,
-                                    contentDescription = null,
-                                    tint = Color.Yellow,
-                                    modifier = Modifier
-                                        .padding(bottom = 6.dp, end = 6.dp)
-                                        .size(18.dp)
-                                )
+                                Icon(Icons.Filled.FavoriteBorder, contentDescription = null,
+                                    tint = Color.Yellow, modifier = Modifier.padding(bottom = 6.dp, end = 6.dp).size(18.dp))
                             }
 
-//                            //✅ Фаворит
-//                            if (FavoriteRed.favoriteList.contains(item.id)) {
-//                                Icon(Icons.Filled.StarOutline, contentDescription = null, tint = Color.Yellow, modifier = Modifier
-//                                    .padding(bottom = 6.dp, end = 6.dp)
-//                                    .size(18.dp))
-//                            }
-//
-////                            //✅ Иконка верифицированного пользователя
-//                            if ((UsersRed.listAllUsers.firstOrNull{ it.username == item.userName }?.verified == true) ){
-//                                Image(painter = painterResource(id = R.drawable.verificed),
-//                                    contentDescription = null, modifier = Modifier
-//                                        .padding(bottom = 6.dp, end = 6.dp)
-//                                        .size(18.dp)
-//                                )
-//                            }
-//
                             //✅ Иконка того что видео скачано
                             if (DownloadRed.downloadList.contains(item.id)) {
-                                Icon(
-                                    Icons.Default.Save,
-                                    contentDescription = null,
-                                    tint = Color.White,
-                                    modifier = Modifier
-                                        .padding(bottom = 6.dp, end = 6.dp)
-                                        .size(18.dp)
-                                )
+                                Icon(Icons.Default.Save, contentDescription = null,
+                                    tint = Color.White, modifier = Modifier.padding(bottom = 6.dp, end = 6.dp).size(18.dp))
                             }
 
                         }

@@ -11,10 +11,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.client.xvideos.screens_red.ThemeRed
+import com.client.xvideos.screens_red.common.ui.atom.Selector
+import com.client.xvideos.screens_red.common.ui.sortByOrder.SortByOrder
 import com.client.xvideos.screens_red.profile.ScreenRedProfileSM
 import timber.log.Timber
 
@@ -36,7 +37,7 @@ fun FeedControls_Container_Line1(vm: ScreenRedProfileSM) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         //--- Feed Ordering Control ---
-        SortBy(vm.orderList, vm.order) {
+        SortByOrder(vm.orderList, vm.order) {
             vm.order = it
             vm.clear()
             //vm.loadNextPage()
@@ -49,7 +50,7 @@ fun FeedControls_Container_Line1(vm: ScreenRedProfileSM) {
                 .padding(horizontal = 4.dp)
                 .weight(1f)
                 .border(1.dp, ThemeRed.colorBorderGray, RoundedCornerShape(8.dp))
-                .background(Color.Transparent)
+                .background(ThemeRed.colorCommonBackground2)
         ) {
             GifTypes_Control(vm)
         }

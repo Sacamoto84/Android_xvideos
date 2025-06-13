@@ -110,30 +110,6 @@ class ScreenRedProfile(val profileName: String) : Screen {
         }
         //🟨🟨🟨🟨🟨🟨🟨🟨⬆️⬆️⬆️⬆️⬆️❗
 
-
-//        // триггерим подгрузку, когда остаётся ≤6 элементов до конца
-//        LaunchedEffect(gridState) {
-//            withContext(Dispatchers.IO) {
-//                snapshotFlow { gridState.layoutInfo }
-//                    .distinctUntilChanged()
-//                    .collect { info ->
-//                        val last = info.visibleItemsInfo.lastOrNull()?.index ?: 0
-//                        visibleItems = last
-//                        //Timber.d("!!! prevIndex = $prevIndex")
-//                        //Timber.d("!!! last = $last")
-//                        //Timber.d("!!! info.totalItemsCount = ${info.totalItemsCount}")
-//
-//                        // Триггер только если движемся ВНИЗ
-//                        if (last > prevIndex) {
-//                            val total = info.totalItemsCount
-//                            //if (total - last <= 6)
-//                            //vm.loadNextPage()
-//                        }
-//                        prevIndex = last
-//                    }
-//            }
-//        }
-
         Scaffold(
             bottomBar = {
                 Column {
@@ -146,7 +122,7 @@ class ScreenRedProfile(val profileName: String) : Screen {
                             .height(16.dp)
                             .fillMaxWidth()
                             //.alpha(al.value)
-                            .background(Color.Black), contentAlignment = Alignment.BottomCenter
+                            .background(ThemeRed.colorCommonBackground2), contentAlignment = Alignment.BottomCenter
                     ) {
 
                         CanvasTimeDurationLine(
@@ -179,7 +155,7 @@ class ScreenRedProfile(val profileName: String) : Screen {
                     BottomBar(vm)
                 }
             },
-            containerColor = Color.Black
+            containerColor = ThemeRed.colorCommonBackground2
         ) {
             Box(Modifier.padding(bottom = it.calculateBottomPadding())) {
 

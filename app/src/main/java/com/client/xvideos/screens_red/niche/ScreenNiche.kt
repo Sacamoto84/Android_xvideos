@@ -32,7 +32,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.paging.compose.collectAsLazyPagingItems
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
@@ -40,9 +39,9 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.feature.redgifs.types.Order
-import com.client.xvideos.screens_red.common.lazyrow123.LazyRow123
-import com.client.xvideos.screens_red.common.sortByOrder.SortByOrder
-import com.client.xvideos.screens_red.common.users.UsersRed
+import com.client.xvideos.screens_red.common.ui.atom.Selector
+import com.client.xvideos.screens_red.common.ui.lazyrow123.LazyRow123
+import com.client.xvideos.screens_red.common.ui.sortByOrder.SortByOrder
 import com.client.xvideos.screens_red.niche.atom.NichePreview
 import com.client.xvideos.screens_red.niche.atom.NicheProfile
 import com.client.xvideos.screens_red.niche.atom.NicheTopCreator
@@ -150,6 +149,8 @@ data class ScreenRedNiche(val nicheName: String = "pumped-pussy") : Screen {
 
             Button(onClick = {navigator.push(ScreenRedSaved())}) {
             }
+
+            Selector(vm.lazyHost.columns) { vm.lazyHost.columns  = it }
 
         }
 
