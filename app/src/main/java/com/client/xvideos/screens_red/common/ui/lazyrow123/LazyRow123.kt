@@ -68,76 +68,63 @@ fun LazyRow123(
     contentBeforeList: @Composable (() -> Unit) = {}
 ) {
 
+    SideEffect { Timber.d("!!! LazyRow2::SideEffect columns: ${host.columns} gotoPosition: $gotoPosition") }
 
     Timber.i("!!! 2 LazyRow123")
 
+    val listGifs = host.pager.collectAsLazyPagingItems()
+
     var fullScreen by remember { mutableStateOf(false) }
+    val isConnected by host.isConnected.collectAsState()
+    val state = rememberLazyGridState()
+    var blockItem by remember { mutableStateOf<GifsInfo?>(null) }
 
     BackHandler { if (fullScreen) fullScreen = false }
 
-    val listGifs = host.pager.collectAsLazyPagingItems()
-
-    val isConnected by host.isConnected.collectAsState()
-
     if (listGifs.itemCount == 0) return
 
-    SideEffect { Timber.d("!!! LazyRow2::SideEffect columns: ${host.columns} gotoPosition: $gotoPosition") }
-
-    val state = rememberLazyGridState()
-
-
-    val centrallyLocatedOrMostVisibleItemIndex by remember {
-        derivedStateOf {
-            val layoutInfo = state.layoutInfo
-            val visibleItemsInfo = layoutInfo.visibleItemsInfo
-            if (visibleItemsInfo.isEmpty()) {
-                return@derivedStateOf state.firstVisibleItemIndex // Или 0, или -1 как индикатор отсутствия
-            }
-
-            val viewportHeight = layoutInfo.viewportSize.height
-
-            val viewportCenterY = layoutInfo.viewportStartOffset + viewportHeight / 2
-
-            var bestCandidateIndex = -1
-
-            bestCandidateIndex = visibleItemsInfo.maxByOrNull { itemInfo ->
-                val itemTop = itemInfo.offset.y
-                val itemBottom = itemInfo.offset.y + itemInfo.size.height
-                val visibleTop = max(itemTop, layoutInfo.viewportStartOffset)
-                val visibleBottom = min(itemBottom, layoutInfo.viewportEndOffset)
-                val visibleHeight = max(0f, (visibleBottom - visibleTop).toFloat())
-                visibleHeight // Можно использовать просто видимую высоту, если ширина у всех элементов одинаковая в LazyVerticalGrid
-                // visibleHeight * itemInfo.size.width // Если ширина может отличаться (маловероятно в Fixed)
-            }?.index ?: state.firstVisibleItemIndex
-
-
-            // --- ВАРИАНТ 2: Ближайший к центру viewport ---
-//            bestCandidateIndex = visibleItemsInfo.minByOrNull { itemInfo ->
-//                val itemCenterY = itemInfo.offset.y + itemInfo.size.height / 2f
-//                abs(itemCenterY - viewportCenterY)
+//    val centrallyLocatedOrMostVisibleItemIndex by remember {
+//        derivedStateOf {
+//            val layoutInfo = state.layoutInfo
+//            val visibleItemsInfo = layoutInfo.visibleItemsInfo
+//            if (visibleItemsInfo.isEmpty()) {
+//                return@derivedStateOf state.firstVisibleItemIndex // Или 0, или -1 как индикатор отсутствия
+//            }
+//
+//            val viewportHeight = layoutInfo.viewportSize.height
+//
+//            val viewportCenterY = layoutInfo.viewportStartOffset + viewportHeight / 2
+//
+//            var bestCandidateIndex = -1
+//
+//            bestCandidateIndex = visibleItemsInfo.maxByOrNull { itemInfo ->
+//                val itemTop = itemInfo.offset.y
+//                val itemBottom = itemInfo.offset.y + itemInfo.size.height
+//                val visibleTop = max(itemTop, layoutInfo.viewportStartOffset)
+//                val visibleBottom = min(itemBottom, layoutInfo.viewportEndOffset)
+//                val visibleHeight = max(0f, (visibleBottom - visibleTop).toFloat())
+//                visibleHeight // Можно использовать просто видимую высоту, если ширина у всех элементов одинаковая в LazyVerticalGrid
+//                // visibleHeight * itemInfo.size.width // Если ширина может отличаться (маловероятно в Fixed)
 //            }?.index ?: state.firstVisibleItemIndex
-
-
-            bestCandidateIndex
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        snapshotFlow { centrallyLocatedOrMostVisibleItemIndex }.collectLatest { visibleIndex ->
-            if (visibleIndex != -1) {
-                host.currentIndex = visibleIndex
-            }
-        }
-    }
+//
+//
+//            // --- ВАРИАНТ 2: Ближайший к центру viewport ---
+////            bestCandidateIndex = visibleItemsInfo.minByOrNull { itemInfo ->
+////                val itemCenterY = itemInfo.offset.y + itemInfo.size.height / 2f
+////                abs(itemCenterY - viewportCenterY)
+////            }?.index ?: state.firstVisibleItemIndex
+//
+//
+//            bestCandidateIndex
+//        }
+//    }
 
     LaunchedEffect(gotoPosition) {
-        if (gotoPosition >= 0 && gotoPosition < listGifs.itemCount) {
-            state.scrollToItem(gotoPosition)
-        }
+        if (gotoPosition >= 0 && gotoPosition < listGifs.itemCount) {state.scrollToItem(gotoPosition)}
     }
 
-    var blockItem by remember { mutableStateOf<GifsInfo?>(null) }
 
+    //Диалог для блокировки
     if (BlockRed.blockVisibleDialog) {
         DialogBlock(
             visible = BlockRed.blockVisibleDialog,
@@ -161,18 +148,13 @@ fun LazyRow123(
         modifier = Modifier.then(modifier),
         contentPadding = contentPadding,
     ) {
-
-        item(key = "before", span = { GridItemSpan(maxLineSpan) }) {
-            contentBeforeList()
-        }
+        item(key = "before", span = { GridItemSpan(maxLineSpan) }) {contentBeforeList()}
 
         items(
             count = listGifs.itemCount,
-            //key = { index -> listGifs[index]!!.id }
         ) { index ->
 
             var isVideo by remember { mutableStateOf(false) }
-
             val item = listGifs[index]
 
             var videoUri by remember { mutableStateOf("") }
@@ -180,11 +162,8 @@ fun LazyRow123(
             if (item != null) {
 
                 Box(
-                    modifier = Modifier
-                        .padding(vertical = 8.dp)
-                        .fillMaxSize()
-                        .clip(RoundedCornerShape(16.dp))
-                        .border(1.dp, Color.DarkGray, RoundedCornerShape(16.dp)),
+                    modifier = Modifier.padding(vertical = 8.dp).padding(horizontal = 4.dp).fillMaxSize()
+                        .clip(RoundedCornerShape(16.dp)).border(1.dp, Color.DarkGray, RoundedCornerShape(16.dp)),
                     contentAlignment = Alignment.Center
                 ) {
 
@@ -206,7 +185,7 @@ fun LazyRow123(
                     ExpandMenuVideo(
                         modifier = Modifier.align(Alignment.TopEnd),
                         option = option,
-                        item,
+                        item = item,
                         onClick = {
                             blockItem = item //Для блока и идентификации и тема
                         })
@@ -245,7 +224,7 @@ fun LazyRow123(
                             //✅ Лайк
                             if (SavedRed.likesList.any { it.id == item.id }) {
                                 Icon(Icons.Filled.FavoriteBorder, contentDescription = null,
-                                    tint = Color.Yellow, modifier = Modifier.padding(bottom = 6.dp, end = 6.dp).size(18.dp))
+                                    tint = Color.White, modifier = Modifier.padding(bottom = 6.dp, end = 6.dp).size(18.dp))
                             }
 
                             //✅ Иконка того что видео скачано

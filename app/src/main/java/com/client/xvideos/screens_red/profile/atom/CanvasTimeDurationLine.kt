@@ -21,10 +21,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 
 
-
-
-
-
 @Composable
 fun CanvasTimeDurationLine(currentTime: Float, duration: Int, timeA: Float = 0f, timeB: Float = 1f , timeABEnable : Boolean, play : Boolean = false) {
 
@@ -115,9 +111,11 @@ fun CanvasTimeDurationLinePreview() {
 fun CanvasTimeDurationLine(
     currentTime: Float,
     duration: Int,
+    modifier: Modifier = Modifier,
     timeA: Float = 0f,
     timeB: Float = 1f,
     timeABEnable: Boolean,
+    visibleAB : Boolean = true,
     play: Boolean = false,
     onSeek: (Float) -> Unit,              // 🔹 при перетаскивании
     onSeekFinished: (() -> Unit)? = null  // 🔹 когда отпустили
@@ -126,8 +124,7 @@ fun CanvasTimeDurationLine(
     var isDragging by remember { mutableStateOf(false) }
 
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = Modifier.fillMaxWidth()
             .height(32.dp) // Даем побольше места для перетаскивания
             .pointerInput(Unit) {
                 detectDragGestures(
@@ -148,7 +145,7 @@ fun CanvasTimeDurationLine(
             }
     ) {
         Canvas(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.then(modifier).fillMaxSize()
         ) {
             val canvasWidth = size.width
             val canvasHeight = size.height
@@ -158,7 +155,7 @@ fun CanvasTimeDurationLine(
                 color = Color(0x80909090),
                 start = Offset(x = 0f, y = canvasHeight / 2),
                 end = Offset(x = canvasWidth, y = canvasHeight / 2),
-                strokeWidth = 4.dp.toPx(),
+                strokeWidth = 2.dp.toPx(),
                 cap = StrokeCap.Square
             )
 
@@ -173,36 +170,38 @@ fun CanvasTimeDurationLine(
                         color = Color(0xFFE73538),
                         start = Offset(x = 0f, y = canvasHeight / 2),
                         end = Offset(x = progressWidth, y = canvasHeight / 2),
-                        strokeWidth = 4.dp.toPx(),
+                        strokeWidth = 2.dp.toPx(),
                         cap = StrokeCap.Square
                     )
                 }
 
                 // Индикатор (ползунок)
-//                drawCircle(
-//                    color = Color(0xFFE73538),
-//                    center = Offset(progressWidth, canvasHeight / 2),
-//                    radius = 8.dp.toPx()
-//                )
+                drawCircle(
+                    color = Color(0xFFE73538),
+                    center = Offset(progressWidth, canvasHeight / 2),
+                    radius = 3.dp.toPx()
+                )
 
                 //Индикатор
-                drawLine(
-                    color = Color(0xFFE73538), // Цвет активного прогресса
-                    start = Offset(x = progressWidth, y = 2.dp.toPx()),
-                    end = Offset(x = progressWidth, y = canvasHeight - 2.dp.toPx()),
-                    strokeWidth = 4.dp.toPx(),
-                    cap = StrokeCap.Round // Закругленные концы
-                )
+//                drawLine(
+//                    color = Color(0xFFE73538), // Цвет активного прогресса
+//                    start = Offset(x = progressWidth, y = 2.dp.toPx()),
+//                    end = Offset(x = progressWidth, y = canvasHeight - 2.dp.toPx()),
+//                    strokeWidth = 4.dp.toPx(),
+//                    cap = StrokeCap.Round // Закругленные концы
+//                )
 
 
                 // Отрезок A-B
-                drawLine(
-                    color = Color(0xFF8BC34A),
-                    start = Offset(x = progressRatioA, y = canvasHeight / 2 - 4.dp.toPx()),
-                    end = Offset(x = progressRatioB, y = canvasHeight / 2 - 4.dp.toPx()),
-                    strokeWidth = 4.dp.toPx(),
-                    cap = StrokeCap.Square
-                )
+                if (visibleAB) {
+                    drawLine(
+                        color = Color(0xFF8BC34A),
+                        start = Offset(x = progressRatioA, y = canvasHeight / 2 - 4.dp.toPx()),
+                        end = Offset(x = progressRatioB, y = canvasHeight / 2 - 4.dp.toPx()),
+                        strokeWidth = 2.dp.toPx(),
+                        cap = StrokeCap.Square
+                    )
+                }
 
             }
         }

@@ -134,7 +134,7 @@ class ScreenRedProfile(val profileName: String) : Screen {
                                     vm.currentPlayerControls!!.seekTo(it)
                                 }
                             },
-                            onSeekFinished = { }
+                            onSeekFinished = { }, modifier = Modifier.padding(end = 148.dp)
                         )
 
                         BasicText(
@@ -142,10 +142,10 @@ class ScreenRedProfile(val profileName: String) : Screen {
                             style = TextStyle(
                                 color = Color.White,
                                 fontFamily = ThemeRed.fontFamilyPopinsRegular,
-                                fontSize = 12.sp
+                                fontSize = 8.sp
                             ),
                             modifier = Modifier
-                                .align(Alignment.TopEnd)
+                                //.align(Alignment.TopEnd)
                                 .offset(x = 0.dp, y = (-0).dp)
                         )
 

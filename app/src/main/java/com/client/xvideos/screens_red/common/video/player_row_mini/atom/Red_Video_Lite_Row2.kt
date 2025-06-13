@@ -1,11 +1,16 @@
 package com.client.xvideos.screens_red.common.video.player_row_mini.atom
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.client.xvideos.BuildConfig
@@ -30,6 +36,7 @@ import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.Screen
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.VideoPlayerConfig
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.ui.video.VideoPlayerWithControl
 import com.client.xvideos.screens_red.ThemeRed
+import com.client.xvideos.screens_red.profile.atom.CanvasTimeDurationLine
 import timber.log.Timber
 
 
@@ -40,7 +47,6 @@ import timber.log.Timber
 fun Red_Video_Lite_Row2(
     url: String,
     play: Boolean = true,
-    modifier: Modifier = Modifier,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
     overlayBottomEnd: @Composable () -> Unit = {},
@@ -64,18 +70,6 @@ fun Red_Video_Lite_Row2(
 
         playerHost.onEvent = { event ->
             when (event) {
-                is MediaPlayerEvent.MuteChange -> {
-                    println("!!! Mute status changed: ${event.isMuted}")
-                }
-
-                is MediaPlayerEvent.PauseChange -> {
-                    println("!!!Pause status changed: ${event.isPaused}")
-                }
-
-                is MediaPlayerEvent.BufferChange -> {
-                    println("???Buffering status: ${event.isBuffering}")
-                    //isBuffering = event.isBuffering
-                }
 
                 is MediaPlayerEvent.CurrentTimeChange -> {
                     //println("!!!Current playback time: ${event.currentTime}s")
@@ -83,8 +77,8 @@ fun Red_Video_Lite_Row2(
                 }
 
                 is MediaPlayerEvent.TotalTimeChange -> {
-                    println("!!!Video duration updated: ${event.totalTime}s")
-                    duration = event.totalTime.toInt()
+                    //println("!!!Video duration updated: ${event.totalTime}s")
+                    duration = event.totalTime
                 }
 
                 else -> {}
@@ -94,20 +88,38 @@ fun Red_Video_Lite_Row2(
 
     Box(modifier = Modifier.fillMaxWidth()) {
         StaticVideoPlayer(playerHost)
-        TimeDuration(time, duration, modifier = Modifier.align(Alignment.TopStart))
-        Box(modifier = Modifier.fillMaxSize().combinedClickable(onClick = onClick, onLongClick = onLongClick))
-        Box(Modifier.align(Alignment.BottomEnd)){ overlayBottomEnd.invoke() }
-        Box(Modifier.padding(horizontal = 16.dp).align(Alignment.BottomCenter)){ CanvasTimeDurationLine(time, duration) }
+
+
+        Box(modifier = Modifier.padding(bottom = 48.dp).fillMaxSize().combinedClickable(onClick = onClick, onLongClick = onLongClick))
+
+
+        Row (Modifier.fillMaxWidth().align(Alignment.BottomEnd), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Bottom) {
+            Box(modifier = Modifier.padding(start = 16.dp).fillMaxWidth().weight(1f)) {
+
+                TimeDuration(time, duration, modifier = Modifier.align(Alignment.TopStart).offset((-2).dp, (-6).dp) )
+
+                CanvasTimeDurationLine(
+                    time, duration, timeA = 0f, timeB = 0f,
+                    timeABEnable = false, visibleAB = false,
+                    play = play, onSeek = { playerHost.seekTo(it) },
+                    onSeekFinished = {}, modifier = Modifier.padding(start = 0.dp, end = 0.dp)
+                )
+            }
+            Box(modifier = Modifier.size(48.dp)) {
+                overlayBottomEnd.invoke()
+            }
+        }
+
     }
 
 }
 
 
 @Composable
-private fun TimeDuration(time : Float, duration: Int, modifier: Modifier = Modifier) {
+private fun TimeDuration(time: Float, duration: Int, modifier: Modifier = Modifier) {
     Text(
-        "%02d/%02d".format(time.toInt(), duration), modifier = Modifier.padding(start = 8.dp).then(modifier), color = Color.White, fontFamily = ThemeRed.fontFamilyPopinsRegular,
-        fontSize = 8.sp
+        "%02d/%02d".format(time.toInt(), duration), modifier = Modifier.then(modifier), color = Color.White, fontFamily = FontFamily.Monospace,
+        fontSize = 10.sp
     )
 }
 
@@ -144,57 +156,50 @@ private fun StaticVideoPlayer(playerHost: MediaPlayerHost) {
     )
 }
 
-@Composable
-private fun CanvasTimeDurationLine(currentTime: Float, duration: Int) {
 
-    Canvas(
-        modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp)
-    ) {
-        val canvasWidth = size.width
-        val canvasHeight = size.height // Будет равно progressHeight
-
-        // 1. Рисуем фон (полная длительность)
-        drawLine(
-            color = Color(0xFF909090), // Цвет фона прогресс-бара
-            start = Offset(x = 0f, y = canvasHeight / 2),
-            end = Offset(x = canvasWidth, y = canvasHeight / 2),
-            strokeWidth = canvasHeight,
-            cap = StrokeCap.Square // Закругленные концы
-        )
-
-        // 2. Рассчитываем и рисуем текущий прогресс
-        if (duration > 0) { // Убедимся, что длительность известна и не равна нулю
-
-            val progressRatio = currentTime / duration.toFloat()
-
-            val progressWidth = canvasWidth * progressRatio.coerceIn(0f, 1f)
-
-            drawLine(
-                color = Color(0xFFE74658), // Цвет активного прогресса
-                start = Offset(x = 0f, y = canvasHeight / 2),
-                end = Offset(x = progressWidth, y = canvasHeight / 2),
-                strokeWidth = 1.5.dp.toPx(),
-                cap = StrokeCap.Square // Закругленные концы
-            )
-
-            //Индикатор
-            drawCircle(
-                color = Color(0xFFE74658),
-                center = Offset(progressWidth, canvasHeight / 2),
-                radius = 2.dp.toPx()
-            )
-
+//@Composable
+//private fun CanvasTimeDurationLine(currentTime: Float, duration: Int) {
+//
+//    Canvas(
+//        modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp)
+//    ) {
+//        val canvasWidth = size.width
+//        val canvasHeight = size.height // Будет равно progressHeight
+//
+//        // 1. Рисуем фон (полная длительность)
+//        drawLine(
+//            color = Color(0xFF909090), // Цвет фона прогресс-бара
+//            start = Offset(x = 0f, y = canvasHeight / 2),
+//            end = Offset(x = canvasWidth, y = canvasHeight / 2),
+//            strokeWidth = canvasHeight,
+//            cap = StrokeCap.Square // Закругленные концы
+//        )
+//
+//        // 2. Рассчитываем и рисуем текущий прогресс
+//        if (duration > 0) { // Убедимся, что длительность известна и не равна нулю
+//
+//            val progressRatio = currentTime / duration.toFloat()
+//
+//            val progressWidth = canvasWidth * progressRatio.coerceIn(0f, 1f)
+//
 //            drawLine(
-//                color = Color(0xFFECF95C), // Цвет активного прогресса
-//                start = Offset(x = progressWidth, y = canvasHeight / 2),
+//                color = Color(0xFFE74658), // Цвет активного прогресса
+//                start = Offset(x = 0f, y = canvasHeight / 2),
 //                end = Offset(x = progressWidth, y = canvasHeight / 2),
-//                strokeWidth = canvasHeight,
-//                cap = StrokeCap.Round // Закругленные концы
+//                strokeWidth = 1.5.dp.toPx(),
+//                cap = StrokeCap.Square // Закругленные концы
 //            )
-
-        }
-
-
-    }
-
-}
+//
+//            //Индикатор
+//            drawCircle(
+//                color = Color(0xFFE74658),
+//                center = Offset(progressWidth, canvasHeight / 2),
+//                radius = 2.dp.toPx()
+//            )
+//
+//        }
+//
+//
+//    }
+//
+//}
