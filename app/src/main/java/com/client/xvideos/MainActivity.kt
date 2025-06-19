@@ -23,9 +23,10 @@ import coil.ImageLoaderFactory
 import coil.memory.MemoryCache
 import coil.request.CachePolicy
 import com.client.xvideos.PermissionScreenActivity.PermissionStorage
+import com.client.xvideos.red.screens.explorer.ScreenRedExplorer
 import com.client.xvideos.screens.videoplayer.video.cache.VideoPlayerCacheManager
-import com.client.xvideos.screens_red.niche.ScreenRedNiche
-import com.client.xvideos.screens_red.top_this_week.ScreenRedTopThisWeek
+import com.client.xvideos.red.screens.niche.ScreenRedNiche
+import com.client.xvideos.red.screens.top_this_week.ScreenRedTopThisWeek
 import com.client.xvideos.ui.theme.XvideosTheme
 import com.client.xvideos.util.KeepScreenOn
 import dagger.hilt.android.AndroidEntryPoint
@@ -122,7 +123,9 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
 
                     //Navigator(startScreen, key = "1")
                     Timber.d("!!! Navigator(ScreenRedNiche())")
-                    Navigator(ScreenRedNiche())
+                    //Navigator(ScreenRedNiche())
+
+                    Navigator(ScreenRedExplorer())
                 }
 
             }

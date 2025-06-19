@@ -2,11 +2,10 @@ package com.client.xvideos
 
 import android.app.Application
 import com.client.xvideos.feature.redgifs.db.clearOldCache
-import com.client.xvideos.feature.redgifs.http.RedGifs
 import com.client.xvideos.feature.room.AppDatabase
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.PlaybackPreference
-import com.client.xvideos.screens_red.common.block.BlockRed
-import com.client.xvideos.screens_red.common.saved.SavedRed
+import com.client.xvideos.red.common.block.BlockRed
+import com.client.xvideos.red.common.saved.SavedRed
 import com.kdownloader.KDownloader
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.DelicateCoroutinesApi

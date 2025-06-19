@@ -2,7 +2,7 @@ package com.client.xvideos.feature
 
 import com.client.xvideos.App
 import com.client.xvideos.AppPath
-import com.client.xvideos.screens_red.common.downloader.DownloadRed
+import com.client.xvideos.red.common.downloader.DownloadRed
 import com.client.xvideos.util.Toast
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
