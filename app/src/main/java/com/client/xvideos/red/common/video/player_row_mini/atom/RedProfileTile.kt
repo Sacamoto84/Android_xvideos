@@ -21,8 +21,8 @@ import com.client.xvideos.R
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.screens.common.urlVideImage.UrlImage
 import com.client.xvideos.red.ThemeRed
-import com.client.xvideos.red.screens.profile.atom.toMinSec
-import com.client.xvideos.red.screens.profile.atom.toPrettyCount
+import com.client.xvideos.util.toMinSec
+import com.client.xvideos.util.toPrettyCount
 import com.composables.core.Icon
 
 @Composable

@@ -1,5 +1,6 @@
 package com.client.xvideos.red.common.ui.lazyrow123
 
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
@@ -49,6 +50,8 @@ class LazyRow123Host(
     val startOrder : Order = Order.LATEST,
     val startColumns : Int = 2
 ) {
+
+    val state: LazyGridState = LazyGridState()
 
     val isConnected = connectivityObserver.isConnected.stateIn(scope, SharingStarted.WhileSubscribed(5000L), false)
 

@@ -66,15 +66,13 @@ fun LazyRow123(
     contentBeforeList: @Composable (() -> Unit) = {}
 ) {
 
-    SideEffect { Timber.d("!!! LazyRow2::SideEffect columns: ${host.columns} gotoPosition: $gotoPosition") }
-
-    Timber.i("!!! 2 LazyRow123")
+    SideEffect { Timber.d("!!! LazyRow123::SideEffect columns: ${host.columns} gotoPosition: $gotoPosition") }
 
     val listGifs = host.pager.collectAsLazyPagingItems() as LazyPagingItems<GifsInfo>
 
     var fullScreen by remember { mutableStateOf(false) }
     val isConnected by host.isConnected.collectAsState()
-    val state = rememberLazyGridState()
+    val state = host.state//rememberLazyGridState()
     var blockItem by remember { mutableStateOf<GifsInfo?>(null) }
 
     val navigator = LocalNavigator.currentOrThrow
@@ -125,9 +123,9 @@ fun LazyRow123(
 //        }
 //    }
 
-    LaunchedEffect(gotoPosition) {
-        if (gotoPosition >= 0 && gotoPosition < listGifs.itemCount) {state.scrollToItem(gotoPosition)}
-    }
+//    LaunchedEffect(gotoPosition) {
+//        if (gotoPosition >= 0 && gotoPosition < listGifs.itemCount) {state.scrollToItem(gotoPosition)}
+//    }
 
 
     //Диалог для блокировки

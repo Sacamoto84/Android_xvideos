@@ -35,6 +35,7 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
+import timber.log.Timber
 import javax.inject.Inject
 
 object NichesTab : Screen {
@@ -67,14 +68,8 @@ object NichesTab : Screen {
                 LazyRow123ExplorerNiches(
                     host = vm.lazyHost,
                     modifier = Modifier.fillMaxWidth(),
-                    onClickOpenProfile = {
-                        vm.lazyHost.currentIndexGoto = vm.lazyHost.currentIndex
-                        //navigator.push(ScreenRedProfile(it))
-                    },
-                    gotoPosition = vm.lazyHost.currentIndexGoto,
                     option = emptyList(),
                     contentPadding = PaddingValues(top = 0.dp),
-                    contentBeforeList = { }
                 )
 
             }
@@ -92,6 +87,14 @@ class ScreenRedExplorerNichesSM @Inject constructor(
     connectivityObserver: ConnectivityObserver
 ) : ScreenModel {
 
+    init {
+        Timber.i("!!! \uD83D\uDCE6 ScreenRedExplorerNichesSM::init")
+    }
+
+    override fun onDispose() {
+        super.onDispose()
+        Timber.i("!!!  \uD83D\uDCE6 ScreenRedExplorerNichesSM::onDispose")
+    }
     val lazyHost =
         LazyRow123Host(
             connectivityObserver = connectivityObserver, scope = screenModelScope,

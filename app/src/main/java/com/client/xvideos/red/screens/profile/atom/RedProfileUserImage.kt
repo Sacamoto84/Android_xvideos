@@ -25,6 +25,7 @@ import com.client.xvideos.R
 import com.client.xvideos.feature.redgifs.types.CreatorResponse
 import com.client.xvideos.screens.common.urlVideImage.UrlImage
 import com.client.xvideos.red.ThemeRed
+import com.client.xvideos.util.toPrettyCount
 import com.composeunstyled.Text
 import java.util.Locale
 
@@ -108,7 +109,7 @@ fun RedProfileCreaterInfo(item: CreatorResponse) {
                     .weight(1f)
             ) {
                 Text(
-                    item.users[0].views.toPrettyCount().toString(),
+                    item.users[0].views.toPrettyCount(),
                     color = Color.White,
                     fontFamily = ThemeRed.fontFamilyPopinsMedium
                 )
@@ -130,7 +131,7 @@ fun RedProfileCreaterInfo(item: CreatorResponse) {
             ) {
 
                 Text(
-                    item.users[0].publishedGifs.toPrettyCount().toString(),
+                    item.users[0].publishedGifs.toPrettyCount(),
                     color = Color.White,
                     fontFamily = ThemeRed.fontFamilyPopinsMedium
                 )
@@ -163,48 +164,4 @@ fun RedProfileCreaterInfo(item: CreatorResponse) {
 
     }
 
-
-}
-
-
-/**
- * 1_250   -> "1.2k"
- * 68_500  -> "68.5k"
- * 1_000_000 -> "1M"
- * 1_450_000 -> "1.4M"
- * 900     -> "900"
- */
-@SuppressLint("DefaultLocale")
-fun Long.toPrettyCount(): String {
-    val absValue = kotlin.math.abs(this)
-
-    return when {
-        absValue < 1_000 -> "$absValue"                       // 0-999
-        absValue < 1_000_000 -> {                                   // 1.0k-999.9k
-            val value = absValue / 1_000.0
-            String.format(Locale.US, "%.1fk", value)
-        }
-
-        absValue < 1_000_000_000 -> {                               // 1.0M-999.9M
-            val value = absValue / 1_000_000.0
-            String.format(Locale.US, "%.1fM", value)
-        }
-
-        else -> {                                                   // 1.0B+
-            val value = absValue / 1_000_000_000.0
-            String.format(Locale.US, "%.1fB", value)
-        }
-    }
-}
-
-/**
- *  68.7   → "01:08"
- * 134.0   → "02:14"
- *  9.2    → "00:09"
- */
-fun Double.toMinSec(): String {
-    val totalSec = this.toInt()                     // отбрасываем дробную часть
-    val minutes = totalSec / 60
-    val seconds = totalSec % 60
-    return "%02d:%02d".format(minutes, seconds)     // ведущие нули
 }

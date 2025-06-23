@@ -9,8 +9,8 @@ data class NichesResponse(
 data class Niche(
     @SerializedName("id") val id: String,
     @SerializedName("name") val name: String,
-    @SerializedName("gifs") val gifs: Int,
-    @SerializedName("subscribers") val subscribers: Int,
+    @SerializedName("gifs") val gifs: Long,
+    @SerializedName("subscribers") val subscribers: Long,
     @SerializedName("thumbnail") val thumbnail: String,
     @SerializedName("previews") val previews: List<Preview>
 )

@@ -34,6 +34,7 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
+import timber.log.Timber
 import javax.inject.Inject
 
 object GifsTab : Screen {
@@ -70,7 +71,7 @@ object GifsTab : Screen {
                         vm.lazyHost.currentIndexGoto = vm.lazyHost.currentIndex
                         //navigator.push(ScreenRedProfile(it))
                     },
-                    gotoPosition = vm.lazyHost.currentIndexGoto,
+                    gotoPosition = 0,
                     option = emptyList(),
                     contentPadding = PaddingValues(top = 0.dp),
                     contentBeforeList = { }
@@ -90,6 +91,15 @@ object GifsTab : Screen {
 class ScreenRedExplorerGifsSM @Inject constructor(
     connectivityObserver: ConnectivityObserver
 ) : ScreenModel {
+
+    init {
+        Timber.i("!!! \uD83D\uDCE6 ScreenRedExplorerGifsSM::init")
+    }
+
+    override fun onDispose() {
+        super.onDispose()
+        Timber.i("!!!  \uD83D\uDCE6 ScreenRedExplorerGifsSM::onDispose")
+    }
 
     val lazyHost =
         LazyRow123Host(
