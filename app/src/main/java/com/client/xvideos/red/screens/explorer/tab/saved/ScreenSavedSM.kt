@@ -1,4 +1,4 @@
-package com.client.xvideos.red.screens.saved
+package com.client.xvideos.red.screens.explorer.tab.saved
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope

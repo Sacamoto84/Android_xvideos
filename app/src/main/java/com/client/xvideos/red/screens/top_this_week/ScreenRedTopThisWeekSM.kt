@@ -31,10 +31,6 @@ class ScreenRedTopThisWeekSM @Inject constructor(
     connectivityObserver: ConnectivityObserver
 ) : ScreenModel {
 
-    init {
-        Timber.d("!!!  ⚠\uFE0F ScreenRedTopThisWeekSM init {...} ")
-    }
-
     val lazyHost =
         LazyRow123Host(
             connectivityObserver = connectivityObserver, scope = screenModelScope,
@@ -102,19 +98,19 @@ class ScreenRedTopThisWeekSM @Inject constructor(
 //   }
 
     //////////////////////////////////////////////////////////////////////////////////////////
-    val expandMenuVideoList =
-        listOf(
-            ExpandMenuVideoModel("Скачать", Icons.Filled.FileDownload, onClick = {
-                if (it == null) return@ExpandMenuVideoModel
-                DownloadRed.downloadItem(it)
-            }),
-            ExpandMenuVideoModel("Поделиться", Icons.Default.Share),
-            ExpandMenuVideoModel("Блокировать", Icons.Default.Block, onClick = {
-                if (it == null) return@ExpandMenuVideoModel
-                BlockRed.blockVisibleDialog = true
-            }),
-
-            )
+//    val expandMenuVideoList =
+//        listOf(
+//            ExpandMenuVideoModel("Скачать", Icons.Filled.FileDownload, onClick = {
+//                if (it == null) return@ExpandMenuVideoModel
+//                DownloadRed.downloadItem(it)
+//            }),
+//            ExpandMenuVideoModel("Поделиться", Icons.Default.Share),
+//            ExpandMenuVideoModel("Блокировать", Icons.Default.Block, onClick = {
+//                if (it == null) return@ExpandMenuVideoModel
+//                BlockRed.blockVisibleDialog = true
+//            }),
+//
+//            )
     //////////////////////////////////////////////////////////////////////////////////////////
 
 }

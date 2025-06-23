@@ -68,28 +68,28 @@ class ScreenNicheSM @AssistedInject constructor(
 
 
 
-    val expandMenuVideoList =
-        listOf(
-            ExpandMenuVideoModel("Скачать", Icons.Filled.FileDownload, onClick = {
-                if (it == null) return@ExpandMenuVideoModel
-                DownloadRed.downloadItem(it)
-            }),
-            ExpandMenuVideoModel("Поделиться", Icons.Default.Share),
-            ExpandMenuVideoModel("Блокировать", Icons.Default.Block, onClick = {
-                if (it == null) return@ExpandMenuVideoModel
-                BlockRed.blockVisibleDialog = true
-            }),
-
-            ExpandMenuVideoModel("Like", Icons.Default.Favorite, onClick = {
-                if (it == null) return@ExpandMenuVideoModel
-                SavedRed.addLikes(it)
-            }),
-
-            ExpandMenuVideoModel("!Like", Icons.Default.Block, onClick = {
-                if (it == null) return@ExpandMenuVideoModel
-                SavedRed.removeLikes(it)
-            }),
-        )
+//    val expandMenuVideoList =
+//        listOf(
+//            ExpandMenuVideoModel("Скачать", Icons.Filled.FileDownload, onClick = {
+//                if (it == null) return@ExpandMenuVideoModel
+//                DownloadRed.downloadItem(it)
+//            }),
+//            ExpandMenuVideoModel("Поделиться", Icons.Default.Share),
+//            ExpandMenuVideoModel("Блокировать", Icons.Default.Block, onClick = {
+//                if (it == null) return@ExpandMenuVideoModel
+//                BlockRed.blockVisibleDialog = true
+//            }),
+//
+//            ExpandMenuVideoModel("Like", Icons.Default.Favorite, onClick = {
+//                if (it == null) return@ExpandMenuVideoModel
+//                SavedRed.addLikes(it)
+//            }),
+//
+//            ExpandMenuVideoModel("!Like", Icons.Default.Block, onClick = {
+//                if (it == null) return@ExpandMenuVideoModel
+//                SavedRed.removeLikes(it)
+//            }),
+//        )
 
 
 }

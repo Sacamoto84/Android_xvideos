@@ -2,7 +2,21 @@ package com.client.xvideos.red.screens.explorer.top
 
 import android.util.Log
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.Icon
 import androidx.compose.material.TabRowDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.Group
+import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.outlined.Bookmark
+import androidx.compose.material.icons.outlined.BookmarkBorder
+import androidx.compose.material.icons.outlined.Group
+import androidx.compose.material.icons.outlined.Image
+import androidx.compose.material.icons.outlined.Movie
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.rounded.BookmarkBorder
 import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
@@ -22,6 +36,7 @@ import com.client.xvideos.red.ThemeRed
 fun TabRow(onChangeState: (Int) -> Unit) {
     var state by remember { mutableIntStateOf(0) }
     val titles = listOf("Gifs", "Images", "Creators", "Niches")
+    val titlesIcon = listOf(Icons.Outlined.Movie, Icons.Outlined.Image, Icons.Outlined.Person, Icons.Outlined.Group, Icons.Outlined.BookmarkBorder)
     SecondaryTabRow(
         modifier = Modifier.height(48.dp),
         selectedTabIndex = state,
@@ -35,20 +50,20 @@ fun TabRow(onChangeState: (Int) -> Unit) {
             )
         }
     ) {
-        titles.forEachIndexed { index, item ->
+        titlesIcon.forEachIndexed { index, item ->
             Tab(
                 selected = index == state,
                 onClick = {
                     state = index
                     onChangeState.invoke(index)
                 },
-                text = {
-                    Text(
-                        item,
-                        fontFamily = ThemeRed.fontFamilyPopinsRegular,
-                        fontSize = 14.sp
+              icon = {
+                    Icon(
+                        item, contentDescription = null, tint = Color.White,
+                        modifier = Modifier.size(24.dp)
                     )
-                })
+                }
+            )
         }
     }
 }

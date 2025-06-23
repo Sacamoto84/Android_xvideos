@@ -20,8 +20,9 @@ import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import com.client.xvideos.red.ThemeRed
 import com.client.xvideos.red.screens.explorer.tab.FavoritesTab
-import com.client.xvideos.red.screens.explorer.tab.GifsTab
-import com.client.xvideos.red.screens.explorer.tab.NichesTab
+import com.client.xvideos.red.screens.explorer.tab.gifs.GifsTab
+import com.client.xvideos.red.screens.explorer.tab.niches.NichesTab
+import com.client.xvideos.red.screens.explorer.tab.saved.SavedTab
 import com.client.xvideos.red.screens.explorer.top.TabRow
 
 @Composable
@@ -47,11 +48,12 @@ class ScreenRedExplorer() : Screen {
 
         val vm: ScreenRedExplorerSM = getScreenModel()
 
-        Scaffold(topBar ={ TabRow(onChangeState = {vm.screenType = it}) }, containerColor = ThemeRed.colorCommonBackground2){paddingValues ->
-            Box(modifier = Modifier.padding(paddingValues)) {
+        Scaffold(bottomBar ={ TabRow(onChangeState = {vm.screenType = it}) }, containerColor = ThemeRed.colorCommonBackground2){paddingValues ->
+            Box(modifier = Modifier.padding(bottom = paddingValues.calculateBottomPadding())) {
                 when (vm.screenType) {
                     0 -> GifsTab.Content()
                     3 -> NichesTab.Content()
+                    4 -> SavedTab.Content()
                     else -> FavoritesTab.Content()
                 }
             }

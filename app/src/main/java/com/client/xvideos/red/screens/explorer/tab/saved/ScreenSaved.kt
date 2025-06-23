@@ -1,4 +1,4 @@
-package com.client.xvideos.red.screens.saved
+package com.client.xvideos.red.screens.explorer.tab.saved
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.PaddingValues
@@ -19,7 +19,10 @@ import com.client.xvideos.red.common.ui.lazyrow123.LazyRow123
 import com.client.xvideos.red.screens.profile.ScreenRedProfile
 
 
-class ScreenRedSaved : Screen {
+object SavedTab : Screen {
+
+    private fun readResolve(): Any = SavedTab
+
     override val key: ScreenKey = uniqueScreenKey
 
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -30,7 +33,6 @@ class ScreenRedSaved : Screen {
 
 
         Scaffold(modifier = Modifier.fillMaxSize(), containerColor = ThemeRed.colorCommonBackground2) {
-
 
             LazyRow123(
                 host = vm.likedHost,

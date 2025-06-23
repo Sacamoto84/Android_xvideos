@@ -39,6 +39,7 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.feature.redgifs.types.Order
+import com.client.xvideos.red.common.expand_menu_video.impl.ExpandMenuVideoImpl
 import com.client.xvideos.red.common.ui.atom.Selector
 import com.client.xvideos.red.common.ui.lazyrow123.LazyRow123
 import com.client.xvideos.red.common.ui.sortByOrder.SortByOrder
@@ -46,7 +47,6 @@ import com.client.xvideos.red.screens.niche.atom.NichePreview
 import com.client.xvideos.red.screens.niche.atom.NicheProfile
 import com.client.xvideos.red.screens.niche.atom.NicheTopCreator
 import com.client.xvideos.red.screens.profile.ScreenRedProfile
-import com.client.xvideos.red.screens.saved.ScreenRedSaved
 import timber.log.Timber
 import kotlin.math.roundToInt
 
@@ -97,7 +97,7 @@ data class ScreenRedNiche(val nicheName: String = "pumped-pussy") : Screen {
                         navigator.push(ScreenRedProfile(it))
                     },
                     gotoPosition = vm.lazyHost.currentIndexGoto,
-                    option = vm.expandMenuVideoList,
+                    option = ExpandMenuVideoImpl.expandMenuVideoList,
                     contentPadding = PaddingValues(top = toolbarHeight),
                     contentBeforeList = {
 
@@ -141,8 +141,8 @@ data class ScreenRedNiche(val nicheName: String = "pumped-pussy") : Screen {
                     Order.LATEST,
                 ), sort, onSelect = { vm.lazyHost.changeSortType(it) })
 
-            Button(onClick = {navigator.push(ScreenRedSaved())}) {
-            }
+//            Button(onClick = {navigator.push(ScreenRedSaved())}) {
+//            }
 
             Selector(vm.lazyHost.columns) { vm.lazyHost.columns  = it }
 

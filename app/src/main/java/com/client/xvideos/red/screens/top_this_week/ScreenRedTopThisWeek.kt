@@ -27,6 +27,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.red.ThemeRed
+import com.client.xvideos.red.common.expand_menu_video.impl.ExpandMenuVideoImpl
 import com.client.xvideos.red.common.users.UsersRed
 import com.client.xvideos.red.screens.profile.ScreenRedProfile
 import com.client.xvideos.red.screens.top_this_week.model.VisibleType
@@ -129,7 +130,7 @@ class ScreenRedTopThisWeek : Screen {
                         modifier = Modifier.fillMaxSize(),
                         onClickOpenProfile = { vm.lazyHost.currentIndexGoto =  vm.lazyHost.currentIndex; navigator.push(ScreenRedProfile(it)) },
                         gotoPosition = vm.lazyHost.currentIndexGoto,
-                        option = vm.expandMenuVideoList,
+                        option = ExpandMenuVideoImpl.expandMenuVideoList,
                     )
 
                 }

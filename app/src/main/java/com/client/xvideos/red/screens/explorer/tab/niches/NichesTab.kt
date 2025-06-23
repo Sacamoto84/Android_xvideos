@@ -1,4 +1,4 @@
-package com.client.xvideos.red.screens.explorer.tab
+package com.client.xvideos.red.screens.explorer.tab.niches
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
@@ -25,7 +25,7 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.feature.redgifs.types.Order
 import com.client.xvideos.red.ThemeRed
-import com.client.xvideos.red.common.ui.lazyrow123.LazyRow123
+import com.client.xvideos.red.common.ui.lazyrow123.LazyRow123ExplorerNiches
 import com.client.xvideos.red.common.ui.lazyrow123.LazyRow123Host
 import com.client.xvideos.red.common.ui.lazyrow123.TypePager
 import com.client.xvideos.red.common.ui.sortByOrder.SortByOrder
@@ -37,9 +37,9 @@ import dagger.multibindings.IntoMap
 import timber.log.Timber
 import javax.inject.Inject
 
-object GifsTab : Screen {
+object NichesTab : Screen {
 
-    private fun readResolve(): Any = GifsTab
+    private fun readResolve(): Any = NichesTab
 
     override val key: ScreenKey = uniqueScreenKey
 
@@ -48,33 +48,27 @@ object GifsTab : Screen {
     )
     @Composable
     override fun Content() {
-        val vm: ScreenRedExplorerGifsSM = getScreenModel()
+        val vm: ScreenRedExplorerNichesSM = getScreenModel()
 
         Box(modifier = Modifier
             .size(64.dp)
             .background(Color.Green)) { Text("toString()") }
 
-        Scaffold(topBar = {
+        Scaffold(bottomBar = {
             SortByOrder(
-                listOf(Order.TOP_WEEK, Order.TOP_MONTH, Order.TOP_ALLTIME, Order.TRENDING, Order.LATEST),
+                listOf(Order.NICHES_SUBSCRIBERS, Order.NICHES_POST, Order.NICHES_NAME_A_Z, Order.NICHES_NAME_Z_A),
                 vm.lazyHost.sortType.collectAsStateWithLifecycle().value,
                 onSelect = { vm.lazyHost.changeSortType(it) })
 
         },containerColor = ThemeRed.colorCommonBackground2) {
 
-            Box(modifier = Modifier.padding(top = it.calculateTopPadding()).fillMaxSize()) {
+            Box(modifier = Modifier.padding(bottom = it.calculateBottomPadding()).fillMaxSize()) {
 
-                LazyRow123(
+                LazyRow123ExplorerNiches(
                     host = vm.lazyHost,
                     modifier = Modifier.fillMaxWidth(),
-                    onClickOpenProfile = {
-                        vm.lazyHost.currentIndexGoto = vm.lazyHost.currentIndex
-                        //navigator.push(ScreenRedProfile(it))
-                    },
-                    gotoPosition = 0,
                     option = emptyList(),
                     contentPadding = PaddingValues(top = 0.dp),
-                    contentBeforeList = { }
                 )
 
             }
@@ -88,23 +82,22 @@ object GifsTab : Screen {
 }
 
 
-class ScreenRedExplorerGifsSM @Inject constructor(
+class ScreenRedExplorerNichesSM @Inject constructor(
     connectivityObserver: ConnectivityObserver
 ) : ScreenModel {
 
     init {
-        Timber.i("!!! \uD83D\uDCE6 ScreenRedExplorerGifsSM::init")
+        Timber.i("!!! \uD83D\uDCE6 ScreenRedExplorerNichesSM::init")
     }
 
     override fun onDispose() {
         super.onDispose()
-        Timber.i("!!!  \uD83D\uDCE6 ScreenRedExplorerGifsSM::onDispose")
+        Timber.i("!!!  \uD83D\uDCE6 ScreenRedExplorerNichesSM::onDispose")
     }
-
     val lazyHost =
         LazyRow123Host(
             connectivityObserver = connectivityObserver, scope = screenModelScope,
-            extraString = "", typePager = TypePager.TOP
+            extraString = "", typePager = TypePager.EXPLORER_NICHES, startOrder = Order.NICHES_SUBSCRIBERS, startColumns = 1
         )
 
 }
@@ -112,9 +105,9 @@ class ScreenRedExplorerGifsSM @Inject constructor(
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class ScreenModuleRedExplorerGifs {
+abstract class ScreenModuleRedExplorerNiches {
     @Binds
     @IntoMap
-    @ScreenModelKey(ScreenRedExplorerGifsSM::class)
-    abstract fun bindScreenRedExplorerGifsSreenModel(hiltListScreenModel: ScreenRedExplorerGifsSM): ScreenModel
+    @ScreenModelKey(ScreenRedExplorerNichesSM::class)
+    abstract fun bindScreenRedExplorerNichesSreenModel(hiltListScreenModel: ScreenRedExplorerNichesSM): ScreenModel
 }
