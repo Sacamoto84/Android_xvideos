@@ -73,8 +73,13 @@ fun SortByOrder(list: List<Order>, selected: Order, onSelect: (Order) -> Unit) {
                 Order.BEST -> "Best"
                 Order.TOP28 -> "Top28"
                 Order.NEW -> "New"
-                Order.WEEK -> "Week"
-                Order.MONTH -> "Month"
+                Order.TOP_WEEK -> "Week"
+                Order.TOP_MONTH -> "Month"
+                Order.TOP_ALLTIME -> "All time"
+                Order.NICHES_SUBSCRIBERS -> "Subscribers"
+                Order.NICHES_POST -> "Post"
+                Order.NICHES_NAME_A_Z -> "Name A-Z"
+                Order.NICHES_NAME_Z_A -> "Name Z-A"
             }
 
             BasicText(
@@ -124,8 +129,13 @@ fun SortByOrder(list: List<Order>, selected: Order, onSelect: (Order) -> Unit) {
                                 Order.BEST -> " Best"
                                 Order.TOP28 -> " Top28"
                                 Order.NEW -> " New"
-                                Order.WEEK -> "Week"
-                                Order.MONTH -> "Month"
+                                Order.TOP_WEEK -> "Week"
+                                Order.TOP_MONTH -> "Month"
+                                Order.TOP_ALLTIME -> "All time"
+                                Order.NICHES_SUBSCRIBERS -> "Subscribers"
+                                Order.NICHES_POST -> "Post"
+                                Order.NICHES_NAME_A_Z -> "Name A-Z"
+                                Order.NICHES_NAME_Z_A -> "Name Z-A"
                             }
 
                             Text(

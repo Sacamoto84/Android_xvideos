@@ -1,29 +1,28 @@
 package com.client.xvideos.red.screens.explorer
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.material.BottomNavigation
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material.Text
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
-import cafe.adriel.voyager.navigator.tab.TabDisposable
-import cafe.adriel.voyager.navigator.tab.TabNavigator
+import com.client.xvideos.red.ThemeRed
 import com.client.xvideos.red.screens.explorer.tab.FavoritesTab
-import com.client.xvideos.red.screens.explorer.tab.HomeTab
+import com.client.xvideos.red.screens.explorer.tab.GifsTab
+import com.client.xvideos.red.screens.explorer.tab.NichesTab
+import com.client.xvideos.red.screens.explorer.top.TabRow
 
 @Composable
 private fun RowScope.TabNavigationItem(tab: Tab) {
@@ -48,49 +47,15 @@ class ScreenRedExplorer() : Screen {
 
         val vm: ScreenRedExplorerSM = getScreenModel()
 
-        TabNavigator(
-            HomeTab,
-            tabDisposable = {
-                TabDisposable(
-                    navigator = it,
-                    tabs = listOf(HomeTab, HomeTab, HomeTab)
-                )
-            }
-        ) { tabNavigator ->
-
-
-            Scaffold(
-                topBar = {
-                    TopAppBar(
-                        title = {
-                            Text(
-                                text = tabNavigator.current.options.title,
-                                color = Color.White
-                            )
-                        }
-                    )
-                }, content = { CurrentTab() },
-                bottomBar = {
-                    BottomNavigation {
-                        TabNavigationItem(HomeTab)
-                        TabNavigationItem(FavoritesTab)
-                        TabNavigationItem(HomeTab)
-                    }
+        Scaffold(topBar ={ TabRow(onChangeState = {vm.screenType = it}) }, containerColor = ThemeRed.colorCommonBackground2){paddingValues ->
+            Box(modifier = Modifier.padding(paddingValues)) {
+                when (vm.screenType) {
+                    0 -> GifsTab.Content()
+                    3 -> NichesTab.Content()
+                    else -> FavoritesTab.Content()
                 }
-            )
-
-
-
+            }
         }
-
-
-//        Scaffold(topBar ={ TabRow(onChangeState = {vm.screenType = it}) }, containerColor = ThemeRed.colorCommonBackground2){
-//
-//
-//
-//
-//        }
-
 
     }
 }

@@ -57,7 +57,7 @@ fun BottomBar(
         ) {
 
             SortByOrder(
-                listOf(Order.WEEK, Order.MONTH, Order.TRENDING, Order.LATEST),
+                listOf(Order.TOP_WEEK, Order.TOP_MONTH, Order.TRENDING, Order.LATEST),
                 vm.lazyHost.sortType.collectAsStateWithLifecycle().value
             ) {
                 vm.lazyHost.changeSortType(it)

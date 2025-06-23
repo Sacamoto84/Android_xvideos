@@ -9,7 +9,7 @@ import com.client.xvideos.red.common.block.BlockRed
 import com.client.xvideos.red.common.users.UsersRed
 import timber.log.Timber
 
-class ItemTopThisWeekPagingSource (val sort : Order): PagingSource<Int, GifsInfo>() {
+class ItemTopPagingSource (val sort : Order): PagingSource<Int, GifsInfo>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int,  GifsInfo> {
 
@@ -27,8 +27,8 @@ class ItemTopThisWeekPagingSource (val sort : Order): PagingSource<Int, GifsInfo
             }
 
             val response =  when(sort) {
-                Order.WEEK -> RedGifs.getTopThisWeek(100, page)
-                Order.MONTH -> RedGifs.getTopThisMonth(100, page)
+                Order.TOP_WEEK -> RedGifs.getTopThisWeek(100, page)
+                Order.TOP_MONTH -> RedGifs.getTopThisMonth(100, page)
                 Order.TRENDING -> RedGifs.getTopTrending(100, page)
                 Order.LATEST -> RedGifs.getTopLatest(100, page)
                 else -> {

@@ -22,7 +22,7 @@ class ScreenRedExplorerSM @Inject constructor(
    var screenType by mutableIntStateOf(0)
 
 
-
+  var count by mutableIntStateOf(0)
 
 
 

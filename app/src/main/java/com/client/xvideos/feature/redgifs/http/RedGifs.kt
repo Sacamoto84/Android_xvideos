@@ -28,6 +28,7 @@ import kotlinx.serialization.json.JsonElement
 import timber.log.Timber
 import java.lang.reflect.Modifier
 import java.lang.reflect.Type
+import kotlin.Int
 
 object RedGifs {
 
@@ -279,6 +280,30 @@ object RedGifs {
         val route = Route(method = "GET", path = "/v2/niches/{niches}/top-tags", "niches" to niches)
         return api.request<TagsContainerGson>(route).tags
     }
+
+
+
+    //explorer
+
+    //
+    //subscribers https://api.redgifs.com/v2/niches?order=subscribers&previews=yes&sort=desc&page=1&count=30
+    //posts https://api.redgifs.com/v2/niches?order=posts&previews=yes&sort=desc&page=1&count=30
+    //name a-z https://api.redgifs.com/v2/niches?order=name&previews=yes&sort=asc&page=1&count=30
+    //name z-a https://api.redgifs.com/v2/niches?order=name&previews=yes&sort=desc&page=1&count=30
+    //
+    @Throws(ApiException::class)
+    suspend fun getExplorerNiches(order: Order = Order.NICHES_SUBSCRIBERS, count: Int = 100, page: Int = 1): NichesResponse {
+        val route = Route(method = "GET", path = "/v2/niches?&order={order}&previews=yes&sort=desc&page={page}&count={count}",
+            "order" to order.value, "page" to page, "count" to count)
+        return api.request(route)
+    }
+
+//    suspend fun searchImage(searchText: String, order: Order = Order.NEW, count: Int = 100, page: Int = 1): MediaResponse {
+//        val route = Route(method = "GET", path = "/v2/gifs/search?search_text={search_text}&order={order}&count={count}&page={page}&type=i",
+//            "search_text" to searchText, "order" to order.value, "count" to count, "page" to page)
+//        return cacheMediaResponse(route)
+//    }
+
 
 }
 

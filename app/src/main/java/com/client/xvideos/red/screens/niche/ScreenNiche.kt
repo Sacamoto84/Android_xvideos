@@ -86,12 +86,7 @@ data class ScreenRedNiche(val nicheName: String = "pumped-pussy") : Screen {
             }
         }
 
-
-
-
-
         Scaffold(modifier = Modifier.fillMaxSize(), containerColor = Color(0xFF0F0F0F)) {
-
             Box(modifier = Modifier.fillMaxSize().nestedScroll(nestedScrollConnection)) {
 
                 LazyRow123(
@@ -130,7 +125,6 @@ data class ScreenRedNiche(val nicheName: String = "pumped-pussy") : Screen {
                 )
 
             }
-
         }
 
 

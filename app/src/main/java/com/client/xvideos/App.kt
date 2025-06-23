@@ -2,6 +2,7 @@ package com.client.xvideos
 
 import android.app.Application
 import com.client.xvideos.feature.redgifs.db.clearOldCache
+import com.client.xvideos.feature.redgifs.http.RedGifs.getExplorerNiches
 import com.client.xvideos.feature.room.AppDatabase
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.PlaybackPreference
 import com.client.xvideos.red.common.block.BlockRed
@@ -70,6 +71,9 @@ class App : Application() {
         BlockRed.refreshBlockList()
 
         GlobalScope.launch {
+            val a = getExplorerNiches()
+            a
+
             clearOldCache( db.cacheMedaResponseDao())
             SavedRed.refreshLikesList()
         }

@@ -38,7 +38,7 @@ class ScreenRedTopThisWeekSM @Inject constructor(
     val lazyHost =
         LazyRow123Host(
             connectivityObserver = connectivityObserver, scope = screenModelScope,
-            typePager = TypePager.WEEK
+            typePager = TypePager.TOP
         )
 
 

@@ -1,7 +1,7 @@
 [versions]
 agp = "8.10.1"
 composeThemeAdapter = "1.2.1"
-core = "1.31.1"
+core = "1.33.0"
 diskLruCache = "1.5"
 gson = "2.13.1"
 hiltAndroid = "2.56.2"
@@ -17,15 +17,15 @@ ktor= "3.1.0"
 
 lifecycleRuntimeKtx = "2.9.1"
 activityCompose = "1.10.1"
-composeBom = "2025.06.00"
+composeBom = "2025.06.01"
 
-material = "1.14.0-alpha01"
-materialVersion = "1.8.2"
-material3 = "1.4.0-alpha15"
+material = "1.14.0-alpha02"
+materialVersion = "1.8.3"
+material3 = "1.4.0-alpha16"
 
 media3 = "1.7.1"
 
-room = "2.7.1"
+room = "2.7.2"
 
 slf4jApi = "2.0.17"
 slf4jSimple = "2.0.17"
@@ -35,7 +35,7 @@ googleGmsGoogleServices = "4.4.2"
 datastoreCoreAndroid = "1.1.7"
 volley = "1.2.1"
 
-nav3Core = "1.0.0-alpha03"
+nav3Core = "1.0.0-alpha04"
 material3AdaptiveNav3 = "1.0.0-SNAPSHOT"
 
 [libraries]
@@ -110,7 +110,7 @@ androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "j
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
-androidx-compose-bom = { group = "androidx.compose", name = "compose-bom-alpha", version.ref = "composeBom" }
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom-beta", version.ref = "composeBom" }
 
 
 

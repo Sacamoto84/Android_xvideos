@@ -38,7 +38,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.redgifs.types.Order
 import com.client.xvideos.red.common.block.BlockRed
@@ -67,14 +70,22 @@ fun LazyRow123(
 
     Timber.i("!!! 2 LazyRow123")
 
-    val listGifs = host.pager.collectAsLazyPagingItems()
+    val listGifs = host.pager.collectAsLazyPagingItems() as LazyPagingItems<GifsInfo>
 
     var fullScreen by remember { mutableStateOf(false) }
     val isConnected by host.isConnected.collectAsState()
     val state = rememberLazyGridState()
     var blockItem by remember { mutableStateOf<GifsInfo?>(null) }
 
-    BackHandler { if (fullScreen) fullScreen = false }
+    val navigator = LocalNavigator.currentOrThrow
+
+    BackHandler {
+        if (fullScreen)
+            fullScreen = false
+        else{
+            navigator.pop()
+        }
+    }
 
     if (listGifs.itemCount == 0) return
 

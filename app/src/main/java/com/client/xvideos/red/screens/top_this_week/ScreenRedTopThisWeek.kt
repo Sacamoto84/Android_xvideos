@@ -18,12 +18,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.red.ThemeRed
 import com.client.xvideos.red.common.users.UsersRed
 import com.client.xvideos.red.screens.profile.ScreenRedProfile
@@ -44,7 +46,7 @@ class ScreenRedTopThisWeek : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val vm: ScreenRedTopThisWeekSM = getScreenModel()
 
-        val items = vm.lazyHost.pager.collectAsLazyPagingItems()
+        val items = vm.lazyHost.pager.collectAsLazyPagingItems() as LazyPagingItems<GifsInfo>
 
         val shouldScrollToTop by vm.lazyHost.scrollToTopAfterSortChange.collectAsState() // Подписываемся на флаг
         val visibleType by vm.visibleType.collectAsState()
@@ -93,8 +95,7 @@ class ScreenRedTopThisWeek : Screen {
             Timber.d("!!! items.itemCount = ${items.itemCount}")
 
             // Отображаем индикатор загрузки поверх контента, если это первая загрузка
-            val isLoadingInitial =
-                items.loadState.refresh is LoadState.Loading// && items.itemCount == 0
+            val isLoadingInitial = items.loadState.refresh is LoadState.Loading// && items.itemCount == 0
             val isErrorInitial = items.loadState.refresh is LoadState.Error
 
 

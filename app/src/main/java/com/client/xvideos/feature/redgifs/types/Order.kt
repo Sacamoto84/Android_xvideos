@@ -12,9 +12,17 @@ enum class Order(val value: String) {
 
     FORCE_TEMP(""),
 
-    WEEK("week"),
+    TOP_WEEK("week"),
+    TOP_MONTH("month"),
+    //TOP ALL TIME
+    TOP_ALLTIME("alltime"),
 
-    MONTH("month")
+
+    //NICHES
+    NICHES_SUBSCRIBERS("subscribers"),
+    NICHES_POST("posts"),
+    NICHES_NAME_A_Z("name"),
+    NICHES_NAME_Z_A("name"),
 
 }
 

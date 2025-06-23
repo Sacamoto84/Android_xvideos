@@ -9,11 +9,11 @@ import androidx.paging.PagingData
 import androidx.paging.PagingSource
 import androidx.paging.cachedIn
 import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
-import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.redgifs.types.Order
+import com.client.xvideos.red.common.pagin.ItemExplorerNailsPagingSource
 import com.client.xvideos.red.common.pagin.ItemLikesPagingSource
 import com.client.xvideos.red.common.pagin.ItemNailsPagingSource
-import com.client.xvideos.red.common.pagin.ItemTopThisWeekPagingSource
+import com.client.xvideos.red.common.pagin.ItemTopPagingSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -30,22 +30,31 @@ import timber.log.Timber
 
 enum class TypePager {
     NICHES,
-    WEEK,
-    LIKES
+    TOP,
+    LIKES,
+
+
+    //
+    EXPLORER_NICHES,
+
+
+
 }
 
 class LazyRow123Host(
     val connectivityObserver: ConnectivityObserver,
     val scope : CoroutineScope,
     val typePager : TypePager,
-    val extraString : String = ""
+    val extraString : String = "",
+    val startOrder : Order = Order.LATEST,
+    val startColumns : Int = 2
 ) {
 
     val isConnected = connectivityObserver.isConnected.stateIn(scope, SharingStarted.WhileSubscribed(5000L), false)
 
     //////////////
     // StateFlow текущего типа сортировки
-    private val _sortType = MutableStateFlow(Order.LATEST) // или "popular", "oldest"
+    private val _sortType = MutableStateFlow(startOrder) // или "popular", "oldest"
     val sortType: StateFlow<Order> = _sortType.asStateFlow()
 
     fun changeSortType(newSort: Order) {
@@ -70,7 +79,7 @@ class LazyRow123Host(
 
     @OptIn(ExperimentalCoroutinesApi::class, DelicateCoroutinesApi::class)
     // ✅ Один общий поток Pager для LazyPagingItems
-    val pager: Flow<PagingData<GifsInfo>> = sortType
+    val pager: Flow<PagingData<Any>> = sortType
         .flatMapLatest { sort ->
             Timber.d("!!! pager sort = $sort")
             Pager(
@@ -97,24 +106,28 @@ class LazyRow123Host(
         Timber.d("!!! SM: scrollToTopAfterSortChange set to false (consumed)")
     }
 
-    var columns by mutableIntStateOf(2)             //Количество колонок
+    var columns by mutableIntStateOf(startColumns)             //Количество колонок
     var currentIndex by mutableIntStateOf(0)
     var currentIndexGoto by mutableIntStateOf(0)
 
 }
 
-fun createPager(typePager: TypePager, sort : Order, extraString : String) : PagingSource<Int, GifsInfo>{
+fun createPager(typePager: TypePager, sort : Order, extraString : String) : PagingSource<Int, Any>{
     val pagingSourceFactory = when (typePager) {
         TypePager.NICHES -> {
             ItemNailsPagingSource(order = sort, nichesName = extraString)
         }
-        TypePager.WEEK -> {
-            ItemTopThisWeekPagingSource(sort)
+        TypePager.TOP -> {
+            ItemTopPagingSource(sort)
         }
         TypePager.LIKES -> {
             ItemLikesPagingSource(sort)
         }
 
+        TypePager.EXPLORER_NICHES -> {
+            ItemExplorerNailsPagingSource(order = sort)
+        }
+
     }
-    return pagingSourceFactory
+    return pagingSourceFactory as PagingSource<Int, Any>
 }
