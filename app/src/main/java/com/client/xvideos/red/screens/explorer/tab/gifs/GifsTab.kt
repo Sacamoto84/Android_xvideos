@@ -3,14 +3,17 @@ package com.client.xvideos.red.screens.explorer.tab.gifs
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -32,6 +35,8 @@ import com.client.xvideos.red.common.ui.lazyrow123.LazyRow123
 import com.client.xvideos.red.common.ui.lazyrow123.LazyRow123Host
 import com.client.xvideos.red.common.ui.lazyrow123.TypePager
 import com.client.xvideos.red.common.ui.sortByOrder.SortByOrder
+import com.client.xvideos.red.screens.LocalRootScreenModel
+import com.client.xvideos.red.screens.ScreenRedRootSM
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -51,8 +56,17 @@ object GifsTab : Screen {
     override fun Content() {
         val vm: ScreenRedExplorerGifsSM = getScreenModel()
 
+        //val root: ScreenRedRootSM = getScreenModel<ScreenRedRootSM>()
+
+        val root = LocalRootScreenModel.current
+
+        LaunchedEffect(Unit) {
+            root.showSnackbar("Snackbar из вложенного экрана")
+        }
+
         Scaffold(bottomBar = {
-            Box(modifier = Modifier.background(ThemeRed.colorCommonBackground2)) {
+            Row(modifier = Modifier.background(ThemeRed.colorCommonBackground2)) {
+               //
                 SortByOrder(
                     listOf(
                         Order.TOP_WEEK,
@@ -63,6 +77,15 @@ object GifsTab : Screen {
                     ),
                     vm.lazyHost.sortType.collectAsStateWithLifecycle().value,
                     onSelect = { vm.lazyHost.changeSortType(it) })
+                //
+                Button(onClick = {
+                    root.showSnackbar("Snackbar из вложенного экрана")
+                }) {
+
+
+                }
+
+
             }
         }, containerColor = ThemeRed.colorCommonBackground) {
 

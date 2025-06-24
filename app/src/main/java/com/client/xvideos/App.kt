@@ -71,9 +71,6 @@ class App : Application() {
         BlockRed.refreshBlockList()
 
         GlobalScope.launch {
-            val a = getExplorerNiches()
-            a
-
             clearOldCache( db.cacheMedaResponseDao())
             SavedRed.refreshLikesList()
         }

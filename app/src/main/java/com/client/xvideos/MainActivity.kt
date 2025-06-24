@@ -23,6 +23,7 @@ import coil.ImageLoaderFactory
 import coil.memory.MemoryCache
 import coil.request.CachePolicy
 import com.client.xvideos.PermissionScreenActivity.PermissionStorage
+import com.client.xvideos.red.screens.ScreenRedRoot
 import com.client.xvideos.red.screens.explorer.ScreenRedExplorer
 import com.client.xvideos.screens.videoplayer.video.cache.VideoPlayerCacheManager
 import com.client.xvideos.red.screens.niche.ScreenRedNiche
@@ -125,7 +126,9 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
                     Timber.d("!!! Navigator(ScreenRedNiche())")
                     //Navigator(ScreenRedNiche())
 
-                    Navigator(ScreenRedExplorer())
+                    Navigator(ScreenRedRoot())
+
+                    //Navigator(ScreenRedExplorer())
                 }
 
             }
