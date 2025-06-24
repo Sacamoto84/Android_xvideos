@@ -3,6 +3,8 @@ package com.client.xvideos.feature
 import com.client.xvideos.App
 import com.client.xvideos.AppPath
 import com.client.xvideos.red.common.downloader.DownloadRed
+import com.client.xvideos.red.common.snackBar.SnackBarEvent
+import com.client.xvideos.red.common.snackBar.UiMessage
 import com.client.xvideos.util.Toast
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +23,6 @@ data class ItemsRedDownload(
  */
 
 
-
 object Downloader {
 
     //Процент скачивания 0..1 - начало скачивания, -2 busy, -3 error
@@ -31,7 +32,7 @@ object Downloader {
     fun downloadRedName(id: String, name: String, url: String) {
 
         if ((url == "") || (name == "")) {
-                     Toast("Ошибка в названии файла или креатор")
+            Toast("Ошибка в названии файла или креатор")
             percent.value = -3f
             return
         }
@@ -47,7 +48,8 @@ object Downloader {
             val p = AppPath.cache_download_red + "/" + name
             File(p).mkdirs()
 
-            val request = App.instance.kDownloader.newRequestBuilder(url, p, "$id.mp4").tag(id).build()
+            val request =
+                App.instance.kDownloader.newRequestBuilder(url, p, "$id.mp4").tag(id).build()
 
             App.instance.kDownloader.enqueue(
                 request,
@@ -56,17 +58,23 @@ object Downloader {
                     percent.value = 0f
                 },
 
-                onError = {println("!!! onError закачки: $it"); percent.value = -3f},
-                onProgress = {it1 -> percent.value = it1 / 100f},
+                onError = {
+                    println("!!! onError закачки: $it"); percent.value = -3f
+                    SnackBarEvent.infoChannel.trySend(UiMessage.Error("Ошибка закачки: $it"))
+                },
+
+                onProgress = { it1 -> percent.value = it1 / 100f },
                 onCompleted = {
                     println("!!! onCompleted закачки")
                     percent.value = -2f
-                    Toast("Скачивание завершено")
+                    //Toast("Скачивание завершено")
+                    SnackBarEvent.infoChannel.trySend(UiMessage.Success("Скачивание завершено"))
                     DownloadRed.refreshDownloadList()
                 },
             )
         } else {
-            Toast("Файл есть к кеше")
+            //Toast("Файл есть к кеше")
+            SnackBarEvent.infoChannel.trySend(UiMessage.Info("Файл есть к кеше"))
         }
 
     }
@@ -91,7 +99,8 @@ object Downloader {
             return
         }
 
-        val itemsToInsertInDb = mutableListOf<ItemsRedDownload>() // Key: fileName (name), Value: Item
+        val itemsToInsertInDb =
+            mutableListOf<ItemsRedDownload>() // Key: fileName (name), Value: Item
 
         for (creatorDir in creatorDirs) {
 
@@ -108,11 +117,13 @@ object Downloader {
                 // Если запись с таким 'name' уже есть в БД, её 'url' будет сохранен при REPLACE.
                 // Если записи нет, 'url' будет пустой строкой, пока не будет обновлен другим процессом.
 
-                itemsToInsertInDb.add(ItemsRedDownload(
-                    id = fileName,
-                    name = creatorName,
-                    url = "", // Заполняется при реальной закачке, здесь мы его не знаем
-                ))
+                itemsToInsertInDb.add(
+                    ItemsRedDownload(
+                        id = fileName,
+                        name = creatorName,
+                        url = "", // Заполняется при реальной закачке, здесь мы его не знаем
+                    )
+                )
 
             }
 

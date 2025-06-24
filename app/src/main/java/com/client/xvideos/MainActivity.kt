@@ -104,7 +104,8 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
 //                // setStatusBarColor() and setNavigationBarColor() also exist
 //                onDispose {}
 //            }
-            val startScreen = remember { ScreenRedTopThisWeek() }
+
+            //val startScreen = remember { ScreenRedTopThisWeek() }
 
             XvideosTheme(darkTheme = true) {
 

@@ -60,9 +60,9 @@ object GifsTab : Screen {
 
         val root = LocalRootScreenModel.current
 
-        LaunchedEffect(Unit) {
-            root.showSnackbar("Snackbar из вложенного экрана")
-        }
+//        LaunchedEffect(Unit) {
+//            root.showSnackbar("Snackbar из вложенного экрана")
+//        }
 
         Scaffold(bottomBar = {
             Row(modifier = Modifier.background(ThemeRed.colorCommonBackground2)) {
@@ -78,14 +78,7 @@ object GifsTab : Screen {
                     vm.lazyHost.sortType.collectAsStateWithLifecycle().value,
                     onSelect = { vm.lazyHost.changeSortType(it) })
                 //
-                Button(onClick = {
-                    root.showSnackbar("Snackbar из вложенного экрана")
-                }) {
-
-
-                }
-
-
+                //Button(onClick = {root.showSnackbar("Snackbar из вложенного экрана")}){}
             }
         }, containerColor = ThemeRed.colorCommonBackground) {
 

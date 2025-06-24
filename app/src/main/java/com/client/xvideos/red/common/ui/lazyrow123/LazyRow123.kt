@@ -63,7 +63,10 @@ fun LazyRow123(
     gotoPosition: Int,
     option: List<ExpandMenuVideoModel> = emptyList(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
-    contentBeforeList: @Composable (() -> Unit) = {}
+    contentBeforeList: @Composable (() -> Unit) = {},
+
+    gotoUp: () -> Unit = {},
+
 ) {
 
     SideEffect { Timber.d("!!! LazyRow123::SideEffect columns: ${host.columns} gotoPosition: $gotoPosition") }

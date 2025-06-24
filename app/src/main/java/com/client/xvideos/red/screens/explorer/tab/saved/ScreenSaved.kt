@@ -1,9 +1,24 @@
 package com.client.xvideos.red.screens.explorer.tab.saved
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Apps
+import androidx.compose.material.icons.outlined.BookmarkBorder
+import androidx.compose.material.icons.outlined.Dataset
+import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.Folder
+import androidx.compose.material.icons.outlined.GridOn
+import androidx.compose.material.icons.outlined.Group
+import androidx.compose.material.icons.outlined.Image
+import androidx.compose.material.icons.outlined.Movie
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -16,7 +31,12 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.red.ThemeRed
 import com.client.xvideos.red.common.ui.lazyrow123.LazyRow123
+import com.client.xvideos.red.screens.explorer.tab.FavoritesTab
+import com.client.xvideos.red.screens.explorer.tab.gifs.GifsTab
+import com.client.xvideos.red.screens.explorer.tab.niches.NichesTab
+import com.client.xvideos.red.screens.explorer.top.TabRow
 import com.client.xvideos.red.screens.profile.ScreenRedProfile
+import com.client.xvideos.red.screens.top_this_week.ScreenRedTopThisWeek
 
 
 object SavedTab : Screen {
@@ -31,21 +51,44 @@ object SavedTab : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val vm: ScreenSavedSM = getScreenModel()
 
+        val l = listOf(
+            Icons.Outlined.FavoriteBorder,
+            Icons.Outlined.Person,
+            Icons.Outlined.Group,
+            Icons.Outlined.Save,
+            //Icons.Outlined.Dataset,
+            //Icons.Outlined.Folder,
+            Icons.Outlined.Apps,
+        )
 
-        Scaffold(modifier = Modifier.fillMaxSize(), containerColor = ThemeRed.colorCommonBackground2) {
+        Scaffold(
+            bottomBar = { TabRow(titlesIcon = l, onChangeState = { vm.screenType = it }) },
+            modifier = Modifier.fillMaxSize(),
+            containerColor = ThemeRed.colorCommonBackground2
+        ) { paddingValues ->
 
-            LazyRow123(
-                host = vm.likedHost,
-                modifier = Modifier.fillMaxWidth(),
-                onClickOpenProfile = {
-                    vm.likedHost.currentIndexGoto = vm.likedHost.currentIndex
-                    navigator.push(ScreenRedProfile(it))
-                },
-                gotoPosition = vm.likedHost.currentIndexGoto,
-                option = emptyList(),//vm.expandMenuVideoList,
-                contentPadding = PaddingValues(0.dp),
-                contentBeforeList = { }
-            )
+            Box(modifier = Modifier.padding(bottom = paddingValues.calculateBottomPadding())) {
+                when (vm.screenType) {
+                    0 -> GifsTab.Content()
+                    1 -> ScreenRedTopThisWeek.Content()
+                    3 -> NichesTab.Content()
+                    else -> FavoritesTab.Content()
+                }
+            }
+
+
+//            LazyRow123(
+//                host = vm.likedHost,
+//                modifier = Modifier.fillMaxWidth(),
+//                onClickOpenProfile = {
+//                    vm.likedHost.currentIndexGoto = vm.likedHost.currentIndex
+//                    navigator.push(ScreenRedProfile(it))
+//                },
+//                gotoPosition = vm.likedHost.currentIndexGoto,
+//                option = emptyList(),//vm.expandMenuVideoList,
+//                contentPadding = PaddingValues(0.dp),
+//                contentBeforeList = { }
+//            )
 
         }
 

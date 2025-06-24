@@ -21,10 +21,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.redgifs.types.UserInfo
+import com.client.xvideos.feature.redgifs.types.URL
 import com.client.xvideos.screens.common.urlVideImage.UrlImage
 import com.client.xvideos.red.ThemeRed
 
@@ -69,4 +71,32 @@ fun ProfileInfo1(modifier: Modifier = Modifier, onClick: ()->Unit, videoItem: Gi
 
 
     }
+}
+
+@Preview
+@Composable
+fun ProfileInfo1Preview() {
+    val videoItem = GifsInfo(
+        id = "id",
+        createDate = 0,
+        likes = 0,
+        width = 100,
+        height = 100,
+        tags = listOf("ssss", "ssss", "sss"),
+        description = "description",
+        views = null,
+        type = 1,
+        userName = "userName",
+        urls = URL(),
+        duration = 57.0,
+        hls = true,
+        niches = null
+    )
+    val listUsers = listOf(
+        UserInfo(
+            username = "userName",
+            url = "url"
+        )
+    )
+    ProfileInfo1(onClick = {}, videoItem = videoItem, listUsers = listUsers)
 }

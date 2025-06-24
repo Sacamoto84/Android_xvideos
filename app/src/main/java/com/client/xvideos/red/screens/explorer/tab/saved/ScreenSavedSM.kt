@@ -1,5 +1,8 @@
 package com.client.xvideos.red.screens.explorer.tab.saved
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.setValue
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelKey
@@ -17,6 +20,8 @@ import javax.inject.Inject
 class ScreenSavedSM @Inject constructor(
     connectivityObserver: ConnectivityObserver
 ) : ScreenModel {
+
+    var screenType by mutableIntStateOf(0)
 
     val likedHost =  LazyRow123Host(connectivityObserver = connectivityObserver, scope = screenModelScope, typePager = TypePager.LIKES)
 

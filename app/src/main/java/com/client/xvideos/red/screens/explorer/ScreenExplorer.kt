@@ -5,6 +5,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomNavigationItem
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.BookmarkBorder
+import androidx.compose.material.icons.outlined.Group
+import androidx.compose.material.icons.outlined.Image
+import androidx.compose.material.icons.outlined.Movie
+import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -24,6 +30,7 @@ import com.client.xvideos.red.screens.explorer.tab.gifs.GifsTab
 import com.client.xvideos.red.screens.explorer.tab.niches.NichesTab
 import com.client.xvideos.red.screens.explorer.tab.saved.SavedTab
 import com.client.xvideos.red.screens.explorer.top.TabRow
+import com.client.xvideos.red.screens.top_this_week.ScreenRedTopThisWeek
 
 @Composable
 private fun RowScope.TabNavigationItem(tab: Tab) {
@@ -47,11 +54,12 @@ class ScreenRedExplorer() : Screen {
         val navigator = LocalNavigator.currentOrThrow
 
         val vm: ScreenRedExplorerSM = getScreenModel()
-
-        Scaffold(bottomBar ={ TabRow(onChangeState = {vm.screenType = it}) }, containerColor = ThemeRed.colorCommonBackground2){paddingValues ->
+        val l = listOf(Icons.Outlined.Movie, Icons.Outlined.Image, Icons.Outlined.Person, Icons.Outlined.Group, Icons.Outlined.BookmarkBorder)
+        Scaffold(bottomBar ={ TabRow(titlesIcon = l, onChangeState = {vm.screenType = it}) }, containerColor = ThemeRed.colorCommonBackground2){paddingValues ->
             Box(modifier = Modifier.padding(bottom = paddingValues.calculateBottomPadding())) {
                 when (vm.screenType) {
                     0 -> GifsTab.Content()
+                    1 -> ScreenRedTopThisWeek.Content()
                     3 -> NichesTab.Content()
                     4 -> SavedTab.Content()
                     else -> FavoritesTab.Content()

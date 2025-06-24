@@ -38,7 +38,10 @@ import com.client.xvideos.red.screens.top_this_week.state.FullScreenLoading
 import com.client.xvideos.red.screens.top_this_week.state.LoadingNextPageIndicator
 import timber.log.Timber
 
-class ScreenRedTopThisWeek : Screen {
+object ScreenRedTopThisWeek : Screen {
+
+    private fun readResolve(): Any = ScreenRedTopThisWeek
+
     override val key: ScreenKey = "ScreenRedTopThisWeek"
 
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")

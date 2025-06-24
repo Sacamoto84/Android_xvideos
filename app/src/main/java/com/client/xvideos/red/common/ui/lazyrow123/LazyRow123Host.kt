@@ -17,6 +17,7 @@ import com.client.xvideos.red.common.pagin.ItemNailsPagingSource
 import com.client.xvideos.red.common.pagin.ItemTopPagingSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
@@ -112,6 +113,8 @@ class LazyRow123Host(
     var columns by mutableIntStateOf(startColumns)             //Количество колонок
     var currentIndex by mutableIntStateOf(0)
     var currentIndexGoto by mutableIntStateOf(0)
+
+    fun gotoUp(){ scope.launch { state.scrollToItem(0) } }
 
 }
 
