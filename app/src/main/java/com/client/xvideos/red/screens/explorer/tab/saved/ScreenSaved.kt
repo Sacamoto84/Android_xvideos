@@ -21,6 +21,10 @@ import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
@@ -34,6 +38,7 @@ import com.client.xvideos.red.common.ui.lazyrow123.LazyRow123
 import com.client.xvideos.red.screens.explorer.tab.FavoritesTab
 import com.client.xvideos.red.screens.explorer.tab.gifs.GifsTab
 import com.client.xvideos.red.screens.explorer.tab.niches.NichesTab
+import com.client.xvideos.red.screens.explorer.tab.saved.tab.SavedLikesTab
 import com.client.xvideos.red.screens.explorer.top.TabRow
 import com.client.xvideos.red.screens.profile.ScreenRedProfile
 import com.client.xvideos.red.screens.top_this_week.ScreenRedTopThisWeek
@@ -48,8 +53,8 @@ object SavedTab : Screen {
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
     override fun Content() {
-        val navigator = LocalNavigator.currentOrThrow
-        val vm: ScreenSavedSM = getScreenModel()
+
+        var screenType by rememberSaveable {  mutableIntStateOf(0) }
 
         val l = listOf(
             Icons.Outlined.FavoriteBorder,
@@ -62,35 +67,19 @@ object SavedTab : Screen {
         )
 
         Scaffold(
-            bottomBar = { TabRow(titlesIcon = l, onChangeState = { vm.screenType = it }) },
+            bottomBar = { TabRow(titlesIcon = l, onChangeState = { screenType = it }) },
             modifier = Modifier.fillMaxSize(),
             containerColor = ThemeRed.colorCommonBackground2
         ) { paddingValues ->
 
             Box(modifier = Modifier.padding(bottom = paddingValues.calculateBottomPadding())) {
-                when (vm.screenType) {
-                    0 -> GifsTab.Content()
+                when (screenType) {
+                    0 -> SavedLikesTab.Content()
                     1 -> ScreenRedTopThisWeek.Content()
                     3 -> NichesTab.Content()
                     else -> FavoritesTab.Content()
                 }
             }
-
-
-//            LazyRow123(
-//                host = vm.likedHost,
-//                modifier = Modifier.fillMaxWidth(),
-//                onClickOpenProfile = {
-//                    vm.likedHost.currentIndexGoto = vm.likedHost.currentIndex
-//                    navigator.push(ScreenRedProfile(it))
-//                },
-//                gotoPosition = vm.likedHost.currentIndexGoto,
-//                option = emptyList(),//vm.expandMenuVideoList,
-//                contentPadding = PaddingValues(0.dp),
-//                contentBeforeList = { }
-//            )
-
         }
-
     }
 }

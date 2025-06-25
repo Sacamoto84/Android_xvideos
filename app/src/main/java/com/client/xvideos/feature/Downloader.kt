@@ -48,8 +48,7 @@ object Downloader {
             val p = AppPath.cache_download_red + "/" + name
             File(p).mkdirs()
 
-            val request =
-                App.instance.kDownloader.newRequestBuilder(url, p, "$id.mp4").tag(id).build()
+            val request = App.instance.kDownloader.newRequestBuilder(url, p, "$id.mp4").tag(id).build()
 
             App.instance.kDownloader.enqueue(
                 request,

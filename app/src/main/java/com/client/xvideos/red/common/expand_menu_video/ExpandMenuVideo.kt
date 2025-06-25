@@ -30,7 +30,18 @@ import com.client.xvideos.red.ThemeRed
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExpandMenuVideo(modifier: Modifier = Modifier, option : List<ExpandMenuVideoModel> = emptyList(), item: GifsInfo? = null,  onClick : ()->Unit = {}) {
+fun ExpandMenuVideo(
+    modifier: Modifier = Modifier,
+    option: List<ExpandMenuVideoModel> = emptyList(),
+    item: GifsInfo? = null,
+    onClick: () -> Unit = {},
+    onRun0: () -> Unit = {},
+    onRun1: () -> Unit = {},
+    onRun2: () -> Unit = {},
+    onRun3: () -> Unit = {},
+    onRun4: () -> Unit = {},
+    onRun5: () -> Unit = {},
+) {
 
     var expanded by remember { mutableStateOf(false) }
 
@@ -41,7 +52,9 @@ fun ExpandMenuVideo(modifier: Modifier = Modifier, option : List<ExpandMenuVideo
     )
     {
         IconButton(
-            modifier = Modifier.size(48.dp).menuAnchor(ExposedDropdownMenuAnchorType.SecondaryEditable),
+            modifier = Modifier
+                .size(48.dp)
+                .menuAnchor(ExposedDropdownMenuAnchorType.SecondaryEditable),
             onClick = {}) {
             Icon(
                 Icons.Default.MoreVert,
@@ -58,23 +71,42 @@ fun ExpandMenuVideo(modifier: Modifier = Modifier, option : List<ExpandMenuVideo
             containerColor = Color(0xFFF1EDF4)//ThemeRed.colorCommonBackground
         ) {
 
-            option.forEach { it ->
+            option.forEachIndexed { index, it ->
 
                 DropdownMenuItem(
                     leadingIcon = {
-                        if (it.leadingIconVector != null) {Icon(it.leadingIconVector, contentDescription = "", tint = Color(0xFF48454E))}
+                        if (it.leadingIconVector != null) {
+                            Icon(
+                                it.leadingIconVector,
+                                contentDescription = "",
+                                tint = Color(0xFF48454E)
+                            )
+                        }
                     },
 
                     text = {
-                            Text(
-                                it.text,
-                                style = TextStyle(color = Color(0xFF48454E), fontFamily = ThemeRed.fontFamilyPopinsRegular, fontSize = 20.sp),
-                                modifier = Modifier
-                            )
+                        Text(
+                            it.text,
+                            style = TextStyle(
+                                color = Color(0xFF48454E),
+                                fontFamily = ThemeRed.fontFamilyPopinsRegular,
+                                fontSize = 20.sp
+                            ),
+                            modifier = Modifier
+                        )
                     },
                     onClick = {
-                         it.onClick.invoke(item)
-                         expanded = false},
+                        it.onClick.invoke(item)
+                        when(index){
+                            0 -> onRun0.invoke()
+                            1 -> onRun1.invoke()
+                            2 -> onRun2.invoke()
+                            3 -> onRun3.invoke()
+                            4 -> onRun4.invoke()
+                            5 -> onRun5.invoke()
+                        }
+                        expanded = false
+                    },
                     contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
                 )
             }

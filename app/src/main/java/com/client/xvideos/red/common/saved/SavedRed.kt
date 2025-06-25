@@ -11,7 +11,6 @@ object SavedRed {
 
     var likesList = mutableStateListOf<GifsInfo>()
 
-
     fun addLikes(item: GifsInfo) {
         println("!!! addLikes() id:${item.id} userName:${item.userName} url:${item.urls.hd}")
         val res = likesItemSaveToDisk(item)

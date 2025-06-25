@@ -38,12 +38,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.redgifs.types.Order
+import com.client.xvideos.red.ThemeRed
 import com.client.xvideos.red.common.block.BlockRed
 import com.client.xvideos.red.common.block.ui.DialogBlock
 import com.client.xvideos.red.common.downloader.DownloadRed
@@ -53,6 +55,7 @@ import com.client.xvideos.red.screens.top_this_week.ProfileInfo1
 import com.client.xvideos.red.common.expand_menu_video.ExpandMenuVideoModel
 import com.client.xvideos.red.common.saved.SavedRed
 import com.client.xvideos.red.common.users.UsersRed
+import com.composeunstyled.Text
 import timber.log.Timber
 
 @Composable
@@ -67,7 +70,15 @@ fun LazyRow123(
 
     gotoUp: () -> Unit = {},
 
-) {
+    //Для меню
+    onRun0: () -> Unit = {},
+    onRun1: () -> Unit = {},
+    onRun2: () -> Unit = {},
+    onRun3: () -> Unit = {},
+    onRun4: () -> Unit = {},
+    onRun5: () -> Unit = {},
+
+    ) {
 
     SideEffect { Timber.d("!!! LazyRow123::SideEffect columns: ${host.columns} gotoPosition: $gotoPosition") }
 
@@ -83,12 +94,17 @@ fun LazyRow123(
     BackHandler {
         if (fullScreen)
             fullScreen = false
-        else{
+        else {
             navigator.pop()
         }
     }
 
-    if (listGifs.itemCount == 0) return
+    if (listGifs.itemCount == 0) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+            Text("Отсутствуют данные", color = Color.White, fontFamily = ThemeRed.fontFamilyDMsanss, fontSize = 20.sp)
+        }
+        return
+    }
 
 //    val centrallyLocatedOrMostVisibleItemIndex by remember {
 //        derivedStateOf {
@@ -139,9 +155,7 @@ fun LazyRow123(
             onBlockConfirmed = {
                 if ((blockItem != null)) {
                     BlockRed.blockItem(blockItem!!)
-                    val temp = host.sortType.value
-                    host.changeSortType(Order.FORCE_TEMP)
-                    host.changeSortType(temp)
+                    host.refresh()
                 }
             }
         )
@@ -155,7 +169,7 @@ fun LazyRow123(
         modifier = Modifier.then(modifier),
         contentPadding = contentPadding,
     ) {
-        item(key = "before", span = { GridItemSpan(maxLineSpan) }) {contentBeforeList()}
+        item(key = "before", span = { GridItemSpan(maxLineSpan) }) { contentBeforeList() }
 
         items(
             count = listGifs.itemCount,
@@ -169,8 +183,12 @@ fun LazyRow123(
             if (item != null) {
 
                 Box(
-                    modifier = Modifier.padding(vertical = 8.dp).padding(horizontal = 4.dp).fillMaxSize()
-                        .clip(RoundedCornerShape(16.dp)).border(1.dp, Color.DarkGray, RoundedCornerShape(16.dp)),
+                    modifier = Modifier
+                        .padding(vertical = 8.dp)
+                        .padding(horizontal = 4.dp)
+                        .fillMaxSize()
+                        .clip(RoundedCornerShape(16.dp))
+                        .border(1.dp, Color.DarkGray, RoundedCornerShape(16.dp)),
                     contentAlignment = Alignment.Center
                 ) {
 
@@ -195,7 +213,8 @@ fun LazyRow123(
                         item = item,
                         onClick = {
                             blockItem = item //Для блока и идентификации и тема
-                        })
+                        }, onRun0, onRun1, onRun2, onRun3, onRun4, onRun5
+                    )
 
                     ProfileInfo1(
                         modifier = Modifier
@@ -212,7 +231,8 @@ fun LazyRow123(
 
                     AnimatedVisibility(
                         !isVideo, modifier = Modifier
-                            .fillMaxSize().align(Alignment.BottomCenter),
+                            .fillMaxSize()
+                            .align(Alignment.BottomCenter),
                         enter = slideInVertically(
                             initialOffsetY = { fullHeight -> fullHeight }, // снизу вверх
                             animationSpec = tween(durationMillis = 200)
@@ -230,14 +250,26 @@ fun LazyRow123(
 
                             //✅ Лайк
                             if (SavedRed.likesList.any { it.id == item.id }) {
-                                Icon(Icons.Filled.FavoriteBorder, contentDescription = null,
-                                    tint = Color.White, modifier = Modifier.padding(bottom = 6.dp, end = 6.dp).size(18.dp))
+                                Icon(
+                                    Icons.Filled.FavoriteBorder,
+                                    contentDescription = null,
+                                    tint = Color.White,
+                                    modifier = Modifier
+                                        .padding(bottom = 6.dp, end = 6.dp)
+                                        .size(18.dp)
+                                )
                             }
 
                             //✅ Иконка того что видео скачано
                             if (DownloadRed.downloadList.contains(item.id)) {
-                                Icon(Icons.Default.Save, contentDescription = null,
-                                    tint = Color.White, modifier = Modifier.padding(bottom = 6.dp, end = 6.dp).size(18.dp))
+                                Icon(
+                                    Icons.Default.Save,
+                                    contentDescription = null,
+                                    tint = Color.White,
+                                    modifier = Modifier
+                                        .padding(bottom = 6.dp, end = 6.dp)
+                                        .size(18.dp)
+                                )
                             }
 
                         }
@@ -252,9 +284,11 @@ fun LazyRow123(
 
 
     if (fullScreen) {
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .background(Color.DarkGray)) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.DarkGray)
+        ) {
 
             if (blockItem != null) {
                 RedUrlVideoImageAndLongClick(

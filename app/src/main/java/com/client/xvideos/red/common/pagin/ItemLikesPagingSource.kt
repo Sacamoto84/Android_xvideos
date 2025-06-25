@@ -17,15 +17,7 @@ class ItemLikesPagingSource (val order : Order): PagingSource<Int, GifsInfo>() {
         return try {
             Timber.d("!!! ItemLikesPagingSource::load() page = $page sortTop:$order")
 
-            if (order == Order.FORCE_TEMP) {
-                LoadResult.Page(
-                    data = emptyList(),
-                    prevKey = null,
-                    nextKey = page
-                )
-            }
-
-            val gif1 = SavedRed.likesList.toList()
+            val gif1 = if(order != Order.FORCE_TEMP) SavedRed.likesList.toList() else emptyList()
 
             LoadResult.Page(
                 data = gif1,
@@ -40,10 +32,6 @@ class ItemLikesPagingSource (val order : Order): PagingSource<Int, GifsInfo>() {
     }
 
     override fun getRefreshKey(state: PagingState<Int, GifsInfo>): Int? {
-//        return state.anchorPosition?.let { position ->
-//            state.closestPageToPosition(position)?.prevKey?.plus(1)
-//                ?: state.closestPageToPosition(position)?.nextKey?.minus(1)
-//        }
         return null
     }
 }

@@ -80,9 +80,7 @@ fun LazyRow123ExplorerNiches(
             onBlockConfirmed = {
                 if ((blockItem != null)) {
                     BlockRed.blockItem(blockItem!!)
-                    val temp = host.sortType.value
-                    host.changeSortType(Order.FORCE_TEMP)
-                    host.changeSortType(temp)
+                    host.refresh()
                 }
             }
         )

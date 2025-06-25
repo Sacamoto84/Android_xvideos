@@ -36,6 +36,25 @@ object ExpandMenuVideoImpl {
             }),
         )
 
+    val expandMenuVideoListLikes =
+        listOf(
+            ExpandMenuVideoModel("Скачать", Icons.Filled.FileDownload, onClick = {
+                if (it == null) return@ExpandMenuVideoModel
+                DownloadRed.downloadItem(it)
+            }),
+            ExpandMenuVideoModel("Поделиться", Icons.Default.Share),
+            ExpandMenuVideoModel("Блокировать", Icons.Default.Block, onClick = {
+                if (it == null) return@ExpandMenuVideoModel
+                BlockRed.blockVisibleDialog = true
+            }),
+
+            ExpandMenuVideoModel("!Like", Icons.Default.Block, onClick = {
+                if (it == null) return@ExpandMenuVideoModel
+                SavedRed.removeLikes(it)
+                SavedRed.refreshLikesList()
+            }),
+        )
+
 
 
 }

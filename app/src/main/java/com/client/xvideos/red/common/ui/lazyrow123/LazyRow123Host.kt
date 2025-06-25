@@ -49,7 +49,7 @@ class LazyRow123Host(
     val typePager : TypePager,
     val extraString : String = "",
     val startOrder : Order = Order.LATEST,
-    val startColumns : Int = 2
+    val startColumns : Int = 2,
 ) {
 
     val state: LazyGridState = LazyGridState()
@@ -94,7 +94,7 @@ class LazyRow123Host(
                 }
             ).flow
         }
-        .cachedIn(GlobalScope)
+        .cachedIn(scope)
 
 
 
@@ -115,6 +115,13 @@ class LazyRow123Host(
     var currentIndexGoto by mutableIntStateOf(0)
 
     fun gotoUp(){ scope.launch { state.scrollToItem(0) } }
+
+    fun refresh(){
+        val temp = sortType.value
+        changeSortType(Order.FORCE_TEMP)
+        changeSortType(temp)
+    }
+
 
 }
 
