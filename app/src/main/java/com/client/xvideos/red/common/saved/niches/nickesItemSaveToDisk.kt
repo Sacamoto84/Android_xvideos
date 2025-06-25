@@ -31,6 +31,4 @@ fun nickesItemSaveToDisk(nickesInfo: NichesInfo): Result<Boolean>  {
         Timber.e(e, "Ошибка при сохранении лайка GIF")
         Result.failure(e)
     }
-
 }
-

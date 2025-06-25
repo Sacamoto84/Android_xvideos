@@ -9,7 +9,7 @@ import java.io.IOException
 
 fun likesItemSaveToDisk(item: GifsInfo): Result<Boolean> {
     return try {
-        Timber.i("!!! сохранить лайк GIFS -> likesItem() id:${item.id} userName:${item.userName} url:${item.urls.hd}")
+        Timber.i("!!! Сохранить лайк GIFS -> likesItemSaveToDisk() id:${item.id} userName:${item.userName} url:${item.urls.hd}")
 
         // Создаем директорию <userName>/block, если её нет
         val likesDir = File(AppPath.likes_red, item.userName)

@@ -14,10 +14,17 @@ fun likesItemRemoveFromDisk(item: GifsInfo): Result<Boolean> {
         val likesDir = File(AppPath.likes_red, item.userName)
         val likesFile = File(likesDir, "${item.id}.likes")
 
+        // 1. Удаляем сам файл лайка, если существует
         if (likesFile.exists()) {
-            val deleted = likesFile.delete()
-            if (!deleted) {
+            if (!likesFile.delete()) {
                 return Result.failure(IOException("Не удалось удалить файл: ${likesFile.absolutePath}"))
+            }
+        }
+
+        // 2. Проверяем, остались ли ещё файлы в каталоге
+        if (likesDir.exists() && likesDir.list()?.isEmpty() == true) {
+            if (!likesDir.delete()) {
+                return Result.failure(IOException("Не удалось удалить пустую директорию: ${likesDir.absolutePath}"))
             }
         }
 

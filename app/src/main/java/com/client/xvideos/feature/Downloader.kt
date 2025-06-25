@@ -59,7 +59,7 @@ object Downloader {
 
                 onError = {
                     println("!!! onError закачки: $it"); percent.value = -3f
-                    SnackBarEvent.infoChannel.trySend(UiMessage.Error("Ошибка закачки: $it"))
+                    SnackBarEvent.messages.trySend(UiMessage.Error("Ошибка закачки: $it"))
                 },
 
                 onProgress = { it1 -> percent.value = it1 / 100f },
@@ -67,13 +67,13 @@ object Downloader {
                     println("!!! onCompleted закачки")
                     percent.value = -2f
                     //Toast("Скачивание завершено")
-                    SnackBarEvent.infoChannel.trySend(UiMessage.Success("Скачивание завершено"))
+                    SnackBarEvent.messages.trySend(UiMessage.Success("Скачивание завершено"))
                     DownloadRed.refreshDownloadList()
                 },
             )
         } else {
             //Toast("Файл есть к кеше")
-            SnackBarEvent.infoChannel.trySend(UiMessage.Info("Файл есть к кеше"))
+            SnackBarEvent.messages.trySend(UiMessage.Info("Файл есть к кеше"))
         }
 
     }

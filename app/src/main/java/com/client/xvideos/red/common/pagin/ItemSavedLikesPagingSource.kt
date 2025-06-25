@@ -8,7 +8,7 @@ import com.client.xvideos.red.common.saved.SavedRed
 import timber.log.Timber
 
 
-class ItemLikesPagingSource (val order : Order): PagingSource<Int, GifsInfo>() {
+class ItemSavedLikesPagingSource (val order : Order): PagingSource<Int, GifsInfo>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int,  GifsInfo> {
 

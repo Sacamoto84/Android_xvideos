@@ -68,8 +68,6 @@ fun LazyRow123(
     contentPadding: PaddingValues = PaddingValues(0.dp),
     contentBeforeList: @Composable (() -> Unit) = {},
 
-    gotoUp: () -> Unit = {},
-
     //Для меню
     onRun0: () -> Unit = {},
     onRun1: () -> Unit = {},
@@ -77,7 +75,6 @@ fun LazyRow123(
     onRun3: () -> Unit = {},
     onRun4: () -> Unit = {},
     onRun5: () -> Unit = {},
-
     ) {
 
     SideEffect { Timber.d("!!! LazyRow123::SideEffect columns: ${host.columns} gotoPosition: $gotoPosition") }

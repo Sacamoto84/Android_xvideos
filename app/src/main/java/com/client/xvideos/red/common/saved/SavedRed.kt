@@ -2,13 +2,19 @@ package com.client.xvideos.red.common.saved
 
 import androidx.compose.runtime.mutableStateListOf
 import com.client.xvideos.feature.redgifs.types.GifsInfo
+import com.client.xvideos.feature.redgifs.types.NichesInfo
 import com.client.xvideos.red.common.saved.likes.getAllLikesFromDisk
 import com.client.xvideos.red.common.saved.likes.likesItemRemoveFromDisk
 import com.client.xvideos.red.common.saved.likes.likesItemSaveToDisk
+import com.client.xvideos.red.common.saved.niches.getAllNichesFromDisk
+import com.client.xvideos.red.common.saved.niches.nickesItemRemoveFromDisk
+import com.client.xvideos.red.common.saved.niches.nickesItemSaveToDisk
+import com.client.xvideos.red.common.snackBar.SnackBarEvent
 import com.client.xvideos.util.Toast
 
 object SavedRed {
 
+    /////////////////////////////////////////////////////////////////////////////////////////////
     var likesList = mutableStateListOf<GifsInfo>()
 
     fun addLikes(item: GifsInfo) {
@@ -34,7 +40,40 @@ object SavedRed {
         val a = getAllLikesFromDisk()
         likesList.addAll(a)
     }
+    /////////////////////////////////////////////////////////////////////////////////////////////
 
+    var nichesList = mutableStateListOf<NichesInfo>()
+
+    fun addNiches(item: NichesInfo) {
+        println("!!! addNiches() id:${item.id} name:${item.name}")
+        nickesItemSaveToDisk(item)
+            .onSuccess {
+                SnackBarEvent.info("Группа добавлена")
+                nichesList.add(item)
+            }
+            .onFailure { e ->
+                SnackBarEvent.error("Ошибка добавления группы ${e.message}")
+            }
+    }
+
+    fun removeNiches(item: NichesInfo) {
+        println("!!! removeNiches() id:${item.id} name:${item.name}")
+        nickesItemRemoveFromDisk(item.id)
+            .onSuccess {
+                SnackBarEvent.info("Группа удалена")
+                nichesList.remove(item)
+            }
+            .onFailure { e ->
+                SnackBarEvent.error("Ошибка удаления группы ${e.message}")
+            }
+    }
+
+    fun refreshNichesList() {
+        nichesList.clear()
+        val a = getAllNichesFromDisk()
+        nichesList.addAll(a)
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////
 
 }
 

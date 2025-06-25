@@ -12,14 +12,12 @@ import androidx.paging.cachedIn
 import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.feature.redgifs.types.Order
 import com.client.xvideos.red.common.pagin.ItemExplorerNailsPagingSource
-import com.client.xvideos.red.common.pagin.ItemLikesPagingSource
+import com.client.xvideos.red.common.pagin.ItemSavedLikesPagingSource
 import com.client.xvideos.red.common.pagin.ItemNailsPagingSource
 import com.client.xvideos.red.common.pagin.ItemTopPagingSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -134,7 +132,7 @@ fun createPager(typePager: TypePager, sort : Order, extraString : String) : Pagi
             ItemTopPagingSource(sort)
         }
         TypePager.LIKES -> {
-            ItemLikesPagingSource(sort)
+            ItemSavedLikesPagingSource(sort)
         }
 
         TypePager.EXPLORER_NICHES -> {

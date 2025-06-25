@@ -36,9 +36,9 @@ object AppPath {
 
     val db_red : String = "${main}/${Folder.RED.value}/db"
 
-    val likes_red : String = "${main}/${Folder.RED.value}/Saves/Likes"
-    val collection_red : String = "${main}/${Folder.RED.value}/Saves/Collection"
-    val niches_red : String = "${main}/${Folder.RED.value}/Saves/Niches"
+    val likes_red : String = "${main}/${Folder.RED.value}/Saved/Likes"
+    val collection_red : String = "${main}/${Folder.RED.value}/Saved/Collection"
+    val niches_red : String = "${main}/${Folder.RED.value}/Saved/Niches"
 
     init {
 
