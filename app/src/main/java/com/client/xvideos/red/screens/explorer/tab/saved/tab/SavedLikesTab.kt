@@ -3,12 +3,8 @@ package com.client.xvideos.red.screens.explorer.tab.saved.tab
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.ScreenModel
@@ -26,7 +22,6 @@ import com.client.xvideos.red.common.saved.SavedRed
 import com.client.xvideos.red.common.ui.lazyrow123.LazyRow123
 import com.client.xvideos.red.common.ui.lazyrow123.LazyRow123Host
 import com.client.xvideos.red.common.ui.lazyrow123.TypePager
-import com.client.xvideos.red.screens.explorer.tab.saved.SavedTab
 import com.client.xvideos.red.screens.profile.ScreenRedProfile
 import dagger.Binds
 import dagger.Module
@@ -38,7 +33,7 @@ import javax.inject.Inject
 
 object SavedLikesTab : Screen {
 
-    private fun readResolve(): Any = SavedTab
+    private fun readResolve(): Any = SavedLikesTab
 
     override val key: ScreenKey = uniqueScreenKey
 
@@ -78,7 +73,7 @@ class ScreenSavedLikesSM @Inject constructor(
     val likedHost = LazyRow123Host(
         connectivityObserver = connectivityObserver,
         scope = screenModelScope,
-        typePager = TypePager.LIKES
+        typePager = TypePager.SAVED_LIKES
     )
 
 }

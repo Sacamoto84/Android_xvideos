@@ -50,6 +50,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.feature.redgifs.types.Order
 import com.client.xvideos.red.ThemeRed
 import com.client.xvideos.red.common.expand_menu_video.impl.ExpandMenuVideoImpl
+import com.client.xvideos.red.common.saved.SavedRed
 import com.client.xvideos.red.common.ui.atom.Selector
 import com.client.xvideos.red.common.ui.lazyrow123.LazyRow123
 import com.client.xvideos.red.common.ui.sortByOrder.SortByOrder
@@ -122,7 +123,12 @@ data class ScreenRedNiche(val nicheName: String = "pumped-pussy") : Screen {
                                 .background(Color(0xFF0F0F0F))
                         ) {
 
+                            Button(onClick = { SavedRed.addNiches(vm.niche)}) {
+                                Text("Добавить группу")
+                            }
+
                             NicheProfile(vm.niche)
+
                             Text(
                                 "Related Niches",
                                 color = Color.White,

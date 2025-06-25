@@ -73,6 +73,7 @@ class App : Application() {
         GlobalScope.launch {
             clearOldCache( db.cacheMedaResponseDao())
             SavedRed.refreshLikesList()
+            SavedRed.refreshNichesList()
         }
 
     }

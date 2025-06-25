@@ -39,6 +39,7 @@ import com.client.xvideos.red.screens.explorer.tab.FavoritesTab
 import com.client.xvideos.red.screens.explorer.tab.gifs.GifsTab
 import com.client.xvideos.red.screens.explorer.tab.niches.NichesTab
 import com.client.xvideos.red.screens.explorer.tab.saved.tab.SavedLikesTab
+import com.client.xvideos.red.screens.explorer.tab.saved.tab.SavedNichesTab
 import com.client.xvideos.red.screens.explorer.top.TabRow
 import com.client.xvideos.red.screens.profile.ScreenRedProfile
 import com.client.xvideos.red.screens.top_this_week.ScreenRedTopThisWeek
@@ -76,6 +77,7 @@ object SavedTab : Screen {
                 when (screenType) {
                     0 -> SavedLikesTab.Content()
                     1 -> ScreenRedTopThisWeek.Content()
+                    2 -> SavedNichesTab.Content()
                     3 -> NichesTab.Content()
                     else -> FavoritesTab.Content()
                 }

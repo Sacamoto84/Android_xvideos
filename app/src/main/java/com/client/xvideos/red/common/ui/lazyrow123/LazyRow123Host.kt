@@ -31,8 +31,8 @@ import timber.log.Timber
 enum class TypePager {
     NICHES,
     TOP,
-    LIKES,
 
+    SAVED_LIKES,
 
     //
     EXPLORER_NICHES,
@@ -131,7 +131,7 @@ fun createPager(typePager: TypePager, sort : Order, extraString : String) : Pagi
         TypePager.TOP -> {
             ItemTopPagingSource(sort)
         }
-        TypePager.LIKES -> {
+        TypePager.SAVED_LIKES -> {
             ItemSavedLikesPagingSource(sort)
         }
 
