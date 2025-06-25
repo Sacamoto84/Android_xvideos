@@ -1,8 +1,12 @@
 package com.client.xvideos.red.common.saved
 
 import androidx.compose.runtime.mutableStateListOf
+import com.client.xvideos.feature.redgifs.types.CreatorResponse
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.redgifs.types.NichesInfo
+import com.client.xvideos.red.common.saved.creators.creatorsItemRemoveFromDisk
+import com.client.xvideos.red.common.saved.creators.creatorsItemSaveToDisk
+import com.client.xvideos.red.common.saved.creators.getAllCreatorsFromDisk
 import com.client.xvideos.red.common.saved.likes.getAllLikesFromDisk
 import com.client.xvideos.red.common.saved.likes.likesItemRemoveFromDisk
 import com.client.xvideos.red.common.saved.likes.likesItemSaveToDisk
@@ -42,6 +46,39 @@ object SavedRed {
     }
     /////////////////////////////////////////////////////////////////////////////////////////////
 
+    var creatorsList = mutableStateListOf<CreatorResponse>()
+
+    fun addCreator(item: CreatorResponse) {
+        println("!!! addCreator() id:${item.users[0].name}")
+        creatorsItemSaveToDisk(item)
+            .onSuccess {
+                SnackBarEvent.info("Creator добавлен")
+                creatorsList.add(item)
+            }
+            .onFailure { e ->
+                SnackBarEvent.error("Ошибка добавления creator ${e.message}")
+            }
+    }
+
+    fun removeCreator(item: CreatorResponse) {
+        println("!!! removeNiches() id:${item.users[0].name} ")
+        creatorsItemRemoveFromDisk(item.users[0].name)
+            .onSuccess {
+                SnackBarEvent.info("Группа удалена")
+                creatorsList.remove(item)
+            }
+            .onFailure { e ->
+                SnackBarEvent.error("Ошибка удаления группы ${e.message}")
+            }
+    }
+
+    fun refreshCreatorsList() {
+        creatorsList.clear()
+        val a = getAllCreatorsFromDisk()
+        creatorsList.addAll(a)
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////
     var nichesList = mutableStateListOf<NichesInfo>()
 
     fun addNiches(item: NichesInfo) {
@@ -73,7 +110,6 @@ object SavedRed {
         val a = getAllNichesFromDisk()
         nichesList.addAll(a)
     }
-    /////////////////////////////////////////////////////////////////////////////////////////////
 
 }
 
