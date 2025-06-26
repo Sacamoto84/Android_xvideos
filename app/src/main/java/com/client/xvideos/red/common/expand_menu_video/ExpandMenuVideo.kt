@@ -5,7 +5,14 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.PermIdentity
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
@@ -25,8 +32,162 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
+import com.client.xvideos.feature.redgifs.http.RedGifs
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.red.ThemeRed
+import com.client.xvideos.red.common.block.BlockRed
+import com.client.xvideos.red.common.downloader.DownloadRed
+import com.client.xvideos.red.common.saved.SavedRed
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+
+
+private val tintColor = Color(0xFF48454E)
+private val style =
+    TextStyle(color = tintColor, fontFamily = ThemeRed.fontFamilyPopinsRegular, fontSize = 20.sp)
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ExpandMenuVideo(
+    item: GifsInfo? = null,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {},
+    scope: CoroutineScope,
+    onRunLike: () -> Unit = {},
+) {
+
+    var expanded by remember { mutableStateOf(false) }
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { if (it) onClick.invoke(); expanded = it },
+        modifier = Modifier.then(modifier)
+    )
+    {
+        IconButton(
+            modifier = Modifier
+                .size(48.dp)
+                .menuAnchor(ExposedDropdownMenuAnchorType.SecondaryEditable),
+            onClick = {}) {
+            Icon(
+                Icons.Default.MoreVert,
+                contentDescription = "",
+                tint = Color.White,
+                modifier = Modifier.size(24.dp)
+            )
+        }
+
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.width(IntrinsicSize.Min),
+            containerColor = Color(0xFFF1EDF4)//ThemeRed.colorCommonBackground
+        ) {
+
+            DropdownMenuItem(
+                leadingIcon = {
+                    Icon(
+                        Icons.Filled.FileDownload,
+                        contentDescription = "",
+                        tint = tintColor
+                    )
+                },
+                text = {
+                    Text(
+                        "Скачать",
+                        style = TextStyle(
+                            color = Color(0xFF48454E),
+                            fontFamily = ThemeRed.fontFamilyPopinsRegular,
+                            fontSize = 20.sp
+                        )
+                    )
+                },
+                onClick = {
+                    if (item == null) return@DropdownMenuItem; DownloadRed.downloadItem(item); expanded =
+                    false
+                }, contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+            )
+
+
+            DropdownMenuItem(
+                leadingIcon = {
+                    Icon(
+                        Icons.Default.Share,
+                        contentDescription = "",
+                        tint = tintColor
+                    )
+                },
+                text = { Text("Поделиться", style = style) },
+                onClick = {
+                    if (item == null) return@DropdownMenuItem; DownloadRed.downloadItem(item); expanded =
+                    false
+                }, contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+            )
+
+            DropdownMenuItem(
+                leadingIcon = {
+                    Icon(
+                        Icons.Default.Block,
+                        contentDescription = "",
+                        tint = tintColor
+                    )
+                },
+                text = { Text("Блокировать", style = style) },
+                onClick = {
+                    if (item == null) return@DropdownMenuItem; BlockRed.blockVisibleDialog =
+                    true; expanded = false
+                }, contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+            )
+
+
+            val isLiked = SavedRed.likesList.any { it.id == item?.id }
+            val textLiked = if (isLiked) "Unlike" else "Like"
+            val textLikedIcon = if (isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder
+            DropdownMenuItem(
+                leadingIcon = {Icon(textLikedIcon, contentDescription = "", tint = tintColor)},
+                text = { Text(textLiked, style = style) },
+                onClick = {
+                    if (item == null) return@DropdownMenuItem
+                    scope.launch {
+                        delay(200)
+                        if (!isLiked) SavedRed.addLikes(item) else SavedRed.removeLikes(item)
+                        onRunLike.invoke()
+                    }
+                    expanded = false
+                }, contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+            )
+
+            val isFollowed = SavedRed.creatorsList.any { it.username == item?.userName }
+            val textFollowed = if (isFollowed) "Unfollow" else "Follow"
+            val textFollowedIcon = if (isFollowed) Icons.Default.Person else Icons.Default.PermIdentity
+            DropdownMenuItem(
+                leadingIcon = {Icon(textFollowedIcon, contentDescription = "", tint = tintColor)},
+                text = { Text(textFollowed, style = style) },
+                onClick = {
+                    if (item == null) return@DropdownMenuItem
+                    scope.launch {
+                        delay(200)
+                        if (!isFollowed) {
+                            try {
+                                val a = RedGifs.readCreator(item.userName)
+                                SavedRed.addCreator(a)
+                            } catch (e: Exception) { e.printStackTrace() }
+                        }
+                        else {
+                            SavedRed.removeCreator(item.userName)
+                        }
+                    }
+                    expanded = false
+                }, contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+            )
+        }
+
+    }
+
+
+}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -97,7 +258,7 @@ fun ExpandMenuVideo(
                     },
                     onClick = {
                         it.onClick.invoke(item)
-                        when(index){
+                        when (index) {
                             0 -> onRun0.invoke()
                             1 -> onRun1.invoke()
                             2 -> onRun2.invoke()

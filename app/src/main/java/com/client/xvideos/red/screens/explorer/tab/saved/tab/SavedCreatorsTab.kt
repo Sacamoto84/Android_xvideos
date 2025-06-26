@@ -132,7 +132,7 @@ object SavedCreatorsTab : Screen {
                 confirmButton = {
                     TextButton(
                         onClick = {
-                            SavedRed.removeCreator(pending)   // удаляем
+                            SavedRed.removeCreator(pending.username)   // удаляем
                             itemPendingDelete = null         // закрываем диалог
                         }
                     ) { Text("Удалить", fontSize = 16.sp, color = Color(0xFF6552A5)) }

@@ -5,15 +5,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.Snackbar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -29,14 +25,12 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.red.common.expand_menu_video.impl.ExpandMenuVideoImpl
 import com.client.xvideos.red.common.saved.SavedRed
-import com.client.xvideos.red.common.snackBar.SnackBarEvent
 import com.client.xvideos.red.common.ui.lazyrow123.LazyRow123
 import com.client.xvideos.red.common.ui.lazyrow123.LazyRow123Host
 import com.client.xvideos.red.common.ui.lazyrow123.TypePager
 import com.client.xvideos.red.screens.profile.ScreenRedProfile
 import com.client.xvideos.red.screens.profile.atom.VerticalScrollbar
 import com.client.xvideos.red.screens.profile.rememberVisibleRangePercentIgnoringFirstNForGrid
-import com.client.xvideos.red.screens.profile.rememberVisibleRangePercentIgnoringFirstNForLazyColumn
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -93,9 +87,10 @@ object SavedLikesTab : Screen {
                 contentPadding = PaddingValues(0.dp),
                 contentBeforeList = { },
 
-                onRun3 = {
+                onRunLike = {
                     vm.likedHost.refresh()
                 }
+
             )
 
             //---- Скролл ----

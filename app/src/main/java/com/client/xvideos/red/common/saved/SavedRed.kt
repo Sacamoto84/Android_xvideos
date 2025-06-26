@@ -1,7 +1,6 @@
 package com.client.xvideos.red.common.saved
 
 import androidx.compose.runtime.mutableStateListOf
-import com.client.xvideos.feature.redgifs.types.CreatorResponse
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.redgifs.types.NichesInfo
 import com.client.xvideos.feature.redgifs.types.UserInfo
@@ -15,7 +14,6 @@ import com.client.xvideos.red.common.saved.niches.getAllNichesFromDisk
 import com.client.xvideos.red.common.saved.niches.nickesItemRemoveFromDisk
 import com.client.xvideos.red.common.saved.niches.nickesItemSaveToDisk
 import com.client.xvideos.red.common.snackBar.SnackBarEvent
-import com.client.xvideos.util.Toast
 
 object SavedRed {
 
@@ -24,20 +22,28 @@ object SavedRed {
 
     fun addLikes(item: GifsInfo) {
         println("!!! addLikes() id:${item.id} userName:${item.userName} url:${item.urls.hd}")
-        val res = likesItemSaveToDisk(item)
-        if (res.isSuccess) {
-            Toast("Лайк")
-            likesList.add(item)
-        }
+        likesItemSaveToDisk(item)
+            .onSuccess {
+                SnackBarEvent.success("Like")
+                likesList.add(item)
+            }
+            .onFailure { e ->
+                SnackBarEvent.error("Ошибка добавления лайка ${e.message}")
+            }
     }
 
     fun removeLikes(item: GifsInfo) {
         println("!!! removeLikes() id:${item.id} userName:${item.userName} url:${item.urls.hd}")
-        val res = likesItemRemoveFromDisk(item)
-        if (res.isSuccess) {
-            Toast("Удалил лайк")
-            likesList.remove(item)
-        }
+
+        likesItemRemoveFromDisk(item)
+            .onSuccess {
+                SnackBarEvent.info("Unlike")
+                likesList.remove(item)
+            }
+            .onFailure { e ->
+                SnackBarEvent.error("Ошибка удаления лайка ${e.message}")
+            }
+
     }
 
     fun refreshLikesList() {
@@ -61,9 +67,9 @@ object SavedRed {
             }
     }
 
-    fun removeCreator(item: UserInfo) {
-        println("!!! removeCreator() id:${item.username} ")
-        creatorsItemRemoveFromDisk(item.username)
+    fun removeCreator(username: String) {
+        println("!!! removeCreator() id:${username} ")
+        creatorsItemRemoveFromDisk(username)
             .onSuccess {
                 SnackBarEvent.info("Автор удален")
                 //creatorsList.remove(item)

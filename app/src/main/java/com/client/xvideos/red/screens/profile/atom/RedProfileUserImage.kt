@@ -104,7 +104,7 @@ fun RedProfileCreaterInfo(item: UserInfo) {
                 .clip(RoundedCornerShape(8.dp))
                 .background(if (isFollow) Color.Black else ThemeRed.colorYellow)
                 .border( 1.dp, if (isFollow)Color.White else Color.Transparent, RoundedCornerShape(8.dp))
-                .clickable { if (isFollow) SavedRed.removeCreator(item) else SavedRed.addCreator(item)
+                .clickable { if (isFollow) SavedRed.removeCreator(item.username) else SavedRed.addCreator(item)
                            }, contentAlignment = Alignment.Center) {
             Text(if (isFollow) "Отписаться" else "Подписаться", color = if (isFollow) Color.White else Color.Black)
         }

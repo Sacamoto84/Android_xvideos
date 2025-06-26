@@ -1,6 +1,7 @@
 package com.client.xvideos.red.screens
 
 import android.annotation.SuppressLint
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
@@ -96,6 +97,9 @@ class ScreenRedRoot() : Screen {
             }
         }
 
+        BackHandler {
+
+        }
 
         CompositionLocalProvider(LocalRootScreenModel provides root) {
             Scaffold(

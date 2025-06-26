@@ -66,19 +66,14 @@ fun LazyRow123(
     contentBeforeList: @Composable (() -> Unit) = {},
 
     //Для меню
-    onRun0: () -> Unit = {},
-    onRun1: () -> Unit = {},
-    onRun2: () -> Unit = {},
-    onRun3: () -> Unit = {},
-    onRun4: () -> Unit = {},
-    onRun5: () -> Unit = {},
+    onRunLike: () -> Unit = {},
+
     ) {
 
     SideEffect { Timber.d("!!! LazyRow123::SideEffect columns: ${host.columns} gotoPosition: $gotoPosition") }
 
     val listGifs = host.pager.collectAsLazyPagingItems() as LazyPagingItems<GifsInfo>
 
-    var fullScreen by remember { mutableStateOf(false) }
     val isConnected by host.isConnected.collectAsState()
     val state = host.state//rememberLazyGridState()
     var blockItem by remember { mutableStateOf<GifsInfo?>(null) }
@@ -150,6 +145,7 @@ fun LazyRow123(
                 if ((blockItem != null)) {
                     BlockRed.blockItem(blockItem!!)
                     host.refresh()
+                    blockItem = null
                 }
             }
         )
@@ -203,13 +199,15 @@ fun LazyRow123(
 
                     //Меню на 3 точки
                     ExpandMenuVideo(
-                        modifier = Modifier.align(Alignment.TopEnd),
-                        option = option,
                         item = item,
+                        modifier = Modifier.align(Alignment.TopEnd),
                         onClick = {
                             blockItem = item //Для блока и идентификации и тема
-                        }, onRun0, onRun1, onRun2, onRun3, onRun4, onRun5
+                        },
+                        scope = host.scope,
+                        onRunLike = onRunLike
                     )
+
 
                     if(host.visibleProfileInfo) {
                         ProfileInfo1(

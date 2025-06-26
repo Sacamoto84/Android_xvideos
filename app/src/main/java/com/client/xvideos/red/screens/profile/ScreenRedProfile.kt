@@ -149,7 +149,7 @@ class ScreenRedProfile(val profileName: String) : Screen {
 
                             },
 
-                            onRun3 = {
+                            onRunLike = {
                                 //vm.likedHost.refresh()
                             }
                         )
