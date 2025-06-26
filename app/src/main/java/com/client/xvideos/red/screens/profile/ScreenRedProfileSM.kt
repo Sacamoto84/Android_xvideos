@@ -103,12 +103,12 @@ class ScreenRedProfileSM @AssistedInject constructor(
             //maxCreatorGifs = creator?.users[0]?.publishedGifs ?: 0
             maxCreatorGifs = creator?.pages ?: 0
 
-            val repeats = 1//maxCreatorGifs / 100 + 1
-
-            repeat(repeats) {
-                loadNextPage(userName = profileName, items = 100, page = it+1)
-                delay(1000)
-            }
+//            val repeats = 1//maxCreatorGifs / 100 + 1
+//
+//            repeat(repeats) {
+//                loadNextPage(userName = profileName, items = 100, page = it+1)
+//                delay(1000)
+//            }
 
             //Фильтруем список тегов убрав из списка блокируемые gif
             BlockRed.refreshListAndBlock(_list)
