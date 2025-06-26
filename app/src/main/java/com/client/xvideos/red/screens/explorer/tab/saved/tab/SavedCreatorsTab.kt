@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -65,6 +66,9 @@ import com.client.xvideos.red.common.ui.lazyrow123.LazyRow123Host
 import com.client.xvideos.red.common.ui.lazyrow123.TypePager
 import com.client.xvideos.red.screens.niche.ScreenRedNiche
 import com.client.xvideos.red.screens.profile.ScreenRedProfile
+import com.client.xvideos.red.screens.profile.atom.VerticalScrollbar
+import com.client.xvideos.red.screens.profile.rememberVisibleRangePercentIgnoringFirstNForGrid
+import com.client.xvideos.red.screens.profile.rememberVisibleRangePercentIgnoringFirstNForLazyColumn
 import com.client.xvideos.screens.common.urlVideImage.UrlImage
 import com.composeunstyled.Text
 import dagger.Binds
@@ -91,6 +95,12 @@ object SavedCreatorsTab : Screen {
 
         /**  ➜ сюда запоминаем элемент, который пользователь хочет удалить  */
         var itemPendingDelete by remember { mutableStateOf<UserInfo?>(null) }
+
+        //Расчет процентов для скролл
+
+        val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForLazyColumn(
+            gridState = state, itemsToIgnore = 0
+        )
 
         /* ---------- Диалог подтверждения ---------- */
         itemPendingDelete?.let { pending ->
@@ -137,77 +147,96 @@ object SavedCreatorsTab : Screen {
         Scaffold(topBar = {
             Text(">Авторы", modifier = Modifier.padding(start = 8.dp), color = ThemeRed.colorYellow, fontSize = 18.sp, fontFamily = ThemeRed.fontFamilyPopinsRegular)
         }) { padding ->
+            Box(modifier = Modifier.padding(top = padding.calculateTopPadding()).fillMaxSize()) {
+                LazyColumn(
+                    state = state,
+                    modifier = Modifier.fillMaxSize()
+                )
+                {
 
-            LazyColumn(state = state, modifier = Modifier.padding(top = padding.calculateTopPadding()).fillMaxSize())
-            {
+                    items(SavedRed.creatorsList) {
 
-                items(SavedRed.creatorsList) {
+                        Row(
+                            modifier = Modifier
+                                .padding(vertical = 2.dp)
+                                .padding(horizontal = 8.dp)
+                                .fillMaxWidth()
+                                .background(ThemeRed.colorBottomBarDivider)
+                                .clickable(onClick = {
+                                    navigator.push(
+                                        ScreenRedProfile(it.username)
+                                    )
+                                }),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
 
-                    Row(
-                        modifier = Modifier
-                            .padding(vertical = 2.dp)
-                            .padding(horizontal = 8.dp)
-                            .fillMaxWidth()
-                            .background(ThemeRed.colorBottomBarDivider)
-                            .clickable(onClick = {
-                                navigator.push(
-                                    ScreenRedProfile(it.username)
+                            if (it.profileImageUrl != null) {
+                                UrlImage(
+                                    it.profileImageUrl,
+                                    modifier = Modifier.size(96.dp),
+                                    contentScale = ContentScale.Crop
                                 )
-                            }),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
+                            } else {
+                                Box(
+                                    modifier = Modifier.clip(RoundedCornerShape(0.dp)).size(96.dp)
+                                        .background(Color.DarkGray),
+                                    contentAlignment = Alignment.Center
+                                )
+                                {
+                                    Icon(
+                                        Icons.Default.Person,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(24.dp),
+                                        tint = Color.White
+                                    )
+                                }
+                            }
 
-                        if(it.profileImageUrl != null){
-                            UrlImage(it.profileImageUrl, modifier = Modifier.size(96.dp), contentScale = ContentScale.Crop)
-                        }
-                        else
-                        {
-                            Box(
-                                modifier = Modifier.clip(RoundedCornerShape(0.dp)).size(96.dp).background(Color.DarkGray), contentAlignment = Alignment.Center
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                it.name,
+                                color = Color.White,
+                                fontSize = 20.sp,
+                                fontFamily = ThemeRed.fontFamilyDMsanss,
+                                maxLines = 3,              // сколько строк допускаем (можно убрать, чтобы было неограниченно)
+                                overflow = TextOverflow.Ellipsis,   // «…» если всё-таки не влезло
+                                modifier = Modifier.weight(1f)
                             )
-                            {
-                                Icon(
-                                    Icons.Default.Person,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(24.dp),
-                                    tint = Color.White
+
+
+                            Box(
+                                modifier = Modifier
+                                    .width(96.dp)
+                                    .height(48.dp)
+                                    .border(1.dp, Color.White, RoundedCornerShape(8.dp))
+                                    .background(Color.Black)
+                                    .clickable { itemPendingDelete = it },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    "Выйти",
+                                    fontFamily = ThemeRed.fontFamilyDMsanss,
+                                    fontSize = 18.sp,
+                                    color = Color.White
                                 )
                             }
+
+                            Spacer(modifier = Modifier.width(8.dp))
                         }
-
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            it.name,
-                            color = Color.White,
-                            fontSize = 20.sp,
-                            fontFamily = ThemeRed.fontFamilyDMsanss,
-                            maxLines = 3,              // сколько строк допускаем (можно убрать, чтобы было неограниченно)
-                            overflow = TextOverflow.Ellipsis,   // «…» если всё-таки не влезло
-                            modifier = Modifier.weight(1f)
-                        )
-
-
-                        Box(
-                            modifier = Modifier
-                                .width(96.dp)
-                                .height(48.dp)
-                                .border(1.dp, Color.White, RoundedCornerShape(8.dp))
-                                .background(Color.Black)
-                                .clickable { itemPendingDelete = it },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                "Выйти",
-                                fontFamily = ThemeRed.fontFamilyDMsanss,
-                                fontSize = 18.sp,
-                                color = Color.White
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.width(8.dp))
                     }
                 }
+
+                //---- Скролл ----
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .align(Alignment.CenterEnd)
+                        .width(2.dp)
+                ) {
+                    VerticalScrollbar(scrollPercent)
+                }
+
             }
 
         }
