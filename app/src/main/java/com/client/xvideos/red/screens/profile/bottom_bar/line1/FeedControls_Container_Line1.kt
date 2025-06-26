@@ -54,7 +54,10 @@ fun FeedControls_Container_Line1(vm: ScreenRedProfileSM) {
         ) {
             GifTypes_Control(vm)
         }
-        Selector(vm.selector.collectAsStateWithLifecycle().value) { vm.setSelector(it) }
+        Selector(vm.selector.collectAsStateWithLifecycle().value) {
+            vm.setSelector(it)
+            vm.likedHost.columns = it
+        }
 
         //--- Feed View Mode Control ---
 

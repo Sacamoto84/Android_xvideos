@@ -14,6 +14,7 @@ import com.client.xvideos.feature.redgifs.types.Order
 import com.client.xvideos.red.common.pagin.ItemExplorerNailsPagingSource
 import com.client.xvideos.red.common.pagin.ItemSavedLikesPagingSource
 import com.client.xvideos.red.common.pagin.ItemNailsPagingSource
+import com.client.xvideos.red.common.pagin.ItemProfilePagingSource
 import com.client.xvideos.red.common.pagin.ItemTopPagingSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -34,6 +35,8 @@ enum class TypePager {
 
     SAVED_LIKES,
 
+    PROFILE,
+
     //
     EXPLORER_NICHES,
 
@@ -48,6 +51,7 @@ class LazyRow123Host(
     val extraString : String = "",
     val startOrder : Order = Order.LATEST,
     val startColumns : Int = 2,
+    val visibleProfileInfo : Boolean = true
 ) {
 
     val state: LazyGridState = LazyGridState()
@@ -137,6 +141,10 @@ fun createPager(typePager: TypePager, sort : Order, extraString : String) : Pagi
 
         TypePager.EXPLORER_NICHES -> {
             ItemExplorerNailsPagingSource(order = sort)
+        }
+
+        TypePager.PROFILE -> {
+            ItemProfilePagingSource(profileName = extraString, sort)
         }
 
     }

@@ -50,6 +50,8 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.red.ThemeRed
 import com.client.xvideos.red.common.block.BlockRed
 import com.client.xvideos.red.common.block.ui.DialogBlock
+import com.client.xvideos.red.common.expand_menu_video.impl.ExpandMenuVideoImpl
+import com.client.xvideos.red.common.ui.lazyrow123.LazyRow123
 import com.client.xvideos.red.screens.profile.atom.CanvasTimeDurationLine
 import com.client.xvideos.red.screens.profile.atom.RedProfileCreaterInfo
 import com.client.xvideos.red.common.video.player_row_mini.RedUrlVideoImageAndLongClick
@@ -77,7 +79,7 @@ class ScreenRedProfile(val profileName: String) : Screen {
             factory.create(profileName)
         }
 
-        val gridState = rememberLazyGridState()
+        //val gridState = rememberLazyGridState()
         val list = vm.list.collectAsState()
 
         val isLoading = vm.isLoading.collectAsState().value
@@ -92,7 +94,7 @@ class ScreenRedProfile(val profileName: String) : Screen {
 
         //Расчет процентов для скролл
         val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForGrid(
-            gridState = gridState, itemsToIgnore = 3, numberOfColumns = 2
+            gridState = vm.likedHost.state, itemsToIgnore = 3, numberOfColumns = 2
         )
 
 
@@ -110,6 +112,7 @@ class ScreenRedProfile(val profileName: String) : Screen {
         }
         //🟨🟨🟨🟨🟨🟨🟨🟨⬆️⬆️⬆️⬆️⬆️❗
 
+
         Scaffold(
             bottomBar = {
                 Column {
@@ -122,7 +125,8 @@ class ScreenRedProfile(val profileName: String) : Screen {
                             .height(16.dp)
                             .fillMaxWidth()
                             //.alpha(al.value)
-                            .background(ThemeRed.colorCommonBackground2), contentAlignment = Alignment.BottomCenter
+                            .background(ThemeRed.colorCommonBackground2),
+                        contentAlignment = Alignment.BottomCenter
                     ) {
 
                         CanvasTimeDurationLine(
@@ -159,112 +163,127 @@ class ScreenRedProfile(val profileName: String) : Screen {
         ) {
             Box(Modifier.padding(bottom = it.calculateBottomPadding())) {
 
-                //Тикток при одном селекторе
-                if (selector == 1) {
-
-                    TikTokStyleVideoFeed(
-                        vm,
-                        list.value,
-                        onChangeTime = { it1 ->
-                            vm.currentPlayerTime = it1.first
-                            vm.currentPlayerDuration = it1.second
-                        },
-                        onPageUIElementsVisibilityChange = { it1 -> trackVisible = it1 },
-                        isMute = vm.mute,
-                        onLongClick = { },
-
-                        //Текущий выбранный элемент в пейджере
-                        onChangePagerPage = { it1 -> vm.currentTikTokPage = it1 },
-                        modifier = Modifier,
-                        timeA = vm.timeA, timeB = vm.timeB, enableAB = vm.enableAB,
-
-                        menuContent = { MenuContent(vm) },
-                        menuContentWidth = 300.dp,
-
-                        menuDefaultOpen = vm.menuCenter,
-                        menuOpenChanged = { it1 ->
-                            vm.menuCenter = it1
-                            Timber.i("@@@ menuOpenChanged vm.menuCenter = it $it1")
-                        },
-                        initialPage = vm.tictikStartIndex
-                    )
-
-                } else {
+//                //Тикток при одном селекторе
+//                if (selector == 1) {
+//
+//                    TikTokStyleVideoFeed(
+//                        vm,
+//                        list.value,
+//                        onChangeTime = { it1 ->
+//                            vm.currentPlayerTime = it1.first
+//                            vm.currentPlayerDuration = it1.second
+//                        },
+//                        onPageUIElementsVisibilityChange = { it1 -> trackVisible = it1 },
+//                        isMute = vm.mute,
+//                        onLongClick = { },
+//
+//                        //Текущий выбранный элемент в пейджере
+//                        onChangePagerPage = { it1 -> vm.currentTikTokPage = it1 },
+//                        modifier = Modifier,
+//                        timeA = vm.timeA, timeB = vm.timeB, enableAB = vm.enableAB,
+//
+//                        menuContent = { MenuContent(vm) },
+//                        menuContentWidth = 300.dp,
+//
+//                        menuDefaultOpen = vm.menuCenter,
+//                        menuOpenChanged = { it1 ->
+//                            vm.menuCenter = it1
+//                            Timber.i("@@@ menuOpenChanged vm.menuCenter = it $it1")
+//                        },
+//                        initialPage = vm.tictikStartIndex
+//                    )
+//
+//                } else {
 
                     Box(modifier = Modifier.fillMaxSize()) {
 
-                        LaunchedEffect(vm.currentTikTokPage) {
-                            gridState.scrollToItem(vm.currentTikTokPage)
-                        }
 
-                        LazyVerticalGrid(
-                            state = gridState,
-                            columns = GridCells.Fixed(2),
+                        LazyRow123(
+                            host = vm.likedHost,
                             modifier = Modifier.fillMaxSize(),
-                            horizontalArrangement = Arrangement.spacedBy(4.dp),
-                            verticalArrangement = Arrangement.spacedBy(4.dp),
-                            contentPadding = PaddingValues(4.dp) // Отступы по краям сетки
-                        ) {
+                            gotoPosition = vm.likedHost.currentIndexGoto,
+                            option = ExpandMenuVideoImpl.expandMenuVideoListLikes,
+                            contentPadding = PaddingValues(0.dp),
+                            contentBeforeList = { },
 
-                            item(key = "info", span = { GridItemSpan(maxLineSpan) }) {
-                                if (vm.creator != null){
-                                    RedProfileCreaterInfo(vm.creator!!)
-                                }
+                            onRun3 = {
+                                //vm.likedHost.refresh()
                             }
-
-                            item(key = "tags", span = { GridItemSpan(maxLineSpan) }) {
-                                if (vm.creator != null){
-                                    TagsBlock(vm.tags.collectAsStateWithLifecycle().value.toList())
-                                }
-                            }
+                        )
 
 
+//                        LaunchedEffect(vm.currentTikTokPage) {
+//                            vm.likedHost.state.scrollToItem(vm.currentTikTokPage)
+//                        }
+//
+//                        LazyVerticalGrid(
+//                            state = vm.likedHost.state,
+//                            columns = GridCells.Fixed(2),
+//                            modifier = Modifier.fillMaxSize(),
+//                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+//                            verticalArrangement = Arrangement.spacedBy(4.dp),
+//                            contentPadding = PaddingValues(4.dp) // Отступы по краям сетки
+//                        ) {
+//
+//                            item(key = "info", span = { GridItemSpan(maxLineSpan) }) {
+//                                if (vm.creator != null){
+//                                    RedProfileCreaterInfo(vm.creator!!)
+//                                }
+//                            }
+//
+//                            item(key = "tags", span = { GridItemSpan(maxLineSpan) }) {
+//                                if ((vm.creator != null) && (vm.tags.collectAsStateWithLifecycle().value.isNotEmpty())) {
+//                                    TagsBlock(vm.tags.collectAsStateWithLifecycle().value.toList())
+//                                }
+//                            }
+//
+//
+//
+//                            //Тайлы картинок и видео
+//                            itemsIndexed(
+//                                count = vm.likedHost.li.itemCount,
+//                                key = { index, item -> item.id }) { index, item ->
+//                                Box(modifier = Modifier
+//                                    .fillMaxSize()
+//                                    .aspectRatio(1080f / 1920)) {
+//                                    RedUrlVideoImageAndLongClick(item, index, onLongClick = {
+//                                        vm.openFullScreen(index)
+//                                    }, onDoubleClick = {}, onFullScreen = {
+//                                        vm.openFullScreen(index)
+//                                    }, isNetConnected = true //!!!
+//                                    )
+//                                }
+//                            }
+//                    }
 
-                            //Тайлы картинок и видео
-                            itemsIndexed(
-                                list.value,
-                                key = { index, item -> item.id }) { index, item ->
-                                Box(modifier = Modifier
-                                    .fillMaxSize()
-                                    .aspectRatio(1080f / 1920)) {
-                                    RedUrlVideoImageAndLongClick(item, index, onLongClick = {
-                                        vm.openFullScreen(index)
-                                    }, onDoubleClick = {}, onFullScreen = {
-                                        vm.openFullScreen(index)
-                                    }, isNetConnected = true //!!!
-                                    )
-                                }
-                            }
+                    //Индикатор загрузки
+                    if (isLoading) {
+                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(56.dp),
+                                strokeWidth = 8.dp
+                            )
                         }
-
-                        //Индикатор загрузки
-                        if (isLoading) {
-                            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(56.dp),
-                                    strokeWidth = 8.dp
-                                )
-                            }
-                        }
-
-                        Text("      " + visibleItems.toString(), color = Color.White)
-
-                        //---- Скролл ----
-                        Box(
-                            modifier = Modifier
-                                .fillMaxHeight()
-                                .align(Alignment.CenterEnd)
-                                .width(2.dp)
-                        ) { VerticalScrollbar(scrollPercent) }
-
                     }
 
+                    Text("      " + visibleItems.toString(), color = Color.White)
+
+                    //---- Скролл ----
+                    Box(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .align(Alignment.CenterEnd)
+                            .width(2.dp)
+                    ) { VerticalScrollbar(scrollPercent) }
 
                 }
 
 
             }
+
+
         }
+    }
 
 
 //        // триггерим подгрузку, когда остаётся ≤6 элементов до конца
@@ -468,7 +487,5 @@ class ScreenRedProfile(val profileName: String) : Screen {
 //            }
 //        }
 
-
-    }
 }
 

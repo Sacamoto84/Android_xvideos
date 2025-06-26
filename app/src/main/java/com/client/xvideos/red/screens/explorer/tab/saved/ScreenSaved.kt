@@ -2,21 +2,12 @@ package com.client.xvideos.red.screens.explorer.tab.saved
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Apps
-import androidx.compose.material.icons.outlined.BookmarkBorder
-import androidx.compose.material.icons.outlined.Dataset
-import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
-import androidx.compose.material.icons.outlined.Folder
-import androidx.compose.material.icons.outlined.GridOn
 import androidx.compose.material.icons.outlined.Group
-import androidx.compose.material.icons.outlined.Image
-import androidx.compose.material.icons.outlined.Movie
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material3.Scaffold
@@ -26,24 +17,16 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
-import cafe.adriel.voyager.hilt.getScreenModel
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.red.ThemeRed
-import com.client.xvideos.red.common.ui.lazyrow123.LazyRow123
 import com.client.xvideos.red.screens.explorer.tab.FavoritesTab
-import com.client.xvideos.red.screens.explorer.tab.gifs.GifsTab
 import com.client.xvideos.red.screens.explorer.tab.niches.NichesTab
 import com.client.xvideos.red.screens.explorer.tab.saved.tab.SavedCreatorsTab
 import com.client.xvideos.red.screens.explorer.tab.saved.tab.SavedLikesTab
 import com.client.xvideos.red.screens.explorer.tab.saved.tab.SavedNichesTab
 import com.client.xvideos.red.screens.explorer.top.TabRow
-import com.client.xvideos.red.screens.profile.ScreenRedProfile
-import com.client.xvideos.red.screens.top_this_week.ScreenRedTopThisWeek
 
 
 object SavedTab : Screen {

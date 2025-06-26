@@ -11,6 +11,7 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
 import com.client.xvideos.feature.Downloader
+import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.feature.preference.PreferencesRepository
 import com.client.xvideos.feature.redgifs.extractNameFromUrl
 import com.client.xvideos.feature.redgifs.http.RedGifs
@@ -18,10 +19,13 @@ import com.client.xvideos.feature.redgifs.types.CreatorResponse
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.redgifs.types.MediaType
 import com.client.xvideos.feature.redgifs.types.Order
+import com.client.xvideos.feature.redgifs.types.UserInfo
 import com.client.xvideos.feature.room.AppDatabase
 import com.client.xvideos.red.common.block.BlockRed
 import com.client.xvideos.red.common.network.loadGifs
 import com.client.xvideos.red.common.share.useCaseShareGifs
+import com.client.xvideos.red.common.ui.lazyrow123.LazyRow123Host
+import com.client.xvideos.red.common.ui.lazyrow123.TypePager
 import dagger.Binds
 import dagger.Module
 import dagger.assisted.Assisted
@@ -49,6 +53,7 @@ class ScreenRedProfileSM @AssistedInject constructor(
     @Assisted val profileName: String,
     private val db: AppDatabase,
     private val pref: PreferencesRepository,
+    connectivityObserver: ConnectivityObserver
 ) : ScreenModel {
 
     @AssistedFactory
@@ -65,7 +70,7 @@ class ScreenRedProfileSM @AssistedInject constructor(
 
     //var selector by mutableIntStateOf(0) // 0- 1 елемент  1-2 елемента показывать
 
-    var creator: CreatorResponse? by mutableStateOf(null)
+    var creator: UserInfo? by mutableStateOf(null)
 
     //═════════════════════════════════════════════════════════════════════════════════════════════════════╗
     //* Список тегов                                                                                       ║
@@ -91,6 +96,18 @@ class ScreenRedProfileSM @AssistedInject constructor(
     val selector = pref.flowRedSelector.stateIn(screenModelScope, SharingStarted.WhileSubscribed(5000), 0)
     fun setSelector(value: Int) { screenModelScope.launch { pref.setRedSelector(value) } }
     ///////////////////////////////////////////////
+
+
+
+    val likedHost = LazyRow123Host(
+        connectivityObserver = connectivityObserver,
+        scope = screenModelScope,
+        typePager = TypePager.PROFILE,
+        extraString = profileName,
+        visibleProfileInfo = false
+    )
+
+
     init {
 
         screenModelScope.launch {
@@ -99,9 +116,9 @@ class ScreenRedProfileSM @AssistedInject constructor(
 
             setSelector(2)
 
-            creator = RedGifs.searchCreator(userName = profileName, page = 1,  count = 1, type = MediaType.GIF,  order = order )
+            creator = RedGifs.readCreator(profileName)
             //maxCreatorGifs = creator?.users[0]?.publishedGifs ?: 0
-            maxCreatorGifs = creator?.pages ?: 0
+           // maxCreatorGifs = creator?.pages ?: 0
 
 //            val repeats = 1//maxCreatorGifs / 100 + 1
 //

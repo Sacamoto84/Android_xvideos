@@ -4,11 +4,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FileDownload
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Share
+import com.client.xvideos.feature.redgifs.http.RedGifs
 import com.client.xvideos.red.common.block.BlockRed
 import com.client.xvideos.red.common.downloader.DownloadRed
 import com.client.xvideos.red.common.expand_menu_video.ExpandMenuVideoModel
 import com.client.xvideos.red.common.saved.SavedRed
+import kotlinx.coroutines.runBlocking
 
 object ExpandMenuVideoImpl {
 
@@ -33,6 +36,19 @@ object ExpandMenuVideoImpl {
             ExpandMenuVideoModel("!Like", Icons.Default.Block, onClick = {
                 if (it == null) return@ExpandMenuVideoModel
                 SavedRed.removeLikes(it)
+            }),
+
+            ExpandMenuVideoModel("Подписаться", Icons.Default.Person, onClick = {
+                if (it == null) return@ExpandMenuVideoModel
+                runBlocking {
+                    try {
+                        val a = RedGifs.readCreator(it.userName)
+                        SavedRed.addCreator(a)
+                    }
+                   catch (e: Exception){
+                       e.printStackTrace()
+                   }
+                }
             }),
         )
 

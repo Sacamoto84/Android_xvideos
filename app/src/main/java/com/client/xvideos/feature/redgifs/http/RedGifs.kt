@@ -14,6 +14,7 @@ import com.client.xvideos.feature.redgifs.types.NichesInfo
 import com.client.xvideos.feature.redgifs.types.NichesResponse
 import com.client.xvideos.feature.redgifs.types.Order
 import com.client.xvideos.feature.redgifs.types.TopCreatorsResponse
+import com.client.xvideos.feature.redgifs.types.UserInfo
 import com.client.xvideos.feature.redgifs.types.tag.TagSuggestion
 import com.client.xvideos.feature.redgifs.types.tag.TagsResponse
 import com.google.android.gms.common.api.ApiException
@@ -164,6 +165,21 @@ object RedGifs {
         return res
 
 
+    }
+
+
+    //https://api.redgifs.com/v1/users/drfunkenfootz_md
+    suspend fun readCreator(
+        userName: String = "lilijunex",
+    ): UserInfo {
+        val route = Route(
+            method = "GET",
+            path = "/v1/users/{username}",
+            "username" to userName,
+        )
+
+        val res: UserInfo = api.request(route)
+        return res
     }
 
 

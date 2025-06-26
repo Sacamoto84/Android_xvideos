@@ -214,18 +214,19 @@ fun LazyRow123(
                         }, onRun0, onRun1, onRun2, onRun3, onRun4, onRun5
                     )
 
-                    ProfileInfo1(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .align(Alignment.BottomStart)
-                            .offset((4).dp, (-4).dp),
-                        onClick = { onClickOpenProfile(item.userName) },
-                        videoItem = item,
-                        listUsers = UsersRed.listAllUsers,
-                        visibleUserName = host.columns <= 2 && !isVideo,
-                        visibleIcon = !isVideo
-                    )
-
+                    if(host.visibleProfileInfo) {
+                        ProfileInfo1(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .align(Alignment.BottomStart)
+                                .offset((4).dp, (-4).dp),
+                            onClick = { onClickOpenProfile(item.userName) },
+                            videoItem = item,
+                            listUsers = UsersRed.listAllUsers,
+                            visibleUserName = host.columns <= 2 && !isVideo,
+                            visibleIcon = !isVideo
+                        )
+                    }
 
                     AnimatedVisibility(
                         !isVideo, modifier = Modifier

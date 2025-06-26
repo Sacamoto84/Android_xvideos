@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.client.xvideos.R
 import com.client.xvideos.feature.redgifs.types.CreatorResponse
+import com.client.xvideos.feature.redgifs.types.UserInfo
 import com.client.xvideos.red.ThemeRed
 import com.client.xvideos.red.common.saved.SavedRed
 import com.client.xvideos.screens.common.urlVideImage.UrlImage
@@ -34,9 +35,7 @@ import com.client.xvideos.util.toPrettyCount
 import com.composeunstyled.Text
 
 @Composable
-fun RedProfileCreaterInfo(item: CreatorResponse) {
-
-    if (item.users.isEmpty()) return
+fun RedProfileCreaterInfo(item: UserInfo) {
 
     Column(
         modifier = Modifier
@@ -54,7 +53,7 @@ fun RedProfileCreaterInfo(item: CreatorResponse) {
         ) {
 
 
-            UrlImage(item.users[0].profileImageUrl.toString(), modifier = Modifier.size(128.dp))
+            UrlImage(item.profileImageUrl.toString(), modifier = Modifier.size(128.dp))
 
             Row(
                 modifier = Modifier.wrapContentHeight(),
@@ -62,7 +61,7 @@ fun RedProfileCreaterInfo(item: CreatorResponse) {
             ) {
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    item.users[0].username,
+                    item.username,
                     color = Color.White,
                     fontFamily = ThemeRed.fontFamilyPopinsMedium,
                     fontSize = 28.sp,
@@ -80,7 +79,7 @@ fun RedProfileCreaterInfo(item: CreatorResponse) {
 
         }
 
-        val isFollow = SavedRed.creatorsList.any { it.username == item.users[0].username }
+        val isFollow = SavedRed.creatorsList.any { it.username == item.username }
         Box(
             modifier = Modifier
                 .width(96.dp)
@@ -88,7 +87,7 @@ fun RedProfileCreaterInfo(item: CreatorResponse) {
                 .clip(RoundedCornerShape(8.dp))
                 .background(if (isFollow) Color.Black else ThemeRed.colorYellow)
                 .border( 1.dp, if (isFollow)Color.White else Color.Transparent, RoundedCornerShape(8.dp))
-                .clickable { if (isFollow) SavedRed.removeCreator(item.users[0]) else SavedRed.addCreator(item.users[0])
+                .clickable { if (isFollow) SavedRed.removeCreator(item) else SavedRed.addCreator(item)
                            }, contentAlignment = Alignment.Center) {
             Text(if (isFollow) "Отписаться" else "Подписаться", color = if (isFollow) Color.White else Color.Black)
         }
@@ -108,7 +107,7 @@ fun RedProfileCreaterInfo(item: CreatorResponse) {
                     .weight(1f)
             ) {
                 Text(
-                    item.users[0].followers.toPrettyCount().toString(),
+                    item.followers.toPrettyCount().toString(),
                     color = Color.White,
                     fontFamily = ThemeRed.fontFamilyPopinsMedium
                 )
@@ -135,7 +134,7 @@ fun RedProfileCreaterInfo(item: CreatorResponse) {
                     .weight(1f)
             ) {
                 Text(
-                    item.users[0].views.toPrettyCount(),
+                    item.views.toPrettyCount(),
                     color = Color.White,
                     fontFamily = ThemeRed.fontFamilyPopinsMedium
                 )
@@ -162,7 +161,7 @@ fun RedProfileCreaterInfo(item: CreatorResponse) {
             ) {
 
                 Text(
-                    item.users[0].publishedGifs.toPrettyCount(),
+                    item.publishedGifs.toPrettyCount(),
                     color = Color.White,
                     fontFamily = ThemeRed.fontFamilyPopinsMedium
                 )
@@ -177,7 +176,7 @@ fun RedProfileCreaterInfo(item: CreatorResponse) {
         }
 
         Text(
-            "About ${item.users[0].username}:",
+            "About ${item.username}:",
             color = ThemeRed.colorTextGray,
             fontSize = 14.sp,
             fontFamily = ThemeRed.fontFamilyPopinsRegular
@@ -186,7 +185,7 @@ fun RedProfileCreaterInfo(item: CreatorResponse) {
         Spacer(Modifier.height(4.dp))
 
         Text(
-            item.users[0].description.toString().trimMargin(),
+            item.description.toString().trimMargin(),
             color = Color.White,
             fontSize = 14.sp, fontFamily = ThemeRed.fontFamilyPopinsRegular
         )

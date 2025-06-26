@@ -53,11 +53,11 @@ object SavedRed {
         println("!!! addCreator() id:${item.username}")
         creatorsItemSaveToDisk(item)
             .onSuccess {
-                SnackBarEvent.info("Creator добавлен")
+                SnackBarEvent.success("Автор добавлен")
                 creatorsList.add(item)
             }
             .onFailure { e ->
-                SnackBarEvent.error("Ошибка добавления creator ${e.message}")
+                SnackBarEvent.error("Ошибка добавления Автора ${e.message}")
             }
     }
 
@@ -65,11 +65,11 @@ object SavedRed {
         println("!!! removeCreator() id:${item.username} ")
         creatorsItemRemoveFromDisk(item.username)
             .onSuccess {
-                SnackBarEvent.info("Creator удален")
+                SnackBarEvent.info("Автор удален")
                 creatorsList.remove(item)
             }
             .onFailure { e ->
-                SnackBarEvent.error("Ошибка удаления creator ${e.message}")
+                SnackBarEvent.error("Ошибка удаления Автора ${e.message}")
             }
     }
 
