@@ -1,6 +1,7 @@
 package com.client.xvideos.red.common.ui.lazyrow123
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -42,11 +43,13 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.redgifs.types.Niche
+import com.client.xvideos.feature.redgifs.types.NichesInfo
 import com.client.xvideos.feature.redgifs.types.Order
 import com.client.xvideos.red.ThemeRed
 import com.client.xvideos.red.common.block.BlockRed
 import com.client.xvideos.red.common.block.ui.DialogBlock
 import com.client.xvideos.red.common.expand_menu_video.ExpandMenuVideoModel
+import com.client.xvideos.red.common.saved.SavedRed
 import com.client.xvideos.red.screens.niche.ScreenRedNiche
 import com.client.xvideos.screens.common.urlVideImage.UrlImage
 import com.client.xvideos.util.toPrettyCountInt
@@ -101,9 +104,11 @@ fun NichePreview2(niches: Niche, onClick: () -> Unit) {
             .padding(horizontal = 8.dp)
             .clip(RoundedCornerShape(16.dp))
             .background(Color(0xFF323232))
-            .clickable { onClick() }) {
+            .clickable { onClick() })
+    {
 
-        Row(modifier = Modifier) {
+        ////////////////////////////////////////////
+        Row(modifier = Modifier.fillMaxWidth()) {
             UrlImage(
                 niches.thumbnail,
                 modifier = Modifier
@@ -112,42 +117,130 @@ fun NichePreview2(niches: Niche, onClick: () -> Unit) {
                     .size(64.dp)
             )
 
-            Column(modifier = Modifier.padding(start = 8.dp)) {
+            Column(modifier = Modifier
+                .padding(start = 8.dp)
+                .fillMaxWidth())
+            {
 
-                Text(text = niches.name, modifier = Modifier, color = Color.White, fontSize = 18.sp,  fontFamily = ThemeRed.fontFamilyDMsanss)
+                Text(
+                    text = niches.name,
+                    modifier = Modifier,
+                    color = Color.White,
+                    fontSize = 18.sp,
+                    fontFamily = ThemeRed.fontFamilyDMsanss
+                )
 
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Outlined.Group, contentDescription = null, modifier = Modifier.size(18.dp), tint = Color(0XFF959595))
-                    Text(text = niches.subscribers.toPrettyCountInt(), modifier = Modifier.padding(start = 4.dp), color = Color(0XFF959595),
-                        fontSize = 16.sp, fontFamily = ThemeRed.fontFamilyDMsanss)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.Top
+                ) {
+                    Column {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                Icons.Outlined.Group,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp),
+                                tint = Color(0XFF959595)
+                            )
+                            Text(
+                                text = niches.subscribers.toPrettyCountInt(),
+                                modifier = Modifier.padding(start = 4.dp),
+                                color = Color(0XFF959595),
+                                fontSize = 16.sp,
+                                fontFamily = ThemeRed.fontFamilyDMsanss
+                            )
+                        }
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                Icons.Outlined.Photo,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp),
+                                tint = Color(0XFF959595)
+                            )
+                            Text(
+                                text = niches.gifs.toPrettyCountInt(),
+                                modifier = Modifier.padding(start = 4.dp),
+                                color = Color(0XFF959595),
+                                fontSize = 16.sp,
+                                fontFamily = ThemeRed.fontFamilyDMsanss
+                            )
+                        }
+                    }
+
+                    val isFollowed = SavedRed.nichesList.any { it.id == niches.id }
+
+                    Box(
+                        modifier = Modifier
+                            .padding(end = 4.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .width(128.dp)
+                            .height(44.dp)
+                            .border(
+                                1.dp,
+                                if (isFollowed) Color.White else Color.Transparent,
+                                RoundedCornerShape(8.dp)
+                            )
+                            .background(if (isFollowed) Color.Black else ThemeRed.colorYellow)
+                            .clickable(onClick = {
+
+                                val nichesInfo = NichesInfo(
+                                    id = niches.id,
+                                    name = niches.name,
+                                    subscribers = niches.subscribers,
+                                    gifs = niches.gifs,
+                                    thumbnail = niches.thumbnail,
+                                )
+
+                                if (isFollowed)
+                                    SavedRed.removeNiches(nichesInfo)
+                                else
+                                    SavedRed.addNiches(nichesInfo)
+
+                            }), contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            if (isFollowed) "Выйти" else "Подписаться",
+                            color = if (isFollowed) Color.White else Color.Black
+                        )
+                    }
                 }
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Outlined.Photo, contentDescription = null, modifier = Modifier.size(18.dp), tint = Color(0XFF959595))
-                    Text(text = niches.gifs.toPrettyCountInt(),  modifier = Modifier.padding(start = 4.dp), color = Color(0XFF959595),
-                        fontSize = 16.sp, fontFamily = ThemeRed.fontFamilyDMsanss)
-                }
-
-
             }
         }
-
+        ////////////////////////////////////////////
         Row(
             modifier = Modifier
                 .padding(horizontal = 4.dp)
                 .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            UrlImage(niches.previews[0].thumbnail, modifier = Modifier.aspectRatio(1f).weight(1f), contentScale = ContentScale.Crop)
+            UrlImage(
+                niches.previews[0].thumbnail,
+                modifier = Modifier
+                    .aspectRatio(1f)
+                    .weight(1f),
+                contentScale = ContentScale.Crop
+            )
             Spacer(modifier = Modifier.width(4.dp))
-            UrlImage(niches.previews[1].thumbnail, modifier = Modifier.aspectRatio(1f).weight(1f), contentScale = ContentScale.Crop)
+            UrlImage(
+                niches.previews[1].thumbnail,
+                modifier = Modifier
+                    .aspectRatio(1f)
+                    .weight(1f),
+                contentScale = ContentScale.Crop
+            )
             Spacer(modifier = Modifier.width(4.dp))
-            UrlImage(niches.previews[2].thumbnail, modifier = Modifier.aspectRatio(1f).weight(1f), contentScale = ContentScale.Crop)
+            UrlImage(
+                niches.previews[2].thumbnail,
+                modifier = Modifier
+                    .aspectRatio(1f)
+                    .weight(1f),
+                contentScale = ContentScale.Crop
+            )
         }
         Spacer(modifier = Modifier.height(4.dp))
+
     }
-
-
 }
 
 
