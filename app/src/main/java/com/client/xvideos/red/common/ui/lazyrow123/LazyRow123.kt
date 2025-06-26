@@ -23,6 +23,7 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
@@ -244,6 +245,18 @@ fun LazyRow123(
                             verticalAlignment = Alignment.Bottom,
                             horizontalArrangement = Arrangement.End
                         ) {
+
+                            //
+                            if (SavedRed.creatorsList.any { it.username == item.userName }) {
+                                Icon(
+                                    Icons.Filled.Person,
+                                    contentDescription = null,
+                                    tint = Color.White,
+                                    modifier = Modifier
+                                        .padding(bottom = 6.dp, end = 6.dp)
+                                        .size(18.dp)
+                                )
+                            }
 
                             //✅ Лайк
                             if (SavedRed.likesList.any { it.id == item.id }) {

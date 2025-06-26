@@ -38,6 +38,7 @@ import com.client.xvideos.red.common.ui.lazyrow123.LazyRow123
 import com.client.xvideos.red.screens.explorer.tab.FavoritesTab
 import com.client.xvideos.red.screens.explorer.tab.gifs.GifsTab
 import com.client.xvideos.red.screens.explorer.tab.niches.NichesTab
+import com.client.xvideos.red.screens.explorer.tab.saved.tab.SavedCreatorsTab
 import com.client.xvideos.red.screens.explorer.tab.saved.tab.SavedLikesTab
 import com.client.xvideos.red.screens.explorer.tab.saved.tab.SavedNichesTab
 import com.client.xvideos.red.screens.explorer.top.TabRow
@@ -76,7 +77,7 @@ object SavedTab : Screen {
             Box(modifier = Modifier.padding(bottom = paddingValues.calculateBottomPadding())) {
                 when (screenType) {
                     0 -> SavedLikesTab.Content()
-                    1 -> ScreenRedTopThisWeek.Content()
+                    1 -> SavedCreatorsTab.Content()
                     2 -> SavedNichesTab.Content()
                     3 -> NichesTab.Content()
                     else -> FavoritesTab.Content()

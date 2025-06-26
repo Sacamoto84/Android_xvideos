@@ -4,20 +4,21 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.client.xvideos.feature.redgifs.http.RedGifs
 import com.client.xvideos.feature.redgifs.types.GifsInfo
+import com.client.xvideos.feature.redgifs.types.MediaType
 import com.client.xvideos.feature.redgifs.types.Order
 import com.client.xvideos.red.common.block.BlockRed
 import com.client.xvideos.red.common.snackBar.SnackBarEvent
 import com.client.xvideos.red.common.users.UsersRed
 import timber.log.Timber
 
-class ItemTopPagingSource (val sort : Order): PagingSource<Int, GifsInfo>() {
+class ItemProfilePagingSource (val profileName : String, val sort : Order): PagingSource<Int, GifsInfo>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int,  GifsInfo> {
 
         val page = params.key ?: 1 // API нумерует страницы с 1
 
         return try {
-            Timber.d("!!! ItemTopThisWeekPagingSource::load() page = $page sortTop:$sort")
+            Timber.d("!!! ItemProfilePagingSource::load() page = $page profileName:${profileName} sortTop:$sort")
 
             if (sort == Order.FORCE_TEMP) {
                 LoadResult.Page(
@@ -27,15 +28,7 @@ class ItemTopPagingSource (val sort : Order): PagingSource<Int, GifsInfo>() {
                 )
             }
 
-            val response =  when(sort) {
-                Order.TOP_WEEK -> RedGifs.getTopThisWeek(100, page)
-                Order.TOP_MONTH -> RedGifs.getTopThisMonth(100, page)
-                Order.TRENDING -> RedGifs.getTopTrending(100, page)
-                Order.LATEST -> RedGifs.getTopLatest(100, page)
-                else -> {
-                    RedGifs.getTopThisWeek(100, page)
-                }
-            }
+            val response = RedGifs.searchCreator(userName = profileName, page = page,  count = 100, type = MediaType.GIF,  order = sort )
 
             val isEndReached = response.gifs.isEmpty() // или, если ты знаешь, что сервер вернул всё
 
@@ -60,8 +53,8 @@ class ItemTopPagingSource (val sort : Order): PagingSource<Int, GifsInfo>() {
             )
 
         } catch (e: Exception) {
-            Timber.e("!!! ItemPagingSource load() page = $page Ошибка = ${e.message}")
-            SnackBarEvent.error("ItemPagingSource load() page = $page Ошибка = ${e.message}")
+            Timber.e("!!! ItemProfilePagingSource load() profileName:${profileName} page = $page Ошибка = ${e.message}")
+            SnackBarEvent.error("ItemProfilePagingSource load() profileName:${profileName} page = $page Ошибка = ${e.message}")
             LoadResult.Error(e)
         }
     }

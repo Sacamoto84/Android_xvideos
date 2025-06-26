@@ -4,6 +4,7 @@ import androidx.compose.runtime.mutableStateListOf
 import com.client.xvideos.feature.redgifs.types.CreatorResponse
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.redgifs.types.NichesInfo
+import com.client.xvideos.feature.redgifs.types.UserInfo
 import com.client.xvideos.red.common.saved.creators.creatorsItemRemoveFromDisk
 import com.client.xvideos.red.common.saved.creators.creatorsItemSaveToDisk
 import com.client.xvideos.red.common.saved.creators.getAllCreatorsFromDisk
@@ -46,10 +47,10 @@ object SavedRed {
     }
     /////////////////////////////////////////////////////////////////////////////////////////////
 
-    var creatorsList = mutableStateListOf<CreatorResponse>()
+    var creatorsList = mutableStateListOf<UserInfo>()
 
-    fun addCreator(item: CreatorResponse) {
-        println("!!! addCreator() id:${item.users[0].name}")
+    fun addCreator(item: UserInfo) {
+        println("!!! addCreator() id:${item.username}")
         creatorsItemSaveToDisk(item)
             .onSuccess {
                 SnackBarEvent.info("Creator добавлен")
@@ -60,15 +61,15 @@ object SavedRed {
             }
     }
 
-    fun removeCreator(item: CreatorResponse) {
-        println("!!! removeNiches() id:${item.users[0].name} ")
-        creatorsItemRemoveFromDisk(item.users[0].name)
+    fun removeCreator(item: UserInfo) {
+        println("!!! removeCreator() id:${item.username} ")
+        creatorsItemRemoveFromDisk(item.username)
             .onSuccess {
-                SnackBarEvent.info("Группа удалена")
+                SnackBarEvent.info("Creator удален")
                 creatorsList.remove(item)
             }
             .onFailure { e ->
-                SnackBarEvent.error("Ошибка удаления группы ${e.message}")
+                SnackBarEvent.error("Ошибка удаления creator ${e.message}")
             }
     }
 

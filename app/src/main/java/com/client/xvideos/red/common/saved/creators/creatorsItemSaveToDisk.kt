@@ -2,14 +2,15 @@ package com.client.xvideos.red.common.saved.creators
 
 import com.client.xvideos.AppPath
 import com.client.xvideos.feature.redgifs.types.CreatorResponse
+import com.client.xvideos.feature.redgifs.types.UserInfo
 import com.google.gson.Gson
 import timber.log.Timber
 import java.io.File
 import java.io.IOException
 
-fun creatorsItemSaveToDisk(item : CreatorResponse): Result<Boolean>  {
+fun creatorsItemSaveToDisk(item : UserInfo): Result<Boolean>  {
     return try {
-        Timber.i("!!! creatorsItemSaveToDisk() id:${item.users[0].name}")
+        Timber.i("!!! creatorsItemSaveToDisk() id:${item.username}")
 
         // Создаем директорию <userName>/block, если её нет
         val dir = File(AppPath.creators_red)
@@ -20,7 +21,7 @@ fun creatorsItemSaveToDisk(item : CreatorResponse): Result<Boolean>  {
         }
 
         // Создаем файл-блокировку
-        val file = File(dir, "${item.users[0].name}.creator")
+        val file = File(dir, "${item.username}.creator")
 
         // Сохраняем URL как JSON в файл
         val gson = Gson()

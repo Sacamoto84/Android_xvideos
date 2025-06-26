@@ -3,11 +3,12 @@ package com.client.xvideos.red.common.saved.creators
 import com.client.xvideos.AppPath
 import com.client.xvideos.feature.redgifs.types.CreatorResponse
 import com.client.xvideos.feature.redgifs.types.NichesInfo
+import com.client.xvideos.feature.redgifs.types.UserInfo
 import com.google.gson.Gson
 import timber.log.Timber
 import java.io.File
 
-fun getAllCreatorsFromDisk(): List<CreatorResponse>  {
+fun getAllCreatorsFromDisk(): List<UserInfo>  {
     val dir = File(AppPath.creators_red)
 
     // Если директории нет или это не каталог — возвращаем пустой список
@@ -23,7 +24,7 @@ fun getAllCreatorsFromDisk(): List<CreatorResponse>  {
         ?.mapNotNull { file ->
             runCatching {
                 val json = file.readText(Charsets.UTF_8)
-                gson.fromJson(json, CreatorResponse::class.java)
+                gson.fromJson(json, UserInfo::class.java)
             }.onFailure { e ->
                 Timber.e(e, "!!! Не удалось разобрать файл creator: ${file.name}")
             }.getOrNull()

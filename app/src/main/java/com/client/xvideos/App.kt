@@ -74,6 +74,7 @@ class App : Application() {
             clearOldCache( db.cacheMedaResponseDao())
             SavedRed.refreshLikesList()
             SavedRed.refreshNichesList()
+            SavedRed.refreshCreatorsList()
         }
 
     }

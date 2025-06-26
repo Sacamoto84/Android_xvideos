@@ -33,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -51,6 +52,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.feature.redgifs.types.NichesInfo
+import com.client.xvideos.feature.redgifs.types.UserInfo
 import com.client.xvideos.red.ThemeRed
 import com.client.xvideos.red.common.expand_menu_video.impl.ExpandMenuVideoImpl
 import com.client.xvideos.red.common.saved.SavedRed
@@ -70,9 +72,9 @@ import io.ktor.http.Url
 import javax.inject.Inject
 
 
-object SavedNichesTab : Screen {
+object SavedCreatorsTab : Screen {
 
-    private fun readResolve(): Any = SavedNichesTab
+    private fun readResolve(): Any = SavedCreatorsTab
 
     override val key: ScreenKey = uniqueScreenKey
 
@@ -80,22 +82,25 @@ object SavedNichesTab : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val vm: ScreenSavedNichesSM = getScreenModel()
 
         val state = rememberLazyListState()
 
         /**  ➜ сюда запоминаем элемент, который пользователь хочет удалить  */
-        var itemPendingDelete by remember { mutableStateOf<NichesInfo?>(null) }
+        var itemPendingDelete by remember { mutableStateOf<UserInfo?>(null) }
 
         /* ---------- Диалог подтверждения ---------- */
         itemPendingDelete?.let { pending ->
             AlertDialog(
 
-                icon = { UrlImage(pending.thumbnail, modifier = Modifier.size(96.dp)) },
+                icon = {
+                    pending.profileImageUrl?.let {
+                        UrlImage(pending.profileImageUrl, modifier = Modifier.size(96.dp))
+                    }
+                },
 
                 onDismissRequest = { itemPendingDelete = null },
 
-                title = { Text("Удалить группу?", fontWeight = FontWeight.Bold, fontSize = 20.sp) },
+                title = { Text("Удалить автора?", fontWeight = FontWeight.Bold, fontSize = 20.sp) },
                 text = {
                     Text(buildAnnotatedString {
                         append("Удалить «")
@@ -107,7 +112,7 @@ object SavedNichesTab : Screen {
                 confirmButton = {
                     TextButton(
                         onClick = {
-                            SavedRed.removeNiches(pending)   // удаляем
+                            SavedRed.removeCreator(pending)   // удаляем
                             itemPendingDelete = null         // закрываем диалог
                         }
                     ) { Text("Удалить", fontSize = 16.sp, color = Color(0xFF6552A5)) }
@@ -126,12 +131,13 @@ object SavedNichesTab : Screen {
 
 
         Scaffold(topBar = {
-            Text(">Группы", modifier = Modifier.padding(start = 8.dp), color = ThemeRed.colorYellow, fontSize = 18.sp, fontFamily = ThemeRed.fontFamilyPopinsRegular)
+            Text(">Авторы", modifier = Modifier.padding(start = 8.dp), color = ThemeRed.colorYellow, fontSize = 18.sp, fontFamily = ThemeRed.fontFamilyPopinsRegular)
         }) { padding ->
 
             LazyColumn(state = state, modifier = Modifier.padding(top = padding.calculateTopPadding()).fillMaxSize())
             {
-                items(SavedRed.nichesList) {
+
+                items(SavedRed.creatorsList) {
 
                     Row(
                         modifier = Modifier
@@ -141,13 +147,17 @@ object SavedNichesTab : Screen {
                             .background(ThemeRed.colorBottomBarDivider)
                             .clickable(onClick = {
                                 navigator.push(
-                                    ScreenRedNiche(it.id)
+                                    ScreenRedProfile(it.username)
                                 )
                             }),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        UrlImage(it.thumbnail, modifier = Modifier.size(96.dp))
+
+                        it.profileImageUrl?.let { u ->
+                            UrlImage(u, modifier = Modifier.size(96.dp), contentScale = ContentScale.Crop)
+                        }
+
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             it.name,
@@ -178,26 +188,14 @@ object SavedNichesTab : Screen {
                         }
 
                         Spacer(modifier = Modifier.width(8.dp))
-
                     }
                 }
             }
+
         }
+
+
+
     }
 }
 
-class ScreenSavedNichesSM @Inject constructor(
-    connectivityObserver: ConnectivityObserver
-) : ScreenModel {
-
-
-}
-
-@Module
-@InstallIn(SingletonComponent::class)
-abstract class ScreenModuleRedSavedNiches {
-    @Binds
-    @IntoMap
-    @ScreenModelKey(ScreenSavedNichesSM::class)
-    abstract fun bindScreenRedSavedNichesScreenModel(hiltListScreenModel: ScreenSavedNichesSM): ScreenModel
-}
