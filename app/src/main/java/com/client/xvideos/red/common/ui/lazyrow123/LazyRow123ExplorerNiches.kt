@@ -62,29 +62,13 @@ fun LazyRow123ExplorerNiches(
 
     val navigator = LocalNavigator.currentOrThrow
 
-    SideEffect { Timber.d("!!! LazyRow123ExplorerNiches::SideEffect columns: ${host.columns}") }
 
     val listNiche = host.pager.collectAsLazyPagingItems() as LazyPagingItems<Niche>
 
-    val isConnected by host.isConnected.collectAsState()
     val state = host.state//rememberLazyGridState()
-    var blockItem by remember { mutableStateOf<GifsInfo?>(null) }
+
 
     if (listNiche.itemCount == 0) return
-
-    //Диалог для блокировки
-    if (BlockRed.blockVisibleDialog) {
-        DialogBlock(
-            visible = BlockRed.blockVisibleDialog,
-            onDismiss = { BlockRed.blockVisibleDialog = false },
-            onBlockConfirmed = {
-                if ((blockItem != null)) {
-                    BlockRed.blockItem(blockItem!!)
-                    host.refresh()
-                }
-            }
-        )
-    }
 
     LazyVerticalGrid(
         state = state,

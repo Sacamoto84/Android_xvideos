@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -59,6 +60,8 @@ import com.client.xvideos.red.common.ui.lazyrow123.LazyRow123Host
 import com.client.xvideos.red.common.ui.lazyrow123.TypePager
 import com.client.xvideos.red.screens.niche.ScreenRedNiche
 import com.client.xvideos.red.screens.profile.ScreenRedProfile
+import com.client.xvideos.red.screens.profile.atom.VerticalScrollbar
+import com.client.xvideos.red.screens.profile.rememberVisibleRangePercentIgnoringFirstNForLazyColumn
 import com.client.xvideos.screens.common.urlVideImage.UrlImage
 import com.composeunstyled.Text
 import dagger.Binds
@@ -83,6 +86,10 @@ object SavedNichesTab : Screen {
         val vm: ScreenSavedNichesSM = getScreenModel()
 
         val state = rememberLazyListState()
+
+        val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForLazyColumn(
+            gridState = state, itemsToIgnore = 0
+        )
 
         /**  ➜ сюда запоминаем элемент, который пользователь хочет удалить  */
         var itemPendingDelete by remember { mutableStateOf<NichesInfo?>(null) }
@@ -129,59 +136,78 @@ object SavedNichesTab : Screen {
             Text(">Группы", modifier = Modifier.padding(start = 8.dp), color = ThemeRed.colorYellow, fontSize = 18.sp, fontFamily = ThemeRed.fontFamilyPopinsRegular)
         }) { padding ->
 
-            LazyColumn(state = state, modifier = Modifier.padding(top = padding.calculateTopPadding()).fillMaxSize())
-            {
-                items(SavedRed.nichesList) {
+            Box(modifier = Modifier
+                .padding(top = padding.calculateTopPadding())
+                .fillMaxSize()) {
 
-                    Row(
-                        modifier = Modifier
-                            .padding(vertical = 2.dp)
-                            .padding(horizontal = 8.dp)
-                            .fillMaxWidth()
-                            .background(ThemeRed.colorBottomBarDivider)
-                            .clickable(onClick = {
-                                navigator.push(
-                                    ScreenRedNiche(it.id)
-                                )
-                            }),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        UrlImage(it.thumbnail, modifier = Modifier.size(96.dp))
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            it.name,
-                            color = Color.White,
-                            fontSize = 20.sp,
-                            fontFamily = ThemeRed.fontFamilyDMsanss,
-                            maxLines = 3,              // сколько строк допускаем (можно убрать, чтобы было неограниченно)
-                            overflow = TextOverflow.Ellipsis,   // «…» если всё-таки не влезло
-                            modifier = Modifier.weight(1f)
-                        )
+                LazyColumn(
+                    state = state,
+                    modifier = Modifier.fillMaxSize()
+                )
+                {
+                    items(SavedRed.nichesList) {
 
-
-                        Box(
+                        Row(
                             modifier = Modifier
-                                .width(96.dp)
-                                .height(48.dp)
-                                .border(1.dp, Color.White, RoundedCornerShape(8.dp))
-                                .background(Color.Black)
-                                .clickable { itemPendingDelete = it },
-                            contentAlignment = Alignment.Center
+                                .padding(vertical = 2.dp)
+                                .padding(horizontal = 8.dp)
+                                .fillMaxWidth()
+                                .background(ThemeRed.colorBottomBarDivider)
+                                .clickable(onClick = {
+                                    navigator.push(
+                                        ScreenRedNiche(it.id)
+                                    )
+                                }),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
+                            UrlImage(it.thumbnail, modifier = Modifier.size(96.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                "Выйти",
+                                it.name,
+                                color = Color.White,
+                                fontSize = 20.sp,
                                 fontFamily = ThemeRed.fontFamilyDMsanss,
-                                fontSize = 18.sp,
-                                color = Color.White
+                                maxLines = 3,              // сколько строк допускаем (можно убрать, чтобы было неограниченно)
+                                overflow = TextOverflow.Ellipsis,   // «…» если всё-таки не влезло
+                                modifier = Modifier.weight(1f)
                             )
+
+
+                            Box(
+                                modifier = Modifier
+                                    .width(96.dp)
+                                    .height(48.dp)
+                                    .border(1.dp, Color.White, RoundedCornerShape(8.dp))
+                                    .background(Color.Black)
+                                    .clickable { itemPendingDelete = it },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    "Выйти",
+                                    fontFamily = ThemeRed.fontFamilyDMsanss,
+                                    fontSize = 18.sp,
+                                    color = Color.White
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.width(8.dp))
+
                         }
-
-                        Spacer(modifier = Modifier.width(8.dp))
-
                     }
                 }
+
+                //---- Скролл ----
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .align(Alignment.CenterEnd)
+                        .width(2.dp)
+                ) {
+                    VerticalScrollbar(scrollPercent)
+                }
             }
+
         }
     }
 }

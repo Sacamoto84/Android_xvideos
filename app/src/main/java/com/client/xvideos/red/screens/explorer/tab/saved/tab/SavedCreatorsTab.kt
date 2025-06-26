@@ -1,6 +1,7 @@
 package com.client.xvideos.red.screens.explorer.tab.saved.tab
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -22,12 +23,17 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxState
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -145,85 +151,95 @@ object SavedCreatorsTab : Screen {
 
 
         Scaffold(topBar = {
-            Text(">Авторы", modifier = Modifier.padding(start = 8.dp), color = ThemeRed.colorYellow, fontSize = 18.sp, fontFamily = ThemeRed.fontFamilyPopinsRegular)
+            Text(
+                ">Авторы",
+                modifier = Modifier.padding(start = 8.dp),
+                color = ThemeRed.colorYellow,
+                fontSize = 18.sp,
+                fontFamily = ThemeRed.fontFamilyPopinsRegular
+            )
         }) { padding ->
-            Box(modifier = Modifier.padding(top = padding.calculateTopPadding()).fillMaxSize()) {
+            Box(modifier = Modifier
+                .padding(top = padding.calculateTopPadding())
+                .fillMaxSize()) {
                 LazyColumn(
                     state = state,
                     modifier = Modifier.fillMaxSize()
                 )
                 {
 
-                    items(SavedRed.creatorsList) {
+                    items(SavedRed.creatorsList) { it1 ->
 
-                        Row(
-                            modifier = Modifier
-                                .padding(vertical = 2.dp)
-                                .padding(horizontal = 8.dp)
-                                .fillMaxWidth()
-                                .background(ThemeRed.colorBottomBarDivider)
-                                .clickable(onClick = {
-                                    navigator.push(
-                                        ScreenRedProfile(it.username)
+                            Row(
+                                modifier = Modifier
+                                    .padding(vertical = 2.dp)
+                                    .padding(horizontal = 8.dp)
+                                    .fillMaxWidth()
+                                    .background(ThemeRed.colorBottomBarDivider)
+                                    .clickable(onClick = {
+                                        navigator.push(
+                                            ScreenRedProfile(it1.username)
+                                        )
+                                    }),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+
+                                if (it1.profileImageUrl != null) {
+                                    UrlImage(
+                                        it1.profileImageUrl,
+                                        modifier = Modifier.size(96.dp),
+                                        contentScale = ContentScale.Crop
                                     )
-                                }),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
+                                } else {
+                                    Box(
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(0.dp))
+                                            .size(96.dp)
+                                            .background(Color.DarkGray),
+                                        contentAlignment = Alignment.Center
+                                    )
+                                    {
+                                        Icon(
+                                            Icons.Default.Person,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(24.dp),
+                                            tint = Color.White
+                                        )
+                                    }
+                                }
 
-                            if (it.profileImageUrl != null) {
-                                UrlImage(
-                                    it.profileImageUrl,
-                                    modifier = Modifier.size(96.dp),
-                                    contentScale = ContentScale.Crop
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    it1.name,
+                                    color = Color.White,
+                                    fontSize = 20.sp,
+                                    fontFamily = ThemeRed.fontFamilyDMsanss,
+                                    maxLines = 3,              // сколько строк допускаем (можно убрать, чтобы было неограниченно)
+                                    overflow = TextOverflow.Ellipsis,   // «…» если всё-таки не влезло
+                                    modifier = Modifier.weight(1f)
                                 )
-                            } else {
+
+
                                 Box(
-                                    modifier = Modifier.clip(RoundedCornerShape(0.dp)).size(96.dp)
-                                        .background(Color.DarkGray),
+                                    modifier = Modifier
+                                        .width(96.dp)
+                                        .height(48.dp)
+                                        .border(1.dp, Color.White, RoundedCornerShape(8.dp))
+                                        .background(Color.Black)
+                                        .clickable { itemPendingDelete = it1 },
                                     contentAlignment = Alignment.Center
-                                )
-                                {
-                                    Icon(
-                                        Icons.Default.Person,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(24.dp),
-                                        tint = Color.White
+                                ) {
+                                    Text(
+                                        "Выйти",
+                                        fontFamily = ThemeRed.fontFamilyDMsanss,
+                                        fontSize = 18.sp,
+                                        color = Color.White
                                     )
                                 }
+                                Spacer(modifier = Modifier.width(8.dp))
                             }
 
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                it.name,
-                                color = Color.White,
-                                fontSize = 20.sp,
-                                fontFamily = ThemeRed.fontFamilyDMsanss,
-                                maxLines = 3,              // сколько строк допускаем (можно убрать, чтобы было неограниченно)
-                                overflow = TextOverflow.Ellipsis,   // «…» если всё-таки не влезло
-                                modifier = Modifier.weight(1f)
-                            )
-
-
-                            Box(
-                                modifier = Modifier
-                                    .width(96.dp)
-                                    .height(48.dp)
-                                    .border(1.dp, Color.White, RoundedCornerShape(8.dp))
-                                    .background(Color.Black)
-                                    .clickable { itemPendingDelete = it },
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    "Выйти",
-                                    fontFamily = ThemeRed.fontFamilyDMsanss,
-                                    fontSize = 18.sp,
-                                    color = Color.White
-                                )
-                            }
-
-                            Spacer(modifier = Modifier.width(8.dp))
-                        }
                     }
                 }
 
@@ -242,7 +258,5 @@ object SavedCreatorsTab : Screen {
         }
 
 
-
     }
 }
-

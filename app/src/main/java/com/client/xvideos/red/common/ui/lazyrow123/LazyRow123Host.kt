@@ -1,5 +1,6 @@
 package com.client.xvideos.red.common.ui.lazyrow123
 
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -55,6 +56,8 @@ class LazyRow123Host(
 ) {
 
     val state: LazyGridState = LazyGridState()
+
+    val stateColumn = LazyListState()
 
     val isConnected = connectivityObserver.isConnected.stateIn(scope, SharingStarted.WhileSubscribed(5000L), false)
 
@@ -117,6 +120,8 @@ class LazyRow123Host(
     var currentIndexGoto by mutableIntStateOf(0)
 
     fun gotoUp(){ scope.launch { state.scrollToItem(0) } }
+
+    fun gotoUpColumn(){ scope.launch { stateColumn.scrollToItem(0) } }
 
     fun refresh(){
         val temp = sortType.value

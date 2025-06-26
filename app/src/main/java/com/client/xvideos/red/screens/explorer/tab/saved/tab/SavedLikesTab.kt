@@ -1,8 +1,12 @@
 package com.client.xvideos.red.screens.explorer.tab.saved.tab
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.Snackbar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -10,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.ScreenModel
@@ -29,6 +34,9 @@ import com.client.xvideos.red.common.ui.lazyrow123.LazyRow123
 import com.client.xvideos.red.common.ui.lazyrow123.LazyRow123Host
 import com.client.xvideos.red.common.ui.lazyrow123.TypePager
 import com.client.xvideos.red.screens.profile.ScreenRedProfile
+import com.client.xvideos.red.screens.profile.atom.VerticalScrollbar
+import com.client.xvideos.red.screens.profile.rememberVisibleRangePercentIgnoringFirstNForGrid
+import com.client.xvideos.red.screens.profile.rememberVisibleRangePercentIgnoringFirstNForLazyColumn
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -57,6 +65,8 @@ object SavedLikesTab : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val vm: ScreenSavedLikesSM = getScreenModel()
 
+
+
         LaunchedEffect(column.intValue) {
             vm.likedHost.columns = column.intValue
         }
@@ -65,22 +75,40 @@ object SavedLikesTab : Screen {
             vm.likedHost.refresh()
         }
 
-        LazyRow123(
-            host = vm.likedHost,
-            modifier = Modifier.fillMaxSize(),
-            onClickOpenProfile = {
-                vm.likedHost.currentIndexGoto = vm.likedHost.currentIndex
-                navigator.push(ScreenRedProfile(it))
-            },
-            gotoPosition = vm.likedHost.currentIndexGoto,
-            option = ExpandMenuVideoImpl.expandMenuVideoListLikes,
-            contentPadding = PaddingValues(0.dp),
-            contentBeforeList = { },
-
-            onRun3 = {
-                vm.likedHost.refresh()
-            }
+        val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForGrid(
+            gridState = vm.likedHost.state, itemsToIgnore = 0, numberOfColumns = column.intValue
         )
+
+        Box(modifier = Modifier.fillMaxSize()) {
+
+            LazyRow123(
+                host = vm.likedHost,
+                modifier = Modifier.fillMaxSize(),
+                onClickOpenProfile = {
+                    vm.likedHost.currentIndexGoto = vm.likedHost.currentIndex
+                    navigator.push(ScreenRedProfile(it))
+                },
+                gotoPosition = vm.likedHost.currentIndexGoto,
+                option = ExpandMenuVideoImpl.expandMenuVideoListLikes,
+                contentPadding = PaddingValues(0.dp),
+                contentBeforeList = { },
+
+                onRun3 = {
+                    vm.likedHost.refresh()
+                }
+            )
+
+            //---- Скролл ----
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .align(Alignment.CenterEnd)
+                    .width(2.dp)
+            ) {
+                VerticalScrollbar(scrollPercent)
+            }
+        }
+
 
     }
 
