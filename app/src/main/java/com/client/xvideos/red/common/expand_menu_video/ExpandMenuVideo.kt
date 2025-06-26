@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddCircleOutline
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
@@ -181,6 +182,26 @@ fun ExpandMenuVideo(
                     expanded = false
                 }, contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
             )
+
+
+            DropdownMenuItem(
+                leadingIcon = {
+                    Icon(
+                        Icons.Default.AddCircleOutline,
+                        contentDescription = "",
+                        tint = tintColor
+                    )
+                },
+                text = { Text("Add to Collection", style = style) },
+                onClick = {
+                    if (item == null) return@DropdownMenuItem
+                    SavedRed.collectionItemGifInfo = item
+                    SavedRed.collectionVisibleDialog = true
+                    expanded = false
+                }, contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+            )
+
+
         }
 
     }

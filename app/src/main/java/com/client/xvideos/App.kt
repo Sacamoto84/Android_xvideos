@@ -75,6 +75,7 @@ class App : Application() {
             SavedRed.refreshLikesList()
             SavedRed.refreshNichesList()
             SavedRed.refreshCreatorsList()
+            SavedRed.refreshCollectionList()
         }
 
     }

@@ -12,7 +12,7 @@ fun collectionItemSaveToDisk(item: GifsInfo, collectionName: String): Result<Boo
         Timber.i("!!! сохранить лайк GIFS -> likesItem() id:${item.id} userName:${item.userName} url:${item.urls.hd}")
 
         // Создаем директорию <userName>/block, если её нет
-        val dir = File(AppPath.collection_red+"/"+collectionName, item.userName)
+        val dir = File(AppPath.collection_red+"/"+collectionName)
 
         if (!dir.exists()) {
             val created = dir.mkdirs()

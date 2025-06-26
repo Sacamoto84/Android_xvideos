@@ -1,9 +1,15 @@
 package com.client.xvideos.red.common.saved
 
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.redgifs.types.NichesInfo
 import com.client.xvideos.feature.redgifs.types.UserInfo
+import com.client.xvideos.red.common.saved.collection.collectionItemSaveToDisk
+import com.client.xvideos.red.common.saved.collection.model.CollectionEntity
+import com.client.xvideos.red.common.saved.collection.readAllCollections
 import com.client.xvideos.red.common.saved.creators.creatorsItemRemoveFromDisk
 import com.client.xvideos.red.common.saved.creators.creatorsItemSaveToDisk
 import com.client.xvideos.red.common.saved.creators.getAllCreatorsFromDisk
@@ -118,6 +124,29 @@ object SavedRed {
         val a = getAllNichesFromDisk()
         nichesList.addAll(a)
     }
+    /////////////////////////////////////////////////////////////////////////////////////////////
+
+    var collectionList = mutableStateListOf<CollectionEntity>()
+
+    var collectionVisibleDialog by mutableStateOf(false)  //║ Показ диалога на добавление в блок лист
+    var collectionItemGifInfo by mutableStateOf<GifsInfo?>(null)
+
+    fun addCollection(item: GifsInfo, collectionName: String) {
+        println("!!! addCollection() item:${item.id} collectionName:$collectionName")
+        val a = collectionItemSaveToDisk(item, collectionName)
+        refreshCollectionList()
+    }
+
+    fun refreshCollectionList() {
+        val a = readAllCollections()
+        if (a.isSuccess) {
+            collectionList.clear()
+            collectionList.addAll(a.getOrThrow())
+        } else {
+            SnackBarEvent.error("Ошибка чтения коллекций ${a.exceptionOrNull()?.message}")
+        }
+    }
+
 
 }
 

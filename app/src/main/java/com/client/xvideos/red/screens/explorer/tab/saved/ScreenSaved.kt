@@ -33,6 +33,7 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import com.client.xvideos.red.ThemeRed
 import com.client.xvideos.red.screens.explorer.tab.FavoritesTab
 import com.client.xvideos.red.screens.explorer.tab.niches.NichesTab
+import com.client.xvideos.red.screens.explorer.tab.saved.tab.SavedCollectionTab
 import com.client.xvideos.red.screens.explorer.tab.saved.tab.SavedCreatorsTab
 import com.client.xvideos.red.screens.explorer.tab.saved.tab.SavedLikesTab
 import com.client.xvideos.red.screens.explorer.tab.saved.tab.SavedNichesTab
@@ -94,7 +95,6 @@ object SavedTab : Screen {
                 )
             },
 
-
             modifier = Modifier.fillMaxSize(),
             containerColor = ThemeRed.colorCommonBackground2
         ) { paddingValues ->
@@ -104,7 +104,7 @@ object SavedTab : Screen {
                     0 -> SavedLikesTab.Content()
                     1 -> SavedCreatorsTab.Content()
                     2 -> SavedNichesTab.Content()
-                    3 -> NichesTab.Content()
+                    4 -> SavedCollectionTab.Content()
                     else -> FavoritesTab.Content()
                 }
             }

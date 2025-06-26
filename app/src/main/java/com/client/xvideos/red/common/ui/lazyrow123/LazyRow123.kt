@@ -50,6 +50,7 @@ import com.client.xvideos.red.common.expand_menu_video.ExpandMenuVideo
 import com.client.xvideos.red.screens.top_this_week.ProfileInfo1
 import com.client.xvideos.red.common.expand_menu_video.ExpandMenuVideoModel
 import com.client.xvideos.red.common.saved.SavedRed
+import com.client.xvideos.red.common.saved.collection.ui.DialogCollection
 import com.client.xvideos.red.common.users.UsersRed
 import com.client.xvideos.red.screens.fullscreen.ScreenRedFullScreen
 import com.composeunstyled.Text
@@ -146,6 +147,26 @@ fun LazyRow123(
                     BlockRed.blockItem(blockItem!!)
                     host.refresh()
                     blockItem = null
+                }
+            }
+        )
+    }
+
+    if (SavedRed.collectionVisibleDialog) {
+        DialogCollection(
+            visible = SavedRed.collectionVisibleDialog,
+            onDismiss = { SavedRed.collectionVisibleDialog = false },
+            onBlockConfirmed = {
+//                if ((SavedRed.collectionItemGifInfo != null)) {
+//                    SavedRed.addCollection(SavedRed.collectionItemGifInfo!!, "test")
+//                    SavedRed.collectionItemGifInfo = null
+//                }
+            },
+            onSelectCollection = { collection ->
+                if ((SavedRed.collectionItemGifInfo != null)) {
+                    SavedRed.addCollection(SavedRed.collectionItemGifInfo!!, collection)
+                    SavedRed.collectionItemGifInfo = null
+                    SavedRed.collectionVisibleDialog = false
                 }
             }
         )

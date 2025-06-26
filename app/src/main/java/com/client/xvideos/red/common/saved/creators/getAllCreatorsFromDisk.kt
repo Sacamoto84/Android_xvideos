@@ -1,8 +1,6 @@
 package com.client.xvideos.red.common.saved.creators
 
 import com.client.xvideos.AppPath
-import com.client.xvideos.feature.redgifs.types.CreatorResponse
-import com.client.xvideos.feature.redgifs.types.NichesInfo
 import com.client.xvideos.feature.redgifs.types.UserInfo
 import com.google.gson.Gson
 import timber.log.Timber
