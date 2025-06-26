@@ -3,8 +3,13 @@ package com.client.xvideos.red.screens.explorer.tab.saved.tab
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Snackbar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.ScreenModel
@@ -19,6 +24,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.red.common.expand_menu_video.impl.ExpandMenuVideoImpl
 import com.client.xvideos.red.common.saved.SavedRed
+import com.client.xvideos.red.common.snackBar.SnackBarEvent
 import com.client.xvideos.red.common.ui.lazyrow123.LazyRow123
 import com.client.xvideos.red.common.ui.lazyrow123.LazyRow123Host
 import com.client.xvideos.red.common.ui.lazyrow123.TypePager
@@ -37,11 +43,23 @@ object SavedLikesTab : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
 
+    val column = mutableIntStateOf(2)
+
+    fun addColumn() {
+        column.intValue += 1
+        if(column.intValue > 3)
+            column.intValue = 1
+    }
+
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val vm: ScreenSavedLikesSM = getScreenModel()
+
+        LaunchedEffect(column.intValue) {
+            vm.likedHost.columns = column.intValue
+        }
 
         LaunchedEffect(SavedRed.likesList){
             vm.likedHost.refresh()
@@ -65,6 +83,9 @@ object SavedLikesTab : Screen {
         )
 
     }
+
+
+
 }
 
 class ScreenSavedLikesSM @Inject constructor(

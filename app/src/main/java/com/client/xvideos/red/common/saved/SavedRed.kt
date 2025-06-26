@@ -66,7 +66,8 @@ object SavedRed {
         creatorsItemRemoveFromDisk(item.username)
             .onSuccess {
                 SnackBarEvent.info("Автор удален")
-                creatorsList.remove(item)
+                //creatorsList.remove(item)
+                refreshCreatorsList()
             }
             .onFailure { e ->
                 SnackBarEvent.error("Ошибка удаления Автора ${e.message}")
