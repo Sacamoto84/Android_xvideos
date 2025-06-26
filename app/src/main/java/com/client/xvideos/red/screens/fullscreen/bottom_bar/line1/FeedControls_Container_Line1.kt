@@ -1,4 +1,4 @@
-package com.client.xvideos.red.screens.profile.bottom_bar.line1
+package com.client.xvideos.red.screens.fullscreen.bottom_bar.line1
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -16,6 +16,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.client.xvideos.red.ThemeRed
 import com.client.xvideos.red.common.ui.atom.Selector
 import com.client.xvideos.red.common.ui.sortByOrder.SortByOrder
+import com.client.xvideos.red.screens.fullscreen.ScreenRedFullScreenSM
 import com.client.xvideos.red.screens.profile.ScreenRedProfileSM
 import timber.log.Timber
 

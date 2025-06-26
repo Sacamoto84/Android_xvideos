@@ -1,32 +1,18 @@
 package com.client.xvideos.red.screens.profile
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.itemsIndexed
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicText
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -35,11 +21,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
@@ -52,17 +35,10 @@ import com.client.xvideos.red.common.block.BlockRed
 import com.client.xvideos.red.common.block.ui.DialogBlock
 import com.client.xvideos.red.common.expand_menu_video.impl.ExpandMenuVideoImpl
 import com.client.xvideos.red.common.ui.lazyrow123.LazyRow123
-import com.client.xvideos.red.screens.profile.atom.CanvasTimeDurationLine
 import com.client.xvideos.red.screens.profile.atom.RedProfileCreaterInfo
-import com.client.xvideos.red.common.video.player_row_mini.RedUrlVideoImageAndLongClick
 import com.client.xvideos.red.screens.profile.atom.VerticalScrollbar
-import com.client.xvideos.red.screens.profile.bottom_bar.BottomBar
 import com.client.xvideos.red.screens.profile.tags.TagsBlock
-import com.client.xvideos.red.screens.profile.tikTok.MenuContent
-import com.client.xvideos.red.screens.profile.tikTok.TikTokStyleVideoFeed
-
 import com.composeunstyled.rememberDisclosureState
-import timber.log.Timber
 
 class ScreenRedProfile(val profileName: String) : Screen {
 
@@ -113,54 +89,7 @@ class ScreenRedProfile(val profileName: String) : Screen {
         //🟨🟨🟨🟨🟨🟨🟨🟨⬆️⬆️⬆️⬆️⬆️❗
 
 
-        Scaffold(
-            bottomBar = {
-                Column {
-
-                    Box(
-                        Modifier
-                            .padding(bottom = 4.dp)
-                            .padding(horizontal = 16.dp)
-                            .clip(RoundedCornerShape(0))
-                            .height(16.dp)
-                            .fillMaxWidth()
-                            //.alpha(al.value)
-                            .background(ThemeRed.colorCommonBackground2),
-                        contentAlignment = Alignment.BottomCenter
-                    ) {
-
-                        CanvasTimeDurationLine(
-                            currentTime = vm.currentPlayerTime, duration = vm.currentPlayerDuration,
-                            timeA = vm.timeA, timeB = vm.timeB,
-                            timeABEnable = vm.enableAB, play = vm.play,
-                            onSeek = {
-                                if (vm.currentPlayerControls != null) {
-                                    vm.currentPlayerControls!!.seekTo(it)
-                                }
-                            },
-                            onSeekFinished = { }, modifier = Modifier.padding(end = 148.dp)
-                        )
-
-                        BasicText(
-                            vm.currentTikTokPage.toString() + "/" + vm.list.collectAsState().value.lastIndex,
-                            style = TextStyle(
-                                color = Color.White,
-                                fontFamily = ThemeRed.fontFamilyPopinsRegular,
-                                fontSize = 8.sp
-                            ),
-                            modifier = Modifier
-                                //.align(Alignment.TopEnd)
-                                .offset(x = 0.dp, y = (-0).dp)
-                        )
-
-                    }
-
-                    //   }
-                    BottomBar(vm)
-                }
-            },
-            containerColor = ThemeRed.colorCommonBackground2
-        ) {
+        Scaffold( containerColor = ThemeRed.colorCommonBackground2 ) {
             Box(Modifier.padding(bottom = it.calculateBottomPadding())) {
 
 //                //Тикток при одном селекторе
@@ -204,7 +133,21 @@ class ScreenRedProfile(val profileName: String) : Screen {
                             gotoPosition = vm.likedHost.currentIndexGoto,
                             option = ExpandMenuVideoImpl.expandMenuVideoListLikes,
                             contentPadding = PaddingValues(0.dp),
-                            contentBeforeList = { },
+                            contentBeforeList = {
+
+                                Column {
+
+                                    if (vm.creator != null) {
+                                        RedProfileCreaterInfo(vm.creator!!)
+                                    }
+
+                                    if ((vm.creator != null) && (vm.tags.collectAsStateWithLifecycle().value.isNotEmpty())) {
+                                        TagsBlock(vm.tags.collectAsStateWithLifecycle().value.toList())
+                                    }
+
+                                }
+
+                            },
 
                             onRun3 = {
                                 //vm.likedHost.refresh()

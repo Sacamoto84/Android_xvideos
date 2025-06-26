@@ -1,11 +1,9 @@
 package com.client.xvideos.red.common.ui.lazyrow123
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,7 +17,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FavoriteBorder
@@ -27,7 +24,6 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -45,7 +41,6 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.feature.redgifs.types.GifsInfo
-import com.client.xvideos.feature.redgifs.types.Order
 import com.client.xvideos.red.ThemeRed
 import com.client.xvideos.red.common.block.BlockRed
 import com.client.xvideos.red.common.block.ui.DialogBlock
@@ -56,6 +51,7 @@ import com.client.xvideos.red.screens.top_this_week.ProfileInfo1
 import com.client.xvideos.red.common.expand_menu_video.ExpandMenuVideoModel
 import com.client.xvideos.red.common.saved.SavedRed
 import com.client.xvideos.red.common.users.UsersRed
+import com.client.xvideos.red.screens.fullscreen.ScreenRedFullScreen
 import com.composeunstyled.Text
 import timber.log.Timber
 
@@ -89,13 +85,13 @@ fun LazyRow123(
 
     val navigator = LocalNavigator.currentOrThrow
 
-    BackHandler {
-        if (fullScreen)
-            fullScreen = false
-        else {
-            navigator.pop()
-        }
-    }
+//    BackHandler {
+//        if (fullScreen)
+//            fullScreen = false
+//        else {
+//            navigator.pop()
+//        }
+//    }
 
     if (listGifs.itemCount == 0) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
@@ -200,7 +196,8 @@ fun LazyRow123(
                         onVideoUri = { videoUri = it },
                         onFullScreen = {
                             blockItem = item
-                            fullScreen = fullScreen.not()
+                            //fullScreen = fullScreen.not()
+                            navigator.push(ScreenRedFullScreen(item))
                         }
                     )
 
@@ -294,28 +291,28 @@ fun LazyRow123(
     }
 
 
-    if (fullScreen) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.DarkGray)
-        ) {
-
-            if (blockItem != null) {
-                RedUrlVideoImageAndLongClick(
-                    blockItem!!, 0, onLongClick = {},
-                    onVideo = { },
-                    isVisibleView = false,
-                    isVisibleDuration = false,
-                    play = true,
-                    isNetConnected = isConnected,
-                    onVideoUri = {},
-                    onFullScreen = { fullScreen = fullScreen.not() }
-                )
-            }
-
-        }
-    }
+//    if (fullScreen) {
+//        Box(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .background(Color.DarkGray)
+//        ) {
+//
+//            if (blockItem != null) {
+//                RedUrlVideoImageAndLongClick(
+//                    blockItem!!, 0, onLongClick = {},
+//                    onVideo = { },
+//                    isVisibleView = false,
+//                    isVisibleDuration = false,
+//                    play = true,
+//                    isNetConnected = isConnected,
+//                    onVideoUri = {},
+//                    onFullScreen = { fullScreen = fullScreen.not() }
+//                )
+//            }
+//
+//        }
+//    }
 
 }
 

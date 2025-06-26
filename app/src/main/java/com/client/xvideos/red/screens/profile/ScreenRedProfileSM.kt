@@ -15,7 +15,6 @@ import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.feature.preference.PreferencesRepository
 import com.client.xvideos.feature.redgifs.extractNameFromUrl
 import com.client.xvideos.feature.redgifs.http.RedGifs
-import com.client.xvideos.feature.redgifs.types.CreatorResponse
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.redgifs.types.MediaType
 import com.client.xvideos.feature.redgifs.types.Order
@@ -34,7 +33,6 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

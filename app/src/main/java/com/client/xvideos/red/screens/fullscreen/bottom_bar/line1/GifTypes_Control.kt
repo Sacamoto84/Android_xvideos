@@ -1,4 +1,4 @@
-package com.client.xvideos.red.screens.profile.bottom_bar.line1
+package com.client.xvideos.red.screens.fullscreen.bottom_bar.line1
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

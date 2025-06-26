@@ -24,6 +24,8 @@ import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.feature.redgifs.types.Order
 import com.client.xvideos.red.ThemeRed
@@ -37,6 +39,7 @@ import com.client.xvideos.red.common.ui.lazyrow123.TypePager
 import com.client.xvideos.red.common.ui.sortByOrder.SortByOrder
 import com.client.xvideos.red.screens.LocalRootScreenModel
 import com.client.xvideos.red.screens.ScreenRedRootSM
+import com.client.xvideos.red.screens.profile.ScreenRedProfile
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -55,6 +58,8 @@ object GifsTab : Screen {
     @Composable
     override fun Content() {
         val vm: ScreenRedExplorerGifsSM = getScreenModel()
+
+        val  navigator = LocalNavigator.currentOrThrow
 
         //val root: ScreenRedRootSM = getScreenModel<ScreenRedRootSM>()
 
@@ -89,9 +94,9 @@ object GifsTab : Screen {
                 LazyRow123(
                     host = vm.lazyHost,
                     modifier = Modifier.fillMaxSize(),
-                    onClickOpenProfile = {
+                    onClickOpenProfile = { name ->
                         vm.lazyHost.currentIndexGoto = vm.lazyHost.currentIndex
-                        //navigator.push(ScreenRedProfile(it))
+                        navigator.push(ScreenRedProfile(name))
                     },
                     gotoPosition = 0,
                     option = ExpandMenuVideoImpl.expandMenuVideoList,

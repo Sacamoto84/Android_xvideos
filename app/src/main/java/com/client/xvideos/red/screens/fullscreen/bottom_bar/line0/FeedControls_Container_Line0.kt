@@ -1,4 +1,4 @@
-package com.client.xvideos.red.screens.profile.bottom_bar.line0
+package com.client.xvideos.red.screens.fullscreen.bottom_bar.line0
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -37,13 +37,14 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.R
 import com.client.xvideos.red.ThemeRed
+import com.client.xvideos.red.screens.fullscreen.ScreenRedFullScreenSM
 import com.client.xvideos.red.screens.manager_block.ScreenRedManageBlock
 import com.client.xvideos.red.screens.profile.ScreenRedProfileSM
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun FeedControls_Container_Line0(vm: ScreenRedProfileSM) {
+fun FeedControls_Container_Line0(vm: ScreenRedFullScreenSM) {
 
     val border = Modifier.border(1.dp, ThemeRed.colorBorderGray)
 
@@ -183,7 +184,7 @@ fun FeedControls_Container_Line0(vm: ScreenRedProfileSM) {
                 .width(48.dp)
                 .border(1.dp, ThemeRed.colorBorderGray, RoundedCornerShape(8.dp))
                 .clickable(onClick = {
-                    vm.downloadCurrentItem()
+                    //vm.downloadCurrentItem()
                 }), contentAlignment = Alignment.Center
         ) {
             Icon(
@@ -202,7 +203,7 @@ fun FeedControls_Container_Line0(vm: ScreenRedProfileSM) {
                 .width(48.dp)
                 .border(1.dp, ThemeRed.colorBorderGray, RoundedCornerShape(8.dp))
                 .clickable(onClick = {
-                    vm.downloadCurrentItem()
+                    //vm.downloadCurrentItem()
                 }), contentAlignment = Alignment.Center
         ) {
             Icon(
@@ -226,7 +227,7 @@ fun FeedControls_Container_Line0(vm: ScreenRedProfileSM) {
                 .width(48.dp)
                 .border(1.dp, ThemeRed.colorBorderGray, RoundedCornerShape(8.dp))
                 .clickable(onClick = {
-                    vm.downloadCurrentItem()
+                    //vm.downloadCurrentItem()
                 }), contentAlignment = Alignment.Center
         ) {
             Icon(
