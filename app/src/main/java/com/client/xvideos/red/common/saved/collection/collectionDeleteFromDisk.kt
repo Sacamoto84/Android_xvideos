@@ -25,3 +25,5 @@ fun collectionDeleteFromDisk(collectionName: String): Result<Boolean> =
         Timber.e(e, "Ошибка при удалении коллекции $collectionName")
         Result.failure(e)
     }
+
+

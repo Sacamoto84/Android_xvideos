@@ -40,6 +40,7 @@ import com.client.xvideos.red.ThemeRed
 import com.client.xvideos.red.common.block.BlockRed
 import com.client.xvideos.red.common.downloader.DownloadRed
 import com.client.xvideos.red.common.saved.SavedRed
+import com.client.xvideos.red.common.saved.collection.collectionItemDeleteFromDisk
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
@@ -58,6 +59,7 @@ fun ExpandMenuVideo(
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
     onRunLike: () -> Unit = {},
+    onRefresh: () -> Unit = {},
     isCollection : Boolean = false,
 ) {
 
@@ -87,7 +89,7 @@ fun ExpandMenuVideo(
             DropdownMenuItem_Like(item, onRunLike){expanded = false}
             DropdownMenuItem_Follow(item){ expanded = false }
             DropdownMenuItem_AddCollection(item) { expanded = false }
-            if(isCollection) DropdownMenuItem_RemoveFromCollection(item) { expanded = false }
+            if(isCollection) DropdownMenuItem_RemoveFromCollection(item, onRefresh) { expanded = false }
         }
     }
 }
@@ -152,8 +154,8 @@ fun DropdownMenuItem_Like(item: GifsInfo? = null, onRunLike: () -> Unit, onDismi
                 delay(200)
                 if (!isLiked) SavedRed.addLikes(item) else SavedRed.removeLikes(item)
                 onRunLike.invoke()
+                onDismiss.invoke()
             }
-            onDismiss.invoke()
         }, contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
     )
 }
@@ -210,7 +212,7 @@ fun DropdownMenuItem_AddCollection(item: GifsInfo? = null, onDismiss: () -> Unit
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DropdownMenuItem_RemoveFromCollection(item: GifsInfo? = null, onDismiss: () -> Unit){
+fun DropdownMenuItem_RemoveFromCollection(item: GifsInfo? = null, onRefresh: () -> Unit, onDismiss: () -> Unit){
     DropdownMenuItem(
         leadingIcon = {
             Icon(
@@ -222,8 +224,13 @@ fun DropdownMenuItem_RemoveFromCollection(item: GifsInfo? = null, onDismiss: () 
         text = { Text("Remove from Collection", style = style) },
         onClick = {
             if (item == null) return@DropdownMenuItem
-            SavedRed.collectionItemGifInfo = item
-            SavedRed.collectionVisibleDialog = true
+            if (SavedRed.selectedCollection == null) {
+                onDismiss.invoke()
+                return@DropdownMenuItem
+            }
+            SavedRed.deleteItemFromCollection(item, SavedRed.selectedCollection!!)
+            onRefresh.invoke()
+
             onDismiss.invoke()
         }, contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
     )

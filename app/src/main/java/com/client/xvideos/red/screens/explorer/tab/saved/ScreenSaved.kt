@@ -75,30 +75,35 @@ object SavedTab : Screen {
                             if (it == screenType) {
                                 when (it) {
                                     0 -> SavedLikesTab.addColumn()
+                                    4 -> SavedCollectionTab.addColumn()
                                 }
                             }
                             screenType = it
                         },
                         overlay0 = {
                             Box(
-                                modifier = Modifier
-                                    .size(24.dp)
-                                //.background(Color.Blue)
-                                , contentAlignment = Alignment.CenterStart
+                                modifier = Modifier.size(24.dp), contentAlignment = Alignment.CenterStart
                             ) {
                                 Row {
                                     repeat(SavedLikesTab.column.intValue) {
-                                        Box(
-                                            modifier = Modifier
-                                                .padding(end = 2.dp)
-                                                .clip(CircleShape)
-                                                .size(4.dp)
-                                                .background(Color.White)
-                                        )
+                                        Box(modifier = Modifier.padding(end = 2.dp).clip(CircleShape).size(4.dp).background(Color.White))
                                     }
                                 }
                             }
-                        }
+                        },
+                        overlay4 = {
+                            Box(
+                                modifier = Modifier.size(24.dp), contentAlignment = Alignment.CenterStart
+                            ) {
+                                Row {
+                                    repeat(SavedCollectionTab.column.intValue) {
+                                        Box(modifier = Modifier.padding(end = 2.dp).clip(CircleShape).size(4.dp).background(Color.White))
+                                    }
+                                }
+                            }
+                        },
+
+
                     )
                 }
             },

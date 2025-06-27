@@ -35,6 +35,8 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
 import javax.inject.Inject
 
 
@@ -58,14 +60,12 @@ object SavedLikesTab : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val vm: ScreenSavedLikesSM = getScreenModel()
 
-
-
         LaunchedEffect(column.intValue) {
             vm.likedHost.columns = column.intValue
         }
 
         LaunchedEffect(SavedRed.likesList){
-            vm.likedHost.refresh()
+            //vm.likedHost.refresh()
         }
 
         val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForGrid(
@@ -85,9 +85,7 @@ object SavedLikesTab : Screen {
                 contentPadding = PaddingValues(0.dp),
                 contentBeforeList = { },
 
-                onRunLike = {
-                    vm.likedHost.refresh()
-                }
+                isRunLike = true
 
             )
 
@@ -112,6 +110,8 @@ object SavedLikesTab : Screen {
 class ScreenSavedLikesSM @Inject constructor(
     connectivityObserver: ConnectivityObserver
 ) : ScreenModel {
+
+    @OptIn(DelicateCoroutinesApi::class)
     val likedHost = LazyRow123Host(
         connectivityObserver = connectivityObserver,
         scope = screenModelScope,

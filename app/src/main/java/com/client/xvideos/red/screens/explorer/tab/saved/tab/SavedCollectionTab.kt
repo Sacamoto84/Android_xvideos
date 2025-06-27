@@ -12,6 +12,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -62,7 +63,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import cafe.adriel.voyager.core.model.ScreenModel
+import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
@@ -74,6 +78,7 @@ import com.client.xvideos.R
 import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.redgifs.types.NichesInfo
+import com.client.xvideos.feature.redgifs.types.Order
 import com.client.xvideos.red.ThemeRed
 import com.client.xvideos.red.common.block.BlockRed
 import com.client.xvideos.red.common.block.ui.DialogBlock
@@ -81,6 +86,10 @@ import com.client.xvideos.red.common.downloader.DownloadRed
 import com.client.xvideos.red.common.expand_menu_video.ExpandMenuVideo
 import com.client.xvideos.red.common.saved.SavedRed
 import com.client.xvideos.red.common.saved.collection.model.CollectionEntity
+import com.client.xvideos.red.common.saved.collection.ui.DaialogNewCollection
+import com.client.xvideos.red.common.ui.lazyrow123.LazyRow123
+import com.client.xvideos.red.common.ui.lazyrow123.LazyRow123Host
+import com.client.xvideos.red.common.ui.lazyrow123.TypePager
 import com.client.xvideos.red.common.users.UsersRed
 import com.client.xvideos.red.common.video.player_row_mini.RedUrlVideoImageAndLongClick
 import com.client.xvideos.red.screens.fullscreen.ScreenRedFullScreen
@@ -103,6 +112,14 @@ object SavedCollectionTab : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
 
+    val column = mutableIntStateOf(2)
+
+    fun addColumn() {
+        column.intValue += 1
+        if (column.intValue > 3)
+            column.intValue = 1
+    }
+
     @OptIn(DelicateCoroutinesApi::class)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
@@ -113,25 +130,30 @@ object SavedCollectionTab : Screen {
 
         var blockItem by rememberSaveable { mutableStateOf<GifsInfo?>(null) }
 
-        var selectedCollection by rememberSaveable { mutableStateOf<String?>(null) }
-
-        var columns by rememberSaveable { mutableIntStateOf(2) }
-
-        BackHandler {
-            selectedCollection = null
-        }
+        BackHandler { SavedRed.selectedCollection = null }
 
         val list: SnapshotStateList<GifsInfo> = emptyList<GifsInfo>().toMutableStateList()
 
-        LaunchedEffect(selectedCollection) {
-            if (selectedCollection != null) {
+        val listGifs: LazyPagingItems<Any> = vm.likedHost.pager.collectAsLazyPagingItems()
+
+        LaunchedEffect(column.intValue) {
+            vm.likedHost.columns = column.intValue
+        }
+
+        LaunchedEffect(SavedRed.selectedCollection) {
+            if (SavedRed.selectedCollection != null) {
                 list.clear()
-                list.addAll(SavedRed.collectionList.first { it.collection == selectedCollection }.list)
+                list.addAll(SavedRed.collectionList.first { it.collection == SavedRed.selectedCollection }.list)
+                vm.likedHost.extraString = SavedRed.selectedCollection!!
+                listGifs.refresh()
             } else {
                 list.clear()
             }
         }
 
+//        LaunchedEffect(SavedRed.collectionList) {
+//            listGifs.refresh()
+//        }
 
         /**  ➜ сюда запоминаем элемент, который пользователь хочет удалить  */
         var itemPendingDelete by remember { mutableStateOf<String?>(null) }
@@ -192,9 +214,30 @@ object SavedCollectionTab : Screen {
             )
         }
 
+
+        var collectionVisibleDialogCreateNew by remember { mutableStateOf(false) }
+
+        if (collectionVisibleDialogCreateNew) {
+            DaialogNewCollection(
+                visible = collectionVisibleDialogCreateNew,
+                onDismiss = {
+                    collectionVisibleDialogCreateNew = false
+                },
+                onBlockConfirmed = { collection ->
+                    if ((collection != "")) {
+                        SavedRed.createCollection(collection)
+                        collectionVisibleDialogCreateNew = false
+                    }
+                }
+            )
+        }
+
+
+
+
         Scaffold(topBar = {
             Text(
-                ">Коллекция>" + selectedCollection ?: "---",
+                ">Коллекция>" + SavedRed.selectedCollection ?: "---",
                 modifier = Modifier.padding(start = 8.dp),
                 color = ThemeRed.colorYellow,
                 fontSize = 18.sp,
@@ -203,7 +246,7 @@ object SavedCollectionTab : Screen {
         }) { padding ->
 
 
-            if (selectedCollection == null) {
+            if (SavedRed.selectedCollection == null) {
                 LazyVerticalGrid(
                     modifier = Modifier.padding(padding),
                     state = vm.gridState,
@@ -218,7 +261,7 @@ object SavedCollectionTab : Screen {
                                 .padding(horizontal = 8.dp)
                                 .padding(vertical = 4.dp)
                                 .combinedClickable(
-                                    onClick = { selectedCollection = it.collection },
+                                    onClick = { SavedRed.selectedCollection = it.collection },
                                     onLongClick = { itemPendingDelete = it.collection }),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -253,7 +296,10 @@ object SavedCollectionTab : Screen {
                                     .padding(start = 8.dp, top = 4.dp)
                                     .size(72.dp)
                                     .clip(RoundedCornerShape(25))
-                                    .background(ThemeRed.colorYellow),
+                                    .background(ThemeRed.colorYellow)
+                                    .clickable(onClick = {
+                                        collectionVisibleDialogCreateNew = true
+                                    }),
                                 contentAlignment = Alignment.Center
                             ) {
 
@@ -270,145 +316,157 @@ object SavedCollectionTab : Screen {
                 }
             } else {
 
-                LazyColumn(state = vm.listState, modifier = Modifier.padding(padding)) {
+                LazyRow123(
+                    host = vm.likedHost,
+                    modifier = Modifier
+                        .padding(top = padding.calculateTopPadding())
+                        .fillMaxSize(),
+                    onClickOpenProfile = {},
+                    gotoPosition = 0,
+                )
 
-                    item {
-                        Box(
-                            modifier = Modifier
-                                .size(64.dp)
-                                .background(Color.Gray)
-                                .clickable(onClick = { selectedCollection = null })
-                        )
-                    }
-
-                    itemsIndexed(list) { index, item ->
-
-                        var isVideo by remember { mutableStateOf(false) }
-
-                        Box(
-                            modifier = Modifier
-                                .padding(vertical = 8.dp)
-                                .padding(horizontal = 4.dp)
-                                .fillMaxSize()
-                                .clip(RoundedCornerShape(16.dp))
-                                .border(1.dp, Color.DarkGray, RoundedCornerShape(16.dp)),
-                            contentAlignment = Alignment.Center
-                        ) {
-
-                            RedUrlVideoImageAndLongClick(
-                                item, index, onLongClick = {},
-                                onVideo = { isVideo = it },
-                                isVisibleView = false,
-                                isVisibleDuration = false,
-                                play = false,//centrallyLocatedOrMostVisibleItemIndex == index && host.columns == 1,
-                                isNetConnected = true,
-                                onVideoUri = { },
-                                onFullScreen = {
-                                    //blockItem = item
-                                    navigator.push(ScreenRedFullScreen(item))
-                                }
-                            )
-
-                            //Меню на 3 точки
-                            ExpandMenuVideo(
-                                item = item,
-                                modifier = Modifier.align(Alignment.TopEnd),
-                                onClick = {
-                                    blockItem = item //Для блока и идентификации и тема
-                                },
-                                onRunLike = {},
-                                isCollection = true,
-                            )
-
-                            if (true) {
-                                ProfileInfo1(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .align(Alignment.BottomStart)
-                                        .offset((4).dp, (-4).dp),
-                                    onClick = { navigator.push(ScreenRedProfile(item.userName)) },
-                                    videoItem = item,
-                                    listUsers = UsersRed.listAllUsers,
-                                    visibleUserName = columns <= 2 && !isVideo,
-                                    visibleIcon = !isVideo
-                                )
-                            }
-
-                            AnimatedVisibility(
-                                !isVideo, modifier = Modifier
-                                    .fillMaxSize()
-                                    .align(Alignment.BottomCenter),
-                                enter = slideInVertically(
-                                    initialOffsetY = { fullHeight -> fullHeight }, // снизу вверх
-                                    animationSpec = tween(durationMillis = 200)
-                                ),
-                                exit = slideOutVertically(
-                                    targetOffsetY = { fullHeight -> fullHeight }, // сверху вниз
-                                    animationSpec = tween(durationMillis = 200)
-                                )
-                            ) {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    verticalAlignment = Alignment.Bottom,
-                                    horizontalArrangement = Arrangement.End
-                                ) {
-
-
-                                    if (SavedRed.collectionList.any { it.list.any { it2 -> it2.id == item.id } }) {
-                                        Icon(
-                                            painter = painterResource(R.drawable.collection_multi_input_svgrepo_com),
-                                            contentDescription = null,
-                                            tint = Color.White,
-                                            modifier = Modifier
-                                                .padding(bottom = 6.dp, end = 6.dp)
-                                                .size(18.dp)
-                                        )
-                                    }
-
-                                    //
-                                    if (SavedRed.creatorsList.any { it.username == item.userName }) {
-                                        Icon(
-                                            Icons.Filled.Person,
-                                            contentDescription = null,
-                                            tint = Color.White,
-                                            modifier = Modifier
-                                                .padding(bottom = 6.dp, end = 6.dp)
-                                                .size(18.dp)
-                                        )
-                                    }
-
-                                    //✅ Лайк
-                                    if (SavedRed.likesList.any { it.id == item.id }) {
-                                        Icon(
-                                            Icons.Filled.FavoriteBorder,
-                                            contentDescription = null,
-                                            tint = Color.White,
-                                            modifier = Modifier
-                                                .padding(bottom = 6.dp, end = 6.dp)
-                                                .size(18.dp)
-                                        )
-                                    }
-
-                                    //✅ Иконка того что видео скачано
-                                    if (DownloadRed.downloadList.contains(item.id)) {
-                                        Icon(
-                                            Icons.Default.Save,
-                                            contentDescription = null,
-                                            tint = Color.White,
-                                            modifier = Modifier
-                                                .padding(bottom = 6.dp, end = 6.dp)
-                                                .size(18.dp)
-                                        )
-                                    }
-
-                                }
-
-                            }
-
-
-                        }
-                    }
-                }
+//                LazyVerticalGrid(state = vm.listState,
+//                    modifier = Modifier.padding(padding))
+//                {
+//
+//
+//                    item {
+//                        Box(
+//                            modifier = Modifier
+//                                .size(64.dp)
+//                                .background(Color.Gray)
+//                                .clickable(onClick = { selectedCollection = null })
+//                        )
+//                    }
+//
+//                    itemsIndexed(list) { index, item ->
+//
+//                        var isVideo by remember { mutableStateOf(false) }
+//
+//                        Box(
+//                            modifier = Modifier
+//                                .padding(vertical = 8.dp)
+//                                .padding(horizontal = 4.dp)
+//                                .fillMaxSize()
+//                                .clip(RoundedCornerShape(16.dp))
+//                                .border(1.dp, Color.DarkGray, RoundedCornerShape(16.dp)),
+//                            contentAlignment = Alignment.Center
+//                        ) {
+//
+//                            RedUrlVideoImageAndLongClick(
+//                                item, index, onLongClick = {},
+//                                onVideo = { isVideo = it },
+//                                isVisibleView = false,
+//                                isVisibleDuration = false,
+//                                play = false,//centrallyLocatedOrMostVisibleItemIndex == index && host.columns == 1,
+//                                isNetConnected = true,
+//                                onVideoUri = { },
+//                                onFullScreen = {
+//                                    //blockItem = item
+//                                    navigator.push(ScreenRedFullScreen(item))
+//                                }
+//                            )
+//
+//                            //Меню на 3 точки
+//                            ExpandMenuVideo(
+//                                item = item,
+//                                modifier = Modifier.align(Alignment.TopEnd),
+//                                onClick = {
+//                                    blockItem = item //Для блока и идентификации и тема
+//                                },
+//                                onRunLike = {},
+//                                isCollection = true,
+//                            )
+//
+//
+//                            ProfileInfo1(
+//                                modifier = Modifier
+//                                    .fillMaxWidth()
+//                                    .align(Alignment.BottomStart)
+//                                    .offset((4).dp, (-4).dp),
+//                                onClick = { navigator.push(ScreenRedProfile(item.userName)) },
+//                                videoItem = item,
+//                                listUsers = UsersRed.listAllUsers,
+//                                visibleUserName = column.intValue <= 2 && !isVideo,
+//                                visibleIcon = !isVideo
+//                            )
+//
+//
+//                            AnimatedVisibility(
+//                                !isVideo, modifier = Modifier
+//                                    .fillMaxSize()
+//                                    .align(Alignment.BottomCenter),
+//                                enter = slideInVertically(
+//                                    initialOffsetY = { fullHeight -> fullHeight }, // снизу вверх
+//                                    animationSpec = tween(durationMillis = 200)
+//                                ),
+//                                exit = slideOutVertically(
+//                                    targetOffsetY = { fullHeight -> fullHeight }, // сверху вниз
+//                                    animationSpec = tween(durationMillis = 200)
+//                                )
+//                            ) {
+//                                Row(
+//                                    modifier = Modifier.fillMaxWidth(),
+//                                    verticalAlignment = Alignment.Bottom,
+//                                    horizontalArrangement = Arrangement.End
+//                                ) {
+//
+//
+//                                    if (SavedRed.collectionList.any { it.list.any { it2 -> it2.id == item.id } }) {
+//                                        Icon(
+//                                            painter = painterResource(R.drawable.collection_multi_input_svgrepo_com),
+//                                            contentDescription = null,
+//                                            tint = Color.White,
+//                                            modifier = Modifier
+//                                                .padding(bottom = 6.dp, end = 6.dp)
+//                                                .size(18.dp)
+//                                        )
+//                                    }
+//
+//                                    //
+//                                    if (SavedRed.creatorsList.any { it.username == item.userName }) {
+//                                        Icon(
+//                                            Icons.Filled.Person,
+//                                            contentDescription = null,
+//                                            tint = Color.White,
+//                                            modifier = Modifier
+//                                                .padding(bottom = 6.dp, end = 6.dp)
+//                                                .size(18.dp)
+//                                        )
+//                                    }
+//
+//                                    //✅ Лайк
+//                                    if (SavedRed.likesList.any { it.id == item.id }) {
+//                                        Icon(
+//                                            Icons.Filled.FavoriteBorder,
+//                                            contentDescription = null,
+//                                            tint = Color.White,
+//                                            modifier = Modifier
+//                                                .padding(bottom = 6.dp, end = 6.dp)
+//                                                .size(18.dp)
+//                                        )
+//                                    }
+//
+//                                    //✅ Иконка того что видео скачано
+//                                    if (DownloadRed.downloadList.contains(item.id)) {
+//                                        Icon(
+//                                            Icons.Default.Save,
+//                                            contentDescription = null,
+//                                            tint = Color.White,
+//                                            modifier = Modifier
+//                                                .padding(bottom = 6.dp, end = 6.dp)
+//                                                .size(18.dp)
+//                                        )
+//                                    }
+//
+//                                }
+//
+//                            }
+//
+//
+//                        }
+//                    }
+//                }
 
 
             }
@@ -423,7 +481,15 @@ class ScreenSavedCollectionSM @Inject constructor(
     connectivityObserver: ConnectivityObserver
 ) : ScreenModel {
     val gridState = LazyGridState()
-    val listState = LazyListState()
+
+    val likedHost = LazyRow123Host(
+        connectivityObserver = connectivityObserver,
+        scope = screenModelScope,
+        typePager = TypePager.SAVED_COLLECTION,
+        extraString = "",
+        startOrder = Order.LATEST,
+        isCollection = true
+    )
 }
 
 @Module

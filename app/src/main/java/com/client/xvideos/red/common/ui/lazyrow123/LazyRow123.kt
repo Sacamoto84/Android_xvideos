@@ -66,7 +66,7 @@ fun LazyRow123(
     contentBeforeList: @Composable (() -> Unit) = {},
 
     //Для меню
-    onRunLike: () -> Unit = {},
+    isRunLike: Boolean = false,
 
     ) {
 
@@ -89,11 +89,17 @@ fun LazyRow123(
 //    }
 
     if (listGifs.itemCount == 0) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
-            Text("Отсутствуют данные", color = Color.White, fontFamily = ThemeRed.fontFamilyDMsanss, fontSize = 20.sp)
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text(
+                "Отсутствуют данные",
+                color = Color.White,
+                fontFamily = ThemeRed.fontFamilyDMsanss,
+                fontSize = 20.sp
+            )
         }
         return
     }
+
 
 //    val centrallyLocatedOrMostVisibleItemIndex by remember {
 //        derivedStateOf {
@@ -144,7 +150,7 @@ fun LazyRow123(
             onBlockConfirmed = {
                 if ((blockItem != null)) {
                     BlockRed.blockItem(blockItem!!)
-                    host.refresh()
+                    listGifs.refresh()
                     blockItem = null
                 }
             }
@@ -206,11 +212,19 @@ fun LazyRow123(
                         onClick = {
                             blockItem = item //Для блока и идентификации и тема
                         },
-                        onRunLike = onRunLike
+                        onRunLike = {
+                            if(isRunLike) {
+                                listGifs.refresh()
+                            }
+                        },
+                        onRefresh = {
+                            listGifs.refresh()
+                        },
+                        host.isCollection
                     )
 
 
-                    if(host.visibleProfileInfo) {
+                    if (host.visibleProfileInfo) {
                         ProfileInfo1(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -245,8 +259,14 @@ fun LazyRow123(
 
 
                             if (SavedRed.collectionList.any { it.list.any { it2 -> it2.id == item.id } }) {
-                                Icon(painter = painterResource(R.drawable.collection_multi_input_svgrepo_com), contentDescription = null, tint = Color.White,
-                                    modifier = Modifier.padding(bottom = 6.dp, end = 6.dp).size(18.dp))
+                                Icon(
+                                    painter = painterResource(R.drawable.collection_multi_input_svgrepo_com),
+                                    contentDescription = null,
+                                    tint = Color.White,
+                                    modifier = Modifier
+                                        .padding(bottom = 6.dp, end = 6.dp)
+                                        .size(18.dp)
+                                )
                             }
 
                             //

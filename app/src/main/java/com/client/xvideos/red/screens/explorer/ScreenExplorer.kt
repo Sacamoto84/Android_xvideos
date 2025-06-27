@@ -30,7 +30,6 @@ import com.client.xvideos.red.screens.explorer.tab.gifs.GifsTab
 import com.client.xvideos.red.screens.explorer.tab.niches.NichesTab
 import com.client.xvideos.red.screens.explorer.tab.saved.SavedTab
 import com.client.xvideos.red.screens.explorer.top.TabRow
-import com.client.xvideos.red.screens.top_this_week.ScreenRedTopThisWeek
 
 @Composable
 private fun RowScope.TabNavigationItem(tab: Tab) {
@@ -54,14 +53,13 @@ class ScreenRedExplorer() : Screen {
         val navigator = LocalNavigator.currentOrThrow
 
         val vm: ScreenRedExplorerSM = getScreenModel()
-        val l = listOf(Icons.Outlined.Movie, Icons.Outlined.Image, Icons.Outlined.Person, Icons.Outlined.Group, Icons.Outlined.BookmarkBorder)
+        val l = listOf(Icons.Outlined.Movie, Icons.Outlined.Group, Icons.Outlined.BookmarkBorder)
         Scaffold(bottomBar ={ TabRow(titlesIcon = l, onChangeState = {vm.screenType = it}) }, containerColor = ThemeRed.colorCommonBackground2){paddingValues ->
             Box(modifier = Modifier.padding(bottom = paddingValues.calculateBottomPadding())) {
                 when (vm.screenType) {
                     0 -> GifsTab.Content()
-                    1 -> ScreenRedTopThisWeek.Content()
-                    3 -> NichesTab.Content()
-                    4 -> SavedTab.Content()
+                    1 -> NichesTab.Content()
+                    2 -> SavedTab.Content()
                     else -> FavoritesTab.Content()
                 }
             }
