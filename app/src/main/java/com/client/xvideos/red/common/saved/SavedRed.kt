@@ -131,6 +131,8 @@ object SavedRed {
     var collectionVisibleDialog by mutableStateOf(false)  //║ Показ диалога на добавление в блок лист
     var collectionItemGifInfo by mutableStateOf<GifsInfo?>(null)
 
+    var collectionVisibleDialogCreateNew by mutableStateOf(false)  //║ Показ диалога на добавление в блок лист
+
     fun addCollection(item: GifsInfo, collectionName: String) {
         println("!!! addCollection() item:${item.id} collectionName:$collectionName")
         val a = collectionItemSaveToDisk(item, collectionName)

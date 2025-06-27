@@ -25,12 +25,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.ScreenModel
+import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.hilt.ScreenModelKey
@@ -38,6 +40,8 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.Navigator
 import com.client.xvideos.red.ThemeRed
 import com.client.xvideos.red.common.downloader.ui.DownloadIndicator
+import com.client.xvideos.red.common.saved.SavedRed
+import com.client.xvideos.red.common.saved.collection.ui.DialogCollection
 import com.client.xvideos.red.common.snackBar.SnackBarEvent
 import com.client.xvideos.red.common.snackBar.UiMessage
 import com.client.xvideos.red.screens.explorer.ScreenRedExplorer
@@ -85,6 +89,8 @@ class ScreenRedRoot() : Screen {
         val root: ScreenRedRootSM = getScreenModel()
         val snackbarHostState = remember { SnackbarHostState() }
 
+        val scope = rememberCoroutineScope()
+
         LaunchedEffect(Unit) {
             root.snackbarEvents.collect { message ->
                 snackbarHostState.showSnackbar(message)
@@ -97,9 +103,35 @@ class ScreenRedRoot() : Screen {
             }
         }
 
-        BackHandler {
+        BackHandler { }
 
+        if (SavedRed.collectionVisibleDialog) {
+            DialogCollection(
+                visible = SavedRed.collectionVisibleDialog,
+                onDismiss = { SavedRed.collectionVisibleDialog = false },
+                onBlockConfirmed = {
+//                if ((SavedRed.collectionItemGifInfo != null)) {
+//                    SavedRed.addCollection(SavedRed.collectionItemGifInfo!!, "test")
+//                    SavedRed.collectionItemGifInfo = null
+//                }
+                },
+                onSelectCollection = { collection ->
+                    root.screenModelScope.launch {
+                        if ((SavedRed.collectionItemGifInfo != null)) {
+                            SavedRed.addCollection(SavedRed.collectionItemGifInfo!!, collection)
+                            SavedRed.collectionItemGifInfo = null
+                            SnackBarEvent.success("Элемент добавлен в коллекцию")
+                            delay(800)
+                            SavedRed.collectionVisibleDialog = false
+                        }
+                    }
+                }
+            )
         }
+
+
+
+
 
         CompositionLocalProvider(LocalRootScreenModel provides root) {
             Scaffold(

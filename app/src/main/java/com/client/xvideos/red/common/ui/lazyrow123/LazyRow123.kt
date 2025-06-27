@@ -19,9 +19,15 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Apps
+import androidx.compose.material.icons.filled.Collections
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.ViewCozy
+import androidx.compose.material.icons.outlined.Apps
+import androidx.compose.material.icons.outlined.ViewComfyAlt
+import androidx.compose.material.icons.outlined.ViewCozy
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
@@ -51,9 +57,13 @@ import com.client.xvideos.red.screens.top_this_week.ProfileInfo1
 import com.client.xvideos.red.common.expand_menu_video.ExpandMenuVideoModel
 import com.client.xvideos.red.common.saved.SavedRed
 import com.client.xvideos.red.common.saved.collection.ui.DialogCollection
+import com.client.xvideos.red.common.snackBar.SnackBarEvent
 import com.client.xvideos.red.common.users.UsersRed
 import com.client.xvideos.red.screens.fullscreen.ScreenRedFullScreen
 import com.composeunstyled.Text
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 
 @Composable
@@ -152,25 +162,7 @@ fun LazyRow123(
         )
     }
 
-    if (SavedRed.collectionVisibleDialog) {
-        DialogCollection(
-            visible = SavedRed.collectionVisibleDialog,
-            onDismiss = { SavedRed.collectionVisibleDialog = false },
-            onBlockConfirmed = {
-//                if ((SavedRed.collectionItemGifInfo != null)) {
-//                    SavedRed.addCollection(SavedRed.collectionItemGifInfo!!, "test")
-//                    SavedRed.collectionItemGifInfo = null
-//                }
-            },
-            onSelectCollection = { collection ->
-                if ((SavedRed.collectionItemGifInfo != null)) {
-                    SavedRed.addCollection(SavedRed.collectionItemGifInfo!!, collection)
-                    SavedRed.collectionItemGifInfo = null
-                    SavedRed.collectionVisibleDialog = false
-                }
-            }
-        )
-    }
+
 
 
 
@@ -262,6 +254,12 @@ fun LazyRow123(
                             verticalAlignment = Alignment.Bottom,
                             horizontalArrangement = Arrangement.End
                         ) {
+
+
+                            if (SavedRed.collectionList.any { it.list.any { it2 -> it2.id == item.id } }) {
+                                Icon(Icons.Outlined.ViewComfyAlt, contentDescription = null, tint = Color.White,
+                                    modifier = Modifier.padding(bottom = 6.dp, end = 6.dp).size(18.dp))
+                            }
 
                             //
                             if (SavedRed.creatorsList.any { it.username == item.userName }) {
