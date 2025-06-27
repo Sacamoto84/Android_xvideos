@@ -19,15 +19,9 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Apps
-import androidx.compose.material.icons.filled.Collections
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Save
-import androidx.compose.material.icons.filled.ViewCozy
-import androidx.compose.material.icons.outlined.Apps
-import androidx.compose.material.icons.outlined.ViewComfyAlt
-import androidx.compose.material.icons.outlined.ViewCozy
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
@@ -40,30 +34,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.client.xvideos.R
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.red.ThemeRed
 import com.client.xvideos.red.common.block.BlockRed
 import com.client.xvideos.red.common.block.ui.DialogBlock
 import com.client.xvideos.red.common.downloader.DownloadRed
-import com.client.xvideos.red.common.video.player_row_mini.RedUrlVideoImageAndLongClick
 import com.client.xvideos.red.common.expand_menu_video.ExpandMenuVideo
-import com.client.xvideos.red.screens.top_this_week.ProfileInfo1
-import com.client.xvideos.red.common.expand_menu_video.ExpandMenuVideoModel
 import com.client.xvideos.red.common.saved.SavedRed
-import com.client.xvideos.red.common.saved.collection.ui.DialogCollection
-import com.client.xvideos.red.common.snackBar.SnackBarEvent
 import com.client.xvideos.red.common.users.UsersRed
+import com.client.xvideos.red.common.video.player_row_mini.RedUrlVideoImageAndLongClick
 import com.client.xvideos.red.screens.fullscreen.ScreenRedFullScreen
+import com.client.xvideos.red.screens.top_this_week.ProfileInfo1
 import com.composeunstyled.Text
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 
 @Composable
@@ -72,7 +62,6 @@ fun LazyRow123(
     modifier: Modifier = Modifier,
     onClickOpenProfile: (String) -> Unit = {},
     gotoPosition: Int,
-    option: List<ExpandMenuVideoModel> = emptyList(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
     contentBeforeList: @Composable (() -> Unit) = {},
 
@@ -217,7 +206,6 @@ fun LazyRow123(
                         onClick = {
                             blockItem = item //Для блока и идентификации и тема
                         },
-                        scope = host.scope,
                         onRunLike = onRunLike
                     )
 
@@ -257,7 +245,7 @@ fun LazyRow123(
 
 
                             if (SavedRed.collectionList.any { it.list.any { it2 -> it2.id == item.id } }) {
-                                Icon(Icons.Outlined.ViewComfyAlt, contentDescription = null, tint = Color.White,
+                                Icon(painter = painterResource(R.drawable.collection_multi_input_svgrepo_com), contentDescription = null, tint = Color.White,
                                     modifier = Modifier.padding(bottom = 6.dp, end = 6.dp).size(18.dp))
                             }
 

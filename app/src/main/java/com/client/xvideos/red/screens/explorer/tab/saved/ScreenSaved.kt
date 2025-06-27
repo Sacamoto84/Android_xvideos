@@ -3,10 +3,12 @@ package com.client.xvideos.red.screens.explorer.tab.saved
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Apps
@@ -14,6 +16,7 @@ import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Group
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Save
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -64,35 +67,40 @@ object SavedTab : Screen {
 
         Scaffold(
             bottomBar = {
-                TabRow(
-                    titlesIcon = l, onChangeState = {
-                        if (it == screenType) {
-
-                            when (it) {
-                                0 -> SavedLikesTab.addColumn()
-                            }
-
-                        }
-                        screenType = it
-                    },
-                    overlay0 = {
-                        Box(
-                            modifier = Modifier
-                                .size(24.dp)
-                                //.background(Color.Blue)
-                            , contentAlignment = Alignment.CenterStart
-                        ) {
-                            Row {
-                                repeat(SavedLikesTab.column.intValue){
-                                    Box(modifier = Modifier.padding(end = 2.dp).clip(CircleShape).size(4.dp).background(Color.White))
+                Column {
+                    HorizontalDivider()
+                    TabRow(
+                        //containerColor = ThemeRed.colorBottomBarBackground,
+                        titlesIcon = l, onChangeState = {
+                            if (it == screenType) {
+                                when (it) {
+                                    0 -> SavedLikesTab.addColumn()
                                 }
                             }
-
+                            screenType = it
+                        },
+                        overlay0 = {
+                            Box(
+                                modifier = Modifier
+                                    .size(24.dp)
+                                //.background(Color.Blue)
+                                , contentAlignment = Alignment.CenterStart
+                            ) {
+                                Row {
+                                    repeat(SavedLikesTab.column.intValue) {
+                                        Box(
+                                            modifier = Modifier
+                                                .padding(end = 2.dp)
+                                                .clip(CircleShape)
+                                                .size(4.dp)
+                                                .background(Color.White)
+                                        )
+                                    }
+                                }
+                            }
                         }
-                    }
-
-
-                )
+                    )
+                }
             },
 
             modifier = Modifier.fillMaxSize(),

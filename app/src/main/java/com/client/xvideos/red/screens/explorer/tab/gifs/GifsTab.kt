@@ -6,14 +6,8 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Block
-import androidx.compose.material.icons.filled.FileDownload
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -29,16 +23,11 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.feature.redgifs.types.Order
 import com.client.xvideos.red.ThemeRed
-import com.client.xvideos.red.common.block.BlockRed
-import com.client.xvideos.red.common.downloader.DownloadRed
-import com.client.xvideos.red.common.expand_menu_video.ExpandMenuVideoModel
-import com.client.xvideos.red.common.expand_menu_video.impl.ExpandMenuVideoImpl
 import com.client.xvideos.red.common.ui.lazyrow123.LazyRow123
 import com.client.xvideos.red.common.ui.lazyrow123.LazyRow123Host
 import com.client.xvideos.red.common.ui.lazyrow123.TypePager
 import com.client.xvideos.red.common.ui.sortByOrder.SortByOrder
 import com.client.xvideos.red.screens.LocalRootScreenModel
-import com.client.xvideos.red.screens.ScreenRedRootSM
 import com.client.xvideos.red.screens.profile.ScreenRedProfile
 import dagger.Binds
 import dagger.Module
@@ -99,7 +88,6 @@ object GifsTab : Screen {
                         navigator.push(ScreenRedProfile(name))
                     },
                     gotoPosition = 0,
-                    option = ExpandMenuVideoImpl.expandMenuVideoList,
                     contentPadding = PaddingValues(top = 0.dp),
                     contentBeforeList = { }
                 )

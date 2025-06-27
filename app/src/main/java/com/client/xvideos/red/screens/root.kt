@@ -41,6 +41,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import com.client.xvideos.red.ThemeRed
 import com.client.xvideos.red.common.downloader.ui.DownloadIndicator
 import com.client.xvideos.red.common.saved.SavedRed
+import com.client.xvideos.red.common.saved.collection.ui.DaialogNewCollection
 import com.client.xvideos.red.common.saved.collection.ui.DialogCollection
 import com.client.xvideos.red.common.snackBar.SnackBarEvent
 import com.client.xvideos.red.common.snackBar.UiMessage
@@ -105,15 +106,15 @@ class ScreenRedRoot() : Screen {
 
         BackHandler { }
 
+
+
+
         if (SavedRed.collectionVisibleDialog) {
             DialogCollection(
                 visible = SavedRed.collectionVisibleDialog,
                 onDismiss = { SavedRed.collectionVisibleDialog = false },
                 onBlockConfirmed = {
-//                if ((SavedRed.collectionItemGifInfo != null)) {
-//                    SavedRed.addCollection(SavedRed.collectionItemGifInfo!!, "test")
-//                    SavedRed.collectionItemGifInfo = null
-//                }
+                    SavedRed.collectionVisibleDialogCreateNew = true
                 },
                 onSelectCollection = { collection ->
                     root.screenModelScope.launch {
@@ -129,9 +130,21 @@ class ScreenRedRoot() : Screen {
             )
         }
 
-
-
-
+        if (SavedRed.collectionVisibleDialogCreateNew) {
+            DaialogNewCollection(
+                visible = SavedRed.collectionVisibleDialogCreateNew,
+                onDismiss = {
+                    SavedRed.collectionVisibleDialogCreateNew = false
+                    SavedRed.collectionVisibleDialog = true
+                },
+                onBlockConfirmed = { collection ->
+                    if ((collection != "")) {
+                        SavedRed.createCollection(collection)
+                        SavedRed.collectionVisibleDialogCreateNew = false
+                    }
+                }
+            )
+        }
 
         CompositionLocalProvider(LocalRootScreenModel provides root) {
             Scaffold(
@@ -139,7 +152,6 @@ class ScreenRedRoot() : Screen {
                 snackbarHost = {
 
                     SnackbarHost(snackbarHostState) { data ->
-
 
 
                         val uiMsg = (data.visuals as? UiSnackbarVisuals)?.ui
@@ -166,15 +178,16 @@ class ScreenRedRoot() : Screen {
                         }
 
                         LaunchedEffect(data) {
-                            when (uiMsg){
+                            when (uiMsg) {
                                 is UiMessage.Success -> {
                                     delay(2000)
                                     data.dismiss()
                                 }
-                                 is UiMessage.Error -> {
-                                     delay(5000)
-                                     data.dismiss()
-                                 }
+
+                                is UiMessage.Error -> {
+                                    delay(5000)
+                                    data.dismiss()
+                                }
 
                                 is UiMessage.Info -> {
                                     delay(2000)

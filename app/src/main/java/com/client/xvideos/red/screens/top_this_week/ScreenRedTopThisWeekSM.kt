@@ -1,19 +1,12 @@
 package com.client.xvideos.red.screens.top_this_week
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Block
-import androidx.compose.material.icons.filled.FileDownload
-import androidx.compose.material.icons.filled.Share
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
-import com.client.xvideos.red.common.block.BlockRed
-import com.client.xvideos.red.common.downloader.DownloadRed
-import com.client.xvideos.red.common.expand_menu_video.ExpandMenuVideoModel
-import com.client.xvideos.red.screens.top_this_week.model.VisibleType
 import com.client.xvideos.red.common.ui.lazyrow123.LazyRow123Host
 import com.client.xvideos.red.common.ui.lazyrow123.TypePager
+import com.client.xvideos.red.screens.top_this_week.model.VisibleType
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -24,7 +17,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
-import timber.log.Timber
 import javax.inject.Inject
 
 class ScreenRedTopThisWeekSM @Inject constructor(

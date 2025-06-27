@@ -1,5 +1,6 @@
 package com.client.xvideos.red.screens.explorer.top
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
@@ -29,6 +30,7 @@ import com.client.xvideos.red.ThemeRed
 @Composable
 fun TabRow(
     titlesIcon: List<ImageVector>, onChangeState: (Int) -> Unit,
+    containerColor: Color = ThemeRed.colorCommonBackground2,
     overlay0: @Composable () -> Unit = {},
     overlay1: @Composable () -> Unit = {},
     overlay2: @Composable () -> Unit = {},
@@ -40,7 +42,7 @@ fun TabRow(
     SecondaryTabRow(
         modifier = Modifier.height(48.dp),
         selectedTabIndex = state,
-        containerColor = ThemeRed.colorCommonBackground2,
+        containerColor = containerColor,
         contentColor = Color.White,
         indicator = {
             TabRowDefaults.Indicator(
@@ -51,7 +53,7 @@ fun TabRow(
         }
     ) {
         titlesIcon.forEachIndexed { index, item ->
-            Box {
+            Box(modifier = Modifier.background(if (index == state) Color.Transparent else Color.Transparent)) {
                 Tab(
                     selected = index == state,
                     onClick = {
@@ -60,7 +62,8 @@ fun TabRow(
                     },
                     icon = {
                         Icon(
-                            item, contentDescription = null, tint = Color.White,
+                            item, contentDescription = null,
+                            tint = if (index == state) Color.White else Color.Gray,
                             modifier = Modifier.size(24.dp)
                         )
                     }

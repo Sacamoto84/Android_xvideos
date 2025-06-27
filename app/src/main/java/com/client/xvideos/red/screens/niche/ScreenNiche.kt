@@ -49,7 +49,6 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.feature.redgifs.types.Order
 import com.client.xvideos.red.ThemeRed
-import com.client.xvideos.red.common.expand_menu_video.impl.ExpandMenuVideoImpl
 import com.client.xvideos.red.common.saved.SavedRed
 import com.client.xvideos.red.common.ui.atom.Selector
 import com.client.xvideos.red.common.ui.lazyrow123.LazyRow123
@@ -113,7 +112,6 @@ data class ScreenRedNiche(val nicheName: String = "pumped-pussy") : Screen {
                         navigator.push(ScreenRedProfile(it))
                     },
                     gotoPosition = vm.lazyHost.currentIndexGoto,
-                    option = ExpandMenuVideoImpl.expandMenuVideoList,
                     contentPadding = PaddingValues(top = toolbarHeight),
                     contentBeforeList = {
 

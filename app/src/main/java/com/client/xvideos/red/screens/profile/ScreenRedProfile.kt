@@ -33,7 +33,6 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.red.ThemeRed
 import com.client.xvideos.red.common.block.BlockRed
 import com.client.xvideos.red.common.block.ui.DialogBlock
-import com.client.xvideos.red.common.expand_menu_video.impl.ExpandMenuVideoImpl
 import com.client.xvideos.red.common.ui.lazyrow123.LazyRow123
 import com.client.xvideos.red.screens.profile.atom.RedProfileCreaterInfo
 import com.client.xvideos.red.screens.profile.atom.VerticalScrollbar
@@ -131,7 +130,6 @@ class ScreenRedProfile(val profileName: String) : Screen {
                             host = vm.likedHost,
                             modifier = Modifier.fillMaxSize(),
                             gotoPosition = vm.likedHost.currentIndexGoto,
-                            option = ExpandMenuVideoImpl.expandMenuVideoListLikes,
                             contentPadding = PaddingValues(0.dp),
                             contentBeforeList = {
 

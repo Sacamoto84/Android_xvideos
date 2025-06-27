@@ -1,10 +1,5 @@
 package com.client.xvideos.red.screens.niche
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Block
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FileDownload
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -17,12 +12,8 @@ import com.client.xvideos.feature.redgifs.http.RedGifs
 import com.client.xvideos.feature.redgifs.types.NichesInfo
 import com.client.xvideos.feature.redgifs.types.NichesResponse
 import com.client.xvideos.feature.redgifs.types.TopCreatorsResponse
-import com.client.xvideos.red.common.block.BlockRed
-import com.client.xvideos.red.common.downloader.DownloadRed
-import com.client.xvideos.red.common.expand_menu_video.ExpandMenuVideoModel
 import com.client.xvideos.red.common.ui.lazyrow123.LazyRow123Host
 import com.client.xvideos.red.common.ui.lazyrow123.TypePager
-import com.client.xvideos.red.common.saved.SavedRed
 import dagger.Binds
 import dagger.Module
 import dagger.assisted.Assisted

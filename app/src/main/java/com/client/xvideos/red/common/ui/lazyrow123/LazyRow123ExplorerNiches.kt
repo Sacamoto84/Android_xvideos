@@ -24,12 +24,6 @@ import androidx.compose.material.icons.outlined.Photo
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,25 +35,18 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.redgifs.types.Niche
 import com.client.xvideos.feature.redgifs.types.NichesInfo
-import com.client.xvideos.feature.redgifs.types.Order
 import com.client.xvideos.red.ThemeRed
-import com.client.xvideos.red.common.block.BlockRed
-import com.client.xvideos.red.common.block.ui.DialogBlock
-import com.client.xvideos.red.common.expand_menu_video.ExpandMenuVideoModel
 import com.client.xvideos.red.common.saved.SavedRed
 import com.client.xvideos.red.screens.niche.ScreenRedNiche
 import com.client.xvideos.screens.common.urlVideImage.UrlImage
 import com.client.xvideos.util.toPrettyCountInt
-import timber.log.Timber
 
 @Composable
 fun LazyRow123ExplorerNiches(
     host: LazyRow123Host,
     modifier: Modifier = Modifier,
-    option: List<ExpandMenuVideoModel> = emptyList(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
 

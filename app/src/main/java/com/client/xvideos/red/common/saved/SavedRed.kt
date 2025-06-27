@@ -7,6 +7,8 @@ import androidx.compose.runtime.setValue
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.redgifs.types.NichesInfo
 import com.client.xvideos.feature.redgifs.types.UserInfo
+import com.client.xvideos.red.common.saved.collection.collectionCreateToDisk
+import com.client.xvideos.red.common.saved.collection.collectionDeleteFromDisk
 import com.client.xvideos.red.common.saved.collection.collectionItemSaveToDisk
 import com.client.xvideos.red.common.saved.collection.model.CollectionEntity
 import com.client.xvideos.red.common.saved.collection.readAllCollections
@@ -20,6 +22,11 @@ import com.client.xvideos.red.common.saved.niches.getAllNichesFromDisk
 import com.client.xvideos.red.common.saved.niches.nickesItemRemoveFromDisk
 import com.client.xvideos.red.common.saved.niches.nickesItemSaveToDisk
 import com.client.xvideos.red.common.snackBar.SnackBarEvent
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 object SavedRed {
 
@@ -52,10 +59,15 @@ object SavedRed {
 
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     fun refreshLikesList() {
-        likesList.clear()
-        val a = getAllLikesFromDisk()
-        likesList.addAll(a)
+        GlobalScope.launch(Dispatchers.IO) {
+            val a = getAllLikesFromDisk()
+            withContext(Dispatchers.Main) {
+                likesList.clear()
+                likesList.addAll(a)
+            }
+        }
     }
     /////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -86,10 +98,15 @@ object SavedRed {
             }
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     fun refreshCreatorsList() {
-        creatorsList.clear()
-        val a = getAllCreatorsFromDisk()
-        creatorsList.addAll(a)
+        GlobalScope.launch(Dispatchers.IO) {
+            val a = getAllCreatorsFromDisk()
+            withContext(Dispatchers.Main) {
+                creatorsList.clear()
+                creatorsList.addAll(a)
+            }
+        }
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////
@@ -119,10 +136,15 @@ object SavedRed {
             }
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     fun refreshNichesList() {
-        nichesList.clear()
-        val a = getAllNichesFromDisk()
-        nichesList.addAll(a)
+        GlobalScope.launch(Dispatchers.IO) {
+            val a = getAllNichesFromDisk()
+            withContext(Dispatchers.Main) {
+                nichesList.clear()
+                nichesList.addAll(a)
+            }
+        }
     }
     /////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -139,13 +161,40 @@ object SavedRed {
         refreshCollectionList()
     }
 
+    fun deleteCollection(collectionName: String) {
+        collectionDeleteFromDisk(collectionName)
+            .onSuccess {
+                SnackBarEvent.success("Коллекция $collectionName удалена")
+                refreshCollectionList()
+            }
+            .onFailure { e ->
+                SnackBarEvent.error("Ошибка удаления коллекции $collectionName ${e.message}")
+            }
+    }
+    fun createCollection(collectionName: String) {
+        println("!!! createCollection() collectionName:$collectionName")
+        collectionCreateToDisk(collectionName)
+            .onSuccess {
+                SnackBarEvent.success("Коллекция $collectionName создана")
+                refreshCollectionList()
+            }
+            .onFailure { e ->
+                SnackBarEvent.error("Ошибка создания коллекции $collectionName ${e.message}")
+            }
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
     fun refreshCollectionList() {
-        val a = readAllCollections()
-        if (a.isSuccess) {
-            collectionList.clear()
-            collectionList.addAll(a.getOrThrow())
-        } else {
-            SnackBarEvent.error("Ошибка чтения коллекций ${a.exceptionOrNull()?.message}")
+        GlobalScope.launch(Dispatchers.IO) {
+            val a = readAllCollections()
+            withContext(Dispatchers.Main) {
+                if (a.isSuccess) {
+                    collectionList.clear()
+                    collectionList.addAll(a.getOrThrow())
+                } else {
+                    SnackBarEvent.error("Ошибка чтения коллекций ${a.exceptionOrNull()?.message}")
+                }
+            }
         }
     }
 

@@ -69,13 +69,13 @@ class App : Application() {
         kDownloader = KDownloader.create(applicationContext)
 
         BlockRed.refreshBlockList()
+        SavedRed.refreshLikesList()
+        SavedRed.refreshNichesList()
+        SavedRed.refreshCreatorsList()
+        SavedRed.refreshCollectionList()
 
         GlobalScope.launch {
             clearOldCache( db.cacheMedaResponseDao())
-            SavedRed.refreshLikesList()
-            SavedRed.refreshNichesList()
-            SavedRed.refreshCreatorsList()
-            SavedRed.refreshCollectionList()
         }
 
     }

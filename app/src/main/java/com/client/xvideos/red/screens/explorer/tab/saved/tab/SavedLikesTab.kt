@@ -23,7 +23,6 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
-import com.client.xvideos.red.common.expand_menu_video.impl.ExpandMenuVideoImpl
 import com.client.xvideos.red.common.saved.SavedRed
 import com.client.xvideos.red.common.ui.lazyrow123.LazyRow123
 import com.client.xvideos.red.common.ui.lazyrow123.LazyRow123Host
@@ -83,7 +82,6 @@ object SavedLikesTab : Screen {
                     navigator.push(ScreenRedProfile(it))
                 },
                 gotoPosition = vm.likedHost.currentIndexGoto,
-                option = ExpandMenuVideoImpl.expandMenuVideoListLikes,
                 contentPadding = PaddingValues(0.dp),
                 contentBeforeList = { },
 
