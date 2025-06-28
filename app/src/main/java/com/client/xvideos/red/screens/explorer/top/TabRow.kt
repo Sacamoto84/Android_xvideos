@@ -23,6 +23,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.client.xvideos.red.ThemeRed
@@ -38,6 +40,9 @@ fun TabRow(
     overlay4: @Composable () -> Unit = {},
     overlay5: @Composable () -> Unit = {},
 ) {
+
+    val haptic = LocalHapticFeedback.current
+
     var state by rememberSaveable { mutableIntStateOf(0) }
     SecondaryTabRow(
         modifier = Modifier.height(48.dp),
@@ -57,6 +62,7 @@ fun TabRow(
                 Tab(
                     selected = index == state,
                     onClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                         state = index
                         onChangeState.invoke(index)
                     },

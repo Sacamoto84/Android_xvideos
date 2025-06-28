@@ -30,6 +30,8 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
@@ -92,6 +94,8 @@ class ScreenRedRoot() : Screen {
 
         val scope = rememberCoroutineScope()
 
+        val haptic = LocalHapticFeedback.current
+
         LaunchedEffect(Unit) {
             root.snackbarEvents.collect { message ->
                 snackbarHostState.showSnackbar(message)
@@ -100,14 +104,12 @@ class ScreenRedRoot() : Screen {
 
         LaunchedEffect(Unit) {
             SnackBarEvent.messages.receiveAsFlow().collect { message ->
+                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                 snackbarHostState.show(message)
             }
         }
 
         BackHandler { }
-
-
-
 
         if (SavedRed.collectionVisibleDialog) {
             DialogCollection(

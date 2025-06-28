@@ -4,13 +4,31 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.compose.collectAsLazyPagingItems
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.screen.Screen
@@ -28,14 +46,19 @@ import com.client.xvideos.red.common.ui.lazyrow123.LazyRow123Host
 import com.client.xvideos.red.common.ui.lazyrow123.TypePager
 import com.client.xvideos.red.common.ui.sortByOrder.SortByOrder
 import com.client.xvideos.red.screens.LocalRootScreenModel
+import com.client.xvideos.red.screens.explorer.tab.saved.tab.SavedLikesTab.column
 import com.client.xvideos.red.screens.profile.ScreenRedProfile
+import com.client.xvideos.red.screens.profile.atom.VerticalScrollbar
+import com.client.xvideos.red.screens.profile.rememberVisibleRangePercentIgnoringFirstNForGrid
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 object GifsTab : Screen {
@@ -44,23 +67,31 @@ object GifsTab : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
         val vm: ScreenRedExplorerGifsSM = getScreenModel()
 
-        val  navigator = LocalNavigator.currentOrThrow
-
-        //val root: ScreenRedRootSM = getScreenModel<ScreenRedRootSM>()
+        val navigator = LocalNavigator.currentOrThrow
 
         val root = LocalRootScreenModel.current
 
-//        LaunchedEffect(Unit) {
-//            root.showSnackbar("Snackbar из вложенного экрана")
-//        }
+        val state = rememberPullToRefreshState()
+        var isRefreshing by remember { mutableStateOf(false) }
+
+        val host = vm.lazyHost.pager.collectAsLazyPagingItems()
+
+        val scope = rememberCoroutineScope()
+
+        val haptic = LocalHapticFeedback.current
+
+        val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForGrid(
+            gridState = vm.lazyHost.state, itemsToIgnore = 0, numberOfColumns = column.intValue
+        )
 
         Scaffold(bottomBar = {
             Row(modifier = Modifier.background(ThemeRed.colorCommonBackground2)) {
-               //
+                //
                 SortByOrder(
                     listOf(
                         Order.TOP_WEEK,
@@ -76,21 +107,66 @@ object GifsTab : Screen {
             }
         }, containerColor = ThemeRed.colorCommonBackground) {
 
-            Box(modifier = Modifier
-                .padding(bottom = it.calculateBottomPadding())
-                .fillMaxSize()) {
+            Box(
+                modifier = Modifier
+                    .padding(bottom = it.calculateBottomPadding())
+                    .fillMaxSize()
+            ) {
 
-                LazyRow123(
-                    host = vm.lazyHost,
-                    modifier = Modifier.fillMaxSize(),
-                    onClickOpenProfile = { name ->
-                        vm.lazyHost.currentIndexGoto = vm.lazyHost.currentIndex
-                        navigator.push(ScreenRedProfile(name))
+                PullToRefreshBox(
+                    isRefreshing = isRefreshing,
+                    onRefresh = {
+                        scope.launch {
+                            haptic.performHapticFeedback(HapticFeedbackType.Confirm)
+                            isRefreshing = true
+                            delay(500)
+                            isRefreshing = false
+
+                        }
+
+                        host.refresh()
+
                     },
-                    gotoPosition = 0,
-                    contentPadding = PaddingValues(top = 0.dp),
-                    contentBeforeList = { }
-                )
+                    modifier = Modifier,
+                    state = state,
+                    indicator = {
+                        Indicator(
+                            modifier = Modifier.align(Alignment.TopCenter),
+                            isRefreshing = isRefreshing,
+                            containerColor = Color.White,
+                            color = Color.Black,
+                            state = state
+                        )
+                    },
+                ) {
+
+
+                    LazyRow123(
+                        host = vm.lazyHost,
+                        modifier = Modifier.fillMaxSize(),
+                        onClickOpenProfile = { name ->
+                            vm.lazyHost.currentIndexGoto = vm.lazyHost.currentIndex
+                            navigator.push(ScreenRedProfile(name))
+                        },
+                        gotoPosition = 0,
+                        contentPadding = PaddingValues(top = 0.dp),
+                        contentBeforeList = { }
+                    )
+
+                    //---- Скролл ----
+                    Box(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .align(Alignment.CenterEnd)
+                            .width(2.dp)
+                    ) {
+                        VerticalScrollbar(scrollPercent)
+                    }
+
+
+
+                }
+
 
             }
 
@@ -107,8 +183,17 @@ class ScreenRedExplorerGifsSM @Inject constructor(
     connectivityObserver: ConnectivityObserver
 ) : ScreenModel {
 
-    val isConnected = connectivityObserver.isConnected.stateIn(screenModelScope, SharingStarted.WhileSubscribed(5000L), false)
-    val lazyHost = LazyRow123Host(connectivityObserver = connectivityObserver, scope = screenModelScope, extraString = "", typePager = TypePager.TOP)
+    val isConnected = connectivityObserver.isConnected.stateIn(
+        screenModelScope,
+        SharingStarted.WhileSubscribed(5000L),
+        false
+    )
+    val lazyHost = LazyRow123Host(
+        connectivityObserver = connectivityObserver,
+        scope = screenModelScope,
+        extraString = "",
+        typePager = TypePager.TOP
+    )
 
 }
 

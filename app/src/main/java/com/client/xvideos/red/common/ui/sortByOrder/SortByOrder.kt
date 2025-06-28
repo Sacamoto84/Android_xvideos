@@ -30,6 +30,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
@@ -44,9 +46,14 @@ fun SortByOrder(list: List<Order>, selected: Order, onSelect: (Order) -> Unit) {
 
     var expanded by remember { mutableStateOf(false) }
 
+    val haptic = LocalHapticFeedback.current
+
     ExposedDropdownMenuBox(
         expanded = expanded,
-        onExpandedChange = { expanded = it },
+        onExpandedChange = {
+            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+            expanded = it
+        },
         modifier = Modifier
     )
     {
@@ -60,7 +67,9 @@ fun SortByOrder(list: List<Order>, selected: Order, onSelect: (Order) -> Unit) {
                     1.dp, Color(0xFF3A3A3A),
                     RoundedCornerShape(8.dp)
                 )
-                .clickable(onClick = { expanded = true }), horizontalArrangement = Arrangement.SpaceAround
+                .clickable(onClick = {
+                    expanded = true
+                }), horizontalArrangement = Arrangement.SpaceAround
         ) {
 
             val text = when (selected) {
@@ -84,8 +93,14 @@ fun SortByOrder(list: List<Order>, selected: Order, onSelect: (Order) -> Unit) {
 
             BasicText(
                 text,
-                modifier = Modifier.padding(start = 8.dp).align(Alignment.CenterVertically),
-                style = TextStyle( color = Color.White, fontFamily = ThemeRed.fontFamilyDMsanss, fontSize = 18.sp)
+                modifier = Modifier
+                    .padding(start = 8.dp)
+                    .align(Alignment.CenterVertically),
+                style = TextStyle(
+                    color = Color.White,
+                    fontFamily = ThemeRed.fontFamilyDMsanss,
+                    fontSize = 18.sp
+                )
             )
 
             Icon(
@@ -103,8 +118,7 @@ fun SortByOrder(list: List<Order>, selected: Order, onSelect: (Order) -> Unit) {
         ExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            modifier = Modifier
-            , containerColor = Color(0xFF090909),
+            modifier = Modifier, containerColor = Color(0xFF090909),
             shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, ThemeRed.colorBorderGray)
         ) {
             list.forEach { option ->
@@ -113,9 +127,12 @@ fun SortByOrder(list: List<Order>, selected: Order, onSelect: (Order) -> Unit) {
                     text = {
 
                         Box(
-                            modifier = Modifier.fillMaxWidth().height(32.dp).clip(RoundedCornerShape(8.dp))
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(32.dp)
+                                .clip(RoundedCornerShape(8.dp))
                                 .background(if (option == selected) Color(0xFF222222) else Color.Transparent)
-                                //.padding(start = 8.dp)
+                            //.padding(start = 8.dp)
                             , contentAlignment = Alignment.CenterStart
                         ) {
 
@@ -140,14 +157,22 @@ fun SortByOrder(list: List<Order>, selected: Order, onSelect: (Order) -> Unit) {
 
                             Text(
                                 text,
-                                style = TextStyle(color = Color.White, fontFamily = ThemeRed.fontFamilyDMsanss, fontSize = 18.sp),
+                                style = TextStyle(
+                                    color = Color.White,
+                                    fontFamily = ThemeRed.fontFamilyDMsanss,
+                                    fontSize = 18.sp
+                                ),
                                 modifier = Modifier
                             )
                         }
                     },
-                    onClick = {onSelect(option); expanded = false},
+                    onClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.Confirm)
+                        onSelect(option)
+                        expanded = false
+                    },
 
-                )
+                    )
             }
         }
 
