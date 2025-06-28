@@ -1,6 +1,5 @@
 package com.client.xvideos.feature.redgifs.http
 
-import androidx.tracing.Trace
 import com.client.xvideos.App
 import com.client.xvideos.feature.redgifs.db.CacheMediaResponseEntity
 import com.client.xvideos.feature.redgifs.db.getCurrentTimeText
@@ -10,25 +9,21 @@ import com.client.xvideos.feature.redgifs.types.CreatorsResponse
 import com.client.xvideos.feature.redgifs.types.MediaResponse
 import com.client.xvideos.feature.redgifs.types.MediaType
 import com.client.xvideos.feature.redgifs.types.NicheResponse
-import com.client.xvideos.feature.redgifs.types.NichesInfo
 import com.client.xvideos.feature.redgifs.types.NichesResponse
 import com.client.xvideos.feature.redgifs.types.Order
 import com.client.xvideos.feature.redgifs.types.TopCreatorsResponse
 import com.client.xvideos.feature.redgifs.types.UserInfo
+import com.client.xvideos.feature.redgifs.types.search.SearchCreatorsResponse
+import com.client.xvideos.feature.redgifs.types.search.SearchItemNichesResponse
+import com.client.xvideos.feature.redgifs.types.search.SearchItemTagsResponse
 import com.client.xvideos.feature.redgifs.types.tag.TagSuggestion
 import com.client.xvideos.feature.redgifs.types.tag.TagsResponse
 import com.google.android.gms.common.api.ApiException
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import com.google.gson.JsonDeserializer
-import com.google.gson.JsonPrimitive
-import com.google.gson.JsonSerializationContext
-import com.google.gson.JsonSerializer
 import com.google.gson.annotations.SerializedName
-import kotlinx.serialization.json.JsonElement
+import com.google.gson.reflect.TypeToken
 import timber.log.Timber
-import java.lang.reflect.Modifier
-import java.lang.reflect.Type
 import kotlin.Int
 
 object RedGifs {
@@ -320,6 +315,46 @@ object RedGifs {
         return api.request(route)
     }
 
+
+
+
+    //////////////////////////////////// Поиск ////////////////////////////////////
+    //https://api.redgifs.com/v2/creators/suggest?query=Ana
+    //Возвращает 5 элементов
+    @Throws(ApiException::class)
+    suspend fun searchCreatorsShort(text: String): SearchCreatorsResponse {
+        val route = Route(method = "GET", path = "/v2/creators/suggest?query={text}", "text" to text)
+        return api.request<SearchCreatorsResponse>(route)
+    }
+
+//    //https://api.redgifs.com/v2/search/creators?query=Ana&page=1&count=40&ord
+//    @Throws(ApiException::class)
+//    suspend fun searchCreatorsLong(text: String, page : Int, count : Int): SearchCreatorsResponse {
+//        val route = Route(method = "GET", path = "/v2/search/creators?query={text}&page={page}&count={count}&ord", "text" to text, "page" to page, "count" to count)
+//        return api.request<SearchCreatorsResponse>(route)
+//    }
+
+
+    //https://api.redgifs.com/v2/niches/search?query=Ana
+    @Throws(ApiException::class)
+    suspend fun searchNichesShort(text: String): List<SearchItemNichesResponse> {
+        val route = Route(method = "GET", path = "/v2/niches/search?query={text}", "text" to text)
+        val res = api.requestText(route)
+        val listType = object : TypeToken<List<SearchItemNichesResponse>>() {}.type
+        val niches: List<SearchItemNichesResponse> = Gson().fromJson(res, listType)
+        return niches
+    }
+
+    //SearchItemTagsResponse
+    //https://api.redgifs.com/v2/search/suggest?query=Ana
+    @Throws(ApiException::class)
+    suspend fun searchTagsShort(text: String): List<SearchItemTagsResponse> {
+        val route = Route(method = "GET", path = "/v2/search/suggest?query={text}", "text" to text)
+        val res = api.requestText(route)
+        val listType = object : TypeToken<List<SearchItemTagsResponse>>() {}.type
+        val tags: List<SearchItemTagsResponse> = Gson().fromJson(res, listType)
+        return tags
+    }
 }
 
 private suspend fun cacheMediaResponse(route : Route) : MediaResponse {
