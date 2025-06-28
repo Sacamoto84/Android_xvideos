@@ -146,7 +146,7 @@ class LazyRow123Host(
         combine(SearchRed.searchText, sortType) { text, sort ->          // ① слепили параметры
             SearchParams(text.trim(), sort)
         }
-            .debounce(1000)                                          // ② ждём паузу ввода
+            .debounce(2000)                                          // ② ждём паузу ввода
             .distinctUntilChanged()                                 // ③ игнорируем дубли
             .flatMapLatest { params ->                              // ④ НОВЫЙ Pager при каждом изменении
                 Pager(

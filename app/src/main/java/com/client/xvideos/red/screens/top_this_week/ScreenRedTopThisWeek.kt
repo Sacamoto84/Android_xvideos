@@ -1,42 +1,5 @@
 package com.client.xvideos.red.screens.top_this_week
 
-import android.annotation.SuppressLint
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.paging.LoadState
-import androidx.paging.compose.LazyPagingItems
-import androidx.paging.compose.collectAsLazyPagingItems
-import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.core.screen.ScreenKey
-import cafe.adriel.voyager.hilt.getScreenModel
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
-import com.client.xvideos.feature.redgifs.types.GifsInfo
-import com.client.xvideos.red.ThemeRed
-import com.client.xvideos.red.common.users.UsersRed
-import com.client.xvideos.red.screens.profile.ScreenRedProfile
-import com.client.xvideos.red.screens.top_this_week.model.VisibleType
-import com.client.xvideos.red.common.ui.lazyrow123.LazyRow123
-import com.client.xvideos.red.screens.top_this_week.row1.TikTokPow1
-import com.client.xvideos.red.screens.top_this_week.state.ErrorState
-import com.client.xvideos.red.screens.top_this_week.state.FullScreenLoading
-import com.client.xvideos.red.screens.top_this_week.state.LoadingNextPageIndicator
-import timber.log.Timber
-
 //object ScreenRedTopThisWeek : Screen {
 //
 //    private fun readResolve(): Any = ScreenRedTopThisWeek

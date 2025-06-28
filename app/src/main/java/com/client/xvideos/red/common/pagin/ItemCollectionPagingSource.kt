@@ -7,15 +7,20 @@ import com.client.xvideos.red.common.saved.SavedRed
 import com.client.xvideos.red.common.snackBar.SnackBarEvent
 import timber.log.Timber
 
-class ItemCollectionPagingSource (val collection : String): PagingSource<Int, GifsInfo>() {
+class ItemCollectionPagingSource(val collection: String) : PagingSource<Int, GifsInfo>() {
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int,  GifsInfo> {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, GifsInfo> {
 
         return try {
             Timber.d("!!! ItemCollectionPagingSource::load() collection:${collection}")
 
+            val a = if (collection.isNotEmpty()) {
+                SavedRed.collectionList.first { it.collection == collection }.list
+            } else
+                emptyList()
+
             LoadResult.Page(
-                data = if (collection.isNotEmpty()) SavedRed.collectionList.first{it.collection == collection}.list else emptyList(),
+                data = a,
                 prevKey = null,
                 nextKey = null
             )

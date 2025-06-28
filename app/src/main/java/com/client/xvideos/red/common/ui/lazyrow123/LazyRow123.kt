@@ -22,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Save
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
@@ -37,6 +38,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -53,6 +55,7 @@ import com.client.xvideos.red.common.users.UsersRed
 import com.client.xvideos.red.common.video.player_row_mini.RedUrlVideoImageAndLongClick
 import com.client.xvideos.red.screens.fullscreen.ScreenRedFullScreen
 import com.client.xvideos.red.screens.top_this_week.ProfileInfo1
+import com.client.xvideos.red.screens.top_this_week.state.LoadingNextPageIndicator
 import com.composeunstyled.Text
 import timber.log.Timber
 
@@ -80,6 +83,12 @@ fun LazyRow123(
 
     val navigator = LocalNavigator.currentOrThrow
 
+    // Отображаем индикатор загрузки поверх контента, если это первая загрузка
+    // a) ПЕРВОНАЧАЛЬНАЯ загрузка (+ pull‑to‑refresh)
+    val isInitialLoading = listGifs.loadState.refresh is LoadState.Loading
+            && listGifs.itemCount == 0          // важно!
+    val isErrorInitial = listGifs.loadState.refresh is LoadState.Error
+
 //    BackHandler {
 //        if (fullScreen)
 //            fullScreen = false
@@ -97,7 +106,7 @@ fun LazyRow123(
                 fontSize = 20.sp
             )
         }
-        return
+        //return
     }
 
 
@@ -157,187 +166,183 @@ fun LazyRow123(
         )
     }
 
+    Box(modifier.fillMaxSize()) {
 
 
+        LazyVerticalGrid(
+            state = state,
+            columns = GridCells.Fixed(host.columns.coerceIn(1..3)),
+            modifier = Modifier.then(modifier),
+            contentPadding = contentPadding,
+        ) {
+            item(key = "before", span = { GridItemSpan(maxLineSpan) }) { contentBeforeList() }
 
+            items(
+                count = listGifs.itemCount,
+            ) { index ->
 
-    LazyVerticalGrid(
-        state = state,
-        columns = GridCells.Fixed(host.columns.coerceIn(1..3)),
-        modifier = Modifier.then(modifier),
-        contentPadding = contentPadding,
-    ) {
-        item(key = "before", span = { GridItemSpan(maxLineSpan) }) { contentBeforeList() }
+                var isVideo by remember { mutableStateOf(false) }
+                val item = listGifs[index]
 
-        items(
-            count = listGifs.itemCount,
-        ) { index ->
+                var videoUri by remember { mutableStateOf("") }
 
-            var isVideo by remember { mutableStateOf(false) }
-            val item = listGifs[index]
+                if (item != null) {
 
-            var videoUri by remember { mutableStateOf("") }
-
-            if (item != null) {
-
-                Box(
-                    modifier = Modifier
-                        .padding(vertical = 8.dp)
-                        .padding(horizontal = 4.dp)
-                        .fillMaxSize()
-                        .clip(RoundedCornerShape(16.dp))
-                        .border(1.dp, Color.DarkGray, RoundedCornerShape(16.dp)),
-                    contentAlignment = Alignment.Center
-                ) {
-
-                    RedUrlVideoImageAndLongClick(
-                        item, index, onLongClick = {},
-                        onVideo = { isVideo = it },
-                        isVisibleView = false,
-                        isVisibleDuration = false,
-                        play = false,//centrallyLocatedOrMostVisibleItemIndex == index && host.columns == 1,
-                        isNetConnected = isConnected,
-                        onVideoUri = { videoUri = it },
-                        onFullScreen = {
-                            blockItem = item
-                            //fullScreen = fullScreen.not()
-                            navigator.push(ScreenRedFullScreen(item))
-                        }
-                    )
-
-                    //Меню на 3 точки
-                    ExpandMenuVideo(
-                        item = item,
-                        modifier = Modifier.align(Alignment.TopEnd),
-                        onClick = {
-                            blockItem = item //Для блока и идентификации и тема
-                        },
-                        onRunLike = {
-                            if(isRunLike) {
-                                listGifs.refresh()
-                            }
-                        },
-                        onRefresh = {
-                            listGifs.refresh()
-                        },
-                        host.isCollection
-                    )
-
-
-                    if (host.visibleProfileInfo) {
-                        ProfileInfo1(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .align(Alignment.BottomStart)
-                                .offset((4).dp, (-4).dp),
-                            onClick = { onClickOpenProfile(item.userName) },
-                            videoItem = item,
-                            listUsers = UsersRed.listAllUsers,
-                            visibleUserName = host.columns <= 2 && !isVideo,
-                            visibleIcon = !isVideo
-                        )
-                    }
-
-                    AnimatedVisibility(
-                        !isVideo, modifier = Modifier
+                    Box(
+                        modifier = Modifier
+                            .padding(vertical = 8.dp)
+                            .padding(horizontal = 4.dp)
                             .fillMaxSize()
-                            .align(Alignment.BottomCenter),
-                        enter = slideInVertically(
-                            initialOffsetY = { fullHeight -> fullHeight }, // снизу вверх
-                            animationSpec = tween(durationMillis = 200)
-                        ),
-                        exit = slideOutVertically(
-                            targetOffsetY = { fullHeight -> fullHeight }, // сверху вниз
-                            animationSpec = tween(durationMillis = 200)
-                        )
+                            .clip(RoundedCornerShape(16.dp))
+                            .border(1.dp, Color.DarkGray, RoundedCornerShape(16.dp)),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.Bottom,
-                            horizontalArrangement = Arrangement.End
+
+                        RedUrlVideoImageAndLongClick(
+                            item, index, onLongClick = {},
+                            onVideo = { isVideo = it },
+                            isVisibleView = false,
+                            isVisibleDuration = false,
+                            play = false,//centrallyLocatedOrMostVisibleItemIndex == index && host.columns == 1,
+                            isNetConnected = isConnected,
+                            onVideoUri = { videoUri = it },
+                            onFullScreen = {
+                                blockItem = item
+                                //fullScreen = fullScreen.not()
+                                navigator.push(ScreenRedFullScreen(item))
+                            }
+                        )
+
+                        //Меню на 3 точки
+                        ExpandMenuVideo(
+                            item = item,
+                            modifier = Modifier.align(Alignment.TopEnd),
+                            onClick = {
+                                blockItem = item //Для блока и идентификации и тема
+                            },
+                            onRunLike = {
+                                if (isRunLike) {
+                                    listGifs.refresh()
+                                }
+                            },
+                            onRefresh = {
+                                listGifs.refresh()
+                            },
+                            host.isCollection
+                        )
+
+
+                        if (host.visibleProfileInfo) {
+                            ProfileInfo1(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .align(Alignment.BottomStart)
+                                    .offset((4).dp, (-4).dp),
+                                onClick = { onClickOpenProfile(item.userName) },
+                                videoItem = item,
+                                listUsers = UsersRed.listAllUsers,
+                                visibleUserName = host.columns <= 2 && !isVideo,
+                                visibleIcon = !isVideo
+                            )
+                        }
+
+                        AnimatedVisibility(
+                            !isVideo, modifier = Modifier
+                                .fillMaxSize()
+                                .align(Alignment.BottomCenter),
+                            enter = slideInVertically(
+                                initialOffsetY = { fullHeight -> fullHeight }, // снизу вверх
+                                animationSpec = tween(durationMillis = 200)
+                            ),
+                            exit = slideOutVertically(
+                                targetOffsetY = { fullHeight -> fullHeight }, // сверху вниз
+                                animationSpec = tween(durationMillis = 200)
+                            )
                         ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.Bottom,
+                                horizontalArrangement = Arrangement.End
+                            ) {
 
 
-                            if (SavedRed.collectionList.any { it.list.any { it2 -> it2.id == item.id } }) {
-                                Icon(
-                                    painter = painterResource(R.drawable.collection_multi_input_svgrepo_com),
-                                    contentDescription = null,
-                                    tint = Color.White,
-                                    modifier = Modifier
-                                        .padding(bottom = 6.dp, end = 6.dp)
-                                        .size(18.dp)
-                                )
-                            }
+                                if (SavedRed.collectionList.any { it.list.any { it2 -> it2.id == item.id } }) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.collection_multi_input_svgrepo_com),
+                                        contentDescription = null,
+                                        tint = Color.White,
+                                        modifier = Modifier
+                                            .padding(bottom = 6.dp, end = 6.dp)
+                                            .size(18.dp)
+                                    )
+                                }
 
-                            //
-                            if (SavedRed.creatorsList.any { it.username == item.userName }) {
-                                Icon(
-                                    Icons.Filled.Person,
-                                    contentDescription = null,
-                                    tint = Color.White,
-                                    modifier = Modifier
-                                        .padding(bottom = 6.dp, end = 6.dp)
-                                        .size(18.dp)
-                                )
-                            }
+                                //
+                                if (SavedRed.creatorsList.any { it.username == item.userName }) {
+                                    Icon(
+                                        Icons.Filled.Person,
+                                        contentDescription = null,
+                                        tint = Color.White,
+                                        modifier = Modifier
+                                            .padding(bottom = 6.dp, end = 6.dp)
+                                            .size(18.dp)
+                                    )
+                                }
 
-                            //✅ Лайк
-                            if (SavedRed.likesList.any { it.id == item.id }) {
-                                Icon(
-                                    Icons.Filled.FavoriteBorder,
-                                    contentDescription = null,
-                                    tint = Color.White,
-                                    modifier = Modifier
-                                        .padding(bottom = 6.dp, end = 6.dp)
-                                        .size(18.dp)
-                                )
-                            }
+                                //✅ Лайк
+                                if (SavedRed.likesList.any { it.id == item.id }) {
+                                    Icon(
+                                        Icons.Filled.FavoriteBorder,
+                                        contentDescription = null,
+                                        tint = Color.White,
+                                        modifier = Modifier
+                                            .padding(bottom = 6.dp, end = 6.dp)
+                                            .size(18.dp)
+                                    )
+                                }
 
-                            //✅ Иконка того что видео скачано
-                            if (DownloadRed.downloadList.contains(item.id)) {
-                                Icon(
-                                    Icons.Default.Save,
-                                    contentDescription = null,
-                                    tint = Color.White,
-                                    modifier = Modifier
-                                        .padding(bottom = 6.dp, end = 6.dp)
-                                        .size(18.dp)
-                                )
+                                //✅ Иконка того что видео скачано
+                                if (DownloadRed.downloadList.contains(item.id)) {
+                                    Icon(
+                                        Icons.Default.Save,
+                                        contentDescription = null,
+                                        tint = Color.White,
+                                        modifier = Modifier
+                                            .padding(bottom = 6.dp, end = 6.dp)
+                                            .size(18.dp)
+                                    )
+                                }
+
                             }
 
                         }
 
                     }
-
                 }
             }
         }
 
+
+        if (isInitialLoading) {
+            Box(
+                modifier = modifier
+                    .align(Alignment.Center)
+                    .offset(0.dp, 40.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = ThemeRed.colorYellow)
+            }
+        }
+
+        if (listGifs.loadState.append is LoadState.Loading && listGifs.itemCount > 0) {
+            Box(modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(16.dp)) {
+                CircularProgressIndicator(color = ThemeRed.colorYellow) // Может быть меньше размером
+            }
+        }
+
     }
-
-
-//    if (fullScreen) {
-//        Box(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .background(Color.DarkGray)
-//        ) {
-//
-//            if (blockItem != null) {
-//                RedUrlVideoImageAndLongClick(
-//                    blockItem!!, 0, onLongClick = {},
-//                    onVideo = { },
-//                    isVisibleView = false,
-//                    isVisibleDuration = false,
-//                    play = true,
-//                    isNetConnected = isConnected,
-//                    onVideoUri = {},
-//                    onFullScreen = { fullScreen = fullScreen.not() }
-//                )
-//            }
-//
-//        }
-//    }
 
 }
 

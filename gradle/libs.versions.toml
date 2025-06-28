@@ -1,7 +1,7 @@
 [versions]
 agp = "8.11.0"
 composeThemeAdapter = "1.2.1"
-core = "1.36.0"
+core = "1.36.1"
 diskLruCache = "1.5"
 gson = "2.13.1"
 hiltAndroid = "2.56.2"

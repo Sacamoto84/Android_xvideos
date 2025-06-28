@@ -10,6 +10,8 @@ import com.client.xvideos.feature.redgifs.db.CacheMedaResponseDao
 import com.client.xvideos.feature.redgifs.db.CacheMediaResponseEntity
 import com.client.xvideos.feature.room.entity.Favorites
 import com.client.xvideos.feature.room.entity.Items
+import com.client.xvideos.red.common.search.SearchRedHistoryDao
+import com.client.xvideos.red.common.search.SearchRedHistoryEntity
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -18,13 +20,19 @@ import dagger.hilt.components.SingletonComponent
 import java.util.Date
 import javax.inject.Singleton
 
-@Database(entities = [Items::class, Favorites::class, CacheMediaResponseEntity::class], version = 2, exportSchema = true)
+@Database(
+    entities = [Items::class, Favorites::class, CacheMediaResponseEntity::class, SearchRedHistoryEntity::class],
+    version = 3,
+    exportSchema = true
+)
 @TypeConverters(DateConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun favoriteDao(): FavoriteGalleryDao
     abstract fun itemsDao(): ItemsDao
 
-    abstract fun cacheMedaResponseDao() : CacheMedaResponseDao
+    abstract fun cacheMedaResponseDao(): CacheMedaResponseDao
+
+    abstract fun redSearchHistoryDao(): SearchRedHistoryDao
 
 }
 
@@ -53,7 +61,6 @@ object RoomPrefs {
             .allowMainThreadQueries()
             .build()
     }
-
 
 
 }
