@@ -5,12 +5,14 @@ import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.material3.TimeInput
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.PagingSource
 import androidx.paging.cachedIn
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.redgifs.types.Order
@@ -21,9 +23,11 @@ import com.client.xvideos.red.common.pagin.ItemSavedLikesPagingSource
 import com.client.xvideos.red.common.pagin.ItemNailsPagingSource
 import com.client.xvideos.red.common.pagin.ItemProfilePagingSource
 import com.client.xvideos.red.common.pagin.ItemTopPagingSource
+import com.client.xvideos.red.common.search.SearchRed
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,10 +36,16 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -57,6 +67,9 @@ enum class TypePager {
 
 }
 
+private data class SearchParams(val query: String, val sort: Order)
+
+@OptIn(FlowPreview::class)
 class LazyRow123Host(
     val connectivityObserver: ConnectivityObserver,
     val scope: CoroutineScope,
@@ -67,6 +80,26 @@ class LazyRow123Host(
     val visibleProfileInfo: Boolean = true,
     val isCollection: Boolean = false
 ) {
+
+    //var searchText by mutableStateOf("")
+
+    private val refreshTrigger = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+
+//    init {
+//        scope.launch {
+//
+//            SearchRed.searchText
+//                .debounce(1000)               // ждать 400мс тишины
+//                .map { it.trim() }           // подчистить пробелы
+//                .distinctUntilChanged()      // игнорировать дубликаты
+//                .filter { it.length >= 2 }   // например, не искать по 1 букве
+//                .collectLatest { term ->     // отменять предыдущий поиск
+//                    searchText = term        // вызываем API / БД
+//                    refresh()
+//                }
+//
+//        }
+//    }
 
     val state: LazyGridState = LazyGridState()
 
@@ -94,19 +127,45 @@ class LazyRow123Host(
         //}
     }
 
+    //   @OptIn(ExperimentalCoroutinesApi::class)
+//    val pager: Flow<PagingData<Any>> =  combine(sortType, refreshTrigger.onStart { emit(Unit) }) { sort, _ -> sort }
+//        .flatMapLatest { sort ->
+//            Timber.d("!!! >>>pager sort = $sort")
+//            Pager(
+//                config = PagingConfig(pageSize = 109, prefetchDistance = 10, initialLoadSize = 109),
+//                pagingSourceFactory = {
+//                    Timber.d("!!! >>>pagingSourceFactory{...}")
+//                    createPager(typePager, sort, extraString, searchText)
+//                }
+//            ).flow
+//        }
+//        .cachedIn(scope)
+
     @OptIn(ExperimentalCoroutinesApi::class)
-    val pager: Flow<PagingData<Any>> = sortType
-        .flatMapLatest { sort ->
-            Timber.d("!!! >>>pager sort = $sort")
-            Pager(
-                config = PagingConfig(pageSize = 109, prefetchDistance = 10, initialLoadSize = 109),
-                pagingSourceFactory = {
-                    Timber.d("!!! >>>pagingSourceFactory{...}")
-                    createPager(typePager, sort, extraString)
-                }
-            ).flow
+    val pager: Flow<PagingData<Any>> =
+        combine(SearchRed.searchText, sortType) { text, sort ->          // ① слепили параметры
+            SearchParams(text.trim(), sort)
         }
-        .cachedIn(scope)
+            .debounce(1000)                                          // ② ждём паузу ввода
+            .distinctUntilChanged()                                 // ③ игнорируем дубли
+            .flatMapLatest { params ->                              // ④ НОВЫЙ Pager при каждом изменении
+                Pager(
+                    config = PagingConfig(
+                        pageSize = 100,
+                        prefetchDistance = 10,
+                        initialLoadSize = 100
+                    ),
+                    pagingSourceFactory = {
+                        Timber.d("!!! >>>pagingSourceFactory{...}")
+                        gotoUp()
+                        gotoUpColumn()
+                        createPager(typePager, params.sort, extraString, params.query)
+                    }
+                ).flow
+            }
+            .cachedIn(scope)
+
+
     var columns by mutableIntStateOf(startColumns)             //Количество колонок
     var currentIndex by mutableIntStateOf(0)
     var currentIndexGoto by mutableIntStateOf(0)
@@ -119,18 +178,26 @@ class LazyRow123Host(
         scope.launch { stateColumn.scrollToItem(0) }
     }
 
+    fun refresh() {
+        refreshTrigger.tryEmit(Unit)   // пересоздать Flow
+    }
 
 
 }
 
-fun createPager(typePager: TypePager, sort: Order, extraString: String): PagingSource<Int, Any> {
+fun createPager(
+    typePager: TypePager,
+    sort: Order,
+    extraString: String,
+    searchText: String
+): PagingSource<Int, Any> {
     val pagingSourceFactory = when (typePager) {
         TypePager.NICHES -> {
             ItemNailsPagingSource(order = sort, nichesName = extraString)
         }
 
         TypePager.TOP -> {
-            ItemTopPagingSource(sort)
+            ItemTopPagingSource(sort = sort, searchText = searchText)
         }
 
         TypePager.SAVED_LIKES -> {

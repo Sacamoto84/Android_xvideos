@@ -44,6 +44,11 @@ import com.client.xvideos.red.ThemeRed
 @Composable
 fun SortByOrder(list: List<Order>, selected: Order, onSelect: (Order) -> Unit) {
 
+    if (list.any { it != selected }){
+        onSelect(Order.LATEST)
+        return
+    }
+
     var expanded by remember { mutableStateOf(false) }
 
     val haptic = LocalHapticFeedback.current

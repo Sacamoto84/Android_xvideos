@@ -36,7 +36,9 @@ object RedGifs {
     // Возвращает список всех существующих тегов. 7к штук (имя, количество)
     // ⭐ Работает
     @Throws(ApiException::class)
-    suspend fun getTags(vararg parameters: Pair<String, Any>): TagsResponse {return api.request(Route("GET", "/v1/tags", *parameters))}
+    suspend fun getTags(vararg parameters: Pair<String, Any>): TagsResponse {
+        return api.request(Route("GET", "/v1/tags", *parameters))
+    }
 
 
     @Throws(ApiException::class)
@@ -45,28 +47,6 @@ object RedGifs {
         return cacheMediaResponse(route)
     }
 
-    /**
-     * ## Поиск GIF-ов по тексту.
-     */
-    @Throws(ApiException::class)
-    suspend fun search(
-        searchText: String,             // строка поиска.
-        order: Order = Order.NEW,       // порядок сортировки.
-        count: Int = 100,               // сколько элементов вернуть.
-        page: Int = 1,                  // номер страницы (1-based).
-        vararg params: Pair<String, Any> = emptyArray(),
-    ): MediaResponse {
-        val route = Route(
-            method = "GET",
-            path = "/v2/gifs/search?search_text={search_text}&order={order}&count={count}&page={page}",
-            "search_text" to searchText,
-            "order" to order.value,
-            "count" to count,
-            "page" to page,
-            *params                     // дополнительные параметры из vararg
-        )
-        return cacheMediaResponse(route)
-    }
 
     /**
      * ## Получить топ GIF-ов за неделю.
@@ -94,8 +74,13 @@ object RedGifs {
         page: Int,                       // номер страницы (1-based).
         type: MediaType = MediaType.GIF, // тип медиа (GIF, image и т.д.).
     ): MediaResponse {
-        val route = Route(method = "GET", path = "/v2/gifs/search?order=top28&count={count}&page={page}&type={type}",
-            "count" to count, "page" to page, "type" to type.value)
+        val route = Route(
+            method = "GET",
+            path = "/v2/gifs/search?order=top28&count={count}&page={page}&type={type}",
+            "count" to count,
+            "page" to page,
+            "type" to type.value
+        )
         return cacheMediaResponse(route)
     }
 
@@ -105,8 +90,13 @@ object RedGifs {
         page: Int,                       // номер страницы (1-based).
         type: MediaType = MediaType.GIF, // тип медиа (GIF, image и т.д.).
     ): MediaResponse {
-        val route = Route(method = "GET", path = "/v2/gifs/search?order=trending&count={count}&page={page}&type={type}",
-            "count" to count, "page" to page, "type" to type.value)
+        val route = Route(
+            method = "GET",
+            path = "/v2/gifs/search?order=trending&count={count}&page={page}&type={type}",
+            "count" to count,
+            "page" to page,
+            "type" to type.value
+        )
         return cacheMediaResponse(route)
     }
 
@@ -117,8 +107,13 @@ object RedGifs {
         page: Int,                       // номер страницы (1-based).
         type: MediaType = MediaType.GIF, // тип медиа (GIF, image и т.д.).
     ): MediaResponse {
-        val route = Route(method = "GET", path = "/v2/gifs/search?order=new&count={count}&page={page}&type={type}",
-            "count" to count, "page" to page, "type" to type.value)
+        val route = Route(
+            method = "GET",
+            path = "/v2/gifs/search?order=new&count={count}&page={page}&type={type}",
+            "count" to count,
+            "page" to page,
+            "type" to type.value
+        )
 
         Timber.i("!!! getTopLatest ${route.url}")
         // Запрос из сети
@@ -128,39 +123,6 @@ object RedGifs {
     }
 
     //--------------------------- User/Creator methods ---------------------------
-
-    //Работает
-    suspend fun searchCreators(
-        page: Int = 1,
-        order: Order = Order.TOP,
-        verified: Boolean = true,
-        tags: List<String>? = listOf("Teen", "Ass"),
-    ): CreatorsResponse {
-
-        var url = "/v1/creators/search?page={page}&order={order}"
-
-        if (verified) {
-            url += "&verified={verified}"
-        }
-
-        if (tags != null && tags.isNotEmpty()) {
-            url += "&tags={tags}"
-        }
-
-        val routeParams = mutableMapOf<String, Any>(
-            "page" to page, "order" to order.value, "verified" to if (verified) "y" else "n"
-        )
-
-        if (tags != null && tags.isNotEmpty()) {
-            routeParams["tags"] = tags.joinToString(",")
-        }
-
-        val route = Route(method = "GET", path = url, *routeParams.toList().toTypedArray())
-        val res: CreatorsResponse = api.request(route)
-        return res
-
-
-    }
 
 
     //https://api.redgifs.com/v1/users/drfunkenfootz_md
@@ -211,9 +173,20 @@ object RedGifs {
 
     //--------------------------- Pic methods ---------------------------
 
-    suspend fun searchImage(searchText: String, order: Order = Order.NEW, count: Int = 100, page: Int = 1): MediaResponse {
-        val route = Route(method = "GET", path = "/v2/gifs/search?search_text={search_text}&order={order}&count={count}&page={page}&type=i",
-            "search_text" to searchText, "order" to order.value, "count" to count, "page" to page)
+    suspend fun searchImage(
+        searchText: String,
+        order: Order = Order.NEW,
+        count: Int = 100,
+        page: Int = 1
+    ): MediaResponse {
+        val route = Route(
+            method = "GET",
+            path = "/v2/gifs/search?search_text={search_text}&order={order}&count={count}&page={page}&type=i",
+            "search_text" to searchText,
+            "order" to order.value,
+            "count" to count,
+            "page" to page
+        )
         return cacheMediaResponse(route)
     }
 
@@ -245,11 +218,10 @@ object RedGifs {
      */
     @Throws(ApiException::class)
     suspend fun getTagSuggestions(query: String): List<TagSuggestion> {
-        val route = Route(method = "GET", path = "/v2/search/suggest?query={query}", "query" to query)
+        val route =
+            Route(method = "GET", path = "/v2/search/suggest?query={query}", "query" to query)
         return api.request(route)
     }
-
-
 
 
     //niches
@@ -262,9 +234,20 @@ object RedGifs {
 
     //https://api.redgifs.com/v2/niches/cowgirl-pov/gifs?count=30&page=1&order=new
     @Throws(ApiException::class)
-    suspend fun getNiches(niches: String = "pumped-pussy", page: Int = 1, count: Int = 100, order: Order = Order.NEW): MediaResponse {
-        val route = Route(method = "GET", path = "/v2/niches/{niches}/gifs?page={page}&count={count}&order={order}",
-            "niches" to niches, "page" to page, "count" to count, "order" to order.value)
+    suspend fun getNiches(
+        niches: String = "pumped-pussy",
+        page: Int = 1,
+        count: Int = 100,
+        order: Order = Order.NEW
+    ): MediaResponse {
+        val route = Route(
+            method = "GET",
+            path = "/v2/niches/{niches}/gifs?page={page}&count={count}&order={order}",
+            "niches" to niches,
+            "page" to page,
+            "count" to count,
+            "order" to order.value
+        )
         return cacheMediaResponse(route)
     }
 
@@ -279,7 +262,8 @@ object RedGifs {
     //https://api.redgifs.com/v2/niches/pumped-pussy/top-creators
     @Throws(ApiException::class)
     suspend fun getNichesTopCreators(niches: String = "pumped-pussy"): TopCreatorsResponse {
-        val route = Route(method = "GET", path = "/v2/niches/{niches}/top-creators", "niches" to niches)
+        val route =
+            Route(method = "GET", path = "/v2/niches/{niches}/top-creators", "niches" to niches)
         return api.request<TopCreatorsResponse>(route)
     }
 
@@ -293,7 +277,6 @@ object RedGifs {
     }
 
 
-
     //explorer
 
     //
@@ -303,19 +286,27 @@ object RedGifs {
     //name z-a https://api.redgifs.com/v2/niches?order=name&previews=yes&sort=desc&page=1&count=30
     //
     @Throws(ApiException::class)
-    suspend fun getExplorerNiches(order: Order = Order.NICHES_SUBSCRIBERS, count: Int = 100, page: Int = 1): NichesResponse {
+    suspend fun getExplorerNiches(
+        order: Order = Order.NICHES_SUBSCRIBERS,
+        count: Int = 100,
+        page: Int = 1
+    ): NichesResponse {
 
         val sort = when (order) {
             Order.NICHES_NAME_A_Z -> "asc"
             else -> "desc"
         }
-        val route = Route(method = "GET", path = "/v2/niches?&order={order}&previews=yes&sort={sort}&page={page}&count={count}",
-            "order" to order.value, "sort" to sort, "page" to page, "count" to count)
+        val route = Route(
+            method = "GET",
+            path = "/v2/niches?&order={order}&previews=yes&sort={sort}&page={page}&count={count}",
+            "order" to order.value,
+            "sort" to sort,
+            "page" to page,
+            "count" to count
+        )
 
         return api.request(route)
     }
-
-
 
 
     //////////////////////////////////// Поиск ////////////////////////////////////
@@ -323,9 +314,72 @@ object RedGifs {
     //Возвращает 5 элементов
     @Throws(ApiException::class)
     suspend fun searchCreatorsShort(text: String): SearchCreatorsResponse {
-        val route = Route(method = "GET", path = "/v2/creators/suggest?query={text}", "text" to text)
+        val route =
+            Route(method = "GET", path = "/v2/creators/suggest?query={text}", "text" to text)
         return api.request<SearchCreatorsResponse>(route)
     }
+
+
+    //https://api.redgifs.com/v1/creators/search?order=trending&page=1 //По умолчанию без поиска
+    //Работает
+    suspend fun searchCreators(
+        page: Int = 1,
+        order: Order = Order.TOP,
+        verified: Boolean = true,
+        tags: List<String>? = null// = listOf("Teen", "Ass"),
+    ): CreatorsResponse {
+
+        var url = "/v1/creators/search?page={page}&order={order}"
+
+        if (verified) {
+            url += "&verified=yes"
+        }
+
+        if (tags != null && tags.isNotEmpty()) {
+            url += "&tags={tags}"
+        }
+
+        val routeParams = mutableMapOf<String, Any>(
+            "page" to page, "order" to order.value
+        )
+
+        if (tags != null && tags.isNotEmpty()) {
+            routeParams["tags"] = tags.joinToString(",")
+        }
+
+        val route = Route(method = "GET", path = url, *routeParams.toList().toTypedArray())
+        val res: CreatorsResponse = api.request(route)
+        return res
+
+    }
+
+    //https://api.redgifs.com/v2/search/creators?query=ana&page=1&count=40&order=trending
+    suspend fun searchCreators(
+        text: String = "",
+        page: Int = 1,
+        order: Order = Order.TRENDING,
+        verified: Boolean = true,
+    ): CreatorResponse {
+
+        var url = "/v2/search/creators?query={text}&page={page}&count={count}&order={order}"
+
+        if (verified) {
+            url += "&verified=yes"
+        }
+
+        val routeParams = mutableMapOf<String, Any>(
+            "text" to text,
+            "page" to page,
+            "order" to order.value
+
+        )
+
+        val route = Route(method = "GET", path = url, *routeParams.toList().toTypedArray())
+        val res: CreatorResponse = api.request(route)
+        return res
+
+    }
+
 
 //    //https://api.redgifs.com/v2/search/creators?query=Ana&page=1&count=40&ord
 //    @Throws(ApiException::class)
@@ -355,9 +409,50 @@ object RedGifs {
         val tags: List<SearchItemTagsResponse> = Gson().fromJson(res, listType)
         return tags
     }
+
+
+    /**
+     * ## Поиск GIF-ов по тексту.
+     * https://api.redgifs.com/v2/search/gifs?query=anal&page=2&count=40&order=top
+     *
+     * top, trending, latest
+     */
+    @Throws(ApiException::class)
+    suspend fun searchGifs(
+        searchText: String,             // строка поиска.
+        order: Order = Order.TOP,       // порядок сортировки.
+        count: Int = 100,               // сколько элементов вернуть.
+        page: Int = 1,                  // номер страницы (1-based).
+        verified: Boolean = false,
+    ): MediaResponse {
+
+        val route = if (!verified) {
+            Route(
+                method = "GET",
+                path = "/v2/search/gifs?query={search_text}&order={order}&count={count}&page={page}",
+                "search_text" to searchText,
+                "order" to order.value,
+                "count" to count,
+                "page" to page,
+            )
+        } else {
+            Route(
+                method = "GET",
+                path = "/v2/search/gifs?query={search_text}&order={order}&count={count}&page={page}&verified=yes",
+                "search_text" to searchText,
+                "order" to order.value,
+                "count" to count,
+                "page" to page,
+            )
+        }
+        //return cacheMediaResponse(route)
+        return api.request(route)
+    }
+
+
 }
 
-private suspend fun cacheMediaResponse(route : Route) : MediaResponse {
+private suspend fun cacheMediaResponse(route: Route): MediaResponse {
 
     val cacheDao = App.instance.db.cacheMedaResponseDao()
     val cachedEntity = cacheDao.get(route.url)

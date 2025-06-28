@@ -6,15 +6,18 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,7 +26,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
@@ -41,6 +43,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.feature.redgifs.types.Order
 import com.client.xvideos.red.ThemeRed
+import com.client.xvideos.red.common.search.SearchRed
 import com.client.xvideos.red.common.ui.lazyrow123.LazyRow123
 import com.client.xvideos.red.common.ui.lazyrow123.LazyRow123Host
 import com.client.xvideos.red.common.ui.lazyrow123.TypePager
@@ -50,6 +53,7 @@ import com.client.xvideos.red.screens.explorer.tab.saved.tab.SavedLikesTab.colum
 import com.client.xvideos.red.screens.profile.ScreenRedProfile
 import com.client.xvideos.red.screens.profile.atom.VerticalScrollbar
 import com.client.xvideos.red.screens.profile.rememberVisibleRangePercentIgnoringFirstNForGrid
+import com.composeunstyled.TextField
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -89,21 +93,45 @@ object GifsTab : Screen {
             gridState = vm.lazyHost.state, itemsToIgnore = 0, numberOfColumns = column.intValue
         )
 
+        val searchR = SearchRed.searchText.collectAsStateWithLifecycle().value
+
         Scaffold(bottomBar = {
             Row(modifier = Modifier.background(ThemeRed.colorCommonBackground2)) {
                 //
-                SortByOrder(
-                    listOf(
-                        Order.TOP_WEEK,
-                        Order.TOP_MONTH,
-                        Order.TOP_ALLTIME,
-                        Order.TRENDING,
-                        Order.LATEST
-                    ),
-                    vm.lazyHost.sortType.collectAsStateWithLifecycle().value,
-                    onSelect = { vm.lazyHost.changeSortType(it) })
-                //
-                //Button(onClick = {root.showSnackbar("Snackbar из вложенного экрана")}){}
+                if(searchR == "") {
+                    SortByOrder(
+                        listOf(
+                            Order.TOP_WEEK,
+                            Order.TOP_MONTH,
+                            Order.TOP_ALLTIME,
+                            Order.TRENDING,
+                            Order.LATEST
+                        ),
+                        vm.lazyHost.sortType.collectAsStateWithLifecycle().value,
+                        onSelect = { vm.lazyHost.changeSortType(it) })
+                }
+                else
+                {
+                    SortByOrder(
+                        listOf(
+                            Order.TOP,
+                            Order.TRENDING,
+                            Order.LATEST
+                        ),
+                        vm.lazyHost.sortType.collectAsStateWithLifecycle().value,
+                        onSelect = { vm.lazyHost.changeSortType(it) })
+                }
+
+
+                TextField(value = SearchRed.searchText.collectAsStateWithLifecycle().value,
+                    onValueChange = {
+                    SearchRed.searchText.value = it
+                    //l.refresh()
+                }, modifier = Modifier.height(48.dp),
+                    backgroundColor = Color.DarkGray,
+                    contentColor = Color.White
+                    //colors = TextFieldDefaults.colors(focusedTextColor = Color.White, unfocusedTextColor = Color.White)
+                )
             }
         }, containerColor = ThemeRed.colorCommonBackground) {
 
@@ -164,7 +192,6 @@ object GifsTab : Screen {
                     }
 
 
-
                 }
 
 
@@ -194,6 +221,7 @@ class ScreenRedExplorerGifsSM @Inject constructor(
         extraString = "",
         typePager = TypePager.TOP
     )
+
 
 }
 
