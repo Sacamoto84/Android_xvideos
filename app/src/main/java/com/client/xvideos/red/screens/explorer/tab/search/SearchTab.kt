@@ -35,7 +35,8 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
-import com.client.xvideos.feature.redgifs.http.RedGifs
+import com.client.xvideos.feature.redgifs.api.RedApi
+import com.client.xvideos.feature.redgifs.api.RedApi_Search
 import com.client.xvideos.feature.redgifs.types.search.SearchItemCreatorsResponse
 import com.client.xvideos.feature.redgifs.types.search.SearchItemNichesResponse
 import com.client.xvideos.feature.redgifs.types.search.SearchItemTagsResponse
@@ -148,7 +149,7 @@ class ScreenRedExplorerSearchSM @Inject constructor(
                     return@collect
                 }
 
-                val creator = RedGifs.searchCreatorsShort(text)
+                val creator = RedApi_Search.searchCreatorsShort(text)
 
                 creatorsList.clear()
                 creatorsList.addAll(creator.items)

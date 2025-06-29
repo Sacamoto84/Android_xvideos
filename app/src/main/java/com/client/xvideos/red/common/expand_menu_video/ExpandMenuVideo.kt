@@ -33,15 +33,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.tooling.preview.Preview
-import com.client.xvideos.feature.redgifs.http.RedGifs
+import com.client.xvideos.feature.redgifs.api.RedApi
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.red.ThemeRed
 import com.client.xvideos.red.common.block.BlockRed
 import com.client.xvideos.red.common.downloader.DownloadRed
 import com.client.xvideos.red.common.saved.SavedRed
-import com.client.xvideos.red.common.saved.collection.collectionItemDeleteFromDisk
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -175,7 +172,7 @@ fun DropdownMenuItem_Follow(item: GifsInfo? = null, onDismiss: () -> Unit){
                 delay(200)
                 if (!isFollowed) {
                     try {
-                        val a = RedGifs.readCreator(item.userName)
+                        val a = RedApi.readCreator(item.userName)
                         SavedRed.addCreator(a)
                     } catch (e: Exception) { e.printStackTrace() }
                 }

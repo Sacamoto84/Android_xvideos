@@ -5,22 +5,30 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -28,12 +36,17 @@ import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -44,6 +57,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
@@ -52,6 +66,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -75,6 +90,9 @@ import com.client.xvideos.red.common.expand_menu_video.DropdownMenuItem_Follow
 import com.client.xvideos.red.common.expand_menu_video.DropdownMenuItem_Like
 import com.client.xvideos.red.common.expand_menu_video.DropdownMenuItem_RemoveFromCollection
 import com.client.xvideos.red.common.expand_menu_video.DropdownMenuItem_Share
+import com.composables.core.Dialog
+import com.composables.core.DialogPanel
+import com.composables.core.rememberDialogState
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
@@ -92,10 +110,13 @@ object SearchRed {
 
     var verified = MutableStateFlow(false)
 
+    var searchTextDone = MutableStateFlow("")
+
     @Composable
     fun CustomBasicTextField(
         value: String,
         onValueChange: (String) -> Unit,
+        onDone: (String) -> Unit = {},
         modifier: Modifier = Modifier,
     ) {
 
@@ -170,7 +191,8 @@ object SearchRed {
                     // 2. Обрабатываем её нажатие
                     keyboardActions = KeyboardActions(
                         onDone = {
-                            add(value)                          // например, запускаем поиск
+                            onDone(value)
+                            add(value)                         // например, запускаем поиск
                             focusManager.clearFocus()          // убираем курсор
                             keyboardController?.hide()         // закрываем клавиатуру
                         }
@@ -179,7 +201,10 @@ object SearchRed {
                     )
 
                 if (value != "") {
-                    IconButton(onClick = { onValueChange("") }, modifier = Modifier.size(48.dp)) {
+                    IconButton(onClick = {
+                        onDone("")
+                        onValueChange("")
+                    }, modifier = Modifier.size(48.dp)) {
                         Icon(
                             Icons.Default.Clear,
                             contentDescription = null,
@@ -188,13 +213,7 @@ object SearchRed {
                     }
                 }
 
-//                IconButton(onClick = { onValueChange("") }, modifier = Modifier.size(48.dp)) {
-//                    Icon(
-//                        Icons.Default.ArrowDropDown,
-//                        contentDescription = null,
-//                        tint = Color(0xFF757575)
-//                    )
-//                }
+                ExpandMenuHelper()
 
                 ExpandMenuHistory(history1)
 
@@ -202,6 +221,75 @@ object SearchRed {
             }
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun ExpandMenuHelper(
+        //items: List<String>,
+        //modifier: Modifier = Modifier,
+    ) {
+
+        val dialogState = rememberDialogState()
+
+        Box {
+            Button(onClick= { dialogState.visible = true }) {
+                Text("Show Dialog")
+            }
+            Dialog(state = dialogState) {
+                DialogPanel(
+                    modifier = Modifier
+                        .displayCutoutPadding()
+                        .systemBarsPadding()
+                        .widthIn(min = 280.dp, max = 560.dp)
+                        .padding(20.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .border(1.dp, Color(0xFFE4E4E4), RoundedCornerShape(12.dp))
+                        .background(Color.White),
+                ) {
+                    Column {
+                        Column(Modifier.padding(start = 24.dp, top = 24.dp, end = 24.dp)) {
+                            Text(
+                                text = "Update Available",
+                                style = TextStyle(fontWeight = FontWeight.Medium)
+                            )
+                            Spacer(Modifier.height(8.dp))
+                            Text(
+                                text = "A new version of the app is available. Please update to the latest version.",
+                                style = TextStyle(color = Color(0xFF474747))
+                            )
+                        }
+                        Spacer(Modifier.height(24.dp))
+                        Button(
+                            onClick = { /* TODO */ },
+                            modifier = Modifier.padding(12.dp).align(Alignment.End),
+                            shape = RoundedCornerShape(4.dp),
+                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
+                        ) {
+                            Text(
+                                text = "Update",
+                                color = Color(0xFF6699FF)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
 
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -225,7 +313,7 @@ object SearchRed {
                     .menuAnchor(ExposedDropdownMenuAnchorType.SecondaryEditable),
                 onClick = {}) {
                 Icon(
-                    if(expanded )Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
+                    if (expanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
                     contentDescription = "",
                     tint = Color(0xFF757575),
                     modifier = Modifier.size(24.dp)
@@ -243,14 +331,20 @@ object SearchRed {
                 items.reversed().forEach {
 
                     Row(
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp).clickable( onClick = {searchText.value = it} ),
-                        horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp)
+                            .clickable(onClick = { searchText.value = it }),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
                             it,
                             color = Color.White,
                             fontSize = 22.sp,
-                            modifier = Modifier.padding(vertical = 4.dp).padding(start = 16.dp),
+                            modifier = Modifier
+                                .padding(vertical = 4.dp)
+                                .padding(start = 16.dp),
                             fontFamily = ThemeRed.fontFamilyDMsanss
                         )
 

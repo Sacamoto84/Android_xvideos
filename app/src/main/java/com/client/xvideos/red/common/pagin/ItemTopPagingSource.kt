@@ -2,7 +2,8 @@ package com.client.xvideos.red.common.pagin
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.client.xvideos.feature.redgifs.http.RedGifs
+import com.client.xvideos.feature.redgifs.api.RedApi
+import com.client.xvideos.feature.redgifs.api.RedApi_Search
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.redgifs.types.MediaResponse
 import com.client.xvideos.feature.redgifs.types.Order
@@ -22,15 +23,15 @@ class ItemTopPagingSource(val sort: Order, val searchText: String) : PagingSourc
 
             val response: MediaResponse = if (searchText != "") {
                 Timber.i("!!! ItemTopPagingSource::load()  RedGifs.searchGifs($searchText)")
-                RedGifs.searchGifs(searchText, sort, 100, page)
+                RedApi_Search.searchGifs(searchText, sort, 100, page)
             } else {
                 when (sort) {
-                    Order.TOP_WEEK -> RedGifs.getTopThisWeek(100, page)
-                    Order.TOP_MONTH -> RedGifs.getTopThisMonth(100, page)
-                    Order.TRENDING -> RedGifs.getTopTrending(100, page)
-                    Order.LATEST -> RedGifs.getTopLatest(100, page)
+                    Order.TOP_WEEK -> RedApi.getTopThisWeek(100, page)
+                    Order.TOP_MONTH -> RedApi.getTopThisMonth(100, page)
+                    Order.TRENDING -> RedApi.getTopTrending(100, page)
+                    Order.LATEST -> RedApi.getTopLatest(100, page)
                     else -> {
-                        RedGifs.getTopThisWeek(100, page)
+                        RedApi.getTopThisWeek(100, page)
                     }
                 }
 

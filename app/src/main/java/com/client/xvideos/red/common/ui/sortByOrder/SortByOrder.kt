@@ -42,7 +42,7 @@ import com.client.xvideos.red.ThemeRed
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SortByOrder(list: List<Order>, selected: Order, onSelect: (Order) -> Unit) {
+fun SortByOrder(list: List<Order>, selected: Order, onSelect: (Order) -> Unit, containerColor : Color = Color.Transparent) {
 
     if (!list.any { it == selected }){
         onSelect(Order.LATEST)
@@ -58,7 +58,7 @@ fun SortByOrder(list: List<Order>, selected: Order, onSelect: (Order) -> Unit) {
             haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
             expanded = it
         },
-        modifier = Modifier
+        modifier = Modifier.background(containerColor)
     )
     {
 

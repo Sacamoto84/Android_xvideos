@@ -190,11 +190,11 @@ fun LazyRow123(
 
                     Box(
                         modifier = Modifier
-                            .padding(vertical = 8.dp)
-                            .padding(horizontal = 4.dp)
+                            .padding(vertical = 2.dp)
+                            .padding(horizontal = 2.dp)
                             .fillMaxSize()
-                            .clip(RoundedCornerShape(16.dp))
-                            .border(1.dp, Color.DarkGray, RoundedCornerShape(16.dp)),
+                            .clip(RoundedCornerShape(12.dp))
+                            .border(1.dp, Color.DarkGray, RoundedCornerShape(12.dp)),
                         contentAlignment = Alignment.Center
                     ) {
 

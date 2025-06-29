@@ -56,8 +56,18 @@ class ScreenRedExplorer() : Screen {
         val navigator = LocalNavigator.currentOrThrow
 
         val vm: ScreenRedExplorerSM = getScreenModel()
-        val l = listOf(Icons.Outlined.Movie, Icons.Outlined.Group, Icons.Outlined.BookmarkBorder, Icons.Outlined.Search)
-        Scaffold(bottomBar ={ TabRow(titlesIcon = l, onChangeState = {vm.screenType = it}) }, containerColor = ThemeRed.colorCommonBackground2){paddingValues ->
+        val l = listOf(
+            Icons.Outlined.Movie,
+            Icons.Outlined.Group,
+            Icons.Outlined.BookmarkBorder,
+            Icons.Outlined.Search
+        )
+        Scaffold(bottomBar = {
+            TabRow(
+                containerColor = ThemeRed.colorTabLevel0,
+                titlesIcon = l,
+                onChangeState = { vm.screenType = it })
+        }, containerColor = ThemeRed.colorCommonBackground2) { paddingValues ->
             Box(modifier = Modifier.padding(bottom = paddingValues.calculateBottomPadding())) {
                 when (vm.screenType) {
                     0 -> GifsTab.Content()

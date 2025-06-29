@@ -2,7 +2,7 @@ package com.client.xvideos.red.common.pagin
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.client.xvideos.feature.redgifs.http.RedGifs
+import com.client.xvideos.feature.redgifs.api.RedApi
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.redgifs.types.MediaType
 import com.client.xvideos.feature.redgifs.types.Order
@@ -28,7 +28,7 @@ class ItemProfilePagingSource (val profileName : String, val sort : Order): Pagi
                 )
             }
 
-            val response = RedGifs.searchCreator(userName = profileName, page = page,  count = 100, type = MediaType.GIF,  order = sort )
+            val response = RedApi.searchCreator(userName = profileName, page = page,  count = 100, type = MediaType.GIF,  order = sort )
 
             val isEndReached = response.gifs.isEmpty() // или, если ты знаешь, что сервер вернул всё
 

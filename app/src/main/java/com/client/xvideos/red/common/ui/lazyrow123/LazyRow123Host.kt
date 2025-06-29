@@ -143,10 +143,10 @@ class LazyRow123Host(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val pager: Flow<PagingData<Any>> =
-        combine(SearchRed.searchText, sortType) { text, sort ->          // ① слепили параметры
+        combine(SearchRed.searchTextDone, sortType) { text, sort ->          // ① слепили параметры
             SearchParams(text.trim(), sort)
         }
-            .debounce(2000)                                          // ② ждём паузу ввода
+            //.debounce(2000)                                          // ② ждём паузу ввода
             .distinctUntilChanged()                                 // ③ игнорируем дубли
             .flatMapLatest { params ->                              // ④ НОВЫЙ Pager при каждом изменении
                 Pager(

@@ -2,7 +2,7 @@ package com.client.xvideos.red.common.pagin
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.client.xvideos.feature.redgifs.http.RedGifs
+import com.client.xvideos.feature.redgifs.api.RedApi
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.redgifs.types.Order
 import com.client.xvideos.red.common.block.BlockRed
@@ -26,7 +26,7 @@ class ItemNailsPagingSource (val order : Order, val nichesName : String): Paging
                 )
             }
 
-            val response = RedGifs.getNiches(niches = nichesName, page = page, order = order)
+            val response = RedApi.getNiches(niches = nichesName, page = page, order = order)
 
             val isEndReached = response.gifs.isEmpty() // или, если ты знаешь, что сервер вернул всё
 

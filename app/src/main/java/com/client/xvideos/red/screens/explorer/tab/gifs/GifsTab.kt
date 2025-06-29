@@ -109,23 +109,27 @@ object GifsTab : Screen {
         val searchR = SearchRed.searchText.collectAsStateWithLifecycle().value
 
         Scaffold(bottomBar = {
-            Row(modifier = Modifier.background(ThemeRed.colorCommonBackground2).height(50.dp), verticalAlignment = Alignment.Bottom) {
+            Row(modifier = Modifier.background(ThemeRed.colorTabLevel0).height(50.dp), verticalAlignment = Alignment.Bottom) {
                 //
                 if (searchR == "") {
                     SortByOrder(
-                        listOf(
+                        containerColor = ThemeRed.colorCommonBackground,
+                        list = listOf(
                             Order.TOP_WEEK,
                             Order.TOP_MONTH,
                             Order.TOP_ALLTIME,
                             Order.TRENDING,
                             Order.LATEST
                         ),
-                        vm.lazyHost.sortType.collectAsStateWithLifecycle().value,
-                        onSelect = { vm.lazyHost.changeSortType(it) })
+                        selected = vm.lazyHost.sortType.collectAsStateWithLifecycle().value,
+                        onSelect = { vm.lazyHost.changeSortType(it) }
+
+                    )
                 } else {
                     SortByOrder(
-                        listOf(Order.TOP, Order.TRENDING, Order.LATEST),
-                        vm.lazyHost.sortType.collectAsStateWithLifecycle().value,
+                        containerColor = ThemeRed.colorCommonBackground,
+                        list = listOf(Order.TOP, Order.TRENDING, Order.LATEST),
+                        selected = vm.lazyHost.sortType.collectAsStateWithLifecycle().value,
                         onSelect = { vm.lazyHost.changeSortType(it) })
                 }
 
@@ -134,7 +138,10 @@ object GifsTab : Screen {
                     value = SearchRed.searchText.collectAsStateWithLifecycle().value,
                     onValueChange = {
                         SearchRed.searchText.value = it
-                    }, modifier = Modifier.padding(start = 4.dp).weight(1f)
+                    }, onDone = {
+                        SearchRed.searchTextDone.value = it
+                    }
+                    , modifier = Modifier.padding(start = 4.dp).weight(1f)
                 )
 
 
@@ -144,6 +151,7 @@ object GifsTab : Screen {
                         .padding(start = 4.dp)
                         .size(48.dp)
                         .border(1.dp, Color(0x80757575), RoundedCornerShape(8.dp))
+                        .background(ThemeRed.colorCommonBackground)
                         .clickable(
                             onClick = {
                                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)

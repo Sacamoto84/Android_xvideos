@@ -38,11 +38,11 @@ fun FeedControls_Container_Line1(vm: ScreenRedProfileSM) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         //--- Feed Ordering Control ---
-        SortByOrder(vm.orderList, vm.order) {
+        SortByOrder(list =vm.orderList, selected =  vm.order, onSelect = {
             vm.order = it
             vm.clear()
             //vm.loadNextPage()
-        }
+        })
 
         //--- Feed Gif Types Control ---
         // Выбор типа отображения All Gifs Images

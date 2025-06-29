@@ -18,7 +18,7 @@ import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import io.ktor.client.plugins.cache.HttpCache
 
-class ApiClient {
+object ApiClient {
 
     val USER_AGENT: String =
         "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3346.8 Safari/537.36 Redgifs/"

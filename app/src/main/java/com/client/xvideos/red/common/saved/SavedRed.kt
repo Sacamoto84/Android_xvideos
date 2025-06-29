@@ -3,11 +3,13 @@ package com.client.xvideos.red.common.saved
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import com.client.xvideos.feature.redgifs.api.RedApi
+import com.client.xvideos.feature.redgifs.api.RedApi_Tags
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.redgifs.types.NichesInfo
 import com.client.xvideos.feature.redgifs.types.UserInfo
+import com.client.xvideos.feature.redgifs.types.tag.TagInfo
 import com.client.xvideos.red.common.saved.collection.collectionCreateToDisk
 import com.client.xvideos.red.common.saved.collection.collectionDeleteFromDisk
 import com.client.xvideos.red.common.saved.collection.collectionItemDeleteFromDisk
@@ -28,7 +30,6 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 object SavedRed {
 
@@ -205,6 +206,11 @@ object SavedRed {
             SnackBarEvent.error("Ошибка чтения коллекций ${a.exceptionOrNull()?.message}")
         }
     }
+
+    var tagsList = listOf<TagInfo>()
+
+    @OptIn(DelicateCoroutinesApi::class)
+    fun refreshTagList() { GlobalScope.launch(Dispatchers.IO) { tagsList = RedApi_Tags.getTags().tags } }
 
 }
 

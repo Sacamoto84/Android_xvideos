@@ -14,7 +14,7 @@ import com.client.xvideos.feature.Downloader
 import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.feature.preference.PreferencesRepository
 import com.client.xvideos.feature.redgifs.extractNameFromUrl
-import com.client.xvideos.feature.redgifs.http.RedGifs
+import com.client.xvideos.feature.redgifs.api.RedApi
 import com.client.xvideos.feature.redgifs.types.GifsInfo
 import com.client.xvideos.feature.redgifs.types.MediaType
 import com.client.xvideos.feature.redgifs.types.Order
@@ -114,7 +114,7 @@ class ScreenRedProfileSM @AssistedInject constructor(
 
             setSelector(2)
 
-            creator = RedGifs.readCreator(profileName)
+            creator = RedApi.readCreator(profileName)
             //maxCreatorGifs = creator?.users[0]?.publishedGifs ?: 0
            // maxCreatorGifs = creator?.pages ?: 0
 

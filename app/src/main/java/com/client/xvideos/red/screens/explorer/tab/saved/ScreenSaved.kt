@@ -70,6 +70,8 @@ object SavedTab : Screen {
                 Column {
                     HorizontalDivider()
                     TabRow(
+                        containerColor = ThemeRed.colorTabLevel1,
+
                         //containerColor = ThemeRed.colorBottomBarBackground,
                         titlesIcon = l, onChangeState = {
                             if (it == screenType) {

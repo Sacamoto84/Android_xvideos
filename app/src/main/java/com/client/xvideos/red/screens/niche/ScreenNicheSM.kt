@@ -8,7 +8,7 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
 import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
-import com.client.xvideos.feature.redgifs.http.RedGifs
+import com.client.xvideos.feature.redgifs.api.RedApi
 import com.client.xvideos.feature.redgifs.types.NichesInfo
 import com.client.xvideos.feature.redgifs.types.NichesResponse
 import com.client.xvideos.feature.redgifs.types.TopCreatorsResponse
@@ -51,9 +51,9 @@ class ScreenNicheSM @AssistedInject constructor(
         lazyHost.columns = 2
 
         screenModelScope.launch {
-            niche = RedGifs.getNiche(nicheName).niche            // Нужно кешировать
-            related = RedGifs.getNichesRelated(nicheName)        // Нужно кешировать
-            topCreator = RedGifs.getNichesTopCreators(nicheName) // Нужно кешировать
+            niche = RedApi.getNiche(nicheName).niche            // Нужно кешировать
+            related = RedApi.getNichesRelated(nicheName)        // Нужно кешировать
+            topCreator = RedApi.getNichesTopCreators(nicheName) // Нужно кешировать
         }
     }
 

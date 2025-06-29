@@ -1,16 +1,12 @@
 package com.client.xvideos.feature.redgifs.http
 
-class Route(method: String, path: String, vararg parameters: Pair<String, Any>) {
+class Route(val method: String, val path: String, vararg parameters: Pair<String, Any>) {
 
     val BASE = "https://api.redgifs.com"
 
-    val method: String
-    val path: String
     val url: String
 
     init {
-        this.method = method
-        this.path = path
         var tempUrl = BASE + path
         if (parameters.isNotEmpty()) {
             val formattedParams = parameters.associate { (k, v) ->
@@ -30,7 +26,7 @@ class Route(method: String, path: String, vararg parameters: Pair<String, Any>) 
         return result
     }
 
-    // Helper function to encode URL components (equivalent to Python's quote)
+    // Helper function to encode URL components
     private fun encodeURIComponent(s: String): String {
         return s.replace(" ", "%20")
             .replace("!", "%21")

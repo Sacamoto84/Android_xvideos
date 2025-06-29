@@ -1,9 +1,11 @@
-package com.client.xvideos.feature.redgifs.http
+package com.client.xvideos.feature.redgifs.api
 
 import com.client.xvideos.App
 import com.client.xvideos.feature.redgifs.db.CacheMediaResponseEntity
 import com.client.xvideos.feature.redgifs.db.getCurrentTimeText
-import com.client.xvideos.feature.redgifs.http.RedGifs.api
+import com.client.xvideos.feature.redgifs.api.RedApi.api
+import com.client.xvideos.feature.redgifs.http.ApiClient
+import com.client.xvideos.feature.redgifs.http.Route
 import com.client.xvideos.feature.redgifs.types.CreatorResponse
 import com.client.xvideos.feature.redgifs.types.CreatorsResponse
 import com.client.xvideos.feature.redgifs.types.MediaResponse
@@ -26,19 +28,14 @@ import com.google.gson.reflect.TypeToken
 import timber.log.Timber
 import kotlin.Int
 
-object RedGifs {
+object RedApi {
 
-    val api = ApiClient()
+    val api = ApiClient
 
     //--------------------------- GIF methods ---------------------------
 
 
-    // Возвращает список всех существующих тегов. 7к штук (имя, количество)
-    // ⭐ Работает
-    @Throws(ApiException::class)
-    suspend fun getTags(vararg parameters: Pair<String, Any>): TagsResponse {
-        return api.request(Route("GET", "/v1/tags", *parameters))
-    }
+
 
 
     @Throws(ApiException::class)
@@ -202,26 +199,7 @@ object RedGifs {
 
     //--------------------------- Tag methods ---------------------------
 
-    /**
-     * ## Получить список 20 популярных тегов (Trending Tags).
-     * ## ⭐ Работает ⭐
-     */
-    @Throws(ApiException::class)
-    suspend fun getTrendingTags(): TagsResponse {
-        val route = Route(method = "GET", path = "/v2/search/trending")
-        val res: TagsResponse = api.request(route)
-        return res
-    }
 
-    /**
-     * ## Получить подсказки (suggest) по тегам.
-     */
-    @Throws(ApiException::class)
-    suspend fun getTagSuggestions(query: String): List<TagSuggestion> {
-        val route =
-            Route(method = "GET", path = "/v2/search/suggest?query={query}", "query" to query)
-        return api.request(route)
-    }
 
 
     //niches
@@ -279,45 +257,11 @@ object RedGifs {
 
     //explorer
 
-    //
-    //subscribers https://api.redgifs.com/v2/niches?order=subscribers&previews=yes&sort=desc&page=1&count=30
-    //posts https://api.redgifs.com/v2/niches?order=posts&previews=yes&sort=desc&page=1&count=30
-    //name a-z https://api.redgifs.com/v2/niches?order=name&previews=yes&sort=asc&page=1&count=30
-    //name z-a https://api.redgifs.com/v2/niches?order=name&previews=yes&sort=desc&page=1&count=30
-    //
-    @Throws(ApiException::class)
-    suspend fun getExplorerNiches(
-        order: Order = Order.NICHES_SUBSCRIBERS,
-        count: Int = 100,
-        page: Int = 1
-    ): NichesResponse {
 
-        val sort = when (order) {
-            Order.NICHES_NAME_A_Z -> "asc"
-            else -> "desc"
-        }
-        val route = Route(
-            method = "GET",
-            path = "/v2/niches?&order={order}&previews=yes&sort={sort}&page={page}&count={count}",
-            "order" to order.value,
-            "sort" to sort,
-            "page" to page,
-            "count" to count
-        )
-
-        return api.request(route)
-    }
 
 
     //////////////////////////////////// Поиск ////////////////////////////////////
-    //https://api.redgifs.com/v2/creators/suggest?query=Ana
-    //Возвращает 5 элементов
-    @Throws(ApiException::class)
-    suspend fun searchCreatorsShort(text: String): SearchCreatorsResponse {
-        val route =
-            Route(method = "GET", path = "/v2/creators/suggest?query={text}", "text" to text)
-        return api.request<SearchCreatorsResponse>(route)
-    }
+
 
 
     //https://api.redgifs.com/v1/creators/search?order=trending&page=1 //По умолчанию без поиска
@@ -411,44 +355,16 @@ object RedGifs {
     }
 
 
+
     /**
-     * ## Поиск GIF-ов по тексту.
-     * https://api.redgifs.com/v2/search/gifs?query=anal&page=2&count=40&order=top
-     *
-     * top, trending, latest
+     * ## Получить подсказки (suggest) по тегам.
      */
     @Throws(ApiException::class)
-    suspend fun searchGifs(
-        searchText: String,             // строка поиска.
-        order: Order = Order.TOP,       // порядок сортировки.
-        count: Int = 100,               // сколько элементов вернуть.
-        page: Int = 1,                  // номер страницы (1-based).
-        verified: Boolean = false,
-    ): MediaResponse {
-
-        val route = if (!verified) {
-            Route(
-                method = "GET",
-                path = "/v2/search/gifs?query={search_text}&order={order}&count={count}&page={page}",
-                "search_text" to searchText,
-                "order" to order.value,
-                "count" to count,
-                "page" to page,
-            )
-        } else {
-            Route(
-                method = "GET",
-                path = "/v2/search/gifs?query={search_text}&order={order}&count={count}&page={page}&verified=yes",
-                "search_text" to searchText,
-                "order" to order.value,
-                "count" to count,
-                "page" to page,
-            )
-        }
-        //return cacheMediaResponse(route)
+    suspend fun getTagSuggestions(query: String): List<TagSuggestion> {
+        val route =
+            Route(method = "GET", path = "/v2/search/suggest?query={query}", "query" to query)
         return api.request(route)
     }
-
 
 }
 
