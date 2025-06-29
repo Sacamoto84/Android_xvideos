@@ -1,11 +1,17 @@
 package com.client.xvideos.red.common.search
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -13,15 +19,24 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.grid.LazyGridScope
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.staggeredgrid.LazyHorizontalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -48,6 +63,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -62,6 +78,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -72,6 +89,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.room.Dao
 import androidx.room.Entity
 import androidx.room.Insert
@@ -90,9 +110,14 @@ import com.client.xvideos.red.common.expand_menu_video.DropdownMenuItem_Follow
 import com.client.xvideos.red.common.expand_menu_video.DropdownMenuItem_Like
 import com.client.xvideos.red.common.expand_menu_video.DropdownMenuItem_RemoveFromCollection
 import com.client.xvideos.red.common.expand_menu_video.DropdownMenuItem_Share
+import com.client.xvideos.red.common.saved.SavedRed
+import com.client.xvideos.util.toPrettyCount
+import com.client.xvideos.util.toPrettyCountInt
 import com.composables.core.Dialog
 import com.composables.core.DialogPanel
+import com.composables.core.Scrim
 import com.composables.core.rememberDialogState
+import com.composeunstyled.LocalModalWindow
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
@@ -223,73 +248,75 @@ object SearchRed {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun ExpandMenuHelper(
-        //items: List<String>,
-        //modifier: Modifier = Modifier,
+        items: List<String> = listOf("1111", "3333", "3333"),
+        modifier: Modifier = Modifier,
     ) {
+        var expanded by remember { mutableStateOf(false) }
 
-        val dialogState = rememberDialogState()
-
-        Box {
-            Button(onClick= { dialogState.visible = true }) {
-                Text("Show Dialog")
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = it },
+            modifier = Modifier.then(modifier)
+        )
+        {
+            IconButton(
+                modifier = Modifier
+                    .size(48.dp)
+                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
+                onClick = {}) {
+                Icon(
+                    if (expanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
+                    contentDescription = "",
+                    tint = Color(0xFF757575),
+                    modifier = Modifier.size(24.dp)
+                )
             }
-            Dialog(state = dialogState) {
-                DialogPanel(
-                    modifier = Modifier
-                        .displayCutoutPadding()
-                        .systemBarsPadding()
-                        .widthIn(min = 280.dp, max = 560.dp)
-                        .padding(20.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .border(1.dp, Color(0xFFE4E4E4), RoundedCornerShape(12.dp))
-                        .background(Color.White),
-                ) {
-                    Column {
-                        Column(Modifier.padding(start = 24.dp, top = 24.dp, end = 24.dp)) {
-                            Text(
-                                text = "Update Available",
-                                style = TextStyle(fontWeight = FontWeight.Medium)
-                            )
-                            Spacer(Modifier.height(8.dp))
-                            Text(
-                                text = "A new version of the app is available. Please update to the latest version.",
-                                style = TextStyle(color = Color(0xFF474747))
-                            )
-                        }
-                        Spacer(Modifier.height(24.dp))
-                        Button(
-                            onClick = { /* TODO */ },
-                            modifier = Modifier.padding(12.dp).align(Alignment.End),
-                            shape = RoundedCornerShape(4.dp),
-                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
+
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                modifier = Modifier
+                    //.imePadding()
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.7f),
+                containerColor = ThemeRed.colorBottomBarDivider
+            ) {
+                //DropdownMenuItem_Download(item){ expanded = false }
+
+
+                FlowRow(Modifier.fillMaxSize(), maxItemsInEachRow = 10) {
+                    SavedRed.tagsList.sortedByDescending { it.count }.take(50).forEach {
+                        Row( modifier = Modifier
+                            .padding(horizontal = 4.dp)
+                            .padding(vertical = 4.dp)
+                            .border(1.dp, Color.LightGray, RoundedCornerShape(50))
+                            .padding(4.dp)
+                            .clickable(onClick = {
+                                searchText.value = it.name
+                                searchTextDone.value = it.name
+                                expanded = false
+                            })
+
                         ) {
+
                             Text(
-                                text = "Update",
-                                color = Color(0xFF6699FF)
+                                it.name + " " + it.count.toPrettyCountInt(),
+                                color = Color.White,
+                                modifier = Modifier
                             )
+
                         }
                     }
                 }
+
+
             }
         }
+
     }
-
-
 
 
     @OptIn(ExperimentalMaterial3Api::class)
