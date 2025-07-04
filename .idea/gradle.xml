@@ -11,6 +11,14 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/redgifs" />
+            <option value="$PROJECT_DIR$/redgifs/common" />
+            <option value="$PROJECT_DIR$/redgifs/db" />
+            <option value="$PROJECT_DIR$/redgifs/model" />
+            <option value="$PROJECT_DIR$/redgifs/network" />
+            <option value="$PROJECT_DIR$/redgifs/ui" />
+            <option value="$PROJECT_DIR$/xvideos" />
+            <option value="$PROJECT_DIR$/xvideos/ui" />
           </set>
         </option>
       </GradleProjectSettings>

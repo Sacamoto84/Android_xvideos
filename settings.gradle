@@ -26,3 +26,9 @@ dependencyResolutionManagement {
 
 rootProject.name = "xvideos"
 include ':app'
+include ':redgifs:network'
+include ':redgifs:ui'
+include ':xvideos:ui'
+include ':redgifs:common'
+include ':redgifs:model'
+include ':redgifs:db'

@@ -2,7 +2,6 @@ package com.client.xvideos.red.common.pagin
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.client.xvideos.feature.redgifs.api.RedApi
 import com.client.xvideos.feature.redgifs.api.RedApi_Explorer
 import com.client.xvideos.feature.redgifs.types.Niche
 import com.client.xvideos.feature.redgifs.types.Order
