@@ -1,8 +1,8 @@
 package com.client.xvideos.redgifs.network.api
 
 import com.client.xvideos.App
-import com.client.xvideos.redgifs.network.db.CacheMediaResponseEntity
-import com.client.xvideos.redgifs.network.db.getCurrentTimeText
+import com.client.xvideos.redgifs.db.entity.CacheMediaResponseEntity
+import com.client.xvideos.redgifs.db.entity.getCurrentTimeText
 import com.client.xvideos.redgifs.network.http.ApiClient
 import com.client.xvideos.redgifs.network.http.Route
 import com.client.xvideos.redgifs.network.types.CreatorResponse
@@ -30,10 +30,6 @@ object RedApi {
     val api = ApiClient
 
     //--------------------------- GIF methods ---------------------------
-
-
-
-
 
     @Throws(ApiException::class)
     suspend fun getGif(id: String): MediaResponse {

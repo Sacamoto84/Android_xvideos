@@ -13,7 +13,6 @@ import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
 import com.client.xvideos.feature.Downloader
 import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.feature.preference.PreferencesRepository
-import com.client.xvideos.redgifs.network.extractNameFromUrl
 import com.client.xvideos.redgifs.network.api.RedApi
 import com.client.xvideos.redgifs.network.types.GifsInfo
 import com.client.xvideos.redgifs.network.types.MediaType
@@ -59,12 +58,8 @@ class ScreenRedProfileSM @AssistedInject constructor(
         fun create(profileName: String): ScreenRedProfileSM
     }
 
-
     val _list = MutableStateFlow<List<GifsInfo>>(emptyList())
     val list: StateFlow<List<GifsInfo>> = _list
-
-
-
 
     //var selector by mutableIntStateOf(0) // 0- 1 елемент  1-2 елемента показывать
 
@@ -169,7 +164,7 @@ class ScreenRedProfileSM @AssistedInject constructor(
     fun downloadCurrentItem() {
         screenModelScope.launch {
             val item = list.value[currentTikTokPage]
-            val hiName = extractNameFromUrl(item.urls.hd.toString()) //https://media.redgifs.com/HealthyPettyRedhead.mp4 > HealthyPettyRedhead
+            //val hiName = extractNameFromUrl(item.urls.hd.toString()) //https://media.redgifs.com/HealthyPettyRedhead.mp4 > HealthyPettyRedhead
             Timber.i("!!! downloadItem() id:${item.id} userName:${item.userName} url:${item.urls.hd}")
             Downloader.downloadRedName(item.id, item.userName, item.urls.hd.toString())
             Timber.i("!!! downloadItem() ... завершено")

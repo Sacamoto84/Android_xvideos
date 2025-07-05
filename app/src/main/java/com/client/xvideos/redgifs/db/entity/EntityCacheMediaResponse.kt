@@ -1,4 +1,4 @@
-package com.client.xvideos.redgifs.network.db
+package com.client.xvideos.redgifs.db.entity
 
 import androidx.room.Dao
 import androidx.room.Entity

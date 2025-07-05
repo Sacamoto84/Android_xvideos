@@ -16,12 +16,9 @@ import timber.log.Timber
 object BlockRed {
 
     //══════════ Блокировка ═══════════════════════════╦══════════════════════════════════════════════════════════════╗
-    var blockVisibleDialog by mutableStateOf(false)  //║ Показ диалога на добавление в блок лист                      ║
-    var blockList = MutableStateFlow<List<GifsInfo>>(emptyList())       //║                                                              ║
+    var blockVisibleDialog by mutableStateOf(false)                //║ Показ диалога на добавление в блок лист        ║
+    var blockList = MutableStateFlow<List<GifsInfo>>(emptyList())  //║                                                ║
     //═════════════════════════════════════════════════╬══════════════════════════════════════════════════════════════╣
-
-    //private val _blockList = MutableStateFlow<List<GifsInfo>>(emptyList())
-    //val blockList: StateFlow<List<GifsInfo>> = _blockList
 
     //══════════ Блокировка ═════════════════════════════════════════════════════════════╗
     fun refreshListAndBlock(list: MutableStateFlow<List<GifsInfo>>){                   //║

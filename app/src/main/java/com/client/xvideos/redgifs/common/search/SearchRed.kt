@@ -128,12 +128,16 @@ object SearchRed {
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxHeight()
             ) {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = null,
-                    tint = Color(0xFF757575),
-                    modifier = Modifier.padding(start = 4.dp)
-                )
+
+                if ((value == "") && (!isFocused)) {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = null,
+                        tint = Color(0xFF757575),
+                        modifier = Modifier.padding(start = 4.dp)
+                    )
+                }
+
                 Spacer(modifier = Modifier.width(4.dp))
                 BasicTextField(
                     value = value,
@@ -199,7 +203,6 @@ object SearchRed {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun ExpandMenuHelper(
-        items: List<String> = listOf("1111", "3333", "3333"),
         modifier: Modifier = Modifier,
     ) {
         var expanded by remember { mutableStateOf(false) }
@@ -230,17 +233,19 @@ object SearchRed {
                     //.imePadding()
                     .fillMaxWidth()
                     .fillMaxHeight(0.7f),
-                containerColor = ThemeRed.colorBottomBarDivider
+                containerColor = ThemeRed.colorTabLevel2
             ) {
                 //DropdownMenuItem_Download(item){ expanded = false }
 
 
                 FlowRow(Modifier.fillMaxSize(), maxItemsInEachRow = 10) {
-                    SavedRed.tagsList.sortedByDescending { it.count }.take(50).forEach {
+                    SavedRed.tagsList.sortedByDescending { it.count }.take(200).forEach {
                         Row( modifier = Modifier
-                            .padding(horizontal = 4.dp)
-                            .padding(vertical = 4.dp)
-                            .border(1.dp, Color.LightGray, RoundedCornerShape(50))
+                            .padding(horizontal = 2.dp)
+                            .padding(vertical = 2.dp)
+
+                            .border(1.dp, ThemeRed.colorTextGray, RoundedCornerShape(25))
+                            .background(Color.Transparent)
                             .padding(4.dp)
                             .clickable(onClick = {
                                 searchText.value = it.name
@@ -251,9 +256,10 @@ object SearchRed {
                         ) {
 
                             Text(
-                                it.name + " " + it.count.toPrettyCountInt(),
+                                it.name, //+" " + it.count.toPrettyCountInt(),
                                 color = Color.White,
-                                modifier = Modifier
+                                modifier = Modifier,
+                                fontSize = 12.sp
                             )
 
                         }

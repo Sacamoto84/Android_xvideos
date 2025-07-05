@@ -123,18 +123,11 @@ object GifsTab : Screen {
                         onSelect = { vm.lazyHost.changeSortType(it) })
                 }
 
-
                 SearchRed.CustomBasicTextField(
                     value = SearchRed.searchText.collectAsStateWithLifecycle().value,
-                    onValueChange = {
-                        SearchRed.searchText.value = it
-                    }, onDone = {
-                        SearchRed.searchTextDone.value = it
-                    }
-                    , modifier = Modifier.padding(start = 4.dp).weight(1f)
+                    onValueChange = { SearchRed.searchText.value = it }, onDone = { SearchRed.searchTextDone.value = it },
+                    modifier = Modifier.padding(start = 4.dp).weight(1f)
                 )
-
-
 
                 Box(
                     modifier = Modifier

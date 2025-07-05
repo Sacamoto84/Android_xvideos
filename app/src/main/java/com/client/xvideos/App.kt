@@ -1,7 +1,7 @@
 package com.client.xvideos
 
 import android.app.Application
-import com.client.xvideos.redgifs.network.db.clearOldCache
+import com.client.xvideos.redgifs.db.entity.clearOldCache
 import com.client.xvideos.feature.room.AppDatabase
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.PlaybackPreference
 import com.client.xvideos.redgifs.common.block.BlockRed

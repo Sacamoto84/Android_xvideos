@@ -43,7 +43,6 @@ fun DialogCollection(
     visible: Boolean,
     onDismiss: () -> Unit,
     onBlockConfirmed: () -> Unit,
-
     onSelectCollection: (String) -> Unit = {}
 ) {
 
