@@ -12,7 +12,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -23,7 +22,7 @@ import coil.ImageLoaderFactory
 import coil.memory.MemoryCache
 import coil.request.CachePolicy
 import com.client.xvideos.PermissionScreenActivity.PermissionStorage
-import com.client.xvideos.red.screens.ScreenRedRoot
+import com.client.xvideos.redgifs.screens.ScreenRedRoot
 import com.client.xvideos.screens.videoplayer.video.cache.VideoPlayerCacheManager
 import com.client.xvideos.ui.theme.XvideosTheme
 import com.client.xvideos.util.KeepScreenOn

@@ -1,0 +1,43 @@
+package com.client.xvideos.redgifs.network.types
+
+enum class Order(val value: String) {
+    TRENDING("trending"),
+    TOP("top"),
+    LATEST("latest"),
+    OLDEST("oldest"),
+    RECENT("recent"),
+    BEST("best"),
+    TOP28("top28"),
+    NEW("new"),
+
+    FORCE_TEMP(""),
+
+    TOP_WEEK("week"),
+    TOP_MONTH("month"),
+    //TOP ALL TIME
+    TOP_ALLTIME("alltime"),
+
+
+    //NICHES
+    NICHES_SUBSCRIBERS("subscribers"),
+    NICHES_POST("posts"),
+    NICHES_NAME_A_Z("name"),
+    NICHES_NAME_Z_A("name"),
+
+}
+
+enum class MediaType(val value: String) {
+    IMAGE("i"),
+    GIF("g");
+}
+
+
+
+
+
+
+
+
+
+
+

@@ -6,12 +6,12 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
-import com.client.xvideos.feature.redgifs.db.CacheMedaResponseDao
-import com.client.xvideos.feature.redgifs.db.CacheMediaResponseEntity
+import com.client.xvideos.redgifs.network.db.CacheMedaResponseDao
+import com.client.xvideos.redgifs.network.db.CacheMediaResponseEntity
 import com.client.xvideos.feature.room.entity.Favorites
 import com.client.xvideos.feature.room.entity.Items
-import com.client.xvideos.red.common.search.SearchRedHistoryDao
-import com.client.xvideos.red.common.search.SearchRedHistoryEntity
+import com.client.xvideos.redgifs.common.search.SearchRedHistoryDao
+import com.client.xvideos.redgifs.common.search.SearchRedHistoryEntity
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
