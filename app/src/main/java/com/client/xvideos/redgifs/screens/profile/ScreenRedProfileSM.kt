@@ -51,7 +51,8 @@ class ScreenRedProfileSM @AssistedInject constructor(
     @Assisted val profileName: String,
     private val db: AppDatabase,
     private val pref: PreferencesRepository,
-    connectivityObserver: ConnectivityObserver
+    connectivityObserver: ConnectivityObserver,
+    val block: BlockRed
 ) : ScreenModel {
 
     @AssistedFactory
@@ -98,7 +99,8 @@ class ScreenRedProfileSM @AssistedInject constructor(
         scope = screenModelScope,
         typePager = TypePager.PROFILE,
         extraString = profileName,
-        visibleProfileInfo = false
+        visibleProfileInfo = false,
+        block = block
     )
 
 
@@ -117,7 +119,7 @@ class ScreenRedProfileSM @AssistedInject constructor(
             }
 
             //Фильтруем список тегов убрав из списка блокируемые gif
-            BlockRed.refreshListAndBlock(_list)
+            block.refreshListAndBlock(_list)
         }
 
     }

@@ -11,6 +11,7 @@ import androidx.paging.PagingData
 import androidx.paging.PagingSource
 import androidx.paging.cachedIn
 import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
+import com.client.xvideos.redgifs.common.block.BlockRed
 import com.client.xvideos.redgifs.network.types.Order
 import com.client.xvideos.redgifs.common.pagin.ItemCollectionPagingSource
 import com.client.xvideos.redgifs.common.pagin.ItemEmptyPagingSource
@@ -64,7 +65,8 @@ class LazyRow123Host(
     val startOrder: Order = Order.LATEST,
     val startColumns: Int = 2,
     val visibleProfileInfo: Boolean = true,
-    val isCollection: Boolean = false
+    val isCollection: Boolean = false,
+    val block: BlockRed
 ) {
 
     //var searchText by mutableStateOf("")
@@ -145,7 +147,7 @@ class LazyRow123Host(
                         Timber.d("!!! >>>pagingSourceFactory{...}")
                         gotoUp()
                         gotoUpColumn()
-                        createPager(typePager, params.sort, extraString, params.query)
+                        createPager(typePager, params.sort, extraString, params.query, block)
                     }
                 ).flow
             }
@@ -175,15 +177,16 @@ fun createPager(
     typePager: TypePager,
     sort: Order,
     extraString: String,
-    searchText: String
+    searchText: String,
+    block : BlockRed
 ): PagingSource<Int, Any> {
     val pagingSourceFactory = when (typePager) {
         TypePager.NICHES -> {
-            ItemNailsPagingSource(order = sort, nichesName = extraString)
+            ItemNailsPagingSource(order = sort, nichesName = extraString, block = block)
         }
 
         TypePager.TOP -> {
-            ItemTopPagingSource(sort = sort, searchText = searchText)
+            ItemTopPagingSource(sort = sort, searchText = searchText, block = block)
         }
 
         TypePager.SAVED_LIKES -> {
@@ -195,7 +198,7 @@ fun createPager(
         }
 
         TypePager.PROFILE -> {
-            ItemProfilePagingSource(profileName = extraString, sort)
+            ItemProfilePagingSource(profileName = extraString, sort = sort, block = block)
         }
 
         TypePager.EMPTY -> {

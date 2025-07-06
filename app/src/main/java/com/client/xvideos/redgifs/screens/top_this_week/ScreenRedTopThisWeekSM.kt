@@ -4,6 +4,7 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
+import com.client.xvideos.redgifs.common.block.BlockRed
 import com.client.xvideos.redgifs.common.ui.lazyrow123.LazyRow123Host
 import com.client.xvideos.redgifs.common.ui.lazyrow123.TypePager
 import com.client.xvideos.redgifs.screens.top_this_week.model.VisibleType
@@ -20,13 +21,15 @@ import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 class ScreenRedTopThisWeekSM @Inject constructor(
-    connectivityObserver: ConnectivityObserver
+    connectivityObserver: ConnectivityObserver,
+    val block: BlockRed
 ) : ScreenModel {
 
     val lazyHost =
         LazyRow123Host(
             connectivityObserver = connectivityObserver, scope = screenModelScope,
-            typePager = TypePager.TOP
+            typePager = TypePager.TOP,
+            block = block
         )
 
 

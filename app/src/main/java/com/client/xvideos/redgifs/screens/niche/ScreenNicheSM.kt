@@ -8,6 +8,7 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
 import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
+import com.client.xvideos.redgifs.common.block.BlockRed
 import com.client.xvideos.redgifs.network.api.RedApi
 import com.client.xvideos.redgifs.network.types.NichesInfo
 import com.client.xvideos.redgifs.network.types.NichesResponse
@@ -27,7 +28,8 @@ import timber.log.Timber
 
 class ScreenNicheSM @AssistedInject constructor(
     @Assisted val nicheName: String,
-    connectivityObserver: ConnectivityObserver
+    connectivityObserver: ConnectivityObserver,
+    val block: BlockRed
 ) : ScreenModel {
 
     @AssistedFactory
@@ -42,7 +44,8 @@ class ScreenNicheSM @AssistedInject constructor(
     val lazyHost =
         LazyRow123Host(
             connectivityObserver = connectivityObserver, scope = screenModelScope,
-            extraString = nicheName, typePager = TypePager.NICHES
+            extraString = nicheName, typePager = TypePager.NICHES,
+            block = block
         )
 
     init {

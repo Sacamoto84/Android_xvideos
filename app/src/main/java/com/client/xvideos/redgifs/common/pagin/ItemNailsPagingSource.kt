@@ -9,7 +9,7 @@ import com.client.xvideos.redgifs.common.block.BlockRed
 import com.client.xvideos.redgifs.common.users.UsersRed
 import timber.log.Timber
 
-class ItemNailsPagingSource (val order : Order, val nichesName : String): PagingSource<Int, GifsInfo>() {
+class ItemNailsPagingSource (val order : Order, val nichesName : String, val block: BlockRed): PagingSource<Int, GifsInfo>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int,  GifsInfo> {
 
@@ -35,7 +35,7 @@ class ItemNailsPagingSource (val order : Order, val nichesName : String): Paging
             Timber.d("!!! load() a.gif.size = ${response.gifs.size}")
 
             val gifs : List<GifsInfo> = response.gifs.distinctBy { it.id }
-            val blockedSet = BlockRed.blockList.value.map{it.id}.toSet()
+            val blockedSet = block.blockList.value.map{it.id}.toSet()
             val gifs1 = gifs.filterNot { it.id in blockedSet }
 
             val user = response.users.distinctBy { it.username }

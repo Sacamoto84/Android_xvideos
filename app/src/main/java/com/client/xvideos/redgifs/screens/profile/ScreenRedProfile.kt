@@ -72,17 +72,18 @@ class ScreenRedProfile(val profileName: String) : Screen {
             gridState = vm.likedHost.state, itemsToIgnore = 3, numberOfColumns = 2
         )
 
+         val block = vm.block
 
         //🟨🟨🟨🟨🟨🟨🟨🟨🎨🎨🎨🟨🟨🟨🟨🟨🟨🟨🟨
         //╭┈┈ Диалог блокировки ┈┈╮
         //│ Отмена    Блокировать │
         //╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈╯
         DialogBlock(
-            visible = BlockRed.blockVisibleDialog,
-            onDismiss = { BlockRed.blockVisibleDialog = false }) {
+            visible = block.blockVisibleDialog,
+            onDismiss = { block.blockVisibleDialog = false }) {
             val a = vm.currentTikTokGifInfo; if (a != null) {
-            BlockRed.blockItem(a)
-            BlockRed.refreshListAndBlock(vm._list)
+            block.blockItem(a)
+            block.refreshListAndBlock(vm._list)
         }
         }
         //🟨🟨🟨🟨🟨🟨🟨🟨⬆️⬆️⬆️⬆️⬆️❗

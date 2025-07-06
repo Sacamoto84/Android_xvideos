@@ -69,7 +69,6 @@ fun LazyRow123(
 
     //Для меню
     isRunLike: Boolean = false,
-
     ) {
 
     SideEffect { Timber.d("!!! LazyRow123::SideEffect columns: ${host.columns} gotoPosition: $gotoPosition") }
@@ -87,6 +86,8 @@ fun LazyRow123(
     val isInitialLoading = listGifs.loadState.refresh is LoadState.Loading
             && listGifs.itemCount == 0          // важно!
     val isErrorInitial = listGifs.loadState.refresh is LoadState.Error
+
+    val block = host.block
 
 //    BackHandler {
 //        if (fullScreen)
@@ -151,13 +152,13 @@ fun LazyRow123(
 
 
     //Диалог для блокировки
-    if (BlockRed.blockVisibleDialog) {
+    if (block.blockVisibleDialog) {
         DialogBlock(
-            visible = BlockRed.blockVisibleDialog,
-            onDismiss = { BlockRed.blockVisibleDialog = false },
+            visible = block.blockVisibleDialog,
+            onDismiss = { block.blockVisibleDialog = false },
             onBlockConfirmed = {
                 if ((blockItem != null)) {
-                    BlockRed.blockItem(blockItem!!)
+                    block.blockItem(blockItem!!)
                     listGifs.refresh()
                     blockItem = null
                 }
@@ -227,7 +228,8 @@ fun LazyRow123(
                             onRefresh = {
                                 listGifs.refresh()
                             },
-                            host.isCollection
+                            host.isCollection,
+                            block
                         )
 
 

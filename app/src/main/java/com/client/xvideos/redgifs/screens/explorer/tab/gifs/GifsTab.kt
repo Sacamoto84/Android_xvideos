@@ -47,6 +47,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.redgifs.network.types.Order
 import com.client.xvideos.redgifs.ThemeRed
+import com.client.xvideos.redgifs.common.block.BlockRed
 import com.client.xvideos.redgifs.common.search.SearchRed
 import com.client.xvideos.redgifs.common.ui.lazyrow123.LazyRow123
 import com.client.xvideos.redgifs.common.ui.lazyrow123.LazyRow123Host
@@ -82,6 +83,8 @@ object GifsTab : Screen {
         val navigator = LocalNavigator.currentOrThrow
 
         val root = LocalRootScreenModel.current
+
+        val block = vm.block
 
         val state = rememberPullToRefreshState()
         var isRefreshing by remember { mutableStateOf(false) }
@@ -196,7 +199,7 @@ object GifsTab : Screen {
                         },
                         gotoPosition = 0,
                         contentPadding = PaddingValues(top = 0.dp),
-                        contentBeforeList = { }
+                        contentBeforeList = { },
                     )
 
                     //---- Скролл ----
@@ -225,7 +228,8 @@ object GifsTab : Screen {
 
 
 class ScreenRedExplorerGifsSM @Inject constructor(
-    connectivityObserver: ConnectivityObserver
+    connectivityObserver: ConnectivityObserver,
+    val block: BlockRed
 ) : ScreenModel {
 
     val isConnected = connectivityObserver.isConnected.stateIn(
@@ -237,7 +241,8 @@ class ScreenRedExplorerGifsSM @Inject constructor(
         connectivityObserver = connectivityObserver,
         scope = screenModelScope,
         extraString = "",
-        typePager = TypePager.TOP
+        typePager = TypePager.TOP,
+        block = block
     )
 
 

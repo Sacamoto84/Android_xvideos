@@ -170,20 +170,20 @@ object SavedCollectionTab : Screen {
             )
         }
         /* ---------- /Диалог ---------- */
+        val block = vm.block
         //Диалог для блокировки
-        if (BlockRed.blockVisibleDialog) {
+        if (block.blockVisibleDialog) {
             DialogBlock(
-                visible = BlockRed.blockVisibleDialog,
-                onDismiss = { BlockRed.blockVisibleDialog = false },
+                visible = block.blockVisibleDialog,
+                onDismiss = { block.blockVisibleDialog = false },
                 onBlockConfirmed = {
                     if ((blockItem != null)) {
-                        BlockRed.blockItem(blockItem!!)
+                        block.blockItem(blockItem!!)
                         blockItem = null
                     }
                 }
             )
         }
-
 
         var collectionVisibleDialogCreateNew by remember { mutableStateOf(false) }
 
@@ -448,7 +448,8 @@ object SavedCollectionTab : Screen {
 
 
 class ScreenSavedCollectionSM @Inject constructor(
-    connectivityObserver: ConnectivityObserver
+    connectivityObserver: ConnectivityObserver,
+    val block: BlockRed,
 ) : ScreenModel {
     val gridState = LazyGridState()
 
@@ -458,7 +459,8 @@ class ScreenSavedCollectionSM @Inject constructor(
         typePager = TypePager.SAVED_COLLECTION,
         extraString = "",
         startOrder = Order.LATEST,
-        isCollection = true
+        isCollection = true,
+        block = block
     )
 }
 

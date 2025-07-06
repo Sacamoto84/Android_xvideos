@@ -29,6 +29,7 @@ import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.redgifs.network.types.Niche
 import com.client.xvideos.redgifs.network.types.Order
 import com.client.xvideos.redgifs.ThemeRed
+import com.client.xvideos.redgifs.common.block.BlockRed
 import com.client.xvideos.redgifs.common.ui.lazyrow123.LazyRow123Host
 import com.client.xvideos.redgifs.common.ui.lazyrow123.NichePreview2
 import com.client.xvideos.redgifs.common.ui.lazyrow123.TypePager
@@ -127,7 +128,8 @@ object NichesTab : Screen {
 
 
 class ScreenRedExplorerNichesSM @Inject constructor(
-    connectivityObserver: ConnectivityObserver
+    connectivityObserver: ConnectivityObserver,
+    block: BlockRed
 ) : ScreenModel {
 
     val lazyHost =
@@ -137,7 +139,8 @@ class ScreenRedExplorerNichesSM @Inject constructor(
             extraString = "",
             typePager = TypePager.EXPLORER_NICHES,
             startOrder = Order.NICHES_SUBSCRIBERS,
-            startColumns = 1
+            startColumns = 1,
+            block = block
         )
 
 }

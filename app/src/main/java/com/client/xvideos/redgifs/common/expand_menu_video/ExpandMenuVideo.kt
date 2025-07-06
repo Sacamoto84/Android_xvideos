@@ -58,6 +58,7 @@ fun ExpandMenuVideo(
     onRunLike: () -> Unit = {},
     onRefresh: () -> Unit = {},
     isCollection : Boolean = false,
+    block: BlockRed
 ) {
 
     var expanded by remember { mutableStateOf(false) }
@@ -82,7 +83,7 @@ fun ExpandMenuVideo(
         ) {
             DropdownMenuItem_Download(item){ expanded = false }
             DropdownMenuItem_Share(item){ expanded = false }
-            DropdownMenuItem_Block(item){ expanded = false }
+            DropdownMenuItem_Block(item = item, block = block){ expanded = false }
             DropdownMenuItem_Like(item, onRunLike){expanded = false}
             DropdownMenuItem_Follow(item){ expanded = false }
             DropdownMenuItem_AddCollection(item) { expanded = false }
@@ -125,12 +126,12 @@ fun DropdownMenuItem_Share(item: GifsInfo? = null, onDismiss: () -> Unit){
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DropdownMenuItem_Block(item: GifsInfo? = null, onDismiss: () -> Unit){
+fun DropdownMenuItem_Block(item: GifsInfo? = null, block: BlockRed, onDismiss: () -> Unit){
     DropdownMenuItem(
         leadingIcon = {Icon(Icons.Default.Block, contentDescription = "", tint = tintColor)},
         text = { Text("Блокировать", style = style) },
         onClick = {
-            if (item == null) return@DropdownMenuItem; BlockRed.blockVisibleDialog = true
+            if (item == null) return@DropdownMenuItem; block.blockVisibleDialog = true
             onDismiss.invoke()
         }, contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
     )

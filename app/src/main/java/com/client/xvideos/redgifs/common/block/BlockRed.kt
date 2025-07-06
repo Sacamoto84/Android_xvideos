@@ -4,22 +4,30 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.client.xvideos.redgifs.network.types.GifsInfo
+import androidx.room.withTransaction
+import com.client.xvideos.di.ApplicationScope
 import com.client.xvideos.redgifs.common.block.useCase.blockGetAllBlockedGifs
 import com.client.xvideos.redgifs.common.block.useCase.blockGetAllBlockedGifsInfo
 import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
+import com.client.xvideos.redgifs.db.AppRedGifsDatabase
 import com.client.xvideos.redgifs.db.dao.BlockDao
 import com.client.xvideos.redgifs.db.dao.GifsInfoDao
 import com.client.xvideos.redgifs.db.entity.BlockEntity
 import com.client.xvideos.redgifs.db.entity.toEntity
-import kotlinx.coroutines.GlobalScope
+import com.client.xvideos.redgifs.network.types.GifsInfo
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class BlockRed @Inject constructor(
     private val blockDao: BlockDao,
-    private val infoDao: GifsInfoDao
+    private val infoDao: GifsInfoDao,
+    private val db: AppRedGifsDatabase,
+    @ApplicationScope private val scope: CoroutineScope
 ) {
 
     //══════════ Блокировка ═════════════════════════════════════════╦════════════════════════════════════════════════╗
@@ -48,33 +56,21 @@ class BlockRed @Inject constructor(
     //═══════════════════════════════════════════════════════╝
 
     fun blockItem(item: GifsInfo) {
-
-        GlobalScope.launch {
+        scope.launch {
             runCatching {
-                infoDao.insert(item.toEntity())
-                blockDao.insertBlock(BlockEntity(id = item.id, gifId = item.id))
+                val item = item.toEntity()
+                db.withTransaction {
+                    infoDao.insert(item)
+                    blockDao.insertBlock(BlockEntity(id = item.id, gifId = item.id))
+                }
             }.onSuccess {
                 SnackBarEvent.success("GIFs заблокирован\"")
             }
             .onFailure { errorMsg ->
+                Timber.e(errorMsg, "!!! Не удалось заблокировать GIF")
                 SnackBarEvent.error("Ошибка блокировки: $errorMsg")
             }
         }
-
-//        val result = com.client.xvideos.redgifs.common.block.useCase.blockItem(item)
-//        if (result.isSuccess) {
-//            Timber.i("!!! GIF успешно заблокирован")
-//            Toast.makeText(App.instance.applicationContext, "GIFs заблокирован", Toast.LENGTH_SHORT).show()
-//        } else {
-//            val exception = result.exceptionOrNull()
-//            val errorMsg = exception?.localizedMessage ?: "Неизвестная ошибка"
-//            Timber.e(exception, "Не удалось заблокировать GIF")
-//            Toast.makeText(App.instance.applicationContext, "Ошибка блокировки: $errorMsg", Toast.LENGTH_SHORT).show()
-//        }
-//        refreshBlockList()
-//        //refreshListAndBlock(list)
-
-
     }
 
 }

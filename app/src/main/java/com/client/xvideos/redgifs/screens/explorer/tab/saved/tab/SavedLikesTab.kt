@@ -23,6 +23,7 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
+import com.client.xvideos.redgifs.common.block.BlockRed
 import com.client.xvideos.redgifs.common.saved.SavedRed
 import com.client.xvideos.redgifs.common.ui.lazyrow123.LazyRow123
 import com.client.xvideos.redgifs.common.ui.lazyrow123.LazyRow123Host
@@ -107,14 +108,16 @@ object SavedLikesTab : Screen {
 }
 
 class ScreenSavedLikesSM @Inject constructor(
-    connectivityObserver: ConnectivityObserver
+    connectivityObserver: ConnectivityObserver,
+    val block: BlockRed
 ) : ScreenModel {
 
     @OptIn(DelicateCoroutinesApi::class)
     val likedHost = LazyRow123Host(
         connectivityObserver = connectivityObserver,
         scope = screenModelScope,
-        typePager = TypePager.SAVED_LIKES
+        typePager = TypePager.SAVED_LIKES,
+        block = block
     )
 
 }

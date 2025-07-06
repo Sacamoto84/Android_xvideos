@@ -77,7 +77,7 @@ fun MenuContent(vm: ScreenRedProfileSM) {
 
 
         Box(
-            modifier = Modifier.then(themeButton).clickable(onClick = {BlockRed.blockVisibleDialog = true}),
+            modifier = Modifier.then(themeButton).clickable(onClick = {vm.block.blockVisibleDialog = true}),
             contentAlignment = Alignment.Center
         ) {
             Icon(Icons.Filled.Block, contentDescription = null, tint = Color.White)

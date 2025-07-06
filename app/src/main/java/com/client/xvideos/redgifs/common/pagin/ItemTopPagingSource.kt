@@ -12,7 +12,7 @@ import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
 import com.client.xvideos.redgifs.common.users.UsersRed
 import timber.log.Timber
 
-class ItemTopPagingSource(val sort: Order, val searchText: String) : PagingSource<Int, GifsInfo>() {
+class ItemTopPagingSource(val sort: Order, val searchText: String, val block: BlockRed) : PagingSource<Int, GifsInfo>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, GifsInfo> {
 
@@ -42,7 +42,7 @@ class ItemTopPagingSource(val sort: Order, val searchText: String) : PagingSourc
             Timber.d("!!! load() a.gif.size = ${response.gifs.size} page:${page} pages:${response.pages}")
 
             val gifs: List<GifsInfo> = response.gifs.distinctBy { it.id }
-            val blockedSet = BlockRed.blockList.value.map { it.id }.toSet()
+            val blockedSet = block.blockList.value.map { it.id }.toSet()
             val gifs1 = gifs.filterNot { it.id in blockedSet }
 
             val user = response.users.distinctBy { it.username }
