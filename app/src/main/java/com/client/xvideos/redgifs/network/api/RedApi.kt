@@ -363,7 +363,7 @@ object RedApi {
 
 private suspend fun cacheMediaResponse(route: Route): MediaResponse {
 
-    val cacheDao = App.instance.db.cacheMedaResponseDao()
+    val cacheDao = App.instance.redGifsDb.cacheMediaResponseDao()
     val cachedEntity = cacheDao.get(route.url)
 
     val gson = GsonBuilder()

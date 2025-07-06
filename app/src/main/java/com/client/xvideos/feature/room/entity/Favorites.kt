@@ -9,7 +9,6 @@ import androidx.room.Relation
 import java.util.Date
 
 /**
- * ![alt text](https://ah-img.luscious.net/Joking42/499900/gk4rhayxqaadbfo_01JN9493Z724XCWD4KGPD740CY.1680x0.jpg)
  * @see <img height="640"  src="https://ah-img.luscious.net/Joking42/499900/gk4rhayxqaadbfo_01JN9493Z724XCWD4KGPD740CY.1680x0.jpg"/>
  */
 
@@ -25,9 +24,6 @@ data class FavoriteWithItem(
 )
 
 
-/**
- * @see <img width="320" height="240" src="https://raw.githubusercontent.com/wiki/ReactiveX/RxJava/images/rx-operators/Completable.png"/>
- */
 @Entity(
     tableName = "favorites",
     foreignKeys = [
@@ -43,7 +39,6 @@ data class FavoriteWithItem(
 data class Favorites(
     @PrimaryKey
     val id: Long = 0,
-
     val itemId: Long, // Внешний ключ на Items.id
     val date: Date = Date(),   // Время создания записи
 )

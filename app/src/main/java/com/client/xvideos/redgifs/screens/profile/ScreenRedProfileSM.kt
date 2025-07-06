@@ -22,6 +22,7 @@ import com.client.xvideos.feature.room.AppDatabase
 import com.client.xvideos.redgifs.common.block.BlockRed
 import com.client.xvideos.redgifs.common.network.loadGifs
 import com.client.xvideos.redgifs.common.share.useCaseShareGifs
+import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
 import com.client.xvideos.redgifs.common.ui.lazyrow123.LazyRow123Host
 import com.client.xvideos.redgifs.common.ui.lazyrow123.TypePager
 import dagger.Binds
@@ -104,25 +105,19 @@ class ScreenRedProfileSM @AssistedInject constructor(
     init {
 
         screenModelScope.launch {
-
             clear()
-
             setSelector(2)
 
-            creator = RedApi.readCreator(profileName)
-            //maxCreatorGifs = creator?.users[0]?.publishedGifs ?: 0
-           // maxCreatorGifs = creator?.pages ?: 0
-
-//            val repeats = 1//maxCreatorGifs / 100 + 1
-//
-//            repeat(repeats) {
-//                loadNextPage(userName = profileName, items = 100, page = it+1)
-//                delay(1000)
-//            }
+            try {
+                creator = RedApi.readCreator(profileName)
+            }catch (e: Exception){
+                creator = null
+                Timber.e(e)
+                SnackBarEvent.error(e.message.toString())
+            }
 
             //Фильтруем список тегов убрав из списка блокируемые gif
             BlockRed.refreshListAndBlock(_list)
-
         }
 
     }

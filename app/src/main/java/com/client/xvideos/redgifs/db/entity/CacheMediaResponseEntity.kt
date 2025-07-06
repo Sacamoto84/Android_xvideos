@@ -1,11 +1,7 @@
 package com.client.xvideos.redgifs.db.entity
 
-import androidx.room.Dao
 import androidx.room.Entity
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
-import androidx.room.Query
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -24,23 +20,6 @@ data class CacheMediaResponseEntity(
     val timeCreateText: String = getCurrentTimeText()// добавляем поле для времени в текстовом формате = getCurrentTimeText()
 )
 
-@Dao
-interface CacheMedaResponseDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(doc: CacheMediaResponseEntity)
-
-    @Query("SELECT * FROM cache_media_response WHERE url = :url")
-    suspend fun get(url: String): CacheMediaResponseEntity?
-
-    @Query("DELETE FROM cache_media_response WHERE timeCreate < :time")
-    suspend fun deleteOld(time: Long)
-
-    // ✅ Удаление всего кеша
-    @Query("DELETE FROM cache_media_response")
-    suspend fun deleteAll()
-
-}
-
 
 fun getStartOfTodayMillis(): Long {
     val calendar = Calendar.getInstance()
@@ -51,15 +30,12 @@ fun getStartOfTodayMillis(): Long {
     return calendar.timeInMillis
 }
 
-/** Удалить все записи созданные в прошлых сутках */
-suspend fun clearOldCache(cacheDao: CacheMedaResponseDao) {
-    val todayStartMillis = getStartOfTodayMillis()
-    cacheDao.deleteOld(todayStartMillis)
-}
+
 
 fun getCurrentTimeText(): String {
     val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US)
     sdf.timeZone = TimeZone.getTimeZone("UTC")
     return sdf.format(Date())
 }
+
 

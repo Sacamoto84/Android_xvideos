@@ -13,8 +13,8 @@ object RedApi_Tags {
      * #### Возвращает список всех существующих тегов. 7к штук (имя, количество)
      */
     @Throws(ApiException::class)
-    suspend fun getTags(vararg parameters: Pair<String, Any>): TagsResponse {
-        return RedApi.api.request(Route("GET", "/v1/tags", *parameters))
+    suspend fun getTags(): TagsResponse {
+        return api.request(Route("GET", "/v1/tags"))
     }
 
     /**

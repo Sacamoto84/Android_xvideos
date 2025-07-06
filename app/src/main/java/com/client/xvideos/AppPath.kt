@@ -41,6 +41,7 @@ object AppPath {
     val niches_red : String = "${main}/${Folder.RED.value}/Saved/Niches"
     val creators_red : String = "${main}/${Folder.RED.value}/Saved/Creators"
 
+
     init {
 
         println("---AppPath---")

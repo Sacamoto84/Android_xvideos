@@ -47,3 +47,19 @@
 
 # Не обфусцировать и не удалять androidx.tracing.Trace
 -keep class androidx.tracing.Trace { *; }
+
+# Сохраняем классы coil.size.Dimension и все его подклассы
+-keep class coil.size.** { *; }
+
+# Сохраняем конструкторы без изменений
+-keepclassmembers class coil.size.** {
+    public <init>(...);
+}
+
+# Иногда полезно сохранить все модели, которые сериализует Gson
+-keepclassmembers class * {
+    @com.google.gson.annotations.SerializedName <fields>;
+}
+
+-dontwarn coil.**
+-keep class coil.** { *; }

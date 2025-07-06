@@ -2,7 +2,7 @@ package com.client.xvideos.redgifs.network.types
 
 import com.google.gson.annotations.SerializedName
 
-data class URL(
+data class URL1(
     @SerializedName("thumbnail") val thumbnail: String = "",     // Картинка как SD
     @SerializedName("silent") val silent: String? = null,     // * Полное видео в mp4 !!! Без звука в HD Для скачивания
     @SerializedName("poster") val poster: String? = null,     // Большая картинка Видео как HD

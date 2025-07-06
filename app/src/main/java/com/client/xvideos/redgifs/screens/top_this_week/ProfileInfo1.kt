@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.client.xvideos.redgifs.network.types.GifsInfo
 import com.client.xvideos.redgifs.network.types.UserInfo
-import com.client.xvideos.redgifs.network.types.URL
+import com.client.xvideos.redgifs.network.types.URL1
 import com.client.xvideos.screens.common.urlVideImage.UrlImage
 import com.client.xvideos.redgifs.ThemeRed
 
@@ -87,7 +87,7 @@ fun ProfileInfo1Preview() {
         views = null,
         type = 1,
         userName = "userName",
-        urls = URL(),
+        urls = URL1(),
         duration = 57.0,
         hls = true,
         niches = null

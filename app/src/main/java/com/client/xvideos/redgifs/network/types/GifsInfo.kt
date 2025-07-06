@@ -13,8 +13,7 @@ data class GifsInfo(
     @SerializedName("views") val views: Long? = null,
     @SerializedName("type") val type: Int = 0,  //1-Gif 2-Image
     @SerializedName("userName") val userName: String = "userName",           // "lilijunex"
-    @SerializedName("urls") val urls: URL = URL(),
-
+    @SerializedName("urls") val urls: URL1 = URL1(),
     @SerializedName("duration") val duration: Double? = null,
     @SerializedName("hls") val hls: Boolean? = null,
     @SerializedName("niches") val niches: List<String>? = null,

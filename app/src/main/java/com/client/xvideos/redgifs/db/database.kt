@@ -1,42 +1,27 @@
 package com.client.xvideos.redgifs.db
 
-import android.content.Context
 import androidx.room.Database
-import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.client.xvideos.feature.room.DateConverter
-import com.client.xvideos.redgifs.db.entity.CacheMedaResponseDao
+import com.client.xvideos.redgifs.db.converter.Converters
+import com.client.xvideos.redgifs.db.dao.BlockDao
+import com.client.xvideos.redgifs.db.dao.CacheMediaResponseDao
+import com.client.xvideos.redgifs.db.dao.GifsInfoDao
+import com.client.xvideos.redgifs.db.entity.BlockEntity
 import com.client.xvideos.redgifs.db.entity.CacheMediaResponseEntity
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
+import com.client.xvideos.redgifs.db.entity.GifsInfoEntity
 
 @Database(
-    entities = [CacheMediaResponseEntity::class],
-    version = 1,
+    entities = [CacheMediaResponseEntity::class, BlockEntity::class, GifsInfoEntity::class],
+    version = 4,
+    autoMigrations = [
+        //AutoMigration(from = 4, to = 5)
+    ],
     exportSchema = true
 )
-@TypeConverters(DateConverter::class)
+@TypeConverters(Converters::class)
 abstract class AppRedGifsDatabase : RoomDatabase() {
-    abstract fun cacheMedaResponseDao(): CacheMedaResponseDao
-}
-
-@Module
-@InstallIn(SingletonComponent::class)
-object RoomRedgifsPrefs {
-
-    @Provides
-    @Singleton
-    fun provideRedGifsStockDatabase(@ApplicationContext context: Context): AppRedGifsDatabase {
-        println("!!! DI ROOM")
-        return Room.databaseBuilder(context, AppRedGifsDatabase::class.java, "red_database")
-            .fallbackToDestructiveMigration()
-            .allowMainThreadQueries()
-            .build()
-    }
-
+    abstract fun cacheMediaResponseDao(): CacheMediaResponseDao
+    abstract fun blockDao(): BlockDao
+    abstract fun gifInfoDao(): GifsInfoDao
 }

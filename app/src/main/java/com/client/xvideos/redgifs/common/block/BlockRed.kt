@@ -1,27 +1,34 @@
 package com.client.xvideos.redgifs.common.block
 
-import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.client.xvideos.App
 import com.client.xvideos.redgifs.network.types.GifsInfo
 import com.client.xvideos.redgifs.common.block.useCase.blockGetAllBlockedGifs
 import com.client.xvideos.redgifs.common.block.useCase.blockGetAllBlockedGifsInfo
+import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
+import com.client.xvideos.redgifs.db.dao.BlockDao
+import com.client.xvideos.redgifs.db.dao.GifsInfoDao
+import com.client.xvideos.redgifs.db.entity.BlockEntity
+import com.client.xvideos.redgifs.db.entity.toEntity
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.MutableStateFlow
-import timber.log.Timber
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+class BlockRed @Inject constructor(
+    private val blockDao: BlockDao,
+    private val infoDao: GifsInfoDao
+) {
 
-object BlockRed {
-
-    //══════════ Блокировка ═══════════════════════════╦══════════════════════════════════════════════════════════════╗
+    //══════════ Блокировка ═════════════════════════════════════════╦════════════════════════════════════════════════╗
     var blockVisibleDialog by mutableStateOf(false)                //║ Показ диалога на добавление в блок лист        ║
     var blockList = MutableStateFlow<List<GifsInfo>>(emptyList())  //║                                                ║
-    //═════════════════════════════════════════════════╬══════════════════════════════════════════════════════════════╣
+    //════════════════════════════════════════════════════════════════════════════════════════════════════════════════╣
 
     //══════════ Блокировка ═════════════════════════════════════════════════════════════╗
-    fun refreshListAndBlock(list: MutableStateFlow<List<GifsInfo>>){                   //║
+    fun refreshListAndBlock(list: MutableStateFlow<List<GifsInfo>>) {                   //║
         val blockList1 = mutableStateListOf<String>()
         blockList1.clear()                                                              //║
         blockList1.addAll(blockGetAllBlockedGifs())                                     //║
@@ -31,7 +38,7 @@ object BlockRed {
     //═══════════════════════════════════════════════════════════════════════════════════╝
 
     //═══════════════════════════════════════════════════════╗
-    fun refreshBlockList(){                                //║
+    fun refreshBlockList() {                               //║
         val blockList1 = mutableStateListOf<GifsInfo>()    //║
         blockList1.clear()                                 //║
         blockList1.addAll(blockGetAllBlockedGifsInfo())    //║
@@ -41,18 +48,33 @@ object BlockRed {
     //═══════════════════════════════════════════════════════╝
 
     fun blockItem(item: GifsInfo) {
-        val result = com.client.xvideos.redgifs.common.block.useCase.blockItem(item)
-        if (result.isSuccess) {
-            Timber.i("!!! GIF успешно заблокирован")
-            Toast.makeText(App.instance.applicationContext, "GIFs заблокирован", Toast.LENGTH_SHORT).show()
-        } else {
-            val exception = result.exceptionOrNull()
-            val errorMsg = exception?.localizedMessage ?: "Неизвестная ошибка"
-            Timber.e(exception, "Не удалось заблокировать GIF")
-            Toast.makeText(App.instance.applicationContext, "Ошибка блокировки: $errorMsg", Toast.LENGTH_SHORT).show()
+
+        GlobalScope.launch {
+            runCatching {
+                infoDao.insert(item.toEntity())
+                blockDao.insertBlock(BlockEntity(id = item.id, gifId = item.id))
+            }.onSuccess {
+                SnackBarEvent.success("GIFs заблокирован\"")
+            }
+            .onFailure { errorMsg ->
+                SnackBarEvent.error("Ошибка блокировки: $errorMsg")
+            }
         }
-        refreshBlockList()
-        //refreshListAndBlock(list)
+
+//        val result = com.client.xvideos.redgifs.common.block.useCase.blockItem(item)
+//        if (result.isSuccess) {
+//            Timber.i("!!! GIF успешно заблокирован")
+//            Toast.makeText(App.instance.applicationContext, "GIFs заблокирован", Toast.LENGTH_SHORT).show()
+//        } else {
+//            val exception = result.exceptionOrNull()
+//            val errorMsg = exception?.localizedMessage ?: "Неизвестная ошибка"
+//            Timber.e(exception, "Не удалось заблокировать GIF")
+//            Toast.makeText(App.instance.applicationContext, "Ошибка блокировки: $errorMsg", Toast.LENGTH_SHORT).show()
+//        }
+//        refreshBlockList()
+//        //refreshListAndBlock(list)
+
+
     }
 
 }
