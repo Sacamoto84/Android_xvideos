@@ -44,18 +44,12 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.client.xvideos.redgifs.network.types.Order
-import com.client.xvideos.redgifs.ThemeRed
-import com.client.xvideos.redgifs.common.saved.SavedRed
-import com.client.xvideos.redgifs.common.ui.atom.Selector
-import com.client.xvideos.redgifs.common.ui.lazyrow123.LazyRow123
-import com.client.xvideos.redgifs.common.ui.sortByOrder.SortByOrder
-import com.client.xvideos.redgifs.screens.niche.atom.NichePreview
-import com.client.xvideos.redgifs.screens.niche.atom.NicheProfile
-import com.client.xvideos.redgifs.screens.niche.atom.NicheTopCreator
-import com.client.xvideos.redgifs.screens.profile.ScreenRedProfile
+import com.client.redgifs.ThemeRed
+import com.client.redgifs.common.ui.lazyrow123.LazyRow123
+import com.client.redgifs.screens.niche.atom.NichePreview
+import com.client.redgifs.screens.niche.atom.NicheTopCreator
+import com.client.redgifs.screens.profile.ScreenRedProfile
 import timber.log.Timber
-import kotlin.collections.get
 import kotlin.math.roundToInt
 
 data class ScreenRedNiche(val nicheName: String = "pumped-pussy") : Screen {

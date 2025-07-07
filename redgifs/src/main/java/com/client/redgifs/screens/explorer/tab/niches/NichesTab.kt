@@ -25,25 +25,13 @@ import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
-import com.client.xvideos.redgifs.network.types.Niche
-import com.client.xvideos.redgifs.network.types.Order
-import com.client.xvideos.redgifs.ThemeRed
-import com.client.xvideos.redgifs.common.block.BlockRed
-import com.client.xvideos.redgifs.common.ui.lazyrow123.LazyRow123Host
-import com.client.xvideos.redgifs.common.ui.lazyrow123.NichePreview2
-import com.client.xvideos.redgifs.common.ui.lazyrow123.TypePager
-import com.client.xvideos.redgifs.common.ui.sortByOrder.SortByOrder
-import com.client.xvideos.redgifs.screens.niche.ScreenRedNiche
-import com.client.xvideos.redgifs.screens.profile.atom.VerticalScrollbar
-import com.client.xvideos.redgifs.screens.profile.rememberVisibleRangePercentIgnoringFirstNForLazyColumn
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
 import javax.inject.Inject
-import kotlin.collections.get
+
 
 object NichesTab : Screen {
 

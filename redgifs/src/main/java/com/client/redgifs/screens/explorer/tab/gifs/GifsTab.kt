@@ -48,6 +48,9 @@ import com.client.redgifs.ThemeRed
 import com.client.redgifs.common.block.BlockRed
 import com.client.redgifs.common.search.SearchRed
 import com.client.redgifs.common.ui.lazyrow123.LazyRow123
+import com.client.redgifs.common.ui.lazyrow123.LazyRow123Host
+import com.client.redgifs.common.ui.lazyrow123.TypePager
+import com.client.redgifs.common.ui.sortByOrder.SortByOrder
 import com.client.redgifs.network.types.Order
 import com.client.redgifs.screens.LocalRootScreenModel
 import com.client.redgifs.screens.profile.ScreenRedProfile
@@ -96,7 +99,7 @@ object GifsTab : Screen {
         val searchR = SearchRed.searchText.collectAsStateWithLifecycle().value
 
         Scaffold(bottomBar = {
-            Row(modifier = background(ThemeRed.colorTabLevel0).height(50.dp), verticalAlignment = Alignment.Bottom) {
+            Row(modifier = Modifier.background(ThemeRed.colorTabLevel0).height(50.dp), verticalAlignment = Alignment.Bottom) {
                 //
                 if (searchR == "") {
                     SortByOrder(

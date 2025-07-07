@@ -1,4 +1,4 @@
-package com.client.xvideos.feature.connectivityObserver
+package com.client.common.connectivityObserver
 
 import android.content.Context
 import android.net.ConnectivityManager
@@ -7,8 +7,6 @@ import android.net.Network
 import android.net.NetworkCapabilities
 import android.os.Build
 import androidx.core.content.getSystemService
-import androidx.room.Room
-import com.client.xvideos.feature.room.AppDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
