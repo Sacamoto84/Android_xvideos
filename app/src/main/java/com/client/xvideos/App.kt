@@ -1,12 +1,11 @@
 package com.client.xvideos
 
 import android.app.Application
+import com.client.xvideos.redgifs.db.entity.clearOldCache
 import com.client.xvideos.feature.room.AppDatabase
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.PlaybackPreference
 import com.client.xvideos.redgifs.common.block.BlockRed
 import com.client.xvideos.redgifs.common.saved.SavedRed
-import com.client.xvideos.redgifs.db.AppRedGifsDatabase
-import com.client.xvideos.redgifs.db.dao.clearOldCache
 import com.kdownloader.KDownloader
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -58,12 +57,6 @@ class App : Application() {
     @Inject
     lateinit var db: AppDatabase
 
-    @Inject
-    lateinit var redGifsDb: AppRedGifsDatabase
-
-    @Inject
-    lateinit var blockRed: BlockRed
-
     @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate() {
         super.onCreate()
@@ -76,16 +69,14 @@ class App : Application() {
 
         SavedRed.refreshTagList()
 
-
-        //blockRed.refreshBlockList()
-
-        SavedRed.likes.refresh()
-        SavedRed.niches.refresh()
-        SavedRed.creators.refresh()
-        SavedRed.collections.refreshCollectionList()
+        BlockRed.refreshBlockList()
+        SavedRed.refreshLikesList()
+        SavedRed.refreshNichesList()
+        SavedRed.refreshCreatorsList()
+        SavedRed.refreshCollectionList()
 
         GlobalScope.launch {
-            clearOldCache( redGifsDb.cacheMediaResponseDao())
+            clearOldCache( db.cacheMedaResponseDao())
         }
 
     }

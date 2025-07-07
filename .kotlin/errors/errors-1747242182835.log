@@ -60,30 +60,30 @@ FUN name:DashBoardVideoLite visibility:public modality:FINAL <> (passedString:ko
   VALUE_PARAMETER name:$changed index:2 type:kotlin.Int
   BLOCK_BODY
     BLOCK type=kotlin.Unit origin=null
-      SET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=kotlin.Unit origin=null
+      SET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=kotlin.Unit origin=null
         CALL 'public abstract fun startRestartGroup (key: kotlin.Int): androidx.compose.runtime.Composer declared in androidx.compose.runtime.Composer' type=androidx.compose.runtime.Composer origin=null
-          $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
+          $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
           key: CONST Int type=kotlin.Int value=-365022558
       CALL 'public final fun sourceInformation (composer: androidx.compose.runtime.Composer, sourceInformation: kotlin.String): kotlin.Unit declared in androidx.compose.runtime.ComposerKt' type=kotlin.Unit origin=null
-        composer: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
+        composer: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
         sourceInformation: CONST String type=kotlin.String value="C(DashBoardVideoLite)35@1368L7,39@1462L45,54@1962L272,70@2298L175,70@2275L198,79@2499L1109,79@2479L1129,124@3722L14,121@3614L128:DashBoardVideoLite.kt#nxpcez"
     VAR name:$dirty type:kotlin.Int [val]
-      GET_VAR '$changed: kotlin.Int declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=kotlin.Int origin=null
+      GET_VAR '$changed: kotlin.Int declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=kotlin.Int origin=null
     WHEN type=kotlin.Unit origin=IF
       BRANCH
         if: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=null
           arg0: CALL 'public final fun and (other: kotlin.Int): kotlin.Int [infix] declared in kotlin.Int' type=kotlin.Int origin=null
-            $this: GET_VAR '$changed: kotlin.Int declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=kotlin.Int origin=null
+            $this: GET_VAR '$changed: kotlin.Int declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=kotlin.Int origin=null
             other: CONST Int type=kotlin.Int value=6
           arg1: CONST Int type=kotlin.Int value=0
-        then: SET_VAR 'val $dirty: kotlin.Int [val] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=kotlin.Unit origin=null
+        then: SET_VAR 'val $dirty: kotlin.Int [val] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=kotlin.Unit origin=null
           CALL 'public final fun or (other: kotlin.Int): kotlin.Int [infix] declared in kotlin.Int' type=kotlin.Int origin=null
-            $this: GET_VAR 'val $dirty: kotlin.Int [val] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=kotlin.Int origin=null
+            $this: GET_VAR 'val $dirty: kotlin.Int [val] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=kotlin.Int origin=null
             other: WHEN type=kotlin.Int origin=IF
               BRANCH
                 if: CALL 'public abstract fun changed (value: kotlin.Any?): kotlin.Boolean declared in androidx.compose.runtime.Composer' type=kotlin.Boolean origin=null
-                  $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
-                  value: GET_VAR 'passedString: kotlin.String declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=kotlin.String origin=null
+                  $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
+                  value: GET_VAR 'passedString: kotlin.String declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=kotlin.String origin=null
                 then: CONST Int type=kotlin.Int value=4
               BRANCH
                 if: CONST Boolean type=kotlin.Boolean value=true
@@ -94,139 +94,139 @@ FUN name:DashBoardVideoLite visibility:public modality:FINAL <> (passedString:ko
           arg0: CALL 'public final fun not (): kotlin.Boolean [operator] declared in kotlin.Boolean' type=kotlin.Boolean origin=null
             $this: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=null
               arg0: CALL 'public final fun and (other: kotlin.Int): kotlin.Int [infix] declared in kotlin.Int' type=kotlin.Int origin=null
-                $this: GET_VAR 'val $dirty: kotlin.Int [val] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=kotlin.Int origin=null
+                $this: GET_VAR 'val $dirty: kotlin.Int [val] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=kotlin.Int origin=null
                 other: CONST Int type=kotlin.Int value=3
               arg1: CONST Int type=kotlin.Int value=2
           arg1: CALL 'public final fun not (): kotlin.Boolean [operator] declared in kotlin.Boolean' type=kotlin.Boolean origin=null
             $this: CALL 'public abstract fun <get-skipping> (): kotlin.Boolean declared in androidx.compose.runtime.Composer' type=kotlin.Boolean origin=null
-              $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
+              $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
         then: BLOCK type=kotlin.Unit origin=null
           WHEN type=kotlin.Unit origin=IF
             BRANCH
               if: CALL 'public final fun isTraceInProgress (): kotlin.Boolean declared in androidx.compose.runtime.ComposerKt' type=kotlin.Boolean origin=null
               then: CALL 'public final fun traceEventStart (key: kotlin.Int, dirty1: kotlin.Int, dirty2: kotlin.Int, info: kotlin.String): kotlin.Unit declared in androidx.compose.runtime.ComposerKt' type=kotlin.Unit origin=null
                 key: CONST Int type=kotlin.Int value=-365022558
-                dirty1: GET_VAR 'val $dirty: kotlin.Int [val] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=kotlin.Int origin=null
+                dirty1: GET_VAR 'val $dirty: kotlin.Int [val] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=kotlin.Int origin=null
                 dirty2: CONST Int type=kotlin.Int value=-1
-                info: CONST String type=kotlin.String value="com.client.xvideos.screens.dashboards.atom.DashBoardVideoLite (DashBoardVideoLite.kt:33)"
+                info: CONST String type=kotlin.String value="com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLite (DashBoardVideoLite.kt:33)"
           VAR name:context type:android.content.Context [val]
             CALL 'public final fun <get-current> ($composer: androidx.compose.runtime.Composer?, $changed: kotlin.Int): T of androidx.compose.runtime.CompositionLocal [inline] declared in androidx.compose.runtime.CompositionLocal' type=android.content.Context origin=GET_PROPERTY
               $this: TYPE_OP type=androidx.compose.runtime.CompositionLocal<T of androidx.compose.runtime.CompositionLocal> origin=IMPLICIT_CAST typeOperand=androidx.compose.runtime.CompositionLocal<T of androidx.compose.runtime.CompositionLocal>
                 CALL 'public final fun <get-LocalContext> (): androidx.compose.runtime.ProvidableCompositionLocal<android.content.Context> declared in androidx.compose.ui.platform.AndroidCompositionLocals_androidKt' type=androidx.compose.runtime.ProvidableCompositionLocal<android.content.Context> origin=GET_PROPERTY
-              $composer: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
+              $composer: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
               $changed: CONST Int type=kotlin.Int value=0
           VAR PROPERTY_DELEGATE name:player$delegate type:androidx.compose.runtime.MutableState<androidx.media3.common.Player?> [val]
             BLOCK type=androidx.compose.runtime.MutableState<androidx.media3.common.Player?> origin=null
               BLOCK type=kotlin.Unit origin=null
                 CALL 'public abstract fun startReplaceGroup (key: kotlin.Int): kotlin.Unit declared in androidx.compose.runtime.Composer' type=kotlin.Unit origin=null
-                  $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
+                  $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
                   key: CONST Int type=kotlin.Int value=1849434622
                 CALL 'public final fun sourceInformation (composer: androidx.compose.runtime.Composer, sourceInformation: kotlin.String): kotlin.Unit declared in androidx.compose.runtime.ComposerKt' type=kotlin.Unit origin=null
-                  composer: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
+                  composer: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
                   sourceInformation: CONST String type=kotlin.String value="CC(remember):DashBoardVideoLite.kt#9igjgp"
               VAR IR_TEMPORARY_VARIABLE name:tmp0_group type:androidx.compose.runtime.MutableState<androidx.media3.common.Player?> [val]
                 CALL 'public final fun cache <T> (invalid: kotlin.Boolean, block: @[DisallowComposableCalls] kotlin.Function0<T of androidx.compose.runtime.ComposerKt.cache>): T of androidx.compose.runtime.ComposerKt.cache [inline] declared in androidx.compose.runtime.ComposerKt' type=androidx.compose.runtime.MutableState<androidx.media3.common.Player?> origin=null
                   <T>: androidx.compose.runtime.MutableState<androidx.media3.common.Player?>
-                  $receiver: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
+                  $receiver: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
                   invalid: CONST Boolean type=kotlin.Boolean value=false
                   block: BLOCK type=kotlin.Function0<androidx.compose.runtime.MutableState<androidx.media3.common.Player?>> origin=LAMBDA
                     COMPOSITE type=kotlin.Unit origin=null
-                    FUNCTION_REFERENCE 'private final fun DashBoardVideoLite$lambda$0 (): androidx.compose.runtime.MutableState<androidx.media3.common.Player?> declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt' type=kotlin.Function0<androidx.compose.runtime.MutableState<androidx.media3.common.Player?>> origin=INLINE_LAMBDA reflectionTarget=null
+                    FUNCTION_REFERENCE 'private final fun DashBoardVideoLite$lambda$0 (): androidx.compose.runtime.MutableState<androidx.media3.common.Player?> declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt' type=kotlin.Function0<androidx.compose.runtime.MutableState<androidx.media3.common.Player?>> origin=INLINE_LAMBDA reflectionTarget=null
               CALL 'public abstract fun endReplaceGroup (): kotlin.Unit declared in androidx.compose.runtime.Composer' type=kotlin.Unit origin=null
-                $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
-              GET_VAR 'val tmp0_group: androidx.compose.runtime.MutableState<androidx.media3.common.Player?> [val] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.MutableState<androidx.media3.common.Player?> origin=null
+                $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
+              GET_VAR 'val tmp0_group: androidx.compose.runtime.MutableState<androidx.media3.common.Player?> [val] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.MutableState<androidx.media3.common.Player?> origin=null
           VAR name:playerView type:androidx.media3.ui.PlayerView [val]
             BLOCK type=androidx.media3.ui.PlayerView origin=null
               BLOCK type=kotlin.Unit origin=null
                 CALL 'public abstract fun startReplaceGroup (key: kotlin.Int): kotlin.Unit declared in androidx.compose.runtime.Composer' type=kotlin.Unit origin=null
-                  $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
+                  $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
                   key: CONST Int type=kotlin.Int value=1849434622
                 CALL 'public final fun sourceInformation (composer: androidx.compose.runtime.Composer, sourceInformation: kotlin.String): kotlin.Unit declared in androidx.compose.runtime.ComposerKt' type=kotlin.Unit origin=null
-                  composer: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
+                  composer: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
                   sourceInformation: CONST String type=kotlin.String value="CC(remember):DashBoardVideoLite.kt#9igjgp"
               VAR IR_TEMPORARY_VARIABLE name:tmp1_group type:androidx.media3.ui.PlayerView [val]
                 CALL 'public final fun cache <T> (invalid: kotlin.Boolean, block: @[DisallowComposableCalls] kotlin.Function0<T of androidx.compose.runtime.ComposerKt.cache>): T of androidx.compose.runtime.ComposerKt.cache [inline] declared in androidx.compose.runtime.ComposerKt' type=androidx.media3.ui.PlayerView origin=null
                   <T>: androidx.media3.ui.PlayerView
-                  $receiver: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
+                  $receiver: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
                   invalid: CONST Boolean type=kotlin.Boolean value=false
                   block: BLOCK type=kotlin.Function0<androidx.media3.ui.PlayerView> origin=LAMBDA
                     COMPOSITE type=kotlin.Unit origin=null
-                    FUNCTION_REFERENCE 'private final fun DashBoardVideoLite$lambda$4 ($context: android.content.Context, $player$delegate: androidx.compose.runtime.MutableState<androidx.media3.common.Player?>): androidx.media3.ui.PlayerView declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt' type=kotlin.Function0<androidx.media3.ui.PlayerView> origin=INLINE_LAMBDA reflectionTarget=null
-                      $context: GET_VAR 'val context: android.content.Context [val] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=android.content.Context origin=null
-                      $player$delegate: GET_VAR 'val player$delegate: androidx.compose.runtime.MutableState<androidx.media3.common.Player?> [val] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.MutableState<androidx.media3.common.Player?> origin=null
+                    FUNCTION_REFERENCE 'private final fun DashBoardVideoLite$lambda$4 ($context: android.content.Context, $player$delegate: androidx.compose.runtime.MutableState<androidx.media3.common.Player?>): androidx.media3.ui.PlayerView declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt' type=kotlin.Function0<androidx.media3.ui.PlayerView> origin=INLINE_LAMBDA reflectionTarget=null
+                      $context: GET_VAR 'val context: android.content.Context [val] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=android.content.Context origin=null
+                      $player$delegate: GET_VAR 'val player$delegate: androidx.compose.runtime.MutableState<androidx.media3.common.Player?> [val] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.MutableState<androidx.media3.common.Player?> origin=null
               CALL 'public abstract fun endReplaceGroup (): kotlin.Unit declared in androidx.compose.runtime.Composer' type=kotlin.Unit origin=null
-                $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
-              GET_VAR 'val tmp1_group: androidx.media3.ui.PlayerView [val] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.media3.ui.PlayerView origin=null
+                $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
+              GET_VAR 'val tmp1_group: androidx.media3.ui.PlayerView [val] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.media3.ui.PlayerView origin=null
           CALL 'public open fun setPlayer (p0: @[EnhancedNullability] androidx.media3.common.Player?): kotlin.Unit declared in androidx.media3.ui.PlayerView' type=kotlin.Unit origin=EQ
-            $this: GET_VAR 'val playerView: androidx.media3.ui.PlayerView [val] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.media3.ui.PlayerView origin=null
-            p0: CALL 'private final fun DashBoardVideoLite$lambda$1 ($player$delegate: androidx.compose.runtime.MutableState<androidx.media3.common.Player?>): androidx.media3.common.Player? declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt' type=androidx.media3.common.Player? origin=GET_LOCAL_PROPERTY
-              $player$delegate: GET_VAR 'val player$delegate: androidx.compose.runtime.MutableState<androidx.media3.common.Player?> [val] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.MutableState<androidx.media3.common.Player?> origin=null
+            $this: GET_VAR 'val playerView: androidx.media3.ui.PlayerView [val] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.media3.ui.PlayerView origin=null
+            p0: CALL 'private final fun DashBoardVideoLite$lambda$1 ($player$delegate: androidx.compose.runtime.MutableState<androidx.media3.common.Player?>): androidx.media3.common.Player? declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt' type=androidx.media3.common.Player? origin=GET_LOCAL_PROPERTY
+              $player$delegate: GET_VAR 'val player$delegate: androidx.compose.runtime.MutableState<androidx.media3.common.Player?> [val] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.MutableState<androidx.media3.common.Player?> origin=null
           CALL 'public final fun DisposableEffect (key1: kotlin.Any?, effect: @[ExtensionFunctionType] kotlin.Function1<androidx.compose.runtime.DisposableEffectScope, androidx.compose.runtime.DisposableEffectResult>, $composer: androidx.compose.runtime.Composer?, $changed: kotlin.Int): kotlin.Unit declared in androidx.compose.runtime.EffectsKt' type=kotlin.Unit origin=null
             key1: GET_FIELD 'FIELD FIELD_FOR_OBJECT_INSTANCE name:INSTANCE type:kotlin.Unit visibility:public [final,static] declared in kotlin.Unit' type=kotlin.Unit origin=null
             effect: BLOCK type=@[ExtensionFunctionType] kotlin.Function1<androidx.compose.runtime.DisposableEffectScope, androidx.compose.runtime.DisposableEffectResult> origin=null
               BLOCK type=kotlin.Unit origin=null
                 CALL 'public abstract fun startReplaceGroup (key: kotlin.Int): kotlin.Unit declared in androidx.compose.runtime.Composer' type=kotlin.Unit origin=null
-                  $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
+                  $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
                   key: CONST Int type=kotlin.Int value=-1633490746
                 CALL 'public final fun sourceInformation (composer: androidx.compose.runtime.Composer, sourceInformation: kotlin.String): kotlin.Unit declared in androidx.compose.runtime.ComposerKt' type=kotlin.Unit origin=null
-                  composer: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
+                  composer: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
                   sourceInformation: CONST String type=kotlin.String value="CC(remember):DashBoardVideoLite.kt#9igjgp"
               VAR IR_TEMPORARY_VARIABLE name:tmp2_group type:@[ExtensionFunctionType] kotlin.Function1<androidx.compose.runtime.DisposableEffectScope, androidx.compose.runtime.DisposableEffectResult> [val]
                 CALL 'public final fun cache <T> (invalid: kotlin.Boolean, block: @[DisallowComposableCalls] kotlin.Function0<T of androidx.compose.runtime.ComposerKt.cache>): T of androidx.compose.runtime.ComposerKt.cache [inline] declared in androidx.compose.runtime.ComposerKt' type=@[ExtensionFunctionType] kotlin.Function1<androidx.compose.runtime.DisposableEffectScope, androidx.compose.runtime.DisposableEffectResult> origin=null
                   <T>: @[ExtensionFunctionType] kotlin.Function1<androidx.compose.runtime.DisposableEffectScope, androidx.compose.runtime.DisposableEffectResult>
-                  $receiver: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
+                  $receiver: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
                   invalid: CALL 'public open fun changedInstance (value: kotlin.Any?): kotlin.Boolean declared in androidx.compose.runtime.Composer' type=kotlin.Boolean origin=null
-                    $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
-                    value: GET_VAR 'val playerView: androidx.media3.ui.PlayerView [val] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.media3.ui.PlayerView origin=null
+                    $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
+                    value: GET_VAR 'val playerView: androidx.media3.ui.PlayerView [val] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.media3.ui.PlayerView origin=null
                   block: BLOCK type=kotlin.Function0<@[ExtensionFunctionType] kotlin.Function1<androidx.compose.runtime.DisposableEffectScope, androidx.compose.runtime.DisposableEffectResult>> origin=LAMBDA
                     COMPOSITE type=kotlin.Unit origin=null
-                    FUNCTION_REFERENCE 'private final fun DashBoardVideoLite$lambda$7 ($playerView: androidx.media3.ui.PlayerView, $player$delegate: androidx.compose.runtime.MutableState<androidx.media3.common.Player?>): @[ExtensionFunctionType] kotlin.Function1<androidx.compose.runtime.DisposableEffectScope, androidx.compose.runtime.DisposableEffectResult> declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt' type=kotlin.Function0<@[ExtensionFunctionType] kotlin.Function1<androidx.compose.runtime.DisposableEffectScope, androidx.compose.runtime.DisposableEffectResult>> origin=INLINE_LAMBDA reflectionTarget=null
-                      $playerView: GET_VAR 'val playerView: androidx.media3.ui.PlayerView [val] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.media3.ui.PlayerView origin=null
-                      $player$delegate: GET_VAR 'val player$delegate: androidx.compose.runtime.MutableState<androidx.media3.common.Player?> [val] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.MutableState<androidx.media3.common.Player?> origin=null
+                    FUNCTION_REFERENCE 'private final fun DashBoardVideoLite$lambda$7 ($playerView: androidx.media3.ui.PlayerView, $player$delegate: androidx.compose.runtime.MutableState<androidx.media3.common.Player?>): @[ExtensionFunctionType] kotlin.Function1<androidx.compose.runtime.DisposableEffectScope, androidx.compose.runtime.DisposableEffectResult> declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt' type=kotlin.Function0<@[ExtensionFunctionType] kotlin.Function1<androidx.compose.runtime.DisposableEffectScope, androidx.compose.runtime.DisposableEffectResult>> origin=INLINE_LAMBDA reflectionTarget=null
+                      $playerView: GET_VAR 'val playerView: androidx.media3.ui.PlayerView [val] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.media3.ui.PlayerView origin=null
+                      $player$delegate: GET_VAR 'val player$delegate: androidx.compose.runtime.MutableState<androidx.media3.common.Player?> [val] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.MutableState<androidx.media3.common.Player?> origin=null
               CALL 'public abstract fun endReplaceGroup (): kotlin.Unit declared in androidx.compose.runtime.Composer' type=kotlin.Unit origin=null
-                $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
-              GET_VAR 'val tmp2_group: @[ExtensionFunctionType] kotlin.Function1<androidx.compose.runtime.DisposableEffectScope, androidx.compose.runtime.DisposableEffectResult> [val] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=@[ExtensionFunctionType] kotlin.Function1<androidx.compose.runtime.DisposableEffectScope, androidx.compose.runtime.DisposableEffectResult> origin=null
-            $composer: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
+                $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
+              GET_VAR 'val tmp2_group: @[ExtensionFunctionType] kotlin.Function1<androidx.compose.runtime.DisposableEffectScope, androidx.compose.runtime.DisposableEffectResult> [val] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=@[ExtensionFunctionType] kotlin.Function1<androidx.compose.runtime.DisposableEffectScope, androidx.compose.runtime.DisposableEffectResult> origin=null
+            $composer: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
             $changed: CONST Int type=kotlin.Int value=6
-          CALL 'public final fun ComposableLifecycle (lifecycleOwner: androidx.lifecycle.LifecycleOwner?, onEvent: kotlin.Function2<androidx.lifecycle.LifecycleOwner, androidx.lifecycle.Lifecycle.Event, kotlin.Unit>, $composer: androidx.compose.runtime.Composer?, $changed: kotlin.Int, $default: kotlin.Int): kotlin.Unit declared in com.client.xvideos.screens.videoplayer.deprecated.ComposableLifecycleKt' type=kotlin.Unit origin=null
+          CALL 'public final fun ComposableLifecycle (lifecycleOwner: androidx.lifecycle.LifecycleOwner?, onEvent: kotlin.Function2<androidx.lifecycle.LifecycleOwner, androidx.lifecycle.Lifecycle.Event, kotlin.Unit>, $composer: androidx.compose.runtime.Composer?, $changed: kotlin.Int, $default: kotlin.Int): kotlin.Unit declared in com.client.xvideos.xvideos.screens.videoplayer.deprecated.ComposableLifecycleKt' type=kotlin.Unit origin=null
             lifecycleOwner: COMPOSITE type=kotlin.Nothing? origin=DEFAULT_VALUE
               CONST Null type=kotlin.Nothing? value=null
             onEvent: BLOCK type=kotlin.Function2<androidx.lifecycle.LifecycleOwner, androidx.lifecycle.Lifecycle.Event, kotlin.Unit> origin=null
               BLOCK type=kotlin.Unit origin=null
                 CALL 'public abstract fun startReplaceGroup (key: kotlin.Int): kotlin.Unit declared in androidx.compose.runtime.Composer' type=kotlin.Unit origin=null
-                  $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
+                  $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
                   key: CONST Int type=kotlin.Int value=-1224400529
                 CALL 'public final fun sourceInformation (composer: androidx.compose.runtime.Composer, sourceInformation: kotlin.String): kotlin.Unit declared in androidx.compose.runtime.ComposerKt' type=kotlin.Unit origin=null
-                  composer: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
+                  composer: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
                   sourceInformation: CONST String type=kotlin.String value="CC(remember):DashBoardVideoLite.kt#9igjgp"
               VAR IR_TEMPORARY_VARIABLE name:tmp3_group type:kotlin.Function2<androidx.lifecycle.LifecycleOwner, androidx.lifecycle.Lifecycle.Event, kotlin.Unit> [val]
                 CALL 'public final fun cache <T> (invalid: kotlin.Boolean, block: @[DisallowComposableCalls] kotlin.Function0<T of androidx.compose.runtime.ComposerKt.cache>): T of androidx.compose.runtime.ComposerKt.cache [inline] declared in androidx.compose.runtime.ComposerKt' type=kotlin.Function2<androidx.lifecycle.LifecycleOwner, androidx.lifecycle.Lifecycle.Event, kotlin.Unit> origin=null
                   <T>: kotlin.Function2<androidx.lifecycle.LifecycleOwner, androidx.lifecycle.Lifecycle.Event, kotlin.Unit>
-                  $receiver: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
+                  $receiver: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
                   invalid: CALL 'public final fun or (other: kotlin.Boolean): kotlin.Boolean [infix] declared in kotlin.Boolean' type=kotlin.Boolean origin=null
                     $this: CALL 'public final fun or (other: kotlin.Boolean): kotlin.Boolean [infix] declared in kotlin.Boolean' type=kotlin.Boolean origin=null
                       $this: CALL 'public open fun changedInstance (value: kotlin.Any?): kotlin.Boolean declared in androidx.compose.runtime.Composer' type=kotlin.Boolean origin=null
-                        $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
-                        value: GET_VAR 'val context: android.content.Context [val] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=android.content.Context origin=null
+                        $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
+                        value: GET_VAR 'val context: android.content.Context [val] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=android.content.Context origin=null
                       other: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=null
                         arg0: CALL 'public final fun and (other: kotlin.Int): kotlin.Int [infix] declared in kotlin.Int' type=kotlin.Int origin=null
-                          $this: GET_VAR 'val $dirty: kotlin.Int [val] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=kotlin.Int origin=null
+                          $this: GET_VAR 'val $dirty: kotlin.Int [val] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=kotlin.Int origin=null
                           other: CONST Int type=kotlin.Int value=14
                         arg1: CONST Int type=kotlin.Int value=4
                     other: CALL 'public open fun changedInstance (value: kotlin.Any?): kotlin.Boolean declared in androidx.compose.runtime.Composer' type=kotlin.Boolean origin=null
-                      $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
-                      value: GET_VAR 'val playerView: androidx.media3.ui.PlayerView [val] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.media3.ui.PlayerView origin=null
+                      $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
+                      value: GET_VAR 'val playerView: androidx.media3.ui.PlayerView [val] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.media3.ui.PlayerView origin=null
                   block: BLOCK type=kotlin.Function0<kotlin.Function2<androidx.lifecycle.LifecycleOwner, androidx.lifecycle.Lifecycle.Event, kotlin.Unit>> origin=LAMBDA
                     COMPOSITE type=kotlin.Unit origin=null
-                    FUNCTION_REFERENCE 'private final fun DashBoardVideoLite$lambda$11 ($context: android.content.Context, $playerView: androidx.media3.ui.PlayerView, $passedString: kotlin.String, $player$delegate: androidx.compose.runtime.MutableState<androidx.media3.common.Player?>): kotlin.Function2<androidx.lifecycle.LifecycleOwner, androidx.lifecycle.Lifecycle.Event, kotlin.Unit> declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt' type=kotlin.Function0<kotlin.Function2<androidx.lifecycle.LifecycleOwner, androidx.lifecycle.Lifecycle.Event, kotlin.Unit>> origin=INLINE_LAMBDA reflectionTarget=null
-                      $context: GET_VAR 'val context: android.content.Context [val] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=android.content.Context origin=null
-                      $playerView: GET_VAR 'val playerView: androidx.media3.ui.PlayerView [val] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.media3.ui.PlayerView origin=null
-                      $passedString: GET_VAR 'passedString: kotlin.String declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=kotlin.String origin=null
-                      $player$delegate: GET_VAR 'val player$delegate: androidx.compose.runtime.MutableState<androidx.media3.common.Player?> [val] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.MutableState<androidx.media3.common.Player?> origin=null
+                    FUNCTION_REFERENCE 'private final fun DashBoardVideoLite$lambda$11 ($context: android.content.Context, $playerView: androidx.media3.ui.PlayerView, $passedString: kotlin.String, $player$delegate: androidx.compose.runtime.MutableState<androidx.media3.common.Player?>): kotlin.Function2<androidx.lifecycle.LifecycleOwner, androidx.lifecycle.Lifecycle.Event, kotlin.Unit> declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt' type=kotlin.Function0<kotlin.Function2<androidx.lifecycle.LifecycleOwner, androidx.lifecycle.Lifecycle.Event, kotlin.Unit>> origin=INLINE_LAMBDA reflectionTarget=null
+                      $context: GET_VAR 'val context: android.content.Context [val] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=android.content.Context origin=null
+                      $playerView: GET_VAR 'val playerView: androidx.media3.ui.PlayerView [val] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.media3.ui.PlayerView origin=null
+                      $passedString: GET_VAR 'passedString: kotlin.String declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=kotlin.String origin=null
+                      $player$delegate: GET_VAR 'val player$delegate: androidx.compose.runtime.MutableState<androidx.media3.common.Player?> [val] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.MutableState<androidx.media3.common.Player?> origin=null
               CALL 'public abstract fun endReplaceGroup (): kotlin.Unit declared in androidx.compose.runtime.Composer' type=kotlin.Unit origin=null
-                $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
-              GET_VAR 'val tmp3_group: kotlin.Function2<androidx.lifecycle.LifecycleOwner, androidx.lifecycle.Lifecycle.Event, kotlin.Unit> [val] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=kotlin.Function2<androidx.lifecycle.LifecycleOwner, androidx.lifecycle.Lifecycle.Event, kotlin.Unit> origin=null
-            $composer: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
+                $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
+              GET_VAR 'val tmp3_group: kotlin.Function2<androidx.lifecycle.LifecycleOwner, androidx.lifecycle.Lifecycle.Event, kotlin.Unit> [val] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=kotlin.Function2<androidx.lifecycle.LifecycleOwner, androidx.lifecycle.Lifecycle.Event, kotlin.Unit> origin=null
+            $composer: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
             $changed: CONST Int type=kotlin.Int value=0
             $default: CONST Int type=kotlin.Int value=1
           BLOCK type=kotlin.Unit origin=ARGUMENTS_REORDERING_FOR_CALL
@@ -249,29 +249,29 @@ FUN name:DashBoardVideoLite visibility:public modality:FINAL <> (passedString:ko
               factory: BLOCK type=kotlin.Function1<android.content.Context, androidx.media3.ui.PlayerView> origin=null
                 BLOCK type=kotlin.Unit origin=null
                   CALL 'public abstract fun startReplaceGroup (key: kotlin.Int): kotlin.Unit declared in androidx.compose.runtime.Composer' type=kotlin.Unit origin=null
-                    $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
+                    $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
                     key: CONST Int type=kotlin.Int value=5004770
                   CALL 'public final fun sourceInformation (composer: androidx.compose.runtime.Composer, sourceInformation: kotlin.String): kotlin.Unit declared in androidx.compose.runtime.ComposerKt' type=kotlin.Unit origin=null
-                    composer: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
+                    composer: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
                     sourceInformation: CONST String type=kotlin.String value="CC(remember):DashBoardVideoLite.kt#9igjgp"
                 VAR IR_TEMPORARY_VARIABLE name:tmp4_group type:kotlin.Function1<android.content.Context, androidx.media3.ui.PlayerView> [val]
                   CALL 'public final fun cache <T> (invalid: kotlin.Boolean, block: @[DisallowComposableCalls] kotlin.Function0<T of androidx.compose.runtime.ComposerKt.cache>): T of androidx.compose.runtime.ComposerKt.cache [inline] declared in androidx.compose.runtime.ComposerKt' type=kotlin.Function1<android.content.Context, androidx.media3.ui.PlayerView> origin=null
                     <T>: kotlin.Function1<android.content.Context, androidx.media3.ui.PlayerView>
-                    $receiver: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
+                    $receiver: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
                     invalid: CALL 'public open fun changedInstance (value: kotlin.Any?): kotlin.Boolean declared in androidx.compose.runtime.Composer' type=kotlin.Boolean origin=null
-                      $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
-                      value: GET_VAR 'val playerView: androidx.media3.ui.PlayerView [val] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.media3.ui.PlayerView origin=null
+                      $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
+                      value: GET_VAR 'val playerView: androidx.media3.ui.PlayerView [val] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.media3.ui.PlayerView origin=null
                     block: BLOCK type=kotlin.Function0<kotlin.Function1<android.content.Context, androidx.media3.ui.PlayerView>> origin=LAMBDA
                       COMPOSITE type=kotlin.Unit origin=null
-                      FUNCTION_REFERENCE 'private final fun DashBoardVideoLite$lambda$13 ($playerView: androidx.media3.ui.PlayerView): kotlin.Function1<android.content.Context, androidx.media3.ui.PlayerView> declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt' type=kotlin.Function0<kotlin.Function1<android.content.Context, androidx.media3.ui.PlayerView>> origin=INLINE_LAMBDA reflectionTarget=null
-                        $playerView: GET_VAR 'val playerView: androidx.media3.ui.PlayerView [val] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.media3.ui.PlayerView origin=null
+                      FUNCTION_REFERENCE 'private final fun DashBoardVideoLite$lambda$13 ($playerView: androidx.media3.ui.PlayerView): kotlin.Function1<android.content.Context, androidx.media3.ui.PlayerView> declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt' type=kotlin.Function0<kotlin.Function1<android.content.Context, androidx.media3.ui.PlayerView>> origin=INLINE_LAMBDA reflectionTarget=null
+                        $playerView: GET_VAR 'val playerView: androidx.media3.ui.PlayerView [val] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.media3.ui.PlayerView origin=null
                 CALL 'public abstract fun endReplaceGroup (): kotlin.Unit declared in androidx.compose.runtime.Composer' type=kotlin.Unit origin=null
-                  $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
-                GET_VAR 'val tmp4_group: kotlin.Function1<android.content.Context, androidx.media3.ui.PlayerView> [val] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=kotlin.Function1<android.content.Context, androidx.media3.ui.PlayerView> origin=null
-              modifier: GET_VAR 'val tmp0_modifier: androidx.compose.ui.Modifier [val] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.ui.Modifier origin=null
+                  $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
+                GET_VAR 'val tmp4_group: kotlin.Function1<android.content.Context, androidx.media3.ui.PlayerView> [val] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=kotlin.Function1<android.content.Context, androidx.media3.ui.PlayerView> origin=null
+              modifier: GET_VAR 'val tmp0_modifier: androidx.compose.ui.Modifier [val] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.ui.Modifier origin=null
               update: COMPOSITE type=kotlin.Nothing? origin=DEFAULT_VALUE
                 CONST Null type=kotlin.Nothing? value=null
-              $composer: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
+              $composer: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
               $changed: CONST Int type=kotlin.Int value=48
               $default: CONST Int type=kotlin.Int value=4
           WHEN type=kotlin.Unit origin=IF
@@ -281,7 +281,7 @@ FUN name:DashBoardVideoLite visibility:public modality:FINAL <> (passedString:ko
       BRANCH
         if: CONST Boolean type=kotlin.Boolean value=true
         then: CALL 'public abstract fun skipToGroupEnd (): kotlin.Unit declared in androidx.compose.runtime.Composer' type=kotlin.Unit origin=null
-          $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
+          $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
     BLOCK type=kotlin.Unit origin=null
       BLOCK type=kotlin.Unit origin=FOLDED_SAFE_CALL
         WHEN type=kotlin.Unit origin=FOLDED_SAFE_CALL
@@ -289,20 +289,20 @@ FUN name:DashBoardVideoLite visibility:public modality:FINAL <> (passedString:ko
             if: COMPOSITE type=kotlin.Boolean origin=null
               VAR IR_TEMPORARY_VARIABLE name:tmp5_safe_receiver type:androidx.compose.runtime.ScopeUpdateScope? [val]
                 CALL 'public abstract fun endRestartGroup (): androidx.compose.runtime.ScopeUpdateScope? declared in androidx.compose.runtime.Composer' type=androidx.compose.runtime.ScopeUpdateScope? origin=null
-                  $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
+                  $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.Composer? origin=null
               CALL 'public final fun not (): kotlin.Boolean [operator] declared in kotlin.Boolean' type=kotlin.Boolean origin=null
                 $this: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=null
-                  arg0: GET_VAR 'val tmp5_safe_receiver: androidx.compose.runtime.ScopeUpdateScope? [val] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.ScopeUpdateScope? origin=null
+                  arg0: GET_VAR 'val tmp5_safe_receiver: androidx.compose.runtime.ScopeUpdateScope? [val] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.ScopeUpdateScope? origin=null
                   arg1: CONST Null type=kotlin.Nothing? value=null
             then: CALL 'public abstract fun updateScope (block: kotlin.Function2<androidx.compose.runtime.Composer, kotlin.Int, kotlin.Unit>): kotlin.Unit declared in androidx.compose.runtime.ScopeUpdateScope' type=kotlin.Unit origin=null
-              $this: GET_VAR 'val tmp5_safe_receiver: androidx.compose.runtime.ScopeUpdateScope? [val] declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.ScopeUpdateScope? origin=null
+              $this: GET_VAR 'val tmp5_safe_receiver: androidx.compose.runtime.ScopeUpdateScope? [val] declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=androidx.compose.runtime.ScopeUpdateScope? origin=null
               block: BLOCK type=kotlin.Function2<androidx.compose.runtime.Composer?, kotlin.Int, kotlin.Unit> origin=LAMBDA
                 COMPOSITE type=kotlin.Unit origin=null
                 CALL 'public final fun <jvm-indy> <T> (dynamicCall: T of kotlin.jvm.internal.<jvm-indy>, bootstrapMethodHandle: kotlin.Any, vararg bootstrapMethodArguments: kotlin.Any): T of kotlin.jvm.internal.<jvm-indy> declared in kotlin.jvm.internal' type=kotlin.Function2<androidx.compose.runtime.Composer?, kotlin.Int, kotlin.Unit> origin=null
                   <T>: kotlin.Function2<androidx.compose.runtime.Composer?, kotlin.Int, kotlin.Unit>
                   dynamicCall: CALL 'public final fun invoke (p0: kotlin.String, p1: kotlin.Int): kotlin.Function2<androidx.compose.runtime.Composer?, kotlin.Int, kotlin.Unit> declared in kotlin.jvm.internal.invokeDynamic' type=kotlin.Function2<androidx.compose.runtime.Composer?, kotlin.Int, kotlin.Unit> origin=null
-                    p0: GET_VAR 'passedString: kotlin.String declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=kotlin.String origin=null
-                    p1: GET_VAR '$changed: kotlin.Int declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=kotlin.Int origin=null
+                    p0: GET_VAR 'passedString: kotlin.String declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=kotlin.String origin=null
+                    p1: GET_VAR '$changed: kotlin.Int declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite' type=kotlin.Int origin=null
                   bootstrapMethodHandle: CALL 'public final fun <jvm-method-handle> (tag: kotlin.Int, owner: kotlin.String, name: kotlin.String, descriptor: kotlin.String, isInterface: kotlin.Boolean): kotlin.Any declared in kotlin.jvm.internal' type=kotlin.Any origin=null
                     tag: CONST Int type=kotlin.Int value=6
                     owner: CONST String type=kotlin.String value="java/lang/invoke/LambdaMetafactory"
@@ -312,7 +312,7 @@ FUN name:DashBoardVideoLite visibility:public modality:FINAL <> (passedString:ko
                   bootstrapMethodArguments: VARARG type=kotlin.Array<kotlin.Any> varargElementType=kotlin.Any
                     CALL 'public final fun <jvm-original-method-type> (method: kotlin.Any): kotlin.Any declared in kotlin.jvm.internal' type=kotlin.Any origin=null
                       method: RAW_FUNCTION_REFERENCE 'public abstract fun invoke (p1: P1 of kotlin.Function2, p2: P2 of kotlin.Function2): R of kotlin.Function2 [operator] declared in kotlin.Function2' type=kotlin.Any
-                    RAW_FUNCTION_REFERENCE 'private final fun DashBoardVideoLite$lambda$14 ($passedString: kotlin.String, $$changed: kotlin.Int, $composer: androidx.compose.runtime.Composer?, $force: kotlin.Int): kotlin.Unit? declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt' type=kotlin.Any
+                    RAW_FUNCTION_REFERENCE 'private final fun DashBoardVideoLite$lambda$14 ($passedString: kotlin.String, $$changed: kotlin.Int, $composer: androidx.compose.runtime.Composer?, $force: kotlin.Int): kotlin.Unit? declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt' type=kotlin.Any
                     CALL 'public final fun <jvm-original-method-type> (method: kotlin.Any): kotlin.Any declared in kotlin.jvm.internal' type=kotlin.Any origin=null
                       method: RAW_FUNCTION_REFERENCE 'public abstract fun invoke (p1: androidx.compose.runtime.Composer?, p2: kotlin.Int?): kotlin.Unit? [fake_override,operator] declared in kotlin.jvm.internal.invokeDynamic.<fake>' type=kotlin.Any
           BRANCH
@@ -337,15 +337,15 @@ FUN INLINE_LAMBDA name:DashBoardVideoLite$lambda$4 visibility:private modality:F
   BLOCK_BODY
     VAR name:$i$a$-cache-DashBoardVideoLiteKt$DashBoardVideoLite$playerView$1 type:kotlin.Int [val]
       CONST Int type=kotlin.Int value=0
-    RETURN type=kotlin.Nothing from='private final fun DashBoardVideoLite$lambda$4 ($context: android.content.Context, $player$delegate: androidx.compose.runtime.MutableState<androidx.media3.common.Player?>): androidx.media3.ui.PlayerView declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt'
+    RETURN type=kotlin.Nothing from='private final fun DashBoardVideoLite$lambda$4 ($context: android.content.Context, $player$delegate: androidx.compose.runtime.MutableState<androidx.media3.common.Player?>): androidx.media3.ui.PlayerView declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt'
       CALL 'public final fun apply <T> (block: @[ExtensionFunctionType] kotlin.Function1<T of kotlin.StandardKt.apply, kotlin.Unit>): T of kotlin.StandardKt.apply [inline] declared in kotlin.StandardKt' type=androidx.media3.ui.PlayerView origin=null
         <T>: androidx.media3.ui.PlayerView
         $receiver: CONSTRUCTOR_CALL 'public constructor <init> (p0: @[EnhancedNullability] android.content.Context) declared in androidx.media3.ui.PlayerView' type=androidx.media3.ui.PlayerView origin=null
-          p0: GET_VAR '$context: android.content.Context declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite$lambda$4' type=android.content.Context origin=null
+          p0: GET_VAR '$context: android.content.Context declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite$lambda$4' type=android.content.Context origin=null
         block: BLOCK type=@[ExtensionFunctionType] kotlin.Function1<androidx.media3.ui.PlayerView, kotlin.Unit> origin=LAMBDA
           COMPOSITE type=kotlin.Unit origin=null
-          FUNCTION_REFERENCE 'private final fun DashBoardVideoLite$lambda$4$lambda$3 ($player$delegate: androidx.compose.runtime.MutableState<androidx.media3.common.Player?>): kotlin.Unit declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt' type=@[ExtensionFunctionType] kotlin.Function1<androidx.media3.ui.PlayerView, kotlin.Unit> origin=INLINE_LAMBDA reflectionTarget=null
-            $player$delegate: GET_VAR '$player$delegate: androidx.compose.runtime.MutableState<androidx.media3.common.Player?> declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite$lambda$4' type=androidx.compose.runtime.MutableState<androidx.media3.common.Player?> origin=null
+          FUNCTION_REFERENCE 'private final fun DashBoardVideoLite$lambda$4$lambda$3 ($player$delegate: androidx.compose.runtime.MutableState<androidx.media3.common.Player?>): kotlin.Unit declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt' type=@[ExtensionFunctionType] kotlin.Function1<androidx.media3.ui.PlayerView, kotlin.Unit> origin=INLINE_LAMBDA reflectionTarget=null
+            $player$delegate: GET_VAR '$player$delegate: androidx.compose.runtime.MutableState<androidx.media3.common.Player?> declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite$lambda$4' type=androidx.compose.runtime.MutableState<androidx.media3.common.Player?> origin=null
 
 	at org.jetbrains.kotlin.backend.jvm.codegen.FunctionCodegen.generate(FunctionCodegen.kt:48)
 	at org.jetbrains.kotlin.backend.jvm.codegen.IrSourceCompilerForInline.generateLambdaBody(IrSourceCompilerForInline.kt:68)
@@ -394,19 +394,19 @@ FUN INLINE_LAMBDA name:DashBoardVideoLite$lambda$4$lambda$3 visibility:private m
     VAR name:$i$a$-apply-DashBoardVideoLiteKt$DashBoardVideoLite$playerView$1$1 type:kotlin.Int [val]
       CONST Int type=kotlin.Int value=0
     CALL 'public open fun setPlayer (p0: @[EnhancedNullability] androidx.media3.common.Player?): kotlin.Unit declared in androidx.media3.ui.PlayerView' type=kotlin.Unit origin=EQ
-      $this: GET_VAR '$this$apply: androidx.media3.ui.PlayerView declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite$lambda$4$lambda$3' type=androidx.media3.ui.PlayerView origin=null
-      p0: CALL 'private final fun DashBoardVideoLite$lambda$1 ($player$delegate: androidx.compose.runtime.MutableState<androidx.media3.common.Player?>): androidx.media3.common.Player? declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt' type=androidx.media3.common.Player? origin=GET_LOCAL_PROPERTY
-        $player$delegate: GET_VAR '$player$delegate: androidx.compose.runtime.MutableState<androidx.media3.common.Player?> declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite$lambda$4$lambda$3' type=androidx.compose.runtime.MutableState<androidx.media3.common.Player?> origin=null
+      $this: GET_VAR '$this$apply: androidx.media3.ui.PlayerView declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite$lambda$4$lambda$3' type=androidx.media3.ui.PlayerView origin=null
+      p0: CALL 'private final fun DashBoardVideoLite$lambda$1 ($player$delegate: androidx.compose.runtime.MutableState<androidx.media3.common.Player?>): androidx.media3.common.Player? declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt' type=androidx.media3.common.Player? origin=GET_LOCAL_PROPERTY
+        $player$delegate: GET_VAR '$player$delegate: androidx.compose.runtime.MutableState<androidx.media3.common.Player?> declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite$lambda$4$lambda$3' type=androidx.compose.runtime.MutableState<androidx.media3.common.Player?> origin=null
     CALL 'public open fun setControllerAutoShow (p0: kotlin.Boolean): kotlin.Unit declared in androidx.media3.ui.PlayerView' type=kotlin.Unit origin=EQ
-      $this: GET_VAR '$this$apply: androidx.media3.ui.PlayerView declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite$lambda$4$lambda$3' type=androidx.media3.ui.PlayerView origin=null
+      $this: GET_VAR '$this$apply: androidx.media3.ui.PlayerView declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite$lambda$4$lambda$3' type=androidx.media3.ui.PlayerView origin=null
       p0: CONST Boolean type=kotlin.Boolean value=false
     CALL 'public open fun hideController (): kotlin.Unit declared in androidx.media3.ui.PlayerView' type=kotlin.Unit origin=null
-      $this: GET_VAR '$this$apply: androidx.media3.ui.PlayerView declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite$lambda$4$lambda$3' type=androidx.media3.ui.PlayerView origin=null
+      $this: GET_VAR '$this$apply: androidx.media3.ui.PlayerView declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite$lambda$4$lambda$3' type=androidx.media3.ui.PlayerView origin=null
     CALL 'public open fun setKeepScreenOn (p0: kotlin.Boolean): kotlin.Unit [fake_override] declared in androidx.media3.ui.PlayerView' type=kotlin.Unit origin=EQ
-      $this: GET_VAR '$this$apply: androidx.media3.ui.PlayerView declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite$lambda$4$lambda$3' type=androidx.media3.ui.PlayerView origin=null
+      $this: GET_VAR '$this$apply: androidx.media3.ui.PlayerView declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite$lambda$4$lambda$3' type=androidx.media3.ui.PlayerView origin=null
       p0: CONST Boolean type=kotlin.Boolean value=true
     CALL 'public open fun setUseController (p0: kotlin.Boolean): kotlin.Unit declared in androidx.media3.ui.PlayerView' type=kotlin.Unit origin=null
-      $this: GET_VAR '$this$apply: androidx.media3.ui.PlayerView declared in com.client.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite$lambda$4$lambda$3' type=androidx.media3.ui.PlayerView origin=null
+      $this: GET_VAR '$this$apply: androidx.media3.ui.PlayerView declared in com.client.xvideos.xvideos.screens.dashboards.atom.DashBoardVideoLiteKt.DashBoardVideoLite$lambda$4$lambda$3' type=androidx.media3.ui.PlayerView origin=null
       p0: CONST Boolean type=kotlin.Boolean value=false
     SET_FIELD 'FIELD IR_EXTERNAL_JAVA_DECLARATION_STUB name:repeatMode type:kotlin.Int visibility:public [final,static] declared in android.R.attr' type=kotlin.Unit superQualifierSymbol=android.R.attr origin=EQ
       value: CONST Int type=kotlin.Int value=2

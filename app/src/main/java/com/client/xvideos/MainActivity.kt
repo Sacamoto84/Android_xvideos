@@ -23,7 +23,7 @@ import coil.memory.MemoryCache
 import coil.request.CachePolicy
 import com.client.xvideos.PermissionScreenActivity.PermissionStorage
 import com.client.xvideos.redgifs.screens.ScreenRedRoot
-import com.client.xvideos.screens.videoplayer.video.cache.VideoPlayerCacheManager
+import com.client.xvideos.xvideos.screens.videoplayer.video.cache.VideoPlayerCacheManager
 import com.client.xvideos.ui.theme.XvideosTheme
 import com.client.xvideos.util.KeepScreenOn
 import dagger.hilt.android.AndroidEntryPoint
