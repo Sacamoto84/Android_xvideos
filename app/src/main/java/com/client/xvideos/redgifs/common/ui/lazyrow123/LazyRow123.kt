@@ -63,15 +63,13 @@ fun LazyRow123(
     host: LazyRow123Host,
     modifier: Modifier = Modifier,
     onClickOpenProfile: (String) -> Unit = {},
-    gotoPosition: Int,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     contentBeforeList: @Composable (() -> Unit) = {},
-
     //Для меню
     isRunLike: Boolean = false,
     ) {
 
-    SideEffect { Timber.d("!!! LazyRow123::SideEffect columns: ${host.columns} gotoPosition: $gotoPosition") }
+    SideEffect { Timber.d("!!! LazyRow123::SideEffect columns: ${host.columns}") }
 
     val listGifs = host.pager.collectAsLazyPagingItems() as LazyPagingItems<GifsInfo>
 
@@ -151,6 +149,7 @@ fun LazyRow123(
 //    }
 
 
+
     //Диалог для блокировки
     if (block.blockVisibleDialog) {
         DialogBlock(
@@ -166,8 +165,8 @@ fun LazyRow123(
         )
     }
 
-    Box(modifier.fillMaxSize()) {
 
+    Box(modifier.fillMaxSize()) {
 
         LazyVerticalGrid(
             state = state,

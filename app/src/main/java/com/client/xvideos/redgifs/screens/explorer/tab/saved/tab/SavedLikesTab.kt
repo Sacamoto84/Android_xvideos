@@ -78,10 +78,10 @@ object SavedLikesTab : Screen {
                 host = vm.likedHost,
                 modifier = Modifier.fillMaxSize(),
                 onClickOpenProfile = {
-                    vm.likedHost.currentIndexGoto = vm.likedHost.currentIndex
+                    //vm.likedHost.currentIndexGoto = vm.likedHost.currentIndex
                     navigator.push(ScreenRedProfile(it))
                 },
-                gotoPosition = vm.likedHost.currentIndexGoto,
+                //gotoPosition = vm.likedHost.currentIndexGoto,
                 contentPadding = PaddingValues(0.dp),
                 contentBeforeList = { },
 

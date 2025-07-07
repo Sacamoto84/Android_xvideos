@@ -83,7 +83,7 @@ class ScreenRedProfile(val profileName: String) : Screen {
             onDismiss = { block.blockVisibleDialog = false }) {
             val a = vm.currentTikTokGifInfo; if (a != null) {
             block.blockItem(a)
-            block.refreshListAndBlock(vm._list)
+            //block.refresh(vm._list)
         }
         }
         //🟨🟨🟨🟨🟨🟨🟨🟨⬆️⬆️⬆️⬆️⬆️❗
@@ -130,10 +130,8 @@ class ScreenRedProfile(val profileName: String) : Screen {
                         LazyRow123(
                             host = vm.likedHost,
                             modifier = Modifier.fillMaxSize(),
-                            gotoPosition = vm.likedHost.currentIndexGoto,
-                            contentPadding = PaddingValues(0.dp),
+                            //gotoPosition = vm.likedHost.currentIndexGoto,
                             contentBeforeList = {
-
                                 Column {
 
                                     if (vm.creator != null) {
@@ -145,7 +143,6 @@ class ScreenRedProfile(val profileName: String) : Screen {
                                     }
 
                                 }
-
                             },
                         )
 

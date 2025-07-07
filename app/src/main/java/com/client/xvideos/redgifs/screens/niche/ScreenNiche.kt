@@ -106,10 +106,10 @@ data class ScreenRedNiche(val nicheName: String = "pumped-pussy") : Screen {
                     host = vm.lazyHost,
                     modifier = Modifier.fillMaxWidth(),
                     onClickOpenProfile = {
-                        vm.lazyHost.currentIndexGoto = vm.lazyHost.currentIndex
+                        //vm.lazyHost.currentIndexGoto = vm.lazyHost.currentIndex
                         navigator.push(ScreenRedProfile(it))
                     },
-                    gotoPosition = vm.lazyHost.currentIndexGoto,
+                    //gotoPosition = vm.lazyHost.currentIndexGoto,
                     contentPadding = PaddingValues(top = toolbarHeight),
                     contentBeforeList = {
 

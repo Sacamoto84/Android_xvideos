@@ -77,7 +77,7 @@ class App : Application() {
         SavedRed.refreshTagList()
 
 
-        blockRed.refreshBlockList()
+        //blockRed.refreshBlockList()
 
         SavedRed.refreshLikesList()
         SavedRed.refreshNichesList()

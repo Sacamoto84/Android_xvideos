@@ -73,22 +73,6 @@ class LazyRow123Host(
 
     private val refreshTrigger = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
-//    init {
-//        scope.launch {
-//
-//            SearchRed.searchText
-//                .debounce(1000)               // ждать 400мс тишины
-//                .map { it.trim() }           // подчистить пробелы
-//                .distinctUntilChanged()      // игнорировать дубликаты
-//                .filter { it.length >= 2 }   // например, не искать по 1 букве
-//                .collectLatest { term ->     // отменять предыдущий поиск
-//                    searchText = term        // вызываем API / БД
-//                    refresh()
-//                }
-//
-//        }
-//    }
-
     val state: LazyGridState = LazyGridState()
 
     val stateColumn = LazyListState()
@@ -131,7 +115,7 @@ class LazyRow123Host(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val pager: Flow<PagingData<Any>> =
-        combine(SearchRed.searchTextDone, sortType) { text, sort ->          // ① слепили параметры
+        combine(SearchRed.searchTextDone, sortType, block.blockList) { text, sort, blockList ->
             SearchParams(text.trim(), sort)
         }
             //.debounce(2000)                                          // ② ждём паузу ввода

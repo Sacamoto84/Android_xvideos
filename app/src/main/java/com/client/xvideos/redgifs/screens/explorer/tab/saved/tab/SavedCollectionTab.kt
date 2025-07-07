@@ -292,7 +292,6 @@ object SavedCollectionTab : Screen {
                         .padding(top = padding.calculateTopPadding())
                         .fillMaxSize(),
                     onClickOpenProfile = {},
-                    gotoPosition = 0,
                 )
 
 //                LazyVerticalGrid(state = vm.listState,

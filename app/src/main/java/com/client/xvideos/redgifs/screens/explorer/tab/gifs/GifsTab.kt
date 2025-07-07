@@ -197,7 +197,6 @@ object GifsTab : Screen {
                             vm.lazyHost.currentIndexGoto = vm.lazyHost.currentIndex
                             navigator.push(ScreenRedProfile(name))
                         },
-                        gotoPosition = 0,
                         contentPadding = PaddingValues(top = 0.dp),
                         contentBeforeList = { },
                     )

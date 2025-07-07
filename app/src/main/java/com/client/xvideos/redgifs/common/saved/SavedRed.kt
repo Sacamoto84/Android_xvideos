@@ -4,27 +4,21 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.client.xvideos.redgifs.network.api.RedApi_Tags
-import com.client.xvideos.redgifs.network.types.GifsInfo
-import com.client.xvideos.redgifs.network.types.NichesInfo
-import com.client.xvideos.redgifs.network.types.UserInfo
-import com.client.xvideos.redgifs.network.types.tag.TagInfo
+import com.client.xvideos.AppPath
+import com.client.xvideos.feature.fileDB.FileDB
 import com.client.xvideos.redgifs.common.saved.collection.collectionCreateToDisk
 import com.client.xvideos.redgifs.common.saved.collection.collectionDeleteFromDisk
 import com.client.xvideos.redgifs.common.saved.collection.collectionItemDeleteFromDisk
 import com.client.xvideos.redgifs.common.saved.collection.collectionItemSaveToDisk
 import com.client.xvideos.redgifs.common.saved.collection.model.CollectionEntity
 import com.client.xvideos.redgifs.common.saved.collection.readAllCollections
-import com.client.xvideos.redgifs.common.saved.creators.creatorsItemRemoveFromDisk
-import com.client.xvideos.redgifs.common.saved.creators.creatorsItemSaveToDisk
-import com.client.xvideos.redgifs.common.saved.creators.getAllCreatorsFromDisk
-import com.client.xvideos.redgifs.common.saved.likes.getAllLikesFromDisk
-import com.client.xvideos.redgifs.common.saved.likes.likesItemRemoveFromDisk
-import com.client.xvideos.redgifs.common.saved.likes.likesItemSaveToDisk
-import com.client.xvideos.redgifs.common.saved.niches.getAllNichesFromDisk
-import com.client.xvideos.redgifs.common.saved.niches.nickesItemRemoveFromDisk
-import com.client.xvideos.redgifs.common.saved.niches.nickesItemSaveToDisk
 import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
+import com.client.xvideos.redgifs.network.api.RedApi_Tags
+import com.client.xvideos.redgifs.network.types.GifsInfo
+import com.client.xvideos.redgifs.network.types.NichesInfo
+import com.client.xvideos.redgifs.network.types.UserInfo
+import com.client.xvideos.redgifs.network.types.tag.TagInfo
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -33,11 +27,13 @@ import kotlinx.coroutines.launch
 object SavedRed {
 
     /////////////////////////////////////////////////////////////////////////////////////////////
-    var likesList = mutableStateListOf<GifsInfo>()
+    val likesDb = FileDB<GifsInfo>(AppPath.likes_red, "likes", object : TypeToken<GifsInfo>() {}.type)
+
+    var likesList = likesDb.list
 
     fun addLikes(item: GifsInfo) {
         println("!!! addLikes() id:${item.id} userName:${item.userName} url:${item.urls.hd}")
-        likesItemSaveToDisk(item)
+        likesDb.insert(item.id, item)
             .onSuccess {
                 SnackBarEvent.success("Like")
                 likesList.add(item)
@@ -49,30 +45,27 @@ object SavedRed {
 
     fun removeLikes(item: GifsInfo) {
         println("!!! removeLikes() id:${item.id} userName:${item.userName} url:${item.urls.hd}")
-
-        likesItemRemoveFromDisk(item)
-            .onSuccess {
-                SnackBarEvent.info("Unlike")
-            }
-            .onFailure { e ->
-                SnackBarEvent.error("Ошибка удаления лайка ${e.message}")
-            }
-            refreshLikesList()
+        likesDb.delete(item.id)
+            .onSuccess { SnackBarEvent.info("Unlike") }
+            .onFailure { e ->  SnackBarEvent.error("Ошибка удаления лайка ${e.message}") }
+        refreshLikesList()
     }
 
     @OptIn(DelicateCoroutinesApi::class)
     fun refreshLikesList() {
-        val a = getAllLikesFromDisk()
-        likesList.clear()
-        likesList.addAll(a)
+        likesDb.refresh()
     }
     /////////////////////////////////////////////////////////////////////////////////////////////
 
-    var creatorsList = mutableStateListOf<UserInfo>()
+    //var creatorsList = mutableStateListOf<UserInfo>()
+
+    val creatorDb = FileDB<UserInfo>(AppPath.creators_red, "creator", object : TypeToken<UserInfo>() {}.type)
+
+    var creatorsList = creatorDb.list
 
     fun addCreator(item: UserInfo) {
         println("!!! addCreator() id:${item.username}")
-        creatorsItemSaveToDisk(item)
+        creatorDb.insert(item.username, item)
             .onSuccess {
                 SnackBarEvent.success("Автор добавлен")
                 creatorsList.add(item)
@@ -84,7 +77,7 @@ object SavedRed {
 
     fun removeCreator(username: String) {
         println("!!! removeCreator() id:${username} ")
-        creatorsItemRemoveFromDisk(username)
+        creatorDb.delete(username)
             .onSuccess {
                 SnackBarEvent.info("Автор удален")
                 //creatorsList.remove(item)
@@ -97,21 +90,16 @@ object SavedRed {
 
     @OptIn(DelicateCoroutinesApi::class)
     fun refreshCreatorsList() {
-
-        val a = getAllCreatorsFromDisk()
-
-        creatorsList.clear()
-        creatorsList.addAll(a)
-
-
+        creatorDb.refresh()
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////
-    var nichesList = mutableStateListOf<NichesInfo>()
+    val nichesDb = FileDB<NichesInfo>(AppPath.niches_red, "niches", object : TypeToken<NichesInfo>() {}.type)
+    val nichesList = nichesDb.list
 
     fun addNiches(item: NichesInfo) {
         println("!!! addNiches() id:${item.id} name:${item.name}")
-        nickesItemSaveToDisk(item)
+        nichesDb.insert(item.id, item)
             .onSuccess {
                 SnackBarEvent.info("Группа добавлена")
                 nichesList.add(item)
@@ -123,7 +111,7 @@ object SavedRed {
 
     fun removeNiches(item: NichesInfo) {
         println("!!! removeNiches() id:${item.id} name:${item.name}")
-        nickesItemRemoveFromDisk(item.id)
+        nichesDb.delete(item.id)
             .onSuccess {
                 SnackBarEvent.info("Группа удалена")
                 nichesList.remove(item)
@@ -135,13 +123,7 @@ object SavedRed {
 
     @OptIn(DelicateCoroutinesApi::class)
     fun refreshNichesList() {
-
-        val a = getAllNichesFromDisk()
-
-        nichesList.clear()
-        nichesList.addAll(a)
-
-
+        nichesDb.refresh()
     }
     /////////////////////////////////////////////////////////////////////////////////////////////
 
