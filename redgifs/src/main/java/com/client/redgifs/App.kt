@@ -1,11 +1,14 @@
-package com.client.xvideos
+package com.client.redgifs
 
 import android.app.Application
-import com.client.xvideos.feature.room.AppDatabase
-import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.PlaybackPreference
+import com.client.redgifs.common.block.BlockRed
+import com.client.redgifs.common.saved.SavedRed
+import com.client.redgifs.db.dao.clearOldCache
 import com.kdownloader.KDownloader
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import timber.log.Timber.DebugTree
 import java.security.SecureRandom
@@ -57,10 +60,22 @@ class App : Application() {
         super.onCreate()
         instance = this
         //if (BuildConfig.DEBUG)
-            Timber.plant(DebugTree())
+        Timber.plant(DebugTree())
         //allowAllSSL()
         PlaybackPreference.initialize(this)
         kDownloader = KDownloader.create(applicationContext)
+
+        SavedRed.refreshTagList()
+
+        BlockRed.refreshBlockList()
+        SavedRed.refreshLikesList()
+        SavedRed.refreshNichesList()
+        SavedRed.refreshCreatorsList()
+        SavedRed.refreshCollectionList()
+
+        GlobalScope.launch {
+            clearOldCache( db.cacheMedaResponseDao())
+        }
 
     }
 

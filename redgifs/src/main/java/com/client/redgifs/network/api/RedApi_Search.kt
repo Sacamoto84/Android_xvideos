@@ -1,10 +1,10 @@
 package com.client.redgifs.network.api
 
-import com.client.xvideos.redgifs.network.http.ApiClient
-import com.client.xvideos.redgifs.network.http.Route
-import com.client.xvideos.redgifs.network.types.MediaResponse
-import com.client.xvideos.redgifs.network.types.Order
-import com.client.xvideos.redgifs.network.types.search.SearchCreatorsResponse
+import com.client.redgifs.network.http.ApiClient
+import com.client.redgifs.network.http.Route
+import com.client.redgifs.network.types.MediaResponse
+import com.client.redgifs.network.types.Order
+import com.client.redgifs.network.types.search.SearchCreatorsResponse
 import com.google.android.gms.common.api.ApiException
 
 object RedApi_Search {

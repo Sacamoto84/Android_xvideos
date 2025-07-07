@@ -1,9 +1,9 @@
 package com.client.redgifs.network.api
 
-import com.client.xvideos.redgifs.network.http.ApiClient
-import com.client.xvideos.redgifs.network.http.Route
-import com.client.xvideos.redgifs.network.types.NichesResponse
-import com.client.xvideos.redgifs.network.types.Order
+import com.client.redgifs.network.http.ApiClient
+import com.client.redgifs.network.http.Route
+import com.client.redgifs.network.types.NichesResponse
+import com.client.redgifs.network.types.Order
 import com.google.android.gms.common.api.ApiException
 
 object RedApi_Explorer {
