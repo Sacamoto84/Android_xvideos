@@ -79,10 +79,10 @@ class App : Application() {
 
         //blockRed.refreshBlockList()
 
-        SavedRed.refreshLikesList()
-        SavedRed.refreshNichesList()
-        SavedRed.refreshCreatorsList()
-        SavedRed.refreshCollectionList()
+        SavedRed.likes.refresh()
+        SavedRed.niches.refresh()
+        SavedRed.creators.refresh()
+        SavedRed.collections.refreshCollectionList()
 
         GlobalScope.launch {
             clearOldCache( redGifsDb.cacheMediaResponseDao())

@@ -46,7 +46,6 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.R
 import com.client.xvideos.redgifs.network.types.GifsInfo
 import com.client.xvideos.redgifs.ThemeRed
-import com.client.xvideos.redgifs.common.block.BlockRed
 import com.client.xvideos.redgifs.common.block.ui.DialogBlock
 import com.client.xvideos.redgifs.common.downloader.DownloadRed
 import com.client.xvideos.redgifs.common.expand_menu_video.ExpandMenuVideo
@@ -266,7 +265,7 @@ fun LazyRow123(
                             ) {
 
 
-                                if (SavedRed.collectionList.any { it.list.any { it2 -> it2.id == item.id } }) {
+                                if (SavedRed.collections.collectionList.any { it.list.any { it2 -> it2.id == item.id } }) {
                                     Icon(
                                         painter = painterResource(R.drawable.collection_multi_input_svgrepo_com),
                                         contentDescription = null,
@@ -278,7 +277,7 @@ fun LazyRow123(
                                 }
 
                                 //
-                                if (SavedRed.creatorsList.any { it.username == item.userName }) {
+                                if (SavedRed.creators.list.any { it.username == item.userName }) {
                                     Icon(
                                         Icons.Filled.Person,
                                         contentDescription = null,
@@ -290,7 +289,7 @@ fun LazyRow123(
                                 }
 
                                 //✅ Лайк
-                                if (SavedRed.likesList.any { it.id == item.id }) {
+                                if (SavedRed.likes.list.any { it.id == item.id }) {
                                     Icon(
                                         Icons.Filled.FavoriteBorder,
                                         contentDescription = null,

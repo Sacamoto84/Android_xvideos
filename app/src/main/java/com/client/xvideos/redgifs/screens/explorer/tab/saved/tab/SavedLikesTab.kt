@@ -64,7 +64,7 @@ object SavedLikesTab : Screen {
             vm.likedHost.columns = column.intValue
         }
 
-        LaunchedEffect(SavedRed.likesList){
+        LaunchedEffect(SavedRed.likes.list){
             //vm.likedHost.refresh()
         }
 

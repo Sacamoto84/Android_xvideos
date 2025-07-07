@@ -103,7 +103,7 @@ object SavedCreatorsTab : Screen {
                 confirmButton = {
                     TextButton(
                         onClick = {
-                            SavedRed.removeCreator(pending.username)   // удаляем
+                            SavedRed.creators.remove(pending.username)   // удаляем
                             itemPendingDelete = null         // закрываем диалог
                         }
                     ) { Text("Удалить", fontSize = 16.sp, color = Color(0xFF6552A5)) }
@@ -139,7 +139,7 @@ object SavedCreatorsTab : Screen {
                 )
                 {
 
-                    items(SavedRed.creatorsList) { it1 ->
+                    items(SavedRed.creators.list) { it1 ->
 
                             Row(
                                 modifier = Modifier

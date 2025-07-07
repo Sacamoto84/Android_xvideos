@@ -103,7 +103,7 @@ object SavedNichesTab : Screen {
                 confirmButton = {
                     TextButton(
                         onClick = {
-                            SavedRed.removeNiches(pending)   // удаляем
+                            SavedRed.niches.remove(pending)   // удаляем
                             itemPendingDelete = null         // закрываем диалог
                         }
                     ) { Text("Удалить", fontSize = 16.sp, color = Color(0xFF6552A5)) }
@@ -134,7 +134,7 @@ object SavedNichesTab : Screen {
                     modifier = Modifier.fillMaxSize()
                 )
                 {
-                    items(SavedRed.nichesList) {
+                    items(SavedRed.niches.list) {
 
                         Row(
                             modifier = Modifier

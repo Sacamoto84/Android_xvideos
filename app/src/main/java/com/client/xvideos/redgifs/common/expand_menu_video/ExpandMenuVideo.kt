@@ -140,7 +140,7 @@ fun DropdownMenuItem_Block(item: GifsInfo? = null, block: BlockRed, onDismiss: (
 @OptIn(ExperimentalMaterial3Api::class, DelicateCoroutinesApi::class)
 @Composable
 fun DropdownMenuItem_Like(item: GifsInfo? = null, onRunLike: () -> Unit, onDismiss: () -> Unit){
-    val isLiked = SavedRed.likesList.any { it.id == item?.id }
+    val isLiked = SavedRed.likes.list.any { it.id == item?.id }
     val textLiked = if (isLiked) "Unlike" else "Like"
     val textLikedIcon = if (isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder
     DropdownMenuItem(
@@ -150,7 +150,7 @@ fun DropdownMenuItem_Like(item: GifsInfo? = null, onRunLike: () -> Unit, onDismi
             if (item == null) return@DropdownMenuItem
             GlobalScope.launch {
                 delay(200)
-                if (!isLiked) SavedRed.addLikes(item) else SavedRed.removeLikes(item)
+                if (!isLiked) SavedRed.likes.add(item) else SavedRed.likes.remove(item)
                 onRunLike.invoke()
                 onDismiss.invoke()
             }
@@ -161,7 +161,7 @@ fun DropdownMenuItem_Like(item: GifsInfo? = null, onRunLike: () -> Unit, onDismi
 @OptIn(ExperimentalMaterial3Api::class, DelicateCoroutinesApi::class)
 @Composable
 fun DropdownMenuItem_Follow(item: GifsInfo? = null, onDismiss: () -> Unit){
-    val isFollowed = SavedRed.creatorsList.any { it.username == item?.userName }
+    val isFollowed = SavedRed.creators.list.any { it.username == item?.userName }
     val textFollowed = if (isFollowed) "Unfollow" else "Follow"
     val textFollowedIcon = if (isFollowed) Icons.Default.Person else Icons.Default.PermIdentity
     DropdownMenuItem(
@@ -174,11 +174,11 @@ fun DropdownMenuItem_Follow(item: GifsInfo? = null, onDismiss: () -> Unit){
                 if (!isFollowed) {
                     try {
                         val a = RedApi.readCreator(item.userName)
-                        SavedRed.addCreator(a)
+                        SavedRed.creators.add(a)
                     } catch (e: Exception) { e.printStackTrace() }
                 }
                 else {
-                    SavedRed.removeCreator(item.userName)
+                    SavedRed.creators.remove(item.userName)
                 }
             }
             onDismiss.invoke()
@@ -200,8 +200,8 @@ fun DropdownMenuItem_AddCollection(item: GifsInfo? = null, onDismiss: () -> Unit
         text = { Text("Add to Collection", style = style) },
         onClick = {
             if (item == null) return@DropdownMenuItem
-            SavedRed.collectionItemGifInfo = item
-            SavedRed.collectionVisibleDialog = true
+            SavedRed.collections.collectionItemGifInfo = item
+            SavedRed.collections.collectionVisibleDialog = true
             onDismiss.invoke()
         }, contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
     )
@@ -222,11 +222,11 @@ fun DropdownMenuItem_RemoveFromCollection(item: GifsInfo? = null, onRefresh: () 
         text = { Text("Remove from Collection", style = style) },
         onClick = {
             if (item == null) return@DropdownMenuItem
-            if (SavedRed.selectedCollection == null) {
+            if (SavedRed.collections.selectedCollection == null) {
                 onDismiss.invoke()
                 return@DropdownMenuItem
             }
-            SavedRed.deleteItemFromCollection(item, SavedRed.selectedCollection!!)
+            SavedRed.collections.deleteItemFromCollection(item, SavedRed.collections.selectedCollection!!)
             onRefresh.invoke()
 
             onDismiss.invoke()

@@ -18,7 +18,7 @@ class ItemSavedLikesPagingSource (val order : Order): PagingSource<Int, GifsInfo
             //val gif1 = if(order != Order.FORCE_TEMP) SavedRed.likesList.toList() else emptyList()
 
             LoadResult.Page(
-                data = SavedRed.likesList.toList(),
+                data = SavedRed.likes.list.toList(),
                 prevKey = null,
                 nextKey = null
             )

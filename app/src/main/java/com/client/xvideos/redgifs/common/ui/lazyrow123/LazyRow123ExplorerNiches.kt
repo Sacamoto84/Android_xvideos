@@ -155,7 +155,7 @@ fun NichePreview2(niches: Niche, onClick: () -> Unit) {
                         }
                     }
 
-                    val isFollowed = SavedRed.nichesList.any { it.id == niches.id }
+                    val isFollowed = SavedRed.niches.list.any { it.id == niches.id }
 
                     Box(
                         modifier = Modifier
@@ -180,9 +180,9 @@ fun NichePreview2(niches: Niche, onClick: () -> Unit) {
                                 )
 
                                 if (isFollowed)
-                                    SavedRed.removeNiches(nichesInfo)
+                                    SavedRed.niches.remove(nichesInfo)
                                 else
-                                    SavedRed.addNiches(nichesInfo)
+                                    SavedRed.niches.add(nichesInfo)
 
                             }), contentAlignment = Alignment.Center
                     ) {

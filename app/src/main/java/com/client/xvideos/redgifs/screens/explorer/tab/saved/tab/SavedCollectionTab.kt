@@ -100,7 +100,7 @@ object SavedCollectionTab : Screen {
 
         var blockItem by rememberSaveable { mutableStateOf<GifsInfo?>(null) }
 
-        BackHandler { SavedRed.selectedCollection = null }
+        BackHandler { SavedRed.collections.selectedCollection = null }
 
         val list: SnapshotStateList<GifsInfo> = emptyList<GifsInfo>().toMutableStateList()
 
@@ -110,11 +110,11 @@ object SavedCollectionTab : Screen {
             vm.likedHost.columns = column.intValue
         }
 
-        LaunchedEffect(SavedRed.selectedCollection) {
-            if (SavedRed.selectedCollection != null) {
+        LaunchedEffect(SavedRed.collections.selectedCollection) {
+            if (SavedRed.collections.selectedCollection != null) {
                 list.clear()
-                list.addAll(SavedRed.collectionList.first { it.collection == SavedRed.selectedCollection }.list)
-                vm.likedHost.extraString = SavedRed.selectedCollection!!
+                list.addAll(SavedRed.collections.collectionList.first { it.collection == SavedRed.collections.selectedCollection }.list)
+                vm.likedHost.extraString = SavedRed.collections.selectedCollection!!
                 listGifs.refresh()
             } else {
                 list.clear()
@@ -154,7 +154,7 @@ object SavedCollectionTab : Screen {
                 confirmButton = {
                     TextButton(
                         onClick = {
-                            SavedRed.deleteCollection(pending)
+                            SavedRed.collections.deleteCollection(pending)
                             itemPendingDelete = null
                         }
                     ) { Text("Удалить", fontSize = 16.sp, color = Color(0xFF6552A5)) }
@@ -195,7 +195,7 @@ object SavedCollectionTab : Screen {
                 },
                 onBlockConfirmed = { collection ->
                     if ((collection != "")) {
-                        SavedRed.createCollection(collection)
+                        SavedRed.collections.createCollection(collection)
                         collectionVisibleDialogCreateNew = false
                     }
                 }
@@ -207,7 +207,7 @@ object SavedCollectionTab : Screen {
 
         Scaffold(topBar = {
             Text(
-                ">Коллекция>" + SavedRed.selectedCollection ?: "---",
+                ">Коллекция>" + SavedRed.collections.selectedCollection ?: "---",
                 modifier = Modifier.padding(start = 8.dp),
                 color = ThemeRed.colorYellow,
                 fontSize = 18.sp,
@@ -216,7 +216,7 @@ object SavedCollectionTab : Screen {
         }) { padding ->
 
 
-            if (SavedRed.selectedCollection == null) {
+            if (SavedRed.collections.selectedCollection == null) {
                 LazyVerticalGrid(
                     modifier = Modifier.padding(padding),
                     state = vm.gridState,
@@ -224,14 +224,14 @@ object SavedCollectionTab : Screen {
 
                     ) {
 
-                    items(SavedRed.collectionList) {
+                    items(SavedRed.collections.collectionList) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 8.dp)
                                 .padding(vertical = 4.dp)
                                 .combinedClickable(
-                                    onClick = { SavedRed.selectedCollection = it.collection },
+                                    onClick = { SavedRed.collections.selectedCollection = it.collection },
                                     onLongClick = { itemPendingDelete = it.collection }),
                             verticalAlignment = Alignment.CenterVertically
                         ) {

@@ -82,7 +82,7 @@ fun DialogCollection(
                 ){
 
                     LazyColumn(state = rememberLazyListState()) {
-                        items(SavedRed.collectionList){
+                        items(SavedRed.collections.collectionList){
                               Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp).padding(vertical = 4.dp)
                                   .clickable(onClick = { onSelectCollection(it.collection) })
                                   , verticalAlignment = Alignment.CenterVertically){

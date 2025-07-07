@@ -15,7 +15,7 @@ class ItemCollectionPagingSource(val collection: String) : PagingSource<Int, Gif
             Timber.d("!!! ItemCollectionPagingSource::load() collection:${collection}")
 
             val a = if (collection.isNotEmpty()) {
-                SavedRed.collectionList.first { it.collection == collection }.list
+                SavedRed.collections.collectionList.first { it.collection == collection }.list
             } else
                 emptyList()
 

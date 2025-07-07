@@ -112,38 +112,38 @@ class ScreenRedRoot() : Screen {
 
         BackHandler { }
 
-        if (SavedRed.collectionVisibleDialog) {
+        if (SavedRed.collections.collectionVisibleDialog) {
             DialogCollection(
-                visible = SavedRed.collectionVisibleDialog,
-                onDismiss = { SavedRed.collectionVisibleDialog = false },
+                visible = SavedRed.collections.collectionVisibleDialog,
+                onDismiss = { SavedRed.collections.collectionVisibleDialog = false },
                 onBlockConfirmed = {
-                    SavedRed.collectionVisibleDialogCreateNew = true
+                    SavedRed.collections.collectionVisibleDialogCreateNew = true
                 },
                 onSelectCollection = { collection ->
                     root.screenModelScope.launch {
-                        if ((SavedRed.collectionItemGifInfo != null)) {
-                            SavedRed.addCollection(SavedRed.collectionItemGifInfo!!, collection)
-                            SavedRed.collectionItemGifInfo = null
+                        if ((SavedRed.collections.collectionItemGifInfo != null)) {
+                            SavedRed.collections.addCollection(SavedRed.collections.collectionItemGifInfo!!, collection)
+                            SavedRed.collections.collectionItemGifInfo = null
                             SnackBarEvent.success("Элемент добавлен в коллекцию")
                             delay(800)
-                            SavedRed.collectionVisibleDialog = false
+                            SavedRed.collections.collectionVisibleDialog = false
                         }
                     }
                 }
             )
         }
 
-        if (SavedRed.collectionVisibleDialogCreateNew) {
+        if (SavedRed.collections.collectionVisibleDialogCreateNew) {
             DaialogNewCollection(
-                visible = SavedRed.collectionVisibleDialogCreateNew,
+                visible = SavedRed.collections.collectionVisibleDialogCreateNew,
                 onDismiss = {
-                    SavedRed.collectionVisibleDialogCreateNew = false
-                    SavedRed.collectionVisibleDialog = true
+                    SavedRed.collections.collectionVisibleDialogCreateNew = false
+                    SavedRed.collections.collectionVisibleDialog = true
                 },
                 onBlockConfirmed = { collection ->
                     if ((collection != "")) {
-                        SavedRed.createCollection(collection)
-                        SavedRed.collectionVisibleDialogCreateNew = false
+                        SavedRed.collections.createCollection(collection)
+                        SavedRed.collections.collectionVisibleDialogCreateNew = false
                     }
                 }
             )
