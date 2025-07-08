@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.feature.country.ComposeCountry
-import com.client.xvideos.noRippleClickable
+import com.client.common.noRippleClickable
 import com.client.xvideos.xvideos.screens.config.ScreenConfig
 import com.client.xvideos.xvideos.screens.favorites.ScreenFavorites
 import com.client.xvideos.ui.theme.grayColor

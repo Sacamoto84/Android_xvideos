@@ -5,7 +5,7 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.navigator.Navigator
-import com.client.xvideos.feature.preference.PreferencesRepository
+import com.client.common.feature.preference.PreferencesRepository
 import com.client.xvideos.feature.room.AppDatabase
 import com.client.xvideos.feature.room.entity.FavoriteWithItem
 import com.client.xvideos.feature.room.entity.Favorites

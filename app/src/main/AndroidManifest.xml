@@ -38,7 +38,7 @@
         android:theme="@style/Theme.Xvideos"
         tools:targetApi="31">
 
-        <activity android:name=".PermissionScreenActivity"
+        <activity android:name="com.client.redgifs.PermissionScreenActivity"
             android:theme="@style/Theme.Xvideos"
             android:screenOrientation="portrait"
             />

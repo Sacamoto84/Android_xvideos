@@ -10,7 +10,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.PagingSource
 import androidx.paging.cachedIn
-import com.client.common.connectivityObserver.ConnectivityObserver
+import com.client.common.feature.connectivityObserver.ConnectivityObserver
 import com.client.redgifs.common.block.BlockRed
 import com.client.redgifs.common.pagin.ItemCollectionPagingSource
 import com.client.redgifs.common.pagin.ItemEmptyPagingSource

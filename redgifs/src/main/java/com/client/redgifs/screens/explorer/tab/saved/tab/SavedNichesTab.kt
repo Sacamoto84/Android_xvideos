@@ -45,7 +45,7 @@ import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.client.common.connectivityObserver.ConnectivityObserver
+import com.client.common.feature.connectivityObserver.ConnectivityObserver
 import com.client.redgifs.ThemeRed
 import com.client.redgifs.common.saved.SavedRed
 import com.client.redgifs.network.types.NichesInfo

@@ -1,5 +1,8 @@
 package com.client.redgifs.network.api
 
+import com.client.redgifs.App
+import com.client.redgifs.db.entity.CacheMediaResponseEntity
+import com.client.redgifs.db.entity.getCurrentTimeText
 import com.client.redgifs.network.http.ApiClient
 import com.client.redgifs.network.http.Route
 import com.client.redgifs.network.types.CreatorResponse
@@ -13,6 +16,7 @@ import com.client.redgifs.network.types.TopCreatorsResponse
 import com.client.redgifs.network.types.UserInfo
 import com.client.redgifs.network.types.search.SearchItemNichesResponse
 import com.client.redgifs.network.types.search.SearchItemTagsResponse
+import com.client.redgifs.network.types.tag.TagSuggestion
 import com.google.android.gms.common.api.ApiException
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -359,7 +363,7 @@ object RedApi {
 
 private suspend fun cacheMediaResponse(route: Route): MediaResponse {
 
-    val cacheDao = App.instance.redGifsDb.cacheMediaResponseDao()
+    val cacheDao = App.instance.db.cacheMedaResponseDao()
     val cachedEntity = cacheDao.get(route.url)
 
     val gson = GsonBuilder()

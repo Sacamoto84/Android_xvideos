@@ -21,7 +21,8 @@ import coil.ImageLoader
 import coil.ImageLoaderFactory
 import coil.memory.MemoryCache
 import coil.request.CachePolicy
-import com.client.xvideos.PermissionScreenActivity.PermissionStorage
+import com.client.common.PermissionScreenActivity
+import com.client.common.PermissionScreenActivity.PermissionStorage
 import com.client.xvideos.xvideos.screens.videoplayer.video.cache.VideoPlayerCacheManager
 import com.client.xvideos.ui.theme.XvideosTheme
 import com.client.xvideos.util.KeepScreenOn

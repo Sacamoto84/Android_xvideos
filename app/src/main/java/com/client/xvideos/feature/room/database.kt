@@ -19,7 +19,7 @@ import java.util.Date
 import javax.inject.Singleton
 
 @Database(
-    entities = [Items::class, Favorites::class, SearchRedHistoryEntity::class],
+    entities = [Items::class, Favorites::class],
     version = 4,
     exportSchema = true
 )

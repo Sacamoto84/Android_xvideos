@@ -4,14 +4,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.client.xvideos.redgifs.common.saved.collection.collectionCreateToDisk
-import com.client.xvideos.redgifs.common.saved.collection.collectionDeleteFromDisk
-import com.client.xvideos.redgifs.common.saved.collection.collectionItemDeleteFromDisk
-import com.client.xvideos.redgifs.common.saved.collection.collectionItemSaveToDisk
-import com.client.xvideos.redgifs.common.saved.collection.model.CollectionEntity
-import com.client.xvideos.redgifs.common.saved.collection.readAllCollections
-import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
-import com.client.xvideos.redgifs.network.types.GifsInfo
+import com.client.redgifs.common.saved.collection.collectionCreateToDisk
+import com.client.redgifs.common.saved.collection.collectionDeleteFromDisk
+import com.client.redgifs.common.saved.collection.collectionItemDeleteFromDisk
+import com.client.redgifs.common.saved.collection.collectionItemSaveToDisk
+import com.client.redgifs.common.saved.collection.model.CollectionEntity
+import com.client.redgifs.common.saved.collection.readAllCollections
+import com.client.redgifs.common.snackBar.SnackBarEvent
+import com.client.redgifs.network.types.GifsInfo
 import kotlinx.coroutines.DelicateCoroutinesApi
 
 class SavedRed_Collection {

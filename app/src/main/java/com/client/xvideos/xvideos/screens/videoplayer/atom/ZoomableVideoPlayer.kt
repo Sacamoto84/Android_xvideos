@@ -22,7 +22,7 @@ import androidx.media3.common.Player
 import androidx.media3.common.Tracks
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.analytics.AnalyticsListener
-import com.client.xvideos.noRippleClickable
+import com.client.common.noRippleClickable
 
 import com.client.xvideos.xvideos.screens.videoplayer.ScreenVideoPlayerSM
 import com.client.xvideos.xvideos.screens.videoplayer.video.RepeatMode

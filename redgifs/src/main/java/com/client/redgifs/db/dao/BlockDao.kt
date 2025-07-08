@@ -34,7 +34,4 @@ interface BlockDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertBlock(block: BlockEntity)
 
-
-
-
 }

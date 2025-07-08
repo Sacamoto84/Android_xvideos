@@ -1,9 +1,10 @@
 package com.client.redgifs
 
 import android.app.Application
+import com.client.common.feature.videoplayer.util.PlaybackPreference
 import com.client.redgifs.common.block.BlockRed
 import com.client.redgifs.common.saved.SavedRed
-import com.client.redgifs.db.dao.clearOldCache
+import com.client.redgifs.db.AppRedGifsDatabase
 import com.kdownloader.KDownloader
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -53,7 +54,7 @@ class App : Application() {
     lateinit var kDownloader: KDownloader
 
     @Inject
-    lateinit var db: AppDatabase
+    lateinit var db: AppRedGifsDatabase
 
     @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate() {
@@ -62,7 +63,9 @@ class App : Application() {
         //if (BuildConfig.DEBUG)
         Timber.plant(DebugTree())
         //allowAllSSL()
+
         PlaybackPreference.initialize(this)
+
         kDownloader = KDownloader.create(applicationContext)
 
         SavedRed.refreshTagList()

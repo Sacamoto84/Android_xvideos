@@ -7,7 +7,7 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
-import com.client.common.connectivityObserver.ConnectivityObserver
+import com.client.common.feature.connectivityObserver.ConnectivityObserver
 import com.client.redgifs.common.block.BlockRed
 import com.client.redgifs.common.ui.lazyrow123.LazyRow123Host
 import com.client.redgifs.common.ui.lazyrow123.TypePager

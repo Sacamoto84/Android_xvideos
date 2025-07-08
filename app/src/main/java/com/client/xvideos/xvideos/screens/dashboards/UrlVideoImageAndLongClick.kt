@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
-import com.client.xvideos.feature.vibrate.vibrateWithPatternAndAmplitude
+import com.client.common.feature.vibrate.vibrateWithPatternAndAmplitude
 import com.client.xvideos.xvideos.model.GalleryItem
 import com.client.xvideos.xvideos.screens.common.urlVideImage.UrlImage
 import com.client.xvideos.xvideos.screens.common.urlVideImage.UrlVideoLite

@@ -6,10 +6,6 @@ import com.client.common.AppPath
 import com.client.redgifs.db.AppRedGifsDatabase
 import com.client.redgifs.db.dao.BlockDao
 import com.client.redgifs.db.dao.GifsInfoDao
-import com.client.xvideos.AppPath
-import com.client.xvideos.redgifs.db.AppRedGifsDatabase
-import com.client.xvideos.redgifs.db.dao.BlockDao
-import com.client.xvideos.redgifs.db.dao.GifsInfoDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
