@@ -30,10 +30,13 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
-import com.client.common.R
-import com.client.common.feature.videoplayer.atom.VideoQualitySelector
-import com.client.common.feature.videoplayer.atom.VideoSpeedSelector
-import com.client.common.feature.videoplayer.video.ResizeMode
+import com.client.xvideos.R
+import com.client.xvideos.screens.videoplayer.ScreenVideoPlayerSM
+import com.client.xvideos.screens.videoplayer.atom.VideoQualitySelector
+import com.client.xvideos.screens.videoplayer.atom.VideoSpeedSelector
+import com.client.xvideos.screens.videoplayer.video.ResizeMode
+import com.client.xvideos.screens.videoplayer.video.toPlayerViewResizeMode
+
 import kotlinx.coroutines.DelicateCoroutinesApi
 
 private val orange = Color.parseColor("#FFA800")
