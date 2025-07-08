@@ -1,7 +1,7 @@
 package com.client.redgifs.db.converter
 
 import androidx.room.TypeConverter
-import com.client.xvideos.redgifs.network.types.URL1
+import com.client.redgifs.network.types.URL1
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 

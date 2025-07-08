@@ -25,13 +25,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.client.xvideos.BuildConfig
-import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPlayerEvent
-import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPlayerHost
-import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.ScreenResize
-import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.VideoPlayerConfig
-import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.ui.video.VideoPlayerWithControl
-import com.client.xvideos.redgifs.screens.profile.atom.CanvasTimeDurationLine
+import com.client.redgifs.BuildConfig
+import com.client.redgifs.screens.profile.atom.CanvasTimeDurationLine
 import timber.log.Timber
 
 

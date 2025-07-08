@@ -27,7 +27,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.client.xvideos.redgifs.ThemeRed
+import com.client.redgifs.ThemeRed
 
 @Composable
 fun TabRow(

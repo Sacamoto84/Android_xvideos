@@ -1,6 +1,5 @@
 package com.client.redgifs.common.expand_menu_video
 
-
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -33,17 +32,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.client.xvideos.redgifs.network.api.RedApi
-import com.client.xvideos.redgifs.network.types.GifsInfo
-import com.client.xvideos.redgifs.ThemeRed
-import com.client.xvideos.redgifs.common.block.BlockRed
-import com.client.xvideos.redgifs.common.downloader.DownloadRed
-import com.client.xvideos.redgifs.common.saved.SavedRed
+import com.client.redgifs.ThemeRed
+import com.client.redgifs.common.block.BlockRed
+import com.client.redgifs.common.downloader.DownloadRed
+import com.client.redgifs.common.saved.SavedRed
+import com.client.redgifs.network.api.RedApi
+import com.client.redgifs.network.types.GifsInfo
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-
 
 private val tintColor = Color(0xFF48454E)
 private val style =

@@ -1,7 +1,7 @@
 package com.client.redgifs.db.dao
 
 import androidx.room.*
-import com.client.xvideos.redgifs.db.entity.GifsInfoEntity
+import com.client.redgifs.db.entity.GifsInfoEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao

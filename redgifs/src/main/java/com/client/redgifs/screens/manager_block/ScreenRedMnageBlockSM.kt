@@ -2,8 +2,8 @@ package com.client.redgifs.screens.manager_block
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.hilt.ScreenModelKey
-import com.client.xvideos.redgifs.network.types.GifsInfo
-import com.client.xvideos.redgifs.common.block.useCase.blockGetAllBlockedGifsInfo
+import com.client.redgifs.common.block.useCase.blockGetAllBlockedGifsInfo
+import com.client.redgifs.network.types.GifsInfo
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

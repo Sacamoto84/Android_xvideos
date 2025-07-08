@@ -30,7 +30,7 @@ import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.client.xvideos.redgifs.ThemeRed
+import com.client.redgifs.ThemeRed
 
 @Composable
 fun TagsBlock(tags: List<String>) {

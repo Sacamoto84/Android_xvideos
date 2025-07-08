@@ -2,8 +2,8 @@ package com.client.redgifs.db.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.client.xvideos.redgifs.network.types.GifsInfo
-import com.client.xvideos.redgifs.network.types.URL1
+import com.client.redgifs.network.types.GifsInfo
+import com.client.redgifs.network.types.URL1
 
 @Entity(tableName = "gifs_info")
 data class GifsInfoEntity(

@@ -2,8 +2,8 @@ package com.client.redgifs.common.share
 
 import android.content.Context
 import android.widget.Toast
-import com.client.xvideos.AppPath
-import com.client.xvideos.redgifs.network.types.GifsInfo
+import com.client.common.AppPath
+import com.client.redgifs.network.types.GifsInfo
 import timber.log.Timber
 import java.io.File
 

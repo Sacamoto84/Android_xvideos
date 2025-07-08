@@ -27,7 +27,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import com.client.xvideos.redgifs.common.video.player_with_menu.model.SwipeState
+import com.client.redgifs.common.video.player_with_menu.model.SwipeState
 import timber.log.Timber
 import kotlin.math.roundToInt
 

@@ -1,9 +1,9 @@
 package com.client.redgifs.common.network
 
-import com.client.xvideos.redgifs.network.api.RedApi
-import com.client.xvideos.redgifs.network.types.CreatorResponse
-import com.client.xvideos.redgifs.network.types.MediaType
-import com.client.xvideos.redgifs.network.types.Order
+import com.client.redgifs.network.api.RedApi
+import com.client.redgifs.network.types.CreatorResponse
+import com.client.redgifs.network.types.MediaType
+import com.client.redgifs.network.types.Order
 
 suspend fun loadGifs(
     userName: String = "lilijunex",

@@ -17,12 +17,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.client.xvideos.R
-import com.client.xvideos.redgifs.network.types.GifsInfo
-import com.client.xvideos.xvideos.screens.common.urlVideImage.UrlImage
-import com.client.xvideos.redgifs.ThemeRed
-import com.client.xvideos.util.toMinSec
-import com.client.xvideos.util.toPrettyCount
+import com.client.redgifs.ThemeRed
+import com.client.redgifs.network.types.GifsInfo
 import com.composables.core.Icon
 
 @Composable

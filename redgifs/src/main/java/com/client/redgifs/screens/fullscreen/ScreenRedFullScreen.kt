@@ -27,11 +27,13 @@ import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import com.client.common.AppPath
+import com.client.redgifs.ThemeRed
 import com.client.redgifs.common.downloader.DownloadRed
 import com.client.redgifs.common.downloader.ui.DownloadIndicator
 import com.client.redgifs.common.video.RedVideoPlayerWithMenu
 import com.client.redgifs.network.types.GifsInfo
 import com.client.redgifs.screens.fullscreen.bottom_bar.line0.FeedControls_Container_Line0
+import com.client.redgifs.screens.profile.atom.CanvasTimeDurationLine
 import com.composables.core.HorizontalSeparator
 import dagger.Binds
 import dagger.Module

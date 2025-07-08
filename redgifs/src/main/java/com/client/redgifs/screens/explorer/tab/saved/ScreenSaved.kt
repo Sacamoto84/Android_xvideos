@@ -31,8 +31,12 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import com.client.redgifs.ThemeRed
+import com.client.redgifs.screens.explorer.tab.FavoritesTab
 import com.client.redgifs.screens.explorer.tab.saved.tab.SavedCollectionTab
+import com.client.redgifs.screens.explorer.tab.saved.tab.SavedCreatorsTab
 import com.client.redgifs.screens.explorer.tab.saved.tab.SavedLikesTab
+import com.client.redgifs.screens.explorer.tab.saved.tab.SavedNichesTab
+import com.client.redgifs.screens.explorer.top.TabRow
 
 object SavedTab : Screen {
 

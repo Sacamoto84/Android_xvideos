@@ -10,8 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.client.xvideos.feature.Downloader
-import com.client.xvideos.redgifs.ThemeRed
+import androidx.media3.exoplayer.offline.Downloader
+import com.client.redgifs.ThemeRed
 import com.composables.core.HorizontalSeparator
 
 @Composable

@@ -44,6 +44,7 @@ import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.client.common.connectivityObserver.ConnectivityObserver
 import com.client.redgifs.ThemeRed
 import com.client.redgifs.common.block.BlockRed
 import com.client.redgifs.common.search.SearchRed
@@ -54,6 +55,7 @@ import com.client.redgifs.common.ui.sortByOrder.SortByOrder
 import com.client.redgifs.network.types.Order
 import com.client.redgifs.screens.LocalRootScreenModel
 import com.client.redgifs.screens.profile.ScreenRedProfile
+import com.client.redgifs.screens.profile.atom.VerticalScrollbar
 import com.client.redgifs.screens.profile.rememberVisibleRangePercentIgnoringFirstNForGrid
 import dagger.Binds
 import dagger.Module

@@ -5,8 +5,8 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.client.xvideos.redgifs.db.entity.BlockEntity
-import com.client.xvideos.redgifs.db.entity.BlockWithGif
+import com.client.redgifs.db.entity.BlockEntity
+import com.client.redgifs.db.entity.BlockWithGif
 import kotlinx.coroutines.flow.Flow
 
 @Dao

@@ -19,8 +19,6 @@ data class CacheMediaResponseEntity(
     val timeCreate: Long = System.currentTimeMillis(),
     val timeCreateText: String = getCurrentTimeText()// добавляем поле для времени в текстовом формате = getCurrentTimeText()
 )
-
-
 fun getStartOfTodayMillis(): Long {
     val calendar = Calendar.getInstance()
     calendar.set(Calendar.HOUR_OF_DAY, 0)
@@ -29,13 +27,8 @@ fun getStartOfTodayMillis(): Long {
     calendar.set(Calendar.MILLISECOND, 0)
     return calendar.timeInMillis
 }
-
-
-
 fun getCurrentTimeText(): String {
     val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US)
     sdf.timeZone = TimeZone.getTimeZone("UTC")
     return sdf.format(Date())
 }
-
-

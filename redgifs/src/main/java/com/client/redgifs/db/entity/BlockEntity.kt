@@ -7,7 +7,6 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.Relation
 
-
 @Entity(
     tableName = "block",
     foreignKeys = [

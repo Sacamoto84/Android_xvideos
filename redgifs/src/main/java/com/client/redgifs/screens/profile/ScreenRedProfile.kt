@@ -29,8 +29,11 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.client.redgifs.ThemeRed
+import com.client.redgifs.common.block.ui.DialogBlock
 import com.client.redgifs.common.ui.lazyrow123.LazyRow123
 import com.client.redgifs.screens.profile.atom.RedProfileCreaterInfo
+import com.client.redgifs.screens.profile.atom.VerticalScrollbar
 import com.client.redgifs.screens.profile.tags.TagsBlock
 import com.composeunstyled.rememberDisclosureState
 

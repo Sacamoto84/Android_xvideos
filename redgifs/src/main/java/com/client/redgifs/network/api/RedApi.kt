@@ -1,5 +1,6 @@
 package com.client.redgifs.network.api
 
+import com.client.redgifs.network.http.ApiClient
 import com.client.redgifs.network.http.Route
 import com.client.redgifs.network.types.CreatorResponse
 import com.client.redgifs.network.types.CreatorsResponse

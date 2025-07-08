@@ -62,9 +62,9 @@ import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Transaction
-import com.client.xvideos.App
-import com.client.xvideos.redgifs.ThemeRed
-import com.client.xvideos.redgifs.common.saved.SavedRed
+import com.client.redgifs.App
+import com.client.redgifs.ThemeRed
+import com.client.redgifs.common.saved.SavedRed
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow

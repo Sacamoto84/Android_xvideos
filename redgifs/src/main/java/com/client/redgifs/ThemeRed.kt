@@ -3,6 +3,7 @@ package com.client.redgifs
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import com.client.common.R
 
 
 object ThemeRed {

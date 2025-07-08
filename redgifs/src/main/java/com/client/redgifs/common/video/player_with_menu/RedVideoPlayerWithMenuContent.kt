@@ -20,13 +20,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.client.xvideos.BuildConfig
-import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPlayerEvent
-import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPlayerHost
-import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.ScreenResize
-import com.client.xvideos.redgifs.ThemeRed
-import com.client.xvideos.redgifs.common.video.player_with_menu.atom.VideoPlayerWithMenuContent
-import com.client.xvideos.redgifs.screens.profile.PlayerControls
+import com.client.redgifs.BuildConfig
+import com.client.redgifs.screens.profile.PlayerControls
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest

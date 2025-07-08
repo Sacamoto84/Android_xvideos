@@ -23,8 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.client.xvideos.redgifs.common.block.BlockRed
-import com.client.xvideos.redgifs.screens.profile.ScreenRedProfileSM
+import com.client.redgifs.screens.profile.ScreenRedProfileSM
 
 @Composable
 fun MenuContent(vm: ScreenRedProfileSM) {

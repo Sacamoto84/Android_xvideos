@@ -23,13 +23,13 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
-import com.client.xvideos.redgifs.ThemeRed
-import com.client.xvideos.redgifs.screens.explorer.tab.FavoritesTab
-import com.client.xvideos.redgifs.screens.explorer.tab.gifs.GifsTab
-import com.client.xvideos.redgifs.screens.explorer.tab.niches.NichesTab
-import com.client.xvideos.redgifs.screens.explorer.tab.saved.SavedTab
-import com.client.xvideos.redgifs.screens.explorer.tab.search.SearchTab
-import com.client.xvideos.redgifs.screens.explorer.top.TabRow
+import com.client.redgifs.ThemeRed
+import com.client.redgifs.screens.explorer.tab.FavoritesTab
+import com.client.redgifs.screens.explorer.tab.gifs.GifsTab
+import com.client.redgifs.screens.explorer.tab.niches.NichesTab
+import com.client.redgifs.screens.explorer.tab.saved.SavedTab
+import com.client.redgifs.screens.explorer.tab.search.SearchTab
+import com.client.redgifs.screens.explorer.top.TabRow
 
 @Composable
 private fun RowScope.TabNavigationItem(tab: Tab) {

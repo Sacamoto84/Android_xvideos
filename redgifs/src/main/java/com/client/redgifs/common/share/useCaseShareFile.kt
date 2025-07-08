@@ -5,7 +5,6 @@ import android.content.Intent
 import androidx.core.content.FileProvider
 import java.io.File
 
-
 fun useCaseShareFile(context: Context, file: File) {
 
     val uri = FileProvider.getUriForFile(

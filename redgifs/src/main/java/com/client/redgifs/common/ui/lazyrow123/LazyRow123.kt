@@ -43,8 +43,10 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.client.common.R
 import com.client.redgifs.ThemeRed
 import com.client.redgifs.common.block.ui.DialogBlock
+import com.client.redgifs.common.downloader.DownloadRed
 import com.client.redgifs.common.expand_menu_video.ExpandMenuVideo
 import com.client.redgifs.common.saved.SavedRed
 import com.client.redgifs.common.users.UsersRed
@@ -52,20 +54,8 @@ import com.client.redgifs.common.video.player_row_mini.RedUrlVideoImageAndLongCl
 import com.client.redgifs.network.types.GifsInfo
 import com.client.redgifs.screens.fullscreen.ScreenRedFullScreen
 import com.client.redgifs.screens.top_this_week.ProfileInfo1
-import com.client.xvideos.R
-import com.client.xvideos.redgifs.network.types.GifsInfo
-import com.client.xvideos.redgifs.ThemeRed
-import com.client.xvideos.redgifs.common.block.ui.DialogBlock
-import com.client.xvideos.redgifs.common.downloader.DownloadRed
-import com.client.xvideos.redgifs.common.expand_menu_video.ExpandMenuVideo
-import com.client.xvideos.redgifs.common.saved.SavedRed
-import com.client.xvideos.redgifs.common.users.UsersRed
-import com.client.xvideos.redgifs.common.video.player_row_mini.RedUrlVideoImageAndLongClick
-import com.client.xvideos.redgifs.screens.fullscreen.ScreenRedFullScreen
-import com.client.xvideos.redgifs.screens.top_this_week.ProfileInfo1
 import com.composeunstyled.Text
 import timber.log.Timber
-import kotlin.collections.get
 
 @Composable
 fun LazyRow123(

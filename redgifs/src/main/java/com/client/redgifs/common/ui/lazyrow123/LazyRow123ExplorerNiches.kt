@@ -35,13 +35,10 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.client.xvideos.redgifs.network.types.Niche
-import com.client.xvideos.redgifs.network.types.NichesInfo
-import com.client.xvideos.redgifs.ThemeRed
-import com.client.xvideos.redgifs.common.saved.SavedRed
-import com.client.xvideos.redgifs.screens.niche.ScreenRedNiche
-import com.client.xvideos.xvideos.screens.common.urlVideImage.UrlImage
-import com.client.xvideos.util.toPrettyCountInt
+import com.client.redgifs.ThemeRed
+import com.client.redgifs.common.saved.SavedRed
+import com.client.redgifs.network.types.Niche
+import com.client.redgifs.screens.niche.ScreenRedNiche
 import kotlin.collections.get
 
 @Composable

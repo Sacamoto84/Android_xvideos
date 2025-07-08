@@ -28,12 +28,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.client.xvideos.R
-import com.client.xvideos.redgifs.network.types.UserInfo
-import com.client.xvideos.redgifs.ThemeRed
-import com.client.xvideos.redgifs.common.saved.SavedRed
-import com.client.xvideos.xvideos.screens.common.urlVideImage.UrlImage
-import com.client.xvideos.util.toPrettyCount
+import com.client.redgifs.ThemeRed
+import com.client.redgifs.common.saved.SavedRed
+import com.client.redgifs.network.types.UserInfo
 import com.composeunstyled.Text
 
 @Composable
