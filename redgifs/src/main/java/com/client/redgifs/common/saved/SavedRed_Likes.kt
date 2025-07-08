@@ -1,16 +1,16 @@
 package com.client.redgifs.common.saved
 
-import com.client.xvideos.AppPath
-import com.client.xvideos.feature.fileDB.FileDB
-import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
-import com.client.xvideos.redgifs.network.types.GifsInfo
+import com.client.common.AppPath
+import com.client.common.feature.fileDB.FileDB
+import com.client.redgifs.common.snackBar.SnackBarEvent
+import com.client.redgifs.network.types.GifsInfo
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlin.onSuccess
 
 class SavedRed_Likes {
 
-    val likesDb = FileDB<GifsInfo>(AppPath.likes_red, "likes", object : TypeToken<GifsInfo>() {}.type)
+    val likesDb =
+        FileDB<GifsInfo>(AppPath.likes_red, "likes", object : TypeToken<GifsInfo>() {}.type)
 
     var list = likesDb.list
 

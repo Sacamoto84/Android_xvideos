@@ -1,16 +1,17 @@
 package com.client.redgifs.common.saved
 
-import com.client.xvideos.AppPath
-import com.client.xvideos.feature.fileDB.FileDB
-import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
-import com.client.xvideos.redgifs.network.types.NichesInfo
+import com.client.common.AppPath
+import com.client.common.feature.fileDB.FileDB
+import com.client.redgifs.common.snackBar.SnackBarEvent
+import com.client.redgifs.network.types.NichesInfo
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlin.onSuccess
 
 class SavedRed_Niches {
 
-    val nichesDb = FileDB<NichesInfo>(AppPath.niches_red, "niches", object : TypeToken<NichesInfo>() {}.type)
+    val nichesDb =
+        FileDB<NichesInfo>(AppPath.niches_red, "niches", object : TypeToken<NichesInfo>() {}.type)
     val list = nichesDb.list
 
     fun add(item: NichesInfo) {

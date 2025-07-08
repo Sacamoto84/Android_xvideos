@@ -68,13 +68,13 @@ class App : Application() {
         SavedRed.refreshTagList()
 
         BlockRed.refreshBlockList()
-        SavedRed.refreshLikesList()
-        SavedRed.refreshNichesList()
-        SavedRed.refreshCreatorsList()
-        SavedRed.refreshCollectionList()
+        SavedRed.likes.refresh()
+        SavedRed.niches.refresh()
+        SavedRed.creators.refresh()
+        SavedRed.collections.refreshCollectionList()
 
         GlobalScope.launch {
-            clearOldCache( db.cacheMedaResponseDao())
+            //clearOldCache( db.cacheMedaResponseDao())
         }
 
     }

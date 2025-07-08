@@ -2,14 +2,14 @@ package com.client.redgifs.common.pagin
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.client.xvideos.redgifs.network.api.RedApi_Explorer
-import com.client.xvideos.redgifs.network.types.Niche
-import com.client.xvideos.redgifs.network.types.Order
+import com.client.redgifs.network.api.RedApi_Explorer
+import com.client.redgifs.network.types.Niche
+import com.client.redgifs.network.types.Order
 import timber.log.Timber
 
 class ItemExplorerNailsPagingSource (val order : Order): PagingSource<Int, Niche>() {
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int,  Niche> {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Niche> {
 
         val page = params.key ?: 1 // API нумерует страницы с 1
 

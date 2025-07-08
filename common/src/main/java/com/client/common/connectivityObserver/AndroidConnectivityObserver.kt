@@ -17,7 +17,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import javax.inject.Singleton
 
-
 @Module
 @InstallIn(SingletonComponent::class)
 object modileConnectivityObserver {

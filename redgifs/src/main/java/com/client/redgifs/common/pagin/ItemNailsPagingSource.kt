@@ -2,11 +2,11 @@ package com.client.redgifs.common.pagin
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.client.xvideos.redgifs.network.api.RedApi
-import com.client.xvideos.redgifs.network.types.GifsInfo
-import com.client.xvideos.redgifs.network.types.Order
-import com.client.xvideos.redgifs.common.block.BlockRed
-import com.client.xvideos.redgifs.common.users.UsersRed
+import com.client.redgifs.common.block.BlockRed
+import com.client.redgifs.common.users.UsersRed
+import com.client.redgifs.network.api.RedApi
+import com.client.redgifs.network.types.GifsInfo
+import com.client.redgifs.network.types.Order
 import timber.log.Timber
 
 class ItemNailsPagingSource (val order : Order, val nichesName : String, val block: BlockRed): PagingSource<Int, GifsInfo>() {
