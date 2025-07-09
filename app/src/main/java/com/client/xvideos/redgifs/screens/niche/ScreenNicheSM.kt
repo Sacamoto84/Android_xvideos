@@ -9,6 +9,7 @@ import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
 import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.redgifs.common.block.BlockRed
+import com.client.xvideos.redgifs.common.saved.SavedRed
 import com.client.xvideos.redgifs.common.search.SearchRed
 import com.redgifs.network.api.RedApi
 import com.redgifs.model.NichesInfo
@@ -32,7 +33,8 @@ class ScreenNicheSM @AssistedInject constructor(
     connectivityObserver: ConnectivityObserver,
     val block: BlockRed,
     search : SearchRed,
-    redApi : RedApi
+    redApi : RedApi,
+    val savedRed: SavedRed
 ) : ScreenModel {
 
     @AssistedFactory

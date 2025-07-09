@@ -135,7 +135,7 @@ class ScreenRedProfile(val profileName: String) : Screen {
                                 Column {
 
                                     if (vm.creator != null) {
-                                        RedProfileCreaterInfo(vm.creator!!)
+                                        RedProfileCreaterInfo(vm.creator!!, vm.savedRed)
                                     }
 
                                     if ((vm.creator != null) && (vm.tags.collectAsStateWithLifecycle().value.isNotEmpty())) {

@@ -20,6 +20,7 @@ import com.client.xvideos.redgifs.common.pagin.ItemSavedLikesPagingSource
 import com.client.xvideos.redgifs.common.pagin.ItemNailsPagingSource
 import com.client.xvideos.redgifs.common.pagin.ItemProfilePagingSource
 import com.client.xvideos.redgifs.common.pagin.ItemTopPagingSource
+import com.client.xvideos.redgifs.common.saved.SavedRed
 import com.client.xvideos.redgifs.common.search.SearchRed
 import com.redgifs.network.api.RedApi
 import kotlinx.coroutines.CoroutineScope
@@ -69,7 +70,8 @@ class LazyRow123Host(
     val isCollection: Boolean = false,
     val block: BlockRed,
     val search : SearchRed,
-    val redApi : RedApi
+    val redApi : RedApi,
+    val savedRed: SavedRed
 ) {
 
     //var searchText by mutableStateOf("")
@@ -134,7 +136,7 @@ class LazyRow123Host(
                         Timber.d("!!! >>>pagingSourceFactory{...}")
                         gotoUp()
                         gotoUpColumn()
-                        createPager(typePager, params.sort, extraString, params.query, block, redApi)
+                        createPager(typePager, params.sort, extraString, params.query, block, redApi, savedRed)
                     }
                 ).flow
             }
@@ -166,7 +168,8 @@ fun createPager(
     extraString: String,
     searchText: String,
     block : BlockRed,
-    redApi : RedApi
+    redApi : RedApi,
+    savedRed: SavedRed
 ): PagingSource<Int, Any> {
     val pagingSourceFactory = when (typePager) {
         TypePager.NICHES -> {
@@ -178,11 +181,11 @@ fun createPager(
         }
 
         TypePager.SAVED_LIKES -> {
-            ItemSavedLikesPagingSource(sort)
+            ItemSavedLikesPagingSource(sort, savedRed)
         }
 
         TypePager.EXPLORER_NICHES -> {
-            ItemExplorerNailsPagingSource(order = sort)
+            ItemExplorerNailsPagingSource(order = sort, redApi = redApi)
         }
 
         TypePager.PROFILE -> {
@@ -194,7 +197,7 @@ fun createPager(
         }
 
         TypePager.SAVED_COLLECTION -> {
-            ItemCollectionPagingSource(extraString)
+            ItemCollectionPagingSource(extraString, savedRed)
         }
 
     }

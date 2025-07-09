@@ -90,15 +90,17 @@ class ScreenRedRoot() : Screen {
     @Composable
     override fun Content() {
 
-        val root: ScreenRedRootSM = getScreenModel()
+        val vm: ScreenRedRootSM = getScreenModel()
         val snackbarHostState = remember { SnackbarHostState() }
 
         val scope = rememberCoroutineScope()
 
         val haptic = LocalHapticFeedback.current
 
+        val savedRed = vm.savedRed
+        
         LaunchedEffect(Unit) {
-            root.snackbarEvents.collect { message ->
+            vm.snackbarEvents.collect { message ->
                 snackbarHostState.showSnackbar(message)
             }
         }
@@ -112,44 +114,48 @@ class ScreenRedRoot() : Screen {
 
         BackHandler { }
 
-        if (SavedRed.collections.collectionVisibleDialog) {
+        if (savedRed.collections.collectionVisibleDialog) {
             DialogCollection(
-                visible = SavedRed.collections.collectionVisibleDialog,
-                onDismiss = { SavedRed.collections.collectionVisibleDialog = false },
+                visible = savedRed.collections.collectionVisibleDialog,
+                onDismiss = { savedRed.collections.collectionVisibleDialog = false },
                 onBlockConfirmed = {
-                    SavedRed.collections.collectionVisibleDialogCreateNew = true
+                    savedRed.collections.collectionVisibleDialogCreateNew = true
                 },
                 onSelectCollection = { collection ->
-                    root.screenModelScope.launch {
-                        if ((SavedRed.collections.collectionItemGifInfo != null)) {
-                            SavedRed.collections.addCollection(SavedRed.collections.collectionItemGifInfo!!, collection)
-                            SavedRed.collections.collectionItemGifInfo = null
+                    vm.screenModelScope.launch {
+                        if ((savedRed.collections.collectionItemGifInfo != null)) {
+                            savedRed.collections.addCollection(
+                                savedRed.collections.collectionItemGifInfo!!,
+                                collection
+                            )
+                            savedRed.collections.collectionItemGifInfo = null
                             SnackBarEvent.success("Элемент добавлен в коллекцию")
                             delay(800)
-                            SavedRed.collections.collectionVisibleDialog = false
+                            savedRed.collections.collectionVisibleDialog = false
                         }
                     }
-                }
+                },
+                savedRed = savedRed
             )
         }
 
-        if (SavedRed.collections.collectionVisibleDialogCreateNew) {
+        if (savedRed.collections.collectionVisibleDialogCreateNew) {
             DaialogNewCollection(
-                visible = SavedRed.collections.collectionVisibleDialogCreateNew,
+                visible = savedRed.collections.collectionVisibleDialogCreateNew,
                 onDismiss = {
-                    SavedRed.collections.collectionVisibleDialogCreateNew = false
-                    SavedRed.collections.collectionVisibleDialog = true
+                    savedRed.collections.collectionVisibleDialogCreateNew = false
+                    savedRed.collections.collectionVisibleDialog = true
                 },
                 onBlockConfirmed = { collection ->
                     if ((collection != "")) {
-                        SavedRed.collections.createCollection(collection)
-                        SavedRed.collections.collectionVisibleDialogCreateNew = false
+                        savedRed.collections.createCollection(collection)
+                        savedRed.collections.collectionVisibleDialogCreateNew = false
                     }
                 }
             )
         }
 
-        CompositionLocalProvider(LocalRootScreenModel provides root) {
+        CompositionLocalProvider(LocalRootScreenModel provides vm) {
             Scaffold(
                 modifier = Modifier.imePadding(),
                 bottomBar = { DownloadIndicator() },
@@ -242,6 +248,7 @@ class ScreenRedRoot() : Screen {
 }
 
 class ScreenRedRootSM @Inject constructor(
+    val savedRed: SavedRed
 ) : ScreenModel {
     private val _snackbarEvents = Channel<String>(64)
     val snackbarEvents = _snackbarEvents.receiveAsFlow()

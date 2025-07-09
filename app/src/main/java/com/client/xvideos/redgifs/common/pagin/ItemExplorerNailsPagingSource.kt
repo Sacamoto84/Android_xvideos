@@ -5,9 +5,10 @@ import androidx.paging.PagingState
 import com.redgifs.network.api.RedApi_Explorer
 import com.redgifs.model.Niche
 import com.redgifs.model.Order
+import com.redgifs.network.api.RedApi
 import timber.log.Timber
 
-class ItemExplorerNailsPagingSource (val order : Order): PagingSource<Int, Niche>() {
+class ItemExplorerNailsPagingSource (val order : Order, val redApi: RedApi): PagingSource<Int, Niche>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int,  Niche> {
 
@@ -24,7 +25,7 @@ class ItemExplorerNailsPagingSource (val order : Order): PagingSource<Int, Niche
                 )
             }
 
-            val response = RedApi_Explorer.getExplorerNiches(order, page = page)
+            val response = redApi.explorer.getExplorerNiches(order, page = page)
 
             val isEndReached = response.niches.isEmpty() // или, если ты знаешь, что сервер вернул всё
 

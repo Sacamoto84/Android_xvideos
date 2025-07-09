@@ -103,7 +103,7 @@ object SavedNichesTab : Screen {
                 confirmButton = {
                     TextButton(
                         onClick = {
-                            SavedRed.niches.remove(pending)   // удаляем
+                            vm.savedRed.niches.remove(pending)   // удаляем
                             itemPendingDelete = null         // закрываем диалог
                         }
                     ) { Text("Удалить", fontSize = 16.sp, color = Color(0xFF6552A5)) }
@@ -134,7 +134,7 @@ object SavedNichesTab : Screen {
                     modifier = Modifier.fillMaxSize()
                 )
                 {
-                    items(SavedRed.niches.list) {
+                    items(vm.savedRed.niches.list) {
 
                         Row(
                             modifier = Modifier
@@ -202,7 +202,8 @@ object SavedNichesTab : Screen {
 }
 
 class ScreenSavedNichesSM @Inject constructor(
-    connectivityObserver: ConnectivityObserver
+    connectivityObserver: ConnectivityObserver,
+    val savedRed: SavedRed
 ) : ScreenModel {
 
 

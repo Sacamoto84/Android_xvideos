@@ -23,7 +23,7 @@ class ItemTopPagingSource(val sort: Order, val searchText: String, val block: Bl
 
             val response: MediaResponse = if (searchText != "") {
                 Timber.i("!!! ItemTopPagingSource::load()  RedGifs.searchGifs($searchText)")
-                RedApi_Search.searchGifs(searchText, sort, 100, page)
+                redApi.search.searchGifs(searchText, sort, 100, page)
             } else {
                 when (sort) {
                     Order.TOP_WEEK -> redApi.getTopThisWeek(100, page)

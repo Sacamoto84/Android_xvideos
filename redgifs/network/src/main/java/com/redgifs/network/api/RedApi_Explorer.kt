@@ -5,8 +5,7 @@ import com.redgifs.network.http.Route
 import com.redgifs.model.NichesResponse
 import com.redgifs.model.Order
 
-object RedApi_Explorer {
-    val api = ApiClient
+class RedApi_Explorer(val api: ApiClient) {
 
     /**
     ### subscribers

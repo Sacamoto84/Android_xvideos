@@ -102,7 +102,9 @@ object SavedCollectionTab : Screen {
 
         var blockItem by rememberSaveable { mutableStateOf<GifsInfo?>(null) }
 
-        BackHandler { SavedRed.collections.selectedCollection = null }
+        val savedRed = vm.savedRed
+
+        BackHandler { savedRed.collections.selectedCollection = null }
 
         val list: SnapshotStateList<GifsInfo> = emptyList<GifsInfo>().toMutableStateList()
 
@@ -112,11 +114,11 @@ object SavedCollectionTab : Screen {
             vm.likedHost.columns = column.intValue
         }
 
-        LaunchedEffect(SavedRed.collections.selectedCollection) {
-            if (SavedRed.collections.selectedCollection != null) {
+        LaunchedEffect(savedRed.collections.selectedCollection) {
+            if (savedRed.collections.selectedCollection != null) {
                 list.clear()
-                list.addAll(SavedRed.collections.collectionList.first { it.collection == SavedRed.collections.selectedCollection }.list)
-                vm.likedHost.extraString = SavedRed.collections.selectedCollection!!
+                list.addAll(savedRed.collections.collectionList.first { it.collection == savedRed.collections.selectedCollection }.list)
+                vm.likedHost.extraString = savedRed.collections.selectedCollection!!
                 listGifs.refresh()
             } else {
                 list.clear()
@@ -156,7 +158,7 @@ object SavedCollectionTab : Screen {
                 confirmButton = {
                     TextButton(
                         onClick = {
-                            SavedRed.collections.deleteCollection(pending)
+                            savedRed.collections.deleteCollection(pending)
                             itemPendingDelete = null
                         }
                     ) { Text("Удалить", fontSize = 16.sp, color = Color(0xFF6552A5)) }
@@ -197,7 +199,7 @@ object SavedCollectionTab : Screen {
                 },
                 onBlockConfirmed = { collection ->
                     if ((collection != "")) {
-                        SavedRed.collections.createCollection(collection)
+                        savedRed.collections.createCollection(collection)
                         collectionVisibleDialogCreateNew = false
                     }
                 }
@@ -209,7 +211,7 @@ object SavedCollectionTab : Screen {
 
         Scaffold(topBar = {
             Text(
-                ">Коллекция>" + SavedRed.collections.selectedCollection ?: "---",
+                ">Коллекция>" + savedRed.collections.selectedCollection ?: "---",
                 modifier = Modifier.padding(start = 8.dp),
                 color = ThemeRed.colorYellow,
                 fontSize = 18.sp,
@@ -218,7 +220,7 @@ object SavedCollectionTab : Screen {
         }) { padding ->
 
 
-            if (SavedRed.collections.selectedCollection == null) {
+            if (savedRed.collections.selectedCollection == null) {
                 LazyVerticalGrid(
                     modifier = Modifier.padding(padding),
                     state = vm.gridState,
@@ -226,14 +228,14 @@ object SavedCollectionTab : Screen {
 
                     ) {
 
-                    items(SavedRed.collections.collectionList) {
+                    items(savedRed.collections.collectionList) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 8.dp)
                                 .padding(vertical = 4.dp)
                                 .combinedClickable(
-                                    onClick = { SavedRed.collections.selectedCollection = it.collection },
+                                    onClick = { savedRed.collections.selectedCollection = it.collection },
                                     onLongClick = { itemPendingDelete = it.collection }),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -452,7 +454,8 @@ class ScreenSavedCollectionSM @Inject constructor(
     connectivityObserver: ConnectivityObserver,
     val block: BlockRed,
     search : SearchRed,
-    redApi : RedApi
+    redApi : RedApi,
+    val savedRed: SavedRed
 ) : ScreenModel {
     val gridState = LazyGridState()
 
@@ -465,7 +468,8 @@ class ScreenSavedCollectionSM @Inject constructor(
         isCollection = true,
         block = block,
         search = search,
-        redApi = redApi
+        redApi = redApi,
+        savedRed = savedRed
     )
 }
 

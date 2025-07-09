@@ -67,9 +67,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import javax.inject.Singleton
 
+
+@Singleton
 class SearchRed @Inject constructor(
-   val dao : SearchRedHistoryDao
+    val dao: SearchRedHistoryDao,
+    val savedRed: SavedRed
 ) {
 
 
@@ -185,7 +189,7 @@ class SearchRed @Inject constructor(
                     }
                 }
 
-                ExpandMenuHelper()
+                ExpandMenuHelper(savedRed = savedRed)
 
                 ExpandMenuHistory(history1)
 
@@ -199,6 +203,7 @@ class SearchRed @Inject constructor(
     @Composable
     fun ExpandMenuHelper(
         modifier: Modifier = Modifier,
+        savedRed: SavedRed
     ) {
         var expanded by remember { mutableStateOf(false) }
 
@@ -234,19 +239,20 @@ class SearchRed @Inject constructor(
 
 
                 FlowRow(Modifier.fillMaxSize(), maxItemsInEachRow = 10) {
-                    SavedRed.tagsList.sortedByDescending { it.count }.take(200).forEach {
-                        Row( modifier = Modifier
-                            .padding(horizontal = 2.dp)
-                            .padding(vertical = 2.dp)
+                    savedRed.tagsList.sortedByDescending { it.count }.take(200).forEach {
+                        Row(
+                            modifier = Modifier
+                                .padding(horizontal = 2.dp)
+                                .padding(vertical = 2.dp)
 
-                            .border(1.dp, ThemeRed.colorTextGray, RoundedCornerShape(25))
-                            .background(Color.Transparent)
-                            .padding(4.dp)
-                            .clickable(onClick = {
-                                searchText.value = it.name
-                                searchTextDone.value = it.name
-                                expanded = false
-                            })
+                                .border(1.dp, ThemeRed.colorTextGray, RoundedCornerShape(25))
+                                .background(Color.Transparent)
+                                .padding(4.dp)
+                                .clickable(onClick = {
+                                    searchText.value = it.name
+                                    searchTextDone.value = it.name
+                                    expanded = false
+                                })
 
                         ) {
 

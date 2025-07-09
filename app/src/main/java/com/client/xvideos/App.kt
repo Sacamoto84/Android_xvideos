@@ -64,6 +64,9 @@ class App : Application() {
     @Inject
     lateinit var blockRed: BlockRed
 
+    @Inject
+    lateinit var savedRed: SavedRed
+
     @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate() {
         super.onCreate()
@@ -74,15 +77,15 @@ class App : Application() {
         PlaybackPreference.initialize(this)
         kDownloader = KDownloader.create(applicationContext)
 
-        SavedRed.refreshTagList()
+        savedRed.refreshTagList()
 
 
         //blockRed.refreshBlockList()
 
-        SavedRed.likes.refresh()
-        SavedRed.niches.refresh()
-        SavedRed.creators.refresh()
-        SavedRed.collections.refreshCollectionList()
+        savedRed.likes.refresh()
+        savedRed.niches.refresh()
+        savedRed.creators.refresh()
+        savedRed.collections.refreshCollectionList()
 
         GlobalScope.launch {
             clearOldCache( redGifsDb.cacheMediaResponseDao())

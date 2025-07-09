@@ -228,7 +228,8 @@ fun LazyRow123(
                             },
                             host.isCollection,
                             block,
-                            host.redApi
+                            host.redApi,
+                            host.savedRed
                         )
 
 
@@ -266,7 +267,7 @@ fun LazyRow123(
                             ) {
 
 
-                                if (SavedRed.collections.collectionList.any { it.list.any { it2 -> it2.id == item.id } }) {
+                                if (host.savedRed.collections.collectionList.any { it.list.any { it2 -> it2.id == item.id } }) {
                                     Icon(
                                         painter = painterResource(R.drawable.collection_multi_input_svgrepo_com),
                                         contentDescription = null,
@@ -278,7 +279,7 @@ fun LazyRow123(
                                 }
 
                                 //
-                                if (SavedRed.creators.list.any { it.username == item.userName }) {
+                                if (host.savedRed.creators.list.any { it.username == item.userName }) {
                                     Icon(
                                         Icons.Filled.Person,
                                         contentDescription = null,
@@ -290,7 +291,7 @@ fun LazyRow123(
                                 }
 
                                 //✅ Лайк
-                                if (SavedRed.likes.list.any { it.id == item.id }) {
+                                if (host.savedRed.likes.list.any { it.id == item.id }) {
                                     Icon(
                                         Icons.Filled.FavoriteBorder,
                                         contentDescription = null,

@@ -66,7 +66,7 @@ object SavedLikesTab : Screen {
             vm.likedHost.columns = column.intValue
         }
 
-        LaunchedEffect(SavedRed.likes.list){
+        LaunchedEffect(vm.savedRed.likes.list){
             //vm.likedHost.refresh()
         }
 
@@ -113,7 +113,8 @@ class ScreenSavedLikesSM @Inject constructor(
     connectivityObserver: ConnectivityObserver,
     val block: BlockRed,
     val search: SearchRed,
-    val redApi: RedApi
+    val redApi: RedApi,
+    val savedRed: SavedRed
 ) : ScreenModel {
 
     @OptIn(DelicateCoroutinesApi::class)

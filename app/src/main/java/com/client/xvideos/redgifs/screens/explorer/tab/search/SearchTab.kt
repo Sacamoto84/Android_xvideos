@@ -41,6 +41,8 @@ import com.redgifs.model.search.SearchItemNichesResponse
 import com.redgifs.model.search.SearchItemTagsResponse
 import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
 import com.client.xvideos.screens.common.urlVideImage.UrlImage
+import com.google.gson.annotations.Since
+import com.redgifs.network.api.RedApi
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -49,6 +51,7 @@ import dagger.multibindings.IntoMap
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import javax.inject.Singleton
 
 object SearchTab : Screen {
 
@@ -125,7 +128,8 @@ object SearchTab : Screen {
 
 
 class ScreenRedExplorerSearchSM @Inject constructor(
-    connectivityObserver: ConnectivityObserver
+    connectivityObserver: ConnectivityObserver,
+    val redApi: RedApi
 ) : ScreenModel {
 
     val searchText = MutableStateFlow<String>("Ana")
@@ -148,7 +152,7 @@ class ScreenRedExplorerSearchSM @Inject constructor(
                     return@collect
                 }
 
-                val creator = RedApi_Search.searchCreatorsShort(text)
+                val creator = redApi.search.searchCreatorsShort(text)
 
                 creatorsList.clear()
                 creatorsList.addAll(creator.items)

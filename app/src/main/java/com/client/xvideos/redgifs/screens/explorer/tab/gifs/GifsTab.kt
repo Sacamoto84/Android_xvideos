@@ -48,6 +48,7 @@ import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
 import com.redgifs.model.Order
 import com.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.common.block.BlockRed
+import com.client.xvideos.redgifs.common.saved.SavedRed
 import com.client.xvideos.redgifs.common.search.SearchRed
 import com.client.xvideos.redgifs.common.ui.lazyrow123.LazyRow123
 import com.client.xvideos.redgifs.common.ui.lazyrow123.LazyRow123Host
@@ -232,7 +233,8 @@ class ScreenRedExplorerGifsSM @Inject constructor(
     connectivityObserver: ConnectivityObserver,
     val block: BlockRed,
     val search: SearchRed,
-    val redApi: RedApi
+    val redApi: RedApi,
+    val savedRed: SavedRed
 ) : ScreenModel {
 
     val isConnected = connectivityObserver.isConnected.stateIn(
@@ -247,7 +249,8 @@ class ScreenRedExplorerGifsSM @Inject constructor(
         typePager = TypePager.TOP,
         block = block,
         search = search,
-        redApi = redApi
+        redApi = redApi,
+        savedRed = savedRed
     )
 
 

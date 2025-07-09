@@ -74,7 +74,7 @@ fun LazyRow123ExplorerNiches(
                 Box(modifier = Modifier.padding(vertical = 4.dp)) {
                     NichePreview2(niches = item, onClick = {
                         navigator.push(ScreenRedNiche(item.id))
-                    })
+                    }, savedRed = host.savedRed)
                 }
             }
         }
@@ -83,7 +83,7 @@ fun LazyRow123ExplorerNiches(
 }
 
 @Composable
-fun NichePreview2(niches: Niche, onClick: () -> Unit) {
+fun NichePreview2(niches: Niche, savedRed: SavedRed, onClick: () -> Unit) {
 
     Column(
         modifier = Modifier
@@ -155,7 +155,7 @@ fun NichePreview2(niches: Niche, onClick: () -> Unit) {
                         }
                     }
 
-                    val isFollowed = SavedRed.niches.list.any { it.id == niches.id }
+                    val isFollowed = savedRed.niches.list.any { it.id == niches.id }
 
                     Box(
                         modifier = Modifier
@@ -180,9 +180,9 @@ fun NichePreview2(niches: Niche, onClick: () -> Unit) {
                                 )
 
                                 if (isFollowed)
-                                    SavedRed.niches.remove(nichesInfo)
+                                    savedRed.niches.remove(nichesInfo)
                                 else
-                                    SavedRed.niches.add(nichesInfo)
+                                    savedRed.niches.add(nichesInfo)
 
                             }), contentAlignment = Alignment.Center
                     ) {

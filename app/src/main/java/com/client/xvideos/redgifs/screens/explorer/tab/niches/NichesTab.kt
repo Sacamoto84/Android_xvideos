@@ -30,6 +30,7 @@ import com.redgifs.model.Niche
 import com.redgifs.model.Order
 import com.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.common.block.BlockRed
+import com.client.xvideos.redgifs.common.saved.SavedRed
 import com.client.xvideos.redgifs.common.search.SearchRed
 import com.client.xvideos.redgifs.common.ui.lazyrow123.LazyRow123Host
 import com.client.xvideos.redgifs.common.ui.lazyrow123.NichePreview2
@@ -102,7 +103,7 @@ object NichesTab : Screen {
                             Box(modifier = Modifier.padding(vertical = 4.dp)) {
                                 NichePreview2(niches = item, onClick = {
                                     navigator.push(ScreenRedNiche(item.id))
-                                })
+                                }, savedRed = vm.savedRed)
                             }
                         }
                     }
@@ -133,7 +134,8 @@ class ScreenRedExplorerNichesSM @Inject constructor(
     connectivityObserver: ConnectivityObserver,
     block: BlockRed,
     search : SearchRed,
-    redApi : RedApi
+    redApi : RedApi,
+    val savedRed: SavedRed
 ) : ScreenModel {
 
     val lazyHost =
@@ -146,7 +148,8 @@ class ScreenRedExplorerNichesSM @Inject constructor(
             startColumns = 1,
             block = block,
             search = search,
-            redApi = redApi
+            redApi = redApi,
+            savedRed = savedRed
         )
 
 }

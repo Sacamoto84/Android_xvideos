@@ -59,7 +59,8 @@ fun ExpandMenuVideo(
     onRefresh: () -> Unit = {},
     isCollection : Boolean = false,
     block: BlockRed,
-    redApi: RedApi
+    redApi: RedApi,
+    savedRed: SavedRed
 ) {
 
     var expanded by remember { mutableStateOf(false) }
@@ -85,10 +86,10 @@ fun ExpandMenuVideo(
             DropdownMenuItem_Download(item){ expanded = false }
             DropdownMenuItem_Share(item){ expanded = false }
             DropdownMenuItem_Block(item = item, block = block){ expanded = false }
-            DropdownMenuItem_Like(item, onRunLike){expanded = false}
-            DropdownMenuItem_Follow(item, redApi){ expanded = false }
-            DropdownMenuItem_AddCollection(item) { expanded = false }
-            if(isCollection) DropdownMenuItem_RemoveFromCollection(item, onRefresh) { expanded = false }
+            DropdownMenuItem_Like(item, onRunLike, savedRed){expanded = false}
+            DropdownMenuItem_Follow(item, redApi, savedRed){ expanded = false }
+            DropdownMenuItem_AddCollection(item, savedRed) { expanded = false }
+            if(isCollection) DropdownMenuItem_RemoveFromCollection(item, onRefresh, savedRed) { expanded = false }
         }
     }
 }
@@ -140,8 +141,8 @@ fun DropdownMenuItem_Block(item: GifsInfo? = null, block: BlockRed, onDismiss: (
 
 @OptIn(ExperimentalMaterial3Api::class, DelicateCoroutinesApi::class)
 @Composable
-fun DropdownMenuItem_Like(item: GifsInfo? = null, onRunLike: () -> Unit, onDismiss: () -> Unit){
-    val isLiked = SavedRed.likes.list.any { it.id == item?.id }
+fun DropdownMenuItem_Like(item: GifsInfo? = null, onRunLike: () -> Unit, savedRed: SavedRed, onDismiss: () -> Unit){
+    val isLiked = savedRed.likes.list.any { it.id == item?.id }
     val textLiked = if (isLiked) "Unlike" else "Like"
     val textLikedIcon = if (isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder
     DropdownMenuItem(
@@ -151,7 +152,7 @@ fun DropdownMenuItem_Like(item: GifsInfo? = null, onRunLike: () -> Unit, onDismi
             if (item == null) return@DropdownMenuItem
             GlobalScope.launch {
                 delay(200)
-                if (!isLiked) SavedRed.likes.add(item) else SavedRed.likes.remove(item)
+                if (!isLiked) savedRed.likes.add(item) else savedRed.likes.remove(item)
                 onRunLike.invoke()
                 onDismiss.invoke()
             }
@@ -161,8 +162,8 @@ fun DropdownMenuItem_Like(item: GifsInfo? = null, onRunLike: () -> Unit, onDismi
 
 @OptIn(ExperimentalMaterial3Api::class, DelicateCoroutinesApi::class)
 @Composable
-fun DropdownMenuItem_Follow(item: GifsInfo? = null, redApi: RedApi, onDismiss: () -> Unit){
-    val isFollowed = SavedRed.creators.list.any { it.username == item?.userName }
+fun DropdownMenuItem_Follow(item: GifsInfo? = null, redApi: RedApi, savedRed: SavedRed, onDismiss: () -> Unit){
+    val isFollowed = savedRed.creators.list.any { it.username == item?.userName }
     val textFollowed = if (isFollowed) "Unfollow" else "Follow"
     val textFollowedIcon = if (isFollowed) Icons.Default.Person else Icons.Default.PermIdentity
     DropdownMenuItem(
@@ -175,11 +176,11 @@ fun DropdownMenuItem_Follow(item: GifsInfo? = null, redApi: RedApi, onDismiss: (
                 if (!isFollowed) {
                     try {
                         val a = redApi.readCreator(item.userName)
-                        SavedRed.creators.add(a)
+                        savedRed.creators.add(a)
                     } catch (e: Exception) { e.printStackTrace() }
                 }
                 else {
-                    SavedRed.creators.remove(item.userName)
+                    savedRed.creators.remove(item.userName)
                 }
             }
             onDismiss.invoke()
@@ -189,7 +190,7 @@ fun DropdownMenuItem_Follow(item: GifsInfo? = null, redApi: RedApi, onDismiss: (
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DropdownMenuItem_AddCollection(item: GifsInfo? = null, onDismiss: () -> Unit){
+fun DropdownMenuItem_AddCollection(item: GifsInfo? = null, savedRed: SavedRed, onDismiss: () -> Unit){
     DropdownMenuItem(
         leadingIcon = {
             Icon(
@@ -201,8 +202,8 @@ fun DropdownMenuItem_AddCollection(item: GifsInfo? = null, onDismiss: () -> Unit
         text = { Text("Add to Collection", style = style) },
         onClick = {
             if (item == null) return@DropdownMenuItem
-            SavedRed.collections.collectionItemGifInfo = item
-            SavedRed.collections.collectionVisibleDialog = true
+            savedRed.collections.collectionItemGifInfo = item
+            savedRed.collections.collectionVisibleDialog = true
             onDismiss.invoke()
         }, contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
     )
@@ -211,7 +212,7 @@ fun DropdownMenuItem_AddCollection(item: GifsInfo? = null, onDismiss: () -> Unit
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DropdownMenuItem_RemoveFromCollection(item: GifsInfo? = null, onRefresh: () -> Unit, onDismiss: () -> Unit){
+fun DropdownMenuItem_RemoveFromCollection(item: GifsInfo? = null, onRefresh: () -> Unit, savedRed: SavedRed, onDismiss: () -> Unit){
     DropdownMenuItem(
         leadingIcon = {
             Icon(
@@ -223,11 +224,11 @@ fun DropdownMenuItem_RemoveFromCollection(item: GifsInfo? = null, onRefresh: () 
         text = { Text("Remove from Collection", style = style) },
         onClick = {
             if (item == null) return@DropdownMenuItem
-            if (SavedRed.collections.selectedCollection == null) {
+            if (savedRed.collections.selectedCollection == null) {
                 onDismiss.invoke()
                 return@DropdownMenuItem
             }
-            SavedRed.collections.deleteItemFromCollection(item, SavedRed.collections.selectedCollection!!)
+            savedRed.collections.deleteItemFromCollection(item, savedRed.collections.selectedCollection!!)
             onRefresh.invoke()
 
             onDismiss.invoke()

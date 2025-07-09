@@ -23,13 +23,19 @@ import com.redgifs.db.entity.CacheMediaResponseEntity
 import com.redgifs.db.entity.getCurrentTimeText
 import timber.log.Timber
 import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.Int
 
+@Singleton
 class RedApi @Inject constructor(
    val dao: CacheMediaResponseDao
 ) {
 
     val api = ApiClient
+
+    val explorer = RedApi_Explorer(api)
+    val search = RedApi_Search(api)
+    val tags = RedApi_Tags(api)
 
     //--------------------------- GIF methods ---------------------------
     suspend fun getGif(id: String): MediaResponse {

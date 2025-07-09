@@ -24,7 +24,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.client.common.R
@@ -36,7 +35,7 @@ import com.client.xvideos.util.toPrettyCount
 import com.composeunstyled.Text
 
 @Composable
-fun RedProfileCreaterInfo(item: UserInfo) {
+fun RedProfileCreaterInfo(item: UserInfo, savedRed: SavedRed) {
 
     Column(
         modifier = Modifier
@@ -94,7 +93,7 @@ fun RedProfileCreaterInfo(item: UserInfo) {
 
         }
 
-        val isFollow = SavedRed.creators.list.any { it.username == item.username }
+        val isFollow = savedRed.creators.list.any { it.username == item.username }
         Box(
             modifier = Modifier
                 .width(96.dp)
@@ -102,7 +101,7 @@ fun RedProfileCreaterInfo(item: UserInfo) {
                 .clip(RoundedCornerShape(8.dp))
                 .background(if (isFollow) Color.Black else ThemeRed.colorYellow)
                 .border( 1.dp, if (isFollow)Color.White else Color.Transparent, RoundedCornerShape(8.dp))
-                .clickable { if (isFollow) SavedRed.creators.remove(item.username) else SavedRed.creators.add(item)
+                .clickable { if (isFollow) savedRed.creators.remove(item.username) else savedRed.creators.add(item)
                            }, contentAlignment = Alignment.Center) {
             Text(if (isFollow) "Отписаться" else "Подписаться", color = if (isFollow) Color.White else Color.Black)
         }

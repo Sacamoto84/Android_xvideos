@@ -4,9 +4,7 @@ import com.redgifs.network.http.ApiClient
 import com.redgifs.network.http.Route
 import com.redgifs.model.tag.TagsResponse
 
-object RedApi_Tags {
-
-    val api = ApiClient
+class RedApi_Tags(val api: ApiClient ) {
 
     /**
      * #### Возвращает список всех существующих тегов. 7к штук (имя, количество)

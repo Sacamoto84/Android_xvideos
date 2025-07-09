@@ -6,9 +6,7 @@ import com.redgifs.model.MediaResponse
 import com.redgifs.model.Order
 import com.redgifs.model.search.SearchCreatorsResponse
 
-object RedApi_Search {
-
-    val api = ApiClient
+class RedApi_Search(val api: ApiClient ) {
 
     //https://api.redgifs.com/v2/creators/suggest?query=Ana
     //Возвращает 5 элементов
