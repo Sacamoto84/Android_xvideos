@@ -43,7 +43,7 @@ fun ProfileInfo1(modifier: Modifier = Modifier, onClick: ()->Unit, videoItem: Gi
                     contentAlignment = Alignment.Center
                 ) {
                     UrlImage(
-                        a.profileImageUrl,
+                        a.profileImageUrl!!,
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop
                     )

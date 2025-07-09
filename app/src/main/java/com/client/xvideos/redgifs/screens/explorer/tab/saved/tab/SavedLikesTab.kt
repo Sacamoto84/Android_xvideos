@@ -25,12 +25,14 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.redgifs.common.block.BlockRed
 import com.client.xvideos.redgifs.common.saved.SavedRed
+import com.client.xvideos.redgifs.common.search.SearchRed
 import com.client.xvideos.redgifs.common.ui.lazyrow123.LazyRow123
 import com.client.xvideos.redgifs.common.ui.lazyrow123.LazyRow123Host
 import com.client.xvideos.redgifs.common.ui.lazyrow123.TypePager
 import com.client.xvideos.redgifs.screens.profile.ScreenRedProfile
 import com.client.xvideos.redgifs.screens.profile.atom.VerticalScrollbar
 import com.client.xvideos.redgifs.screens.profile.rememberVisibleRangePercentIgnoringFirstNForGrid
+import com.redgifs.network.api.RedApi
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -109,7 +111,9 @@ object SavedLikesTab : Screen {
 
 class ScreenSavedLikesSM @Inject constructor(
     connectivityObserver: ConnectivityObserver,
-    val block: BlockRed
+    val block: BlockRed,
+    val search: SearchRed,
+    val redApi: RedApi
 ) : ScreenModel {
 
     @OptIn(DelicateCoroutinesApi::class)
@@ -117,7 +121,9 @@ class ScreenSavedLikesSM @Inject constructor(
         connectivityObserver = connectivityObserver,
         scope = screenModelScope,
         typePager = TypePager.SAVED_LIKES,
-        block = block
+        block = block,
+        search = search,
+        redApi = redApi
     )
 
 }

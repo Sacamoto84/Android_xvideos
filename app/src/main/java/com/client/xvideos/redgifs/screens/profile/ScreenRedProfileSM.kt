@@ -21,6 +21,7 @@ import com.redgifs.model.UserInfo
 import com.client.xvideos.feature.room.AppDatabase
 import com.client.xvideos.redgifs.common.block.BlockRed
 import com.client.xvideos.redgifs.common.network.loadGifs
+import com.client.xvideos.redgifs.common.search.SearchRed
 import com.client.xvideos.redgifs.common.share.useCaseShareGifs
 import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
 import com.client.xvideos.redgifs.common.ui.lazyrow123.LazyRow123Host
@@ -52,7 +53,9 @@ class ScreenRedProfileSM @AssistedInject constructor(
     private val db: AppDatabase,
     private val pref: PreferencesRepository,
     connectivityObserver: ConnectivityObserver,
-    val block: BlockRed
+    val block: BlockRed,
+    val search: SearchRed,
+    val redApi: RedApi
 ) : ScreenModel {
 
     @AssistedFactory
@@ -100,7 +103,9 @@ class ScreenRedProfileSM @AssistedInject constructor(
         typePager = TypePager.PROFILE,
         extraString = profileName,
         visibleProfileInfo = false,
-        block = block
+        block = block,
+        search = search,
+        redApi = redApi
     )
 
 
@@ -111,7 +116,7 @@ class ScreenRedProfileSM @AssistedInject constructor(
             setSelector(2)
 
             try {
-                creator = RedApi.readCreator(profileName)
+                creator = redApi.readCreator(profileName)
             }catch (e: Exception){
                 creator = null
                 Timber.e(e)
@@ -185,7 +190,7 @@ class ScreenRedProfileSM @AssistedInject constructor(
 
         isLoading.value = true
         try {
-            val r = loadGifs(userName = userName, items = items, page = page, ord = order, type = if (typeGifs == TypeGifs.GIFS) MediaType.GIF else MediaType.IMAGE)
+            val r = loadGifs(userName = userName, items = items, page = page, ord = order, type = if (typeGifs == TypeGifs.GIFS) MediaType.GIF else MediaType.IMAGE, redApi)
             _tags.update { it + r.tags }
             val resp = r.gifs
             _list.update { it + resp }

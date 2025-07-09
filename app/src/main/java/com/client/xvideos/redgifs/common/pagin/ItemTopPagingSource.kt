@@ -12,7 +12,7 @@ import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
 import com.client.xvideos.redgifs.common.users.UsersRed
 import timber.log.Timber
 
-class ItemTopPagingSource(val sort: Order, val searchText: String, val block: BlockRed) : PagingSource<Int, GifsInfo>() {
+class ItemTopPagingSource(val sort: Order, val searchText: String, val block: BlockRed, val redApi: RedApi) : PagingSource<Int, GifsInfo>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, GifsInfo> {
 
@@ -26,12 +26,12 @@ class ItemTopPagingSource(val sort: Order, val searchText: String, val block: Bl
                 RedApi_Search.searchGifs(searchText, sort, 100, page)
             } else {
                 when (sort) {
-                    Order.TOP_WEEK -> RedApi.getTopThisWeek(100, page)
-                    Order.TOP_MONTH -> RedApi.getTopThisMonth(100, page)
-                    Order.TRENDING -> RedApi.getTopTrending(100, page)
-                    Order.LATEST -> RedApi.getTopLatest(100, page)
+                    Order.TOP_WEEK -> redApi.getTopThisWeek(100, page)
+                    Order.TOP_MONTH -> redApi.getTopThisMonth(100, page)
+                    Order.TRENDING -> redApi.getTopTrending(100, page)
+                    Order.LATEST -> redApi.getTopLatest(100, page)
                     else -> {
-                        RedApi.getTopThisWeek(100, page)
+                        redApi.getTopThisWeek(100, page)
                     }
                 }
 

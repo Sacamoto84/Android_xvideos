@@ -11,7 +11,7 @@ import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
 import com.client.xvideos.redgifs.common.users.UsersRed
 import timber.log.Timber
 
-class ItemProfilePagingSource (val profileName : String, val sort : Order, val block: BlockRed): PagingSource<Int, GifsInfo>() {
+class ItemProfilePagingSource (val profileName : String, val sort : Order, val block: BlockRed, val redApi: RedApi): PagingSource<Int, GifsInfo>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int,  GifsInfo> {
 
@@ -28,7 +28,7 @@ class ItemProfilePagingSource (val profileName : String, val sort : Order, val b
                 )
             }
 
-            val response = RedApi.searchCreator(userName = profileName, page = page,  count = 100, type = MediaType.GIF,  order = sort )
+            val response = redApi.searchCreator(userName = profileName, page = page,  count = 100, type = MediaType.GIF,  order = sort )
 
             val isEndReached = response.gifs.isEmpty() // или, если ты знаешь, что сервер вернул всё
 

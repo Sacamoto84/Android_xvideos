@@ -1,4 +1,4 @@
-package com.client.xvideos.di
+package com.client.common.di
 
 import javax.inject.Qualifier
 

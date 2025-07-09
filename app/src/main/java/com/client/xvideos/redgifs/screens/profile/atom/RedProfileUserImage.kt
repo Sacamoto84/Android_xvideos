@@ -54,7 +54,7 @@ fun RedProfileCreaterInfo(item: UserInfo) {
         ) {
 
             if(item.profileImageUrl != null) {
-                UrlImage(item.profileImageUrl, modifier = Modifier.size(128.dp))
+                UrlImage(item.profileImageUrl!!, modifier = Modifier.size(128.dp))
             }else {
                 Box(
                     modifier = Modifier.clip(RoundedCornerShape(0.dp)).size(128.dp)

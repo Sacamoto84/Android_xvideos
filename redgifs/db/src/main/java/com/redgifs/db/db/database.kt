@@ -15,7 +15,7 @@ import com.redgifs.db.db.entity.SearchRedHistoryEntity
 
 @Database(
     entities = [CacheMediaResponseEntity::class, BlockEntity::class, GifsInfoEntity::class, SearchRedHistoryEntity::class],
-    version = 5,
+    version = 6,
     autoMigrations = [
         //AutoMigration(from = 4, to = 5)
     ],
@@ -26,6 +26,5 @@ abstract class AppRedGifsDatabase : RoomDatabase() {
     abstract fun cacheMediaResponseDao(): CacheMediaResponseDao
     abstract fun blockDao(): BlockDao
     abstract fun gifInfoDao(): GifsInfoDao
-
     abstract fun searchHistoryDao(): SearchRedHistoryDao
 }

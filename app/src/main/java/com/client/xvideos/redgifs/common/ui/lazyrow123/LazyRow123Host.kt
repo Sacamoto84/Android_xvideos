@@ -134,7 +134,7 @@ class LazyRow123Host(
                         Timber.d("!!! >>>pagingSourceFactory{...}")
                         gotoUp()
                         gotoUpColumn()
-                        createPager(typePager, params.sort, extraString, params.query, block)
+                        createPager(typePager, params.sort, extraString, params.query, block, redApi)
                     }
                 ).flow
             }
@@ -165,15 +165,16 @@ fun createPager(
     sort: Order,
     extraString: String,
     searchText: String,
-    block : BlockRed
+    block : BlockRed,
+    redApi : RedApi
 ): PagingSource<Int, Any> {
     val pagingSourceFactory = when (typePager) {
         TypePager.NICHES -> {
-            ItemNailsPagingSource(order = sort, nichesName = extraString, block = block)
+            ItemNailsPagingSource(order = sort, nichesName = extraString, block = block, redApi = redApi)
         }
 
         TypePager.TOP -> {
-            ItemTopPagingSource(sort = sort, searchText = searchText, block = block)
+            ItemTopPagingSource(sort = sort, searchText = searchText, block = block, redApi = redApi)
         }
 
         TypePager.SAVED_LIKES -> {
@@ -185,7 +186,7 @@ fun createPager(
         }
 
         TypePager.PROFILE -> {
-            ItemProfilePagingSource(profileName = extraString, sort = sort, block = block)
+            ItemProfilePagingSource(profileName = extraString, sort = sort, block = block, redApi = redApi)
         }
 
         TypePager.EMPTY -> {

@@ -85,7 +85,7 @@ object SavedCreatorsTab : Screen {
 
                 icon = {
                     pending.profileImageUrl?.let {
-                        UrlImage(pending.profileImageUrl, modifier = Modifier.size(96.dp))
+                        UrlImage(pending.profileImageUrl!!, modifier = Modifier.size(96.dp))
                     }
                 },
 
@@ -158,7 +158,7 @@ object SavedCreatorsTab : Screen {
 
                                 if (it1.profileImageUrl != null) {
                                     UrlImage(
-                                        it1.profileImageUrl,
+                                        it1.profileImageUrl!!,
                                         modifier = Modifier.size(96.dp),
                                         contentScale = ContentScale.Crop
                                     )

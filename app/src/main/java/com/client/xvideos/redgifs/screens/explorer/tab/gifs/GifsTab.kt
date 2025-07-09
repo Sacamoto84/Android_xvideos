@@ -58,6 +58,7 @@ import com.client.xvideos.redgifs.screens.explorer.tab.saved.tab.SavedLikesTab.c
 import com.client.xvideos.redgifs.screens.profile.ScreenRedProfile
 import com.client.xvideos.redgifs.screens.profile.atom.VerticalScrollbar
 import com.client.xvideos.redgifs.screens.profile.rememberVisibleRangePercentIgnoringFirstNForGrid
+import com.redgifs.network.api.RedApi
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -99,7 +100,9 @@ object GifsTab : Screen {
             gridState = vm.lazyHost.state, itemsToIgnore = 0, numberOfColumns = column.intValue
         )
 
-        val searchR = SearchRed.searchText.collectAsStateWithLifecycle().value
+        val search = vm.search
+
+        val searchR = search.searchText.collectAsStateWithLifecycle().value
 
         Scaffold(bottomBar = {
             Row(modifier = Modifier.background(ThemeRed.colorTabLevel0).height(50.dp), verticalAlignment = Alignment.Bottom) {
@@ -126,9 +129,9 @@ object GifsTab : Screen {
                         onSelect = { vm.lazyHost.changeSortType(it) })
                 }
 
-                SearchRed.CustomBasicTextField(
-                    value = SearchRed.searchText.collectAsStateWithLifecycle().value,
-                    onValueChange = { SearchRed.searchText.value = it }, onDone = { SearchRed.searchTextDone.value = it },
+                search.CustomBasicTextField(
+                    value = search.searchText.collectAsStateWithLifecycle().value,
+                    onValueChange = { search.searchText.value = it }, onDone = { search.searchTextDone.value = it },
                     modifier = Modifier.padding(start = 4.dp).weight(1f)
                 )
 
@@ -225,10 +228,11 @@ object GifsTab : Screen {
 
 }
 
-
 class ScreenRedExplorerGifsSM @Inject constructor(
     connectivityObserver: ConnectivityObserver,
-    val block: BlockRed
+    val block: BlockRed,
+    val search: SearchRed,
+    val redApi: RedApi
 ) : ScreenModel {
 
     val isConnected = connectivityObserver.isConnected.stateIn(
@@ -241,7 +245,9 @@ class ScreenRedExplorerGifsSM @Inject constructor(
         scope = screenModelScope,
         extraString = "",
         typePager = TypePager.TOP,
-        block = block
+        block = block,
+        search = search,
+        redApi = redApi
     )
 
 

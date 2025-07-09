@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.client.common.AppPath
 import com.redgifs.db.db.AppRedGifsDatabase
 import com.redgifs.db.db.dao.BlockDao
+import com.redgifs.db.db.dao.CacheMediaResponseDao
 import com.redgifs.db.db.dao.GifsInfoDao
 import com.redgifs.db.db.dao.SearchRedHistoryDao
 import dagger.Module
@@ -18,6 +19,13 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object RoomRedGifsModule {
+
+
+    @Singleton
+    @Provides
+    fun provideMediaDao(appDatabase: AppRedGifsDatabase): CacheMediaResponseDao {
+        return appDatabase.cacheMediaResponseDao()
+    }
 
     @Singleton
     @Provides

@@ -5,9 +5,11 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.redgifs.common.block.BlockRed
+import com.client.xvideos.redgifs.common.search.SearchRed
 import com.client.xvideos.redgifs.common.ui.lazyrow123.LazyRow123Host
 import com.client.xvideos.redgifs.common.ui.lazyrow123.TypePager
 import com.client.xvideos.redgifs.screens.top_this_week.model.VisibleType
+import com.redgifs.network.api.RedApi
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -22,16 +24,19 @@ import javax.inject.Inject
 
 class ScreenRedTopThisWeekSM @Inject constructor(
     connectivityObserver: ConnectivityObserver,
-    val block: BlockRed
+    val block: BlockRed,
+    val redApi: RedApi,
+    val search: SearchRed
 ) : ScreenModel {
 
     val lazyHost =
         LazyRow123Host(
             connectivityObserver = connectivityObserver, scope = screenModelScope,
             typePager = TypePager.TOP,
-            block = block
+            block = block,
+            search = search,
+            redApi = redApi
         )
-
 
     val isConnected = connectivityObserver
         .isConnected

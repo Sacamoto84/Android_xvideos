@@ -9,7 +9,7 @@ import com.client.xvideos.redgifs.common.block.BlockRed
 import com.client.xvideos.redgifs.common.users.UsersRed
 import timber.log.Timber
 
-class ItemNailsPagingSource (val order : Order, val nichesName : String, val block: BlockRed): PagingSource<Int, GifsInfo>() {
+class ItemNailsPagingSource (val order : Order, val nichesName : String, val block: BlockRed, val redApi: RedApi): PagingSource<Int, GifsInfo>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int,  GifsInfo> {
 
@@ -26,7 +26,7 @@ class ItemNailsPagingSource (val order : Order, val nichesName : String, val blo
                 )
             }
 
-            val response = RedApi.getNiches(niches = nichesName, page = page, order = order)
+            val response = redApi.getNiches(niches = nichesName, page = page, order = order)
 
             val isEndReached = response.gifs.isEmpty() // или, если ты знаешь, что сервер вернул всё
 

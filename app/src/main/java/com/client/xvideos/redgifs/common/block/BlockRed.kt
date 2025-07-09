@@ -4,7 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.room.withTransaction
-import com.client.xvideos.di.ApplicationScope
+import com.client.common.di.ApplicationScope
 import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
 import com.redgifs.db.db.AppRedGifsDatabase
 import com.redgifs.db.db.dao.BlockDao

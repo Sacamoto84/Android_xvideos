@@ -89,7 +89,7 @@ object SearchTab : Screen {
 
                     Row(modifier = Modifier.border(1.dp, Color.White)) {
                         if (it.image != null) {
-                            UrlImage(it.image, modifier = Modifier
+                            UrlImage(it.image!!, modifier = Modifier
                                 .clip(CircleShape)
                                 .size(64.dp))
                         } else {

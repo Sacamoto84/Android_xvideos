@@ -9,6 +9,7 @@ import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
 import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.redgifs.common.block.BlockRed
+import com.client.xvideos.redgifs.common.search.SearchRed
 import com.redgifs.network.api.RedApi
 import com.redgifs.model.NichesInfo
 import com.redgifs.model.NichesResponse
@@ -29,7 +30,9 @@ import timber.log.Timber
 class ScreenNicheSM @AssistedInject constructor(
     @Assisted val nicheName: String,
     connectivityObserver: ConnectivityObserver,
-    val block: BlockRed
+    val block: BlockRed,
+    search : SearchRed,
+    redApi : RedApi
 ) : ScreenModel {
 
     @AssistedFactory
@@ -45,7 +48,9 @@ class ScreenNicheSM @AssistedInject constructor(
         LazyRow123Host(
             connectivityObserver = connectivityObserver, scope = screenModelScope,
             extraString = nicheName, typePager = TypePager.NICHES,
-            block = block
+            block = block,
+            search = search,
+            redApi = redApi
         )
 
     init {
@@ -54,9 +59,9 @@ class ScreenNicheSM @AssistedInject constructor(
         lazyHost.columns = 2
 
         screenModelScope.launch {
-            niche = RedApi.getNiche(nicheName).niche            // Нужно кешировать
-            related = RedApi.getNichesRelated(nicheName)        // Нужно кешировать
-            topCreator = RedApi.getNichesTopCreators(nicheName) // Нужно кешировать
+            niche = redApi.getNiche(nicheName).niche            // Нужно кешировать
+            related = redApi.getNichesRelated(nicheName)        // Нужно кешировать
+            topCreator = redApi.getNichesTopCreators(nicheName) // Нужно кешировать
         }
     }
 

@@ -10,9 +10,10 @@ suspend fun loadGifs(
     items: Int = 100,
     page: Int = 1,
     ord: Order = Order.NEW,
-    type: MediaType = MediaType.GIF
+    type: MediaType = MediaType.GIF,
+    redApi: RedApi
 ): CreatorResponse {
-    val res = RedApi.searchCreator(userName = userName, count = items, page = page, type = type, order = ord)
+    val res = redApi.searchCreator(userName = userName, count = items, page = page, type = type, order = ord)
     return res
 }
 

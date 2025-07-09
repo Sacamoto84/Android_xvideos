@@ -63,11 +63,13 @@ import com.client.xvideos.redgifs.common.block.BlockRed
 import com.client.xvideos.redgifs.common.block.ui.DialogBlock
 import com.client.xvideos.redgifs.common.saved.SavedRed
 import com.client.xvideos.redgifs.common.saved.collection.ui.DaialogNewCollection
+import com.client.xvideos.redgifs.common.search.SearchRed
 import com.client.xvideos.redgifs.common.ui.lazyrow123.LazyRow123
 import com.client.xvideos.redgifs.common.ui.lazyrow123.LazyRow123Host
 import com.client.xvideos.redgifs.common.ui.lazyrow123.TypePager
 import com.client.xvideos.screens.common.urlVideImage.UrlImage
 import com.composeunstyled.Text
+import com.redgifs.network.api.RedApi
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -449,6 +451,8 @@ object SavedCollectionTab : Screen {
 class ScreenSavedCollectionSM @Inject constructor(
     connectivityObserver: ConnectivityObserver,
     val block: BlockRed,
+    search : SearchRed,
+    redApi : RedApi
 ) : ScreenModel {
     val gridState = LazyGridState()
 
@@ -459,7 +463,9 @@ class ScreenSavedCollectionSM @Inject constructor(
         extraString = "",
         startOrder = Order.LATEST,
         isCollection = true,
-        block = block
+        block = block,
+        search = search,
+        redApi = redApi
     )
 }
 

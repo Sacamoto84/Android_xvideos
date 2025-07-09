@@ -30,6 +30,7 @@ import com.redgifs.model.Niche
 import com.redgifs.model.Order
 import com.client.xvideos.redgifs.ThemeRed
 import com.client.xvideos.redgifs.common.block.BlockRed
+import com.client.xvideos.redgifs.common.search.SearchRed
 import com.client.xvideos.redgifs.common.ui.lazyrow123.LazyRow123Host
 import com.client.xvideos.redgifs.common.ui.lazyrow123.NichePreview2
 import com.client.xvideos.redgifs.common.ui.lazyrow123.TypePager
@@ -37,6 +38,7 @@ import com.client.xvideos.redgifs.common.ui.sortByOrder.SortByOrder
 import com.client.xvideos.redgifs.screens.niche.ScreenRedNiche
 import com.client.xvideos.redgifs.screens.profile.atom.VerticalScrollbar
 import com.client.xvideos.redgifs.screens.profile.rememberVisibleRangePercentIgnoringFirstNForLazyColumn
+import com.redgifs.network.api.RedApi
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -129,7 +131,9 @@ object NichesTab : Screen {
 
 class ScreenRedExplorerNichesSM @Inject constructor(
     connectivityObserver: ConnectivityObserver,
-    block: BlockRed
+    block: BlockRed,
+    search : SearchRed,
+    redApi : RedApi
 ) : ScreenModel {
 
     val lazyHost =
@@ -140,7 +144,9 @@ class ScreenRedExplorerNichesSM @Inject constructor(
             typePager = TypePager.EXPLORER_NICHES,
             startOrder = Order.NICHES_SUBSCRIBERS,
             startColumns = 1,
-            block = block
+            block = block,
+            search = search,
+            redApi = redApi
         )
 
 }
