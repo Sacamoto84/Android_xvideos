@@ -6,7 +6,7 @@ import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.Playbac
 import com.client.xvideos.redgifs.common.block.BlockRed
 import com.client.xvideos.redgifs.common.saved.SavedRed
 import com.kdownloader.KDownloader
-import com.redgifs.db.db.AppRedGifsDatabase
+import com.redgifs.db.AppRedGifsDatabase
 import com.redgifs.db.db.dao.clearOldCache
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.DelicateCoroutinesApi

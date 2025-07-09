@@ -55,11 +55,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.client.xvideos.App
 import com.client.xvideos.redgifs.ThemeRed
 import com.client.xvideos.redgifs.common.saved.SavedRed
 import com.redgifs.db.db.dao.SearchRedHistoryDao
-import com.redgifs.db.db.entity.SearchRedHistoryEntity
+import com.redgifs.db.entity.SearchRedHistoryEntity
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.MutableStateFlow

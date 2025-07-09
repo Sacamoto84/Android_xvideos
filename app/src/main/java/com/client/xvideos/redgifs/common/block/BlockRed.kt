@@ -6,7 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.room.withTransaction
 import com.client.common.di.ApplicationScope
 import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
-import com.redgifs.db.db.AppRedGifsDatabase
+import com.redgifs.db.AppRedGifsDatabase
 import com.redgifs.db.db.dao.BlockDao
 import com.redgifs.db.db.dao.GifsInfoDao
 import com.redgifs.db.db.entity.BlockEntity
