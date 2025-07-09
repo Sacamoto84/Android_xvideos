@@ -16,7 +16,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import com.client.xvideos.redgifs.network.types.Niche
+import com.redgifs.model.Niche
 import com.client.xvideos.screens.common.urlVideImage.UrlImage
 
 @Composable

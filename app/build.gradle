@@ -279,8 +279,14 @@ dependencies {
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.androidx.navigation3.runtime)
 
+    implementation(project(":common"))
 
+    implementation(project(":redgifs:common"))
+    implementation(project(":redgifs:network"))
+    implementation(project(":redgifs:model"))
 
+    implementation(project(":redgifs:db"))
+    
 }
 
 ksp {

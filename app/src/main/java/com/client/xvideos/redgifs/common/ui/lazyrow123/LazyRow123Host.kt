@@ -12,7 +12,7 @@ import androidx.paging.PagingSource
 import androidx.paging.cachedIn
 import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.redgifs.common.block.BlockRed
-import com.client.xvideos.redgifs.network.types.Order
+import com.redgifs.model.Order
 import com.client.xvideos.redgifs.common.pagin.ItemCollectionPagingSource
 import com.client.xvideos.redgifs.common.pagin.ItemEmptyPagingSource
 import com.client.xvideos.redgifs.common.pagin.ItemExplorerNailsPagingSource
@@ -21,6 +21,7 @@ import com.client.xvideos.redgifs.common.pagin.ItemNailsPagingSource
 import com.client.xvideos.redgifs.common.pagin.ItemProfilePagingSource
 import com.client.xvideos.redgifs.common.pagin.ItemTopPagingSource
 import com.client.xvideos.redgifs.common.search.SearchRed
+import com.redgifs.network.api.RedApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -66,7 +67,9 @@ class LazyRow123Host(
     val startColumns: Int = 2,
     val visibleProfileInfo: Boolean = true,
     val isCollection: Boolean = false,
-    val block: BlockRed
+    val block: BlockRed,
+    val search : SearchRed,
+    val redApi : RedApi
 ) {
 
     //var searchText by mutableStateOf("")
@@ -115,7 +118,7 @@ class LazyRow123Host(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val pager: Flow<PagingData<Any>> =
-        combine(SearchRed.searchTextDone, sortType, block.blockList) { text, sort, blockList ->
+        combine(search.searchTextDone, sortType, block.blockList) { text, sort, blockList ->
             SearchParams(text.trim(), sort)
         }
             //.debounce(2000)                                          // ② ждём паузу ввода

@@ -18,9 +18,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
-import com.client.xvideos.redgifs.network.types.GifsInfo
-import com.client.xvideos.redgifs.network.types.Order
-import com.client.xvideos.redgifs.network.types.UserInfo
+import com.redgifs.model.GifsInfo
+import com.redgifs.model.Order
+import com.redgifs.model.UserInfo
 import com.client.xvideos.screens.common.urlVideImage.UrlImage
 import com.client.xvideos.redgifs.ThemeRed
 import com.client.xvideos.redgifs.screens.top_this_week.ProfileInfo1

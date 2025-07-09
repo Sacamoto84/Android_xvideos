@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.client.xvideos.redgifs.network.types.TopCreator
+import com.redgifs.model.TopCreator
 import com.client.xvideos.screens.common.urlVideImage.UrlImage
 
 @Composable

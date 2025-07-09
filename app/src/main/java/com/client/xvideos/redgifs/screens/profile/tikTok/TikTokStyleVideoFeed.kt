@@ -16,8 +16,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.client.xvideos.AppPath
-import com.client.xvideos.redgifs.network.types.GifsInfo
+import com.client.common.AppPath
+import com.redgifs.model.GifsInfo
 import com.client.xvideos.redgifs.ThemeRed
 import com.client.xvideos.redgifs.common.downloader.DownloadRed
 import com.client.xvideos.redgifs.screens.profile.ScreenRedProfileSM

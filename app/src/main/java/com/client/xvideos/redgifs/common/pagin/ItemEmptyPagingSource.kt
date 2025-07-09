@@ -2,7 +2,7 @@ package com.client.xvideos.redgifs.common.pagin
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.client.xvideos.redgifs.network.types.GifsInfo
+import com.redgifs.model.GifsInfo
 
 class ItemEmptyPagingSource (): PagingSource<Int, GifsInfo>() {
 

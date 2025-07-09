@@ -11,7 +11,7 @@ import com.client.xvideos.redgifs.common.saved.collection.collectionItemSaveToDi
 import com.client.xvideos.redgifs.common.saved.collection.model.CollectionEntity
 import com.client.xvideos.redgifs.common.saved.collection.readAllCollections
 import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
-import com.client.xvideos.redgifs.network.types.GifsInfo
+import com.redgifs.model.GifsInfo
 import kotlinx.coroutines.DelicateCoroutinesApi
 
 class SavedRed_Collection {

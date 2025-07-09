@@ -1,6 +1,6 @@
 package com.client.xvideos.redgifs.common.users
 
-import com.client.xvideos.redgifs.network.types.UserInfo
+import com.redgifs.model.UserInfo
 import java.util.concurrent.ConcurrentHashMap
 
 object UsersRed {

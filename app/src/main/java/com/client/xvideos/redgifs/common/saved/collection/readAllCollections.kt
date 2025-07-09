@@ -1,7 +1,7 @@
 package com.client.xvideos.redgifs.common.saved.collection
 
-import com.client.xvideos.AppPath
-import com.client.xvideos.redgifs.network.types.GifsInfo
+import com.client.common.AppPath
+import com.redgifs.model.GifsInfo
 import com.client.xvideos.redgifs.common.saved.collection.model.CollectionEntity
 import com.google.gson.Gson
 import timber.log.Timber

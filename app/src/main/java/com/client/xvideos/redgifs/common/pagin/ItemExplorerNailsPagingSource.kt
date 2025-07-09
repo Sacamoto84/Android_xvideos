@@ -2,9 +2,9 @@ package com.client.xvideos.redgifs.common.pagin
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.client.xvideos.redgifs.network.api.RedApi_Explorer
-import com.client.xvideos.redgifs.network.types.Niche
-import com.client.xvideos.redgifs.network.types.Order
+import com.redgifs.network.api.RedApi_Explorer
+import com.redgifs.model.Niche
+import com.redgifs.model.Order
 import timber.log.Timber
 
 class ItemExplorerNailsPagingSource (val order : Order): PagingSource<Int, Niche>() {

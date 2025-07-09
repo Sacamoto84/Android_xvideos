@@ -25,9 +25,9 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
-import com.client.xvideos.AppPath
+import com.client.common.AppPath
 import com.client.xvideos.BuildConfig
-import com.client.xvideos.redgifs.network.types.GifsInfo
+import com.redgifs.model.GifsInfo
 import com.client.xvideos.feature.vibrate.vibrateWithPatternAndAmplitude
 import com.client.xvideos.redgifs.common.downloader.DownloadRed
 import com.client.xvideos.redgifs.common.video.player_row_mini.atom.RedProfileTile

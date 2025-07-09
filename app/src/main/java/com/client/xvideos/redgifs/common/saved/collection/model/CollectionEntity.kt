@@ -1,6 +1,6 @@
 package com.client.xvideos.redgifs.common.saved.collection.model
 
-import com.client.xvideos.redgifs.network.types.GifsInfo
+import com.redgifs.model.GifsInfo
 import com.google.gson.annotations.SerializedName
 
 data class CollectionEntity(

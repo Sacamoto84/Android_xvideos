@@ -5,9 +5,9 @@ import com.client.xvideos.feature.room.AppDatabase
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.PlaybackPreference
 import com.client.xvideos.redgifs.common.block.BlockRed
 import com.client.xvideos.redgifs.common.saved.SavedRed
-import com.client.xvideos.redgifs.db.AppRedGifsDatabase
-import com.client.xvideos.redgifs.db.dao.clearOldCache
 import com.kdownloader.KDownloader
+import com.redgifs.db.db.AppRedGifsDatabase
+import com.redgifs.db.db.dao.clearOldCache
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope

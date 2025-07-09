@@ -1,9 +1,9 @@
 package com.client.xvideos.redgifs.common.downloader
 
 import androidx.compose.runtime.mutableStateSetOf
-import com.client.xvideos.AppPath
+import com.client.common.AppPath
 import com.client.xvideos.feature.Downloader
-import com.client.xvideos.redgifs.network.types.GifsInfo
+import com.redgifs.model.GifsInfo
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope

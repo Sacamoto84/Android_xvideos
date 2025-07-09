@@ -9,10 +9,10 @@ import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
 import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.redgifs.common.block.BlockRed
-import com.client.xvideos.redgifs.network.api.RedApi
-import com.client.xvideos.redgifs.network.types.NichesInfo
-import com.client.xvideos.redgifs.network.types.NichesResponse
-import com.client.xvideos.redgifs.network.types.TopCreatorsResponse
+import com.redgifs.network.api.RedApi
+import com.redgifs.model.NichesInfo
+import com.redgifs.model.NichesResponse
+import com.redgifs.model.TopCreatorsResponse
 import com.client.xvideos.redgifs.common.ui.lazyrow123.LazyRow123Host
 import com.client.xvideos.redgifs.common.ui.lazyrow123.TypePager
 import dagger.Binds

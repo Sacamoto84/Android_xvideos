@@ -1,6 +1,6 @@
 package com.client.xvideos.redgifs.common.saved.collection
 
-import com.client.xvideos.AppPath
+import com.client.common.AppPath
 import timber.log.Timber
 import java.io.File
 import java.io.IOException

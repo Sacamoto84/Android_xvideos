@@ -55,27 +55,23 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.room.Dao
-import androidx.room.Entity
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.PrimaryKey
-import androidx.room.Query
-import androidx.room.Transaction
 import com.client.xvideos.App
 import com.client.xvideos.redgifs.ThemeRed
 import com.client.xvideos.redgifs.common.saved.SavedRed
-import com.client.xvideos.util.toPrettyCountInt
+import com.redgifs.db.db.dao.SearchRedHistoryDao
+import com.redgifs.db.db.entity.SearchRedHistoryEntity
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-object SearchRed {
+class SearchRed @Inject constructor(
+   val dao : SearchRedHistoryDao
+) {
 
 
     //var searchText by mutableStateOf("")
@@ -348,7 +344,7 @@ object SearchRed {
     //Dao
     @OptIn(DelicateCoroutinesApi::class)
     val history: StateFlow<List<String>> =
-        App.instance.db.redSearchHistoryDao().observeAllTexts()
+        dao.observeAllTexts()
             .stateIn(
                 scope = GlobalScope,
                 started = SharingStarted.WhileSubscribed(5_000),
@@ -357,70 +353,17 @@ object SearchRed {
 
     @OptIn(DelicateCoroutinesApi::class)
     fun add(text: String) = GlobalScope.launch {
-        App.instance.db.redSearchHistoryDao().insertAndTrim(SearchRedHistoryEntity(text = text))
+        dao.insertAndTrim(SearchRedHistoryEntity(text = text))
     }
 
     @OptIn(DelicateCoroutinesApi::class)
     fun delete(text: String) = GlobalScope.launch {
-        App.instance.db.redSearchHistoryDao().deleteByTexts(text = text)
+        dao.deleteByTexts(text = text)
     }
 
     @OptIn(DelicateCoroutinesApi::class)
-    fun clear() = GlobalScope.launch { App.instance.db.redSearchHistoryDao().deleteAll() }
+    fun clear() = GlobalScope.launch { dao.deleteAll() }
 
 }
 
-/**
- * Таблица с кешем строк ответов от сервера
- */
-@Entity(tableName = "search_red_history")
-data class SearchRedHistoryEntity(
-    @PrimaryKey
-    val text: String,
-    val timeCreate: Long = System.currentTimeMillis(),
-)
 
-@Dao
-interface SearchRedHistoryDao {
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(item: SearchRedHistoryEntity)
-
-    @Query("SELECT text FROM search_red_history ORDER BY timeCreate DESC")
-    fun observeAllTexts(): Flow<List<String>>   // <‑‑ поток изменений
-
-    @Query("DELETE FROM search_red_history")
-    suspend fun deleteAll()
-
-
-    @Transaction
-    suspend fun insertAndTrim(item: SearchRedHistoryEntity, limit: Int = 10) {
-        insert(item)
-        deleteOlderThanLimit(limit)
-    }
-
-
-    /**
-     * Удаляем всё, что не входит в последние [limit] строк,
-     * отсортированные по времени создания (DESC).
-     *
-     * `rowid` уникален, поэтому подходит для подзапроса.
-     */
-    @Query(
-        """
-        DELETE FROM search_red_history 
-        WHERE rowid NOT IN (
-            SELECT rowid 
-            FROM search_red_history 
-            ORDER BY timeCreate DESC 
-            LIMIT :limit
-        )
-        """
-    )
-    suspend fun deleteOlderThanLimit(limit: Int)
-
-
-    @Query("DELETE FROM search_red_history WHERE text = :text")
-    suspend fun deleteByTexts(text: String)
-
-}

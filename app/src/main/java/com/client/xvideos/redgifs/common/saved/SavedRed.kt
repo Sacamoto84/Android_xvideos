@@ -1,7 +1,7 @@
 package com.client.xvideos.redgifs.common.saved
 
-import com.client.xvideos.redgifs.network.api.RedApi_Tags
-import com.client.xvideos.redgifs.network.types.tag.TagInfo
+import com.redgifs.network.api.RedApi_Tags
+import com.redgifs.model.tag.TagInfo
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope

@@ -24,9 +24,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.client.xvideos.redgifs.network.types.GifsInfo
-import com.client.xvideos.redgifs.network.types.UserInfo
-import com.client.xvideos.redgifs.network.types.URL1
+import com.redgifs.model.GifsInfo
+import com.redgifs.model.UserInfo
+import com.redgifs.model.URL1
 import com.client.xvideos.screens.common.urlVideImage.UrlImage
 import com.client.xvideos.redgifs.ThemeRed
 

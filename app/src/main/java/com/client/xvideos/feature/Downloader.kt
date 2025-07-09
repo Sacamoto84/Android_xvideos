@@ -1,7 +1,7 @@
 package com.client.xvideos.feature
 
 import com.client.xvideos.App
-import com.client.xvideos.AppPath
+import com.client.common.AppPath
 import com.client.xvideos.redgifs.common.downloader.DownloadRed
 import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
 import com.client.xvideos.redgifs.common.snackBar.UiMessage

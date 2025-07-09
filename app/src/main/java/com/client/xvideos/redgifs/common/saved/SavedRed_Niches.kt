@@ -1,9 +1,9 @@
 package com.client.xvideos.redgifs.common.saved
 
-import com.client.xvideos.AppPath
-import com.client.xvideos.feature.fileDB.FileDB
+import com.client.common.fileDB.FileDB
+import com.client.common.AppPath
 import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
-import com.client.xvideos.redgifs.network.types.NichesInfo
+import com.redgifs.model.NichesInfo
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlin.onSuccess

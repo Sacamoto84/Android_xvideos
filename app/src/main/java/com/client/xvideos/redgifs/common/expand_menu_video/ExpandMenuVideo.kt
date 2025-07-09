@@ -33,8 +33,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.client.xvideos.redgifs.network.api.RedApi
-import com.client.xvideos.redgifs.network.types.GifsInfo
+import com.redgifs.network.api.RedApi
+import com.redgifs.model.GifsInfo
 import com.client.xvideos.redgifs.ThemeRed
 import com.client.xvideos.redgifs.common.block.BlockRed
 import com.client.xvideos.redgifs.common.downloader.DownloadRed
@@ -58,7 +58,8 @@ fun ExpandMenuVideo(
     onRunLike: () -> Unit = {},
     onRefresh: () -> Unit = {},
     isCollection : Boolean = false,
-    block: BlockRed
+    block: BlockRed,
+    redApi: RedApi
 ) {
 
     var expanded by remember { mutableStateOf(false) }
@@ -85,7 +86,7 @@ fun ExpandMenuVideo(
             DropdownMenuItem_Share(item){ expanded = false }
             DropdownMenuItem_Block(item = item, block = block){ expanded = false }
             DropdownMenuItem_Like(item, onRunLike){expanded = false}
-            DropdownMenuItem_Follow(item){ expanded = false }
+            DropdownMenuItem_Follow(item, redApi){ expanded = false }
             DropdownMenuItem_AddCollection(item) { expanded = false }
             if(isCollection) DropdownMenuItem_RemoveFromCollection(item, onRefresh) { expanded = false }
         }
@@ -160,7 +161,7 @@ fun DropdownMenuItem_Like(item: GifsInfo? = null, onRunLike: () -> Unit, onDismi
 
 @OptIn(ExperimentalMaterial3Api::class, DelicateCoroutinesApi::class)
 @Composable
-fun DropdownMenuItem_Follow(item: GifsInfo? = null, onDismiss: () -> Unit){
+fun DropdownMenuItem_Follow(item: GifsInfo? = null, redApi: RedApi, onDismiss: () -> Unit){
     val isFollowed = SavedRed.creators.list.any { it.username == item?.userName }
     val textFollowed = if (isFollowed) "Unfollow" else "Follow"
     val textFollowedIcon = if (isFollowed) Icons.Default.Person else Icons.Default.PermIdentity
@@ -173,7 +174,7 @@ fun DropdownMenuItem_Follow(item: GifsInfo? = null, onDismiss: () -> Unit){
                 delay(200)
                 if (!isFollowed) {
                     try {
-                        val a = RedApi.readCreator(item.userName)
+                        val a = redApi.readCreator(item.userName)
                         SavedRed.creators.add(a)
                     } catch (e: Exception) { e.printStackTrace() }
                 }

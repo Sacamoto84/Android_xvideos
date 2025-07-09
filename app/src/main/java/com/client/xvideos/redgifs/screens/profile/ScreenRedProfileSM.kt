@@ -13,11 +13,11 @@ import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
 import com.client.xvideos.feature.Downloader
 import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.feature.preference.PreferencesRepository
-import com.client.xvideos.redgifs.network.api.RedApi
-import com.client.xvideos.redgifs.network.types.GifsInfo
-import com.client.xvideos.redgifs.network.types.MediaType
-import com.client.xvideos.redgifs.network.types.Order
-import com.client.xvideos.redgifs.network.types.UserInfo
+import com.redgifs.network.api.RedApi
+import com.redgifs.model.GifsInfo
+import com.redgifs.model.MediaType
+import com.redgifs.model.Order
+import com.redgifs.model.UserInfo
 import com.client.xvideos.feature.room.AppDatabase
 import com.client.xvideos.redgifs.common.block.BlockRed
 import com.client.xvideos.redgifs.common.network.loadGifs

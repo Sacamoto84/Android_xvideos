@@ -1,7 +1,7 @@
 package com.client.xvideos.redgifs.common.block.useCase
 
-import com.client.xvideos.AppPath
-import com.client.xvideos.redgifs.network.types.GifsInfo
+import com.client.common.AppPath
+import com.redgifs.model.GifsInfo
 import timber.log.Timber
 import java.io.File
 

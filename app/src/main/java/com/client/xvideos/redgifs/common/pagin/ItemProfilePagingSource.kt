@@ -2,10 +2,10 @@ package com.client.xvideos.redgifs.common.pagin
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.client.xvideos.redgifs.network.api.RedApi
-import com.client.xvideos.redgifs.network.types.GifsInfo
-import com.client.xvideos.redgifs.network.types.MediaType
-import com.client.xvideos.redgifs.network.types.Order
+import com.redgifs.network.api.RedApi
+import com.redgifs.model.GifsInfo
+import com.redgifs.model.MediaType
+import com.redgifs.model.Order
 import com.client.xvideos.redgifs.common.block.BlockRed
 import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
 import com.client.xvideos.redgifs.common.users.UsersRed

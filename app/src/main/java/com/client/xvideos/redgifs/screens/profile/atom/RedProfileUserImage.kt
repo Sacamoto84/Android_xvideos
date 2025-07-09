@@ -28,7 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.client.xvideos.R
-import com.client.xvideos.redgifs.network.types.UserInfo
+import com.redgifs.model.UserInfo
 import com.client.xvideos.redgifs.ThemeRed
 import com.client.xvideos.redgifs.common.saved.SavedRed
 import com.client.xvideos.screens.common.urlVideImage.UrlImage

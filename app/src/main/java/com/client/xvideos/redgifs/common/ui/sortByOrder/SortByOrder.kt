@@ -37,7 +37,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.client.xvideos.R
-import com.client.xvideos.redgifs.network.types.Order
+import com.redgifs.model.Order
 import com.client.xvideos.redgifs.ThemeRed
 
 @OptIn(ExperimentalMaterial3Api::class)

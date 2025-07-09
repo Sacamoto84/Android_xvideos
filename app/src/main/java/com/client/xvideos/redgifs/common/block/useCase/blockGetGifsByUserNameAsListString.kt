@@ -1,6 +1,6 @@
 package com.client.xvideos.redgifs.common.block.useCase
 
-import com.client.xvideos.AppPath
+import com.client.common.AppPath
 import timber.log.Timber
 import java.io.File
 

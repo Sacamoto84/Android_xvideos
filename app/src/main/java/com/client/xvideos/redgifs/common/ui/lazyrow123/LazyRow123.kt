@@ -44,7 +44,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.R
-import com.client.xvideos.redgifs.network.types.GifsInfo
+import com.redgifs.model.GifsInfo
 import com.client.xvideos.redgifs.ThemeRed
 import com.client.xvideos.redgifs.common.block.ui.DialogBlock
 import com.client.xvideos.redgifs.common.downloader.DownloadRed
@@ -227,7 +227,8 @@ fun LazyRow123(
                                 listGifs.refresh()
                             },
                             host.isCollection,
-                            block
+                            block,
+                            host.redApi
                         )
 
 
