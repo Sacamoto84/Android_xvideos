@@ -27,9 +27,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.client.xvideos.R
+import com.client.common.R
 import com.redgifs.model.UserInfo
-import com.client.xvideos.redgifs.ThemeRed
+import com.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.common.saved.SavedRed
 import com.client.xvideos.screens.common.urlVideImage.UrlImage
 import com.client.xvideos.util.toPrettyCount
@@ -85,7 +85,7 @@ fun RedProfileCreaterInfo(item: UserInfo) {
                 Spacer(Modifier.width(8.dp))
                 Image(
                     painter = painterResource(id = R.drawable.verificed),
-                    contentDescription = stringResource(id = R.string.dog_content_description),
+                    contentDescription = null,
                     modifier = Modifier
                         .size(26.dp)
                 )

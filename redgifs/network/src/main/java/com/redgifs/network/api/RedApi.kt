@@ -18,9 +18,9 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
-import com.redgifs.db.db.dao.CacheMediaResponseDao
-import com.redgifs.db.db.entity.CacheMediaResponseEntity
-import com.redgifs.db.db.entity.getCurrentTimeText
+import com.redgifs.db.dao.CacheMediaResponseDao
+import com.redgifs.db.entity.CacheMediaResponseEntity
+import com.redgifs.db.entity.getCurrentTimeText
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.Int

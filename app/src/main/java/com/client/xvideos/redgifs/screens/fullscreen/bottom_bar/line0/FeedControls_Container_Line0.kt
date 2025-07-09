@@ -35,8 +35,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.client.xvideos.R
-import com.client.xvideos.redgifs.ThemeRed
+import com.client.common.R
+import com.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.screens.fullscreen.ScreenRedFullScreenSM
 import com.client.xvideos.redgifs.screens.manager_block.ScreenRedManageBlock
 import java.util.Locale

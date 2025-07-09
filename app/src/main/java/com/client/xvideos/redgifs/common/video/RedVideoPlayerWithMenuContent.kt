@@ -24,7 +24,7 @@ import com.client.xvideos.BuildConfig
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPlayerEvent
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.host.MediaPlayerHost
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.model.ScreenResize
-import com.client.xvideos.redgifs.ThemeRed
+import com.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.common.video.player_with_menu.atom.VideoPlayerWithMenuContent
 import com.client.xvideos.redgifs.screens.profile.PlayerControls
 import kotlinx.coroutines.DelicateCoroutinesApi

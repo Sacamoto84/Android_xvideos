@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
-import com.client.xvideos.redgifs.ThemeRed
+import com.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.screens.explorer.tab.FavoritesTab
 import com.client.xvideos.redgifs.screens.explorer.tab.saved.tab.SavedCollectionTab
 import com.client.xvideos.redgifs.screens.explorer.tab.saved.tab.SavedCreatorsTab

@@ -7,7 +7,7 @@ import com.client.xvideos.redgifs.common.block.BlockRed
 import com.client.xvideos.redgifs.common.saved.SavedRed
 import com.kdownloader.KDownloader
 import com.redgifs.db.AppRedGifsDatabase
-import com.redgifs.db.db.dao.clearOldCache
+import com.redgifs.db.dao.clearOldCache
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope

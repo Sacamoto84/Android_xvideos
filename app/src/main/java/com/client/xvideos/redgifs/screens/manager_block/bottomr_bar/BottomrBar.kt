@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.client.xvideos.redgifs.ThemeRed
+import com.redgifs.common.ThemeRed
 import com.composables.core.HorizontalSeparator
 
 @Composable

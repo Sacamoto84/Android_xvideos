@@ -30,7 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.client.xvideos.App
-import com.client.xvideos.R
+import com.client.common.R
 import com.client.xvideos.feature.net.readHtmlFromURL
 import com.client.xvideos.ui.theme.PornHubOrange
 import com.client.xvideos.ui.theme.grayColor

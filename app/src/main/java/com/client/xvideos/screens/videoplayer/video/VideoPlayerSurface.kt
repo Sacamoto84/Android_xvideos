@@ -29,7 +29,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
-import com.client.xvideos.R
+import com.client.common.R
 import com.client.xvideos.screens.videoplayer.ScreenVideoPlayerSM
 import com.client.xvideos.screens.videoplayer.atom.VideoQualitySelector
 import com.client.xvideos.screens.videoplayer.atom.VideoSpeedSelector

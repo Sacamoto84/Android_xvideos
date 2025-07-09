@@ -35,7 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.redgifs.network.api.RedApi
 import com.redgifs.model.GifsInfo
-import com.client.xvideos.redgifs.ThemeRed
+import com.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.common.block.BlockRed
 import com.client.xvideos.redgifs.common.downloader.DownloadRed
 import com.client.xvideos.redgifs.common.saved.SavedRed

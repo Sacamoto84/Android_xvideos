@@ -33,7 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.client.xvideos.redgifs.ThemeRed
+import com.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.common.saved.SavedRed
 import com.client.xvideos.screens.common.urlVideImage.UrlImage
 import com.composables.core.HorizontalSeparator

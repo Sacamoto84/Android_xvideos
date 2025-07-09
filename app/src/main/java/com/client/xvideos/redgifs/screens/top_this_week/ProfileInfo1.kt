@@ -28,7 +28,7 @@ import com.redgifs.model.GifsInfo
 import com.redgifs.model.UserInfo
 import com.redgifs.model.URL1
 import com.client.xvideos.screens.common.urlVideImage.UrlImage
-import com.client.xvideos.redgifs.ThemeRed
+import com.redgifs.common.ThemeRed
 
 @Composable
 fun ProfileInfo1(modifier: Modifier = Modifier, onClick: ()->Unit, videoItem: GifsInfo, listUsers: List<UserInfo>, visibleUserName:Boolean = true, visibleIcon:Boolean = true){

@@ -17,6 +17,7 @@
             <option value="$PROJECT_DIR$/redgifs/db" />
             <option value="$PROJECT_DIR$/redgifs/model" />
             <option value="$PROJECT_DIR$/redgifs/network" />
+            <option value="$PROJECT_DIR$/redgifs/ui" />
           </set>
         </option>
       </GradleProjectSettings>

@@ -7,11 +7,11 @@ import androidx.room.withTransaction
 import com.client.common.di.ApplicationScope
 import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
 import com.redgifs.db.AppRedGifsDatabase
-import com.redgifs.db.db.dao.BlockDao
-import com.redgifs.db.db.dao.GifsInfoDao
-import com.redgifs.db.db.entity.BlockEntity
-import com.redgifs.db.db.entity.toDomain
-import com.redgifs.db.db.entity.toEntity
+import com.redgifs.db.dao.BlockDao
+import com.redgifs.db.dao.GifsInfoDao
+import com.redgifs.db.entity.BlockEntity
+import com.redgifs.db.entity.toDomain
+import com.redgifs.db.entity.toEntity
 import com.redgifs.model.GifsInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.client.common.AppPath
 import com.redgifs.model.GifsInfo
-import com.client.xvideos.redgifs.ThemeRed
+import com.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.common.downloader.DownloadRed
 import com.client.xvideos.redgifs.screens.profile.ScreenRedProfileSM
 import com.client.xvideos.redgifs.common.video.player_with_menu.RedVideoPlayerWithMenuContent

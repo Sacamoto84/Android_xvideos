@@ -30,7 +30,7 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.client.xvideos.redgifs.ThemeRed
+import com.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.common.block.BlockRed
 import com.client.xvideos.redgifs.common.block.ui.DialogBlock
 import com.client.xvideos.redgifs.common.ui.lazyrow123.LazyRow123

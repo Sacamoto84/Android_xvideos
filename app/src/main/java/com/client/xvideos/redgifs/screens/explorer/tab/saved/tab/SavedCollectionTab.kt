@@ -58,7 +58,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
 import com.redgifs.model.GifsInfo
 import com.redgifs.model.Order
-import com.client.xvideos.redgifs.ThemeRed
+import com.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.common.block.BlockRed
 import com.client.xvideos.redgifs.common.block.ui.DialogBlock
 import com.client.xvideos.redgifs.common.saved.SavedRed

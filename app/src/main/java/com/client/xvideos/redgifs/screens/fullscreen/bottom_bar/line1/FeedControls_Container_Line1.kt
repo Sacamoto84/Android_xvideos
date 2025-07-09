@@ -13,7 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.client.xvideos.redgifs.ThemeRed
+import com.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.common.ui.atom.Selector
 import com.client.xvideos.redgifs.common.ui.sortByOrder.SortByOrder
 import com.client.xvideos.redgifs.screens.profile.ScreenRedProfileSM

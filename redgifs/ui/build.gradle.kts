@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "com.client.common"
+    namespace = "com.example.ui"
     compileSdk = 36
 
     defaultConfig {
@@ -44,24 +44,9 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-
-
-
-
-    implementation(libs.gson)
-
-    implementation(libs.timber)
-
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.android.compiler)
-
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
+    //testImplementation(libs.junit)
+    //androidTestImplementation(libs.androidx.junit)
+    //androidTestImplementation(libs.androidx.espresso.core)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -73,4 +58,6 @@ dependencies {
     implementation (libs.androidx.material)
     implementation (libs.androidx.material3)
 
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.android.compiler)
 }

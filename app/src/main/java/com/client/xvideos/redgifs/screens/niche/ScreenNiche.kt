@@ -46,7 +46,7 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.redgifs.model.Order
-import com.client.xvideos.redgifs.ThemeRed
+import com.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.common.saved.SavedRed
 import com.client.xvideos.redgifs.common.ui.atom.Selector
 import com.client.xvideos.redgifs.common.ui.lazyrow123.LazyRow123
