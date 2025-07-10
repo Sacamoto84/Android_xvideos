@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.sp
 import com.redgifs.common.ThemeRed
 
 @Composable
-fun TagsBlock(tags: List<String>) {
+fun TagsBlock(tags: List<String>, tagsSelect: List<String>, onClick: (String) -> Unit = {}) {
     var expanded by remember { mutableStateOf(false) }
     val sorted = remember(tags) { tags.sorted() }
 
@@ -43,7 +43,7 @@ fun TagsBlock(tags: List<String>) {
 
         /* ---------- измеряем все теги ---------- */
         val tagPl = sorted.map { tag ->
-            subcompose("t_$tag") { TagChip(tag) }.first().measure(loose)
+            subcompose("t_$tag") { TagChip(tag, tag in tagsSelect, onClick) }.first().measure(loose)
         }
 
         /* ---------- одна кнопка: текст зависит от expanded ---------- */
@@ -56,7 +56,7 @@ fun TagsBlock(tags: List<String>) {
             tagPl + btnPl                                // все теги + кнопка «Скрыть»
         } else {                                         // нужно уложить в 2 строки
             val list = mutableListOf<Placeable>()
-            var rowW = 0;
+            var rowW = 0
             var lines = 1
             for (p in tagPl) {
                 // резервируем место под кнопку, т.к. она будет последней
@@ -101,23 +101,26 @@ fun TagsBlock(tags: List<String>) {
 
 /* -------------------- CHIP -------------------- */
 @Composable
-private fun TagChip(text: String) {
+private fun TagChip(text: String, select: Boolean, onClick: (String) -> Unit) {
     var pressed by remember { mutableStateOf(false) }
     val bg by animateColorAsState(
         if (pressed) Color(0xFF652E45) else Color.Transparent
     )
 
     Text(
-        text, color = Color.White, fontSize = 14.sp,
+        text, color =
+            if (select) Color.Black else Color.White,
+        fontSize = 14.sp,
         fontFamily = ThemeRed.fontFamilyPopinsRegular,
         modifier = Modifier
             .padding(horizontal = 4.dp, vertical = 2.dp)
             .height(32.dp)
             .clip(RoundedCornerShape(50))
-            .background(bg)
-            .border(1.dp, Color(0xFFEA616F), RoundedCornerShape(50))
+            .background(if (select) ThemeRed.colorYellow else bg)
+            .border(1.dp, ThemeRed.colorYellow, RoundedCornerShape(50))
             .wrapContentWidth()
             .padding(horizontal = 8.dp, vertical = 4.dp)
+            .clickable(onClick = { onClick.invoke(text) })
     )
 }
 
@@ -128,7 +131,9 @@ private fun ExpandCollapseButton(expanded: Boolean, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .padding(horizontal = 4.dp, vertical = 2.dp)
-            .size(32.dp).border(1.dp, ThemeRed.colorRed, CircleShape), contentAlignment = Alignment.Center
+            .size(32.dp)
+            .border(1.dp, ThemeRed.colorYellow, CircleShape),
+        contentAlignment = Alignment.Center
     ) {
         Icon(
             imageVector = if (expanded) Icons.Default.Close else Icons.Filled.MoreHoriz,

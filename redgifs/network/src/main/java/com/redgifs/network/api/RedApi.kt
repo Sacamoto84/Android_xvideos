@@ -135,6 +135,7 @@ class RedApi @Inject constructor(
     }
 
 
+
     suspend fun searchCreator(
         userName: String = "lilijunex",
         page: Int = 1,
@@ -151,6 +152,32 @@ class RedApi @Inject constructor(
             "order" to order.value,
             "type" to type.value
         )
+        val res: CreatorResponse = api.request(route)
+        return res
+    }
+
+    //
+    //https://api.redgifs.com/v2/users/entakeeke1a/search?order=new&count=40&tags=Amateur%2CArmpit%2CArmpits
+    suspend fun searchCreator(
+        userName: String = "lilijunex",
+        page: Int = 1,
+        count: Int = 100,
+        order: Order = Order.NEW,
+        type: MediaType = MediaType.GIF,
+        tags: List<String>
+    ): CreatorResponse {
+
+        val route = Route(
+            method = "GET",
+            path = "/v2/users/{username}/search?order={order}&page={page}&count={count}&type={type}&tags={tags}",
+            "username" to userName,
+            "page" to page,
+            "count" to count,
+            "order" to order.value,
+            "type" to type.value,
+            "tags" to tags.joinToString(",")
+        )
+
         val res: CreatorResponse = api.request(route)
         return res
     }

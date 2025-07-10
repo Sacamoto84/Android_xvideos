@@ -67,10 +67,7 @@ object NichesTab : Screen {
 
         val listNiche = vm.lazyHost.pager.collectAsLazyPagingItems() as LazyPagingItems<Niche>
 
-
-        val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForLazyColumn(
-            gridState = state, itemsToIgnore = 0
-        )
+        val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForLazyColumn( gridState = state, itemsToIgnore = 0 )
 
         if (listNiche.itemCount == 0) return
 
@@ -87,9 +84,7 @@ object NichesTab : Screen {
 
         }, containerColor = ThemeRed.colorCommonBackground2) {
 
-            Box(modifier = Modifier
-                .padding(bottom = it.calculateBottomPadding())
-                .fillMaxSize()) {
+            Box(modifier = Modifier.padding(bottom = it.calculateBottomPadding()).fillMaxSize()) {
 
                 LazyColumn(
                     state = state,

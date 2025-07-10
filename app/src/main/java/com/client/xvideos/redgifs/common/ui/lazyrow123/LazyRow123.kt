@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -66,11 +67,13 @@ fun LazyRow123(
     contentBeforeList: @Composable (() -> Unit) = {},
     //Для меню
     isRunLike: Boolean = false,
+    onAppendLoaded : (LazyPagingItems<GifsInfo>) -> Unit = {},
+    filterTags : List<String> = emptyList()
     ) {
 
-    SideEffect { Timber.d("!!! LazyRow123::SideEffect columns: ${host.columns}") }
-
     val listGifs = host.pager.collectAsLazyPagingItems() as LazyPagingItems<GifsInfo>
+
+    SideEffect { Timber.d("!!! LazyRow123::SideEffect columns: ${host.columns} : $listGifs") }
 
     val isConnected by host.isConnected.collectAsState()
     val state = host.state//rememberLazyGridState()
@@ -106,6 +109,34 @@ fun LazyRow123(
         //return
     }
 
+    val loadState = listGifs.loadState
+    var wasRefreshLoading by remember { mutableStateOf(false) }
+    var wasAppendLoading by remember { mutableStateOf(false) }
+    var wasDataLoaded by remember { mutableStateOf(false) }
+
+    // Первая загрузка
+    LaunchedEffect(loadState.refresh) {
+        if (loadState.refresh is LoadState.NotLoading && !wasDataLoaded && listGifs.itemCount > 0) {
+            wasDataLoaded = true
+            onAppendLoaded(listGifs)
+        }
+
+        // Сброс флага, если снова началась загрузка (например, swipe-to-refresh)
+        if (loadState.refresh is LoadState.Loading) {
+            wasDataLoaded = false
+        }
+    }
+
+    // Догрузка следующих страниц
+    LaunchedEffect(loadState.append) {
+        if (loadState.append is LoadState.Loading && !wasAppendLoading) {
+            wasAppendLoading = true
+            onAppendLoaded(listGifs) // false — догрузка
+        }
+        if (loadState.append !is LoadState.Loading) {
+            wasAppendLoading = false
+        }
+    }
 
 //    val centrallyLocatedOrMostVisibleItemIndex by remember {
 //        derivedStateOf {
@@ -163,7 +194,6 @@ fun LazyRow123(
             }
         )
     }
-
 
     Box(modifier.fillMaxSize()) {
 

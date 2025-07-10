@@ -22,6 +22,7 @@ import com.client.xvideos.redgifs.common.pagin.ItemProfilePagingSource
 import com.client.xvideos.redgifs.common.pagin.ItemTopPagingSource
 import com.client.xvideos.redgifs.common.saved.SavedRed
 import com.client.xvideos.redgifs.common.search.SearchRed
+import com.redgifs.model.GifsInfo
 import com.redgifs.network.api.RedApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -56,7 +57,7 @@ enum class TypePager {
 
 }
 
-private data class SearchParams(val query: String, val sort: Order)
+private data class SearchParams(val query: String, val sort: Order, val tags : String)
 
 @OptIn(FlowPreview::class)
 class LazyRow123Host(
@@ -71,7 +72,8 @@ class LazyRow123Host(
     val block: BlockRed,
     val search : SearchRed,
     val redApi : RedApi,
-    val savedRed: SavedRed
+    val savedRed: SavedRed,
+    val tags : StateFlow<Set<String>> = MutableStateFlow(emptySet())
 ) {
 
     //var searchText by mutableStateOf("")
@@ -120,8 +122,8 @@ class LazyRow123Host(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val pager: Flow<PagingData<Any>> =
-        combine(search.searchTextDone, sortType, block.blockList) { text, sort, blockList ->
-            SearchParams(text.trim(), sort)
+        combine(search.searchTextDone, sortType, block.blockList, tags) { text, sort, blockList, tags ->
+            SearchParams(text.trim(), sort, tags.joinToString(","))
         }
             //.debounce(2000)                                          // ② ждём паузу ввода
             .distinctUntilChanged()                                 // ③ игнорируем дубли
@@ -136,7 +138,7 @@ class LazyRow123Host(
                         Timber.d("!!! >>>pagingSourceFactory{...}")
                         gotoUp()
                         gotoUpColumn()
-                        createPager(typePager, params.sort, extraString, params.query, block, redApi, savedRed)
+                        createPager(typePager, params.sort, extraString, params.query, block, redApi, savedRed , tags.value.toList())
                     }
                 ).flow
             }
@@ -169,7 +171,8 @@ fun createPager(
     searchText: String,
     block : BlockRed,
     redApi : RedApi,
-    savedRed: SavedRed
+    savedRed: SavedRed,
+    tags : List<String> = emptyList()
 ): PagingSource<Int, Any> {
     val pagingSourceFactory = when (typePager) {
         TypePager.NICHES -> {
@@ -189,7 +192,7 @@ fun createPager(
         }
 
         TypePager.PROFILE -> {
-            ItemProfilePagingSource(profileName = extraString, sort = sort, block = block, redApi = redApi)
+            ItemProfilePagingSource(profileName = extraString, sort = sort, block = block, redApi = redApi, tags = tags)
         }
 
         TypePager.EMPTY -> {

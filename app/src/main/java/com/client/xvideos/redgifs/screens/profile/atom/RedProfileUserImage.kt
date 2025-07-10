@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.client.common.R
@@ -39,10 +40,9 @@ fun RedProfileCreaterInfo(item: UserInfo, savedRed: SavedRed) {
 
     Column(
         modifier = Modifier
-            .padding(horizontal = 0.dp)
+            .padding(top = 32.dp)
             .fillMaxWidth()
     ) {
-
 
         //Top info
         Row(
@@ -52,11 +52,13 @@ fun RedProfileCreaterInfo(item: UserInfo, savedRed: SavedRed) {
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            if(item.profileImageUrl != null) {
-                UrlImage(item.profileImageUrl!!, modifier = Modifier.size(128.dp))
-            }else {
+            if (item.profileImageUrl != null) {
+                UrlImage(item.profileImageUrl!!, modifier = Modifier.size(96.dp))
+            } else {
                 Box(
-                    modifier = Modifier.clip(RoundedCornerShape(0.dp)).size(128.dp)
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(0.dp))
+                        .size(96.dp)
                         .background(Color.DarkGray), contentAlignment = Alignment.Center
                 )
                 {
@@ -69,42 +71,66 @@ fun RedProfileCreaterInfo(item: UserInfo, savedRed: SavedRed) {
                 }
             }
 
-            Row(
-                modifier = Modifier.wrapContentHeight(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    item.username,
-                    color = Color.White,
-                    fontFamily = ThemeRed.fontFamilyPopinsMedium,
-                    fontSize = 28.sp,
+            Column(modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)) {
+                Row(
+                    modifier = Modifier.wrapContentHeight(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        item.username,
+                        color = Color.White,
+                        fontFamily = ThemeRed.fontFamilyPopinsMedium,
+                        fontSize = 28.sp,
+                        modifier = Modifier
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Image(
+                        painter = painterResource(id = R.drawable.verificed),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(26.dp)
+                    )
+                }
+
+                val isFollow = savedRed.creators.list.any { it.username == item.username }
+                Box(
                     modifier = Modifier
-                )
-                Spacer(Modifier.width(8.dp))
-                Image(
-                    painter = painterResource(id = R.drawable.verificed),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(26.dp)
-                )
+                        .align(Alignment.Start)
+                        .padding(start = 8.dp, end = 64.dp)
+                        //.width(96.dp)
+                        .fillMaxWidth()
+                        .height(48.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(if (isFollow) Color.Black else ThemeRed.colorYellow)
+                        .border(
+                            1.dp,
+                            if (isFollow) Color.White else Color.Transparent,
+                            RoundedCornerShape(16.dp)
+                        )
+                        .clickable {
+                            if (isFollow) savedRed.creators.remove(item.username) else savedRed.creators.add(
+                                item
+                            )
+                        }, contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        if (isFollow) "Unfollow" else "Follow",
+                        color = if (isFollow) Color.White else Color.Black,
+                        fontFamily = ThemeRed.fontFamilyDMsanss,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
             }
 
 
         }
 
-        val isFollow = savedRed.creators.list.any { it.username == item.username }
-        Box(
-            modifier = Modifier
-                .width(96.dp)
-                .height(48.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(if (isFollow) Color.Black else ThemeRed.colorYellow)
-                .border( 1.dp, if (isFollow)Color.White else Color.Transparent, RoundedCornerShape(8.dp))
-                .clickable { if (isFollow) savedRed.creators.remove(item.username) else savedRed.creators.add(item)
-                           }, contentAlignment = Alignment.Center) {
-            Text(if (isFollow) "Отписаться" else "Подписаться", color = if (isFollow) Color.White else Color.Black)
-        }
+
 
         Row(
             modifier = Modifier
@@ -189,20 +215,22 @@ fun RedProfileCreaterInfo(item: UserInfo, savedRed: SavedRed) {
             }
         }
 
-        Text(
-            "About ${item.username}:",
-            color = ThemeRed.colorTextGray,
-            fontSize = 14.sp,
-            fontFamily = ThemeRed.fontFamilyPopinsRegular
-        )
+        if (item.description != null) {
+            Text(
+                "About ${item.username}:",
+                color = ThemeRed.colorTextGray,
+                fontSize = 14.sp,
+                fontFamily = ThemeRed.fontFamilyPopinsRegular
+            )
 
-        Spacer(Modifier.height(4.dp))
+            Spacer(Modifier.height(4.dp))
 
-        Text(
-            item.description.toString().trimMargin(),
-            color = Color.White,
-            fontSize = 14.sp, fontFamily = ThemeRed.fontFamilyPopinsRegular
-        )
+            Text(
+                item.description.toString().trimMargin(),
+                color = Color.White,
+                fontSize = 14.sp, fontFamily = ThemeRed.fontFamilyPopinsRegular
+            )
+        }
 
         Spacer(Modifier.width(8.dp))
 

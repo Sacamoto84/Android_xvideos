@@ -39,6 +39,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.toSet
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -76,7 +77,19 @@ class ScreenRedProfileSM @AssistedInject constructor(
     //* Список тегов                                                                                       ║
     //══════════════════════════════════════════════════════════════╦══════════════════════════════════════╣
     private val _tags = MutableStateFlow<Set<String>>(emptySet()) //║                                      ║
-    val tags: StateFlow<Set<String>> = _tags                      //║                                      ║
+    val tags: StateFlow<Set<String>> = _tags                      //║
+    val tagsSelect = MutableStateFlow<Set<String>>(emptySet())
+    //                                   ║
+    fun tagsAdd(l : List<String>){
+        _tags.update { it + l }
+    }
+
+    fun toggleSelectTag(tag: String) {
+        tagsSelect.update {
+            if (tag in it) it - tag else it + tag
+        }
+    }
+
     //══════════════════════════════════════════════════════════════╩══════════════════════════════════════╝
 
     //═════════════════════════════════════════════════════════════════════════════════════════════════════╗
@@ -97,8 +110,6 @@ class ScreenRedProfileSM @AssistedInject constructor(
     fun setSelector(value: Int) { screenModelScope.launch { pref.setRedSelector(value) } }
     ///////////////////////////////////////////////
 
-
-
     val likedHost = LazyRow123Host(
         connectivityObserver = connectivityObserver,
         scope = screenModelScope,
@@ -108,7 +119,8 @@ class ScreenRedProfileSM @AssistedInject constructor(
         block = block,
         search = search,
         redApi = redApi,
-        savedRed = savedRed
+        savedRed = savedRed,
+        tags = tagsSelect,
     )
 
 
@@ -211,11 +223,6 @@ class ScreenRedProfileSM @AssistedInject constructor(
         }
         _list.update { emptyList() }
         _tags.update { emptySet() }
-    }
-
-    fun openFullScreen(index : Int){
-        setSelector(1)
-        tictikStartIndex = index
     }
 
 }
