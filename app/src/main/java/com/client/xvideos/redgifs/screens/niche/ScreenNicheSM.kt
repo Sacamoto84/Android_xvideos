@@ -52,7 +52,8 @@ class ScreenNicheSM @AssistedInject constructor(
             extraString = nicheName, typePager = TypePager.NICHES,
             block = block,
             search = search,
-            redApi = redApi
+            redApi = redApi,
+            savedRed = savedRed
         )
 
     init {

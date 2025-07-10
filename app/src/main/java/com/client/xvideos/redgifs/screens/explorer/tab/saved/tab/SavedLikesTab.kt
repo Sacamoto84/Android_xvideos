@@ -124,7 +124,8 @@ class ScreenSavedLikesSM @Inject constructor(
         typePager = TypePager.SAVED_LIKES,
         block = block,
         search = search,
-        redApi = redApi
+        redApi = redApi,
+        savedRed = savedRed
     )
 
 }

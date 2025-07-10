@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -42,19 +43,36 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cafe.adriel.voyager.core.model.ScreenModel
+import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
+import cafe.adriel.voyager.hilt.ScreenModelKey
+import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
+import com.client.xvideos.redgifs.common.block.BlockRed
 import com.redgifs.model.UserInfo
 import com.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.common.saved.SavedRed
+import com.client.xvideos.redgifs.common.search.SearchRed
+import com.client.xvideos.redgifs.common.ui.lazyrow123.LazyRow123Host
+import com.client.xvideos.redgifs.common.ui.lazyrow123.TypePager
 import com.client.xvideos.redgifs.screens.profile.ScreenRedProfile
 import com.client.xvideos.redgifs.screens.profile.atom.VerticalScrollbar
 import com.client.xvideos.redgifs.screens.profile.rememberVisibleRangePercentIgnoringFirstNForLazyColumn
 import com.client.xvideos.screens.common.urlVideImage.UrlImage
 import com.composeunstyled.Text
+import com.redgifs.model.Order
+import com.redgifs.network.api.RedApi
+import dagger.Binds
+import dagger.Module
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+import dagger.multibindings.IntoMap
+import javax.inject.Inject
 
 
 object SavedCreatorsTab : Screen {
@@ -68,7 +86,11 @@ object SavedCreatorsTab : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
 
+        val vm = getScreenModel<ScreenSavedCreatorSM>()
+
         val state = rememberLazyListState()
+
+        val savedRed = vm.savedRed
 
         /**  ➜ сюда запоминаем элемент, который пользователь хочет удалить  */
         var itemPendingDelete by remember { mutableStateOf<UserInfo?>(null) }
@@ -103,7 +125,7 @@ object SavedCreatorsTab : Screen {
                 confirmButton = {
                     TextButton(
                         onClick = {
-                            SavedRed.creators.remove(pending.username)   // удаляем
+                            savedRed.creators.remove(pending.username)   // удаляем
                             itemPendingDelete = null         // закрываем диалог
                         }
                     ) { Text("Удалить", fontSize = 16.sp, color = Color(0xFF6552A5)) }
@@ -139,7 +161,7 @@ object SavedCreatorsTab : Screen {
                 )
                 {
 
-                    items(SavedRed.creators.list) { it1 ->
+                    items(savedRed.creators.list) { it1 ->
 
                             Row(
                                 modifier = Modifier
@@ -231,3 +253,36 @@ object SavedCreatorsTab : Screen {
 
     }
 }
+
+class ScreenSavedCreatorSM @Inject constructor(
+    connectivityObserver: ConnectivityObserver,
+    val block: BlockRed,
+    search : SearchRed,
+    redApi : RedApi,
+    val savedRed: SavedRed
+) : ScreenModel {
+    val gridState = LazyGridState()
+
+    val likedHost = LazyRow123Host(
+        connectivityObserver = connectivityObserver,
+        scope = screenModelScope,
+        typePager = TypePager.SAVED_COLLECTION,
+        extraString = "",
+        startOrder = Order.LATEST,
+        isCollection = true,
+        block = block,
+        search = search,
+        redApi = redApi,
+        savedRed = savedRed
+    )
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+abstract class ScreenModuleRedSavedCreator {
+    @Binds
+    @IntoMap
+    @ScreenModelKey(ScreenSavedCreatorSM::class)
+    abstract fun bindScreenRedSavedCreatorScreenModel(hiltListScreenModel: ScreenSavedCreatorSM): ScreenModel
+}
+
