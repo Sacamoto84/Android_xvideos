@@ -6,15 +6,25 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.Group
 import androidx.compose.material.icons.outlined.Movie
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material.icons.twotone.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import cafe.adriel.voyager.core.registry.rememberScreen
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
@@ -29,6 +39,7 @@ import com.client.xvideos.redgifs.screens.explorer.tab.gifs.GifsTab
 import com.client.xvideos.redgifs.screens.explorer.tab.niches.NichesTab
 import com.client.xvideos.redgifs.screens.explorer.tab.saved.SavedTab
 import com.client.xvideos.redgifs.screens.explorer.tab.search.SearchTab
+import com.client.xvideos.redgifs.screens.explorer.tab.setting.SettingTab
 import com.client.xvideos.redgifs.screens.explorer.top.TabRow
 
 @Composable
@@ -52,25 +63,29 @@ class ScreenRedExplorer() : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
 
-        val vm: ScreenRedExplorerSM = getScreenModel()
+        //val vm: ScreenRedExplorerSM = getScreenModel()
+        var screenType by rememberSaveable{ mutableIntStateOf(0)}
+
         val l = listOf(
             Icons.Outlined.Movie,
             Icons.Outlined.Group,
             Icons.Outlined.BookmarkBorder,
-            Icons.Outlined.Search
+            Icons.Outlined.Search,
+            Icons.Outlined.Settings
         )
         Scaffold(bottomBar = {
             TabRow(
                 containerColor = ThemeRed.colorTabLevel0,
                 titlesIcon = l,
-                onChangeState = { vm.screenType = it })
+                onChangeState = { screenType = it })
         }, containerColor = ThemeRed.colorCommonBackground2) { paddingValues ->
             Box(modifier = Modifier.padding(bottom = paddingValues.calculateBottomPadding())) {
-                when (vm.screenType) {
+                when (screenType) {
                     0 -> GifsTab.Content()
                     1 -> NichesTab.Content()
                     2 -> SavedTab.Content()
                     3 -> SearchTab.Content()
+                    4 -> SettingTab.Content()
                     else -> FavoritesTab.Content()
                 }
             }

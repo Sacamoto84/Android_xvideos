@@ -17,16 +17,8 @@ import javax.inject.Inject
 class ScreenRedExplorerSM @Inject constructor(
     private val db: AppDatabase,
 ) : ScreenModel {
-
-   var screenType by mutableIntStateOf(0)
-
-
-  var count by mutableIntStateOf(0)
-
-
-
-
-
+    var screenType by mutableIntStateOf(0)
+    var count by mutableIntStateOf(0)
 }
 
 
