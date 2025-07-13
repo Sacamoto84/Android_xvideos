@@ -17,7 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.redgifs.model.Niche
-import com.client.xvideos.screens.common.urlVideImage.UrlImage
+import com.client.common.urlVideImage.UrlImage
 
 @Composable
 fun NichePreview(niches: Niche, onClick: () -> Unit) {

@@ -30,8 +30,8 @@ import com.client.common.AppPath
 import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
 import com.redgifs.model.GifsInfo
 import com.redgifs.common.ThemeRed
-import com.client.xvideos.redgifs.common.downloader.DownloadRed
-import com.client.xvideos.redgifs.common.downloader.ui.DownloadIndicator
+import com.redgifs.common.downloader.DownloadRed
+import com.redgifs.common.downloader.ui.DownloadIndicator
 import com.client.xvideos.redgifs.common.video.RedVideoPlayerWithMenu
 import com.client.xvideos.redgifs.screens.fullscreen.bottom_bar.line0.FeedControls_Container_Line0
 import com.client.xvideos.redgifs.screens.profile.PlayerControls

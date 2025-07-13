@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.sp
 import com.redgifs.model.GifsInfo
 import com.redgifs.model.UserInfo
 import com.redgifs.model.URL1
-import com.client.xvideos.screens.common.urlVideImage.UrlImage
+import com.client.common.urlVideImage.UrlImage
 import com.redgifs.common.ThemeRed
 
 @Composable

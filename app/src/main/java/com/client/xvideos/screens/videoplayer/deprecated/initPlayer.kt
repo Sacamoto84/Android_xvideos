@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.media3.common.Player
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
+import com.client.common.buildMediaSource
 
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 fun initPlayer(context: Context, passedString : String ): Player {

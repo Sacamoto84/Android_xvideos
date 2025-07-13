@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.screen.Screen
@@ -42,13 +43,14 @@ import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.Navigator
 import com.redgifs.common.ThemeRed
-import com.client.xvideos.redgifs.common.downloader.ui.DownloadIndicator
-import com.client.xvideos.redgifs.common.saved.SavedRed
-import com.client.xvideos.redgifs.common.saved.collection.ui.DaialogNewCollection
-import com.client.xvideos.redgifs.common.saved.collection.ui.DialogCollection
-import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
-import com.client.xvideos.redgifs.common.snackBar.UiMessage
+import com.redgifs.common.downloader.ui.DownloadIndicator
+import com.redgifs.common.saved.SavedRed
+import com.redgifs.common.saved.collection.ui.DaialogNewCollection
+import com.redgifs.common.saved.collection.ui.DialogCollection
+import com.redgifs.common.snackBar.SnackBarEvent
+import com.redgifs.common.snackBar.UiMessage
 import com.client.xvideos.redgifs.screens.explorer.ScreenRedExplorer
+import com.redgifs.common.downloader.Downloader
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -98,7 +100,11 @@ class ScreenRedRoot() : Screen {
         val haptic = LocalHapticFeedback.current
 
         val savedRed = vm.savedRed
-        
+
+        val percentDownload = vm.downloader.percent.collectAsStateWithLifecycle().value
+        val snackBarEvent = vm.snackBarEvent
+
+
         LaunchedEffect(Unit) {
             vm.snackbarEvents.collect { message ->
                 snackbarHostState.showSnackbar(message)
@@ -106,7 +112,7 @@ class ScreenRedRoot() : Screen {
         }
 
         LaunchedEffect(Unit) {
-            SnackBarEvent.messages.receiveAsFlow().collect { message ->
+            snackBarEvent.messages.receiveAsFlow().collect { message ->
                 haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                 snackbarHostState.show(message)
             }
@@ -129,7 +135,7 @@ class ScreenRedRoot() : Screen {
                                 collection
                             )
                             savedRed.collections.collectionItemGifInfo = null
-                            SnackBarEvent.success("Элемент добавлен в коллекцию")
+                            snackBarEvent.success("Элемент добавлен в коллекцию")
                             delay(800)
                             savedRed.collections.collectionVisibleDialog = false
                         }
@@ -158,7 +164,7 @@ class ScreenRedRoot() : Screen {
         CompositionLocalProvider(LocalRootScreenModel provides vm) {
             Scaffold(
                 modifier = Modifier.imePadding(),
-                bottomBar = { DownloadIndicator() },
+                bottomBar = { DownloadIndicator(percentDownload) },
                 snackbarHost = {
 
                     SnackbarHost(snackbarHostState) { data ->
@@ -248,7 +254,9 @@ class ScreenRedRoot() : Screen {
 }
 
 class ScreenRedRootSM @Inject constructor(
-    val savedRed: SavedRed
+    val savedRed: SavedRed,
+    val snackBarEvent: SnackBarEvent,
+    val downloader: Downloader
 ) : ScreenModel {
     private val _snackbarEvents = Channel<String>(64)
     val snackbarEvents = _snackbarEvents.receiveAsFlow()

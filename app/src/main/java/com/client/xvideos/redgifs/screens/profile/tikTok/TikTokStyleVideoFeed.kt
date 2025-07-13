@@ -1,29 +1,5 @@
 package com.client.xvideos.redgifs.screens.profile.tikTok
 
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.pager.VerticalPager
-import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.client.common.AppPath
-import com.redgifs.model.GifsInfo
-import com.redgifs.common.ThemeRed
-import com.client.xvideos.redgifs.common.downloader.DownloadRed
-import com.client.xvideos.redgifs.screens.profile.ScreenRedProfileSM
-import com.client.xvideos.redgifs.common.video.player_with_menu.RedVideoPlayerWithMenuContent
-import timber.log.Timber
-
 //@OptIn(ExperimentalFoundationApi::class)
 //@Composable
 //fun TikTokStyleVideoFeed(

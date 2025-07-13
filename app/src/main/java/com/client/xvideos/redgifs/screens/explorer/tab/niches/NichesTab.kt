@@ -29,8 +29,8 @@ import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
 import com.redgifs.model.Niche
 import com.redgifs.model.Order
 import com.redgifs.common.ThemeRed
-import com.client.xvideos.redgifs.common.block.BlockRed
-import com.client.xvideos.redgifs.common.saved.SavedRed
+import com.redgifs.common.block.BlockRed
+import com.redgifs.common.saved.SavedRed
 import com.client.xvideos.redgifs.common.search.SearchRed
 import com.client.xvideos.redgifs.common.ui.lazyrow123.LazyRow123Host
 import com.client.xvideos.redgifs.common.ui.lazyrow123.NichePreview2

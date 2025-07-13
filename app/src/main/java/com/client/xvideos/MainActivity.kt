@@ -25,7 +25,7 @@ import com.client.xvideos.PermissionScreenActivity.PermissionStorage
 import com.client.xvideos.redgifs.screens.ScreenRedRoot
 import com.client.xvideos.screens.videoplayer.video.cache.VideoPlayerCacheManager
 import com.client.xvideos.ui.theme.XvideosTheme
-import com.client.xvideos.util.KeepScreenOn
+import com.client.common.util.KeepScreenOn
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import timber.log.Timber

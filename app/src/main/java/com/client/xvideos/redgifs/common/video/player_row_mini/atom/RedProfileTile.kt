@@ -19,10 +19,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.client.common.R
 import com.redgifs.model.GifsInfo
-import com.client.xvideos.screens.common.urlVideImage.UrlImage
+import com.client.common.urlVideImage.UrlImage
 import com.redgifs.common.ThemeRed
-import com.client.xvideos.util.toMinSec
-import com.client.xvideos.util.toPrettyCount
+import com.client.common.util.toMinSec
+import com.client.common.util.toPrettyCount
 import com.composables.core.Icon
 
 @Composable

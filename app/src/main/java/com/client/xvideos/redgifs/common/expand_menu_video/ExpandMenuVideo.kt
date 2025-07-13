@@ -36,9 +36,9 @@ import androidx.compose.ui.unit.sp
 import com.redgifs.network.api.RedApi
 import com.redgifs.model.GifsInfo
 import com.redgifs.common.ThemeRed
-import com.client.xvideos.redgifs.common.block.BlockRed
-import com.client.xvideos.redgifs.common.downloader.DownloadRed
-import com.client.xvideos.redgifs.common.saved.SavedRed
+import com.redgifs.common.block.BlockRed
+import com.redgifs.common.downloader.DownloadRed
+import com.redgifs.common.saved.SavedRed
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -60,7 +60,8 @@ fun ExpandMenuVideo(
     isCollection : Boolean = false,
     block: BlockRed,
     redApi: RedApi,
-    savedRed: SavedRed
+    savedRed: SavedRed,
+    downloadRed: DownloadRed
 ) {
 
     var expanded by remember { mutableStateOf(false) }
@@ -83,8 +84,8 @@ fun ExpandMenuVideo(
             modifier = Modifier.width(IntrinsicSize.Min),
             containerColor = Color(0xFFF1EDF4)//ThemeRed.colorCommonBackground
         ) {
-            DropdownMenuItem_Download(item){ expanded = false }
-            DropdownMenuItem_Share(item){ expanded = false }
+            DropdownMenuItem_Download(item, onClick = {downloadRed.downloadItem(it)}){ expanded = false }
+            DropdownMenuItem_Share(item, onClick = {downloadRed.downloadItem(it)}){ expanded = false }
             DropdownMenuItem_Block(item = item, block = block){ expanded = false }
             DropdownMenuItem_Like(item, onRunLike, savedRed){expanded = false}
             DropdownMenuItem_Follow(item, redApi, savedRed){ expanded = false }
@@ -102,12 +103,14 @@ fun ExpandMenuVideo(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DropdownMenuItem_Download(item: GifsInfo? = null, onDismiss: () -> Unit){
+fun DropdownMenuItem_Download(item: GifsInfo? = null, onClick: (GifsInfo) -> Unit = {}, onDismiss: () -> Unit){
     DropdownMenuItem(
         leadingIcon = {Icon(Icons.Filled.FileDownload, contentDescription = "", tint = tintColor)},
         text = {Text("Скачать", style = style)},
         onClick = {
-            if (item == null) return@DropdownMenuItem; DownloadRed.downloadItem(item)
+            if (item == null) return@DropdownMenuItem
+            onClick.invoke(item)
+            //DownloadRed.downloadItem(item)
             onDismiss.invoke()
         }, contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
     )
@@ -115,12 +118,14 @@ fun DropdownMenuItem_Download(item: GifsInfo? = null, onDismiss: () -> Unit){
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DropdownMenuItem_Share(item: GifsInfo? = null, onDismiss: () -> Unit){
+fun DropdownMenuItem_Share(item: GifsInfo? = null, onClick: (GifsInfo) -> Unit, onDismiss: () -> Unit){
     DropdownMenuItem(
         leadingIcon = {Icon(Icons.Default.Share, contentDescription = "", tint = tintColor)},
         text = { Text("Поделиться", style = style) },
         onClick = {
-            if (item == null) return@DropdownMenuItem; DownloadRed.downloadItem(item)
+            if (item == null) return@DropdownMenuItem
+            //DownloadRed.downloadItem(item)
+            onClick.invoke(item)
             onDismiss.invoke()
         }, contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
     )

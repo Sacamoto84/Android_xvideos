@@ -20,7 +20,6 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object RoomRedGifsModule {
 
-
     @Singleton
     @Provides
     fun provideMediaDao(appDatabase: AppRedGifsDatabase): CacheMediaResponseDao {

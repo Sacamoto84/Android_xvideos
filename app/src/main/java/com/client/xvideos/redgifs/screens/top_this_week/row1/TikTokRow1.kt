@@ -21,7 +21,7 @@ import androidx.paging.compose.LazyPagingItems
 import com.redgifs.model.GifsInfo
 import com.redgifs.model.Order
 import com.redgifs.model.UserInfo
-import com.client.xvideos.screens.common.urlVideImage.UrlImage
+import com.client.common.urlVideImage.UrlImage
 import com.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.screens.top_this_week.ProfileInfo1
 import kotlinx.coroutines.flow.distinctUntilChanged

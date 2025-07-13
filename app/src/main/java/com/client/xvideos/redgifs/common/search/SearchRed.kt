@@ -56,7 +56,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.redgifs.common.ThemeRed
-import com.client.xvideos.redgifs.common.saved.SavedRed
+import com.redgifs.common.saved.SavedRed
 import com.redgifs.db.dao.SearchRedHistoryDao
 import com.redgifs.db.entity.SearchRedHistoryEntity
 import kotlinx.coroutines.DelicateCoroutinesApi

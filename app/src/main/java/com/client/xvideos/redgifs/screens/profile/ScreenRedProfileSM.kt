@@ -10,7 +10,7 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
-import com.client.xvideos.feature.Downloader
+import com.redgifs.common.downloader.Downloader
 import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.feature.preference.PreferencesRepository
 import com.redgifs.network.api.RedApi
@@ -19,12 +19,12 @@ import com.redgifs.model.MediaType
 import com.redgifs.model.Order
 import com.redgifs.model.UserInfo
 import com.client.xvideos.feature.room.AppDatabase
-import com.client.xvideos.redgifs.common.block.BlockRed
+import com.redgifs.common.block.BlockRed
 import com.client.xvideos.redgifs.common.network.loadGifs
-import com.client.xvideos.redgifs.common.saved.SavedRed
+import com.redgifs.common.saved.SavedRed
 import com.client.xvideos.redgifs.common.search.SearchRed
-import com.client.xvideos.redgifs.common.share.useCaseShareGifs
-import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
+import com.redgifs.common.share.useCaseShareGifs
+import com.redgifs.common.snackBar.SnackBarEvent
 import com.client.xvideos.redgifs.common.ui.lazyrow123.LazyRow123Host
 import com.client.xvideos.redgifs.common.ui.lazyrow123.TypePager
 import dagger.Binds
@@ -39,7 +39,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.toSet
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber

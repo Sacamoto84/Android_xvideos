@@ -1,30 +1,43 @@
 [versions]
-agp = "8.11.0"
+accompanistSystemuicontroller = "0.36.0"
+activityKtx = "1.12.0-alpha04"
+agp = "8.11.1"
+componentsResources = "1.8.2"
 composeThemeAdapter = "1.2.1"
-core = "1.36.1"
+core = "1.37.0"
 diskLruCache = "1.5"
 gson = "2.13.1"
 hiltAndroid = "2.56.2"
 hiltAndroidCompiler = "2.56.2"
+hiltNavigationCompose = "1.2.0"
+imageLoader = "1.10.0"
 jsoup = "1.21.1"
+kdownloader = "1.0.4"
 kotlin = "2.1.21"
 coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 
+kotlinxSerializationJson = "1.9.0"
 ktor= "3.1.0"
 
+landscapistCoil = "2.5.1"
+landscapistPlaceholder = "2.5.1"
+lifecycleProcess = "2.9.1"
 lifecycleRuntimeKtx = "2.9.1"
 activityCompose = "1.10.1"
 composeBom = "2025.06.02"
 
+lifecycleViewmodelCompose = "2.9.1"
 material = "1.14.0-alpha02"
 materialVersion = "1.8.3"
 material3 = "1.4.0-alpha17"
 
 media3 = "1.7.1"
 
+pagingRuntime = "3.3.6"
+pagingCompose = "3.3.6"
 room = "2.7.2"
 
 slf4jApi = "2.0.17"
@@ -35,15 +48,31 @@ googleGmsGoogleServices = "4.4.3"
 datastoreCoreAndroid = "1.1.7"
 volley = "1.2.1"
 
-nav3Core = "1.0.0-alpha04"
+nav3Core = "1.0.0-alpha05"
 material3AdaptiveNav3 = "1.0.0-SNAPSHOT"
 appcompat = "1.7.1"
+voyager = "1.1.0-beta03"
+warden = "1.0.0-alpha2"
+zoomable = "2.8.1"
 
 [libraries]
+accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanistSystemuicontroller" }
+androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activityKtx" }
 androidx-adaptive = { module = "androidx.compose.material3.adaptive:adaptive" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 
 #Material
+androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
+androidx-lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "lifecycleProcess" }
+androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelCompose" }
+androidx-paging-compose = { module = "androidx.paging:paging-compose", version.ref = "pagingCompose" }
+androidx-paging-runtime = { module = "androidx.paging:paging-runtime", version.ref = "pagingRuntime" }
+components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "componentsResources" }
+image-loader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "imageLoader" }
+kdownloader = { module = "com.github.varungulatii:Kdownloader", version.ref = "kdownloader" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+landscapist-coil = { module = "com.github.skydoves:landscapist-coil", version.ref = "landscapistCoil" }
+landscapist-placeholder = { module = "com.github.skydoves:landscapist-placeholder", version.ref = "landscapistPlaceholder" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
 androidx-material = { module = "androidx.compose.material:material", version.ref = "materialVersion" }
 androidx-material-icons-core = { module = "androidx.compose.material:material-icons-core" }
@@ -146,9 +175,20 @@ androidx-datastore-core = { module = "androidx.datastore:datastore-core", versio
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastoreCoreAndroid" }
 disk-lru-cache = { module = "com.github.solkin:disk-lru-cache", version.ref = "diskLruCache" }
 
-
 volley = { group = "com.android.volley", name = "volley", version.ref = "volley" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+
+voyager-bottom-sheet-navigator = { module = "cafe.adriel.voyager:voyager-bottom-sheet-navigator", version.ref = "voyager" }
+voyager-hilt = { module = "cafe.adriel.voyager:voyager-hilt", version.ref = "voyager" }
+voyager-livedata = { module = "cafe.adriel.voyager:voyager-livedata", version.ref = "voyager" }
+voyager-navigator = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
+voyager-screenmodel = { module = "cafe.adriel.voyager:voyager-screenmodel", version.ref = "voyager" }
+voyager-tab-navigator = { module = "cafe.adriel.voyager:voyager-tab-navigator", version.ref = "voyager" }
+voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", version.ref = "voyager" }
+
+warden = { module = "com.alexstyl:warden", version.ref = "warden" }
+
+zoomable = { module = "net.engawapg.lib:zoomable", version.ref = "zoomable" }
 
 
 [plugins]

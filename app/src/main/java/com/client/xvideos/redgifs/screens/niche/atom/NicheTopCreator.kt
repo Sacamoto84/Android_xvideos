@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.redgifs.model.TopCreator
-import com.client.xvideos.screens.common.urlVideImage.UrlImage
+import com.client.common.urlVideImage.UrlImage
 
 @Composable
 fun NicheTopCreator(creator : TopCreator, onClick: () -> Unit) {

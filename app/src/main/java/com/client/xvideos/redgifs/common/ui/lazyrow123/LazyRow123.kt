@@ -47,11 +47,10 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.common.R
 import com.redgifs.model.GifsInfo
 import com.redgifs.common.ThemeRed
-import com.client.xvideos.redgifs.common.block.ui.DialogBlock
-import com.client.xvideos.redgifs.common.downloader.DownloadRed
+import com.redgifs.common.block.ui.DialogBlock
+import com.redgifs.common.downloader.DownloadRed
 import com.client.xvideos.redgifs.common.expand_menu_video.ExpandMenuVideo
-import com.client.xvideos.redgifs.common.saved.SavedRed
-import com.client.xvideos.redgifs.common.users.UsersRed
+import com.redgifs.common.UsersRed
 import com.client.xvideos.redgifs.common.video.player_row_mini.RedUrlVideoImageAndLongClick
 import com.client.xvideos.redgifs.screens.fullscreen.ScreenRedFullScreen
 import com.client.xvideos.redgifs.screens.top_this_week.ProfileInfo1

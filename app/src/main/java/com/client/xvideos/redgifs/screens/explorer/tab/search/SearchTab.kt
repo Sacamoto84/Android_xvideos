@@ -35,13 +35,11 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
-import com.redgifs.network.api.RedApi_Search
 import com.redgifs.model.search.SearchItemCreatorsResponse
 import com.redgifs.model.search.SearchItemNichesResponse
 import com.redgifs.model.search.SearchItemTagsResponse
-import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
-import com.client.xvideos.screens.common.urlVideImage.UrlImage
-import com.google.gson.annotations.Since
+import com.redgifs.common.snackBar.SnackBarEvent
+import com.client.common.urlVideImage.UrlImage
 import com.redgifs.network.api.RedApi
 import dagger.Binds
 import dagger.Module
@@ -51,7 +49,6 @@ import dagger.multibindings.IntoMap
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import javax.inject.Singleton
 
 object SearchTab : Screen {
 

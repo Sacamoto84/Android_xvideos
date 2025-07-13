@@ -30,9 +30,9 @@ import androidx.compose.ui.unit.sp
 import com.client.common.R
 import com.redgifs.model.UserInfo
 import com.redgifs.common.ThemeRed
-import com.client.xvideos.redgifs.common.saved.SavedRed
-import com.client.xvideos.screens.common.urlVideImage.UrlImage
-import com.client.xvideos.util.toPrettyCount
+import com.redgifs.common.saved.SavedRed
+import com.client.common.urlVideImage.UrlImage
+import com.client.common.util.toPrettyCount
 import com.composeunstyled.Text
 
 @Composable

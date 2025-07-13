@@ -48,11 +48,11 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
 import com.redgifs.model.NichesInfo
 import com.redgifs.common.ThemeRed
-import com.client.xvideos.redgifs.common.saved.SavedRed
+import com.redgifs.common.saved.SavedRed
 import com.client.xvideos.redgifs.screens.niche.ScreenRedNiche
 import com.client.xvideos.redgifs.screens.profile.atom.VerticalScrollbar
 import com.client.xvideos.redgifs.screens.profile.rememberVisibleRangePercentIgnoringFirstNForLazyColumn
-import com.client.xvideos.screens.common.urlVideImage.UrlImage
+import com.client.common.urlVideImage.UrlImage
 import com.composeunstyled.Text
 import dagger.Binds
 import dagger.Module

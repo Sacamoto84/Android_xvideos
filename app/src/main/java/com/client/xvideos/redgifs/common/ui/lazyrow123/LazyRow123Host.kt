@@ -11,18 +11,19 @@ import androidx.paging.PagingData
 import androidx.paging.PagingSource
 import androidx.paging.cachedIn
 import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
-import com.client.xvideos.redgifs.common.block.BlockRed
+import com.redgifs.common.block.BlockRed
 import com.redgifs.model.Order
-import com.client.xvideos.redgifs.common.pagin.ItemCollectionPagingSource
-import com.client.xvideos.redgifs.common.pagin.ItemEmptyPagingSource
-import com.client.xvideos.redgifs.common.pagin.ItemExplorerNailsPagingSource
-import com.client.xvideos.redgifs.common.pagin.ItemSavedLikesPagingSource
-import com.client.xvideos.redgifs.common.pagin.ItemNailsPagingSource
-import com.client.xvideos.redgifs.common.pagin.ItemProfilePagingSource
-import com.client.xvideos.redgifs.common.pagin.ItemTopPagingSource
-import com.client.xvideos.redgifs.common.saved.SavedRed
+import com.redgifs.common.pagin.ItemCollectionPagingSource
+import com.redgifs.common.pagin.ItemEmptyPagingSource
+import com.redgifs.common.pagin.ItemExplorerNailsPagingSource
+import com.redgifs.common.pagin.ItemSavedLikesPagingSource
+import com.redgifs.common.pagin.ItemNailsPagingSource
+import com.redgifs.common.pagin.ItemProfilePagingSource
+import com.redgifs.common.pagin.ItemTopPagingSource
+import com.redgifs.common.saved.SavedRed
 import com.client.xvideos.redgifs.common.search.SearchRed
-import com.redgifs.model.GifsInfo
+import com.redgifs.common.downloader.DownloadRed
+import com.redgifs.common.snackBar.SnackBarEvent
 import com.redgifs.network.api.RedApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -43,18 +44,11 @@ import timber.log.Timber
 enum class TypePager {
     NICHES,
     TOP,
-
     SAVED_LIKES,
-
     SAVED_COLLECTION,
-
     PROFILE,
-
-    //
     EXPLORER_NICHES,
-
     EMPTY
-
 }
 
 private data class SearchParams(val query: String, val sort: Order, val tags : String)
@@ -73,7 +67,9 @@ class LazyRow123Host(
     val search : SearchRed,
     val redApi : RedApi,
     val savedRed: SavedRed,
-    val tags : StateFlow<Set<String>> = MutableStateFlow(emptySet())
+    val tags : StateFlow<Set<String>> = MutableStateFlow(emptySet()),
+    val snackBarEvent: SnackBarEvent,
+    val downloadRed: DownloadRed
 ) {
 
     //var searchText by mutableStateOf("")
@@ -138,7 +134,7 @@ class LazyRow123Host(
                         Timber.d("!!! >>>pagingSourceFactory{...}")
                         gotoUp()
                         gotoUpColumn()
-                        createPager(typePager, params.sort, extraString, params.query, block, redApi, savedRed , tags.value.toList())
+                        createPager(typePager, params.sort, extraString, params.query, block, redApi, savedRed , tags.value.toList(), snackBarEvent)
                     }
                 ).flow
             }
@@ -172,15 +168,16 @@ fun createPager(
     block : BlockRed,
     redApi : RedApi,
     savedRed: SavedRed,
-    tags : List<String> = emptyList()
+    tags : List<String> = emptyList(),
+    snackBarEvent: SnackBarEvent
 ): PagingSource<Int, Any> {
     val pagingSourceFactory = when (typePager) {
         TypePager.NICHES -> {
-            ItemNailsPagingSource(order = sort, nichesName = extraString, block = block, redApi = redApi)
+            ItemNailsPagingSource(order = sort, nichesName = extraString, block = block, redApi = redApi, snackBarEvent)
         }
 
         TypePager.TOP -> {
-            ItemTopPagingSource(sort = sort, searchText = searchText, block = block, redApi = redApi)
+            ItemTopPagingSource(sort = sort, searchText = searchText, block = block, redApi = redApi, snackBarEvent)
         }
 
         TypePager.SAVED_LIKES -> {
@@ -188,11 +185,11 @@ fun createPager(
         }
 
         TypePager.EXPLORER_NICHES -> {
-            ItemExplorerNailsPagingSource(order = sort, redApi = redApi)
+            ItemExplorerNailsPagingSource(order = sort, redApi = redApi, snackBarEvent)
         }
 
         TypePager.PROFILE -> {
-            ItemProfilePagingSource(profileName = extraString, sort = sort, block = block, redApi = redApi, tags = tags)
+            ItemProfilePagingSource(profileName = extraString, sort = sort, block = block, redApi = redApi, tags = tags, snackBarEvent)
         }
 
         TypePager.EMPTY -> {
@@ -200,7 +197,7 @@ fun createPager(
         }
 
         TypePager.SAVED_COLLECTION -> {
-            ItemCollectionPagingSource(extraString, savedRed)
+            ItemCollectionPagingSource(extraString, savedRed, snackBarEvent)
         }
 
     }

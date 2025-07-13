@@ -29,7 +29,7 @@ import com.client.common.AppPath
 import com.client.xvideos.BuildConfig
 import com.redgifs.model.GifsInfo
 import com.client.xvideos.feature.vibrate.vibrateWithPatternAndAmplitude
-import com.client.xvideos.redgifs.common.downloader.DownloadRed
+import com.redgifs.common.downloader.DownloadRed
 import com.client.xvideos.redgifs.common.video.player_row_mini.atom.RedProfileTile
 import com.client.xvideos.redgifs.common.video.player_row_mini.atom.Red_Video_Lite_Row2
 import timber.log.Timber

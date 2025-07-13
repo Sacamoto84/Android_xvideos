@@ -3,8 +3,8 @@ package com.client.xvideos
 import android.app.Application
 import com.client.xvideos.feature.room.AppDatabase
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.PlaybackPreference
-import com.client.xvideos.redgifs.common.block.BlockRed
-import com.client.xvideos.redgifs.common.saved.SavedRed
+import com.redgifs.common.block.BlockRed
+import com.redgifs.common.saved.SavedRed
 import com.kdownloader.KDownloader
 import com.redgifs.db.AppRedGifsDatabase
 import com.redgifs.db.dao.clearOldCache
@@ -53,7 +53,7 @@ fun allowAllSSL() {
 @HiltAndroidApp
 class App : Application() {
 
-    lateinit var kDownloader: KDownloader
+    //lateinit var kDownloader: KDownloader
 
     @Inject
     lateinit var db: AppDatabase
@@ -75,7 +75,7 @@ class App : Application() {
             Timber.plant(DebugTree())
         //allowAllSSL()
         PlaybackPreference.initialize(this)
-        kDownloader = KDownloader.create(applicationContext)
+        //kDownloader = KDownloader.create(applicationContext)
 
         savedRed.refreshTagList()
 

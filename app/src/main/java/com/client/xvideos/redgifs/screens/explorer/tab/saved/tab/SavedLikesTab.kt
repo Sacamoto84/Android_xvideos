@@ -23,8 +23,8 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
-import com.client.xvideos.redgifs.common.block.BlockRed
-import com.client.xvideos.redgifs.common.saved.SavedRed
+import com.redgifs.common.block.BlockRed
+import com.redgifs.common.saved.SavedRed
 import com.client.xvideos.redgifs.common.search.SearchRed
 import com.client.xvideos.redgifs.common.ui.lazyrow123.LazyRow123
 import com.client.xvideos.redgifs.common.ui.lazyrow123.LazyRow123Host

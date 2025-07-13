@@ -47,7 +47,6 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.redgifs.model.Order
 import com.redgifs.common.ThemeRed
-import com.client.xvideos.redgifs.common.saved.SavedRed
 import com.client.xvideos.redgifs.common.ui.atom.Selector
 import com.client.xvideos.redgifs.common.ui.lazyrow123.LazyRow123
 import com.client.xvideos.redgifs.common.ui.sortByOrder.SortByOrder

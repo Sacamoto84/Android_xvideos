@@ -38,10 +38,10 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.redgifs.model.Niche
 import com.redgifs.model.NichesInfo
 import com.redgifs.common.ThemeRed
-import com.client.xvideos.redgifs.common.saved.SavedRed
+import com.redgifs.common.saved.SavedRed
 import com.client.xvideos.redgifs.screens.niche.ScreenRedNiche
-import com.client.xvideos.screens.common.urlVideImage.UrlImage
-import com.client.xvideos.util.toPrettyCountInt
+import com.client.common.urlVideImage.UrlImage
+import com.client.common.util.toPrettyCountInt
 
 @Composable
 fun LazyRow123ExplorerNiches(
