@@ -10,7 +10,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.getScreenModel
-import com.client.xvideos.redgifs.screens.explorer.ScreenRedExplorerSM
+import com.example.ui.screens.explorer.ScreenRedExplorerSM
 
 object  FavoritesTab : Screen {
 

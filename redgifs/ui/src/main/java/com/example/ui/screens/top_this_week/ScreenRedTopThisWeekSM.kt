@@ -3,10 +3,10 @@ package com.example.ui.screens.top_this_week
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelKey
-import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
-import com.client.xvideos.redgifs.common.ui.lazyrow123.LazyRow123Host
-import com.client.xvideos.redgifs.common.ui.lazyrow123.TypePager
-import com.client.xvideos.redgifs.screens.top_this_week.model.VisibleType
+import com.client.common.connectivityObserver.ConnectivityObserver
+import com.example.ui.screens.top_this_week.model.VisibleType
+import com.example.ui.screens.ui.lazyrow123.LazyRow123Host
+import com.example.ui.screens.ui.lazyrow123.TypePager
 import com.redgifs.common.di.HostDI
 import dagger.Binds
 import dagger.Module

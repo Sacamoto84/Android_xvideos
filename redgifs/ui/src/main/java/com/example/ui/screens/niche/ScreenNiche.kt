@@ -45,15 +45,15 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.example.ui.screens.niche.atom.NichePreview
+import com.example.ui.screens.niche.atom.NicheProfile
+import com.example.ui.screens.niche.atom.NicheTopCreator
+import com.example.ui.screens.profile.ScreenRedProfile
+import com.example.ui.screens.ui.atom.Selector
+import com.example.ui.screens.ui.lazyrow123.LazyRow123
+import com.example.ui.screens.ui.sortByOrder.SortByOrder
 import com.redgifs.model.Order
 import com.redgifs.common.ThemeRed
-import com.client.xvideos.redgifs.common.ui.atom.Selector
-import com.client.xvideos.redgifs.common.ui.lazyrow123.LazyRow123
-import com.client.xvideos.redgifs.common.ui.sortByOrder.SortByOrder
-import com.client.xvideos.redgifs.screens.niche.atom.NichePreview
-import com.client.xvideos.redgifs.screens.niche.atom.NicheProfile
-import com.client.xvideos.redgifs.screens.niche.atom.NicheTopCreator
-import com.client.xvideos.redgifs.screens.profile.ScreenRedProfile
 import timber.log.Timber
 import kotlin.math.roundToInt
 

@@ -22,8 +22,8 @@ import com.redgifs.model.GifsInfo
 import com.redgifs.model.Order
 import com.redgifs.model.UserInfo
 import com.client.common.urlVideImage.UrlImage
+import com.example.ui.screens.top_this_week.ProfileInfo1
 import com.redgifs.common.ThemeRed
-import com.client.xvideos.redgifs.screens.top_this_week.ProfileInfo1
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import timber.log.Timber

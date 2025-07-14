@@ -30,14 +30,13 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
+import com.example.ui.screens.explorer.tab.FavoritesTab
+import com.example.ui.screens.explorer.tab.saved.tab.SavedCollectionTab
+import com.example.ui.screens.explorer.tab.saved.tab.SavedCreatorsTab
+import com.example.ui.screens.explorer.tab.saved.tab.SavedLikesTab
+import com.example.ui.screens.explorer.tab.saved.tab.SavedNichesTab
+import com.example.ui.screens.explorer.top.TabRow
 import com.redgifs.common.ThemeRed
-import com.client.xvideos.redgifs.screens.explorer.tab.FavoritesTab
-import com.client.xvideos.redgifs.screens.explorer.tab.saved.tab.SavedCollectionTab
-import com.client.xvideos.redgifs.screens.explorer.tab.saved.tab.SavedCreatorsTab
-import com.client.xvideos.redgifs.screens.explorer.tab.saved.tab.SavedLikesTab
-import com.client.xvideos.redgifs.screens.explorer.tab.saved.tab.SavedNichesTab
-import com.client.xvideos.redgifs.screens.explorer.top.TabRow
-
 
 object SavedTab : Screen {
 

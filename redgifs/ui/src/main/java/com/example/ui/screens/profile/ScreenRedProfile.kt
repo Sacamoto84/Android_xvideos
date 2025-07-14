@@ -25,12 +25,12 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.example.ui.screens.profile.atom.RedProfileCreaterInfo
+import com.example.ui.screens.profile.atom.VerticalScrollbar
+import com.example.ui.screens.profile.tags.TagsBlock
+import com.example.ui.screens.ui.lazyrow123.LazyRow123
 import com.redgifs.common.ThemeRed
 import com.redgifs.common.block.ui.DialogBlock
-import com.client.xvideos.redgifs.common.ui.lazyrow123.LazyRow123
-import com.client.xvideos.redgifs.screens.profile.atom.RedProfileCreaterInfo
-import com.client.xvideos.redgifs.screens.profile.atom.VerticalScrollbar
-import com.client.xvideos.redgifs.screens.profile.tags.TagsBlock
 import timber.log.Timber
 
 class ScreenRedProfile(val profileName: String) : Screen {

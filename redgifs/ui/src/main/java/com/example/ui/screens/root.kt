@@ -42,7 +42,7 @@ import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.Navigator
-import com.client.xvideos.redgifs.screens.explorer.ScreenRedExplorer
+import com.example.ui.screens.explorer.ScreenRedExplorer
 import com.redgifs.common.ThemeRed
 import com.redgifs.common.di.HostDI
 import com.redgifs.common.downloader.ui.DownloadIndicator

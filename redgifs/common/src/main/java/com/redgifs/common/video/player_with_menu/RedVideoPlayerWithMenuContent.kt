@@ -23,8 +23,10 @@ import androidx.compose.ui.unit.sp
 import com.client.common.videoplayer.host.MediaPlayerEvent
 import com.client.common.videoplayer.host.MediaPlayerHost
 import com.client.common.videoplayer.model.ScreenResize
+import com.redgifs.common.BuildConfig
 
 import com.redgifs.common.ThemeRed
+import com.redgifs.common.video.PlayerControls
 import com.redgifs.common.video.player_with_menu.atom.VideoPlayerWithMenuContent
 
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -77,7 +79,7 @@ fun RedVideoPlayerWithMenuContent(
     LaunchedEffect(isMute) { if (isMute) playerHost.mute() else playerHost.unmute() }
 
     LaunchedEffect(playerHost, enableAB, timeA, timeB) {
-        playerHost.setVideoFitMode(ScreenResize.FIT)
+        playerHost.videoFitMode = ScreenResize.FIT
         playerHost.onEvent = { event ->
             when (event) {
                 is MediaPlayerEvent.CurrentTimeChange -> {

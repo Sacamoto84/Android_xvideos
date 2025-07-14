@@ -1,4 +1,4 @@
-package com.client.xvideos.feature.preference
+package com.client.common.preference
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences

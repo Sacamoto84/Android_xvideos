@@ -1,4 +1,4 @@
-package com.example.ui.screens.profile.atom
+package com.redgifs.common.video
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectDragGestures

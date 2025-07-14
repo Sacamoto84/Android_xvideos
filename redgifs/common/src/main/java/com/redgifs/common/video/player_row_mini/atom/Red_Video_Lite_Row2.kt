@@ -29,6 +29,9 @@ import com.client.common.videoplayer.host.MediaPlayerEvent
 import com.client.common.videoplayer.host.MediaPlayerHost
 import com.client.common.videoplayer.model.ScreenResize
 import com.client.common.videoplayer.model.VideoPlayerConfig
+import com.client.common.videoplayer.ui.video.VideoPlayerWithControl
+import com.redgifs.common.BuildConfig
+import com.redgifs.common.video.CanvasTimeDurationLine
 import timber.log.Timber
 
 
@@ -56,7 +59,7 @@ fun Red_Video_Lite_Row2(
     val playerHost = remember { MediaPlayerHost(mediaUrl = url, isPaused = false, isMuted = true) }
 
     LaunchedEffect(play) { if (play) playerHost.play() else playerHost.pause() }
-    LaunchedEffect(Unit) { playerHost.setVideoFitMode(ScreenResize.FIT); playerHost.mute() }
+    LaunchedEffect(Unit) { playerHost.videoFitMode = ScreenResize.FIT; playerHost.mute() }
 
     LaunchedEffect(Unit) {
 

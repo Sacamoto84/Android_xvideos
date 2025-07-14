@@ -10,7 +10,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.PagingSource
 import androidx.paging.cachedIn
-import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
+import com.client.common.connectivityObserver.ConnectivityObserver
 import com.redgifs.common.block.BlockRed
 import com.redgifs.common.di.HostDI
 import com.redgifs.common.pagin.ItemCollectionPagingSource

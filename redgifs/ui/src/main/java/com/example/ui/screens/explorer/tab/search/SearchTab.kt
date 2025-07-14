@@ -34,14 +34,12 @@ import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
+import com.client.common.connectivityObserver.ConnectivityObserver
+import com.client.common.urlVideImage.UrlImage
+import com.redgifs.common.di.HostDI
 import com.redgifs.model.search.SearchItemCreatorsResponse
 import com.redgifs.model.search.SearchItemNichesResponse
 import com.redgifs.model.search.SearchItemTagsResponse
-import com.redgifs.common.snackBar.SnackBarEvent
-import com.client.common.urlVideImage.UrlImage
-import com.redgifs.common.di.HostDI
-import com.redgifs.network.api.RedApi
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

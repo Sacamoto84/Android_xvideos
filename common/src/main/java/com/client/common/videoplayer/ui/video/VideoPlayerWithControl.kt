@@ -37,7 +37,7 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.TimeSource
 
 @Composable
-internal fun VideoPlayerWithControl(
+fun VideoPlayerWithControl(
     modifier: Modifier,
     playerHost: MediaPlayerHost,
     playerConfig: VideoPlayerConfig

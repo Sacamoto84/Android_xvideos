@@ -10,14 +10,14 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
-import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
-import com.client.xvideos.feature.preference.PreferencesRepository
-import com.client.xvideos.feature.room.AppDatabase
-import com.client.xvideos.redgifs.common.network.loadGifs
-import com.client.xvideos.redgifs.common.ui.lazyrow123.LazyRow123Host
-import com.client.xvideos.redgifs.common.ui.lazyrow123.TypePager
+import com.client.common.connectivityObserver.ConnectivityObserver
+import com.client.common.preference.PreferencesRepository
+import com.example.ui.screens.ui.lazyrow123.LazyRow123Host
+import com.example.ui.screens.ui.lazyrow123.TypePager
 import com.redgifs.common.di.HostDI
+import com.redgifs.common.network.loadGifs
 import com.redgifs.common.share.useCaseShareGifs
+import com.redgifs.common.video.PlayerControls
 import com.redgifs.model.GifsInfo
 import com.redgifs.model.MediaType
 import com.redgifs.model.Order
@@ -46,7 +46,7 @@ enum class TypeGifs(val value: String) {
 
 class ScreenRedProfileSM @AssistedInject constructor(
     @Assisted val profileName: String,
-    private val db: AppDatabase,
+    //private val db: AppDatabase,
     private val pref: PreferencesRepository,
     connectivityObserver: ConnectivityObserver,
     val hostDI: HostDI
@@ -117,7 +117,7 @@ class ScreenRedProfileSM @AssistedInject constructor(
         visibleProfileInfo = false,
         hostDI = hostDI,
         tags = tagsSelect,
-        )
+    )
 
 
     init {

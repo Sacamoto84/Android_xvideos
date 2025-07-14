@@ -1,4 +1,4 @@
-package com.example.ui.screens.profile
+package com.redgifs.common.video
 
 // Интерфейс для внешних действий (можно вынести в отдельный файл)
 interface PlayerControls {

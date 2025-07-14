@@ -1,8 +1,8 @@
 package com.client.xvideos
 
 import android.app.Application
+import com.client.common.videoplayer.util.PlaybackPreference
 import com.client.xvideos.PermissionScreenActivity.PermissionStorage
-import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.PlaybackPreference
 import com.redgifs.common.block.BlockRed
 import com.redgifs.common.saved.SavedRed
 import com.redgifs.db.AppRedGifsDatabase

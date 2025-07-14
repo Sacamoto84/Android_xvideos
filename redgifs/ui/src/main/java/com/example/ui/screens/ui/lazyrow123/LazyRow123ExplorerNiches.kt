@@ -41,6 +41,7 @@ import com.redgifs.common.ThemeRed
 import com.redgifs.common.saved.SavedRed
 import com.client.common.urlVideImage.UrlImage
 import com.client.common.util.toPrettyCountInt
+import com.example.ui.screens.niche.ScreenRedNiche
 
 @Composable
 fun LazyRow123ExplorerNiches(
@@ -51,11 +52,9 @@ fun LazyRow123ExplorerNiches(
 
     val navigator = LocalNavigator.currentOrThrow
 
-
     val listNiche = host.pager.collectAsLazyPagingItems() as LazyPagingItems<Niche>
 
     val state = host.state//rememberLazyGridState()
-
 
     if (listNiche.itemCount == 0) return
 

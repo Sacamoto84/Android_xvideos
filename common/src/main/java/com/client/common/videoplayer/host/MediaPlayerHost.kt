@@ -29,22 +29,22 @@ class MediaPlayerHost(
     drmConfig: DrmConfig? = null,
 ) {
     // Internal states
-    internal var url by mutableStateOf(mediaUrl)
-    internal var speed by mutableStateOf(initialSpeed)
-    internal var videoFitMode by mutableStateOf(initialVideoFitMode)
-    internal var seekToTime: Float? by mutableStateOf(null)
-    internal var isSliding by mutableStateOf(false)
-    internal var isPaused by mutableStateOf(isPaused)
+    var url by mutableStateOf(mediaUrl)
+    var speed by mutableStateOf(initialSpeed)
+    var videoFitMode by mutableStateOf(initialVideoFitMode)
+    var seekToTime: Float? by mutableStateOf(null)
+    var isSliding by mutableStateOf(false)
+    var isPaused by mutableStateOf(isPaused)
     internal var isMuted by mutableStateOf(isMuted)
-    internal var isLooping by mutableStateOf(isLooping)
-    internal var totalTime by mutableStateOf(0) // Total video duration
-    internal var currentTime by mutableFloatStateOf(0f) // Current playback position
-    internal var isBuffering by mutableStateOf(true)
+    var isLooping by mutableStateOf(isLooping)
+    var totalTime by mutableStateOf(0) // Total video duration
+    var currentTime by mutableFloatStateOf(0f) // Current playback position
+    var isBuffering by mutableStateOf(true)
     internal var playFromTime: Float? by mutableStateOf(startTimeInSeconds)
-    internal var volumeLevel by mutableStateOf(if (isMuted) 0f else 1f) // Range 0.0 to 1.0
+    var volumeLevel by mutableStateOf(if (isMuted) 0f else 1f) // Range 0.0 to 1.0
     internal var isFullScreen by mutableStateOf(isFullScreen)
-    internal var headers by mutableStateOf(headers)
-    internal var drmConfig by mutableStateOf(drmConfig)
+    var headers by mutableStateOf(headers)
+    var drmConfig by mutableStateOf(drmConfig)
     var qualityOptions by mutableStateOf(emptyList<VideoQuality>())
     var selectedQuality by mutableStateOf<VideoQuality?>(null)
     var audioTrackOptions by mutableStateOf(emptyList<AudioTrack>())
@@ -118,9 +118,9 @@ class MediaPlayerHost(
         }
     }
 
-    fun setSpeed(speed: PlayerSpeed) {
-        this.speed = speed
-    }
+//    fun setSpeed(speed: PlayerSpeed) {
+//        this.speed = speed
+//    }
 
     @Deprecated(
         message = "Use seekTo(seconds: Float?) instead for better precision.",
@@ -138,13 +138,13 @@ class MediaPlayerHost(
         isSliding = false
     }
 
-    fun setVideoFitMode(mode: ScreenResize) {
-        videoFitMode = mode
-    }
+//    fun setVideoFitMode(mode: ScreenResize) {
+//        videoFitMode = mode
+//    }
 
-    fun setLooping(isLooping: Boolean) {
-        this.isLooping = isLooping
-    }
+//    fun setLooping(isLooping: Boolean) {
+//        this.isLooping = isLooping
+//    }
 
     fun toggleLoop() {
         this.isLooping = !this.isLooping
@@ -190,31 +190,31 @@ class MediaPlayerHost(
         this.subTitlesOptions = options
     }
 
-    internal fun setBufferingStatus(isBuffering: Boolean) {
+    fun setBufferingStatus(isBuffering: Boolean) {
         this.isBuffering = isBuffering
         onEvent?.invoke(MediaPlayerEvent.BufferChange(isBuffering))
     }
 
     // Internal-only setters for time values
-    internal fun updateTotalTime(time: Int) {
+    fun updateTotalTime(time: Int) {
         if (totalTime != time) {
             totalTime = time
             onEvent?.invoke(MediaPlayerEvent.TotalTimeChange(totalTime))
         }
     }
 
-    internal fun updateCurrentTime(time: Float) {
+    fun updateCurrentTime(time: Float) {
         if(currentTime != time) {
             currentTime = time
             onEvent?.invoke(MediaPlayerEvent.CurrentTimeChange(currentTime))
         }
     }
 
-    internal fun triggerMediaEnd() {
+    fun triggerMediaEnd() {
         onEvent?.invoke(MediaPlayerEvent.MediaEnd)
     }
 
-    internal fun triggerError(error: MediaPlayerError) {
+    fun triggerError(error: MediaPlayerError) {
         onError?.invoke(error)
     }
 

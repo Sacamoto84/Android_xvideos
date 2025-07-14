@@ -13,10 +13,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.ui.screens.profile.ScreenRedProfileSM
+import com.example.ui.screens.ui.atom.Selector
+import com.example.ui.screens.ui.sortByOrder.SortByOrder
 import com.redgifs.common.ThemeRed
-import com.client.xvideos.redgifs.common.ui.atom.Selector
-import com.client.xvideos.redgifs.common.ui.sortByOrder.SortByOrder
-import com.client.xvideos.redgifs.screens.profile.ScreenRedProfileSM
 import timber.log.Timber
 
 /**

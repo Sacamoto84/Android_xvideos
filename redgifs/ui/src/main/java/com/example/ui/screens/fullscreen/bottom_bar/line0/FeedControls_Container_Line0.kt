@@ -36,9 +36,9 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.common.R
+import com.example.ui.screens.fullscreen.ScreenRedFullScreenSM
+import com.example.ui.screens.manager_block.ScreenRedManageBlock
 import com.redgifs.common.ThemeRed
-import com.client.xvideos.redgifs.screens.fullscreen.ScreenRedFullScreenSM
-import com.client.xvideos.redgifs.screens.manager_block.ScreenRedManageBlock
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)

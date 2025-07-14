@@ -15,8 +15,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.redgifs.common.ThemeRed
-import com.client.xvideos.redgifs.screens.profile.ScreenRedProfileSM
 import com.composeunstyled.Text
+import com.example.ui.screens.profile.ScreenRedProfileSM
 
 @Composable
 fun GifTypes_Control(vm: ScreenRedProfileSM) {

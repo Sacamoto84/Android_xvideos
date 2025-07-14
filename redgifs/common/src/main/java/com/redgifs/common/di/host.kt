@@ -1,5 +1,6 @@
 package com.redgifs.common.di
 
+import com.client.common.connectivityObserver.ConnectivityObserver
 import com.redgifs.common.block.BlockRed
 import com.redgifs.common.downloader.DownloadRed
 import com.redgifs.common.saved.SavedRed
@@ -11,6 +12,7 @@ import javax.inject.Singleton
 
 @Singleton
 class HostDI @Inject constructor (
+    val connectivityObserver: ConnectivityObserver,
     val block: BlockRed,
     val redApi : RedApi,
     val savedRed: SavedRed,

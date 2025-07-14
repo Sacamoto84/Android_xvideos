@@ -9,7 +9,7 @@ import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
 import javax.inject.Inject
 import cafe.adriel.voyager.core.model.screenModelScope
-import com.client.xvideos.feature.preference.PreferencesRepository
+import com.client.common.preference.PreferencesRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch

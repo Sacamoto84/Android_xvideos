@@ -29,8 +29,8 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.common.urlVideImage.UrlImage
+import com.example.ui.screens.manager_block.bottomr_bar.BottomrBar
 import com.redgifs.common.ThemeRed
-import com.client.xvideos.redgifs.screens.manager_block.bottomr_bar.BottomrBar
 
 class ScreenRedManageBlock() : Screen {
 

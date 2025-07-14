@@ -99,12 +99,11 @@ fun FullControlComposable2(
                         userInteractionCallback()
                     },
                     onResizeScreenToggle = {
-                        playerHost.setVideoFitMode(
+                        playerHost.videoFitMode =
                             when (playerHost.videoFitMode) {
                                 ScreenResize.FIT -> ScreenResize.FILL
                                 ScreenResize.FILL -> ScreenResize.FIT
                             }
-                        )
                         userInteractionCallback()
                     },
                     selectedSize = playerHost.videoFitMode,
@@ -254,7 +253,7 @@ private fun SelectionOverlays(
                 paddingValues = paddingValues,
                 playerConfig = playerConfig,
                 selectedSpeed = playerHost.speed,
-                selectedSpeedCallback = { playerHost.setSpeed(it) },
+                selectedSpeedCallback = { playerHost.speed = it },
                 activeOption = activeOption,
                 activeOptionCallBack = activeOptionCallBack
             )
