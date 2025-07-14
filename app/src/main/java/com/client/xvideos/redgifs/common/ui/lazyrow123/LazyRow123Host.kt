@@ -12,18 +12,17 @@ import androidx.paging.PagingSource
 import androidx.paging.cachedIn
 import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
 import com.redgifs.common.block.BlockRed
-import com.redgifs.model.Order
+import com.redgifs.common.di.HostDI
 import com.redgifs.common.pagin.ItemCollectionPagingSource
 import com.redgifs.common.pagin.ItemEmptyPagingSource
 import com.redgifs.common.pagin.ItemExplorerNailsPagingSource
-import com.redgifs.common.pagin.ItemSavedLikesPagingSource
 import com.redgifs.common.pagin.ItemNailsPagingSource
 import com.redgifs.common.pagin.ItemProfilePagingSource
+import com.redgifs.common.pagin.ItemSavedLikesPagingSource
 import com.redgifs.common.pagin.ItemTopPagingSource
 import com.redgifs.common.saved.SavedRed
-import com.client.xvideos.redgifs.common.search.SearchRed
-import com.redgifs.common.downloader.DownloadRed
 import com.redgifs.common.snackBar.SnackBarEvent
+import com.redgifs.model.Order
 import com.redgifs.network.api.RedApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -63,13 +62,14 @@ class LazyRow123Host(
     val startColumns: Int = 2,
     val visibleProfileInfo: Boolean = true,
     val isCollection: Boolean = false,
-    val block: BlockRed,
-    val search : SearchRed,
-    val redApi : RedApi,
-    val savedRed: SavedRed,
+    //val block: BlockRed,
+    //val search : SearchRed,
+    //val redApi : RedApi,
+    //val savedRed: SavedRed,
     val tags : StateFlow<Set<String>> = MutableStateFlow(emptySet()),
-    val snackBarEvent: SnackBarEvent,
-    val downloadRed: DownloadRed
+    //val snackBarEvent: SnackBarEvent,
+    //val downloadRed: DownloadRed,
+    val hostDI : HostDI
 ) {
 
     //var searchText by mutableStateOf("")
@@ -118,7 +118,7 @@ class LazyRow123Host(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val pager: Flow<PagingData<Any>> =
-        combine(search.searchTextDone, sortType, block.blockList, tags) { text, sort, blockList, tags ->
+        combine(hostDI.search.searchTextDone, sortType,hostDI.block.blockList, tags) { text, sort, blockList, tags ->
             SearchParams(text.trim(), sort, tags.joinToString(","))
         }
             //.debounce(2000)                                          // ② ждём паузу ввода
@@ -134,7 +134,7 @@ class LazyRow123Host(
                         Timber.d("!!! >>>pagingSourceFactory{...}")
                         gotoUp()
                         gotoUpColumn()
-                        createPager(typePager, params.sort, extraString, params.query, block, redApi, savedRed , tags.value.toList(), snackBarEvent)
+                        createPager(typePager, params.sort, extraString, params.query, hostDI.block, hostDI.redApi, hostDI.savedRed , tags.value.toList(), hostDI.snackBarEvent)
                     }
                 ).flow
             }

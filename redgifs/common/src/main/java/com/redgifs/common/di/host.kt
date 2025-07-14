@@ -1,0 +1,20 @@
+package com.redgifs.common.di
+
+import com.redgifs.common.block.BlockRed
+import com.redgifs.common.downloader.DownloadRed
+import com.redgifs.common.saved.SavedRed
+import com.redgifs.common.search.SearchRed
+import com.redgifs.common.snackBar.SnackBarEvent
+import com.redgifs.network.api.RedApi
+import javax.inject.Inject
+import javax.inject.Singleton
+
+@Singleton
+class HostDI @Inject constructor (
+    val block: BlockRed,
+    val redApi : RedApi,
+    val savedRed: SavedRed,
+    val downloadRed: DownloadRed,
+    val search : SearchRed,
+    val snackBarEvent: SnackBarEvent
+)

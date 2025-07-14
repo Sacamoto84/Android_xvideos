@@ -118,7 +118,7 @@ data class ScreenRedNiche(val nicheName: String = "pumped-pussy") : Screen {
                                 .background(Color(0xFF0F0F0F))
                         ) {
 
-                            Button(onClick = { vm.savedRed.niches.add(vm.niche)}) {
+                            Button(onClick = { vm.hostDI.savedRed.niches.add(vm.niche)}) {
                                 Text("Добавить группу")
                             }
 

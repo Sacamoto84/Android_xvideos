@@ -66,9 +66,13 @@ fun LazyRow123(
     contentBeforeList: @Composable (() -> Unit) = {},
     //Для меню
     isRunLike: Boolean = false,
-    onAppendLoaded : (LazyPagingItems<GifsInfo>) -> Unit = {},
-    filterTags : List<String> = emptyList()
-    ) {
+    onAppendLoaded: (LazyPagingItems<GifsInfo>) -> Unit = {},
+    filterTags: List<String> = emptyList()
+
+
+
+
+) {
 
     val listGifs = host.pager.collectAsLazyPagingItems() as LazyPagingItems<GifsInfo>
 
@@ -86,7 +90,7 @@ fun LazyRow123(
             && listGifs.itemCount == 0          // важно!
     val isErrorInitial = listGifs.loadState.refresh is LoadState.Error
 
-    val block = host.block
+    val block = host.hostDI.block
 
 //    BackHandler {
 //        if (fullScreen)
@@ -178,7 +182,6 @@ fun LazyRow123(
 //    }
 
 
-
     //Диалог для блокировки
     if (block.blockVisibleDialog) {
         DialogBlock(
@@ -237,7 +240,8 @@ fun LazyRow123(
                                 blockItem = item
                                 //fullScreen = fullScreen.not()
                                 navigator.push(ScreenRedFullScreen(item))
-                            }
+                            },
+                            downloadRed = host.hostDI.downloadRed
                         )
 
                         //Меню на 3 точки
@@ -257,8 +261,9 @@ fun LazyRow123(
                             },
                             host.isCollection,
                             block,
-                            host.redApi,
-                            host.savedRed
+                            host.hostDI.redApi,
+                            host.hostDI.savedRed,
+                            downloadRed = host.hostDI.downloadRed
                         )
 
 
@@ -296,7 +301,7 @@ fun LazyRow123(
                             ) {
 
 
-                                if (host.savedRed.collections.collectionList.any { it.list.any { it2 -> it2.id == item.id } }) {
+                                if (host.hostDI.savedRed.collections.collectionList.any { it.list.any { it2 -> it2.id == item.id } }) {
                                     Icon(
                                         painter = painterResource(R.drawable.collection_multi_input_svgrepo_com),
                                         contentDescription = null,
@@ -308,7 +313,7 @@ fun LazyRow123(
                                 }
 
                                 //
-                                if (host.savedRed.creators.list.any { it.username == item.userName }) {
+                                if (host.hostDI.savedRed.creators.list.any { it.username == item.userName }) {
                                     Icon(
                                         Icons.Filled.Person,
                                         contentDescription = null,
@@ -320,7 +325,7 @@ fun LazyRow123(
                                 }
 
                                 //✅ Лайк
-                                if (host.savedRed.likes.list.any { it.id == item.id }) {
+                                if (host.hostDI.savedRed.likes.list.any { it.id == item.id }) {
                                     Icon(
                                         Icons.Filled.FavoriteBorder,
                                         contentDescription = null,
@@ -332,7 +337,9 @@ fun LazyRow123(
                                 }
 
                                 //✅ Иконка того что видео скачано
-                                if (DownloadRed.downloadList.contains(item.id)) {
+                                if (
+                                    host.hostDI.downloadRed.downloadList.contains(item.id)
+                                ) {
                                     Icon(
                                         Icons.Default.Save,
                                         contentDescription = null,
@@ -365,9 +372,11 @@ fun LazyRow123(
         }
 
         if (listGifs.loadState.append is LoadState.Loading && listGifs.itemCount > 0) {
-            Box(modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(16.dp)) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(16.dp)
+            ) {
                 CircularProgressIndicator(color = ThemeRed.colorYellow) // Может быть меньше размером
             }
         }

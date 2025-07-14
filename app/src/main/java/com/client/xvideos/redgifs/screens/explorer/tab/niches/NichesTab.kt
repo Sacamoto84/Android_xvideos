@@ -31,7 +31,7 @@ import com.redgifs.model.Order
 import com.redgifs.common.ThemeRed
 import com.redgifs.common.block.BlockRed
 import com.redgifs.common.saved.SavedRed
-import com.client.xvideos.redgifs.common.search.SearchRed
+import com.redgifs.common.search.SearchRed
 import com.client.xvideos.redgifs.common.ui.lazyrow123.LazyRow123Host
 import com.client.xvideos.redgifs.common.ui.lazyrow123.NichePreview2
 import com.client.xvideos.redgifs.common.ui.lazyrow123.TypePager
@@ -39,6 +39,7 @@ import com.client.xvideos.redgifs.common.ui.sortByOrder.SortByOrder
 import com.client.xvideos.redgifs.screens.niche.ScreenRedNiche
 import com.client.xvideos.redgifs.screens.profile.atom.VerticalScrollbar
 import com.client.xvideos.redgifs.screens.profile.rememberVisibleRangePercentIgnoringFirstNForLazyColumn
+import com.redgifs.common.di.HostDI
 import com.redgifs.network.api.RedApi
 import dagger.Binds
 import dagger.Module
@@ -98,7 +99,7 @@ object NichesTab : Screen {
                             Box(modifier = Modifier.padding(vertical = 4.dp)) {
                                 NichePreview2(niches = item, onClick = {
                                     navigator.push(ScreenRedNiche(item.id))
-                                }, savedRed = vm.savedRed)
+                                }, savedRed = vm.hostDI.savedRed)
                             }
                         }
                     }
@@ -127,10 +128,7 @@ object NichesTab : Screen {
 
 class ScreenRedExplorerNichesSM @Inject constructor(
     connectivityObserver: ConnectivityObserver,
-    block: BlockRed,
-    search : SearchRed,
-    redApi : RedApi,
-    val savedRed: SavedRed
+    val hostDI: HostDI
 ) : ScreenModel {
 
     val lazyHost =
@@ -141,10 +139,7 @@ class ScreenRedExplorerNichesSM @Inject constructor(
             typePager = TypePager.EXPLORER_NICHES,
             startOrder = Order.NICHES_SUBSCRIBERS,
             startColumns = 1,
-            block = block,
-            search = search,
-            redApi = redApi,
-            savedRed = savedRed
+            hostDI = hostDI
         )
 
 }

@@ -57,7 +57,7 @@ import com.redgifs.common.block.BlockRed
 import com.redgifs.model.UserInfo
 import com.redgifs.common.ThemeRed
 import com.redgifs.common.saved.SavedRed
-import com.client.xvideos.redgifs.common.search.SearchRed
+import com.redgifs.common.search.SearchRed
 import com.client.xvideos.redgifs.common.ui.lazyrow123.LazyRow123Host
 import com.client.xvideos.redgifs.common.ui.lazyrow123.TypePager
 import com.client.xvideos.redgifs.screens.profile.ScreenRedProfile
@@ -65,6 +65,7 @@ import com.client.xvideos.redgifs.screens.profile.atom.VerticalScrollbar
 import com.client.xvideos.redgifs.screens.profile.rememberVisibleRangePercentIgnoringFirstNForLazyColumn
 import com.client.common.urlVideImage.UrlImage
 import com.composeunstyled.Text
+import com.redgifs.common.di.HostDI
 import com.redgifs.model.Order
 import com.redgifs.network.api.RedApi
 import dagger.Binds
@@ -90,7 +91,7 @@ object SavedCreatorsTab : Screen {
 
         val state = rememberLazyListState()
 
-        val savedRed = vm.savedRed
+        val savedRed = vm.hostDI.savedRed
 
         /**  ➜ сюда запоминаем элемент, который пользователь хочет удалить  */
         var itemPendingDelete by remember { mutableStateOf<UserInfo?>(null) }
@@ -256,10 +257,7 @@ object SavedCreatorsTab : Screen {
 
 class ScreenSavedCreatorSM @Inject constructor(
     connectivityObserver: ConnectivityObserver,
-    val block: BlockRed,
-    search : SearchRed,
-    redApi : RedApi,
-    val savedRed: SavedRed
+    val hostDI: HostDI
 ) : ScreenModel {
     val gridState = LazyGridState()
 
@@ -270,10 +268,7 @@ class ScreenSavedCreatorSM @Inject constructor(
         extraString = "",
         startOrder = Order.LATEST,
         isCollection = true,
-        block = block,
-        search = search,
-        redApi = redApi,
-        savedRed = savedRed
+        hostDI = hostDI
     )
 }
 

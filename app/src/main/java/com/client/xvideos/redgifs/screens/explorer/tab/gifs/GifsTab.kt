@@ -49,7 +49,7 @@ import com.redgifs.model.Order
 import com.redgifs.common.ThemeRed
 import com.redgifs.common.block.BlockRed
 import com.redgifs.common.saved.SavedRed
-import com.client.xvideos.redgifs.common.search.SearchRed
+import com.redgifs.common.search.SearchRed
 import com.client.xvideos.redgifs.common.ui.lazyrow123.LazyRow123
 import com.client.xvideos.redgifs.common.ui.lazyrow123.LazyRow123Host
 import com.client.xvideos.redgifs.common.ui.lazyrow123.TypePager
@@ -59,6 +59,7 @@ import com.client.xvideos.redgifs.screens.explorer.tab.saved.tab.SavedLikesTab.c
 import com.client.xvideos.redgifs.screens.profile.ScreenRedProfile
 import com.client.xvideos.redgifs.screens.profile.atom.VerticalScrollbar
 import com.client.xvideos.redgifs.screens.profile.rememberVisibleRangePercentIgnoringFirstNForGrid
+import com.redgifs.common.di.HostDI
 import com.redgifs.network.api.RedApi
 import dagger.Binds
 import dagger.Module
@@ -88,7 +89,7 @@ object GifsTab : Screen {
 
         val root = LocalRootScreenModel.current
 
-        val block = vm.block
+        val block = vm.hostDI.block
 
         val state = rememberPullToRefreshState()
         var isRefreshing by remember { mutableStateOf(false) }
@@ -103,7 +104,7 @@ object GifsTab : Screen {
             gridState = vm.lazyHost.state, itemsToIgnore = 0, numberOfColumns = column.intValue
         )
 
-        val search = vm.search
+        val search = vm.hostDI.search
 
         val searchR = search.searchText.collectAsStateWithLifecycle().value
 
@@ -233,10 +234,7 @@ object GifsTab : Screen {
 
 class ScreenRedExplorerGifsSM @Inject constructor(
     connectivityObserver: ConnectivityObserver,
-    val block: BlockRed,
-    val search: SearchRed,
-    val redApi: RedApi,
-    val savedRed: SavedRed
+    val hostDI: HostDI
 ) : ScreenModel {
 
     val isConnected = connectivityObserver.isConnected.stateIn(
@@ -249,10 +247,7 @@ class ScreenRedExplorerGifsSM @Inject constructor(
         scope = screenModelScope,
         extraString = "",
         typePager = TypePager.TOP,
-        block = block,
-        search = search,
-        redApi = redApi,
-        savedRed = savedRed
+        hostDI = hostDI
     )
 
 

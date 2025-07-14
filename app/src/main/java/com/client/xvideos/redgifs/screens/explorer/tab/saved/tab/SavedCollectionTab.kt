@@ -61,15 +61,13 @@ import com.redgifs.model.Order
 import com.redgifs.common.ThemeRed
 import com.redgifs.common.block.BlockRed
 import com.redgifs.common.block.ui.DialogBlock
-import com.redgifs.common.saved.SavedRed
 import com.redgifs.common.saved.collection.ui.DaialogNewCollection
-import com.client.xvideos.redgifs.common.search.SearchRed
 import com.client.xvideos.redgifs.common.ui.lazyrow123.LazyRow123
 import com.client.xvideos.redgifs.common.ui.lazyrow123.LazyRow123Host
 import com.client.xvideos.redgifs.common.ui.lazyrow123.TypePager
 import com.client.common.urlVideImage.UrlImage
 import com.composeunstyled.Text
-import com.redgifs.network.api.RedApi
+import com.redgifs.common.di.HostDI
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -102,7 +100,7 @@ object SavedCollectionTab : Screen {
 
         var blockItem by rememberSaveable { mutableStateOf<GifsInfo?>(null) }
 
-        val savedRed = vm.savedRed
+        val savedRed = vm.hostDI.savedRed
 
         BackHandler { savedRed.collections.selectedCollection = null }
 
@@ -453,9 +451,7 @@ object SavedCollectionTab : Screen {
 class ScreenSavedCollectionSM @Inject constructor(
     connectivityObserver: ConnectivityObserver,
     val block: BlockRed,
-    search : SearchRed,
-    redApi : RedApi,
-    val savedRed: SavedRed
+    val hostDI : HostDI,
 ) : ScreenModel {
     val gridState = LazyGridState()
 
@@ -466,10 +462,7 @@ class ScreenSavedCollectionSM @Inject constructor(
         extraString = "",
         startOrder = Order.LATEST,
         isCollection = true,
-        block = block,
-        search = search,
-        redApi = redApi,
-        savedRed = savedRed
+        hostDI = hostDI
     )
 }
 

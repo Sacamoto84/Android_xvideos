@@ -1,4 +1,4 @@
-package com.client.xvideos.redgifs.common.search
+package com.redgifs.common.search
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

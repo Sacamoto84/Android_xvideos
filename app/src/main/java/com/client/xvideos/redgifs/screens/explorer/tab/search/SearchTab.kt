@@ -40,6 +40,7 @@ import com.redgifs.model.search.SearchItemNichesResponse
 import com.redgifs.model.search.SearchItemTagsResponse
 import com.redgifs.common.snackBar.SnackBarEvent
 import com.client.common.urlVideImage.UrlImage
+import com.redgifs.common.di.HostDI
 import com.redgifs.network.api.RedApi
 import dagger.Binds
 import dagger.Module
@@ -126,7 +127,7 @@ object SearchTab : Screen {
 
 class ScreenRedExplorerSearchSM @Inject constructor(
     connectivityObserver: ConnectivityObserver,
-    val redApi: RedApi
+    val hostDI: HostDI
 ) : ScreenModel {
 
     val searchText = MutableStateFlow<String>("Ana")
@@ -142,14 +143,14 @@ class ScreenRedExplorerSearchSM @Inject constructor(
 
             searchText.collect { text ->
 
-                SnackBarEvent.info(text)
+                hostDI.snackBarEvent.info(text)
 
                 if (text == "") {
                     creatorsList.clear()
                     return@collect
                 }
 
-                val creator = redApi.search.searchCreatorsShort(text)
+                val creator = hostDI.redApi.search.searchCreatorsShort(text)
 
                 creatorsList.clear()
                 creatorsList.addAll(creator.items)

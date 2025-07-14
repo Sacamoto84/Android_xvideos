@@ -42,15 +42,13 @@ import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.Navigator
+import com.client.xvideos.redgifs.screens.explorer.ScreenRedExplorer
 import com.redgifs.common.ThemeRed
+import com.redgifs.common.di.HostDI
 import com.redgifs.common.downloader.ui.DownloadIndicator
-import com.redgifs.common.saved.SavedRed
 import com.redgifs.common.saved.collection.ui.DaialogNewCollection
 import com.redgifs.common.saved.collection.ui.DialogCollection
-import com.redgifs.common.snackBar.SnackBarEvent
 import com.redgifs.common.snackBar.UiMessage
-import com.client.xvideos.redgifs.screens.explorer.ScreenRedExplorer
-import com.redgifs.common.downloader.Downloader
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -99,10 +97,10 @@ class ScreenRedRoot() : Screen {
 
         val haptic = LocalHapticFeedback.current
 
-        val savedRed = vm.savedRed
+        val savedRed = vm.hostDI.savedRed
 
-        val percentDownload = vm.downloader.percent.collectAsStateWithLifecycle().value
-        val snackBarEvent = vm.snackBarEvent
+        val percentDownload = vm.hostDI.downloadRed.downloader.percent.collectAsStateWithLifecycle().value
+        val snackBarEvent = vm.hostDI.snackBarEvent
 
 
         LaunchedEffect(Unit) {
@@ -254,9 +252,7 @@ class ScreenRedRoot() : Screen {
 }
 
 class ScreenRedRootSM @Inject constructor(
-    val savedRed: SavedRed,
-    val snackBarEvent: SnackBarEvent,
-    val downloader: Downloader
+    val hostDI: HostDI
 ) : ScreenModel {
     private val _snackbarEvents = Channel<String>(64)
     val snackbarEvents = _snackbarEvents.receiveAsFlow()

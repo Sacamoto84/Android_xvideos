@@ -59,7 +59,9 @@ fun RedUrlVideoImageAndLongClick(
 
     onVideo: (Boolean) -> Unit = {},       //true - видео, false - картинка
 
-    onVideoUri : (String)-> Unit = {}
+    onVideoUri : (String)-> Unit = {},
+
+    downloadRed : DownloadRed
 
 ) {
 
@@ -77,7 +79,7 @@ fun RedUrlVideoImageAndLongClick(
     val videoUri: String = remember(item.id, item.userName) {
         Timber.tag("???").i("Перерачсет videoItem.id = ${item.id}")
         //Определяем адрес откуда брать видео, из кеша или из сети
-        if (DownloadRed.findVideoInDownload(item.id, item.userName))
+        if (downloadRed.downloader.findVideoInDownload(item.id, item.userName))
             "${AppPath.cache_download_red}/${item.userName}/${item.id}.mp4"
         else {
             if (isNetConnected)

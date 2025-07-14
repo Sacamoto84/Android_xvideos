@@ -23,16 +23,13 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.feature.connectivityObserver.ConnectivityObserver
-import com.redgifs.common.block.BlockRed
-import com.redgifs.common.saved.SavedRed
-import com.client.xvideos.redgifs.common.search.SearchRed
 import com.client.xvideos.redgifs.common.ui.lazyrow123.LazyRow123
 import com.client.xvideos.redgifs.common.ui.lazyrow123.LazyRow123Host
 import com.client.xvideos.redgifs.common.ui.lazyrow123.TypePager
 import com.client.xvideos.redgifs.screens.profile.ScreenRedProfile
 import com.client.xvideos.redgifs.screens.profile.atom.VerticalScrollbar
 import com.client.xvideos.redgifs.screens.profile.rememberVisibleRangePercentIgnoringFirstNForGrid
-import com.redgifs.network.api.RedApi
+import com.redgifs.common.di.HostDI
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -66,7 +63,7 @@ object SavedLikesTab : Screen {
             vm.likedHost.columns = column.intValue
         }
 
-        LaunchedEffect(vm.savedRed.likes.list){
+        LaunchedEffect(vm.hostDI.savedRed.likes.list){
             //vm.likedHost.refresh()
         }
 
@@ -111,10 +108,8 @@ object SavedLikesTab : Screen {
 
 class ScreenSavedLikesSM @Inject constructor(
     connectivityObserver: ConnectivityObserver,
-    val block: BlockRed,
-    val search: SearchRed,
-    val redApi: RedApi,
-    val savedRed: SavedRed
+    val hostDI : HostDI
+
 ) : ScreenModel {
 
     @OptIn(DelicateCoroutinesApi::class)
@@ -122,10 +117,7 @@ class ScreenSavedLikesSM @Inject constructor(
         connectivityObserver = connectivityObserver,
         scope = screenModelScope,
         typePager = TypePager.SAVED_LIKES,
-        block = block,
-        search = search,
-        redApi = redApi,
-        savedRed = savedRed
+        hostDI = hostDI
     )
 
 }

@@ -59,7 +59,7 @@ class ScreenRedProfile(val profileName: String) : Screen {
             gridState = vm.likedHost.state, itemsToIgnore = 3, numberOfColumns = 2
         )
 
-        val block = vm.block
+        val block = vm.hostDI.block
 
         //🟨🟨🟨🟨🟨🟨🟨🟨🎨🎨🎨🟨🟨🟨🟨🟨🟨🟨🟨
         //╭┈┈ Диалог блокировки ┈┈╮
@@ -86,7 +86,7 @@ class ScreenRedProfile(val profileName: String) : Screen {
                             Column(modifier = Modifier.fillMaxWidth()) {
 
                                 if (vm.creator != null) {
-                                    RedProfileCreaterInfo(vm.creator!!, vm.savedRed)
+                                    RedProfileCreaterInfo(vm.creator!!, vm.hostDI.savedRed)
                                 }
 
                                 if ((vm.creator != null) && (tags.isNotEmpty())) {

@@ -1,10 +1,11 @@
 package com.redgifs.common.snackBar
 
 import kotlinx.coroutines.channels.Channel
+import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class SnackBarEvent {
+class SnackBarEvent @Inject constructor(){
     val messages = Channel<UiMessage>(64)
 
     fun info(text : String) {messages.trySend(UiMessage.Info(text))}

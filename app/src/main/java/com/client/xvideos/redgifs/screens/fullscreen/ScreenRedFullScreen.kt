@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -21,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
@@ -58,7 +60,7 @@ class ScreenRedFullScreen(val item: GifsInfo) : Screen {
         val videoUri: String = remember(item.id, item.userName) {
             Timber.tag("???").i("Перерасчет videoItem.id = ${item.id}")
             //Определяем адрес откуда брать видео, из кеша или из сети
-            if (DownloadRed.findVideoInDownload(item.id, item.userName))
+            if (vm.downloadRed.downloader.findVideoInDownload(item.id, item.userName))
                 "${AppPath.cache_download_red}/${item.userName}/${item.id}.mp4"
             else
                 "https://api.redgifs.com/v2/gifs/${item.id.lowercase()}/hd.m3u8"
@@ -113,7 +115,7 @@ class ScreenRedFullScreen(val item: GifsInfo) : Screen {
                     Column {
 
                         //Индикатор загрузки
-                        DownloadIndicator()
+                        DownloadIndicator(vm.downloadRed.downloader.percent.collectAsStateWithLifecycle().value)
                         FeedControls_Container_Line0(vm)
                         HorizontalSeparator(Color.Transparent, thickness = 4.dp)
                         //FeedControls_Container_Line1(vm)
@@ -152,7 +154,8 @@ class ScreenRedFullScreen(val item: GifsInfo) : Screen {
 }
 
 class ScreenRedFullScreenSM @Inject constructor(
-    connectivityObserver: ConnectivityObserver
+    connectivityObserver: ConnectivityObserver,
+    val downloadRed: DownloadRed
 ) : ScreenModel {
 
 

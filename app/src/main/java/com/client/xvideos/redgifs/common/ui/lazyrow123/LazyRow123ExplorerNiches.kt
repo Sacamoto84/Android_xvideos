@@ -74,7 +74,7 @@ fun LazyRow123ExplorerNiches(
                 Box(modifier = Modifier.padding(vertical = 4.dp)) {
                     NichePreview2(niches = item, onClick = {
                         navigator.push(ScreenRedNiche(item.id))
-                    }, savedRed = host.savedRed)
+                    }, savedRed = host.hostDI.savedRed)
                 }
             }
         }

@@ -1,11 +1,10 @@
 package com.client.xvideos
 
 import android.app.Application
-import com.client.xvideos.feature.room.AppDatabase
+import com.client.xvideos.PermissionScreenActivity.PermissionStorage
 import com.client.xvideos.feature.videoplayer.chaintech.videoplayer.util.PlaybackPreference
 import com.redgifs.common.block.BlockRed
 import com.redgifs.common.saved.SavedRed
-import com.kdownloader.KDownloader
 import com.redgifs.db.AppRedGifsDatabase
 import com.redgifs.db.dao.clearOldCache
 import dagger.hilt.android.HiltAndroidApp
@@ -55,17 +54,17 @@ class App : Application() {
 
     //lateinit var kDownloader: KDownloader
 
-    @Inject
-    lateinit var db: AppDatabase
+    //@Inject
+    //lateinit var db: AppDatabase
 
     @Inject
-    lateinit var redGifsDb: AppRedGifsDatabase
+    lateinit var redGifsDb: javax.inject.Provider <AppRedGifsDatabase>
 
     @Inject
-    lateinit var blockRed: BlockRed
+    lateinit var blockRed: javax.inject.Provider<BlockRed>
 
     @Inject
-    lateinit var savedRed: SavedRed
+    lateinit var savedRed: javax.inject.Provider<SavedRed>
 
     @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate() {
@@ -77,19 +76,24 @@ class App : Application() {
         PlaybackPreference.initialize(this)
         //kDownloader = KDownloader.create(applicationContext)
 
-        savedRed.refreshTagList()
 
+       if (PermissionStorage.hasPermissions(this)) {
 
-        //blockRed.refreshBlockList()
+           val savedRed = savedRed.get()
 
-        savedRed.likes.refresh()
-        savedRed.niches.refresh()
-        savedRed.creators.refresh()
-        savedRed.collections.refreshCollectionList()
+           savedRed.refreshTagList()
 
-        GlobalScope.launch {
-            clearOldCache( redGifsDb.cacheMediaResponseDao())
-        }
+           blockRed.get().refresh()
+
+           savedRed.likes.refresh()
+           savedRed.niches.refresh()
+           savedRed.creators.refresh()
+           savedRed.collections.refreshCollectionList()
+
+           GlobalScope.launch {
+               clearOldCache( redGifsDb.get().cacheMediaResponseDao())
+           }
+       }
 
     }
 
