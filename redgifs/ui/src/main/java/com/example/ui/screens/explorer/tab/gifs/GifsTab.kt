@@ -4,8 +4,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -16,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -29,12 +32,15 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.room.util.TableInfo
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.screen.Screen
@@ -45,6 +51,7 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.common.connectivityObserver.ConnectivityObserver
+import com.composeunstyled.Thumb
 import com.example.ui.screens.LocalRootScreenModel
 import com.example.ui.screens.explorer.tab.saved.tab.SavedCollectionTab.column
 import com.example.ui.screens.profile.ScreenRedProfile
@@ -74,8 +81,6 @@ object GifsTab : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
 
-
-
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
@@ -83,9 +88,9 @@ object GifsTab : Screen {
 
         val navigator = LocalNavigator.currentOrThrow
 
-        val root = LocalRootScreenModel.current
+        //val root = LocalRootScreenModel.current
 
-        val block = vm.hostDI.block
+        //val block = vm.hostDI.block
 
         val state = rememberPullToRefreshState()
         var isRefreshing by remember { mutableStateOf(false) }
@@ -105,57 +110,71 @@ object GifsTab : Screen {
         val searchR = search.searchText.collectAsStateWithLifecycle().value
 
         Scaffold(bottomBar = {
-            Row(modifier = Modifier.background(ThemeRed.colorTabLevel0).height(50.dp), verticalAlignment = Alignment.Bottom) {
-                //
-                if (searchR == "") {
-                    SortByOrder(
-                        containerColor = ThemeRed.colorCommonBackground,
-                        list = listOf(
-                            Order.TOP_WEEK,
-                            Order.TOP_MONTH,
-                            Order.TOP_ALLTIME,
-                            Order.TRENDING,
-                            Order.LATEST
-                        ),
-                        selected = vm.lazyHost.sortType.collectAsStateWithLifecycle().value,
-                        onSelect = { vm.lazyHost.changeSortType(it) }
 
-                    )
-                } else {
-                    SortByOrder(
-                        containerColor = ThemeRed.colorCommonBackground,
-                        list = listOf(Order.TOP, Order.TRENDING, Order.LATEST),
-                        selected = vm.lazyHost.sortType.collectAsStateWithLifecycle().value,
-                        onSelect = { vm.lazyHost.changeSortType(it) })
-                }
-
-                search.CustomBasicTextField(
-                    value = search.searchText.collectAsStateWithLifecycle().value,
-                    onValueChange = { search.searchText.value = it }, onDone = { search.searchTextDone.value = it },
-                    modifier = Modifier.padding(start = 4.dp).weight(1f)
-                )
-
-                Box(
+            Column(Modifier.background(ThemeRed.colorTabLevel1)) {
+                HorizontalDivider(color = ThemeRed.colorBorderGray)
+                Row(
                     modifier = Modifier
-                        .padding(start = 4.dp)
-                        .size(48.dp)
-                        .border(1.dp, Color(0x80757575), RoundedCornerShape(8.dp))
-                        .background(ThemeRed.colorCommonBackground)
-                        .clickable(
-                            onClick = {
-                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                vm.lazyHost.gotoUp()
-                            }), contentAlignment = Alignment.Center
+                        .padding(top = 1.dp, start = 1.dp)
+                        .background(ThemeRed.colorTabLevel1), verticalAlignment = Alignment.Bottom
                 ) {
-                    Icon(
-                        Icons.Filled.ArrowUpward,
-                        contentDescription = null,
-                        tint = Color.LightGray,
+                    //
+                    if (searchR == "") {
+                        SortByOrder(
+                            containerColor = ThemeRed.colorCommonBackground,
+                            list = listOf(
+                                Order.TOP_WEEK,
+                                Order.TOP_MONTH,
+                                Order.TOP_ALLTIME,
+                                Order.TRENDING,
+                                Order.LATEST
+                            ),
+                            selected = vm.lazyHost.sortType.collectAsStateWithLifecycle().value,
+                            onSelect = { vm.lazyHost.changeSortType(it) }
+
+                        )
+                    } else {
+                        SortByOrder(
+                            containerColor = ThemeRed.colorCommonBackground,
+                            list = listOf(Order.TOP, Order.TRENDING, Order.LATEST),
+                            selected = vm.lazyHost.sortType.collectAsStateWithLifecycle().value,
+                            onSelect = { vm.lazyHost.changeSortType(it) })
+                    }
+
+                    search.CustomBasicTextField(
+                        value = search.searchText.collectAsStateWithLifecycle().value,
+                        onValueChange = { search.searchText.value = it },
+                        onDone = { search.searchTextDone.value = it },
                         modifier = Modifier
+                            .padding(start = 4.dp)
+                            .weight(1f)
                     )
+
+                    Box(
+                        modifier = Modifier
+                            .padding(start = 4.dp)
+                            .size(46.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .border(1.dp, Color(0x80757575), RoundedCornerShape(8.dp))
+                            .background(ThemeRed.colorCommonBackground)
+                            .clickable(
+                                onClick = {
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    vm.lazyHost.gotoUp()
+                                }), contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            Icons.Filled.ArrowUpward,
+                            contentDescription = null,
+                            tint = Color.LightGray,
+                            modifier = Modifier
+                        )
+                    }
+
                 }
-
-
+                Spacer(modifier = Modifier.height(1.dp))
+                HorizontalDivider(color = ThemeRed.colorCommonBackground)
+                HorizontalDivider(color = ThemeRed.colorBorderGray)
             }
         }, containerColor = ThemeRed.colorCommonBackground) {
 

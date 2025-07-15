@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
@@ -58,14 +59,16 @@ fun SortByOrder(list: List<Order>, selected: Order, onSelect: (Order) -> Unit, c
             haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
             expanded = it
         },
-        modifier = Modifier.background(containerColor)
+        modifier = Modifier
+            .clip(RoundedCornerShape(8.dp)).background(containerColor)
+
     )
     {
 
         Row(
             modifier = Modifier
                 .width(120.dp)
-                .height(48.dp)
+                .height(46.dp)
                 .menuAnchor(ExposedDropdownMenuAnchorType.SecondaryEditable)
                 .border(
                     1.dp, Color(0xFF3A3A3A),
@@ -73,7 +76,8 @@ fun SortByOrder(list: List<Order>, selected: Order, onSelect: (Order) -> Unit, c
                 )
                 .clickable(onClick = {
                     expanded = true
-                }), horizontalArrangement = Arrangement.SpaceAround
+                }),
+            horizontalArrangement = Arrangement.SpaceAround
         ) {
 
             val text = when (selected) {
@@ -98,13 +102,15 @@ fun SortByOrder(list: List<Order>, selected: Order, onSelect: (Order) -> Unit, c
             BasicText(
                 text,
                 modifier = Modifier
-                    .padding(start = 8.dp)
+                    .padding(start = 8.dp).weight(1f)
                     .align(Alignment.CenterVertically),
                 style = TextStyle(
                     color = Color.White,
                     fontFamily = ThemeRed.fontFamilyDMsanss,
                     fontSize = 18.sp
-                )
+                ),
+                autoSize =  TextAutoSize.StepBased(minFontSize = 12.sp, maxFontSize = 18.sp),
+                maxLines = 1
             )
 
             Icon(
@@ -112,7 +118,7 @@ fun SortByOrder(list: List<Order>, selected: Order, onSelect: (Order) -> Unit, c
                 contentDescription = "",
                 tint = Color.White,
                 modifier = Modifier
-                    .padding(start = 8.dp, end = 8.dp)
+                    .padding(start = 4.dp, end = 8.dp)
                     .align(Alignment.CenterVertically)
                     .size(12.dp)
                     .rotate(if (expanded) 180f else 0f)
@@ -164,7 +170,7 @@ fun SortByOrder(list: List<Order>, selected: Order, onSelect: (Order) -> Unit, c
                                 style = TextStyle(
                                     color = Color.White,
                                     fontFamily = ThemeRed.fontFamilyDMsanss,
-                                    fontSize = 18.sp
+                                    fontSize = 16.sp
                                 ),
                                 modifier = Modifier
                             )

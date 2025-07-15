@@ -55,9 +55,7 @@ class ScreenRedExplorer() : Screen {
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
     override fun Content() {
-        val navigator = LocalNavigator.currentOrThrow
 
-        //val vm: ScreenRedExplorerSM = getScreenModel()
         var screenType by rememberSaveable{ mutableIntStateOf(0)}
 
         val l = listOf(

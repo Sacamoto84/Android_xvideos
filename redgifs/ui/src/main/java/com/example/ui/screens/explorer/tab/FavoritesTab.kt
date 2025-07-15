@@ -10,7 +10,6 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.getScreenModel
-import com.example.ui.screens.explorer.ScreenRedExplorerSM
 
 object  FavoritesTab : Screen {
 
@@ -20,7 +19,6 @@ object  FavoritesTab : Screen {
 
     @Composable
     override fun Content() {
-        val vm: ScreenRedExplorerSM = getScreenModel()
 
         val haptic = LocalHapticFeedback.current
 
@@ -38,7 +36,6 @@ object  FavoritesTab : Screen {
             Button(onClick = { haptic.performHapticFeedback(HapticFeedbackType.SegmentTick)}) { Text("SegmentTicktivate") }
             Button(onClick = { haptic.performHapticFeedback(HapticFeedbackType.LongPress)}) { Text("LongPress") }
             Button(onClick = { haptic.performHapticFeedback(HapticFeedbackType.ToggleOff)}) { Text("ToggleOff") }
-
 
         }
     }

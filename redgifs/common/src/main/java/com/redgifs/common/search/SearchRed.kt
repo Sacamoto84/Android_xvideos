@@ -25,6 +25,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -76,11 +78,7 @@ class SearchRed @Inject constructor(
     val savedRed: SavedRed
 ) {
 
-
-    //var searchText by mutableStateOf("")
     var searchText = MutableStateFlow("")
-
-    var verified = MutableStateFlow(false)
 
     var searchTextDone = MutableStateFlow("")
 
@@ -114,7 +112,7 @@ class SearchRed @Inject constructor(
 
         Box(
             modifier = modifier
-                .height(48.dp)
+                .height(46.dp)
                 .background(ThemeRed.colorCommonBackground2, RoundedCornerShape(8.dp))
                 .border(
                     width = if (isFocused) 2.dp else 1.dp,
@@ -157,7 +155,6 @@ class SearchRed @Inject constructor(
                         },
                     cursorBrush = SolidColor(Color.Gray),
 
-
                     // 1. Говорим IME, что нам нужна кнопка «Done»
                     keyboardOptions = KeyboardOptions(
                         imeAction = ImeAction.Done,
@@ -172,21 +169,19 @@ class SearchRed @Inject constructor(
                             focusManager.clearFocus()          // убираем курсор
                             keyboardController?.hide()         // закрываем клавиатуру
                         }
-                    ),
-
                     )
+                )
 
                 if (value != "") {
-                    IconButton(onClick = {
-                        onDone("")
-                        onValueChange("")
-                    }, modifier = Modifier.size(48.dp)) {
-                        Icon(
-                            Icons.Default.Clear,
-                            contentDescription = null,
-                            tint = Color(0xFF757575)
-                        )
-                    }
+                    Icon(
+                        Icons.Default.Clear,
+                        contentDescription = null,
+                        tint = Color(0xFF757575),
+                        modifier = Modifier
+                            .width(24.dp)
+                            .height(46.dp)
+                            .clickable(onClick = { onDone("");onValueChange("") })
+                    )
                 }
 
                 ExpandMenuHelper(savedRed = savedRed)
@@ -213,18 +208,15 @@ class SearchRed @Inject constructor(
             modifier = Modifier.then(modifier)
         )
         {
-            IconButton(
+            Icon(
+                if (expanded) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
+                contentDescription = "",
+                tint = Color(0xFF757575),
                 modifier = Modifier
-                    .size(48.dp)
-                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
-                onClick = {}) {
-                Icon(
-                    if (expanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
-                    contentDescription = "",
-                    tint = Color(0xFF757575),
-                    modifier = Modifier.size(24.dp)
-                )
-            }
+                    .width(24.dp)
+                    .height(46.dp)
+                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
+            )
 
             ExposedDropdownMenu(
                 expanded = expanded,
@@ -291,7 +283,7 @@ class SearchRed @Inject constructor(
         {
             IconButton(
                 modifier = Modifier
-                    .size(48.dp)
+                    .size(46.dp)
                     .menuAnchor(ExposedDropdownMenuAnchorType.SecondaryEditable),
                 onClick = {}) {
                 Icon(
