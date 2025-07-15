@@ -2,6 +2,7 @@ package com.example.ui.screens.explorer.tab.niches
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,12 +16,17 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.modifier.modifierLocalConsumer
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -37,6 +43,7 @@ import com.client.common.connectivityObserver.ConnectivityObserver
 import com.example.ui.screens.niche.ScreenRedNiche
 import com.example.ui.screens.profile.atom.VerticalScrollbar
 import com.example.ui.screens.profile.rememberVisibleRangePercentIgnoringFirstNForLazyColumn
+import com.example.ui.screens.ui.atom.ButtonUp
 import com.example.ui.screens.ui.lazyrow123.LazyRow123Host
 import com.example.ui.screens.ui.lazyrow123.NichePreview2
 import com.example.ui.screens.ui.lazyrow123.TypePager
@@ -68,6 +75,7 @@ object NichesTab : Screen {
 
         val navigator = LocalNavigator.currentOrThrow
 
+
         val state = vm.lazyHost.stateColumn
 
         val listNiche = vm.lazyHost.pager.collectAsLazyPagingItems() as LazyPagingItems<Niche>
@@ -76,6 +84,8 @@ object NichesTab : Screen {
             gridState = state,
             itemsToIgnore = 0
         )
+
+        val haptic = LocalHapticFeedback.current
 
         if (listNiche.itemCount == 0) return
 
@@ -87,10 +97,12 @@ object NichesTab : Screen {
 
                 //Spacer(modifier = Modifier.height(2.dp))
 
-                Row(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 1.dp, start = 1.dp)
-                    .background(ThemeRed.colorTabLevel1)) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 1.dp, start = 1.dp)
+                        .background(ThemeRed.colorTabLevel1), horizontalArrangement = Arrangement.SpaceBetween
+                ) {
 
                     SortByOrder(
                         listOf(
@@ -104,6 +116,11 @@ object NichesTab : Screen {
                         containerColor = ThemeRed.colorCommonBackground
                     )
 
+                    ButtonUp {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        vm.lazyHost.gotoUpColumn()
+                    }
+
                 }
                 Spacer(modifier = Modifier.height(1.dp))
                 HorizontalDivider(color = ThemeRed.colorCommonBackground)
@@ -112,9 +129,11 @@ object NichesTab : Screen {
             }
         }, containerColor = ThemeRed.colorCommonBackground2) {
 
-            Box(modifier = Modifier
-                .padding(bottom = it.calculateBottomPadding())
-                .fillMaxSize()) {
+            Box(
+                modifier = Modifier
+                    .padding(bottom = it.calculateBottomPadding())
+                    .fillMaxSize()
+            ) {
 
                 LazyColumn(
                     state = state,
@@ -129,6 +148,15 @@ object NichesTab : Screen {
                                 NichePreview2(niches = item, onClick = {
                                     navigator.push(ScreenRedNiche(item.id))
                                 }, savedRed = vm.hostDI.savedRed)
+
+                                Text(
+                                    index.toString(),
+                                    color = Color.Gray,
+                                    fontFamily = ThemeRed.fontFamilyDMsanss,
+                                    modifier = Modifier.padding(end = 16.dp).align(
+                                        Alignment.TopEnd
+                                    ), fontSize = 12.sp
+                                )
                             }
                         }
                     }

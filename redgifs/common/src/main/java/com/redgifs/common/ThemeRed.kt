@@ -37,7 +37,7 @@ object ThemeRed {
 
 
 
-    val colorBorderSelect = Color(0xFF272727) //
+    val colorBorderSelect = colorTabLevel3 //
     val colorBorderGray   = Color(0xFF3F3F3F) //Окантовка
 
 

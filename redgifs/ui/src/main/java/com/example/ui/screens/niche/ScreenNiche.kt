@@ -7,17 +7,20 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowCircleUp
 import androidx.compose.material3.Button
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -49,6 +52,7 @@ import com.example.ui.screens.niche.atom.NichePreview
 import com.example.ui.screens.niche.atom.NicheProfile
 import com.example.ui.screens.niche.atom.NicheTopCreator
 import com.example.ui.screens.profile.ScreenRedProfile
+import com.example.ui.screens.ui.atom.ButtonUp
 import com.example.ui.screens.ui.atom.Selector
 import com.example.ui.screens.ui.lazyrow123.LazyRow123
 import com.example.ui.screens.ui.sortByOrder.SortByOrder
@@ -75,10 +79,11 @@ data class ScreenRedNiche(val nicheName: String = "pumped-pussy") : Screen {
 
         val isConnected by vm.lazyHost.isConnected.collectAsState()
 
-        val toolbarHeight = 96.dp
+        val toolbarHeight = 48.dp
         val minToolbarHeight = 0.dp // высота лишь третьей строки
         val toolbarHeightPx = with(LocalDensity.current) { toolbarHeight.toPx() }
         val minToolbarHeightPx = with(LocalDensity.current) { minToolbarHeight.toPx() }
+        val oneDptoPx = with(LocalDensity.current) { 1.dp.toPx() }
 
         val offsetY = remember { mutableFloatStateOf(0f) }
 
@@ -96,7 +101,73 @@ data class ScreenRedNiche(val nicheName: String = "pumped-pussy") : Screen {
             }
         }
 
-        Scaffold(modifier = Modifier.fillMaxSize(), containerColor = Color(0xFF0F0F0F)) {
+        Scaffold(
+
+            bottomBar = {
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(toolbarHeight)
+                        .offset { IntOffset(x = 0, y = -offsetY.floatValue.roundToInt()) }
+                        .background(ThemeRed.colorTabLevel1)
+                ) {
+
+                    HorizontalDivider(color = ThemeRed.colorBorderGray)
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 2.dp)
+                            .height(48.dp)
+                            .background(ThemeRed.colorTabLevel1),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+
+                        SortByOrder(
+                            listOf(Order.TRENDING, Order.TOP, Order.LATEST),
+                            sort,
+                            onSelect = { vm.lazyHost.changeSortType(it) }, containerColor = ThemeRed.colorCommonBackground)
+
+
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+
+                            ButtonUp {
+                                vm.lazyHost.gotoUp()
+                            }
+
+                            Spacer(modifier = Modifier.width(2.dp))
+
+                            Selector(vm.lazyHost.columns) { vm.lazyHost.columns = it }
+                        }
+
+                    }
+
+
+
+                }
+
+
+
+
+
+
+
+
+            },
+
+
+
+
+
+
+
+
+
+
+
+            modifier = Modifier.fillMaxSize(), containerColor = Color(0xFF0F0F0F)) {
             Box(modifier = Modifier
                 .fillMaxSize()
                 .nestedScroll(nestedScrollConnection)) {
@@ -118,11 +189,7 @@ data class ScreenRedNiche(val nicheName: String = "pumped-pussy") : Screen {
                                 .background(Color(0xFF0F0F0F))
                         ) {
 
-                            Button(onClick = { vm.hostDI.savedRed.niches.add(vm.niche)}) {
-                                Text("Добавить группу")
-                            }
-
-                            NicheProfile(vm.niche)
+                            NicheProfile(vm.hostDI.savedRed, vm.niche)
 
                             Text(
                                 "Related Niches",
@@ -161,53 +228,7 @@ data class ScreenRedNiche(val nicheName: String = "pumped-pussy") : Screen {
         }
 
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(toolbarHeight)
-                .offset { IntOffset(x = 0, y = offsetY.floatValue.roundToInt()) }
-                .background(MaterialTheme.colorScheme.primaryContainer)) {
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp)
-                    .background(MaterialTheme.colorScheme.primaryContainer),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-
-            }
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp)
-                    .background(MaterialTheme.colorScheme.primaryContainer),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-
-                SortByOrder(
-                    listOf(Order.TRENDING, Order.TOP, Order.LATEST),
-                    sort,
-                    onSelect = { vm.lazyHost.changeSortType(it) })
-
-                IconButton(onClick = { vm.lazyHost.gotoUp() }) {
-                    Icon(
-                        Icons.Default.ArrowCircleUp,
-                        contentDescription = "Back",
-                        tint = Color.White,
-                        modifier = Modifier.size(36.dp)
-                    )
-                }
-
-                Selector(vm.lazyHost.columns) { vm.lazyHost.columns = it }
-
-            }
-
-
-        }
 
     }
 

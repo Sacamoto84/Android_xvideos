@@ -18,7 +18,7 @@ fun DownloadIndicator(percentDownload : Float) {
     //Индикатор загрузки
     when(percentDownload) {
         in  0f..1f -> LinearProgressIndicator(progress = percentDownload,  modifier = Modifier.fillMaxWidth().height(2.dp), color = Color.Green)
-        -2f -> HorizontalSeparator(ThemeRed.colorBottomBarDivider, thickness = 2.dp)
+        -2f -> HorizontalSeparator(Color.Transparent, thickness = 2.dp)
         -3f -> Box(modifier = Modifier.fillMaxWidth().height(2.dp).background(Color.Red))
     }
 }

@@ -39,7 +39,7 @@ fun Selector(selectedIndex: Int, onSelect: (Int) -> Unit) {
 
         Box(
             modifier = Modifier
-                .size(48.dp)
+                .size(46.dp)
                 .background(if (selectedIndex == 2) ThemeRed.colorBorderSelect else ThemeRed.colorCommonBackground2)
                 .clickable { onSelect(2) },
 
@@ -56,12 +56,12 @@ fun Selector(selectedIndex: Int, onSelect: (Int) -> Unit) {
         Box(
             modifier = Modifier
                 .width(1.dp)
-                .height(48.dp)
+                .height(46.dp)
                 .background(ThemeRed.colorBorderGray)
         )
         Box(
             modifier = Modifier
-                .size(48.dp)
+                .size(46.dp)
                 .background(if (selectedIndex == 1) ThemeRed.colorBorderSelect else ThemeRed.colorCommonBackground2)
                 .clickable { onSelect(1) }, contentAlignment = Alignment.Center
         )

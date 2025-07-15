@@ -44,6 +44,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
@@ -208,15 +209,17 @@ class SearchRed @Inject constructor(
             modifier = Modifier.then(modifier)
         )
         {
-            Icon(
-                if (expanded) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
-                contentDescription = "",
-                tint = Color(0xFF757575),
-                modifier = Modifier
-                    .width(24.dp)
-                    .height(46.dp)
-                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
-            )
+            Box(modifier = Modifier.width(36.dp), contentAlignment = Alignment.Center) {
+                Icon(
+                    if (expanded) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
+                    contentDescription = "",
+                    tint = Color(0xFF757575),
+                    modifier = Modifier
+                        .width(24.dp)
+                        .height(46.dp)
+                        .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
+                )
+            }
 
             ExposedDropdownMenu(
                 expanded = expanded,
@@ -224,21 +227,23 @@ class SearchRed @Inject constructor(
                 modifier = Modifier
                     //.imePadding()
                     .fillMaxWidth()
-                    .fillMaxHeight(0.7f),
-                containerColor = ThemeRed.colorTabLevel2
+                    .fillMaxHeight(0.7f)
+                    //.clip(RoundedCornerShape(16.dp))
+                    .border(1.dp, ThemeRed.colorTabLevel3, RoundedCornerShape(16.dp))
+                ,
+                containerColor = ThemeRed.colorTabLevel2,
+                shape = RoundedCornerShape(16.dp)
             ) {
-                //DropdownMenuItem_Download(item){ expanded = false }
 
-
-                FlowRow(Modifier.fillMaxSize(), maxItemsInEachRow = 10) {
+                FlowRow(Modifier.padding(4.dp).fillMaxSize(), maxItemsInEachRow = 10) {
                     savedRed.tagsList.sortedByDescending { it.count }.take(200).forEach {
-                        Row(
+                        Box(
                             modifier = Modifier
                                 .padding(horizontal = 2.dp)
                                 .padding(vertical = 2.dp)
-
+                                .clip(RoundedCornerShape(25))
                                 .border(1.dp, ThemeRed.colorTextGray, RoundedCornerShape(25))
-                                .background(Color.Transparent)
+                                .background(ThemeRed.colorTabLevel1)
                                 .padding(4.dp)
                                 .clickable(onClick = {
                                     searchText.value = it.name

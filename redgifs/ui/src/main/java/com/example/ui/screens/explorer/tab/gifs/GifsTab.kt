@@ -57,6 +57,7 @@ import com.example.ui.screens.explorer.tab.saved.tab.SavedCollectionTab.column
 import com.example.ui.screens.profile.ScreenRedProfile
 import com.example.ui.screens.profile.atom.VerticalScrollbar
 import com.example.ui.screens.profile.rememberVisibleRangePercentIgnoringFirstNForGrid
+import com.example.ui.screens.ui.atom.ButtonUp
 import com.example.ui.screens.ui.lazyrow123.LazyRow123
 import com.example.ui.screens.ui.lazyrow123.LazyRow123Host
 import com.example.ui.screens.ui.lazyrow123.TypePager
@@ -150,25 +151,11 @@ object GifsTab : Screen {
                             .weight(1f)
                     )
 
-                    Box(
-                        modifier = Modifier
-                            .padding(start = 4.dp)
-                            .size(46.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .border(1.dp, Color(0x80757575), RoundedCornerShape(8.dp))
-                            .background(ThemeRed.colorCommonBackground)
-                            .clickable(
-                                onClick = {
-                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                    vm.lazyHost.gotoUp()
-                                }), contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            Icons.Filled.ArrowUpward,
-                            contentDescription = null,
-                            tint = Color.LightGray,
-                            modifier = Modifier
-                        )
+                    Spacer(modifier = Modifier.width(4.dp))
+
+                    ButtonUp {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        vm.lazyHost.gotoUp()
                     }
 
                 }
