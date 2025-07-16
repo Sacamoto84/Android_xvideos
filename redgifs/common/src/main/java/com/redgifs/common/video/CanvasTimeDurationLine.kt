@@ -1,7 +1,11 @@
 package com.redgifs.common.video
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.awaitTouchSlopOrCancellation
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.horizontalDrag
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,9 +20,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
+import kotlinx.coroutines.coroutineScope
+import kotlin.coroutines.cancellation.CancellationException
 
 
 @Composable
@@ -127,21 +134,41 @@ fun CanvasTimeDurationLine1(
         modifier = Modifier.fillMaxWidth()
             .height(32.dp) // Даем побольше места для перетаскивания
             .pointerInput(Unit) {
-                detectDragGestures(
-                    onDragStart = { offset ->
-                        isDragging = true
-                        val newTime = (offset.x/ size.width) * duration
-                        onSeek(newTime.coerceIn(0f, duration.toFloat()).toInt().toFloat())
-                    },
-                    onDrag = { change, _ ->
-                        val newTime = (change.position.x / size.width) * duration
-                        onSeek(newTime.coerceIn(0f, duration.toFloat()).toInt().toFloat())
-                    },
-                    onDragEnd = {
-                        isDragging = false
-                        onSeekFinished?.invoke()
+                coroutineScope {
+                    while (true) {
+                        awaitPointerEventScope {
+                            val down = awaitFirstDown()
+
+                            val downX = down.position.x
+                            val newTime = (downX / size.width) * duration
+                            onSeek(newTime.coerceIn(0f, duration.toFloat()))
+
+                            var drag: PointerInputChange? = null
+                            try {
+                                drag = awaitTouchSlopOrCancellation(down.id) { change, _ ->
+                                    // Начало drag
+                                    isDragging = true
+                                    change.consume()
+                                }
+                            } catch (_: CancellationException) {}
+
+                            if (drag != null) {
+                                // Мы начали перетаскивать
+                                horizontalDrag(drag.id) { change ->
+                                    val dragX = change.position.x
+                                    val newTimeDrag = (dragX / size.width) * duration
+                                    onSeek(newTimeDrag.coerceIn(0f, duration.toFloat()))
+                                    change.consume()
+                                }
+                                isDragging = false
+                                onSeekFinished?.invoke()
+                            } else {
+                                // Просто тап, без драггинга
+                                onSeekFinished?.invoke()
+                            }
+                        }
                     }
-                )
+                }
             }
     ) {
         Canvas(

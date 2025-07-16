@@ -7,6 +7,7 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -54,6 +55,7 @@ import com.redgifs.common.UsersRed
 import com.composeunstyled.Text
 import com.example.ui.screens.fullscreen.ScreenRedFullScreen
 import com.example.ui.screens.top_this_week.ProfileInfo1
+import com.redgifs.common.expand_menu_video.ExpandMenuVideoTags
 import com.redgifs.common.video.player_row_mini.RedUrlVideoImageAndLongClick
 import timber.log.Timber
 
@@ -227,7 +229,11 @@ fun LazyRow123(
                     ) {
 
                         RedUrlVideoImageAndLongClick(
-                            item, index, onLongClick = {},
+                            item, index,
+                            onLongClick = {
+                                blockItem = item
+                                navigator.push(ScreenRedFullScreen(item))
+                            },
                             onVideo = { isVideo = it },
                             isVisibleView = false,
                             isVisibleDuration = false,
@@ -236,33 +242,51 @@ fun LazyRow123(
                             onVideoUri = { videoUri = it },
                             onFullScreen = {
                                 blockItem = item
-                                //fullScreen = fullScreen.not()
                                 navigator.push(ScreenRedFullScreen(item))
                             },
-                            downloadRed = host.hostDI.downloadRed
+                            downloadRed = host.hostDI.downloadRed,
                         )
 
-                        //Меню на 3 точки
-                        ExpandMenuVideo(
-                            item = item,
-                            modifier = Modifier.align(Alignment.TopEnd),
-                            onClick = {
-                                blockItem = item //Для блока и идентификации и тема
-                            },
-                            onRunLike = {
-                                if (isRunLike) {
+
+                        Column(modifier = Modifier.align(Alignment.TopEnd)) {
+
+
+                            //Меню на 3 точки
+                            ExpandMenuVideo(
+                                item = item,
+                                modifier = Modifier,
+                                onClick = {
+                                    blockItem = item //Для блока и идентификации и тема
+                                },
+                                onRunLike = {
+                                    if (isRunLike) {
+                                        listGifs.refresh()
+                                    }
+                                },
+                                onRefresh = {
                                     listGifs.refresh()
-                                }
-                            },
-                            onRefresh = {
-                                listGifs.refresh()
-                            },
-                            host.isCollection,
-                            block,
-                            host.hostDI.redApi,
-                            host.hostDI.savedRed,
-                            downloadRed = host.hostDI.downloadRed
-                        )
+                                },
+                                host.isCollection,
+                                block,
+                                host.hostDI.redApi,
+                                host.hostDI.savedRed,
+                                downloadRed = host.hostDI.downloadRed
+                            )
+
+                            if (item.tags.isNotEmpty()) {
+                                ExpandMenuVideoTags(
+                                    item = item,
+                                    modifier = Modifier,
+                                    onClick = {
+                                        host.hostDI.search.searchText.value = it
+                                        host.hostDI.search.searchTextDone.value = it
+                                    }
+                                )
+                            }
+
+                        }
+
+
 
 
                         if (host.visibleProfileInfo) {
@@ -336,7 +360,7 @@ fun LazyRow123(
 
                                 //✅ Иконка того что видео скачано
                                 if (
-                                    //downloadList.contains(item.id)
+                                //downloadList.contains(item.id)
                                     downloadList.any { it.id == item.id }
                                 ) {
                                     Icon(

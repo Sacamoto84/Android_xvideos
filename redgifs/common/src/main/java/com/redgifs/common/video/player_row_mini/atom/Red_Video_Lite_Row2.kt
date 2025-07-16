@@ -32,6 +32,7 @@ import com.client.common.videoplayer.model.VideoPlayerConfig
 import com.client.common.videoplayer.ui.video.VideoPlayerWithControl
 import com.redgifs.common.BuildConfig
 import com.redgifs.common.video.CanvasTimeDurationLine
+import com.redgifs.common.video.CanvasTimeDurationLine1
 import timber.log.Timber
 
 
@@ -94,7 +95,7 @@ fun Red_Video_Lite_Row2(
 
                 TimeDuration(time, duration, modifier = Modifier.align(Alignment.TopStart).offset((-2).dp, (-6).dp) )
 
-                CanvasTimeDurationLine(
+                CanvasTimeDurationLine1(
                     time, duration, timeA = 0f, timeB = 0f,
                     timeABEnable = false, visibleAB = false,
                     play = play, onSeek = { playerHost.seekTo(it) },

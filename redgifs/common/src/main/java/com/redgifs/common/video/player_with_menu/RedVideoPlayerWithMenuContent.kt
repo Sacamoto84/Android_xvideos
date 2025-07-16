@@ -115,11 +115,6 @@ fun RedVideoPlayerWithMenuContent(
         onClick = onClick,
         modifier = Modifier.fillMaxSize(),
         playerHost = playerHost,
-
-        menuContent = menuContent,
-        menuContentWidth = menuContentWidth,
-        menuDefaultOpen = menuDefaultOpen,
-        menuOpenChanged = menuOpenChanged,
         autoRotate = autoRotate
     )
 

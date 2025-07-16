@@ -54,7 +54,7 @@ fun RedUrlVideoImageAndLongClick(
 
     //--- Нажатия на кнопки ---
     onFullScreen: () -> Unit = {},         //Нажатие на кнопку FullScreen
-    onLongClick: () -> Unit= {},
+    onLongClick: () -> Unit = {},
     onDoubleClick: () -> Unit= {},
 
     onVideo: (Boolean) -> Unit = {},       //true - видео, false - картинка

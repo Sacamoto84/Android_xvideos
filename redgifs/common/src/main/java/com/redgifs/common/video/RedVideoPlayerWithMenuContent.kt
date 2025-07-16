@@ -45,10 +45,6 @@ fun RedVideoPlayerWithMenu(
     timeB: Float = 0f,
     enableAB: Boolean,
     onClick: () -> Unit = {},
-    menuContent: @Composable () -> Unit = {},
-    menuContentWidth: Dp = 192.dp,
-    menuDefaultOpen: Boolean = false,
-    menuOpenChanged: (Boolean) -> Unit = {},
     autoRotate: Boolean,
     isCurrentPage : Boolean
 ) {
@@ -112,11 +108,6 @@ fun RedVideoPlayerWithMenu(
         onClick = onClick,
         modifier = Modifier.fillMaxSize(),
         playerHost = playerHost,
-
-        menuContent = menuContent,
-        menuContentWidth = menuContentWidth,
-        menuDefaultOpen = menuDefaultOpen,
-        menuOpenChanged = menuOpenChanged,
         autoRotate = autoRotate
     )
 

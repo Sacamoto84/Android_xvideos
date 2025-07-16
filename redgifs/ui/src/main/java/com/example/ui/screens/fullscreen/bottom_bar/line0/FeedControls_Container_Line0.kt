@@ -193,25 +193,6 @@ fun FeedControls_Container_Line0(vm: ScreenRedFullScreenSM) {
             )
         }
 
-
-
-
-        Box(
-            modifier = Modifier
-                .height(48.dp)
-                .width(48.dp)
-                .border(1.dp, ThemeRed.colorBorderGray, RoundedCornerShape(8.dp))
-                .clickable(onClick = {
-                    //vm.downloadCurrentItem()
-                }), contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                Icons.Filled.FileDownload,
-                contentDescription = null,
-                tint = if (vm.enableAB == true) Color.Green else Color.LightGray
-            )
-        }
-
     }
 
 }

@@ -69,7 +69,6 @@ class ScreenRedFullScreen(val item: GifsInfo) : Screen {
 
         Scaffold(
 
-
             bottomBar = {
                 Column {
 
@@ -78,7 +77,7 @@ class ScreenRedFullScreen(val item: GifsInfo) : Screen {
                             .padding(bottom = 1.dp)
                             //.padding(horizontal = 16.dp)
                             .clip(RoundedCornerShape(0))
-                            .height(16.dp)
+                            .height(32.dp)
                             .fillMaxWidth()
                             //.alpha(al.value)
                             .background(ThemeRed.colorTabLevel0),
@@ -142,7 +141,6 @@ class ScreenRedFullScreen(val item: GifsInfo) : Screen {
                 timeB = vm.timeB,
                 enableAB = vm.enableAB,
                 onClick = { vm.play = !vm.play },
-                menuContent = {},
                 autoRotate = vm.autoRotate,
                 isCurrentPage = true
             )

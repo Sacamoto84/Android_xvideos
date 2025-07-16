@@ -39,16 +39,10 @@ fun VideoPlayerWithMenuContent(
     modifier: Modifier,
     playerHost: MediaPlayerHost,
     onClick: () -> Unit = {},
-
-    menuContent: @Composable () -> Unit = {},
-    menuContentWidth: Dp = 192.dp,
-    menuDefaultOpen: Boolean,
-    menuOpenChanged: (Boolean) -> Unit,
-
     autoRotate: Boolean
 ) {
 
-    if (BuildConfig.DEBUG) { SideEffect { Timber.i("@@@ VideoPlayerWithMenuContent() menuDefaultOpen:$menuDefaultOpen") } }
+    if (BuildConfig.DEBUG) { SideEffect { Timber.i("@@@ VideoPlayerWithMenuContent()") } }
 
     val zoomState = rememberZoomState(maxScale = 3f)
     LaunchedEffect(playerHost.videoFitMode) { zoomState.reset() }
@@ -74,9 +68,6 @@ fun VideoPlayerWithMenuContent(
         Box(modifier = modifier.zoomable(zoomState = zoomState, zoomEnabled = true, enableOneFingerZoom = false, onTap = { onClick.invoke() })) {
             StaticPlayer( playerHost, autoRotate )
         }
-
-        //--- Меню контент ---
-        MenuContent(menuContent = menuContent, menuContentWidth=menuContentWidth, menuDefaultOpen=menuDefaultOpen, menuOpenChanged=menuOpenChanged)
 
         //Нижняя сенсорная часть
         Box(modifier = Modifier.fillMaxHeight(1 / 3f).fillMaxWidth().align(Alignment.BottomCenter).then(volumeDragModifier).alpha(0.5f).background(Color.Transparent))
