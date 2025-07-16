@@ -33,6 +33,7 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import com.example.ui.screens.explorer.tab.FavoritesTab
 import com.example.ui.screens.explorer.tab.saved.tab.SavedCollectionTab
 import com.example.ui.screens.explorer.tab.saved.tab.SavedCreatorsTab
+import com.example.ui.screens.explorer.tab.saved.tab.SavedDownloadTab
 import com.example.ui.screens.explorer.tab.saved.tab.SavedLikesTab
 import com.example.ui.screens.explorer.tab.saved.tab.SavedNichesTab
 import com.example.ui.screens.explorer.top.TabRow
@@ -113,6 +114,7 @@ object SavedTab : Screen {
                 when (screenType) {
                     0 -> SavedLikesTab.Content()
                     1 -> SavedCreatorsTab.Content()
+                    3 -> SavedDownloadTab.Content()
                     2 -> SavedNichesTab.Content()
                     4 -> SavedCollectionTab.Content()
                     else -> FavoritesTab.Content()

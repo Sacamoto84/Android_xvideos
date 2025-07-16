@@ -35,6 +35,7 @@ import com.redgifs.common.ThemeRed
 import com.redgifs.common.downloader.DownloadRed
 import com.redgifs.common.downloader.ui.DownloadIndicator
 import com.redgifs.common.video.CanvasTimeDurationLine
+import com.redgifs.common.video.CanvasTimeDurationLine1
 import com.redgifs.common.video.PlayerControls
 import com.redgifs.common.video.RedVideoPlayerWithMenu
 import com.redgifs.model.GifsInfo
@@ -74,17 +75,17 @@ class ScreenRedFullScreen(val item: GifsInfo) : Screen {
 
                     Box(
                         Modifier
-                            .padding(bottom = 4.dp)
-                            .padding(horizontal = 16.dp)
+                            .padding(bottom = 1.dp)
+                            //.padding(horizontal = 16.dp)
                             .clip(RoundedCornerShape(0))
                             .height(16.dp)
                             .fillMaxWidth()
                             //.alpha(al.value)
-                            .background(ThemeRed.colorCommonBackground2),
+                            .background(ThemeRed.colorTabLevel0),
                         contentAlignment = Alignment.BottomCenter
                     ) {
 
-                        CanvasTimeDurationLine(
+                        CanvasTimeDurationLine1(
                             currentTime = vm.currentPlayerTime, duration = vm.currentPlayerDuration,
                             timeA = vm.timeA, timeB = vm.timeB,
                             timeABEnable = vm.enableAB, play = vm.play,
@@ -93,7 +94,7 @@ class ScreenRedFullScreen(val item: GifsInfo) : Screen {
                                     vm.currentPlayerControls!!.seekTo(it)
                                 }
                             },
-                            onSeekFinished = { }, modifier = Modifier.padding(end = 148.dp)
+                            onSeekFinished = { }, modifier = Modifier.padding(horizontal = 16.dp)
                         )
 
 //                        BasicText(
@@ -111,8 +112,7 @@ class ScreenRedFullScreen(val item: GifsInfo) : Screen {
                     }
 
                     //   }
-                    Column {
-
+                    Column(modifier = Modifier.background(ThemeRed.colorTabLevel1)) {
                         //Индикатор загрузки
                         DownloadIndicator(vm.downloadRed.downloader.percent.collectAsStateWithLifecycle().value)
                         FeedControls_Container_Line0(vm)

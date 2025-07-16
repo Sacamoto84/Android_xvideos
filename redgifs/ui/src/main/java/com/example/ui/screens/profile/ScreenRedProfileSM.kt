@@ -178,21 +178,21 @@ class ScreenRedProfileSM @AssistedInject constructor(
 
     //---- Downloader ----
     //Загрузить текущую отображаемую страницу
-    fun downloadCurrentItem() {
-        screenModelScope.launch {
-            val item = list.value[currentTikTokPage]
-            //val hiName = extractNameFromUrl(item.urls.hd.toString()) //https://media.redgifs.com/HealthyPettyRedhead.mp4 > HealthyPettyRedhead
-            Timber.i("!!! downloadItem() id:${item.id} userName:${item.userName} url:${item.urls.hd}")
-            hostDI.downloadRed.downloader.downloadRedName(item.id, item.userName, item.urls.hd.toString())
-            Timber.i("!!! downloadItem() ... завершено")
-        }
-    }
+//    fun downloadCurrentItem() {
+//        screenModelScope.launch {
+//            val item = list.value[currentTikTokPage]
+//            //val hiName = extractNameFromUrl(item.urls.hd.toString()) //https://media.redgifs.com/HealthyPettyRedhead.mp4 > HealthyPettyRedhead
+//            Timber.i("!!! downloadItem() id:${item.id} userName:${item.userName} url:${item.urls.hd}")
+//            hostDI.downloadRed.downloader.downloadRedName(item.id, item.userName, item.urls.hd.toString())
+//            Timber.i("!!! downloadItem() ... завершено")
+//        }
+//    }
 
-    fun scanCacheDowmload() {
-        screenModelScope.launch {
-            hostDI.downloadRed.downloader.scanRedCacheDownloadAndUpdate()
-        }
-    }
+//    fun scanCacheDowmload() {
+//        screenModelScope.launch {
+//            hostDI.downloadRed.downloader.scanRedCacheDownloadAndUpdate()
+//        }
+//    }
 
     // Методы
     //════════════════ Поделиться ═══════════════════════════════════════════════════════╗

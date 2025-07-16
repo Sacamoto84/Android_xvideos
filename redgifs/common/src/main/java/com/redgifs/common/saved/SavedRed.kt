@@ -22,6 +22,8 @@ class SavedRed @Inject constructor(
     val niches      = SavedRed_Niches(snackBarEvent)
     val collections = SavedRed_Collection(snackBarEvent)
 
+
+
     var tagsList = listOf<TagInfo>()
 
     @OptIn(DelicateCoroutinesApi::class)

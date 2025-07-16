@@ -36,6 +36,54 @@ fun Long.toPrettyCount(): String {
 }
 
 @SuppressLint("DefaultLocale")
+fun Long.toPrettyCount2(): String {
+    val absValue = abs(this)
+
+    return when {
+        absValue < 1_000 -> "$absValue"                             // 0-999
+
+        absValue < 1_000_000 -> {                                   // 1.0k-999.9k
+            val value = absValue / 1_000.0
+            String.format(Locale.US, "%.2fK", value)
+        }
+
+        absValue < 1_000_000_000 -> {                               // 1.0M-999.9M
+            val value = absValue / 1_000_000.0
+            String.format(Locale.US, "%.2fM", value)
+        }
+
+        else -> {                                                   // 1.0B+
+            val value = absValue / 1_000_000_000.0
+            String.format(Locale.US, "%.2fB", value)
+        }
+    }
+}
+
+@SuppressLint("DefaultLocale")
+fun Long.toPrettyCount3(): String {
+    val absValue = abs(this)
+
+    return when {
+        absValue < 1_000 -> "$absValue"                             // 0-999
+
+        absValue < 1_000_000 -> {                                   // 1.0k-999.9k
+            val value = absValue / 1_000.0
+            String.format(Locale.US, "%.3fK", value)
+        }
+
+        absValue < 1_000_000_000 -> {                               // 1.0M-999.9M
+            val value = absValue / 1_000_000.0
+            String.format(Locale.US, "%.3fM", value)
+        }
+
+        else -> {                                                   // 1.0B+
+            val value = absValue / 1_000_000_000.0
+            String.format(Locale.US, "%.3fB", value)
+        }
+    }
+}
+
+@SuppressLint("DefaultLocale")
 fun Long.toPrettyCountInt(): String {
     val absValue = abs(this)
 

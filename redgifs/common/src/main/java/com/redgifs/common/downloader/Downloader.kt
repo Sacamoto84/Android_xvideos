@@ -2,6 +2,8 @@ package com.redgifs.common.downloader
 
 import androidx.paging.PagingDataEvent
 import com.client.common.AppPath
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.redgifs.common.snackBar.SnackBarEvent
 import com.redgifs.common.snackBar.UiMessage
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -10,6 +12,7 @@ import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 import com.kdownloader.KDownloader
+import com.redgifs.model.GifsInfo
 
 
 //Текущее содержимое готового кеша
@@ -31,32 +34,38 @@ class Downloader @Inject constructor(
     val snackBarEvent: SnackBarEvent,
 ) {
 
-
-
     //Процент скачивания 0..1 - начало скачивания, -2 busy, -3 error
     var percent = MutableStateFlow(-2f)
 
     @OptIn(DelicateCoroutinesApi::class)
-    fun downloadRedName(id: String, name: String, url: String) {
+    fun downloadRedName(item: GifsInfo, onComplete: () -> Unit = {}) {
 
-        if ((url == "") || (name == "")) {
+        if ((item.urls.hd.toString() == "") || (item.userName == "")) {
             //Toast("Ошибка в названии файла или креатор")
             percent.value = -3f
             return
         }
 
+
+
+
         percent.value = -2f
 
+
         //Проверка того что в кеше есть запись с этим именем и кретором
-        val a = findVideoInDownload(id, name)
 
         //Записи нет можно скачивать
-        if (!a) {
+        if (!findVideoInDownload(item.id, item.userName)) {
 
-            val p = AppPath.cache_download_red + "/" + name
+            val p = AppPath.cache_download_red + "/" + item.userName
             File(p).mkdirs()
 
-            val request = kDownloader.newRequestBuilder(url, p, "$id.mp4").tag(id).build()
+            val requestImage = kDownloader.newRequestBuilder(item.urls.thumbnail, p, "${item.id}.jpg").build()
+            kDownloader.enqueue(
+                requestImage
+            )
+
+            val request = kDownloader.newRequestBuilder(item.urls.hd.toString(), p, "${item.id}.mp4").tag(item.id).build()
 
             kDownloader.enqueue(
                 request,
@@ -76,6 +85,12 @@ class Downloader @Inject constructor(
                     percent.value = -2f
                     //Toast("Скачивание завершено")
                     snackBarEvent.messages.trySend(UiMessage.Success("Скачивание завершено"))
+
+                    val gson = GsonBuilder().create()
+                    val text = gson.toJson(item)
+                    File(p, "${item.id}.info").writeText(text.toString())
+
+                    onComplete()
                     //DownloadRed.refreshDownloadList()
                 },
             )
@@ -83,77 +98,6 @@ class Downloader @Inject constructor(
             //Toast("Файл есть к кеше")
             snackBarEvent.messages.trySend(UiMessage.Info("Файл есть к кеше"))
         }
-
-    }
-
-
-    //Проверка сканирование файлов и обновление таблицы того что уже есть на диске
-    fun scanRedCacheDownloadAndUpdate() {
-
-        val mainPath = AppPath.cache_download_red //Путь до базовой папки для скачивания
-
-        val baseDir = File(mainPath)
-        if (!baseDir.exists() || !baseDir.isDirectory) {
-            println("!!! Ошибка: Базовый каталог $mainPath не существует или не является каталогом.")
-            return
-        }
-
-        // Получить список всех папок (креаторов), файлы не учитываем на этом уровне
-        val creatorDirs = baseDir.listFiles { file -> file.isDirectory }
-
-        if (creatorDirs == null) {
-            println("!!! Ошибка: Не удалось найти каталоги в $mainPath.")
-            return
-        }
-
-        val itemsToInsertInDb =
-            mutableListOf<ItemsRedDownload>() // Key: fileName (name), Value: Item
-
-        for (creatorDir in creatorDirs) {
-
-            val creatorName = creatorDir.name // Имя папки = имя креатора
-
-            val mp4Files = creatorDir.listFiles { file ->
-                file.isFile && file.name.endsWith(".mp4", ignoreCase = true)
-            }
-
-            mp4Files?.forEach { mp4File ->
-                val fileName = mp4File.name // Это будет @PrimaryKey
-                // При сканировании мы не знаем 'url', если он не хранится где-то еще.
-                // Если файл найден, он точно скачан.
-                // Если запись с таким 'name' уже есть в БД, её 'url' будет сохранен при REPLACE.
-                // Если записи нет, 'url' будет пустой строкой, пока не будет обновлен другим процессом.
-
-                itemsToInsertInDb.add(
-                    ItemsRedDownload(
-                        id = fileName,
-                        name = creatorName,
-                        url = "", // Заполняется при реальной закачке, здесь мы его не знаем
-                    )
-                )
-
-            }
-
-            //Полностью очистить таблицу
-            //db.redDownloadDao().clearTable()
-            println("!!! Таблица red_cache_download очищена")
-
-
-            if (itemsToInsertInDb.isNotEmpty()) {
-                itemsToInsertInDb.forEach { item ->
-
-
-                    //db.redDownloadDao().insert(item.value)
-
-
-                }
-                println("В таблицу red_cache_download добавлено ${itemsToInsertInDb.size} записей.")
-            } else {
-                println("На диске не найдено файлов для добавления в таблицу red_cache_download.")
-            }
-            println("!!! Перезаполнение таблицы данными с диска завершено.")
-        }
-
 
     }
 

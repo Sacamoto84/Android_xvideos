@@ -108,7 +108,7 @@ fun CanvasTimeDurationLinePreview() {
 
 
 @Composable
-fun CanvasTimeDurationLine(
+fun CanvasTimeDurationLine1(
     currentTime: Float,
     duration: Int,
     modifier: Modifier = Modifier,

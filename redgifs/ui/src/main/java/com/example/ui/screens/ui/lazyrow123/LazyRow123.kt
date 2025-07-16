@@ -39,6 +39,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -66,11 +67,6 @@ fun LazyRow123(
     //Для меню
     isRunLike: Boolean = false,
     onAppendLoaded: (LazyPagingItems<GifsInfo>) -> Unit = {},
-    filterTags: List<String> = emptyList()
-
-
-
-
 ) {
 
     val listGifs = host.pager.collectAsLazyPagingItems() as LazyPagingItems<GifsInfo>
@@ -90,6 +86,9 @@ fun LazyRow123(
     val isErrorInitial = listGifs.loadState.refresh is LoadState.Error
 
     val block = host.hostDI.block
+
+    val downloadList = host.hostDI.downloadRed.downloadList.collectAsState().value
+
 
 //    BackHandler {
 //        if (fullScreen)
@@ -337,7 +336,8 @@ fun LazyRow123(
 
                                 //✅ Иконка того что видео скачано
                                 if (
-                                    host.hostDI.downloadRed.downloadList.contains(item.id)
+                                    //downloadList.contains(item.id)
+                                    downloadList.any { it.id == item.id }
                                 ) {
                                     Icon(
                                         Icons.Default.Save,
