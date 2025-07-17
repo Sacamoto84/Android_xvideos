@@ -92,6 +92,9 @@ object GifsTab : Screen {
 
         //val block = vm.hostDI.block
 
+
+        //val searchTextSuggestions = vm.hostDI.search.searchTextSuggestions.collectAsStateWithLifecycle().value
+
         val state = rememberPullToRefreshState()
         var isRefreshing by remember { mutableStateOf(false) }
 
@@ -153,7 +156,6 @@ object GifsTab : Screen {
                         }
 
                     }
-
 
                     search.CustomBasicTextField(
                         value = search.searchText.collectAsStateWithLifecycle().value,
