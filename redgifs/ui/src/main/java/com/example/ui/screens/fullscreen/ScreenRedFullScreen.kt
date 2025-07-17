@@ -51,6 +51,7 @@ import com.client.common.R
 import com.client.common.connectivityObserver.ConnectivityObserver
 import com.client.common.urlVideImage.UrlImage
 import com.composeunstyled.DropdownPanelAnchor
+import com.example.ui.screens.explorer.ScreenRedExplorer
 import com.example.ui.screens.fullscreen.bottom_bar.FeedControls_Container_Line0
 import com.example.ui.screens.profile.ScreenRedProfile
 import com.redgifs.common.ThemeRed
@@ -60,6 +61,7 @@ import com.redgifs.common.di.HostDI
 import com.redgifs.common.downloader.DownloadRed
 import com.redgifs.common.downloader.ui.DownloadIndicator
 import com.redgifs.common.expand_menu_video.ExpandMenuVideo
+import com.redgifs.common.expand_menu_video.ExpandMenuVideoTags
 import com.redgifs.common.video.CanvasTimeDurationLine1
 import com.redgifs.common.video.PlayerControls
 import com.redgifs.common.video.RedVideoPlayerWithMenu
@@ -207,10 +209,21 @@ class ScreenRedFullScreen(val item: GifsInfo) : Screen {
                             Icon(
                                 Icons.Default.Person,
                                 contentDescription = null,
-                                tint = Color.White, modifier = Modifier.size(24.dp)
+                                tint = Color.White, modifier = Modifier.padding(end = 8.dp).clip(RoundedCornerShape(12.dp)).size(40.dp).background(Color.DarkGray).size(10.dp)
+                            )
+                        }
+                    }else
+                    {
+                        Box(modifier = Modifier.padding(end = 8.dp).clip(RoundedCornerShape(12.dp)).size(40.dp).background(Color.DarkGray), contentAlignment = Alignment.Center) {
+                            Icon(
+                                Icons.Default.Person,
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier.size(18.dp)
                             )
                         }
                     }
+
 
                     if (vm.hostDI.savedRed.collections.collectionList.any { it.list.any { it2 -> it2.id == item.id } }) {
                         Icon(
@@ -275,6 +288,17 @@ class ScreenRedFullScreen(val item: GifsInfo) : Screen {
                             tint = Color.White, modifier = Modifier.size(22.dp)
                         )
                     }
+
+                    ExpandMenuVideoTags(
+                        item = item,
+                        modifier = Modifier,
+                        onClick = {
+                            vm.hostDI.search.searchText.value = it
+                            vm.hostDI.search.searchTextDone.value = it
+                            ScreenRedExplorer.screenType = 0
+                            navigator.pop()
+                        },
+                    )
 
                     //Меню на 3 точки
                     ExpandMenuVideo(

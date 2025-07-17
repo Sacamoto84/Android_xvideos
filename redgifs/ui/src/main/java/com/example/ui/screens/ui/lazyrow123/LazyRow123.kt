@@ -282,6 +282,7 @@ fun LazyRow123(
                                         host.hostDI.search.searchText.value = it
                                         host.hostDI.search.searchTextDone.value = it
                                         ScreenRedExplorer.screenType = 0
+                                        navigator.popAll()
                                     }
                                 )
                             }

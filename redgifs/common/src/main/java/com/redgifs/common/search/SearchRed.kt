@@ -69,6 +69,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -82,6 +83,8 @@ class SearchRed @Inject constructor(
     var searchText = MutableStateFlow("")
 
     var searchTextDone = MutableStateFlow("")
+
+    val focused = MutableStateFlow(false)
 
     @Composable
     fun CustomBasicTextField(
@@ -98,6 +101,11 @@ class SearchRed @Inject constructor(
         val focusManager = LocalFocusManager.current
 
         var isFocused by remember { mutableStateOf(false) }
+
+        LaunchedEffect(isFocused) {
+            focused.value = isFocused
+            Timber.i("!!! >>> isFocused: $isFocused")
+        }
 
         // Отслеживаем высоту клавиатуры
         val imeVisible = WindowInsets.ime.getBottom(LocalDensity.current) > 0
@@ -189,7 +197,6 @@ class SearchRed @Inject constructor(
 
                 ExpandMenuHistory(history1)
 
-
             }
         }
     }
@@ -209,7 +216,7 @@ class SearchRed @Inject constructor(
             modifier = Modifier.then(modifier)
         )
         {
-            Box(modifier = Modifier.width(36.dp), contentAlignment = Alignment.Center) {
+            Box(modifier = Modifier, contentAlignment = Alignment.Center) {
                 Icon(
                     if (expanded) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
                     contentDescription = "",
@@ -288,7 +295,9 @@ class SearchRed @Inject constructor(
         {
             IconButton(
                 modifier = Modifier
-                    .size(46.dp)
+                    .padding(end = 4.dp)
+                    .height(46.dp)
+                    .width(24.dp)
                     .menuAnchor(ExposedDropdownMenuAnchorType.SecondaryEditable),
                 onClick = {}) {
                 Icon(
@@ -341,7 +350,6 @@ class SearchRed @Inject constructor(
             }
         }
     }
-
 
     //Dao
     @OptIn(DelicateCoroutinesApi::class)

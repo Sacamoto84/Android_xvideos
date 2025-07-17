@@ -17,6 +17,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -44,7 +45,7 @@ fun TabRow(
 
     val haptic = LocalHapticFeedback.current
 
-    var state by rememberSaveable(value){ mutableIntStateOf(value) }
+    var state by remember(value){ mutableIntStateOf(value) }
 
     SecondaryTabRow(
         modifier = Modifier.height(48.dp),

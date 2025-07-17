@@ -1,5 +1,6 @@
 package com.example.ui.screens.explorer.tab.gifs
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -112,6 +113,8 @@ object GifsTab : Screen {
             vm.lazyHost.columns = column.intValue
         }
 
+        val isFocused = vm.hostDI.search.focused.collectAsStateWithLifecycle().value
+
         Scaffold(bottomBar = {
 
             Column(Modifier.background(ThemeRed.colorTabLevel1)) {
@@ -121,28 +124,36 @@ object GifsTab : Screen {
                         .padding(top = 1.dp, start = 1.dp)
                         .background(ThemeRed.colorTabLevel1), verticalAlignment = Alignment.Bottom
                 ) {
-                    //
-                    if (searchR == "") {
-                        SortByOrder(
-                            containerColor = ThemeRed.colorCommonBackground,
-                            list = listOf(
-                                Order.TOP_WEEK,
-                                Order.TOP_MONTH,
-                                Order.TOP_ALLTIME,
-                                Order.TRENDING,
-                                Order.LATEST
-                            ),
-                            selected = vm.lazyHost.sortType.collectAsStateWithLifecycle().value,
-                            onSelect = { vm.lazyHost.changeSortType(it) }
 
-                        )
-                    } else {
-                        SortByOrder(
-                            containerColor = ThemeRed.colorCommonBackground,
-                            list = listOf(Order.TOP, Order.TRENDING, Order.LATEST),
-                            selected = vm.lazyHost.sortType.collectAsStateWithLifecycle().value,
-                            onSelect = { vm.lazyHost.changeSortType(it) })
+                    AnimatedVisibility(visible = !isFocused) {
+
+                        //
+                        if (searchR == "") {
+                            SortByOrder(
+                                containerColor = ThemeRed.colorCommonBackground,
+                                list = listOf(
+                                    Order.TOP_WEEK,
+                                    Order.TOP_MONTH,
+                                    Order.TOP_ALLTIME,
+                                    Order.TRENDING,
+                                    Order.LATEST
+                                ),
+                                selected = vm.lazyHost.sortType.collectAsStateWithLifecycle().value,
+                                onSelect = { vm.lazyHost.changeSortType(it) }
+
+                            )
+                        } else {
+
+
+                            SortByOrder(
+                                containerColor = ThemeRed.colorCommonBackground,
+                                list = listOf(Order.TOP, Order.TRENDING, Order.LATEST),
+                                selected = vm.lazyHost.sortType.collectAsStateWithLifecycle().value,
+                                onSelect = { vm.lazyHost.changeSortType(it) })
+                        }
+
                     }
+
 
                     search.CustomBasicTextField(
                         value = search.searchText.collectAsStateWithLifecycle().value,
@@ -155,10 +166,17 @@ object GifsTab : Screen {
 
                     Spacer(modifier = Modifier.width(4.dp))
 
-                    ButtonUp {
-                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                        vm.lazyHost.gotoUp()
+
+                    AnimatedVisibility(visible = !isFocused) {
+                        ButtonUp {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            vm.lazyHost.gotoUp()
+                        }
                     }
+
+
+
+
 
                 }
                 Spacer(modifier = Modifier.height(1.dp))
