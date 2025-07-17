@@ -29,12 +29,11 @@ import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import com.client.common.AppPath
 import com.client.common.connectivityObserver.ConnectivityObserver
-import com.composables.core.HorizontalSeparator
-import com.example.ui.screens.fullscreen.bottom_bar.line0.FeedControls_Container_Line0
+import com.composeunstyled.DropdownPanelAnchor
+import com.example.ui.screens.fullscreen.bottom_bar.FeedControls_Container_Line0
 import com.redgifs.common.ThemeRed
 import com.redgifs.common.downloader.DownloadRed
 import com.redgifs.common.downloader.ui.DownloadIndicator
-import com.redgifs.common.video.CanvasTimeDurationLine
 import com.redgifs.common.video.CanvasTimeDurationLine1
 import com.redgifs.common.video.PlayerControls
 import com.redgifs.common.video.RedVideoPlayerWithMenu
@@ -111,12 +110,13 @@ class ScreenRedFullScreen(val item: GifsInfo) : Screen {
                     }
 
                     //   }
-                    Column(modifier = Modifier.background(ThemeRed.colorTabLevel1)) {
-                        //Индикатор загрузки
-                        DownloadIndicator(vm.downloadRed.downloader.percent.collectAsStateWithLifecycle().value)
+                    Box(modifier = Modifier.background(ThemeRed.colorTabLevel1)) {
                         FeedControls_Container_Line0(vm)
-                        HorizontalSeparator(Color.Transparent, thickness = 4.dp)
-                        //FeedControls_Container_Line1(vm)
+                        //HorizontalSeparator(Color.Transparent, thickness = 4.dp)
+
+                        Box(modifier = Modifier.align(Alignment.BottomCenter)) {
+                            DownloadIndicator(vm.downloadRed.downloader.percent.collectAsStateWithLifecycle().value)
+                        }
                     }
                 }
 

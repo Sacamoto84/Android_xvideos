@@ -36,6 +36,7 @@ import com.client.xvideos.screens.videoplayer.ScreenVideoPlayerSM
 import com.client.xvideos.screens.videoplayer.video.controller.VideoPlayerControllerConfig
 import com.client.xvideos.screens.videoplayer.video.controller.applyToExoPlayerView
 import com.client.xvideos.screens.videoplayer.video.util.findActivity
+import timber.log.Timber
 
 /**
  * ExoPlayer does not support full screen views by default.
@@ -75,6 +76,9 @@ internal fun VideoPlayerFullScreenDialog(
     }
 
     BackHandler(enabled = true) {
+
+        Timber.i("iii BackHandler VideoPlayerFullScreenDialog")
+
         internalFullScreenPlayerView.findViewById<ImageButton>(R.id.exo_fullscreen)
             .performClick()
     }

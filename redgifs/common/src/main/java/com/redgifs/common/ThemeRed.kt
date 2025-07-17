@@ -29,6 +29,8 @@ object ThemeRed {
 
     val colorYellow= Color(0xFFECF95C)
 
+    val colorBlue= Color(0xFF61B2EB)
+
     val colorRed = Color(0xFFEA616F)
 
     val colorTextGray = Color(0xFF8B8B8B)

@@ -74,6 +74,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
 import kotlinx.coroutines.DelicateCoroutinesApi
+import timber.log.Timber
 import javax.inject.Inject
 
 object SavedCollectionTab : Screen {
@@ -94,7 +95,6 @@ object SavedCollectionTab : Screen {
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
     override fun Content() {
-        val navigator = LocalNavigator.currentOrThrow
 
         val vm = getScreenModel<ScreenSavedCollectionSM>()
 
@@ -102,7 +102,10 @@ object SavedCollectionTab : Screen {
 
         val savedRed = vm.hostDI.savedRed
 
-        BackHandler { savedRed.collections.selectedCollection = null }
+        BackHandler {
+            Timber.i("iii BackHandler SavedCollectionTab")
+            savedRed.collections.selectedCollection = null
+        }
 
         val list: SnapshotStateList<GifsInfo> = emptyList<GifsInfo>().toMutableStateList()
 

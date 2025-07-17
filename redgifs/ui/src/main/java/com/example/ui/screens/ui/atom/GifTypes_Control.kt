@@ -1,4 +1,4 @@
-package com.example.ui.screens.fullscreen.bottom_bar.line1
+package com.example.ui.screens.ui.atom
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

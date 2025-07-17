@@ -45,7 +45,7 @@ object SavedTab : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
 
-    var screenType by  mutableIntStateOf(0)
+    var screenType by mutableIntStateOf(0)
 
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
@@ -72,7 +72,8 @@ object SavedTab : Screen {
                         containerColor = ThemeRed.colorTabLevel1,
 
                         //containerColor = ThemeRed.colorBottomBarBackground,
-                        titlesIcon = l, onChangeState = {
+                        titlesIcon = l,
+                        onChangeState = {
                             if (it == screenType) {
                                 when (it) {
                                     0 -> SavedLikesTab.addColumn()
@@ -83,29 +84,43 @@ object SavedTab : Screen {
                         },
                         overlay0 = {
                             Box(
-                                modifier = Modifier.size(24.dp), contentAlignment = Alignment.CenterStart
+                                modifier = Modifier.size(24.dp),
+                                contentAlignment = Alignment.CenterStart
                             ) {
                                 Row {
                                     repeat(SavedLikesTab.column.intValue) {
-                                        Box(modifier = Modifier.padding(end = 2.dp).clip(CircleShape).size(4.dp).background(Color.White))
+                                        Box(
+                                            modifier = Modifier
+                                                .padding(end = 2.dp)
+                                                .clip(CircleShape)
+                                                .size(4.dp)
+                                                .background(if (screenType == 0) Color.White else Color.Gray)
+                                        )
                                     }
                                 }
                             }
                         },
                         overlay4 = {
                             Box(
-                                modifier = Modifier.size(24.dp), contentAlignment = Alignment.CenterStart
+                                modifier = Modifier.size(24.dp),
+                                contentAlignment = Alignment.CenterStart
                             ) {
                                 Row {
                                     repeat(SavedCollectionTab.column.intValue) {
-                                        Box(modifier = Modifier.padding(end = 2.dp).clip(CircleShape).size(4.dp).background(Color.White))
+                                        Box(
+                                            modifier = Modifier
+                                                .padding(end = 2.dp)
+                                                .clip(CircleShape)
+                                                .size(4.dp)
+                                                .background(if (screenType == 4) Color.White else Color.Gray)
+                                        )
                                     }
                                 }
                             }
                         },
 
 
-                    )
+                        )
                 }
             },
 

@@ -60,6 +60,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 val LocalRootScreenModel = staticCompositionLocalOf<ScreenRedRootSM> {
@@ -116,7 +117,9 @@ class ScreenRedRoot() : Screen {
             }
         }
 
-        BackHandler { }
+        BackHandler {
+            Timber.i("iii BackHandler Root")
+        }
 
         if (savedRed.collections.collectionVisibleDialog) {
             DialogCollection(
