@@ -18,6 +18,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.VolumeOff
+import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -144,11 +145,12 @@ fun FeedControls_Container_Line0(vm: ScreenRedFullScreenSM) {
         Box(
             modifier = Modifier
                 .height(46.dp) .width(46.dp)
-                //.border(1.dp, ThemeRed.colorBorderGray, RoundedCornerShape(8.dp))
                 .clickable(onClick = {
-                    //vm.downloadCurrentItem()
+                    vm.mute = vm.mute.not()
                 }), contentAlignment = Alignment.Center
-        ) { Icon(Icons.Filled.VolumeOff, contentDescription = null, tint = if (vm.enableAB) Color.Green else Color.LightGray) }
+        ) {
+            val icon = if (vm.mute) Icons.Filled.VolumeOff else Icons.Filled.VolumeUp
+            Icon(icon, contentDescription = null, tint = if (vm.mute) Color.Gray else Color.White) }
 
     }
 

@@ -33,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.client.common.util.toMinSec
 import com.client.common.util.toTwoDecimalPlacesWithColon
+import com.client.common.videoplayer.extension.formatMinSec
 import com.redgifs.common.ThemeRed
 import kotlinx.coroutines.coroutineScope
 import kotlin.coroutines.cancellation.CancellationException
@@ -136,7 +137,8 @@ fun CanvasTimeDurationLine1(
     play: Boolean = false,
     onSeek: (Float) -> Unit,              // 🔹 при перетаскивании
     onSeekFinished: (() -> Unit)? = null, // 🔹 когда отпустили
-    isVisibleTime : Boolean = true
+    isVisibleTime : Boolean = true,
+    isVisibleStep : Boolean = true
 ) {
 
     var isDragging by remember { mutableStateOf(false) }
@@ -199,9 +201,23 @@ fun CanvasTimeDurationLine1(
             val canvasWidth = size.width
             val canvasHeight = size.height
 
+            if ((duration > 0)&&(isVisibleStep)) {
+                val step = duration
+                val stepW = canvasWidth / duration
+                for (i in 0..step) {
+                    drawLine(
+                        color = Color.Gray,
+                        start = Offset(x = i * stepW, y = canvasHeight / 2 - 0.dp.toPx()),
+                        end = Offset(x = i * stepW, y = canvasHeight / 2 + 4.dp.toPx()),
+                        strokeWidth = 2.dp.toPx(),
+                        cap = StrokeCap.Round
+                    )
+                }
+            }
+
             // Фон
             drawLine(
-                color = Color(0x80909090),
+                color = Color(0xff909090),
                 start = Offset(x = 0f, y = canvasHeight / 2),
                 end = Offset(x = canvasWidth, y = canvasHeight / 2),
                 strokeWidth = 2.dp.toPx(),
@@ -209,7 +225,9 @@ fun CanvasTimeDurationLine1(
             )
 
             if (duration > 0) {
+
                 val progressRatio = currentTime / duration
+
                 val progressRatioA = canvasWidth * (timeA / duration).coerceIn(0f, 1f)
                 val progressRatioB = canvasWidth * (timeB / duration).coerceIn(0f, 1f)
                 val progressWidth = canvasWidth * progressRatio.coerceIn(0f, 1f)
@@ -231,16 +249,6 @@ fun CanvasTimeDurationLine1(
                     radius = 3.dp.toPx()
                 )
 
-                //Индикатор
-//                drawLine(
-//                    color = Color(0xFFE73538), // Цвет активного прогресса
-//                    start = Offset(x = progressWidth, y = 2.dp.toPx()),
-//                    end = Offset(x = progressWidth, y = canvasHeight - 2.dp.toPx()),
-//                    strokeWidth = 4.dp.toPx(),
-//                    cap = StrokeCap.Round // Закругленные концы
-//                )
-
-
                 // Отрезок A-B
                 if (visibleAB) {
                     drawLine(
@@ -254,6 +262,8 @@ fun CanvasTimeDurationLine1(
 
             }
         }
+
+
 
         if (isVisibleTime) {
             Text(

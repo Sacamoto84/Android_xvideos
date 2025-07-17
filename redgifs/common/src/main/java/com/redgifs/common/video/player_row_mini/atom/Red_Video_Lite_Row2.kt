@@ -99,7 +99,8 @@ fun Red_Video_Lite_Row2(
                     time, duration, timeA = 0f, timeB = 0f,
                     timeABEnable = false, visibleAB = false,
                     play = play, onSeek = { playerHost.seekTo(it) },
-                    onSeekFinished = {}, modifier = Modifier.padding(start = 0.dp, end = 0.dp)
+                    onSeekFinished = {}, modifier = Modifier.padding(start = 0.dp, end = 0.dp),
+                    isVisibleTime = false, isVisibleStep = false
                 )
             }
             Box(modifier = Modifier.size(48.dp)) {
