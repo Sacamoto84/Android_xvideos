@@ -51,12 +51,16 @@ class ScreenRedExplorer() : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
 
+    companion object {
+        var screenType by mutableIntStateOf(0)
+    }
+
     @OptIn(ExperimentalMaterial3Api::class)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
     override fun Content() {
 
-        var screenType by rememberSaveable{ mutableIntStateOf(0)}
+        //var screenType by rememberSaveable{ mutableIntStateOf(0)}
 
         val l = listOf(
             Icons.Outlined.Movie,
@@ -66,10 +70,13 @@ class ScreenRedExplorer() : Screen {
             Icons.Outlined.Settings
         )
         Scaffold(bottomBar = {
+
             TabRow(
                 containerColor = ThemeRed.colorTabLevel0,
                 titlesIcon = l,
+                value = screenType,
                 onChangeState = { screenType = it })
+
         }, containerColor = ThemeRed.colorCommonBackground2) { paddingValues ->
             Box(modifier = Modifier.padding(bottom = paddingValues.calculateBottomPadding())) {
                 when (screenType) {

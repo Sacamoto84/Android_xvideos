@@ -53,6 +53,7 @@ import com.redgifs.common.block.ui.DialogBlock
 import com.redgifs.common.expand_menu_video.ExpandMenuVideo
 import com.redgifs.common.UsersRed
 import com.composeunstyled.Text
+import com.example.ui.screens.explorer.ScreenRedExplorer
 import com.example.ui.screens.fullscreen.ScreenRedFullScreen
 import com.example.ui.screens.top_this_week.ProfileInfo1
 import com.redgifs.common.expand_menu_video.ExpandMenuVideoTags
@@ -280,6 +281,7 @@ fun LazyRow123(
                                     onClick = {
                                         host.hostDI.search.searchText.value = it
                                         host.hostDI.search.searchTextDone.value = it
+                                        ScreenRedExplorer.screenType = 0
                                     }
                                 )
                             }

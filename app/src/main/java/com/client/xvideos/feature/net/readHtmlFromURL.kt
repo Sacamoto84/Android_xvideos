@@ -67,14 +67,10 @@ suspend fun readHtmlFromURL(url: String = "https://www.xvideos.com"): String =
                     }
                 }
             }
-
             webView.loadUrl(url)
-
             continuation.invokeOnCancellation { cause ->
                 webView.destroy()
             }
-
-
         }
     }
 

@@ -45,11 +45,11 @@ object SavedTab : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
 
+    var screenType by  mutableIntStateOf(0)
+
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
     override fun Content() {
-
-        var screenType by rememberSaveable { mutableIntStateOf(0) }
 
         val l = listOf(
             Icons.Outlined.FavoriteBorder,
@@ -66,6 +66,9 @@ object SavedTab : Screen {
                 Column {
                     HorizontalDivider()
                     TabRow(
+
+                        value = screenType,
+
                         containerColor = ThemeRed.colorTabLevel1,
 
                         //containerColor = ThemeRed.colorBottomBarBackground,

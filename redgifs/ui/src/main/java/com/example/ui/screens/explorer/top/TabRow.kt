@@ -32,6 +32,7 @@ import com.redgifs.common.ThemeRed
 @Composable
 fun TabRow(
     titlesIcon: List<ImageVector>, onChangeState: (Int) -> Unit,
+    value: Int,
     containerColor: Color = ThemeRed.colorCommonBackground2,
     overlay0: @Composable () -> Unit = {},
     overlay1: @Composable () -> Unit = {},
@@ -43,7 +44,8 @@ fun TabRow(
 
     val haptic = LocalHapticFeedback.current
 
-    var state by rememberSaveable { mutableIntStateOf(0) }
+    var state by rememberSaveable(value){ mutableIntStateOf(value) }
+
     SecondaryTabRow(
         modifier = Modifier.height(48.dp),
         selectedTabIndex = state,
@@ -101,6 +103,6 @@ fun TabRowPreview() {
         Icons.Outlined.Group,
         Icons.Outlined.BookmarkBorder
     )
-    TabRow(l, onChangeState = {})
+    //TabRow(l, onChangeState = {})
 }
 
