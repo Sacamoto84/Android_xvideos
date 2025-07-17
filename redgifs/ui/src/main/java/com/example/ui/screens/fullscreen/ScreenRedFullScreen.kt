@@ -92,7 +92,7 @@ class ScreenRedFullScreen(val item: GifsInfo) : Screen {
                                     vm.currentPlayerControls!!.seekTo(it)
                                 }
                             },
-                            onSeekFinished = { }, modifier = Modifier.padding(horizontal = 16.dp)
+                            onSeekFinished = { }, modifier = Modifier.padding(horizontal = 0.dp)
                         )
 
 //                        BasicText(

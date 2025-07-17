@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
@@ -134,7 +135,8 @@ fun CanvasTimeDurationLine1(
     visibleAB : Boolean = true,
     play: Boolean = false,
     onSeek: (Float) -> Unit,              // 🔹 при перетаскивании
-    onSeekFinished: (() -> Unit)? = null  // 🔹 когда отпустили
+    onSeekFinished: (() -> Unit)? = null, // 🔹 когда отпустили
+    isVisibleTime : Boolean = true
 ) {
 
     var isDragging by remember { mutableStateOf(false) }
@@ -182,12 +184,18 @@ fun CanvasTimeDurationLine1(
         verticalAlignment = Alignment.CenterVertically
     ) {
 
-        Text(currentTime.toDouble().toMinSec(), color = Color.White, fontSize= 12.sp, fontFamily = ThemeRed.fontFamilyPopinsRegular, modifier = Modifier.width(48.dp).background(Color.Green))
+        if (isVisibleTime) {
+            Text(
+                " "+currentTime.toDouble().toMinSec(),
+                color = Color.White,
+                fontSize = 12.sp,
+                fontFamily = ThemeRed.fontFamilyPopinsRegular,
+                modifier = Modifier.width(48.dp)//.background(Color.Green)
+            )
+        }
 
-
-        Canvas(
-            modifier = Modifier.then(modifier).fillMaxSize().weight(1f)
-        ) {
+        Canvas( modifier = Modifier.then(modifier).fillMaxSize().weight(1f) )
+        {
             val canvasWidth = size.width
             val canvasHeight = size.height
 
@@ -247,8 +255,16 @@ fun CanvasTimeDurationLine1(
             }
         }
 
-        Text(duration.toDouble().toMinSec(), color = Color.White,fontSize= 18.sp, modifier = Modifier.width(48.dp).background(Color.Green))
-
+        if (isVisibleTime) {
+            Text(
+                duration.toDouble().toMinSec()+" ",
+                color = Color.White,
+                fontSize = 12.sp,
+                textAlign = TextAlign.End,
+                fontFamily = ThemeRed.fontFamilyPopinsRegular,
+                modifier = Modifier.width(44.dp)//.background(Color.Green)
+            )
+        }
     }
 }
 
