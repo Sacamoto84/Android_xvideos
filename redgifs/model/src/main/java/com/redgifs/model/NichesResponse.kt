@@ -6,9 +6,9 @@ import com.google.gson.annotations.SerializedName
 
 data class NichesResponse(
     @SerializedName("niches") val niches: List<Niche>,
-    @SerializedName("page") val page: Long,
-    @SerializedName("pages") val pages: Long,
-    @SerializedName("total") val total: Long
+    @SerializedName("page") val page: Int,
+    @SerializedName("pages") val pages: Int,
+    @SerializedName("total") val total: Int
 )
 
 /**

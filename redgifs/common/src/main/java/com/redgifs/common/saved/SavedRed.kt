@@ -1,8 +1,10 @@
 package com.redgifs.common.saved
 
+import com.client.common.di.ApplicationScope
 import com.redgifs.common.snackBar.SnackBarEvent
 import com.redgifs.model.tag.TagInfo
 import com.redgifs.network.api.RedApi
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -13,7 +15,8 @@ import javax.inject.Singleton
 @Singleton
 class SavedRed @Inject constructor(
     val redApi: RedApi,
-    snackBarEvent : SnackBarEvent
+    snackBarEvent : SnackBarEvent,
+    @ApplicationScope val scope : CoroutineScope
 ) {
 
     /////////////////////////////////////////////////////////////////////////////////////////////
@@ -21,8 +24,7 @@ class SavedRed @Inject constructor(
     val creators    = SavedRed_Creator(snackBarEvent)
     val niches      = SavedRed_Niches(snackBarEvent)
     val collections = SavedRed_Collection(snackBarEvent)
-
-
+    val nichesCache = SavedRed_NichesCaches(scope, redApi, snackBarEvent)
 
     var tagsList = listOf<TagInfo>()
 

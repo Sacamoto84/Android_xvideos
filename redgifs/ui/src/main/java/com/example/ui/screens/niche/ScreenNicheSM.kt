@@ -37,7 +37,7 @@ class ScreenNicheSM @AssistedInject constructor(
     }
 
     var niche: NichesInfo by mutableStateOf(NichesInfo())
-    var related by mutableStateOf(NichesResponse(emptyList()))
+    var related by mutableStateOf(NichesResponse(emptyList(), 0,0,0))
     var topCreator by mutableStateOf(TopCreatorsResponse(emptyList()))
 
     val lazyHost =

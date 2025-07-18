@@ -123,23 +123,23 @@ private fun ButtonFollow(savedRed: SavedRed, niche: NichesInfo) {
     }
 }
 
-@Preview
-@Composable
-fun ButtonFollowPreview() {
-    val cacheMediaResponseDao: CacheMediaResponseDao? = null
-    val redApi = RedApi(dao = cacheMediaResponseDao!!)
-    val snackBarEvent = SnackBarEvent()
-    val savedRed = SavedRed(redApi = redApi, snackBarEvent = snackBarEvent)
-    val niche = NichesInfo(
-        cover = "cover",
-        description = "description",
-        gifs = 0,
-        id = "id",
-        name = "name",
-        owner = "owner",
-        subscribers = 0,
-        thumbnail = "thumbnail",
-        rules = "rules"
-    )
-    ButtonFollow(savedRed, niche)
-}
+//@Preview
+//@Composable
+//fun ButtonFollowPreview() {
+//    val cacheMediaResponseDao: CacheMediaResponseDao? = null
+//    val redApi = RedApi(dao = cacheMediaResponseDao!!)
+//    val snackBarEvent = SnackBarEvent()
+//    val savedRed = SavedRed(redApi = redApi, snackBarEvent = snackBarEvent)
+//    val niche = NichesInfo(
+//        cover = "cover",
+//        description = "description",
+//        gifs = 0,
+//        id = "id",
+//        name = "name",
+//        owner = "owner",
+//        subscribers = 0,
+//        thumbnail = "thumbnail",
+//        rules = "rules"
+//    )
+//    ButtonFollow(savedRed, niche)
+//}

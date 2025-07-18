@@ -14,12 +14,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -28,6 +33,7 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toString
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -50,6 +56,7 @@ import com.client.common.AppPath
 import com.client.common.getFolderSize
 import com.client.common.util.toPrettyCount3
 import com.composables.core.HorizontalSeparator
+import com.composeunstyled.ProgressIndicator
 import com.redgifs.common.ThemeRed
 import com.redgifs.common.di.HostDI
 import dagger.Binds
@@ -101,7 +108,7 @@ object SettingTab : Screen {
             ConfigText("Размер папки Download:", vm.sizeRedDownload.toPrettyCount3())
             HorizontalDivider(color = Color.DarkGray)
 
-            ConfigTextAndButton(
+            ConfigTextAndButtonWithDialog(
                 text = "Очистить папку Download",
                 value = "Очистить",
                 textDialogTitle = "Очистка папки Download",
@@ -114,6 +121,53 @@ object SettingTab : Screen {
                     vm.sizeRedDownload = getFolderSize(File(AppPath.cache_download_red))
                 }
             }
+            HorizontalDivider(color = Color.DarkGray)
+
+            Row(
+                modifier = Modifier
+                    .padding(start = 8.dp, end = 2.dp)
+                    .padding(vertical = 2.dp)
+                    .height(48.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("Kеш Niches", style = styleTest)
+
+                if (vm.hostDI.savedRed.nichesCache.isDownloading) {
+                    CircularProgressIndicator(color = ThemeRed.colorBlue, modifier = Modifier.size(40.dp))
+                }
+
+                Box(
+                    modifier = Modifier
+                        .height(48.dp)
+                        .width(100.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .border(1.dp, ThemeRed.colorTabLevel3, RoundedCornerShape(8.dp))
+                        .background(ThemeRed.colorBottomBarDivider)
+                        .clickable(onClick = { vm.hostDI.savedRed.nichesCache.refresh()}), contentAlignment = Alignment.Center
+                ) {
+                    Text("Обновить", style = styleTest.copy(fontSize = 18.sp))
+                }
+
+            }
+
+            if (vm.hostDI.savedRed.nichesCache.isDownloading) {
+                LinearProgressIndicator(
+                    progress = { vm.hostDI.savedRed.nichesCache.progress },
+                    modifier = Modifier.padding(horizontal = 4.dp).fillMaxWidth(),
+                    color = ProgressIndicatorDefaults.linearColor,
+                    trackColor = ProgressIndicatorDefaults.linearTrackColor,
+                    strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
+                )
+            }
+            else
+                Spacer(modifier = Modifier.height(4.dp))
+
+            ConfigText("Размер", "${vm.hostDI.savedRed.nichesCache.size}")
+            val minutes = vm.hostDI.savedRed.nichesCache.lastModifiedMinute
+            val hour = vm.hostDI.savedRed.nichesCache.lastModifiedHour
+            ConfigText("Возраст", "${hour}h:${minutes}m")
 
             HorizontalDivider(color = Color.DarkGray)
         }
@@ -143,7 +197,7 @@ private fun ConfigText(text: String, value: String) {
 }
 
 @Composable
-private fun ConfigTextAndButton(
+private fun ConfigTextAndButtonWithDialog(
     text: String,
     value: String,
     textDialogTitle: String,
@@ -249,7 +303,7 @@ fun DialogButton(
 
                         Spacer(Modifier.width(8.dp))
 
-                        androidx.compose.material3.Button(
+                        Button(
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2196F3)),
                             onClick = {
                                 onBlockConfirmed()
