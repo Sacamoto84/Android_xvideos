@@ -1,6 +1,11 @@
 package com.redgifs.common.search
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -80,6 +85,7 @@ import com.redgifs.network.api.RedApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -113,10 +119,10 @@ class SearchRed @Inject constructor(
 
     val stack = ArrayDeque<String>()
 
-    init{
+    init {
         scope.launch {
             searchText.collect {
-                if (it != ""){
+                if (it != "") {
                     val a = redApi.getTagSuggestions(it)
                     searchTextSuggestions.value = a
                 }
@@ -156,170 +162,220 @@ class SearchRed @Inject constructor(
             focused.value = imeVisible
         }
 
-            Column (
-                modifier = modifier.fillMaxWidth()
-                    .background(ThemeRed.colorCommonBackground2, RoundedCornerShape(8.dp))
-                    .border(
-                        width = if (isFocused) 2.dp else 1.dp,
-                        color = if (isFocused) ThemeRed.colorBorderSelect else ThemeRed.colorBorderGray,
-                        shape = RoundedCornerShape(8.dp)
-                    )
-                    .padding(start = 0.dp, end = 0.dp),
-            ) {
+
+        var delayFocus by remember { mutableStateOf(false) }
+
+        LaunchedEffect(isFocused) {
+            if (isFocused) {
+                delay(500)
+            } else {
+                delay(0)
+            }
+            delayFocus = isFocused
+        }
+
+        Column(
+            modifier = modifier.padding(top =  if (isFocused) 4.dp else 0.dp)
+                .fillMaxWidth()
+                .background(ThemeRed.colorCommonBackground2, RoundedCornerShape(8.dp))
+                .border(
+                    width = if (isFocused) 2.dp else 1.dp,
+                    color = if (isFocused) ThemeRed.colorBorderSelect else ThemeRed.colorBorderGray,
+                    shape = RoundedCornerShape(8.dp)
+                ),
+        ) {
 
 
-                AnimatedVisibility(isFocused) {
-
-                    Box(Modifier.fillMaxWidth().height(126.dp)) {
-                        Column {
-                            LazyColumn(Modifier.fillMaxSize().weight(1f)) {
-                                items(searchTagSuggestion) {
-
-                                    val query = searchTextValue
-                                    val text = it.text
-                                    val startIndex = text.indexOf(query, ignoreCase = true)
-                                    val annotatedString = buildAnnotatedString {
-                                        if (startIndex != -1) {
-                                            append(text.substring(0, startIndex))
-                                            withStyle(style = SpanStyle(color = ThemeRed.colorYellow)) {
-                                                append(text.substring(startIndex, startIndex + query.length))
-                                            }
-                                            append(text.substring(startIndex + query.length))
-                                        } else { append(text) }
-                                    }
-
-                                    Box(Modifier.padding(start = 3.dp, top = 1.dp, end = 3.dp).background(ThemeRed.colorTabLevel2).clickable(onClick = {
-                                        searchText.value = it.text
-                                        searchTextDone.value = it.text
-                                        stack.addLast(it.text)
-                                    })){
-
-                                        Row(
-                                            modifier = Modifier.fillMaxSize(),
-                                            verticalAlignment = Alignment.CenterVertically
-                                        ) {
-
-                                            Text(
-                                                it.text,
-                                                fontFamily = ThemeRed.fontFamilyDMsanss,
-                                                fontSize = 18.sp,
-                                                textAlign = TextAlign.Start,
-                                                color = Color.Black,
-                                                modifier = Modifier
-                                                    .padding(start = 4.dp)
-                                                    .height(30.dp)
-                                                    .offset(1.dp, 1.dp)
-                                                    .alignByBaseline()
-                                            )
-                                        }
-
-                                        Row(
-                                            modifier = Modifier.fillMaxSize(),
-                                            verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween
-                                        ) {
-                                            Text(
-                                                annotatedString,
-                                                fontFamily = ThemeRed.fontFamilyDMsanss,
-                                                fontSize = 18.sp,
-                                                textAlign = TextAlign.Start,
-                                                color = Color.White,
-                                                modifier = Modifier
-                                                    .padding(start = 4.dp)
-                                                    .height(30.dp)
-                                                    .alignByBaseline()
-                                            )
-
-                                            Text(
-                                                it.gifs.toPrettyCount2(),
-                                                fontFamily = ThemeRed.fontFamilyDMsanss,
-                                                fontSize = 18.sp,
-                                                textAlign = TextAlign.Start,
-                                                color = Color.White,
-                                                modifier = Modifier
-                                                    .padding(start = 4.dp)
-                                                    .height(30.dp)
-                                                    .alignByBaseline()
-                                            )
-
-                                        }
-
-                                    }
-                                }
-                            }
-                            HorizontalDivider(color = ThemeRed.colorBorderGray, thickness = 1.dp)
-                        }
-                    }
-                }
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(start = 4.dp).height(46.dp)
+            AnimatedVisibility(
+                delayFocus,
+                enter = expandVertically(animationSpec = tween(durationMillis = 500)) + fadeIn(animationSpec = tween(durationMillis = 500)),
+                exit = shrinkVertically(animationSpec = tween(durationMillis = 500)) + fadeOut(animationSpec = tween(durationMillis = 500)),
                 ) {
 
-                    if ((value == "") && (!isFocused)) {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = null,
-                            tint = Color(0xFF757575),
-                            modifier = Modifier.padding(start = 4.dp)
-                        )
-                    }
+                Box(
+                    Modifier.padding(top = 1.dp)
+                        .fillMaxWidth()
+                        .height(126.dp)
+                ) {
+                    Column {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        LazyColumn(
+                            Modifier
+                                .fillMaxSize()
+                                .weight(1f)
+                        ) {
+                            items(searchTagSuggestion) {
 
-                    Spacer(modifier = Modifier.width(4.dp))
-                    BasicTextField(
-                        value = value,
-                        onValueChange = onValueChange,
-                        singleLine = true,
-                        textStyle = TextStyle(
-                            fontSize = 18.sp,
-                            lineHeight = 20.sp,
-                            color = Color.White,
-                            fontFamily = ThemeRed.fontFamilyDMsanss,
-                            textAlign = TextAlign.Left
-                        ),
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxWidth()
-                            .onFocusChanged { focusState ->
-                                isFocused = focusState.isFocused
-                            },
-                        cursorBrush = SolidColor(Color.Gray),
+                                val query = searchTextValue
+                                val text = it.text
+                                val startIndex = text.indexOf(query, ignoreCase = true)
+                                val annotatedString = buildAnnotatedString {
+                                    if (startIndex != -1) {
+                                        append(text.substring(0, startIndex))
+                                        withStyle(style = SpanStyle(color = ThemeRed.colorYellow)) {
+                                            append(
+                                                text.substring(
+                                                    startIndex,
+                                                    startIndex + query.length
+                                                )
+                                            )
+                                        }
+                                        append(text.substring(startIndex + query.length))
+                                    } else {
+                                        append(text)
+                                    }
+                                }
 
-                        // 1. Говорим IME, что нам нужна кнопка «Done»
-                        keyboardOptions = KeyboardOptions(
-                            imeAction = ImeAction.Done,
-                            keyboardType = KeyboardType.Text       // по желанию
-                        ),
+                                Box(
+                                    Modifier
+                                        .padding(start = 3.dp, top = 1.dp, end = 3.dp)
+                                        .background(ThemeRed.colorTabLevel2)
+                                        .clickable(onClick = {
+                                            searchText.value = it.text
+                                            searchTextDone.value = it.text
+                                            stack.addLast(it.text)
+                                        })
+                                ) {
 
-                        // 2. Обрабатываем её нажатие
-                        keyboardActions = KeyboardActions(
-                            onDone = {
-                                onDone(value)
-                                add(value)                         // например, запускаем поиск
-                                focusManager.clearFocus()          // убираем курсор
-                                keyboardController?.hide()         // закрываем клавиатуру
+                                    Row(
+                                        modifier = Modifier.fillMaxSize(),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+
+                                        Text(
+                                            it.text,
+                                            fontFamily = ThemeRed.fontFamilyDMsanss,
+                                            fontSize = 18.sp,
+                                            textAlign = TextAlign.Start,
+                                            color = Color.Black,
+                                            modifier = Modifier
+                                                .padding(start = 4.dp)
+                                                .height(30.dp)
+                                                .offset(1.dp, 1.dp)
+                                                .alignByBaseline()
+                                        )
+                                    }
+
+                                    Row(
+                                        modifier = Modifier.fillMaxSize(),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ) {
+                                        Text(
+                                            annotatedString,
+                                            fontFamily = ThemeRed.fontFamilyDMsanss,
+                                            fontSize = 18.sp,
+                                            textAlign = TextAlign.Start,
+                                            color = Color.White,
+                                            modifier = Modifier
+                                                .padding(start = 4.dp)
+                                                .height(30.dp)
+                                                .alignByBaseline()
+                                        )
+
+                                        Text(
+                                            it.gifs.toPrettyCount2(),
+                                            fontFamily = ThemeRed.fontFamilyDMsanss,
+                                            fontSize = 18.sp,
+                                            textAlign = TextAlign.Start,
+                                            color = Color.White,
+                                            modifier = Modifier
+                                                .padding(start = 4.dp)
+                                                .height(30.dp)
+                                                .alignByBaseline()
+                                        )
+
+                                    }
+
+                                }
                             }
-                        )
-                    )
-
-                    if (value != "") {
-                        Icon( Icons.Default.Clear, contentDescription = null, tint = Color(0xFF757575),
-                            modifier = Modifier.width(36.dp).height(46.dp).clickable(onClick = { onDone("");onValueChange("") }))
+                        }
+                        HorizontalDivider(color = ThemeRed.colorBorderGray, thickness = 1.dp)
                     }
+                }
+            }
 
-                    Icon( Icons.Default.Undo, contentDescription = null, tint = Color(0xFF757575),
-                        modifier = Modifier.width(36.dp).height(46.dp).clickable(onClick = {
-                            if (!stack.isEmpty()){
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .padding(start = 4.dp)
+                    .height(46.dp)
+            ) {
+
+                if ((value == "") && (!isFocused)) {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = null,
+                        tint = Color(0xFF757575),
+                        modifier = Modifier.padding(start = 4.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(4.dp))
+                BasicTextField(
+                    value = value,
+                    onValueChange = onValueChange,
+                    singleLine = true,
+                    textStyle = TextStyle(
+                        fontSize = 18.sp,
+                        lineHeight = 20.sp,
+                        color = Color.White,
+                        fontFamily = ThemeRed.fontFamilyDMsanss,
+                        textAlign = TextAlign.Left
+                    ),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                        .onFocusChanged { focusState ->
+                            isFocused = focusState.isFocused
+                        },
+                    cursorBrush = SolidColor(Color.Gray),
+
+                    // 1. Говорим IME, что нам нужна кнопка «Done»
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Done,
+                        keyboardType = KeyboardType.Text       // по желанию
+                    ),
+
+                    // 2. Обрабатываем её нажатие
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            onDone(value)
+                            add(value)                         // например, запускаем поиск
+                            focusManager.clearFocus()          // убираем курсор
+                            keyboardController?.hide()         // закрываем клавиатуру
+                        }
+                    )
+                )
+
+                if (value != "") {
+                    Icon(
+                        Icons.Default.Clear, contentDescription = null, tint = Color(0xFF757575),
+                        modifier = Modifier
+                            .width(36.dp)
+                            .height(46.dp)
+                            .clickable(onClick = { onDone("");onValueChange("") })
+                    )
+                }
+
+                Icon(
+                    Icons.Default.Undo, contentDescription = null, tint = Color(0xFF757575),
+                    modifier = Modifier
+                        .width(36.dp)
+                        .height(46.dp)
+                        .clickable(onClick = {
+                            if (!stack.isEmpty()) {
                                 val s = stack.removeLast()
                                 searchText.value = s
                                 searchTextDone.value = s
                             }
-                        }))
+                        })
+                )
 
-                    //ExpandMenuHelper(savedRed = savedRed)
-                    ExpandMenuHistory(history1)
-                }
+                //ExpandMenuHelper(savedRed = savedRed)
+                ExpandMenuHistory(history1)
             }
+        }
         //}
     }
 
@@ -357,13 +413,16 @@ class SearchRed @Inject constructor(
                     .fillMaxWidth()
                     .fillMaxHeight(0.7f)
                     //.clip(RoundedCornerShape(16.dp))
-                    .border(1.dp, ThemeRed.colorTabLevel3, RoundedCornerShape(16.dp))
-                ,
+                    .border(1.dp, ThemeRed.colorTabLevel3, RoundedCornerShape(16.dp)),
                 containerColor = ThemeRed.colorTabLevel2,
                 shape = RoundedCornerShape(16.dp)
             ) {
 
-                FlowRow(Modifier.padding(4.dp).fillMaxSize(), maxItemsInEachRow = 10) {
+                FlowRow(
+                    Modifier
+                        .padding(4.dp)
+                        .fillMaxSize(), maxItemsInEachRow = 10
+                ) {
                     savedRed.tagsList.sortedByDescending { it.count }.take(200).forEach {
                         Box(
                             modifier = Modifier

@@ -1,6 +1,11 @@
 package com.example.ui.screens.explorer.tab.gifs
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -77,7 +82,7 @@ object GifsTab : Screen {
 
     fun addColumn() {
         column.intValue += 1
-        if(column.intValue > 3)
+        if (column.intValue > 3)
             column.intValue = 1
     }
 
@@ -128,7 +133,15 @@ object GifsTab : Screen {
                         .background(ThemeRed.colorTabLevel1), verticalAlignment = Alignment.Bottom
                 ) {
 
-                    AnimatedVisibility(visible = !isFocused) {
+                    AnimatedVisibility(
+                        visible = !isFocused,
+                        enter = expandHorizontally(animationSpec = tween(durationMillis = 250)) + fadeIn(
+                            animationSpec = tween(durationMillis = 250)
+                        ),
+                        exit = shrinkHorizontally(animationSpec = tween(durationMillis = 250)) + fadeOut(
+                            animationSpec = tween(durationMillis = 250)
+                        ),
+                    ) {
 
                         //
                         if (searchR == "") {
@@ -169,15 +182,21 @@ object GifsTab : Screen {
                     Spacer(modifier = Modifier.width(4.dp))
 
 
-                    AnimatedVisibility(visible = !isFocused) {
+                    AnimatedVisibility(visible = !isFocused,
+
+                        enter = expandHorizontally(animationSpec = tween(durationMillis = 250), expandFrom = Alignment.Start) + fadeIn(
+                            animationSpec = tween(durationMillis = 250)
+                        ),
+                        exit = shrinkHorizontally(animationSpec = tween(durationMillis = 250), shrinkTowards = Alignment.Start) + fadeOut(
+                            animationSpec = tween(durationMillis = 250)
+                        ),
+
+                        ) {
                         ButtonUp {
                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                             vm.lazyHost.gotoUp()
                         }
                     }
-
-
-
 
 
                 }

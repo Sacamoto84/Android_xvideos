@@ -170,7 +170,6 @@ class SearchNichesRed @Inject constructor(
 
 
                 AnimatedVisibility(isFocused) {
-
                     Box(Modifier.fillMaxWidth().height(126.dp)) {
                         Column {
                             LazyColumn(Modifier.fillMaxSize().weight(1f)) {

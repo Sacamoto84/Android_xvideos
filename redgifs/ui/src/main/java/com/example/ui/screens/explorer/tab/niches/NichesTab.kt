@@ -1,6 +1,11 @@
 package com.example.ui.screens.explorer.tab.niches
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -90,6 +96,8 @@ object NichesTab : Screen {
 
         if (listNiche.itemCount == 0) return
 
+        val focused = vm.search.focused.collectAsStateWithLifecycle().value
+
         Scaffold(bottomBar = {
             Column(Modifier.background(ThemeRed.colorTabLevel1)) {
 
@@ -98,41 +106,72 @@ object NichesTab : Screen {
 
                 //Spacer(modifier = Modifier.height(2.dp))
 
+                val isVisible = !focused
+
+                val buttonOffsetX by animateDpAsState(
+                    targetValue = if (isVisible) 0.dp else 46.dp,
+                    animationSpec = tween(durationMillis = 300),
+                    label = "ButtonUpOffset"
+                )
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 1.dp, start = 1.dp)
-                        .background(ThemeRed.colorTabLevel1), horizontalArrangement = Arrangement.SpaceBetween
+                        .background(ThemeRed.colorTabLevel1),
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
 
-                    SortByOrder(
-                        listOf(
-                            Order.NICHES_SUBSCRIBERS_D,
-                            Order.NICHES_SUBSCRIBERS_A,
-                            Order.NICHES_POST_D,
-                            Order.NICHES_POST_A,
-                            Order.NICHES_NAME_A_Z,
-                            Order.NICHES_NAME_Z_A
-                        ),
-                        vm.lazyHost.sortType.collectAsStateWithLifecycle().value,
-                        onSelect = { vm.lazyHost.changeSortType(it) },
-                        containerColor = ThemeRed.colorCommonBackground
-                    )
+                    AnimatedVisibility(visible = !focused) {
+
+                        SortByOrder(
+                            listOf(
+                                Order.NICHES_SUBSCRIBERS_D,
+                                Order.NICHES_SUBSCRIBERS_A,
+                                Order.NICHES_POST_D,
+                                Order.NICHES_POST_A,
+                                Order.NICHES_NAME_A_Z,
+                                Order.NICHES_NAME_Z_A
+                            ),
+                            vm.lazyHost.sortType.collectAsStateWithLifecycle().value,
+                            onSelect = { vm.lazyHost.changeSortType(it) },
+                            containerColor = ThemeRed.colorCommonBackground
+                        )
+
+                    }
+
+
 
                     vm.search.CustomBasicTextField(
-                        value =  vm.search.searchText.collectAsStateWithLifecycle().value,
-                        onValueChange = {  vm.search.searchText.value = it },
-                        onDone = {  vm.search.searchTextDone.value = it },
+                        value = vm.search.searchText.collectAsStateWithLifecycle().value,
+                        onValueChange = { vm.search.searchText.value = it },
+                        onDone = { vm.search.searchTextDone.value = it },
                         modifier = Modifier
                             .padding(start = 4.dp)
                             .weight(1f)
                     )
 
-
-                    ButtonUp {
-                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                        vm.lazyHost.gotoUpColumn()
+                    AnimatedVisibility(visible = !focused) {
+                        ButtonUp {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            vm.lazyHost.gotoUpColumn()
+                        }
                     }
+
+//                    Box(
+//                        modifier = Modifier
+//                            //.width(buttonWidth)
+//                            //.height(46.dp)
+//                            .offset(x = buttonOffsetX)
+//                            //.alpha(buttonAlpha)
+//                    ) {
+//                        if (isVisible) {
+//                            ButtonUp {
+//                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+//                                vm.lazyHost.gotoUpColumn()
+//                            }
+//                        }
+//                    }
 
                 }
                 Spacer(modifier = Modifier.height(1.dp))
@@ -166,9 +205,11 @@ object NichesTab : Screen {
                                     index.toString(),
                                     color = Color.Gray,
                                     fontFamily = ThemeRed.fontFamilyDMsanss,
-                                    modifier = Modifier.padding(end = 16.dp).align(
-                                        Alignment.TopEnd
-                                    ), fontSize = 12.sp
+                                    modifier = Modifier
+                                        .padding(end = 16.dp)
+                                        .align(
+                                            Alignment.TopEnd
+                                        ), fontSize = 12.sp
                                 )
                             }
                         }
