@@ -4,6 +4,7 @@ import com.client.common.connectivityObserver.ConnectivityObserver
 import com.redgifs.common.block.BlockRed
 import com.redgifs.common.downloader.DownloadRed
 import com.redgifs.common.saved.SavedRed
+import com.redgifs.common.search.SearchNichesRed
 import com.redgifs.common.search.SearchRed
 import com.redgifs.common.snackBar.SnackBarEvent
 import com.redgifs.network.api.RedApi
@@ -18,5 +19,6 @@ class HostDI @Inject constructor (
     val savedRed: SavedRed,
     val downloadRed: DownloadRed,
     val search : SearchRed,
+    val searchNiches : SearchNichesRed,
     val snackBarEvent: SnackBarEvent
 )

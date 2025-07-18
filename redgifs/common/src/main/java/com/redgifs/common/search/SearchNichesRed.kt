@@ -75,6 +75,7 @@ import com.redgifs.common.ThemeRed
 import com.redgifs.common.saved.SavedRed
 import com.redgifs.db.dao.SearchRedHistoryDao
 import com.redgifs.db.entity.SearchRedHistoryEntity
+import com.redgifs.model.search.SearchItemNichesResponse
 import com.redgifs.model.tag.TagSuggestion
 import com.redgifs.network.api.RedApi
 import kotlinx.coroutines.CoroutineScope
@@ -90,7 +91,7 @@ import javax.inject.Singleton
 
 
 @Singleton
-class SearchRed @Inject constructor(
+class SearchNichesRed @Inject constructor(
     val dao: SearchRedHistoryDao,
     val savedRed: SavedRed,
     val redApi: RedApi,
@@ -109,7 +110,7 @@ class SearchRed @Inject constructor(
 
     val focused = MutableStateFlow(false)
 
-    var searchTextSuggestions = MutableStateFlow<List<TagSuggestion>>(emptyList())
+    var searchTextSuggestions = MutableStateFlow<List<SearchItemNichesResponse>>(emptyList())
 
     val stack = ArrayDeque<String>()
 
@@ -117,7 +118,7 @@ class SearchRed @Inject constructor(
         scope.launch {
             searchText.collect {
                 if (it != ""){
-                    val a = redApi.getTagSuggestions(it)
+                    val a = redApi.searchNichesShort(it)
                     searchTextSuggestions.value = a
                 }
             }
@@ -230,7 +231,7 @@ class SearchRed @Inject constructor(
                                             )
 
                                             Text(
-                                                it.gifs.toPrettyCount2(),
+                                                it.subscribers.toPrettyCount2(),
                                                 fontFamily = ThemeRed.fontFamilyDMsanss,
                                                 fontSize = 18.sp,
                                                 textAlign = TextAlign.Start,

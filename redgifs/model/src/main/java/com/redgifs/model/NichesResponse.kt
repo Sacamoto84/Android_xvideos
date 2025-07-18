@@ -2,10 +2,38 @@ package com.redgifs.model
 
 import com.google.gson.annotations.SerializedName
 
+
+
 data class NichesResponse(
-    @SerializedName("niches") val niches: List<Niche>
+    @SerializedName("niches") val niches: List<Niche>,
+    @SerializedName("page") val page: Long,
+    @SerializedName("pages") val pages: Long,
+    @SerializedName("total") val total: Long
 )
 
+/**
+ * ```kotlin
+ *   "id": "female-backs",
+ *   "name": "Female Backs",
+ *   "gifs": 245,
+ *   "subscribers": 914,
+ *   "thumbnail": "https://userpic.redgifs.com/niches/thumbnails/female-backs-dee7838f.jpg",
+ *   previews": [
+ *                 {
+ *                     "id": "dangerouswanmice",
+ *                     "thumbnail": "https://media.redgifs.com/DangerousWanMice-mobile.jpg"
+ *                 },
+ *                 {
+ *                     "id": "weirddaringbovine",
+ *                     "thumbnail": "https://media.redgifs.com/WeirdDaringBovine-mobile.jpg"
+ *                 },
+ *                 {
+ *                     "id": "unsteadyphonywren",
+ *                     "thumbnail": "https://media.redgifs.com/UnsteadyPhonyWren-mobile.jpg"
+ *                 }
+ *             ]
+ * ```
+ */
 data class Niche(
     @SerializedName("id") val id: String,
     @SerializedName("name") val name: String,
@@ -17,7 +45,7 @@ data class Niche(
 
 data class Preview(
     @SerializedName("id") val id: String,
-    @SerializedName("thumbnail")  val thumbnail: String
+    @SerializedName("thumbnail") val thumbnail: String
 )
 
 

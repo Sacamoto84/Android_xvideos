@@ -9,7 +9,7 @@ import com.redgifs.model.Order
 import com.redgifs.network.api.RedApi
 import timber.log.Timber
 
-class ItemExplorerNailsPagingSource (val order : Order, val redApi: RedApi, val snackBarEvent: SnackBarEvent): PagingSource<Int, Niche>() {
+class ItemExplorerNailsPagingSource (val order : Order, val extraString : String, val redApi: RedApi, val snackBarEvent: SnackBarEvent): PagingSource<Int, Niche>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int,  Niche> {
 
@@ -18,21 +18,15 @@ class ItemExplorerNailsPagingSource (val order : Order, val redApi: RedApi, val 
         return try {
             Timber.d("!!! ItemExplorerNailsPagingSource::load() page = $page sortTop:$order")
 
-            if (order == Order.FORCE_TEMP) {
-                LoadResult.Page(
-                    data = emptyList(),
-                    prevKey = null,
-                    nextKey = page
-                )
-            }
-
             val response = redApi.explorer.getExplorerNiches(order, page = page)
 
             val isEndReached = response.niches.isEmpty() // или, если ты знаешь, что сервер вернул всё
 
             val nextKey = if (isEndReached) { null } else { page + 1 }
 
-            Timber.d("!!! load() a.gif.size = ${response.niches.size}")
+            //val nextKey = page + 1
+
+            //Timber.d("!!! load() a.gif.size = ${response.niches.size}")
 
             LoadResult.Page(
                 data = response.niches,

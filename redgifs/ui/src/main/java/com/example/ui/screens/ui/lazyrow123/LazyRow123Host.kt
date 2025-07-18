@@ -50,7 +50,7 @@ enum class TypePager {
     EMPTY
 }
 
-private data class SearchParams(val query: String, val sort: Order, val tags : String)
+private data class SearchParams(val query: String, val sort: Order, val tags : String, val queryNiches : String)
 
 @OptIn(FlowPreview::class)
 class LazyRow123Host(
@@ -118,8 +118,8 @@ class LazyRow123Host(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val pager: Flow<PagingData<Any>> =
-        combine(hostDI.search.searchTextDone, sortType,hostDI.block.blockList, tags) { text, sort, blockList, tags ->
-            SearchParams(text.trim(), sort, tags.joinToString(","))
+        combine(hostDI.search.searchTextDone, sortType,hostDI.block.blockList, tags, hostDI.searchNiches.searchTextDone) { text, sort, blockList, tags, textNiches ->
+            SearchParams(text.trim(), sort, tags.joinToString(","), textNiches)
         }
             //.debounce(2000)                                          // ② ждём паузу ввода
             .distinctUntilChanged()                                 // ③ игнорируем дубли
@@ -134,7 +134,7 @@ class LazyRow123Host(
                         Timber.d("!!! >>>pagingSourceFactory{...}")
                         gotoUp()
                         gotoUpColumn()
-                        createPager(typePager, params.sort, extraString, params.query, hostDI.block, hostDI.redApi, hostDI.savedRed , tags.value.toList(), hostDI.snackBarEvent)
+                        createPager(typePager, params.sort, extraString, params.query, hostDI.block, hostDI.redApi, hostDI.savedRed , tags.value.toList(), hostDI.snackBarEvent, hostDI = hostDI)
                     }
                 ).flow
             }
@@ -169,7 +169,8 @@ fun createPager(
     redApi : RedApi,
     savedRed: SavedRed,
     tags : List<String> = emptyList(),
-    snackBarEvent: SnackBarEvent
+    snackBarEvent: SnackBarEvent,
+    hostDI : HostDI
 ): PagingSource<Int, Any> {
     val pagingSourceFactory = when (typePager) {
         TypePager.NICHES -> {
@@ -185,7 +186,7 @@ fun createPager(
         }
 
         TypePager.EXPLORER_NICHES -> {
-            ItemExplorerNailsPagingSource(order = sort, redApi = redApi, snackBarEvent)
+            ItemExplorerNailsPagingSource(order = sort, extraString = extraString, redApi = redApi, snackBarEvent)
         }
 
         TypePager.PROFILE -> {

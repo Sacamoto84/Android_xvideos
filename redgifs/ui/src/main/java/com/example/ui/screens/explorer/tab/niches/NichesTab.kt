@@ -50,6 +50,7 @@ import com.example.ui.screens.ui.lazyrow123.TypePager
 import com.example.ui.screens.ui.sortByOrder.SortByOrder
 import com.redgifs.common.ThemeRed
 import com.redgifs.common.di.HostDI
+import com.redgifs.common.search.SearchNichesRed
 import com.redgifs.model.Niche
 import com.redgifs.model.Order
 import dagger.Binds
@@ -115,6 +116,16 @@ object NichesTab : Screen {
                         onSelect = { vm.lazyHost.changeSortType(it) },
                         containerColor = ThemeRed.colorCommonBackground
                     )
+
+                    vm.search.CustomBasicTextField(
+                        value =  vm.search.searchText.collectAsStateWithLifecycle().value,
+                        onValueChange = {  vm.search.searchText.value = it },
+                        onDone = {  vm.search.searchTextDone.value = it },
+                        modifier = Modifier
+                            .padding(start = 4.dp)
+                            .weight(1f)
+                    )
+
 
                     ButtonUp {
                         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
@@ -185,7 +196,8 @@ object NichesTab : Screen {
 
 class ScreenRedExplorerNichesSM @Inject constructor(
     connectivityObserver: ConnectivityObserver,
-    val hostDI: HostDI
+    val hostDI: HostDI,
+    val search: SearchNichesRed
 ) : ScreenModel {
 
     val lazyHost =

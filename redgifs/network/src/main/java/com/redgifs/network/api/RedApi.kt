@@ -377,8 +377,7 @@ class RedApi @Inject constructor(
      * ## Получить подсказки (suggest) по тегам.
      */
     suspend fun getTagSuggestions(query: String): List<TagSuggestion> {
-        val route =
-            Route(method = "GET", path = "/v2/search/suggest?query={query}", "query" to query)
+        val route = Route(method = "GET", path = "/v2/search/suggest?query={query}", "query" to query)
         return api.request(route)
     }
 
