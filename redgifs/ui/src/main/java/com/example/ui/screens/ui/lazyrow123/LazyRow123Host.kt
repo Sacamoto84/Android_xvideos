@@ -134,7 +134,7 @@ class LazyRow123Host(
                         Timber.d("!!! >>>pagingSourceFactory{...}")
                         gotoUp()
                         gotoUpColumn()
-                        createPager(typePager, params.sort, extraString, params.query, hostDI.block, hostDI.redApi, hostDI.savedRed , tags.value.toList(), hostDI.snackBarEvent, hostDI = hostDI)
+                        createPager(typePager, params.sort, extraString, params.query, tags.value.toList(), hostDI = hostDI)
                     }
                 ).flow
             }
@@ -165,32 +165,28 @@ fun createPager(
     sort: Order,
     extraString: String,
     searchText: String,
-    block : BlockRed,
-    redApi : RedApi,
-    savedRed: SavedRed,
     tags : List<String> = emptyList(),
-    snackBarEvent: SnackBarEvent,
     hostDI : HostDI
 ): PagingSource<Int, Any> {
     val pagingSourceFactory = when (typePager) {
         TypePager.NICHES -> {
-            ItemNailsPagingSource(order = sort, nichesName = extraString, block = block, redApi = redApi, snackBarEvent)
+            ItemNailsPagingSource(order = sort, nichesName = extraString, block = hostDI.block, redApi = hostDI.redApi, hostDI.snackBarEvent)
         }
 
         TypePager.TOP -> {
-            ItemTopPagingSource(sort = sort, searchText = searchText, block = block, redApi = redApi, snackBarEvent)
+            ItemTopPagingSource(sort = sort, searchText = searchText, block = hostDI.block, redApi = hostDI.redApi, hostDI.snackBarEvent)
         }
 
         TypePager.SAVED_LIKES -> {
-            ItemSavedLikesPagingSource(sort, savedRed)
+            ItemSavedLikesPagingSource(sort, hostDI.savedRed)
         }
 
         TypePager.EXPLORER_NICHES -> {
-            ItemExplorerNailsPagingSource(order = sort, extraString = extraString, redApi = redApi, snackBarEvent)
+            ItemExplorerNailsPagingSource(order = sort, extraString = extraString, redApi = hostDI.redApi, hostDI.snackBarEvent, hostDI.savedRed.nichesCache)
         }
 
         TypePager.PROFILE -> {
-            ItemProfilePagingSource(profileName = extraString, sort = sort, block = block, redApi = redApi, tags = tags, snackBarEvent)
+            ItemProfilePagingSource(profileName = extraString, sort = sort, block = hostDI.block, redApi = hostDI.redApi, tags = tags, hostDI.snackBarEvent)
         }
 
         TypePager.EMPTY -> {
@@ -198,7 +194,7 @@ fun createPager(
         }
 
         TypePager.SAVED_COLLECTION -> {
-            ItemCollectionPagingSource(extraString, savedRed, snackBarEvent)
+            ItemCollectionPagingSource(extraString, hostDI.savedRed, hostDI.snackBarEvent)
         }
 
     }

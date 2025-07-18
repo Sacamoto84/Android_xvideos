@@ -17,24 +17,26 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
 
-class SavedRed_NichesCaches(val scope : CoroutineScope, val redApi: RedApi, val snackBarEvent : SnackBarEvent) {
+class SavedRed_NichesCaches(
+    val scope: CoroutineScope,
+    val redApi: RedApi,
+    val snackBarEvent: SnackBarEvent
+) {
 
     val list = mutableListOf<Niche>()
 
     var size by mutableIntStateOf(-1)
 
     var isDownloading by mutableStateOf(false)
-
     var progress by mutableFloatStateOf(0f)
-
     var lastModifiedHour by mutableLongStateOf(-1)
     var lastModifiedMinute by mutableLongStateOf(-1)
 
-    init{
+    init {
         readFromDisk()
     }
 
-    fun refresh(){
+    fun refresh() {
         scope.launch {
             try {
                 isDownloading = true
@@ -42,9 +44,7 @@ class SavedRed_NichesCaches(val scope : CoroutineScope, val redApi: RedApi, val 
                 val niches = mutableListOf<Niche>()
                 val res = redApi.explorer.getExplorerNiches(page = 1, count = 100)
                 val pages = res.pages
-
-                val step = 1f/(pages-1)
-
+                val step = 1f / (pages - 1)
                 niches.addAll(res.niches)
                 for (i in 2..pages) {
                     delay(200)
@@ -59,17 +59,17 @@ class SavedRed_NichesCaches(val scope : CoroutineScope, val redApi: RedApi, val 
                 val file = File(AppPath.nichesCache_red, "niches.json")
                 file.writeText(json)
                 size = list.size
+                timeRefresh()
                 snackBarEvent.success("Обновление завершено")
                 isDownloading = false
-            }
-            catch (e: Exception) {
+            } catch (e: Exception) {
                 snackBarEvent.error("Ошибка обновления ${e.toString()}")
                 isDownloading = false
             }
         }
     }
 
-    fun readFromDisk(){
+    fun readFromDisk() {
         val file = File(AppPath.nichesCache_red, "niches.json")
         if (!file.exists()) {
             return
@@ -80,11 +80,17 @@ class SavedRed_NichesCaches(val scope : CoroutineScope, val redApi: RedApi, val 
         list.clear()
         list.addAll(niches)
         size = list.size
+        timeRefresh()
+    }
 
+    private fun timeRefresh() {
+        val file = File(AppPath.nichesCache_red, "niches.json")
+        if (!file.exists()) {
+            return
+        }
         // Получаем время последней модификации
         val lastModified = file.lastModified() // время в миллисекундах с эпохи
         val now = System.currentTimeMillis()
-
         val diffMillis = now - lastModified
         lastModifiedMinute = diffMillis / (60 * 1000)
         lastModifiedHour = diffMillis / (60 * 60 * 1000)

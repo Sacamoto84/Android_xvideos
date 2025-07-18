@@ -2,6 +2,7 @@ package com.redgifs.common.pagin
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import com.redgifs.common.saved.SavedRed_NichesCaches
 import com.redgifs.common.snackBar.SnackBarEvent
 import com.redgifs.network.api.RedApi_Explorer
 import com.redgifs.model.Niche
@@ -9,7 +10,7 @@ import com.redgifs.model.Order
 import com.redgifs.network.api.RedApi
 import timber.log.Timber
 
-class ItemExplorerNailsPagingSource (val order : Order, val extraString : String, val redApi: RedApi, val snackBarEvent: SnackBarEvent): PagingSource<Int, Niche>() {
+class ItemExplorerNailsPagingSource (val order : Order, val extraString : String, val redApi: RedApi, val snackBarEvent: SnackBarEvent, val cache : SavedRed_NichesCaches): PagingSource<Int, Niche>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int,  Niche> {
 
@@ -18,20 +19,23 @@ class ItemExplorerNailsPagingSource (val order : Order, val extraString : String
         return try {
             Timber.d("!!! ItemExplorerNailsPagingSource::load() page = $page sortTop:$order")
 
-            val response = redApi.explorer.getExplorerNiches(order, page = page)
+            val response = cache.list.toList()//redApi.explorer.getExplorerNiches(order, page = page)
 
-            val isEndReached = response.niches.isEmpty() // или, если ты знаешь, что сервер вернул всё
-
-            val nextKey = if (isEndReached) { null } else { page + 1 }
-
-            //val nextKey = page + 1
-
-            //Timber.d("!!! load() a.gif.size = ${response.niches.size}")
+            //order
+            val res = when(order){
+                Order.NICHES_SUBSCRIBERS_D -> {response.sortedByDescending { it.subscribers }}
+                Order.NICHES_POST_D -> {response.sortedByDescending  { it.gifs}}
+                Order.NICHES_SUBSCRIBERS_A -> {response.sortedBy{ it.subscribers }}
+                Order.NICHES_POST_A -> {response.sortedBy{ it.gifs}}
+                Order.NICHES_NAME_A_Z -> {response.sortedBy { it.name }}
+                Order.NICHES_NAME_Z_A ->{response.sortedByDescending{ it.name }}
+                else -> {response.sortedBy { it.subscribers }}
+            }
 
             LoadResult.Page(
-                data = response.niches,
+                data = res,
                 prevKey = null,
-                nextKey = nextKey
+                nextKey = null
             )
 
         } catch (e: Exception) {

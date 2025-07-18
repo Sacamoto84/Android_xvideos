@@ -40,7 +40,7 @@ data class Niche(
     @SerializedName("gifs") val gifs: Long,
     @SerializedName("subscribers") val subscribers: Long,
     @SerializedName("thumbnail") val thumbnail: String,
-    @SerializedName("previews") val previews: List<Preview>
+    @SerializedName("previews") val previews: List<Preview>?
 )
 
 data class Preview(

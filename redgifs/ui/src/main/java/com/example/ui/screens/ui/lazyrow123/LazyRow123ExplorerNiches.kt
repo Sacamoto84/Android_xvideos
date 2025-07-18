@@ -193,35 +193,27 @@ fun NichePreview2(niches: Niche, savedRed: SavedRed, onClick: () -> Unit) {
             }
         }
         ////////////////////////////////////////////
-        Row(
-            modifier = Modifier
-                .padding(horizontal = 4.dp)
-                .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            UrlImage(
-                niches.previews[0].thumbnail,
+
+        if (!niches.previews.isNullOrEmpty()) {
+            Row(
                 modifier = Modifier
-                    .aspectRatio(1f)
-                    .weight(1f),
-                contentScale = ContentScale.Crop
-            )
-            Spacer(modifier = Modifier.width(4.dp))
-            UrlImage(
-                niches.previews[1].thumbnail,
-                modifier = Modifier
-                    .aspectRatio(1f)
-                    .weight(1f),
-                contentScale = ContentScale.Crop
-            )
-            Spacer(modifier = Modifier.width(4.dp))
-            UrlImage(
-                niches.previews[2].thumbnail,
-                modifier = Modifier
-                    .aspectRatio(1f)
-                    .weight(1f),
-                contentScale = ContentScale.Crop
-            )
+                    .padding(horizontal = 4.dp)
+                    .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                //Spacer(modifier = Modifier.width(4.dp))
+                repeat(niches.previews!!.size) {
+                    UrlImage(
+                        niches.previews!![it].thumbnail,
+                        modifier = Modifier
+                            .aspectRatio(1f)
+                            .weight(1f),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+                //Spacer(modifier = Modifier.width(4.dp))
+
+            }
         }
         Spacer(modifier = Modifier.height(4.dp))
 

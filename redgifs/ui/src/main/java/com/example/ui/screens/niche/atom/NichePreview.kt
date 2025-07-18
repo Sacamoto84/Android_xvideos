@@ -30,16 +30,17 @@ fun NichePreview(niches: Niche, onClick: () -> Unit) {
             //Text(text = "Join", modifier = Modifier.height(24.dp).background(ThemeRed.colorYellow), color = Color.Black)
         }
 
-        Row(modifier = Modifier) {
-            repeat(3) {
-                UrlImage(
-                    niches.previews[it].thumbnail,
-                    modifier = Modifier.padding(horizontal = 4.dp).size(96.dp),
-                    contentScale = ContentScale.Crop
-                )
+        if (!niches.previews.isNullOrEmpty()) {
+            Row(modifier = Modifier) {
+                repeat(3) {
+                    UrlImage(
+                        niches.previews?.get(it)?.thumbnail ?: "",
+                        modifier = Modifier.padding(horizontal = 4.dp).size(96.dp),
+                        contentScale = ContentScale.Crop
+                    )
+                }
             }
         }
-
 
     }
 

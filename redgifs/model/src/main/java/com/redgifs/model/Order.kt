@@ -19,8 +19,13 @@ enum class Order(val value: String) {
 
 
     //NICHES
-    NICHES_SUBSCRIBERS("subscribers"),
-    NICHES_POST("posts"),
+    NICHES_SUBSCRIBERS_D("subscribers"),
+
+    NICHES_SUBSCRIBERS_A("subscribers_a"),
+
+    NICHES_POST_D("posts"),
+
+    NICHES_POST_A("posts_a"),
     NICHES_NAME_A_Z("name"),
     NICHES_NAME_Z_A("name"),
 
