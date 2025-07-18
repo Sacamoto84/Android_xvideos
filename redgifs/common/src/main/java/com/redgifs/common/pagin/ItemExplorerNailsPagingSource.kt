@@ -10,7 +10,7 @@ import com.redgifs.model.Order
 import com.redgifs.network.api.RedApi
 import timber.log.Timber
 
-class ItemExplorerNailsPagingSource (val order : Order, val extraString : String, val redApi: RedApi, val snackBarEvent: SnackBarEvent, val cache : SavedRed_NichesCaches): PagingSource<Int, Niche>() {
+class ItemExplorerNailsPagingSource (val order : Order, val textNiches : String, val redApi: RedApi, val snackBarEvent: SnackBarEvent, val cache : SavedRed_NichesCaches): PagingSource<Int, Niche>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int,  Niche> {
 
@@ -21,16 +21,26 @@ class ItemExplorerNailsPagingSource (val order : Order, val extraString : String
 
             val response = cache.list.toList()//redApi.explorer.getExplorerNiches(order, page = page)
 
+            // Фильтрация по подстроке в name
+            val filtered = if (textNiches.isNotBlank()) {
+                response.filter { it.name.contains(textNiches, ignoreCase = true) }
+            } else {
+                response
+            }
+
             //order
             val res = when(order){
-                Order.NICHES_SUBSCRIBERS_D -> {response.sortedByDescending { it.subscribers }}
-                Order.NICHES_POST_D -> {response.sortedByDescending  { it.gifs}}
-                Order.NICHES_SUBSCRIBERS_A -> {response.sortedBy{ it.subscribers }}
-                Order.NICHES_POST_A -> {response.sortedBy{ it.gifs}}
-                Order.NICHES_NAME_A_Z -> {response.sortedBy { it.name }}
-                Order.NICHES_NAME_Z_A ->{response.sortedByDescending{ it.name }}
-                else -> {response.sortedBy { it.subscribers }}
+                Order.NICHES_SUBSCRIBERS_D -> {filtered.sortedByDescending { it.subscribers }}
+                Order.NICHES_POST_D -> {filtered.sortedByDescending  { it.gifs}}
+                Order.NICHES_SUBSCRIBERS_A -> {filtered.sortedBy{ it.subscribers }}
+                Order.NICHES_POST_A -> {filtered.sortedBy{ it.gifs}}
+                Order.NICHES_NAME_A_Z -> {filtered.sortedBy { it.name }}
+                Order.NICHES_NAME_Z_A ->{filtered.sortedByDescending{ it.name }}
+                else -> {filtered.sortedBy { it.subscribers }}
             }
+
+            //
+
 
             LoadResult.Page(
                 data = res,

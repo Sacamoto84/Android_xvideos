@@ -28,7 +28,7 @@ class RedApi_Explorer(val api: ApiClient) {
     ```
      */
     suspend fun getExplorerNiches(
-        order: Order = Order.NICHES_SUBSCRIBERS,
+        order: Order = Order.NICHES_SUBSCRIBERS_D,
         count: Int = 100,
         page: Int = 1
     ): NichesResponse {

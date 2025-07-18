@@ -69,7 +69,7 @@ fun SortByOrder(list: List<Order>, selected: Order, onSelect: (Order) -> Unit, c
             modifier = Modifier
                 .width(120.dp)
                 .height(46.dp)
-                .menuAnchor(ExposedDropdownMenuAnchorType.SecondaryEditable)
+                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable)
                 .border(
                     1.dp, Color(0xFF3A3A3A),
                     RoundedCornerShape(8.dp)
@@ -93,8 +93,10 @@ fun SortByOrder(list: List<Order>, selected: Order, onSelect: (Order) -> Unit, c
                 Order.TOP_WEEK -> "Week"
                 Order.TOP_MONTH -> "Month"
                 Order.TOP_ALLTIME -> "All time"
-                Order.NICHES_SUBSCRIBERS -> "Subscribers"
-                Order.NICHES_POST -> "Post"
+                Order.NICHES_SUBSCRIBERS_D -> "Subscribers↓"
+                Order.NICHES_POST_D -> "Post↓"
+                Order.NICHES_SUBSCRIBERS_A -> "Subscribers↑"
+                Order.NICHES_POST_A -> "Post↑"
                 Order.NICHES_NAME_A_Z -> "Name A-Z"
                 Order.NICHES_NAME_Z_A -> "Name Z-A"
             }
@@ -159,21 +161,36 @@ fun SortByOrder(list: List<Order>, selected: Order, onSelect: (Order) -> Unit, c
                                 Order.TOP_WEEK -> "Week"
                                 Order.TOP_MONTH -> "Month"
                                 Order.TOP_ALLTIME -> "All time"
-                                Order.NICHES_SUBSCRIBERS -> "Subscribers"
-                                Order.NICHES_POST -> "Post"
+                                Order.NICHES_SUBSCRIBERS_D -> "Subscribers↓"
+                                Order.NICHES_POST_D -> "Post↓"
+                                Order.NICHES_SUBSCRIBERS_A -> "Subscribers↑"
+                                Order.NICHES_POST_A -> "Post↑"
                                 Order.NICHES_NAME_A_Z -> "Name A-Z"
                                 Order.NICHES_NAME_Z_A -> "Name Z-A"
                             }
 
-                            Text(
+//                            Text(
+//                                text,
+//                                style = TextStyle(
+//                                    color = Color.White,
+//                                    fontFamily = ThemeRed.fontFamilyDMsanss,
+//                                    fontSize = 16.sp
+//                                ),
+//                                modifier = Modifier
+//                            )
+
+                            BasicText(
                                 text,
+                                modifier = Modifier,
                                 style = TextStyle(
                                     color = Color.White,
                                     fontFamily = ThemeRed.fontFamilyDMsanss,
-                                    fontSize = 16.sp
+                                    fontSize = 18.sp
                                 ),
-                                modifier = Modifier
+                                autoSize =  TextAutoSize.StepBased(minFontSize = 12.sp, maxFontSize = 18.sp),
+                                maxLines = 1
                             )
+
                         }
                     },
                     onClick = {

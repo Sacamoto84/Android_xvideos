@@ -107,8 +107,10 @@ object NichesTab : Screen {
 
                     SortByOrder(
                         listOf(
-                            Order.NICHES_SUBSCRIBERS,
-                            Order.NICHES_POST,
+                            Order.NICHES_SUBSCRIBERS_D,
+                            Order.NICHES_SUBSCRIBERS_A,
+                            Order.NICHES_POST_D,
+                            Order.NICHES_POST_A,
                             Order.NICHES_NAME_A_Z,
                             Order.NICHES_NAME_Z_A
                         ),
@@ -206,7 +208,7 @@ class ScreenRedExplorerNichesSM @Inject constructor(
             scope = screenModelScope,
             extraString = "",
             typePager = TypePager.EXPLORER_NICHES,
-            startOrder = Order.NICHES_SUBSCRIBERS,
+            startOrder = Order.NICHES_SUBSCRIBERS_D,
             startColumns = 1,
             hostDI = hostDI
         )

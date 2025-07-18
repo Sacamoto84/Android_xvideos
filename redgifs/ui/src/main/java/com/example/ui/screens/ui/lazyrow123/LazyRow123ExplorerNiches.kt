@@ -211,6 +211,13 @@ fun NichePreview2(niches: Niche, savedRed: SavedRed, onClick: () -> Unit) {
                         contentScale = ContentScale.Crop
                     )
                 }
+                repeat((3 - niches.previews!!.size).coerceIn(0,3)) {
+                    Box(
+                        modifier = Modifier
+                            .aspectRatio(1f)
+                            .weight(1f),
+                    )
+                }
                 //Spacer(modifier = Modifier.width(4.dp))
 
             }
