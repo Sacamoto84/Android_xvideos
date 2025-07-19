@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -28,10 +27,7 @@ import androidx.compose.ui.unit.sp
 import com.client.common.videoplayer.host.MediaPlayerEvent
 import com.client.common.videoplayer.host.MediaPlayerHost
 import com.client.common.videoplayer.model.ScreenResize
-import com.client.common.videoplayer.model.VideoPlayerConfig
-import com.client.common.videoplayer.ui.video.VideoPlayerWithControl
 import com.redgifs.common.BuildConfig
-import com.redgifs.common.video.CanvasTimeDurationLine
 import com.redgifs.common.video.CanvasTimeDurationLine1
 import timber.log.Timber
 
@@ -123,81 +119,32 @@ private fun TimeDuration(time: Float, duration: Int, modifier: Modifier = Modifi
 
 @Composable
 private fun StaticVideoPlayer(playerHost: MediaPlayerHost) {
-    VideoPlayerWithControl(
-        modifier = Modifier.fillMaxSize(),
-        playerHost = playerHost,
-        playerConfig = VideoPlayerConfig(
-            showControls = false,
-            isZoomEnabled = false,
-            reelVerticalScrolling = false,
-            isPauseResumeEnabled = true,
-            isSeekBarVisible = true,
-            isMuteControlEnabled = true,
-            isDurationVisible = true,
-            seekBarThumbColor = Color.Red,
-            seekBarActiveTrackColor = Color.Red,
-            seekBarInactiveTrackColor = Color.White,
-            durationTextColor = Color.White,
-            seekBarBottomPadding = 10.dp,
-            pauseResumeIconSize = 40.dp,
-            isAutoHideControlEnabled = true,
-            controlHideIntervalSeconds = 5,
-            isFastForwardBackwardEnabled = true,
-            isGestureVolumeControlEnabled = false,
-            showAudioTracksOptions = false,
-            loaderView = {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
-                }
-            }
-        )
-    )
+//    VideoPlayerWithControl(
+//        modifier = Modifier.fillMaxSize(),
+//        playerHost = playerHost,
+//        playerConfig = VideoPlayerConfig(
+//            showControls = false,
+//            isZoomEnabled = false,
+//            isPauseResumeEnabled = true,
+//            isSeekBarVisible = true,
+//            isMuteControlEnabled = true,
+//            isDurationVisible = true,
+//            seekBarThumbColor = Color.Red,
+//            seekBarActiveTrackColor = Color.Red,
+//            seekBarInactiveTrackColor = Color.White,
+//            durationTextColor = Color.White,
+//            seekBarBottomPadding = 10.dp,
+//            pauseResumeIconSize = 40.dp,
+//
+//            isFastForwardBackwardEnabled = true,
+//            isGestureVolumeControlEnabled = false,
+//            loaderView = {
+//                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+//                    CircularProgressIndicator()
+//                }
+//            }
+//        )
+//    )
 }
 
 
-//@Composable
-//private fun CanvasTimeDurationLine(currentTime: Float, duration: Int) {
-//
-//    Canvas(
-//        modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp)
-//    ) {
-//        val canvasWidth = size.width
-//        val canvasHeight = size.height // Будет равно progressHeight
-//
-//        // 1. Рисуем фон (полная длительность)
-//        drawLine(
-//            color = Color(0xFF909090), // Цвет фона прогресс-бара
-//            start = Offset(x = 0f, y = canvasHeight / 2),
-//            end = Offset(x = canvasWidth, y = canvasHeight / 2),
-//            strokeWidth = canvasHeight,
-//            cap = StrokeCap.Square // Закругленные концы
-//        )
-//
-//        // 2. Рассчитываем и рисуем текущий прогресс
-//        if (duration > 0) { // Убедимся, что длительность известна и не равна нулю
-//
-//            val progressRatio = currentTime / duration.toFloat()
-//
-//            val progressWidth = canvasWidth * progressRatio.coerceIn(0f, 1f)
-//
-//            drawLine(
-//                color = Color(0xFFE74658), // Цвет активного прогресса
-//                start = Offset(x = 0f, y = canvasHeight / 2),
-//                end = Offset(x = progressWidth, y = canvasHeight / 2),
-//                strokeWidth = 1.5.dp.toPx(),
-//                cap = StrokeCap.Square // Закругленные концы
-//            )
-//
-//            //Индикатор
-//            drawCircle(
-//                color = Color(0xFFE74658),
-//                center = Offset(progressWidth, canvasHeight / 2),
-//                radius = 2.dp.toPx()
-//            )
-//
-//        }
-//
-//
-//    }
-//
-//}

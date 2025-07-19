@@ -81,7 +81,7 @@ fun RedVideoPlayerWithMenu(
                 is MediaPlayerEvent.CurrentTimeChange -> {
                     //println("!!!Current playback time: ${event.currentTime}s")
                     currentTime = event.currentTime
-                    Timber.i("!!! Current playback time: ${event.currentTime}s enableAB:$enableAB timeA:$timeA timeB:$timeB")
+                    //Timber.i("!!! Current playback time: ${event.currentTime}s enableAB:$enableAB timeA:$timeA timeB:$timeB")
                     if (enableAB && currentTime >= timeB) {
                         println("!!! playerHost.seekTo(${timeA}) ")
                         scope.launch { playerHost.seekTo(timeA.toFloat()) }

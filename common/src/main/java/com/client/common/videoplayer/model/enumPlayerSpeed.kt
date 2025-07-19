@@ -8,10 +8,6 @@ enum class ScreenResize {
     FIT, FILL
 }
 
-enum class Platform {
-    Ios, Android, Desktop
-}
-
 enum class PlayerOption {
     NONE, SPEED, QUALITY, AUDIO_TRACK, SUBTITLES
 }

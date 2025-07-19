@@ -7,6 +7,8 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -18,16 +20,33 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
-import com.client.common.videoplayer.util.PlatformDrawable
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 
+@Preview
 @Composable
-internal fun AnimatedClickableIcon(
-    painterRes: PlatformDrawable? = null,
+fun p(){
+    AnimatedClickableIcon(
+        imageVector = Icons.Default.Favorite,
+        contentDescription = "Like",
+        tint = Color.Red,
+        iconSize = 32.dp,
+        animationDuration = 150,
+        onClick = { println("Icon clicked!") }
+    )
+
+}
+
+
+@Composable
+fun AnimatedClickableIcon(
+    painterRes: Painter? = null,
     imageVector: ImageVector? = null,
     contentDescription: String?,
     tint: Color, // Color to tint the icon
@@ -67,7 +86,7 @@ internal fun AnimatedClickableIcon(
         when {
             painterRes != null -> {
                 Image(
-                    painter = painterRes.asPainter(),
+                    painter = painterRes,
                     contentDescription = contentDescription,
                     contentScale = ContentScale.Fit,
                     modifier = Modifier.fillMaxSize(),

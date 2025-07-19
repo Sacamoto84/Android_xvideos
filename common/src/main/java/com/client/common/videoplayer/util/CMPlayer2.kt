@@ -63,8 +63,6 @@ fun CMPPlayer2(
     headers: Map<String, String>?,
     drmConfig: DrmConfig?,
     selectedQuality: VideoQuality?,
-    //isForward : Boolean = false,
-    //isBack: Boolean = false,
     autoRotate: Boolean // можно менять как нужно
 ) {
     val context = LocalContext.current
@@ -90,7 +88,6 @@ fun CMPPlayer2(
 
     var isBuffering by remember { mutableStateOf(false) }
 
-    // Notify buffer state changes
     LaunchedEffect(isBuffering) {
         bufferCallback(isBuffering)
     }
@@ -101,28 +98,11 @@ fun CMPPlayer2(
                 emit((exoPlayer.currentPosition / 1000f).coerceAtLeast(0f))
                 delay(50)
             }
-        }.collectLatest {
-            currentTime(it)
-        }
+        }.collectLatest { currentTime(it) }
 
-    }
-
-    LaunchedEffect(exoPlayer) {
-        while (isActive) {
-
-            if (exoPlayer.videoFormat != null) {
-                currentRotate =
-                    if (exoPlayer.videoFormat!!.height >= exoPlayer.videoFormat!!.width) 0f else -90f
-                Timber.i("@@@! H:${exoPlayer.videoFormat?.height}  W:${exoPlayer.videoFormat?.width} $exoPlayer")
-                break
-            } else {
-                delay(100)
-            }
-        }
     }
 
     LaunchedEffect(autoRotate) {
-        Timber.i("@@@! 888 LaunchedEffect currentRotate:$currentRotate autoRotate:$autoRotate")
         val rotateEffect = ScaleAndRotateTransformation.Builder().setRotationDegrees(if (autoRotate) -90f else 0f).build()
         exoPlayer.setVideoEffects(listOf(rotateEffect))
     }
@@ -169,18 +149,10 @@ fun CMPPlayer2(
                 exoPlayer.clearMediaItems()
                 exoPlayer.removeListener(listener)
                 exoPlayer.release()
-            }
-        }
-
-        DisposableEffect(Unit) {
-            onDispose {
-                exoPlayer.stop()
-                exoPlayer.clearMediaItems()
-                exoPlayer.release()
-                //playerView.keepScreenOn = false
                 CacheManager.release()
             }
         }
+
     }
 }
 

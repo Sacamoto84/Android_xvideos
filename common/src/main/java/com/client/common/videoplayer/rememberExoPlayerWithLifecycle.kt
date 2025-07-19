@@ -48,14 +48,7 @@ fun rememberExoPlayerWithLifecycle(
     val cache = remember(context) { CacheManager.getCache(context) }
     val trackSelector = remember { DefaultTrackSelector(context) }
 
-    val loadControl = DefaultLoadControl.Builder()
-        .setBufferDurationsMs(
-            minBufferMs,
-            maxBufferMs,
-            bufferForPlaybackMs,
-            bufferForPlaybackAfterRebufferM
-        )
-        .build()
+    val loadControl = DefaultLoadControl.Builder().setBufferDurationsMs(minBufferMs, maxBufferMs, bufferForPlaybackMs, bufferForPlaybackAfterRebufferM).build()
 
     val exoPlayer = remember(context) {
         ExoPlayer.Builder(context)
@@ -73,32 +66,18 @@ fun rememberExoPlayerWithLifecycle(
     LaunchedEffect(selectedQuality) {
         applyQualitySelection(trackSelector, selectedQuality)
     }
-//    LaunchedEffect(selectedAudioTrack) {
-//        applyAudioTrackSelection(trackSelector, selectedAudioTrack)
-//    }
-
-//    LaunchedEffect(selectedSubtitleTrack) {
-//        applySubTitleTrackSelection(trackSelector, selectedSubtitleTrack)
-//    }
 
     LaunchedEffect(url) {
         try {
             val mediaItem = MediaItem.fromUri(url.toUri())
 
-            // Создаем трансформацию для поворота на 90 градусов
-            //val rotateEffect = ScaleAndRotateTransformation.Builder().setRotationDegrees(rotate).build()
-
             val mediaSource = when {
                 drmConfig != null -> createHlsMediaSourceWithDrm(mediaItem, headers, drmConfig)
-                isLiveStream || url.endsWith(".m3u8", ignoreCase = true) -> createHlsMediaSource(
-                    mediaItem,
-                    headers
-                )
+                isLiveStream || url.endsWith(".m3u8", ignoreCase = true) -> createHlsMediaSource(mediaItem, headers)
                 else -> createProgressiveMediaSource(mediaItem, cache, context, headers)
             }
 
             exoPlayer.apply {
-                //setVideoEffects(listOf(rotateEffect))
                 stop()
                 clearMediaItems()
                 setMediaSource(mediaSource)
@@ -111,19 +90,12 @@ fun rememberExoPlayerWithLifecycle(
         }
     }
 
-    var appInBackground by remember {
-        mutableStateOf(false)
-    }
+    var appInBackground by remember { mutableStateOf(false) }
 
     DisposableEffect(key1 = lifecycleOwner, appInBackground) {
-        val lifecycleObserver =
-            getExoPlayerLifecycleObserver(exoPlayer, isPause, appInBackground) {
-                appInBackground = it
-            }
+        val lifecycleObserver = getExoPlayerLifecycleObserver(exoPlayer, isPause, appInBackground) { appInBackground = it }
         lifecycleOwner.lifecycle.addObserver(lifecycleObserver)
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(lifecycleObserver)
-        }
+        onDispose { lifecycleOwner.lifecycle.removeObserver(lifecycleObserver) }
     }
     return exoPlayer
 }

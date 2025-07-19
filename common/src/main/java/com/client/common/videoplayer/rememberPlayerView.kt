@@ -31,14 +31,9 @@ fun rememberPlayerView(exoPlayer: ExoPlayer, context: Context): PlayerView {
     }
     val currentPlayer by rememberUpdatedState(exoPlayer)
 
-    LaunchedEffect(currentPlayer) {
-        playerView.player = currentPlayer
-    }
+    LaunchedEffect(currentPlayer) { playerView.player = currentPlayer }
 
-    DisposableEffect(playerView) {
-        onDispose {
-            playerView.player = null
-        }
-    }
+    DisposableEffect(playerView) { onDispose { playerView.player = null } }
+
     return playerView
 }

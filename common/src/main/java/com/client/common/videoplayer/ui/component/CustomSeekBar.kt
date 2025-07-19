@@ -25,7 +25,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.client.common.videoplayer.model.Chapter
+
 
 @Preview
 @Composable
@@ -58,7 +58,6 @@ fun CustomSeekBar(
     thumbColor: Color = Color.White,
     rippleColor: Color = Color.White.copy(alpha = 0.3f), // Soft glow effect
     showThumbAlways: Boolean = false,
-    chapters: List<Chapter>? = null
 ) {
     val density = LocalDensity.current
     var isDragging by remember { mutableStateOf(false) }
@@ -140,17 +139,6 @@ fun CustomSeekBar(
                 end = Offset(progressX, size.height / 2),
                 strokeWidth = with(density) { trackHeight.toPx() }
             )
-
-            // Chapter markers
-            chapters?.forEach { chapter ->
-                val chapterX = ((chapter.startTime / 1000f) / maxProgress) * trackWidthPx
-                drawLine(
-                    color = chapter.markColor,
-                    start = Offset(chapterX, 0f),
-                    end = Offset(chapterX, size.height),
-                    strokeWidth = chapter.markWidth.toPx()
-                )
-            }
 
             // Ripple Effect (Only when dragging)
             if (isDragging && rippleRadius > 0f) {

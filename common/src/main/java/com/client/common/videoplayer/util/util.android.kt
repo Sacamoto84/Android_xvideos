@@ -16,8 +16,6 @@ import androidx.core.view.WindowInsetsControllerCompat
 import com.client.common.videoplayer.host.DrmConfig
 import java.nio.charset.StandardCharsets
 
-fun isDesktop(): Boolean  = false
-
 @SuppressLint("DefaultLocale")
 fun formatMinSec(value: Int): String {
     return if (value == 0) {
