@@ -6,6 +6,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Fullscreen
@@ -123,12 +124,7 @@ fun RedUrlVideoImageAndLongClick(
                 videoUri,//"https://api.redgifs.com/v2/gifs/${item.id.lowercase()}/hd.m3u8",
                 play = true,
                 onClick = { isVideo = isVideo.not() },
-                onLongClick = {},
-                overlayBottomEnd = {
-                    IconButton(
-                        modifier = Modifier.size(48.dp), onClick = { onFullScreen.invoke() }
-                    ) {Icon(Icons.Filled.Fullscreen, contentDescription = null, tint = Color.White)}
-                }
+                onLongClick = { onFullScreen.invoke() },
             )
 
         } else {

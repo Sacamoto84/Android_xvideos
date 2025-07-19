@@ -1,13 +1,9 @@
 package com.redgifs.common.video
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.awaitTouchSlopOrCancellation
-import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.horizontalDrag
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,7 +12,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -28,102 +23,13 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.client.common.util.toMinSec
-import com.client.common.util.toTwoDecimalPlacesWithColon
-import com.client.common.videoplayer.extension.formatMinSec
 import com.redgifs.common.ThemeRed
 import kotlinx.coroutines.coroutineScope
 import kotlin.coroutines.cancellation.CancellationException
-
-
-@Composable
-fun CanvasTimeDurationLine(currentTime: Float, duration: Int, timeA: Float = 0f, timeB: Float = 1f , timeABEnable : Boolean, play : Boolean = false) {
-
-    var last by remember { mutableFloatStateOf(0f) }
-
-    Canvas(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(2.dp)
-
-        //.padding(top = 4.dp) // Небольшой отступ от текста времени
-    ) {
-        val canvasWidth = size.width
-        val canvasHeight = size.height // Будет равно progressHeight
-
-        // 1. Рисуем фон (полная длительность)
-        drawLine(
-            color = Color(0xFF909090), // Цвет фона прогресс-бара
-            start = Offset(x = 0f, y = canvasHeight / 2),
-            end = Offset(x = canvasWidth, y = canvasHeight / 2),
-            strokeWidth = canvasHeight,
-            cap = StrokeCap.Square // Закругленные концы
-        )
-
-        // 2. Рассчитываем и рисуем текущий прогресс
-        if (duration > 0) { // Убедимся, что длительность известна и не равна нулю
-            val progressRatio = currentTime.toFloat() / duration.toFloat()
-
-            val progressRatioA = canvasWidth * (timeA.toFloat() / duration.toFloat()).coerceIn( 0f,1f )
-            val progressRatioB = canvasWidth * (timeB.toFloat() / duration.toFloat()).coerceIn( 0f,1f )
-
-            val progressWidth = canvasWidth * progressRatio.coerceIn(0f, 1f)
-
-            if (!timeABEnable) {
-                drawLine(
-                    color = Color(0xFFE73538), // Цвет активного прогресса
-                    start = Offset(x = 0f, y = canvasHeight / 2),
-                    end = Offset(x = progressWidth, y = canvasHeight / 2),
-                    strokeWidth = canvasHeight,
-                    cap = StrokeCap.Square // Закругленные концы
-                )
-            }
-
-
-
-
-           // if (timeABEnable){
-
-            //Индикатор
-            drawLine(
-                color = Color(0xFFE73538), // Цвет активного прогресса
-                start = Offset(x = progressWidth, y = canvasHeight / 2 - 20),
-                end = Offset(x = progressWidth, y = canvasHeight / 2),
-                strokeWidth = canvasHeight*3,
-                cap = StrokeCap.Round // Закругленные концы
-            )
-
-
-                drawLine(
-                    color = Color(0xFF8BC34A), // Цвет активного прогресса
-                    start = Offset(x = progressRatioA, y = canvasHeight / 2 - canvasHeight),
-                    end = Offset(x = progressRatioB, y = canvasHeight / 2 - canvasHeight),
-                    strokeWidth = canvasHeight,
-                    cap = StrokeCap.Square // Закругленные концы
-                )
-
-
-
-           // }
-
-
-
-        }
-
-
-    }
-
-}
-
-@Preview
-@Composable
-fun CanvasTimeDurationLinePreview() {
-    CanvasTimeDurationLine(currentTime = 50f, duration = 100, timeA = 20f, timeB = 80f, timeABEnable = true, play = false)
-}
-
 
 @Composable
 fun CanvasTimeDurationLine1(
@@ -133,18 +39,20 @@ fun CanvasTimeDurationLine1(
     timeA: Float = 0f,
     timeB: Float = 1f,
     timeABEnable: Boolean,
-    visibleAB : Boolean = true,
+    visibleAB: Boolean = true,
     play: Boolean = false,
     onSeek: (Float) -> Unit,              // 🔹 при перетаскивании
     onSeekFinished: (() -> Unit)? = null, // 🔹 когда отпустили
-    isVisibleTime : Boolean = true,
-    isVisibleStep : Boolean = true
+    isVisibleTime: Boolean = true,
+    isVisibleStep: Boolean = true
 ) {
 
     var isDragging by remember { mutableStateOf(false) }
 
     Row(
-        modifier = Modifier.fillMaxWidth().height(32.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(32.dp)
             .pointerInput(Unit) {
                 coroutineScope {
                     while (true) {
@@ -162,7 +70,8 @@ fun CanvasTimeDurationLine1(
                                     isDragging = true
                                     change.consume()
                                 }
-                            } catch (_: CancellationException) {}
+                            } catch (_: CancellationException) {
+                            }
 
                             if (drag != null) {
                                 // Мы начали перетаскивать
@@ -188,7 +97,7 @@ fun CanvasTimeDurationLine1(
 
         if (isVisibleTime) {
             Text(
-                " "+currentTime.toDouble().toMinSec(),
+                " " + currentTime.toDouble().toMinSec(),
                 color = Color.White,
                 fontSize = 12.sp,
                 fontFamily = ThemeRed.fontFamilyPopinsRegular,
@@ -196,12 +105,15 @@ fun CanvasTimeDurationLine1(
             )
         }
 
-        Canvas( modifier = Modifier.then(modifier).fillMaxSize().weight(1f) )
+        Canvas(modifier = Modifier
+            .then(modifier)
+            .fillMaxSize()
+            .weight(1f))
         {
             val canvasWidth = size.width
             val canvasHeight = size.height
 
-            if ((duration > 0)&&(isVisibleStep)) {
+            if ((duration > 0) && (isVisibleStep)) {
                 val step = duration
                 val stepW = canvasWidth / duration
                 for (i in 0..step) {
@@ -267,7 +179,7 @@ fun CanvasTimeDurationLine1(
 
         if (isVisibleTime) {
             Text(
-                duration.toDouble().toMinSec()+" ",
+                duration.toDouble().toMinSec() + " ",
                 color = Color.White,
                 fontSize = 12.sp,
                 textAlign = TextAlign.End,
@@ -276,5 +188,25 @@ fun CanvasTimeDurationLine1(
             )
         }
     }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000, device = "id:Nexus 5", apiLevel = 34)
+@Composable
+fun CanvasTimeDurationLine1Preview() {
+
+        CanvasTimeDurationLine1(
+            currentTime = 7f,
+            duration = 20,
+            timeA = 2f,
+            timeB = 5f,
+            timeABEnable = false,
+            visibleAB = true,
+            play = false,
+            onSeek = { },
+            onSeekFinished = { },
+            isVisibleTime = true,
+            isVisibleStep = true
+        )
+
 }
 

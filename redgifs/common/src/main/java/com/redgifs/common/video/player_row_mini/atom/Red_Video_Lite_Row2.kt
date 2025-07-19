@@ -29,6 +29,7 @@ import com.client.common.videoplayer.host.MediaPlayerHost
 import com.client.common.videoplayer.model.ScreenResize
 import com.redgifs.common.BuildConfig
 import com.redgifs.common.video.CanvasTimeDurationLine1
+import com.redgifs.common.video.player_with_menu.atom.StaticPlayer
 import timber.log.Timber
 
 
@@ -41,17 +42,12 @@ fun Red_Video_Lite_Row2(
     play: Boolean = true,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
-    overlayBottomEnd: @Composable () -> Unit = {},
 ) {
 
     var time by remember { mutableFloatStateOf(0f) }
     var duration by remember { mutableIntStateOf(0) }
 
-    if (BuildConfig.DEBUG) {
-        SideEffect {
-            Timber.i("@@@ Red_Video_Lite_2Rrow() play = $play, url = $url time = $time, duration = $duration")
-        }
-    }
+    if (BuildConfig.DEBUG) { SideEffect { Timber.i("@@@ Red_Video_Lite_2Rrow() play = $play, url = $url time = $time, duration = $duration") } }
 
     val playerHost = remember { MediaPlayerHost(mediaUrl = url, isPaused = false, isMuted = true) }
 
@@ -59,20 +55,10 @@ fun Red_Video_Lite_Row2(
     LaunchedEffect(Unit) { playerHost.videoFitMode = ScreenResize.FIT; playerHost.mute() }
 
     LaunchedEffect(Unit) {
-
         playerHost.onEvent = { event ->
             when (event) {
-
-                is MediaPlayerEvent.CurrentTimeChange -> {
-                    //println("!!!Current playback time: ${event.currentTime}s")
-                    time = event.currentTime
-                }
-
-                is MediaPlayerEvent.TotalTimeChange -> {
-                    //println("!!!Video duration updated: ${event.totalTime}s")
-                    duration = event.totalTime
-                }
-
+                is MediaPlayerEvent.CurrentTimeChange -> { time = event.currentTime }
+                is MediaPlayerEvent.TotalTimeChange -> { duration = event.totalTime }
                 else -> {}
             }
         }
@@ -80,71 +66,20 @@ fun Red_Video_Lite_Row2(
 
     Box(modifier = Modifier.fillMaxWidth()) {
 
-        StaticVideoPlayer(playerHost)
-
+        StaticPlayer(playerHost, false)
 
         Box(modifier = Modifier.padding(bottom = 48.dp).fillMaxSize().combinedClickable(onClick = onClick, onLongClick = onLongClick))
 
-
-        Row (Modifier.fillMaxWidth().align(Alignment.BottomEnd), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Bottom) {
-            Box(modifier = Modifier.padding(start = 16.dp).fillMaxWidth().weight(1f)) {
-
-                TimeDuration(time, duration, modifier = Modifier.align(Alignment.TopStart).offset((-2).dp, (-6).dp) )
-
-                CanvasTimeDurationLine1(
-                    time, duration, timeA = 0f, timeB = 0f,
-                    timeABEnable = false, visibleAB = false,
-                    play = play, onSeek = { playerHost.seekTo(it) },
-                    onSeekFinished = {}, modifier = Modifier.padding(start = 0.dp, end = 0.dp),
-                    isVisibleTime = false, isVisibleStep = false
-                )
-            }
-            Box(modifier = Modifier.size(48.dp)) {
-                overlayBottomEnd.invoke()
-            }
+        Box (Modifier.fillMaxWidth().align(Alignment.BottomEnd), contentAlignment = Alignment.BottomCenter) {
+            CanvasTimeDurationLine1(
+                time, duration, timeA = 0f, timeB = 0f,
+                timeABEnable = false, visibleAB = false,
+                play = play, onSeek = { playerHost.seekTo(it) },
+                onSeekFinished = {}, modifier = Modifier.padding(start = 4.dp, end = 4.dp).fillMaxWidth().offset(y = 2.dp),
+                isVisibleTime = true, isVisibleStep = false
+            )
         }
 
     }
 
 }
-
-
-@Composable
-private fun TimeDuration(time: Float, duration: Int, modifier: Modifier = Modifier) {
-    Text(
-        "%02d/%02d".format(time.toInt(), duration), modifier = Modifier.then(modifier), color = Color.White, fontFamily = FontFamily.Monospace,
-        fontSize = 10.sp
-    )
-}
-
-@Composable
-private fun StaticVideoPlayer(playerHost: MediaPlayerHost) {
-//    VideoPlayerWithControl(
-//        modifier = Modifier.fillMaxSize(),
-//        playerHost = playerHost,
-//        playerConfig = VideoPlayerConfig(
-//            showControls = false,
-//            isZoomEnabled = false,
-//            isPauseResumeEnabled = true,
-//            isSeekBarVisible = true,
-//            isMuteControlEnabled = true,
-//            isDurationVisible = true,
-//            seekBarThumbColor = Color.Red,
-//            seekBarActiveTrackColor = Color.Red,
-//            seekBarInactiveTrackColor = Color.White,
-//            durationTextColor = Color.White,
-//            seekBarBottomPadding = 10.dp,
-//            pauseResumeIconSize = 40.dp,
-//
-//            isFastForwardBackwardEnabled = true,
-//            isGestureVolumeControlEnabled = false,
-//            loaderView = {
-//                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-//                    CircularProgressIndicator()
-//                }
-//            }
-//        )
-//    )
-}
-
-

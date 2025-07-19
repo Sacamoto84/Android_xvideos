@@ -63,6 +63,7 @@ dependencies {
     implementation(libs.androidx.storage)
     implementation(libs.androidx.datastore.core.android)
     implementation(libs.volley)
+    implementation(libs.ui.tooling)
 
     //implementation libs.firebase.auth
     //implementation libs.firebase.firestore.ktx
@@ -104,6 +105,7 @@ dependencies {
 //    implementation(libs.coil.mp)
 
     implementation(libs.hilt.android)
+    debugImplementation(libs.ui.tooling)
     ksp(libs.hilt.android.compiler)
 
     implementation(libs.voyager.navigator)

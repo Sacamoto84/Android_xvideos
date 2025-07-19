@@ -1,13 +1,10 @@
 package com.redgifs.common.video.player_with_menu.atom
 
-import androidx.compose.foundation.background
+
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import com.client.common.videoplayer.host.MediaPlayerHost
-
-
 import com.client.common.videoplayer.util.CMPPlayer2
 
 @Composable
