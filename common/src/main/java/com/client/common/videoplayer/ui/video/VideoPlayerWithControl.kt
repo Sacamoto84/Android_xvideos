@@ -27,8 +27,6 @@ import com.client.common.videoplayer.model.PlayerOption
 import com.client.common.videoplayer.model.VideoPlayerConfig
 import com.client.common.videoplayer.ui.video.controls.FullControlComposable
 import com.client.common.videoplayer.util.CMPPlayer
-import com.client.common.videoplayer.util.getSeekTime
-import com.client.common.videoplayer.util.saveCurrentPosition
 import kotlinx.coroutines.delay
 import net.engawapg.lib.zoomable.rememberZoomState
 import net.engawapg.lib.zoomable.zoomable
@@ -95,25 +93,25 @@ fun VideoPlayerWithControl(
         )
     }
 
-    //Get Last saved time from preference for resume video
-    LaunchedEffect(playerHost.totalTime) {
-        getSeekTime(playerHost, playerConfig)?.let {
-            playerHost.isSliding = true
-            playerHost.seekToTime = it
-            playerHost.isSliding = false
-        }
-    }
+//    //Get Last saved time from preference for resume video
+//    LaunchedEffect(playerHost.totalTime) {
+//        getSeekTime(playerHost, playerConfig)?.let {
+//            playerHost.isSliding = true
+//            playerHost.seekToTime = it
+//            playerHost.isSliding = false
+//        }
+//    }
 
     //Save video last position into preference
-    var previousUrl by remember { mutableStateOf(playerHost.url) }
-    DisposableEffect(playerHost.url) {
-        onDispose {
-            if(playerConfig.enableResumePlayback) {
-                saveCurrentPosition(playerHost, previousUrl)
-                previousUrl = playerHost.url
-            }
-        }
-    }
+//    var previousUrl by remember { mutableStateOf(playerHost.url) }
+//    DisposableEffect(playerHost.url) {
+//        onDispose {
+//            if(playerConfig.enableResumePlayback) {
+//                saveCurrentPosition(playerHost, previousUrl)
+//                previousUrl = playerHost.url
+//            }
+//        }
+//    }
 
     val zoomState = rememberZoomState(maxScale = 3f)
     LaunchedEffect(playerHost.videoFitMode) {

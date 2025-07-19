@@ -1,5 +1,6 @@
 package com.client.common.urlVideImage
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,9 +29,15 @@ import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
 
 private fun createUnsafeImageLoader(context: Context): ImageLoader {
-    val trustAllCerts = arrayOf<TrustManager>(object : X509TrustManager {
+    val trustAllCerts = arrayOf<TrustManager>(@SuppressLint("CustomX509TrustManager")
+    object : X509TrustManager {
+
+        @SuppressLint("TrustAllX509TrustManager")
         override fun checkClientTrusted(chain: Array<out X509Certificate>?, authType: String?) {}
+
+        @SuppressLint("TrustAllX509TrustManager")
         override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String?) {}
+
         override fun getAcceptedIssuers(): Array<X509Certificate> = arrayOf()
     })
 
@@ -67,7 +74,7 @@ fun UrlImage(url: String, modifier: Modifier = Modifier,  contentScale : Content
         .build()
 
     CoilImage(
-        //imageLoader = {  imageLoader  },
+        imageLoader = {  imageLoader  },
 
         imageRequest = { imageRequest },
         imageOptions = ImageOptions(
