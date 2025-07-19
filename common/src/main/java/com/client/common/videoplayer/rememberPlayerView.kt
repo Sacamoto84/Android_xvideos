@@ -26,6 +26,7 @@ fun rememberPlayerView(exoPlayer: ExoPlayer, context: Context): PlayerView {
             useController = false
             resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
             setShowBuffering(PlayerView.SHOW_BUFFERING_NEVER)
+            setKeepContentOnPlayerReset(true)
         }
     }
     val currentPlayer by rememberUpdatedState(exoPlayer)

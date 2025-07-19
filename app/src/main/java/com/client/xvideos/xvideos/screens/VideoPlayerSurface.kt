@@ -30,7 +30,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
-import com.client.common.R
+import com.client.xvideos.R
 import com.client.xvideos.screens.videoplayer.ScreenVideoPlayerSM
 import com.client.xvideos.screens.videoplayer.atom.VideoQualitySelector
 import com.client.xvideos.screens.videoplayer.atom.VideoSpeedSelector
@@ -104,7 +104,7 @@ fun VideoPlayerSurface(
 //                ///////////////////////////////////////////////////////////////////////////////
 //                //Кнопка изменения отношения сторон
                 val customButtonResize = ImageButton(context).apply {
-                    setImageResource(R.drawable.resize1) // Ваш значок кнопки
+                    setImageResource(com.client.common.R.drawable.resize1) // Ваш значок кнопки
                     contentDescription = "Change Aspect Ratio"
                     setBackgroundResource(R.color.transparent) // Убираем фон
                     setOnClickListener {

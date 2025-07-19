@@ -10,6 +10,10 @@
         <!-- Установка прозрачности для статус-бара -->
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowTranslucentStatus">true</item>
+
+        <!-- Чёрный фон -->
+<!--        <item name="android:background">#000000</item>-->
+<!--        <item name="android:windowBackground">#000000</item>-->
     </style>
 
 </resources>

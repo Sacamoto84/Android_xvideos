@@ -1,30 +1,38 @@
 package com.client.xvideos
 
+import android.app.Activity
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
-import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
-import android.view.WindowManager
 import androidx.activity.ComponentActivity
-import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material.Surface
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import cafe.adriel.voyager.core.annotation.ExperimentalVoyagerApi
 import cafe.adriel.voyager.navigator.Navigator
 import coil.ImageLoader
 import coil.ImageLoaderFactory
 import coil.memory.MemoryCache
 import coil.request.CachePolicy
+import com.client.common.util.KeepScreenOn
 import com.client.xvideos.PermissionScreenActivity.PermissionStorage
 import com.client.xvideos.screens.videoplayer.video.cache.VideoPlayerCacheManager
 import com.client.xvideos.ui.theme.XvideosTheme
-import com.client.common.util.KeepScreenOn
 import com.example.ui.screens.ScreenRedRoot
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -53,24 +61,29 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
             .build()
     }
 
+    @OptIn(ExperimentalVoyagerApi::class, ExperimentalLayoutApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        enableEdgeToEdge(statusBarStyle = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT))
+        //enableEdgeToEdge(statusBarStyle = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT))
         super.onCreate(savedInstanceState)
 
         val window = this.window
-        val windowInsetsController = window?.let {WindowCompat.getInsetsController(it, it.decorView)}
 
-        windowInsetsController?.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+//        val windowInsetsController =
+//            window?.let { WindowCompat.getInsetsController(it, it.decorView) }
+//
+//        windowInsetsController?.systemBarsBehavior =
+//            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+//
+//        window?.let { WindowCompat.setDecorFitsSystemWindows(window, false) }
+//        window?.attributes = window.attributes?.apply {
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+//                layoutInDisplayCutoutMode =
+//                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+//            }
+//        }
+//        windowInsetsController?.hide(WindowInsetsCompat.Type.systemBars())
 
-        window?.let { WindowCompat.setDecorFitsSystemWindows(window, false) }
-        window?.attributes = window.attributes?.apply {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
-            }
-        }
-
-        windowInsetsController?.hide(WindowInsetsCompat.Type.systemBars())
 
         if (!PermissionStorage.hasPermissions(this)) {
             val intent = Intent(this, PermissionScreenActivity::class.java)
@@ -82,34 +95,16 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
         VideoPlayerCacheManager.initialize(this, 1024 * 1024 * 1024)    // 1GB
 
         setContent {
-
             KeepScreenOn()
-
-//            // Remember a SystemUiController
-//            val systemUiController = rememberSystemUiController()
-//            val useDarkIcons = !isSystemInDarkTheme()
-//
-//            DisposableEffect(systemUiController, useDarkIcons) {
-//
-//                systemUiController.setSystemBarsColor(
-//                    color = Color.Transparent,
-//                    darkIcons = useDarkIcons
-//                )
-//
-//
-//                // setStatusBarColor() and setNavigationBarColor() also exist
-//                onDispose {}
-//            }
-
-            //val startScreen = remember { ScreenRedTopThisWeek() }
-
             XvideosTheme(darkTheme = true) {
-
-
-
+                //EdgeToEdgeFix()
                 //Navigator(ScreenTags("blonde"))
-                Box(
-                    modifier = Modifier.fillMaxSize()
+                Surface(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black)
+                        //.windowInsetsPadding(WindowInsets.ime)
+                        //.consumeWindowInsets(WindowInsets.ime)
                     //.displayCutoutPadding()
                     //.systemBarsPadding())
                 )
@@ -118,18 +113,32 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
                     //Navigator(ScreenFavorites())
                     //ScreenRedProfile
                     //Navigator(ScreenRedProfile("lilijunex")
-
                     //Navigator(startScreen, key = "1")
-                    Timber.d("!!! Navigator(ScreenRedNiche())")
                     //Navigator(ScreenRedNiche())
-
-                    Navigator(ScreenRedRoot())
-
-                    //Navigator(ScreenRedExplorer())
+                    Navigator( screen = ScreenRedRoot())
                 }
 
             }
         }
     }
 
+}
+
+@Composable
+fun EdgeToEdgeFix() {
+    val context = LocalContext.current
+    val window = (context as? Activity)?.window ?: return
+    val controller = WindowCompat.getInsetsController(window, window.decorView)
+
+    LaunchedEffect(Unit) {
+        // Поведение: показывать панели при свайпе
+        controller.systemBarsBehavior =
+            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+
+        // Не скрываем навигацию — только статус-бар (если нужно)
+        controller.hide(WindowInsetsCompat.Type.statusBars())
+
+        // "Пинаем" для корректного обновления insets
+        window.decorView.requestApplyInsets()
+    }
 }

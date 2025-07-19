@@ -17,6 +17,8 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -46,7 +48,8 @@ fun RedVideoPlayerWithMenu(
     enableAB: Boolean,
     onClick: () -> Unit = {},
     autoRotate: Boolean,
-    isCurrentPage : Boolean
+    isCurrentPage : Boolean,
+    modifier : Modifier = Modifier
 ) {
 
     if (BuildConfig.DEBUG) { SideEffect {
@@ -106,7 +109,7 @@ fun RedVideoPlayerWithMenu(
 
     VideoPlayerWithMenuContent(
         onClick = onClick,
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.then(modifier),
         playerHost = playerHost,
         autoRotate = autoRotate
     )

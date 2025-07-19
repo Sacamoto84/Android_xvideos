@@ -1,7 +1,16 @@
 package com.client.common.videoplayer.util
 
+import android.content.Context
+import android.graphics.SurfaceTexture
+import android.opengl.EGLConfig
+import android.opengl.GLES11Ext
+import android.opengl.GLES20
+import android.opengl.GLSurfaceView
 import androidx.annotation.OptIn
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -11,11 +20,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.effect.ScaleAndRotateTransformation
+import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.AspectRatioFrameLayout
+import com.client.common.R
 import com.client.common.videoplayer.host.DrmConfig
 import com.client.common.videoplayer.host.MediaPlayerError
 import com.client.common.videoplayer.model.PlayerSpeed
@@ -27,6 +40,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.isActive
 import timber.log.Timber
+import javax.microedition.khronos.opengles.GL10
 
 @OptIn(UnstableApi::class)
 @Composable
@@ -55,7 +69,7 @@ fun CMPPlayer2(
 ) {
     val context = LocalContext.current
 
-    var exoPlayer = rememberExoPlayerWithLifecycle(
+    val exoPlayer = rememberExoPlayerWithLifecycle(
         url,
         context,
         isPause,
@@ -71,8 +85,6 @@ fun CMPPlayer2(
     )
 
     var currentRotate by remember { mutableFloatStateOf(0f) }
-
-    //LaunchedEffect(exoPlayer) { onExoPlayer(exoPlayer) }
 
     val playerView = rememberPlayerView(exoPlayer, context)
 
@@ -109,24 +121,10 @@ fun CMPPlayer2(
         }
     }
 
-//    LaunchedEffect(currentRotate) {
-//        Timber.i("@@@! 777 LaunchedEffect currentRotate:$currentRotate autoRotate:$autoRotate")
-//        if (autoRotate) {
-//            val rotateEffect =
-//                ScaleAndRotateTransformation.Builder().setRotationDegrees(currentRotate).build()
-//            exoPlayer.setVideoEffects(listOf(rotateEffect))
-//        }
-//    }
-
     LaunchedEffect(autoRotate) {
         Timber.i("@@@! 888 LaunchedEffect currentRotate:$currentRotate autoRotate:$autoRotate")
-        //if (autoRotate) {
-
-        val rotateEffect =
-            ScaleAndRotateTransformation.Builder().setRotationDegrees(if (autoRotate) -90f else 0f)
-                .build()
+        val rotateEffect = ScaleAndRotateTransformation.Builder().setRotationDegrees(if (autoRotate) -90f else 0f).build()
         exoPlayer.setVideoEffects(listOf(rotateEffect))
-        //}
     }
 
     // Keep screen on while the player view is active
@@ -134,7 +132,8 @@ fun CMPPlayer2(
         playerView.keepScreenOn = true
     }
 
-    Box {
+    Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
+
         AndroidView(
             factory = { playerView },
             modifier = modifier,
@@ -166,6 +165,8 @@ fun CMPPlayer2(
             exoPlayer.addListener(listener)
 
             onDispose {
+                exoPlayer.stop()
+                exoPlayer.clearMediaItems()
                 exoPlayer.removeListener(listener)
                 exoPlayer.release()
             }
@@ -173,8 +174,10 @@ fun CMPPlayer2(
 
         DisposableEffect(Unit) {
             onDispose {
+                exoPlayer.stop()
+                exoPlayer.clearMediaItems()
                 exoPlayer.release()
-                playerView.keepScreenOn = false
+                //playerView.keepScreenOn = false
                 CacheManager.release()
             }
         }

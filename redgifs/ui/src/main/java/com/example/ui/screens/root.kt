@@ -117,9 +117,9 @@ class ScreenRedRoot() : Screen {
             }
         }
 
-        BackHandler {
-            Timber.i("iii BackHandler Root")
-        }
+//        BackHandler {
+//            Timber.i("iii BackHandler Root")
+//        }
 
         if (savedRed.collections.collectionVisibleDialog) {
             DialogCollection(

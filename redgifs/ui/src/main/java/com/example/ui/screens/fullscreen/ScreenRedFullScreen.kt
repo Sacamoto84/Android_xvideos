@@ -1,12 +1,17 @@
 package com.example.ui.screens.fullscreen
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.slideIn
+import androidx.compose.animation.slideOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -32,25 +37,27 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import cafe.adriel.voyager.core.annotation.ExperimentalVoyagerApi
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
+import cafe.adriel.voyager.core.stack.StackEvent
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import cafe.adriel.voyager.transitions.ScreenTransition
 import com.client.common.AppPath
 import com.client.common.R
 import com.client.common.connectivityObserver.ConnectivityObserver
 import com.client.common.urlVideImage.UrlImage
-import com.composeunstyled.DropdownPanelAnchor
 import com.example.ui.screens.explorer.ScreenRedExplorer
 import com.example.ui.screens.fullscreen.bottom_bar.FeedControls_Container_Line0
 import com.example.ui.screens.profile.ScreenRedProfile
@@ -71,13 +78,29 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
-import kotlinx.coroutines.flow.any
 import timber.log.Timber
 import javax.inject.Inject
 
-class ScreenRedFullScreen(val item: GifsInfo) : Screen {
+@OptIn(ExperimentalVoyagerApi::class)
+class ScreenRedFullScreen(val item: GifsInfo) : Screen, ScreenTransition {
 
     override val key: ScreenKey = "ScreenRedFullScreen"
+
+
+    override fun enter(lastEvent: StackEvent): EnterTransition {
+        return slideIn { size ->
+            val x = if (lastEvent == StackEvent.Pop) -size.width else size.width
+            IntOffset(x = x, y = 0)
+        }
+    }
+
+    override fun exit(lastEvent: StackEvent): ExitTransition {
+        return slideOut { size ->
+            val x = if (lastEvent == StackEvent.Pop) size.width else -size.width
+            IntOffset(x = x, y = 0)
+        }
+    }
+
 
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
@@ -116,8 +139,8 @@ class ScreenRedFullScreen(val item: GifsInfo) : Screen {
             )
         }
 
-
         Scaffold(
+            containerColor = Color.Magenta,
             bottomBar = {
                 Column(modifier = Modifier.background(ThemeRed.colorCommonBackground)) {
 
@@ -160,6 +183,7 @@ class ScreenRedFullScreen(val item: GifsInfo) : Screen {
         ) {
 
             RedVideoPlayerWithMenu(
+                modifier = Modifier.padding(bottom = it.calculateBottomPadding()/2),
                 url = videoUri,
                 play = vm.play,
                 onChangeTime = { it1 ->
@@ -209,12 +233,24 @@ class ScreenRedFullScreen(val item: GifsInfo) : Screen {
                             Icon(
                                 Icons.Default.Person,
                                 contentDescription = null,
-                                tint = Color.White, modifier = Modifier.padding(end = 8.dp).clip(RoundedCornerShape(12.dp)).size(40.dp).background(Color.DarkGray).size(10.dp)
+                                tint = Color.White,
+                                modifier = Modifier
+                                    .padding(end = 8.dp)
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .size(40.dp)
+                                    .background(Color.DarkGray)
+                                    .size(10.dp)
                             )
                         }
-                    }else
-                    {
-                        Box(modifier = Modifier.padding(end = 8.dp).clip(RoundedCornerShape(12.dp)).size(40.dp).background(Color.DarkGray), contentAlignment = Alignment.Center) {
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .padding(end = 8.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                                .size(40.dp)
+                                .background(Color.DarkGray),
+                            contentAlignment = Alignment.Center
+                        ) {
                             Icon(
                                 Icons.Default.Person,
                                 contentDescription = null,
