@@ -159,8 +159,6 @@ object GifsTab : Screen {
 
                             )
                         } else {
-
-
                             SortByOrder(
                                 containerColor = ThemeRed.colorCommonBackground,
                                 list = listOf(Order.TOP, Order.TRENDING, Order.LATEST),
@@ -170,24 +168,23 @@ object GifsTab : Screen {
 
                     }
 
-                    search.CustomBasicTextField(
-                        value = search.searchText.collectAsStateWithLifecycle().value,
-                        onValueChange = { search.searchText.value = it },
-                        onDone = { search.searchTextDone.value = it },
-                        modifier = Modifier
-                            .padding(start = 4.dp)
-                            .weight(1f)
-                    )
+                    search.CustomBasicTextField(modifier = Modifier.padding(start = 4.dp).weight(1f))
 
                     Spacer(modifier = Modifier.width(4.dp))
 
+                    AnimatedVisibility(
+                        visible = !isFocused,
 
-                    AnimatedVisibility(visible = !isFocused,
-
-                        enter = expandHorizontally(animationSpec = tween(durationMillis = 250), expandFrom = Alignment.Start) + fadeIn(
+                        enter = expandHorizontally(
+                            animationSpec = tween(durationMillis = 250),
+                            expandFrom = Alignment.Start
+                        ) + fadeIn(
                             animationSpec = tween(durationMillis = 250)
                         ),
-                        exit = shrinkHorizontally(animationSpec = tween(durationMillis = 250), shrinkTowards = Alignment.Start) + fadeOut(
+                        exit = shrinkHorizontally(
+                            animationSpec = tween(durationMillis = 250),
+                            shrinkTowards = Alignment.Start
+                        ) + fadeOut(
                             animationSpec = tween(durationMillis = 250)
                         ),
 

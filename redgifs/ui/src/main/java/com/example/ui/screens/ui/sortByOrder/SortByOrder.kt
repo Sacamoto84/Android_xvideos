@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -43,9 +44,14 @@ import com.redgifs.common.ThemeRed
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SortByOrder(list: List<Order>, selected: Order, onSelect: (Order) -> Unit, containerColor : Color = Color.Transparent) {
+fun SortByOrder(
+    list: List<Order>,
+    selected: Order,
+    onSelect: (Order) -> Unit,
+    containerColor: Color = Color.Transparent
+) {
 
-    if (!list.any { it == selected }){
+    if (!list.any { it == selected }) {
         onSelect(Order.LATEST)
     }
 
@@ -60,16 +66,17 @@ fun SortByOrder(list: List<Order>, selected: Order, onSelect: (Order) -> Unit, c
             expanded = it
         },
         modifier = Modifier
-            .clip(RoundedCornerShape(8.dp)).background(containerColor)
+            .clip(RoundedCornerShape(8.dp))
+            .background(containerColor)
 
     )
     {
 
         Row(
             modifier = Modifier
-                .width(120.dp)
+                .width(100.dp)
                 .height(46.dp)
-                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable)
+                .menuAnchor(ExposedDropdownMenuAnchorType.SecondaryEditable)
                 .border(
                     1.dp, Color(0xFF3A3A3A),
                     RoundedCornerShape(8.dp)
@@ -104,33 +111,35 @@ fun SortByOrder(list: List<Order>, selected: Order, onSelect: (Order) -> Unit, c
             BasicText(
                 text,
                 modifier = Modifier
-                    .padding(start = 8.dp).weight(1f)
+                    .padding(horizontal = 8.dp)
+                    .weight(1f)
                     .align(Alignment.CenterVertically),
                 style = TextStyle(
                     color = Color.White,
                     fontFamily = ThemeRed.fontFamilyDMsanss,
                     fontSize = 18.sp
                 ),
-                autoSize =  TextAutoSize.StepBased(minFontSize = 12.sp, maxFontSize = 18.sp),
+                autoSize = TextAutoSize.StepBased(minFontSize = 12.sp, maxFontSize = 18.sp),
                 maxLines = 1
             )
 
-            Icon(
-                painter = painterResource(R.drawable.arrow_down),
-                contentDescription = "",
-                tint = Color.White,
-                modifier = Modifier
-                    .padding(start = 4.dp, end = 8.dp)
-                    .align(Alignment.CenterVertically)
-                    .size(12.dp)
-                    .rotate(if (expanded) 180f else 0f)
-            )
+//            Icon(
+//                painter = painterResource(R.drawable.arrow_down),
+//                contentDescription = "",
+//                tint = Color.White,
+//                modifier = Modifier
+//                    .padding(start = 4.dp, end = 8.dp)
+//                    .align(Alignment.CenterVertically)
+//                    .size(12.dp)
+//                    .rotate(if (expanded) 180f else 0f)
+//            )
+
         }
 
         ExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            modifier = Modifier, containerColor = Color(0xFF090909),
+            modifier = Modifier.width(IntrinsicSize.Min), containerColor = Color(0xFF090909),
             shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, ThemeRed.colorBorderGray)
         ) {
             list.forEach { option ->
@@ -149,14 +158,14 @@ fun SortByOrder(list: List<Order>, selected: Order, onSelect: (Order) -> Unit, c
                         ) {
 
                             val text = when (option) {
-                                Order.TOP -> " Top"
-                                Order.LATEST -> " Latest"
-                                Order.TRENDING -> " Trending"
-                                Order.FORCE_TEMP -> " Refresh"
-                                Order.OLDEST -> " Oldest"
-                                Order.RECENT -> " Recent"
-                                Order.BEST -> " Best"
-                                Order.TOP28 -> " Top28"
+                                Order.TOP -> "Top"
+                                Order.LATEST -> "Latest"
+                                Order.TRENDING -> "Trending"
+                                Order.FORCE_TEMP -> "Refresh"
+                                Order.OLDEST -> "Oldest"
+                                Order.RECENT -> "Recent"
+                                Order.BEST -> "Best"
+                                Order.TOP28 -> "Top28"
                                 Order.NEW -> " New"
                                 Order.TOP_WEEK -> "Week"
                                 Order.TOP_MONTH -> "Month"
@@ -181,13 +190,16 @@ fun SortByOrder(list: List<Order>, selected: Order, onSelect: (Order) -> Unit, c
 
                             BasicText(
                                 text,
-                                modifier = Modifier,
+                                modifier = Modifier.padding(horizontal = 8.dp),
                                 style = TextStyle(
                                     color = Color.White,
                                     fontFamily = ThemeRed.fontFamilyDMsanss,
                                     fontSize = 18.sp
                                 ),
-                                autoSize =  TextAutoSize.StepBased(minFontSize = 12.sp, maxFontSize = 18.sp),
+                                autoSize = TextAutoSize.StepBased(
+                                    minFontSize = 12.sp,
+                                    maxFontSize = 18.sp
+                                ),
                                 maxLines = 1
                             )
 

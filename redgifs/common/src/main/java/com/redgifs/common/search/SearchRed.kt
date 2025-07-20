@@ -38,7 +38,6 @@ import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Undo
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
@@ -122,21 +121,22 @@ class SearchRed @Inject constructor(
     init {
         scope.launch {
             searchText.collect {
-                if (it != "") {
-                    val a = redApi.getTagSuggestions(it)
-                    searchTextSuggestions.value = a
-                }
+                val request = if (it == "") " " else it
+                val a = redApi.getTagSuggestions(request)
+                searchTextSuggestions.value = a
             }
         }
     }
 
     @Composable
     fun CustomBasicTextField(
-        value: String,
-        onValueChange: (String) -> Unit,
-        onDone: (String) -> Unit = {},
+        //value: String,
+        //onValueChange: (String) -> Unit,
+        //onDone: (String) -> Unit = {},
         modifier: Modifier = Modifier,
     ) {
+
+        val value = searchText.collectAsStateWithLifecycle().value
 
         val searchTagSuggestion = searchTextSuggestions.collectAsStateWithLifecycle().value
 
@@ -175,7 +175,8 @@ class SearchRed @Inject constructor(
         }
 
         Column(
-            modifier = modifier.padding(top =  if (isFocused) 4.dp else 0.dp)
+            modifier = modifier
+                .padding(top = if (isFocused) 4.dp else 0.dp)
                 .fillMaxWidth()
                 .background(ThemeRed.colorCommonBackground2, RoundedCornerShape(8.dp))
                 .border(
@@ -188,12 +189,17 @@ class SearchRed @Inject constructor(
 
             AnimatedVisibility(
                 delayFocus,
-                enter = expandVertically(animationSpec = tween(durationMillis = 500)) + fadeIn(animationSpec = tween(durationMillis = 500)),
-                exit = shrinkVertically(animationSpec = tween(durationMillis = 500)) + fadeOut(animationSpec = tween(durationMillis = 500)),
-                ) {
+                enter = expandVertically(animationSpec = tween(durationMillis = 500)) + fadeIn(
+                    animationSpec = tween(durationMillis = 500)
+                ),
+                exit = shrinkVertically(animationSpec = tween(durationMillis = 500)) + fadeOut(
+                    animationSpec = tween(durationMillis = 500)
+                ),
+            ) {
 
                 Box(
-                    Modifier.padding(top = 1.dp)
+                    Modifier
+                        .padding(top = 1.dp)
                         .fillMaxWidth()
                         .height(126.dp)
                 ) {
@@ -297,24 +303,24 @@ class SearchRed @Inject constructor(
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .padding(start = 4.dp)
-                    .height(46.dp)
+                modifier = Modifier.padding(start = 4.dp).height(46.dp)
             ) {
 
-                if ((value == "") && (!isFocused)) {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = null,
-                        tint = Color(0xFF757575),
-                        modifier = Modifier.padding(start = 4.dp)
-                    )
-                }
 
-                Spacer(modifier = Modifier.width(4.dp))
+//                if ((value == "") && (!isFocused)) {
+//                    Icon(
+//                        imageVector = Icons.Default.Search,
+//                        contentDescription = null,
+//                        tint = Color(0xFF757575),
+//                        modifier = Modifier.padding(start = 4.dp)
+//                    )
+//                }
+
+                //Spacer(modifier = Modifier.width(4.dp))
+
                 BasicTextField(
                     value = value,
-                    onValueChange = onValueChange,
+                    onValueChange =   { searchText.value = it },
                     singleLine = true,
                     textStyle = TextStyle(
                         fontSize = 18.sp,
@@ -324,23 +330,19 @@ class SearchRed @Inject constructor(
                         textAlign = TextAlign.Left
                     ),
                     modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth()
-                        .onFocusChanged { focusState ->
-                            isFocused = focusState.isFocused
-                        },
+                        .weight(1f).fillMaxWidth()
+                        .onFocusChanged { focusState -> isFocused = focusState.isFocused },
                     cursorBrush = SolidColor(Color.Gray),
 
                     // 1. Говорим IME, что нам нужна кнопка «Done»
                     keyboardOptions = KeyboardOptions(
-                        imeAction = ImeAction.Done,
-                        keyboardType = KeyboardType.Text       // по желанию
+                        imeAction = ImeAction.Done, keyboardType = KeyboardType.Text
                     ),
 
                     // 2. Обрабатываем её нажатие
                     keyboardActions = KeyboardActions(
                         onDone = {
-                            onDone(value)
+                            searchTextDone.value = value
                             add(value)                         // например, запускаем поиск
                             focusManager.clearFocus()          // убираем курсор
                             keyboardController?.hide()         // закрываем клавиатуру
@@ -348,16 +350,22 @@ class SearchRed @Inject constructor(
                     )
                 )
 
+
+                //Кнопка очистка
                 if (value != "") {
                     Icon(
                         Icons.Default.Clear, contentDescription = null, tint = Color(0xFF757575),
                         modifier = Modifier
                             .width(36.dp)
                             .height(46.dp)
-                            .clickable(onClick = { onDone("");onValueChange("") })
+                            .clickable(onClick = {
+                                searchTextDone.value = ""
+                                searchText.value = ""
+                            })
                     )
                 }
 
+                //Кнопка назад
                 Icon(
                     Icons.Default.Undo, contentDescription = null, tint = Color(0xFF757575),
                     modifier = Modifier
