@@ -64,10 +64,12 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
@@ -94,6 +96,12 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 
+
+
+
+
+
+
 @Singleton
 class SearchRed @Inject constructor(
     val dao: SearchRedHistoryDao,
@@ -105,7 +113,7 @@ class SearchRed @Inject constructor(
     /**
      * Отображаемый текст
      */
-    var searchText = MutableStateFlow("")
+    var searchText = MutableStateFlow(TextFieldValue(""))
 
     /**
      * Текст по которому будет идти запрос на сервер
@@ -121,7 +129,7 @@ class SearchRed @Inject constructor(
     init {
         scope.launch {
             searchText.collect {
-                val request = if (it == "") " " else it
+                val request = if (it.text == "") " " else it.text
                 val a = redApi.getTagSuggestions(request)
                 searchTextSuggestions.value = a
             }
@@ -130,9 +138,6 @@ class SearchRed @Inject constructor(
 
     @Composable
     fun CustomBasicTextField(
-        //value: String,
-        //onValueChange: (String) -> Unit,
-        //onDone: (String) -> Unit = {},
         modifier: Modifier = Modifier,
     ) {
 
@@ -211,8 +216,7 @@ class SearchRed @Inject constructor(
                                 .weight(1f)
                         ) {
                             items(searchTagSuggestion) {
-
-                                val query = searchTextValue
+                                val query = searchTextValue.text
                                 val text = it.text
                                 val startIndex = text.indexOf(query, ignoreCase = true)
                                 val annotatedString = buildAnnotatedString {
@@ -237,7 +241,10 @@ class SearchRed @Inject constructor(
                                         .padding(start = 3.dp, top = 1.dp, end = 3.dp)
                                         .background(ThemeRed.colorTabLevel2)
                                         .clickable(onClick = {
-                                            searchText.value = it.text
+                                            searchText.value = TextFieldValue(
+                                                text = it.text,
+                                                selection = TextRange(it.text.length) // курсор в конец
+                                            )
                                             searchTextDone.value = it.text
                                             stack.addLast(it.text)
                                         })
@@ -303,7 +310,9 @@ class SearchRed @Inject constructor(
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(start = 4.dp).height(46.dp)
+                modifier = Modifier
+                    .padding(start = 4.dp)
+                    .height(46.dp)
             ) {
 
 
@@ -320,7 +329,7 @@ class SearchRed @Inject constructor(
 
                 BasicTextField(
                     value = value,
-                    onValueChange =   { searchText.value = it },
+                    onValueChange = { searchText.value = it },
                     singleLine = true,
                     textStyle = TextStyle(
                         fontSize = 18.sp,
@@ -330,7 +339,8 @@ class SearchRed @Inject constructor(
                         textAlign = TextAlign.Left
                     ),
                     modifier = Modifier
-                        .weight(1f).fillMaxWidth()
+                        .weight(1f)
+                        .fillMaxWidth()
                         .onFocusChanged { focusState -> isFocused = focusState.isFocused },
                     cursorBrush = SolidColor(Color.Gray),
 
@@ -342,8 +352,8 @@ class SearchRed @Inject constructor(
                     // 2. Обрабатываем её нажатие
                     keyboardActions = KeyboardActions(
                         onDone = {
-                            searchTextDone.value = value
-                            add(value)                         // например, запускаем поиск
+                            searchTextDone.value = value.text
+                            add(value.text)                         // например, запускаем поиск
                             focusManager.clearFocus()          // убираем курсор
                             keyboardController?.hide()         // закрываем клавиатуру
                         }
@@ -352,7 +362,7 @@ class SearchRed @Inject constructor(
 
 
                 //Кнопка очистка
-                if (value != "") {
+                if (value.text != "") {
                     Icon(
                         Icons.Default.Clear, contentDescription = null, tint = Color(0xFF757575),
                         modifier = Modifier
@@ -360,7 +370,10 @@ class SearchRed @Inject constructor(
                             .height(46.dp)
                             .clickable(onClick = {
                                 searchTextDone.value = ""
-                                searchText.value = ""
+                                searchText.value = TextFieldValue(
+                                    text = "",
+                                    selection = TextRange("".length) // курсор в конец
+                                )
                             })
                     )
                 }
@@ -374,7 +387,10 @@ class SearchRed @Inject constructor(
                         .clickable(onClick = {
                             if (!stack.isEmpty()) {
                                 val s = stack.removeLast()
-                                searchText.value = s
+                                searchText.value = TextFieldValue(
+                                    text = s,
+                                    selection = TextRange(s.length) // курсор в конец
+                                )
                                 searchTextDone.value = s
                             }
                         })
@@ -386,85 +402,6 @@ class SearchRed @Inject constructor(
         }
         //}
     }
-
-    @OptIn(ExperimentalMaterial3Api::class)
-    @Composable
-    fun ExpandMenuHelper(
-        modifier: Modifier = Modifier,
-        savedRed: SavedRed
-    ) {
-        var expanded by remember { mutableStateOf(false) }
-
-        ExposedDropdownMenuBox(
-            expanded = expanded,
-            onExpandedChange = { expanded = it },
-            modifier = Modifier.then(modifier)
-        )
-        {
-            Box(modifier = Modifier, contentAlignment = Alignment.Center) {
-                Icon(
-                    if (expanded) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
-                    contentDescription = "",
-                    tint = Color(0xFF757575),
-                    modifier = Modifier
-                        .width(24.dp)
-                        .height(46.dp)
-                        .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
-                )
-            }
-
-            ExposedDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-                modifier = Modifier
-                    //.imePadding()
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.7f)
-                    //.clip(RoundedCornerShape(16.dp))
-                    .border(1.dp, ThemeRed.colorTabLevel3, RoundedCornerShape(16.dp)),
-                containerColor = ThemeRed.colorTabLevel2,
-                shape = RoundedCornerShape(16.dp)
-            ) {
-
-                FlowRow(
-                    Modifier
-                        .padding(4.dp)
-                        .fillMaxSize(), maxItemsInEachRow = 10
-                ) {
-                    savedRed.tagsList.sortedByDescending { it.count }.take(200).forEach {
-                        Box(
-                            modifier = Modifier
-                                .padding(horizontal = 2.dp)
-                                .padding(vertical = 2.dp)
-                                .clip(RoundedCornerShape(25))
-                                .border(1.dp, ThemeRed.colorTextGray, RoundedCornerShape(25))
-                                .background(ThemeRed.colorTabLevel1)
-                                .padding(4.dp)
-                                .clickable(onClick = {
-                                    searchText.value = it.name
-                                    searchTextDone.value = it.name
-                                    expanded = false
-                                })
-
-                        ) {
-
-                            Text(
-                                it.name, //+" " + it.count.toPrettyCountInt(),
-                                color = Color.White,
-                                modifier = Modifier,
-                                fontSize = 12.sp
-                            )
-
-                        }
-                    }
-                }
-
-
-            }
-        }
-
-    }
-
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
@@ -510,7 +447,12 @@ class SearchRed @Inject constructor(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 8.dp)
-                            .clickable(onClick = { searchText.value = it }),
+                            .clickable(onClick = {
+                                searchText.value = TextFieldValue(
+                                    text = it,
+                                    selection = TextRange(it.length) // курсор в конец
+                                )
+                            }),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {

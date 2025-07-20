@@ -69,14 +69,17 @@ class AndroidConnectivityObserver(
     override val isConnected: StateFlow<Boolean> = callbackFlow {
         val callback = object : NetworkCallback() {
             override fun onAvailable(network: Network) {
+                Timber.w("!!! 999 onAvailable")
                 trySend(true)
             }
 
             override fun onLost(network: Network) {
+                Timber.w("!!! 999 onLost")
                 trySend(false)
             }
 
             override fun onUnavailable() {
+                Timber.w("!!! 999 onUnavailable")
                 trySend(false)
             }
 
@@ -84,6 +87,7 @@ class AndroidConnectivityObserver(
                 network: Network,
                 networkCapabilities: NetworkCapabilities,
             ) {
+                Timber.w("!!! 999 onCapabilitiesChanged")
                 trySend(
                     networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
                 )
@@ -91,17 +95,20 @@ class AndroidConnectivityObserver(
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Timber.w("!!! 999 registerNetworkCallback")
             connectivityManager.registerDefaultNetworkCallback(callback)
         } else {
+            Timber.w("!!! 999 registerNetworkCallback")
             val request = NetworkRequest.Builder().build()
             connectivityManager.registerNetworkCallback(request, callback)
         }
 
         awaitClose {
             try {
+                Timber.w("!!! 999 connectivityManager.unregisterNetworkCallback(callback)")
                 connectivityManager.unregisterNetworkCallback(callback)
             } catch (e: Exception) {
-                Timber.tag("ConnectivityObserver").w(e, "Callback already unregistered")
+                Timber.e(e, "!!! 999 Callback already unregistered")
             }
         }
     }.stateIn(

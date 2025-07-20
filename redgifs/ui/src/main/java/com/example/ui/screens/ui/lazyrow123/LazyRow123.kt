@@ -38,6 +38,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -251,7 +253,6 @@ fun LazyRow123(
 
                         Column(modifier = Modifier.align(Alignment.TopEnd)) {
 
-
                             //Меню на 3 точки
                             ExpandMenuVideo(
                                 item = item,
@@ -278,19 +279,15 @@ fun LazyRow123(
                                 ExpandMenuVideoTags(
                                     item = item,
                                     modifier = Modifier,
-                                    onClick = {
-                                        host.hostDI.search.searchText.value = it
-                                        host.hostDI.search.searchTextDone.value = it
+                                    onClick = {it1->
+                                        host.hostDI.search.searchText.value = TextFieldValue(text = it1, selection = TextRange(it1.length))
+                                        host.hostDI.search.searchTextDone.value = it1
                                         ScreenRedExplorer.screenType = 0
                                         navigator.popAll()
                                     }
                                 )
                             }
-
                         }
-
-
-
 
                         if (host.visibleProfileInfo) {
                             ProfileInfo1(

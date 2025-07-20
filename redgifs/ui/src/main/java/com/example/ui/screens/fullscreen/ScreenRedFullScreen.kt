@@ -41,6 +41,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -328,9 +330,9 @@ class ScreenRedFullScreen(val item: GifsInfo) : Screen, ScreenTransition {
                     ExpandMenuVideoTags(
                         item = item,
                         modifier = Modifier,
-                        onClick = {
-                            vm.hostDI.search.searchText.value = it
-                            vm.hostDI.search.searchTextDone.value = it
+                        onClick = { it1 ->
+                            vm.hostDI.search.searchText.value = TextFieldValue(text = it1, selection = TextRange(it1.length))
+                            vm.hostDI.search.searchTextDone.value = it1
                             ScreenRedExplorer.screenType = 0
                             navigator.pop()
                         },

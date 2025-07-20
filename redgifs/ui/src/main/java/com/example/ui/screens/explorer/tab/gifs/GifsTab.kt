@@ -144,7 +144,7 @@ object GifsTab : Screen {
                     ) {
 
                         //
-                        if (searchR == "") {
+                        if (searchR.text == "") {
                             SortByOrder(
                                 containerColor = ThemeRed.colorCommonBackground,
                                 list = listOf(
