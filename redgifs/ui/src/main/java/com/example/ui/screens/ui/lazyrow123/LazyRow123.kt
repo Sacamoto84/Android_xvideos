@@ -78,7 +78,7 @@ fun LazyRow123(
 
     SideEffect { Timber.d("!!! LazyRow123::SideEffect columns: ${host.columns} : $listGifs") }
 
-    val isConnected by host.isConnected.collectAsState()
+    val isConnected by host.isConnected.collectAsStateWithLifecycle()
     val state = host.state//rememberLazyGridState()
     var blockItem by remember { mutableStateOf<GifsInfo?>(null) }
 
@@ -242,7 +242,6 @@ fun LazyRow123(
                             isVisibleDuration = false,
                             play = false,//centrallyLocatedOrMostVisibleItemIndex == index && host.columns == 1,
                             isNetConnected = isConnected,
-                            onVideoUri = { videoUri = it },
                             onFullScreen = {
                                 blockItem = item
                                 navigator.push(ScreenRedFullScreen(item))

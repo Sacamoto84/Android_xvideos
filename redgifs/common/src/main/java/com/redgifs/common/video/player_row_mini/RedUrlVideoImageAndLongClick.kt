@@ -60,8 +60,6 @@ fun RedUrlVideoImageAndLongClick(
 
     onVideo: (Boolean) -> Unit = {},       //true - видео, false - картинка
 
-    onVideoUri : (String)-> Unit = {},
-
     downloadRed : DownloadRed
 
 ) {
@@ -76,24 +74,6 @@ fun RedUrlVideoImageAndLongClick(
     LaunchedEffect(isVideo) { onVideo(isVideo) }
 
     LaunchedEffect(play) { isVideo = play }
-
-    val videoUri: String = remember(item.id, item.userName) {
-        Timber.tag("???").i("Перерачсет videoItem.id = ${item.id}")
-        //Определяем адрес откуда брать видео, из кеша или из сети
-        if (downloadRed.downloader.findVideoInDownload(item.id, item.userName))
-            "${AppPath.cache_download_red}/${item.userName}/${item.id}.mp4"
-        else {
-            if (isNetConnected)
-                "https://api.redgifs.com/v2/gifs/${item.id.lowercase()}/hd.m3u8"
-            else
-                "android.resource://${context.packageName}/raw/q"
-        }
-    }
-
-    SideEffect {
-        onVideoUri(videoUri)
-        Timber.i("@@@ RedUrlVideoImageAndLongClick() >> videoUri: $videoUri")
-    }
 
     Box(
         modifier = Modifier
@@ -120,8 +100,21 @@ fun RedUrlVideoImageAndLongClick(
     ) {
         if (isVideo) {
 
+            val videoUri: String = remember(item.id, item.userName) {
+                Timber.tag("???").i("Перерачсет videoItem.id = ${item.id}")
+                //Определяем адрес откуда брать видео, из кеша или из сети
+                if (downloadRed.downloader.findVideoInDownload(item.id, item.userName))
+                    "${AppPath.cache_download_red}/${item.userName}/${item.id}.mp4"
+                else {
+                    if (isNetConnected)
+                        "https://api.redgifs.com/v2/gifs/${item.id.lowercase()}/hd.m3u8"
+                    else
+                        "android.resource://${context.packageName}/raw/q"
+                }
+            }
+            Timber.i("@@@ RedUrlVideoImageAndLongClick() >> videoUri: $videoUri")
             Red_Video_Lite_Row2(
-                videoUri,//"https://api.redgifs.com/v2/gifs/${item.id.lowercase()}/hd.m3u8",
+                videoUri,
                 play = true,
                 onClick = { isVideo = isVideo.not() },
                 onLongClick = { onFullScreen.invoke() },
