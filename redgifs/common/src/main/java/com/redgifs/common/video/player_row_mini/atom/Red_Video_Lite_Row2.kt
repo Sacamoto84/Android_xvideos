@@ -47,7 +47,7 @@ fun Red_Video_Lite_Row2(
     var time by remember { mutableFloatStateOf(0f) }
     var duration by remember { mutableIntStateOf(0) }
 
-    if (BuildConfig.DEBUG) { SideEffect { Timber.i("@@@ Red_Video_Lite_2Rrow() play = $play, url = $url time = $time, duration = $duration") } }
+    //if (BuildConfig.DEBUG) { SideEffect { Timber.i("@@@ Red_Video_Lite_2Rrow() play = $play, url = $url time = $time, duration = $duration") } }
 
     val playerHost = remember { MediaPlayerHost(mediaUrl = url, isPaused = false, isMuted = true) }
 

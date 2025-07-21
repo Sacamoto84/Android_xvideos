@@ -2,6 +2,7 @@ package com.example.ui.screens.ui.lazyrow123
 
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
@@ -11,7 +12,6 @@ import androidx.paging.PagingData
 import androidx.paging.PagingSource
 import androidx.paging.cachedIn
 import com.client.common.connectivityObserver.ConnectivityObserver
-import com.redgifs.common.block.BlockRed
 import com.redgifs.common.di.HostDI
 import com.redgifs.common.pagin.ItemCollectionPagingSource
 import com.redgifs.common.pagin.ItemEmptyPagingSource
@@ -20,10 +20,7 @@ import com.redgifs.common.pagin.ItemNailsPagingSource
 import com.redgifs.common.pagin.ItemProfilePagingSource
 import com.redgifs.common.pagin.ItemSavedLikesPagingSource
 import com.redgifs.common.pagin.ItemTopPagingSource
-import com.redgifs.common.saved.SavedRed
-import com.redgifs.common.snackBar.SnackBarEvent
 import com.redgifs.model.Order
-import com.redgifs.network.api.RedApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -77,6 +74,8 @@ class LazyRow123Host(
     private val refreshTrigger = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
     val state: LazyGridState = LazyGridState()
+
+    //val pagerState : PagerState = PagerState()
 
     val stateColumn = LazyListState()
 

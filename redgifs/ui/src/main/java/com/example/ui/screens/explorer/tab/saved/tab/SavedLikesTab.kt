@@ -50,7 +50,7 @@ object SavedLikesTab : Screen {
     fun addColumn() {
         column.intValue += 1
         if(column.intValue > 3)
-            column.intValue = 1
+            column.intValue = 0
     }
 
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")

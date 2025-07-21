@@ -16,6 +16,11 @@ fun rememberVisibleRangePercentIgnoringFirstNForGrid(
     itemsToIgnore: Int = 0,
     numberOfColumns: Int = 2, // Добавляем параметр количества колонок
 ): State<Pair<Float, Float>> {
+
+    if (numberOfColumns == 0) {
+        return remember { mutableStateOf(0f to 1f) }
+    }
+
     val result = remember { mutableStateOf(0f to 1f) }
 
     LaunchedEffect(gridState, itemsToIgnore, numberOfColumns) {

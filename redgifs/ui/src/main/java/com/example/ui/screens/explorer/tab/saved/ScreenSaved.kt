@@ -30,13 +30,16 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
+import com.example.ui.screens.explorer.ScreenRedExplorer
 import com.example.ui.screens.explorer.tab.FavoritesTab
+import com.example.ui.screens.explorer.tab.gifs.GifsTab
 import com.example.ui.screens.explorer.tab.saved.tab.SavedCollectionTab
 import com.example.ui.screens.explorer.tab.saved.tab.SavedCreatorsTab
 import com.example.ui.screens.explorer.tab.saved.tab.SavedDownloadTab
 import com.example.ui.screens.explorer.tab.saved.tab.SavedLikesTab
 import com.example.ui.screens.explorer.tab.saved.tab.SavedNichesTab
 import com.example.ui.screens.explorer.top.TabRow
+import com.example.ui.screens.ui.atom.TabBarPoints
 import com.redgifs.common.ThemeRed
 
 object SavedTab : Screen {
@@ -66,11 +69,8 @@ object SavedTab : Screen {
                 Column {
                     HorizontalDivider()
                     TabRow(
-
                         value = screenType,
-
                         containerColor = ThemeRed.colorTabLevel1,
-
                         //containerColor = ThemeRed.colorBottomBarBackground,
                         titlesIcon = l,
                         onChangeState = {
@@ -82,45 +82,9 @@ object SavedTab : Screen {
                             }
                             screenType = it
                         },
-                        overlay0 = {
-                            Box(
-                                modifier = Modifier.size(24.dp),
-                                contentAlignment = Alignment.CenterStart
-                            ) {
-                                Row {
-                                    repeat(SavedLikesTab.column.intValue) {
-                                        Box(
-                                            modifier = Modifier
-                                                .padding(end = 2.dp)
-                                                .clip(CircleShape)
-                                                .size(4.dp)
-                                                .background(if (screenType == 0) Color.White else Color.Gray)
-                                        )
-                                    }
-                                }
-                            }
-                        },
-                        overlay4 = {
-                            Box(
-                                modifier = Modifier.size(24.dp),
-                                contentAlignment = Alignment.CenterStart
-                            ) {
-                                Row {
-                                    repeat(SavedCollectionTab.column.intValue) {
-                                        Box(
-                                            modifier = Modifier
-                                                .padding(end = 2.dp)
-                                                .clip(CircleShape)
-                                                .size(4.dp)
-                                                .background(if (screenType == 4) Color.White else Color.Gray)
-                                        )
-                                    }
-                                }
-                            }
-                        },
-
-
-                        )
+                        overlay0 = { TabBarPoints(SavedLikesTab.column.intValue, screenType == 0) },
+                        overlay4 = { TabBarPoints(SavedCollectionTab.column.intValue, screenType == 4) },
+                    )
                 }
             },
 

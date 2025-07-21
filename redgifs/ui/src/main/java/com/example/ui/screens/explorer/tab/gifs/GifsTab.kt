@@ -83,7 +83,7 @@ object GifsTab : Screen {
     fun addColumn() {
         column.intValue += 1
         if (column.intValue > 3)
-            column.intValue = 1
+            column.intValue = 0
     }
 
     @OptIn(ExperimentalMaterial3Api::class)

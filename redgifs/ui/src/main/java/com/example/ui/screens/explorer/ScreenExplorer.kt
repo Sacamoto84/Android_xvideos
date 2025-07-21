@@ -44,6 +44,7 @@ import com.example.ui.screens.explorer.tab.saved.tab.SavedLikesTab
 import com.example.ui.screens.explorer.tab.search.SearchTab
 import com.example.ui.screens.explorer.tab.setting.SettingTab
 import com.example.ui.screens.explorer.top.TabRow
+import com.example.ui.screens.ui.atom.TabBarPoints
 import com.redgifs.common.ThemeRed
 
 @Composable
@@ -93,27 +94,8 @@ class ScreenRedExplorer() : Screen {
                     }
                     screenType = it
                 },
-
-                overlay0 = {
-                    Box(
-                        modifier = Modifier.size(24.dp),
-                        contentAlignment = Alignment.CenterStart
-                    ) {
-                        Row {
-                            repeat(GifsTab.column.intValue) {
-                                Box(
-                                    modifier = Modifier
-                                        .padding(end = 2.dp)
-                                        .clip(CircleShape)
-                                        .size(4.dp)
-                                        .background(if (screenType == 0) Color.White else Color.Gray)
-                                )
-                            }
-                        }
-                    }
-                },
-
-                )
+                overlay0 = { TabBarPoints(GifsTab.column.intValue, screenType == 0) },
+            )
 
 
         }, containerColor = ThemeRed.colorCommonBackground2) { paddingValues ->
