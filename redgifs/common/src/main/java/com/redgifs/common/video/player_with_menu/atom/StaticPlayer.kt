@@ -42,6 +42,9 @@ fun StaticPlayer(
         headers = playerHost.headers,
         drmConfig = playerHost.drmConfig,
         selectedQuality = playerHost.selectedQuality,
-        autoRotate = autoRotate
+        autoRotate = autoRotate,
+        poster = {
+            playerHost.poster = it
+        }
     )
 }

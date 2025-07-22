@@ -15,9 +15,14 @@ internal fun createPlayerListener(
     loop: Boolean,
     exoPlayer: ExoPlayer,
     error: (MediaPlayerError) -> Unit,
+    poster: (Boolean) -> Unit
 ): Player.Listener {
 
     return object : Player.Listener {
+
+        override fun onRenderedFirstFrame() {
+            poster(false) // всё, можно скрыть заглушку
+        }
 
         //
         override fun onEvents(player: Player, events: Player.Events) {
@@ -38,6 +43,7 @@ internal fun createPlayerListener(
 
                 Player.STATE_READY -> {
                     loadingState(false)
+                    //stateReady(true)
                 }
 
                 Player.STATE_ENDED -> {

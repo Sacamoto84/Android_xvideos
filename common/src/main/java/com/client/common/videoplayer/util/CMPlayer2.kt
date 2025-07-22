@@ -63,7 +63,8 @@ fun CMPPlayer2(
     headers: Map<String, String>?,
     drmConfig: DrmConfig?,
     selectedQuality: VideoQuality?,
-    autoRotate: Boolean // можно менять как нужно
+    autoRotate: Boolean, // можно менять как нужно
+    poster : (Boolean) -> Unit
 ) {
     val context = LocalContext.current
 
@@ -140,6 +141,7 @@ fun CMPPlayer2(
                 loop,
                 exoPlayer,
                 error,
+                poster
             )
 
             exoPlayer.addListener(listener)

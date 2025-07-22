@@ -1,6 +1,11 @@
 package com.example.ui.screens.top_this_week
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -31,45 +36,75 @@ import com.client.common.urlVideImage.UrlImage
 import com.redgifs.common.ThemeRed
 
 @Composable
-fun ProfileInfo1(modifier: Modifier = Modifier, onClick: ()->Unit, videoItem: GifsInfo, listUsers: List<UserInfo>, visibleUserName:Boolean = true, visibleIcon:Boolean = true){
-    Row(
-        modifier = Modifier.then(modifier).background(Color(0x0CFFFFFF)).clickable(onClick = onClick), verticalAlignment = Alignment.CenterVertically) {
+fun ProfileInfo1(
+    visible: Boolean = true,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+    videoItem: GifsInfo,
+    listUsers: List<UserInfo>,
+    visibleUserName: Boolean = true,
+    ) {
 
-        if (visibleIcon) {
-            val a = listUsers.firstOrNull { it1 -> it1.username == videoItem.userName }
-            if ((a != null) && (a.profileImageUrl != null)) {
-                Box(
-                    modifier = Modifier.clip(RoundedCornerShape(12.dp)).size(48.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    UrlImage(
-                        a.profileImageUrl!!,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
+    AnimatedVisibility(
+        visible,
+        modifier = Modifier.fillMaxSize().then(modifier),
+        enter = slideInVertically (
+            initialOffsetY = { fullHeight -> fullHeight }, // снизу вверх
+            animationSpec = tween(durationMillis = 200)
+        ),
+        exit = slideOutVertically(
+            targetOffsetY = { fullHeight -> fullHeight }, // сверху вниз
+            animationSpec = tween(durationMillis = 200)
+        )
+    )
+    {
+        Row( modifier = Modifier.then(modifier).clickable(onClick = onClick), verticalAlignment = Alignment.CenterVertically )
+        {
+
+            //if (visible) {
+
+                val a = listUsers.firstOrNull { it1 -> it1.username == videoItem.userName }
+                if ((a != null) && (a.profileImageUrl != null)) {
+                    Box(
+                        modifier = Modifier.clip(RoundedCornerShape(12.dp)).size(48.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        UrlImage(
+                            a.profileImageUrl!!,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
                 }
-            } else {
-                Box(
-                    modifier = Modifier.clip(RoundedCornerShape(12.dp)).size(48.dp)
-                        .background(Color.DarkGray), contentAlignment = Alignment.Center
+                else {
+                    Box(
+                        modifier = Modifier.clip(RoundedCornerShape(12.dp)).size(48.dp)
+                            .background(Color.DarkGray), contentAlignment = Alignment.Center
+                    )
+                    { Icon( Icons.Default.Person, contentDescription = null, modifier = Modifier.size(24.dp), tint = Color.White ) }
+                }
+
+            //}
+            ////////////
+            //AnimatedVisibility(visibleUserName) {
+            if (visibleUserName)
+                Text(
+                    videoItem.userName,
+                    autoSize = TextAutoSize.StepBased(minFontSize = 6.sp, maxFontSize = 20.sp),
+                    minLines = 1,
+                    maxLines = 1,
+                    color = Color.White,
+                    fontFamily = ThemeRed.fontFamilyPopinsRegular,
+                    fontSize = 20.sp,
+                    modifier = Modifier
+                        .height(48.dp)
+                        .padding(start = 8.dp)
                 )
-                {
-                    Icon(
-                        Icons.Default.Person,
-                        contentDescription = null,
-                        modifier = Modifier.size(24.dp),
-                        tint = Color.White
-                    )
-                }
-            }
+
+            //}
+
+
         }
-        ////////////
-        AnimatedVisibility(visibleUserName) {
-            Text(videoItem.userName,  autoSize = TextAutoSize.StepBased(minFontSize = 6.sp, maxFontSize = 20.sp), minLines = 1, maxLines = 1, color = Color.White, fontFamily = ThemeRed.fontFamilyPopinsRegular, fontSize = 20.sp, modifier = Modifier.height(48.dp).padding(start = 8.dp))
-        }
-
-
-
     }
 }
 

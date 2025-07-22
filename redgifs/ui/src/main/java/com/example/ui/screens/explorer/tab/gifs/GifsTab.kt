@@ -49,7 +49,7 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.common.connectivityObserver.ConnectivityObserver
-import com.example.ui.screens.explorer.tab.saved.tab.SavedCollectionTab
+import com.client.common.sharedPref.Settings
 import com.example.ui.screens.profile.ScreenRedProfile
 import com.example.ui.screens.profile.atom.VerticalScrollbar
 import com.example.ui.screens.profile.rememberVisibleRangePercentIgnoringFirstNForGrid
@@ -67,8 +67,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -78,12 +76,27 @@ object GifsTab : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
 
-    val column = mutableIntStateOf(2)
+    val column = mutableIntStateOf(
+        when {
+            Settings.gallery_count[0].field.value -> 0
+            Settings.gallery_count[1].field.value -> 1
+            Settings.gallery_count[2].field.value -> 2
+            Settings.gallery_count[3].field.value -> 3
+            Settings.gallery_count[4].field.value -> 4
+            else -> 2
+        }
+    )
 
-    fun addColumn() {
-        column.intValue += 1
-        if (column.intValue > 3)
-            column.intValue = 0
+    fun addColumn(g0: Boolean, g1: Boolean, g2: Boolean, g3: Boolean, g4: Boolean) {
+        val flags = listOf(g0, g1, g2, g3, g4)
+        val enabledIndices =
+            flags.mapIndexedNotNull { index, enabled -> if (enabled) index else null }
+        if (enabledIndices.isEmpty()) return // ничего не включено
+        val currentIndex = column.intValue
+        //val currentPos = enabledIndices.indexOf(currentIndex)
+        val currentPos = enabledIndices.indexOf(currentIndex).takeIf { it != -1 } ?: 2
+        val nextPos = (currentPos + 1) % enabledIndices.size
+        column.intValue = enabledIndices[nextPos]
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -168,7 +181,11 @@ object GifsTab : Screen {
 
                     }
 
-                    search.CustomBasicTextField(modifier = Modifier.padding(start = 4.dp).weight(1f))
+                    search.CustomBasicTextField(
+                        modifier = Modifier
+                            .padding(start = 4.dp)
+                            .weight(1f)
+                    )
 
                     Spacer(modifier = Modifier.width(4.dp))
 
@@ -277,11 +294,6 @@ class ScreenRedExplorerGifsSM @Inject constructor(
     val hostDI: HostDI
 ) : ScreenModel {
 
-    val isConnected = connectivityObserver.isConnected.stateIn(
-        screenModelScope,
-        SharingStarted.WhileSubscribed(5000L),
-        false
-    )
     val lazyHost = LazyRow123Host(
         connectivityObserver = connectivityObserver,
         scope = screenModelScope,
@@ -289,7 +301,6 @@ class ScreenRedExplorerGifsSM @Inject constructor(
         typePager = TypePager.TOP,
         hostDI = hostDI
     )
-
 
 }
 

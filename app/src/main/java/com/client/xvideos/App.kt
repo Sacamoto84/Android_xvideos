@@ -2,6 +2,9 @@ package com.client.xvideos
 
 import android.annotation.SuppressLint
 import android.app.Application
+import android.os.Build
+import android.preference.PreferenceManager
+import com.client.common.sharedPref.Settings
 import com.client.xvideos.PermissionScreenActivity.PermissionStorage
 import com.redgifs.common.block.BlockRed
 import com.redgifs.common.saved.SavedRed
@@ -23,24 +26,25 @@ import javax.net.ssl.X509TrustManager
 
 fun allowAllSSL() {
     try {
-        val trustAllCerts = arrayOf<TrustManager>(@SuppressLint("CustomX509TrustManager")
-        object : X509TrustManager {
-            @SuppressLint("TrustAllX509TrustManager")
-            override fun checkClientTrusted(
-                chain: Array<out X509Certificate>?,
-                authType: String?
-            ) {
-            }
+        val trustAllCerts = arrayOf<TrustManager>(
+            @SuppressLint("CustomX509TrustManager")
+            object : X509TrustManager {
+                @SuppressLint("TrustAllX509TrustManager")
+                override fun checkClientTrusted(
+                    chain: Array<out X509Certificate>?,
+                    authType: String?
+                ) {
+                }
 
-            @SuppressLint("TrustAllX509TrustManager")
-            override fun checkServerTrusted(
-                chain: Array<out X509Certificate>?,
-                authType: String?
-            ) {
-            }
+                @SuppressLint("TrustAllX509TrustManager")
+                override fun checkServerTrusted(
+                    chain: Array<out X509Certificate>?,
+                    authType: String?
+                ) {
+                }
 
-            override fun getAcceptedIssuers(): Array<X509Certificate> = arrayOf()
-        })
+                override fun getAcceptedIssuers(): Array<X509Certificate> = arrayOf()
+            })
 
         val sslContext = SSLContext.getInstance("TLS")
         sslContext.init(null, trustAllCerts, SecureRandom())
@@ -70,9 +74,13 @@ class App : Application() {
         instance = this
         if (BuildConfig.DEBUG)
             Timber.plant(DebugTree())
-        allowAllSSL()
-        //PlaybackPreference.initialize(this)
-        //kDownloader = KDownloader.create(applicationContext)
+
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) {
+            allowAllSSL()
+        }
+
+        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+        Settings.init(prefs)
 
         if (PermissionStorage.hasPermissions(this)) {
 

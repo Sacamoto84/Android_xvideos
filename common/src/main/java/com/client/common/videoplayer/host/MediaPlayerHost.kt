@@ -28,6 +28,8 @@ class MediaPlayerHost(
     headers: Map<String, String>? = null,
     drmConfig: DrmConfig? = null,
 ) {
+    var poster by mutableStateOf(true)
+
     // Internal states
     var url by mutableStateOf(mediaUrl)
     var speed by mutableStateOf(initialSpeed)

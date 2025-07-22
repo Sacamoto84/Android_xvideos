@@ -2,6 +2,8 @@ package com.client.common.urlVideImage
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Build
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
@@ -58,11 +60,9 @@ private fun createUnsafeImageLoader(context: Context): ImageLoader {
  * url: строка с адресом изображения
  */
 @Composable
-fun UrlImage(url: String, modifier: Modifier = Modifier,  contentScale : ContentScale = ContentScale.FillWidth) {
+fun UrlImage(url: String, modifier: Modifier = Modifier,  contentScale : ContentScale = ContentScale.FillWidth, loadIndicator : Boolean = true) {
 
     val context = LocalContext.current
-
-    val imageLoader = remember { createUnsafeImageLoader(context) }
 
     val imageRequest = ImageRequest.Builder(context)
         .data(url)
@@ -73,29 +73,67 @@ fun UrlImage(url: String, modifier: Modifier = Modifier,  contentScale : Content
         .memoryCachePolicy(CachePolicy.ENABLED)
         .build()
 
-    CoilImage(
-        imageLoader = {  imageLoader  },
+    if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) {
 
-        imageRequest = { imageRequest },
-        imageOptions = ImageOptions(
-            contentScale = contentScale,
-            alignment = Alignment.Center
-        ),
-        modifier = Modifier.then(modifier),
-        loading = {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(32.dp)//.align(Alignment.Center)
-                    , color = Color.Gray
-                )
-            }
-        },
-        failure = {
-            Timber.e(">>>>>>>>>>>>"+it.reason)
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("Ошибка загрузки", color = Color.Gray)
-            }
-        }
+        val imageLoader = remember { createUnsafeImageLoader(context) }
 
-    )
+        CoilImage(
+            imageLoader = { imageLoader },
+            imageRequest = { imageRequest },
+            imageOptions = ImageOptions(
+                contentScale = contentScale,
+                alignment = Alignment.Center
+            ),
+            modifier = Modifier.then(modifier),
+            loading = {
+
+                //Box(modifier = Modifier.fillMaxSize().background(Color.Magenta))
+
+                if (loadIndicator) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(32.dp)//.align(Alignment.Center)
+                            , color = Color.Gray
+                        )
+                    }
+                }
+            },
+            failure = {
+                Timber.e(">>>>>>>>>>>>"+it.reason)
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("Ошибка загрузки", color = Color.Gray)
+                }
+            }
+
+        )
+
+    }else{
+        CoilImage(
+            imageRequest = { imageRequest },
+            imageOptions = ImageOptions(
+                contentScale = contentScale,
+                alignment = Alignment.Center
+            ),
+            modifier = Modifier.then(modifier),
+            loading = {
+                //Box(modifier = Modifier.fillMaxSize().background(Color.Magenta))
+                if (loadIndicator) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(32.dp)//.align(Alignment.Center)
+                            , color = Color.Gray
+                        )
+                    }
+                }
+            },
+            failure = {
+                Timber.e(">>>>>>>>>>>>"+it.reason)
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("Ошибка загрузки", color = Color.Gray)
+                }
+            }
+        )
+    }
+
+
 }

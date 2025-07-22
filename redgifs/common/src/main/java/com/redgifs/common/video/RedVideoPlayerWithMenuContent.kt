@@ -96,9 +96,9 @@ fun RedVideoPlayerWithMenu(
     LaunchedEffect(playerHost, onPlayerControlsReady) {
 
         val controls = object : PlayerControls {
-            override fun forward(seconds: Float) { val currentPosition = (currentTime + seconds).coerceAtMost(duration.toFloat()).toFloat(); playerHost.seekTo(currentPosition) }
-            override fun rewind(seconds: Float) { val currentPosition = (currentTime - seconds).coerceAtLeast(0f).toFloat(); playerHost.seekTo(currentPosition) }
-            override fun seekTo(positionSeconds: Float) { playerHost.seekTo( positionSeconds.coerceIn(0f, duration.toFloat()).toFloat()) }
+            override fun forward(seconds: Float) { val currentPosition = (currentTime + seconds).coerceAtMost(duration.toFloat()); playerHost.seekTo(currentPosition) }
+            override fun rewind(seconds: Float) { val currentPosition = (currentTime - seconds).coerceAtLeast(0f); playerHost.seekTo(currentPosition) }
+            override fun seekTo(positionSeconds: Float) { playerHost.seekTo(positionSeconds.coerceIn(0f, duration.toFloat())) }
             override fun stop()  { playerHost.pause(); playerHost.seekTo(0f) }
             override fun pause() { playerHost.pause() }
             override fun play()  { playerHost.play() }
@@ -113,10 +113,6 @@ fun RedVideoPlayerWithMenu(
         playerHost = playerHost,
         autoRotate = autoRotate
     )
-
-
-
-
 
 }
 

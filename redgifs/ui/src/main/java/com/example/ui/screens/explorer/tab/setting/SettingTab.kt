@@ -6,7 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.displayCutoutPadding
@@ -16,23 +15,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ProgressIndicatorDefaults
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,12 +35,9 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.screen.Screen
@@ -59,7 +49,6 @@ import com.client.common.AppPath
 import com.client.common.getFolderSize
 import com.client.common.sharedPref.Settings
 import com.client.common.util.toPrettyCount3
-import com.composables.core.HorizontalSeparator
 import com.redgifs.common.ThemeRed
 import com.redgifs.common.di.HostDI
 import dagger.Binds
@@ -85,11 +74,11 @@ object SettingTab : Screen {
 
         val context = LocalContext.current
 
-        val galey0 = vm.settings.gallery_count[0].value.collectAsState().value
-        val galey1 = vm.settings.gallery_count[1].value.collectAsState().value
-        val galey2 = vm.settings.gallery_count[2].value.collectAsState().value
-        val galey3 = vm.settings.gallery_count[3].value.collectAsState().value
-        val galey4 = vm.settings.gallery_count[4].value.collectAsState().value
+        val galey0 = Settings.gallery_count[0].field.collectAsState().value
+        val galey1 = Settings.gallery_count[1].field.collectAsState().value
+        val galey2 = Settings.gallery_count[2].field.collectAsState().value
+        val galey3 = Settings.gallery_count[3].field.collectAsState().value
+        val galey4 = Settings.gallery_count[4].field.collectAsState().value
 
         LaunchedEffect(Unit) {
             vm.sizeXvideos = getFolderSize(File(AppPath.main))
@@ -184,11 +173,11 @@ object SettingTab : Screen {
 
             HorizontalDivider(color = Color.DarkGray)
 
-            ConfigTextAndCheckBox("Тикток стиль", galey0) { vm.screenModelScope.launch { vm.settings.gallery_count[0].setValue(it) }}
-            ConfigTextAndCheckBox("Один столбец", galey1) { vm.screenModelScope.launch { vm.settings.gallery_count[1].setValue(it) }}
-            ConfigTextAndCheckBox("Два столбца", galey2) { vm.screenModelScope.launch { vm.settings.gallery_count[2].setValue(it) }}
-            ConfigTextAndCheckBox("Три столбца", galey3) { vm.screenModelScope.launch { vm.settings.gallery_count[3].setValue(it) }}
-            ConfigTextAndCheckBox("Четыре столбца", galey4) { vm.screenModelScope.launch { vm.settings.gallery_count[4].setValue(it) }}
+            ConfigTextAndCheckBox("Тикток стиль", galey0) { vm.screenModelScope.launch { Settings.gallery_count[0].setValue(it) }}
+            ConfigTextAndCheckBox("Один столбец", galey1) { vm.screenModelScope.launch { Settings.gallery_count[1].setValue(it) }}
+            ConfigTextAndCheckBox("Два столбца", galey2) { vm.screenModelScope.launch { Settings.gallery_count[2].setValue(it) }}
+            ConfigTextAndCheckBox("Три столбца", galey3) { vm.screenModelScope.launch { Settings.gallery_count[3].setValue(it) }}
+            ConfigTextAndCheckBox("Четыре столбца", galey4) { vm.screenModelScope.launch { Settings.gallery_count[4].setValue(it) }}
 
         }
     }
@@ -202,7 +191,6 @@ val styleTest = TextStyle(
 
 class ScreenRedExplorerSettingSM @Inject constructor(
     val hostDI: HostDI,
-    val settings: Settings
 ) : ScreenModel {
 
     var sizeXvideos by mutableLongStateOf(0L)

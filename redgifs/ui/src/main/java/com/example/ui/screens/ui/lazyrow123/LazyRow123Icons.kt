@@ -29,9 +29,7 @@ import com.redgifs.model.GifsInfo
 fun LazyRow123Icons(modifier : Modifier = Modifier,hostDI : HostDI, item : GifsInfo, isVideo : Boolean, downloadList: List<GifsInfo>) {
 
     AnimatedVisibility(
-        !isVideo, modifier = Modifier
-            .fillMaxSize()
-            .then(modifier),
+        !isVideo, modifier = Modifier.fillMaxSize().then(modifier),
         enter = slideInVertically(
             initialOffsetY = { fullHeight -> fullHeight }, // снизу вверх
             animationSpec = tween(durationMillis = 200)

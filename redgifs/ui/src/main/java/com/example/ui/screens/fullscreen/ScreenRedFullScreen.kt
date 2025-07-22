@@ -89,21 +89,6 @@ class ScreenRedFullScreen(val item: GifsInfo) : Screen, ScreenTransition {
     override val key: ScreenKey = "ScreenRedFullScreen"
 
 
-    override fun enter(lastEvent: StackEvent): EnterTransition {
-        return slideIn { size ->
-            val x = if (lastEvent == StackEvent.Pop) -size.width else size.width
-            IntOffset(x = x, y = 0)
-        }
-    }
-
-    override fun exit(lastEvent: StackEvent): ExitTransition {
-        return slideOut { size ->
-            val x = if (lastEvent == StackEvent.Pop) size.width else -size.width
-            IntOffset(x = x, y = 0)
-        }
-    }
-
-
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
     override fun Content() {

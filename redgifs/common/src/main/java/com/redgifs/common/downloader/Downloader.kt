@@ -60,7 +60,8 @@ class Downloader @Inject constructor(
             val p = AppPath.cache_download_red + "/" + item.userName
             File(p).mkdirs()
 
-            val requestImage = kDownloader.newRequestBuilder(item.urls.thumbnail, p, "${item.id}.jpg").build()
+            val imageUrl = if(item.urls.poster != null) item.urls.poster else item.urls.thumbnail
+            val requestImage = kDownloader.newRequestBuilder(imageUrl!!, p, "${item.id}.jpg").build()
             kDownloader.enqueue(
                 requestImage
             )
