@@ -75,9 +75,9 @@ class App : Application() {
         if (BuildConfig.DEBUG)
             Timber.plant(DebugTree())
 
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) {
-            allowAllSSL()
-        }
+//        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) {
+//            allowAllSSL()
+//        }
 
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
         Settings.init(prefs)

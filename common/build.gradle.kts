@@ -63,6 +63,7 @@ dependencies {
     implementation (libs.androidx.storage)
     implementation (libs.androidx.datastore.core.android)
     implementation (libs.volley)
+    implementation(libs.ui.graphics)
 
     //implementation libs.firebase.auth
     //implementation libs.firebase.firestore.ktx

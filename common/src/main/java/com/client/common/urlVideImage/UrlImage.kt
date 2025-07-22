@@ -13,6 +13,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -60,9 +62,11 @@ private fun createUnsafeImageLoader(context: Context): ImageLoader {
  * url: строка с адресом изображения
  */
 @Composable
-fun UrlImage(url: String, modifier: Modifier = Modifier,  contentScale : ContentScale = ContentScale.FillWidth, loadIndicator : Boolean = true) {
+fun UrlImage(url: String, modifier: Modifier = Modifier,  contentScale : ContentScale = ContentScale.FillWidth, loadIndicator : Boolean = true, isGrayscale: Boolean = false) {
 
     val context = LocalContext.current
+
+    val colorFilter = ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0.9f) })
 
     val imageRequest = ImageRequest.Builder(context)
         .data(url)
@@ -82,7 +86,8 @@ fun UrlImage(url: String, modifier: Modifier = Modifier,  contentScale : Content
             imageRequest = { imageRequest },
             imageOptions = ImageOptions(
                 contentScale = contentScale,
-                alignment = Alignment.Center
+                alignment = Alignment.Center,
+                colorFilter = if (isGrayscale) colorFilter else null
             ),
             modifier = Modifier.then(modifier),
             loading = {
@@ -112,7 +117,8 @@ fun UrlImage(url: String, modifier: Modifier = Modifier,  contentScale : Content
             imageRequest = { imageRequest },
             imageOptions = ImageOptions(
                 contentScale = contentScale,
-                alignment = Alignment.Center
+                alignment = Alignment.Center,
+                colorFilter = if (isGrayscale) colorFilter else null
             ),
             modifier = Modifier.then(modifier),
             loading = {

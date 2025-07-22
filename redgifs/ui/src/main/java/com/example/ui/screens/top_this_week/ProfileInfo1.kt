@@ -11,7 +11,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,7 +28,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.redgifs.model.GifsInfo
@@ -43,11 +47,14 @@ fun ProfileInfo1(
     videoItem: GifsInfo,
     listUsers: List<UserInfo>,
     visibleUserName: Boolean = true,
+    sizeIcon : Dp = 48.dp,
+    cornerRadius : Dp = 12.dp,
+    verticalAlignment: Alignment.Vertical = Alignment.Bottom
     ) {
 
     AnimatedVisibility(
         visible,
-        modifier = Modifier.fillMaxSize().then(modifier),
+        modifier = Modifier.fillMaxWidth().then(modifier),
         enter = slideInVertically (
             initialOffsetY = { fullHeight -> fullHeight }, // снизу вверх
             animationSpec = tween(durationMillis = 200)
@@ -58,51 +65,30 @@ fun ProfileInfo1(
         )
     )
     {
-        Row( modifier = Modifier.then(modifier).clickable(onClick = onClick), verticalAlignment = Alignment.CenterVertically )
+        Row( modifier = Modifier.then(modifier).clickable(onClick = onClick), verticalAlignment = verticalAlignment)
         {
 
-            //if (visible) {
+            val a = listUsers.firstOrNull { it1 -> it1.username == videoItem.userName }
+            if ((a != null) && (a.profileImageUrl != null)) {
+                Box( modifier = Modifier.clip(RoundedCornerShape(cornerRadius)).size(sizeIcon), contentAlignment = Alignment.Center )
+                { UrlImage( a.profileImageUrl!!, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop ) }
+            }
+            else {
+                Box( modifier = Modifier.clip(RoundedCornerShape(cornerRadius)).size(sizeIcon).background(Color.DarkGray), contentAlignment = Alignment.Center )
+                { Icon( Icons.Default.Person, contentDescription = null, modifier = Modifier.size(24.dp), tint = Color.White ) }
+            }
 
-                val a = listUsers.firstOrNull { it1 -> it1.username == videoItem.userName }
-                if ((a != null) && (a.profileImageUrl != null)) {
-                    Box(
-                        modifier = Modifier.clip(RoundedCornerShape(12.dp)).size(48.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        UrlImage(
-                            a.profileImageUrl!!,
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop
-                        )
-                    }
-                }
-                else {
-                    Box(
-                        modifier = Modifier.clip(RoundedCornerShape(12.dp)).size(48.dp)
-                            .background(Color.DarkGray), contentAlignment = Alignment.Center
-                    )
-                    { Icon( Icons.Default.Person, contentDescription = null, modifier = Modifier.size(24.dp), tint = Color.White ) }
-                }
-
-            //}
-            ////////////
-            //AnimatedVisibility(visibleUserName) {
             if (visibleUserName)
                 Text(
                     videoItem.userName,
-                    autoSize = TextAutoSize.StepBased(minFontSize = 6.sp, maxFontSize = 20.sp),
+                    autoSize = TextAutoSize.StepBased(minFontSize = 6.sp, maxFontSize = 18.sp),
                     minLines = 1,
                     maxLines = 1,
                     color = Color.White,
                     fontFamily = ThemeRed.fontFamilyPopinsRegular,
-                    fontSize = 20.sp,
-                    modifier = Modifier
-                        .height(48.dp)
-                        .padding(start = 8.dp)
+                    fontSize = 18.sp,
+                    modifier = Modifier.padding(start = 4.dp).offset(y= (-3).dp)
                 )
-
-            //}
-
 
         }
     }

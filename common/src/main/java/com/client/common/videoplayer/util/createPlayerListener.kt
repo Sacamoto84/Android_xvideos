@@ -21,7 +21,7 @@ internal fun createPlayerListener(
     return object : Player.Listener {
 
         override fun onRenderedFirstFrame() {
-            poster(false) // всё, можно скрыть заглушку
+            poster(false)
         }
 
         //

@@ -1,19 +1,13 @@
 package com.redgifs.common.video.player_row_mini.atom
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -21,19 +15,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.client.common.urlVideImage.UrlImage
 import com.client.common.videoplayer.host.MediaPlayerEvent
 import com.client.common.videoplayer.host.MediaPlayerHost
 import com.client.common.videoplayer.model.ScreenResize
-import com.redgifs.common.BuildConfig
 import com.redgifs.common.video.CanvasTimeDurationLine1
 import com.redgifs.common.video.player_with_menu.atom.StaticPlayer
-import timber.log.Timber
 
 
 /**
@@ -45,8 +32,6 @@ fun Red_Video_Lite_Row2(
     play: Boolean = true,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
-    posterUrl: String? = null,
-    thumbUrl : String,
     poster : (Boolean)->Unit
 ) {
 

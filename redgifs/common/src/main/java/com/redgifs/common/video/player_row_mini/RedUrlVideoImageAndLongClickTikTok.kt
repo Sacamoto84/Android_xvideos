@@ -37,7 +37,7 @@ import java.io.File
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun RedUrlVideoImageAndLongClick(
+fun RedUrlVideoImageAndLongClickTikTok(
     item: GifsInfo,                      //Текущий элемент
     index: Int,                          //Индекс элемента, отображается в режиме картинка
     modifier: Modifier = Modifier,
@@ -70,7 +70,7 @@ fun RedUrlVideoImageAndLongClick(
 
     val haptic = LocalHapticFeedback.current
     val context = LocalContext.current
-    var isVideo by remember { mutableStateOf(false) }
+    var isVideo by remember { mutableStateOf(true) }
 
     val interactionSource = remember { MutableInteractionSource() }
 
@@ -138,8 +138,6 @@ fun RedUrlVideoImageAndLongClick(
             enter = fadeIn(animationSpec = tween(100)),
             exit = fadeOut(animationSpec = tween(200))
         ) {
-
-            //Timber.i("@@@ RedUrlVideoImageAndLongClick() >> videoUri: $videoUri")
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Red_Video_Lite_Row2(
                     videoUri,

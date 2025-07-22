@@ -49,7 +49,7 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
             .diskCache {
                 DiskCache.Builder()
                     .directory(cacheDir.resolve("image_cache"))
-                    .maxSizePercent(0.1)
+                    .maxSizePercent(0.5)
                     .build()
             }
             .memoryCache {
