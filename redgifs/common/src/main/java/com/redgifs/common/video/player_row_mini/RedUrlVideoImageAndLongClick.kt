@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -91,6 +92,19 @@ fun RedUrlVideoImageAndLongClick(
 
     var poster by remember { mutableStateOf(true) }
 
+    val videoUri: String = remember(item.id, item.userName) {
+        Timber.tag("???").i("Перерачсет videoItem.id = ${item.id}")
+        //Определяем адрес откуда брать видео, из кеша или из сети
+        if (downloadRed.downloader.findVideoInDownload(item.id, item.userName))
+            "${AppPath.cache_download_red}/${item.userName}/${item.id}.mp4"
+        else {
+            if (isNetConnected)
+                "https://api.redgifs.com/v2/gifs/${item.id.lowercase()}/hd.m3u8"
+            else
+                "android.resource://${context.packageName}/raw/q"
+        }
+    }
+
     val imageUrl by remember {
         mutableStateOf(
             run {
@@ -131,68 +145,62 @@ fun RedUrlVideoImageAndLongClick(
 
     ) {
 
+        if (isVideo) {
+
+            Timber.i("@@@ RedUrlVideoImageAndLongClick() >> videoUri: $videoUri")
+
+            Box(modifier = Modifier
+                .alpha(if (poster) 0.8f else 1.0f)
+                .background(Color.Magenta)
+            ) {
+
+                Box(modifier = Modifier
+                    //.alpha(0.1f)
+                    .graphicsLayer(
+                    //alpha = 0.2f
+                )) {
+                    Red_Video_Lite_Row2(
+                        videoUri,
+                        play = true,
+                        onClick = { isVideo = isVideo.not() },
+                        onLongClick = { onFullScreen.invoke() },
+                        posterUrl = item.urls.poster,
+                        thumbUrl = item.urls.thumbnail,
+                        poster = {
+                            poster = it
+                        }
+                    )
+                }
+
+//                AnimatedVisibility(
+//                    poster,
+//                    enter = fadeIn(animationSpec = tween(100)),
+//                    exit = fadeOut(animationSpec = tween(100))
+//                ) {
+//                    UrlImage(
+//                        url = imageUrl,
+//                        contentScale = ContentScale.Fit,
+//                        modifier = Modifier.fillMaxSize(),
+//                        loadIndicator = false
+//                    )
+//
+//                }
+
+
+            }
+
+        }
+
         AnimatedVisibility(
-            !isVideo,
+            poster || !isVideo,
             enter = fadeIn(animationSpec = tween(100)),
             exit = fadeOut(animationSpec = tween(100))
         ) {
             UrlImage(
                 url = imageUrl,
                 contentScale = ContentScale.Fit,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize().alpha(if (isVideo) 0.8f else 1.0f)
             )
-
-        }
-
-        if (isVideo) {
-
-            val videoUri: String = remember(item.id, item.userName) {
-                Timber.tag("???").i("Перерачсет videoItem.id = ${item.id}")
-                //Определяем адрес откуда брать видео, из кеша или из сети
-                if (downloadRed.downloader.findVideoInDownload(item.id, item.userName))
-                    "${AppPath.cache_download_red}/${item.userName}/${item.id}.mp4"
-                else {
-                    if (isNetConnected)
-                        "https://api.redgifs.com/v2/gifs/${item.id.lowercase()}/hd.m3u8"
-                    else
-                        "android.resource://${context.packageName}/raw/q"
-                }
-            }
-            Timber.i("@@@ RedUrlVideoImageAndLongClick() >> videoUri: $videoUri")
-
-            Box(modifier = Modifier
-                .alpha(if (poster) 0.7f else 1.0f)
-                .background(Color.Magenta)) {
-
-
-                Red_Video_Lite_Row2(
-                    videoUri,
-                    play = true,
-                    onClick = { isVideo = isVideo.not() },
-                    onLongClick = { onFullScreen.invoke() },
-                    posterUrl = item.urls.poster,
-                    thumbUrl = item.urls.thumbnail,
-                    poster = {
-                        poster = it
-                    }
-                )
-
-                AnimatedVisibility(
-                    poster,
-                    enter = fadeIn(animationSpec = tween(100)),
-                    exit = fadeOut(animationSpec = tween(100))
-                ) {
-                    UrlImage(
-                        url = imageUrl,
-                        contentScale = ContentScale.Fit,
-                        modifier = Modifier.fillMaxSize(),
-                        loadIndicator = false
-                    )
-
-                }
-
-
-            }
 
         }
 
