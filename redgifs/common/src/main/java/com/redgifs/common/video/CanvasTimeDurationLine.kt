@@ -4,10 +4,12 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.awaitTouchSlopOrCancellation
 import androidx.compose.foundation.gestures.horizontalDrag
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -51,6 +53,7 @@ fun CanvasTimeDurationLine1(
 
     Row(
         modifier = Modifier
+            .then(modifier)
             .fillMaxWidth()
             .height(32.dp)
             .pointerInput(Unit) {
@@ -96,17 +99,26 @@ fun CanvasTimeDurationLine1(
     ) {
 
         if (isVisibleTime) {
-            Text(
-                " " + currentTime.toDouble().toMinSec(),
-                color = Color.White,
-                fontSize = 12.sp,
-                fontFamily = ThemeRed.fontFamilyPopinsRegular,
-                modifier = Modifier.width(48.dp)//.background(Color.Green)
-            )
+            Box {
+                Text(
+                    " " + currentTime.toDouble().toMinSec(),
+                    color = Color.Black,
+                    fontSize = 12.sp,
+                    fontFamily = ThemeRed.fontFamilyPopinsRegular,
+                    modifier = Modifier.width(44.dp).offset(0.5.dp, 0.5.dp)//.background(Color.Green)
+                )
+
+                Text(
+                    " " + currentTime.toDouble().toMinSec(),
+                    color = Color.White,
+                    fontSize = 12.sp,
+                    fontFamily = ThemeRed.fontFamilyPopinsRegular,
+                    modifier = Modifier.width(44.dp)//.background(Color.Green)
+                )
+            }
         }
 
         Canvas(modifier = Modifier
-            .then(modifier)
             .fillMaxSize()
             .weight(1f))
         {
@@ -178,14 +190,28 @@ fun CanvasTimeDurationLine1(
 
 
         if (isVisibleTime) {
-            Text(
-                duration.toDouble().toMinSec() + " ",
-                color = Color.White,
-                fontSize = 12.sp,
-                textAlign = TextAlign.End,
-                fontFamily = ThemeRed.fontFamilyPopinsRegular,
-                modifier = Modifier.width(44.dp)//.background(Color.Green)
-            )
+
+Box {
+
+    Text(
+        duration.toDouble().toMinSec() + " ",
+        color = Color.Black,
+        fontSize = 12.sp,
+        textAlign = TextAlign.End,
+        fontFamily = ThemeRed.fontFamilyPopinsRegular,
+        modifier = Modifier.width(44.dp).offset(0.5.dp, 0.5.dp)//.background(Color.Green)
+    )
+
+    Text(
+        duration.toDouble().toMinSec() + " ",
+        color = Color.White,
+        fontSize = 12.sp,
+        textAlign = TextAlign.End,
+        fontFamily = ThemeRed.fontFamilyPopinsRegular,
+        modifier = Modifier.width(44.dp)//.background(Color.Green)
+    )
+}
+
         }
     }
 }

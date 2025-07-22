@@ -41,7 +41,6 @@ import com.redgifs.common.ThemeRed
 
 @Composable
 fun ProfileInfo1(
-    visible: Boolean = true,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     videoItem: GifsInfo,
@@ -52,19 +51,6 @@ fun ProfileInfo1(
     verticalAlignment: Alignment.Vertical = Alignment.Bottom
     ) {
 
-    AnimatedVisibility(
-        visible,
-        modifier = Modifier.fillMaxWidth().then(modifier),
-        enter = slideInVertically (
-            initialOffsetY = { fullHeight -> fullHeight }, // снизу вверх
-            animationSpec = tween(durationMillis = 200)
-        ),
-        exit = slideOutVertically(
-            targetOffsetY = { fullHeight -> fullHeight }, // сверху вниз
-            animationSpec = tween(durationMillis = 200)
-        )
-    )
-    {
         Row( modifier = Modifier.then(modifier).clickable(onClick = onClick), verticalAlignment = verticalAlignment)
         {
 
@@ -90,7 +76,6 @@ fun ProfileInfo1(
                     modifier = Modifier.padding(start = 4.dp).offset(y= (-3).dp)
                 )
 
-        }
     }
 }
 

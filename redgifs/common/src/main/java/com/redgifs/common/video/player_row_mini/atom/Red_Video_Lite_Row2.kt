@@ -78,8 +78,7 @@ fun Red_Video_Lite_Row2(
                     play = play,
                     onSeek = { playerHost.seekTo(it) },
                     onSeekFinished = {},
-                    modifier = Modifier.padding(start = 4.dp, end = 4.dp).fillMaxWidth()
-                        .offset(y = 2.dp),
+                    modifier = Modifier.padding(start = 2.dp, end = 2.dp).fillMaxWidth().offset(y = 5.dp),
                     isVisibleTime = true,
                     isVisibleStep = false
                 )

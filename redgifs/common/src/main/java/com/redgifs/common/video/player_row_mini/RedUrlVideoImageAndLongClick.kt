@@ -11,6 +11,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
@@ -21,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -28,7 +30,9 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import com.client.common.AppPath
 import com.client.common.urlVideImage.UrlImage
 import com.client.common.vibrate.vibrateWithPatternAndAmplitude
+import com.composeunstyled.theme.ThemeOverride
 import com.redgifs.common.BuildConfig
+import com.redgifs.common.ThemeRed
 import com.redgifs.common.downloader.DownloadRed
 import com.redgifs.common.video.player_row_mini.atom.Red_Video_Lite_Row2
 import com.redgifs.model.GifsInfo
@@ -156,14 +160,23 @@ fun RedUrlVideoImageAndLongClick(
             enter = fadeIn(animationSpec = tween(100)),
             exit = fadeOut(animationSpec = tween(100))
         ) {
-            UrlImage(
-                url = imageUrl,
-                contentScale = ContentScale.Fit,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .alpha(if (isVideo) 0.8f else 1.0f),
-                //isGrayscale = isVideo
-            )
+            Box{
+                UrlImage(
+                    url = imageUrl,
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .alpha(if (isVideo) 0.8f else 1.0f),
+                    //isGrayscale = isVideo
+                )
+
+                if (isVideo) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center),
+                        color = Color.LightGray
+                    )
+                }
+            }
 
         }
 

@@ -1,5 +1,10 @@
 package com.example.ui.screens.ui.lazyrow123
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -219,8 +224,8 @@ fun LazyRow123(
                                 .padding(vertical = 2.dp)
                                 .padding(horizontal = 2.dp)
                                 .fillMaxSize()
-                                .clip(RoundedCornerShape(12.dp))
-                                .border(1.dp, Color.DarkGray, RoundedCornerShape(12.dp)),
+                                .clip(RoundedCornerShape(8.dp))
+                                .border(1.dp, Color.DarkGray, RoundedCornerShape(8.dp)),
                             contentAlignment = Alignment.Center
                         ) {
 
@@ -284,27 +289,45 @@ fun LazyRow123(
                                 }
                             }
 
-                            if (host.visibleProfileInfo) {
-                                ProfileInfo1(
-                                    modifier = Modifier.padding(start = 2.dp, bottom = 2.dp).align(Alignment.BottomStart),
-                                    onClick = { onClickOpenProfile(item.userName) },
-                                    videoItem = item,
-                                    listUsers = UsersRed.listAllUsers,
-                                    visibleUserName = host.columns <= 2,
-                                    visible = !isVideo,
-                                    sizeIcon = 40.dp,
-                                    cornerRadius = 8.dp,
-                                    verticalAlignment = Alignment.Top
+                            AnimatedVisibility(
+                                !isVideo,
+                                modifier = Modifier.fillMaxWidth().align(Alignment.BottomStart),
+                                enter = slideInVertically(
+                                    initialOffsetY = { fullHeight -> fullHeight }, // снизу вверх
+                                    animationSpec = tween(durationMillis = 200)
+                                ),
+                                exit = slideOutVertically(
+                                    targetOffsetY = { fullHeight -> fullHeight }, // сверху вниз
+                                    animationSpec = tween(durationMillis = 200)
                                 )
-                            }
+                            ) {
 
-                            LazyRow123Icons(
-                                modifier = Modifier.align(Alignment.BottomCenter),
-                                host.hostDI,
-                                item,
-                                isVideo,
-                                downloadList
-                            )
+                                Box(modifier = Modifier.fillMaxWidth()) {
+
+                                    if (host.visibleProfileInfo) {
+                                        ProfileInfo1(
+                                            modifier = Modifier
+                                                .padding(start = 2.dp, bottom = 2.dp)
+                                                .align(Alignment.BottomStart),
+                                            onClick = { onClickOpenProfile(item.userName) },
+                                            videoItem = item,
+                                            listUsers = UsersRed.listAllUsers,
+                                            visibleUserName = host.columns <= 2,
+                                            sizeIcon = 36.dp,
+                                            cornerRadius = 8.dp,
+                                            verticalAlignment = Alignment.Top
+                                        )
+                                    }
+
+                                    LazyRow123Icons(
+                                        modifier = Modifier.align(Alignment.BottomEnd).offset(2.dp, 2.dp),
+                                        host.hostDI,
+                                        item,
+                                        downloadList
+                                    )
+                                }
+
+                            }
 
                         }
                     }
@@ -332,88 +355,100 @@ fun LazyRow123(
                 } else {
 
 
-                    Column {
+                    Box(
+                        modifier = Modifier
+                            .padding(vertical = 2.dp)
+                            .padding(horizontal = 2.dp)
+                            .fillMaxSize()
+                            .clip(RoundedCornerShape(12.dp))
+                            .border(1.dp, Color.DarkGray, RoundedCornerShape(12.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
 
 
-                        Box(
-                            modifier = Modifier
-                                .padding(vertical = 2.dp)
-                                .padding(horizontal = 2.dp)
-                                .fillMaxSize()
-                                .clip(RoundedCornerShape(12.dp))
-                                .border(1.dp, Color.DarkGray, RoundedCornerShape(12.dp)),
-                            contentAlignment = Alignment.Center
-                        ) {
+                        RedUrlVideoImageAndLongClick(
+                            item,
+                            index,
+                            onLongClick = {
+                                blockItem = item
+                                navigator.push(ScreenRedFullScreen(item))
+                            },
+                            onVideo = { isVideo = it },
+                            isVisibleView = false,
+                            isVisibleDuration = false,
+                            play = index == statePager.currentPage,//centrallyLocatedOrMostVisibleItemIndex == index && host.columns == 1,
+                            isNetConnected = isConnected,
+                            onFullScreen = {
+                                blockItem = item
+                                navigator.push(ScreenRedFullScreen(item))
+                            },
+                            downloadRed = host.hostDI.downloadRed,
+                        )
 
+                        Column(modifier = Modifier.align(Alignment.TopEnd)) {
 
-                            RedUrlVideoImageAndLongClick(
-                                item,
-                                index,
-                                onLongClick = {
-                                    blockItem = item
-                                    navigator.push(ScreenRedFullScreen(item))
+                            //Меню на 3 точки
+                            ExpandMenuVideo(
+                                item = item,
+                                modifier = Modifier,
+                                onClick = {
+                                    blockItem = item //Для блока и идентификации и тема
                                 },
-                                onVideo = { isVideo = it },
-                                isVisibleView = false,
-                                isVisibleDuration = false,
-                                play = index == statePager.currentPage,//centrallyLocatedOrMostVisibleItemIndex == index && host.columns == 1,
-                                isNetConnected = isConnected,
-                                onFullScreen = {
-                                    blockItem = item
-                                    navigator.push(ScreenRedFullScreen(item))
+                                onRunLike = {
+                                    if (isRunLike) {
+                                        listGifs.refresh()
+                                    }
                                 },
-                                downloadRed = host.hostDI.downloadRed,
+                                onRefresh = {
+                                    listGifs.refresh()
+                                },
+                                host.isCollection,
+                                block,
+                                host.hostDI.redApi,
+                                host.hostDI.savedRed,
+                                downloadRed = host.hostDI.downloadRed
                             )
 
-                            Column(modifier = Modifier.align(Alignment.TopEnd)) {
-
-                                //Меню на 3 точки
-                                ExpandMenuVideo(
+                            if (item.tags.isNotEmpty()) {
+                                ExpandMenuVideoTags(
                                     item = item,
                                     modifier = Modifier,
-                                    onClick = {
-                                        blockItem = item //Для блока и идентификации и тема
-                                    },
-                                    onRunLike = {
-                                        if (isRunLike) {
-                                            listGifs.refresh()
-                                        }
-                                    },
-                                    onRefresh = {
-                                        listGifs.refresh()
-                                    },
-                                    host.isCollection,
-                                    block,
-                                    host.hostDI.redApi,
-                                    host.hostDI.savedRed,
-                                    downloadRed = host.hostDI.downloadRed
+                                    onClick = { it1 ->
+                                        host.hostDI.search.searchText.value = TextFieldValue(
+                                            text = it1,
+                                            selection = TextRange(it1.length)
+                                        )
+                                        host.hostDI.search.searchTextDone.value = it1
+                                        ScreenRedExplorer.screenType = 0
+                                        navigator.popAll()
+                                    }
                                 )
-
-                                if (item.tags.isNotEmpty()) {
-                                    ExpandMenuVideoTags(
-                                        item = item,
-                                        modifier = Modifier,
-                                        onClick = { it1 ->
-                                            host.hostDI.search.searchText.value = TextFieldValue(
-                                                text = it1,
-                                                selection = TextRange(it1.length)
-                                            )
-                                            host.hostDI.search.searchTextDone.value = it1
-                                            ScreenRedExplorer.screenType = 0
-                                            navigator.popAll()
-                                        }
-                                    )
-                                }
                             }
+                        }
+
+
+                        AnimatedVisibility(
+                            !isVideo,
+                            modifier = Modifier.fillMaxWidth(),
+                            enter = slideInVertically(
+                                initialOffsetY = { fullHeight -> fullHeight }, // снизу вверх
+                                animationSpec = tween(durationMillis = 200)
+                            ),
+                            exit = slideOutVertically(
+                                targetOffsetY = { fullHeight -> fullHeight }, // сверху вниз
+                                animationSpec = tween(durationMillis = 200)
+                            )
+                        ) {
 
                             if (host.visibleProfileInfo) {
                                 ProfileInfo1(
-                                    modifier = Modifier.padding(start = 2.dp, bottom = 2.dp).align(Alignment.BottomStart),
+                                    modifier = Modifier
+                                        .padding(start = 2.dp, bottom = 2.dp)
+                                        .align(Alignment.BottomStart),
                                     onClick = { onClickOpenProfile(item.userName) },
                                     videoItem = item,
                                     listUsers = UsersRed.listAllUsers,
                                     visibleUserName = true,
-                                    visible = true,
                                     sizeIcon = 32.dp,
                                     cornerRadius = 8.dp
                                 )
@@ -423,52 +458,48 @@ fun LazyRow123(
                                 modifier = Modifier.align(Alignment.BottomCenter),
                                 host.hostDI,
                                 item,
-                                false,
                                 downloadList
                             )
+
 
                         }
 
 
-
-
-
-
                     }
+
+
                 }
 
 
             }
 
 
-        }
 
 
-
-
-        if (isInitialLoading) {
-            Box(
-                modifier = modifier
-                    .align(Alignment.Center)
-                    .offset(0.dp, 40.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(color = ThemeRed.colorYellow)
+            if (isInitialLoading) {
+                Box(
+                    modifier = modifier
+                        .align(Alignment.Center)
+                        .offset(0.dp, 40.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = ThemeRed.colorYellow)
+                }
             }
-        }
 
-        if (listGifs.loadState.append is LoadState.Loading && listGifs.itemCount > 0) {
-            Box(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(16.dp)
-            ) {
-                CircularProgressIndicator(color = ThemeRed.colorYellow) // Может быть меньше размером
+            if (listGifs.loadState.append is LoadState.Loading && listGifs.itemCount > 0) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(16.dp)
+                ) {
+                    CircularProgressIndicator(color = ThemeRed.colorYellow) // Может быть меньше размером
+                }
             }
+
         }
 
     }
-
 }
 
 
