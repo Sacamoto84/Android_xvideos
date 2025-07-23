@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TimeInput
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
@@ -49,7 +50,9 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.common.connectivityObserver.ConnectivityObserver
+import com.client.common.sharedPref.SettingElementInt
 import com.client.common.sharedPref.Settings
+import com.example.ui.screens.explorer.ScreenRedExplorer.Companion.screenType
 import com.example.ui.screens.profile.ScreenRedProfile
 import com.example.ui.screens.profile.atom.VerticalScrollbar
 import com.example.ui.screens.profile.rememberVisibleRangePercentIgnoringFirstNForGrid
@@ -68,32 +71,25 @@ import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 
 
-class ColumnSelect(){
+class ColumnSelect(private val pref: SettingElementInt){
 
-    val column = mutableIntStateOf(
-        when {
-            Settings.gallery_count[0].field.value -> 0
-            Settings.gallery_count[1].field.value -> 1
-            Settings.gallery_count[2].field.value -> 2
-            Settings.gallery_count[3].field.value -> 3
-            Settings.gallery_count[4].field.value -> 4
-            else -> 2
-        }
-    )
+    var column by mutableIntStateOf( pref.field.value )
 
     fun addColumn(g0: Boolean, g1: Boolean, g2: Boolean, g3: Boolean, g4: Boolean) {
         val flags = listOf(g0, g1, g2, g3, g4)
         val enabledIndices =
             flags.mapIndexedNotNull { index, enabled -> if (enabled) index else null }
         if (enabledIndices.isEmpty()) return // ничего не включено
-        val currentIndex = column.intValue
+        val currentIndex = column
         val currentPos = enabledIndices.indexOf(currentIndex).takeIf { it != -1 } ?: 2
         val nextPos = (currentPos + 1) % enabledIndices.size
-        column.intValue = enabledIndices[nextPos]
+        column = enabledIndices[nextPos]
+        pref.setValue(column)
     }
 
 }
@@ -110,11 +106,13 @@ object GifsTab : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
 
-    val columnSelect  = ColumnSelect()
+    @Transient
+    val columnSelect  = ColumnSelect(Settings.current_count_niches)
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
+
         val vm: ScreenRedExplorerGifsSM = getScreenModel()
 
         val navigator = LocalNavigator.currentOrThrow
@@ -129,15 +127,15 @@ object GifsTab : Screen {
         val haptic = LocalHapticFeedback.current
 
         val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForGrid(
-            gridState = vm.lazyHost.state, itemsToIgnore = 0, numberOfColumns = columnSelect.column.intValue
+            gridState = vm.lazyHost.state, itemsToIgnore = 0, numberOfColumns = columnSelect.column
         )
 
         val search = vm.hostDI.search
 
         val searchR = search.searchText.collectAsStateWithLifecycle().value
 
-        LaunchedEffect(columnSelect.column.intValue) {
-            vm.lazyHost.columns = columnSelect.column.intValue
+        LaunchedEffect(columnSelect.column) {
+            vm.lazyHost.columns = columnSelect.column
         }
 
         val isFocused = vm.hostDI.search.focused.collectAsStateWithLifecycle().value

@@ -336,7 +336,7 @@ fun LazyRow123(
                             }
                         }
 
-                        AnimatedVisibility( !isVideo, modifier = Modifier.fillMaxWidth(),
+                        AnimatedVisibility( !isVideo, modifier = Modifier.align(Alignment.BottomStart).fillMaxWidth(),
                             enter = slideInVertically( initialOffsetY = { fullHeight -> fullHeight }, animationSpec = tween(durationMillis = 200)
                             ), exit = slideOutVertically( targetOffsetY = { fullHeight -> fullHeight }, animationSpec = tween(durationMillis = 200) ) ) {
                             if (host.visibleProfileInfo) { ProfileInfo1( modifier = Modifier.padding(start = 2.dp, bottom = 2.dp).align(Alignment.BottomStart), onClick = { onClickOpenProfile(item.userName) }, videoItem = item, listUsers = UsersRed.listAllUsers, visibleUserName = true, sizeIcon = 32.dp, cornerRadius = 8.dp ) }

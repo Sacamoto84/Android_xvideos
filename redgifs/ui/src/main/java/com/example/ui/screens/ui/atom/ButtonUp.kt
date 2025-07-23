@@ -18,15 +18,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.redgifs.common.ThemeRed
 
 @Composable
-fun ButtonUp(onClick: () -> Unit) {
+fun ButtonUp(width : Dp = 32.dp, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .height(46.dp)
-            .width(32.dp)
+            .width(width)
             .clip(RoundedCornerShape(8.dp))
             .border(1.dp, Color(0x80757575), RoundedCornerShape(8.dp))
             .background(ThemeRed.colorCommonBackground)

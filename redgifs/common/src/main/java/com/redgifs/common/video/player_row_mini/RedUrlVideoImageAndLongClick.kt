@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
@@ -27,6 +28,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.unit.sp
 import com.client.common.AppPath
 import com.client.common.urlVideImage.UrlImage
 import com.client.common.vibrate.vibrateWithPatternAndAmplitude
@@ -84,7 +86,11 @@ fun RedUrlVideoImageAndLongClick(
 
     var poster by remember { mutableStateOf(true) }
 
-    val videoUri: String = remember(item.id, item.userName) {
+    LaunchedEffect(item) {
+        isVideo = false
+    }
+
+    val videoUri: String = remember {
         Timber.tag("???").i("Перерачсет videoItem.id = ${item.id}")
         //Определяем адрес откуда брать видео, из кеша или из сети
         if (downloadRed.downloader.findVideoInDownload(item.id, item.userName))
@@ -96,6 +102,8 @@ fun RedUrlVideoImageAndLongClick(
                 "android.resource://${context.packageName}/raw/q"
         }
     }
+
+
 
     val imageUrl by remember {
         mutableStateOf(
@@ -178,6 +186,10 @@ fun RedUrlVideoImageAndLongClick(
                 }
             }
 
+        }
+
+        Box(modifier = Modifier.align(Alignment.TopStart)){
+            Text(index.toString(), color = Color.Gray, fontFamily = ThemeRed.fontFamilyDMsanss, fontSize = 16.sp)
         }
 
     }

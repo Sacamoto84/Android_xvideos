@@ -104,6 +104,6 @@ fun TabRowPreview() {
         Icons.Outlined.Group,
         Icons.Outlined.BookmarkBorder
     )
-    //TabRow(l, onChangeState = {})
+    TabRow(l, onChangeState = {}, 2)
 }
 

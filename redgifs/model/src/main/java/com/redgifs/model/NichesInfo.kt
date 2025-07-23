@@ -12,7 +12,7 @@ data class NichesInfo(
     @SerializedName("description") val description: String = "description",
     @SerializedName("gifs") val gifs: Long = -1,
     @SerializedName("id") val id: String = "id",
-    @SerializedName("name") val name: String = "name",
+    @SerializedName("name") val name: String = "",
     @SerializedName("owner") val owner: String = "owner",
     @SerializedName("subscribers") val subscribers: Long = -1,
     @SerializedName("thumbnail") val thumbnail: String = "thumbnail",

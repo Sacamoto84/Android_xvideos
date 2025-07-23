@@ -58,6 +58,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.common.connectivityObserver.ConnectivityObserver
+import com.client.common.sharedPref.Settings
 import com.client.common.urlVideImage.UrlImage
 import com.composeunstyled.Text
 import com.example.ui.screens.explorer.tab.gifs.ColumnSelect
@@ -87,7 +88,8 @@ object SavedCollectionTab : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
 
-    val columnSelect  = ColumnSelect()
+    @Transient
+    val columnSelect  = ColumnSelect(Settings.current_count_collectionTab)
 
     @OptIn(DelicateCoroutinesApi::class)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")

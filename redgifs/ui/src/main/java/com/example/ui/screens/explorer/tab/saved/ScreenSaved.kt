@@ -79,8 +79,8 @@ object SavedTab : Screen {
                             }
                             screenType = it
                         },
-                        overlay0 = { TabBarPoints(SavedLikesTab.columnSelect.column.intValue, screenType == 0) },
-                        overlay4 = { TabBarPoints(SavedCollectionTab.columnSelect.column.intValue, screenType == 4) },
+                        overlay0 = { TabBarPoints(SavedLikesTab.columnSelect.column, screenType == 0) },
+                        overlay4 = { TabBarPoints(SavedCollectionTab.columnSelect.column, screenType == 4) },
                     )
                 }
             },

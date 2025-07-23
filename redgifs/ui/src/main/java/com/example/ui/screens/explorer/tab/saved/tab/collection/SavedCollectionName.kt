@@ -103,8 +103,8 @@ class ScreenCollectionName(val collectionName: String) : Screen {
             savedRed.collections.selectedCollection.value = null
         }
 
-        LaunchedEffect(SavedCollectionTab.columnSelect.column.intValue) {
-            vm.likedHost.columns = SavedCollectionTab.columnSelect.column.intValue
+        LaunchedEffect(SavedCollectionTab.columnSelect.column) {
+            vm.likedHost.columns = SavedCollectionTab.columnSelect.column
         }
 
         /* ---------- /Диалог ---------- */

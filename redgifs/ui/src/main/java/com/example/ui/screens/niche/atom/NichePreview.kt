@@ -25,7 +25,7 @@ fun NichePreview(niches: Niche, onClick: () -> Unit) {
     Column(modifier = Modifier.fillMaxWidth().padding(end = 8.dp).clip(RoundedCornerShape(16.dp)).background(Color(0xFF323232)).clickable{onClick()}) {
 
         Row(modifier = Modifier) {
-            UrlImage(niches.thumbnail, modifier = Modifier.clip(CircleShape).size(64.dp))
+            UrlImage(niches.thumbnail, modifier = Modifier.padding(start = 4.dp, top = 4.dp, bottom = 4.dp).clip(RoundedCornerShape(topStart = 12.dp)).size(64.dp))
             Text(text = niches.name, modifier = Modifier.padding(start = 8.dp), color = Color.White)
             //Text(text = "Join", modifier = Modifier.height(24.dp).background(ThemeRed.colorYellow), color = Color.Black)
         }
