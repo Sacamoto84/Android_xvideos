@@ -19,7 +19,7 @@ class ItemExplorerNailsPagingSource (val order : Order, val textNiches : String,
         return try {
             Timber.d("!!! ItemExplorerNailsPagingSource::load() page = $page sortTop:$order")
 
-            val response = cache.list.toList()//redApi.explorer.getExplorerNiches(order, page = page)
+            val response = cache.list.toList()
 
             // Фильтрация по подстроке в name
             val filtered = if (textNiches.isNotBlank()) {
@@ -39,14 +39,7 @@ class ItemExplorerNailsPagingSource (val order : Order, val textNiches : String,
                 else -> {filtered.sortedBy { it.subscribers }}
             }
 
-            //
-
-
-            LoadResult.Page(
-                data = res,
-                prevKey = null,
-                nextKey = null
-            )
+            LoadResult.Page( data = res,  prevKey = null, nextKey = null )
 
         } catch (e: Exception) {
             Timber.e("!!! ItemExplorerNailsPagingSource load() page = $page Ошибка = ${e.message}")

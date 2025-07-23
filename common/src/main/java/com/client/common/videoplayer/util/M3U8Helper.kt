@@ -2,8 +2,10 @@ package com.client.common.videoplayer.util
 
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
+import io.ktor.http.HttpHeaders
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -19,7 +21,16 @@ data class M3U8Data(
 class M3U8Helper {
     suspend fun fetchM3U8Data(url: String): M3U8Data {
         val m3u8Content = withContext(Dispatchers.IO) {
-            val client = HttpClient(OkHttp)
+            val client = HttpClient(OkHttp){
+                defaultRequest {
+                    headers.append("Referer", "https://www.redgifs.com/")
+                    headers.append("Origin", "https://www.redgifs.com")
+                    headers.append(HttpHeaders.UserAgent, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 YaBrowser/25.6.0.0 Safari/537.36")
+                    headers.append(HttpHeaders.Accept, "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
+                    headers.append(HttpHeaders.AcceptEncoding, "identity")
+                    headers.append(HttpHeaders.AcceptLanguage, "ru,en;q=0.9")
+                }
+            }
             client.get(url).bodyAsText()
         }
         return parseM3U8Content(m3u8Content, url)

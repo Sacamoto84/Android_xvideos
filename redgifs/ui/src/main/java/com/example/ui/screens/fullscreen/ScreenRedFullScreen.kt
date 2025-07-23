@@ -127,7 +127,7 @@ class ScreenRedFullScreen(val item: GifsInfo) : Screen, ScreenTransition {
         }
 
         Scaffold(
-            containerColor = Color.Magenta,
+            //containerColor = Color.Magenta,
             bottomBar = {
                 Column(modifier = Modifier.background(ThemeRed.colorCommonBackground)) {
 

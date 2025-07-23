@@ -47,7 +47,10 @@ enum class TypePager {
     EMPTY
 }
 
-private data class SearchParams(val query: String, val sort: Order, val tags : String, val queryNiches : String)
+private data class SearchParams(val query: String,
+                                val sort: Order,
+                                val tags : String,
+                                val queryNiches : String)
 
 @OptIn(FlowPreview::class)
 class LazyRow123Host(
@@ -58,18 +61,10 @@ class LazyRow123Host(
     val startOrder: Order = Order.LATEST,
     val startColumns: Int = 2,
     val visibleProfileInfo: Boolean = true,
-    val isCollection: Boolean = false,
-    //val block: BlockRed,
-    //val search : SearchRed,
-    //val redApi : RedApi,
-    //val savedRed: SavedRed,
     val tags : StateFlow<Set<String>> = MutableStateFlow(emptySet()),
-    //val snackBarEvent: SnackBarEvent,
-    //val downloadRed: DownloadRed,
-    val hostDI : HostDI
+    val hostDI : HostDI,
+    val isCollection: Boolean = false
 ) {
-
-    //var searchText by mutableStateOf("")
 
     private val refreshTrigger = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
@@ -98,29 +93,21 @@ class LazyRow123Host(
         _sortType.value = newSort
         //_sortType.tryEmit(newSort)
         Timber.d("!!! *** Sort тип изменен в $newSort")
-        //}
     }
-
-    //   @OptIn(ExperimentalCoroutinesApi::class)
-//    val pager: Flow<PagingData<Any>> =  combine(sortType, refreshTrigger.onStart { emit(Unit) }) { sort, _ -> sort }
-//        .flatMapLatest { sort ->
-//            Timber.d("!!! >>>pager sort = $sort")
-//            Pager(
-//                config = PagingConfig(pageSize = 109, prefetchDistance = 10, initialLoadSize = 109),
-//                pagingSourceFactory = {
-//                    Timber.d("!!! >>>pagingSourceFactory{...}")
-//                    createPager(typePager, sort, extraString, searchText)
-//                }
-//            ).flow
-//        }
-//        .cachedIn(scope)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val pager: Flow<PagingData<Any>> =
-        combine(hostDI.search.searchTextDone, sortType,hostDI.block.blockList, tags, hostDI.searchNiches.searchTextDone) { text, sort, blockList, tags, textNiches ->
+
+        combine(
+            hostDI.search.searchTextDone,
+            sortType,
+            tags,
+            hostDI.searchNiches.searchTextDone,
+        )
+        { text, sort, tags, textNiches ->
             SearchParams(text.trim(), sort, tags.joinToString(","), textNiches)
         }
-            //.debounce(2000)                                          // ② ждём паузу ввода
+            //.debounce(2000)                                       // ② ждём паузу ввода
             .distinctUntilChanged()                                 // ③ игнорируем дубли
             .flatMapLatest { params ->                              // ④ НОВЫЙ Pager при каждом изменении
                 Pager(
@@ -166,7 +153,7 @@ fun createPager(
     searchText: String,
     tags : List<String> = emptyList(),
     hostDI : HostDI,
-    textNiches : String
+    textNiches : String,
 ): PagingSource<Int, Any> {
     val pagingSourceFactory = when (typePager) {
         TypePager.NICHES -> {
@@ -194,7 +181,7 @@ fun createPager(
         }
 
         TypePager.SAVED_COLLECTION -> {
-            ItemCollectionPagingSource(extraString, hostDI.savedRed, hostDI.snackBarEvent)
+            ItemCollectionPagingSource(collection = extraString, savedRed =  hostDI.savedRed, snackBarEvent =  hostDI.snackBarEvent)
         }
 
     }

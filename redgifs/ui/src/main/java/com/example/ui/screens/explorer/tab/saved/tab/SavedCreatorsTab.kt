@@ -263,7 +263,6 @@ class ScreenSavedCreatorSM @Inject constructor(
         typePager = TypePager.SAVED_COLLECTION,
         extraString = "",
         startOrder = Order.LATEST,
-        isCollection = true,
         hostDI = hostDI
     )
 }

@@ -15,12 +15,13 @@ import io.ktor.serialization.gson.gson
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
+import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.request.get
 
 object ApiClient {
 
     val USER_AGENT: String =
-        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3346.8 Safari/537.36 Redgifs/"
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 YaBrowser/25.6.0.0 Safari/537.36"
 
 //    // Set up the user's device information
 //    val deviceInfo = "
@@ -41,16 +42,27 @@ object ApiClient {
                 this.registerTypeAdapter(Long::class.java, LongAdapter()).create()
             }
         }
+        defaultRequest {
+            headers.append("Referer", "https://www.redgifs.com/")
+            headers.append("Origin", "https://www.redgifs.com")
+            headers.append(HttpHeaders.UserAgent, USER_AGENT)
+//            headers.append(HttpHeaders.AcceptEncoding, "gzip, deflate")
+            headers.append(HttpHeaders.Accept, "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
+            headers.append(HttpHeaders.AcceptEncoding, "identity")
+            headers.append(HttpHeaders.AcceptLanguage, "ru,en;q=0.9")
+            headers.append(HttpHeaders.Range, "bytes=0-500000") // нужный диапазон
+        }
         expectSuccess = true
     }
 
     var bearerToken: String? = null
 
-    data class TokenResponse(  @SerializedName("token") val token: String)
+    data class TokenResponse(@SerializedName("token") val token: String)
 
     suspend fun login() {
         // Получить временный токен
-        val tokenResponse = client.get("https://api.redgifs.com/v2/auth/temporary").body<TokenResponse>()
+        val tokenResponse =
+            client.get("https://api.redgifs.com/v2/auth/temporary").body<TokenResponse>()
         bearerToken = tokenResponse.token
     }
 

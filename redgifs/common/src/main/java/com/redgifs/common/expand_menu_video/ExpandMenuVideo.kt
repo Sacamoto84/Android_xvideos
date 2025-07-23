@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.redgifs.network.api.RedApi
 import com.redgifs.model.GifsInfo
 import com.redgifs.common.ThemeRed
@@ -224,6 +225,9 @@ fun DropdownMenuItem_AddCollection(item: GifsInfo? = null, savedRed: SavedRed, o
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DropdownMenuItem_RemoveFromCollection(item: GifsInfo? = null, onRefresh: () -> Unit, savedRed: SavedRed, onDismiss: () -> Unit){
+
+    val selectedCollection = savedRed.collections.selectedCollection.collectAsStateWithLifecycle().value
+
     DropdownMenuItem(
         leadingIcon = {
             Icon(
@@ -235,11 +239,11 @@ fun DropdownMenuItem_RemoveFromCollection(item: GifsInfo? = null, onRefresh: () 
         text = { Text("Remove from Collection", style = style) },
         onClick = {
             if (item == null) return@DropdownMenuItem
-            if (savedRed.collections.selectedCollection == null) {
+            if (selectedCollection == null) {
                 onDismiss.invoke()
                 return@DropdownMenuItem
             }
-            savedRed.collections.deleteItemFromCollection(item, savedRed.collections.selectedCollection!!)
+            savedRed.collections.deleteItemFromCollection(item, selectedCollection)
             onRefresh.invoke()
 
             onDismiss.invoke()

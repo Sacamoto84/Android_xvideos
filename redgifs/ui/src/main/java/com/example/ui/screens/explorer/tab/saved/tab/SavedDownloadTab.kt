@@ -1,8 +1,6 @@
 package com.example.ui.screens.explorer.tab.saved.tab
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.widget.ImageButton
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -11,7 +9,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,15 +17,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Fullscreen
 import androidx.compose.material.icons.outlined.Share
-import androidx.compose.material.icons.outlined.Shower
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -47,13 +44,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.model.ScreenModel
-import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
@@ -62,20 +59,16 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.common.AppPath
-import com.client.common.connectivityObserver.ConnectivityObserver
 import com.client.common.urlVideImage.UrlImage
 import com.client.common.util.toPrettyCount3
 import com.composeunstyled.Text
 import com.example.ui.screens.fullscreen.ScreenRedFullScreen
 import com.example.ui.screens.profile.atom.VerticalScrollbar
 import com.example.ui.screens.profile.rememberVisibleRangePercentIgnoringFirstNForLazyColumn
-import com.example.ui.screens.ui.lazyrow123.LazyRow123Host
-import com.example.ui.screens.ui.lazyrow123.TypePager
 import com.redgifs.common.ThemeRed
 import com.redgifs.common.di.HostDI
 import com.redgifs.common.share.useCaseShareGifs
 import com.redgifs.model.GifsInfo
-import com.redgifs.model.Order
 import com.redgifs.model.UserInfo
 import dagger.Binds
 import dagger.Module
@@ -158,7 +151,7 @@ object SavedDownloadTab : Screen {
 
         Scaffold(topBar = {
             Text(
-                ">Авторы",
+                ">Загрузки",
                 modifier = Modifier.padding(start = 8.dp),
                 color = ThemeRed.colorYellow,
                 fontSize = 18.sp,
@@ -187,13 +180,11 @@ object SavedDownloadTab : Screen {
                                     RoundedCornerShape(8.dp)
                                 )
                                 .background(ThemeRed.colorTabLevel3)
+                                .clickable(onClick = {navigator.push(ScreenRedFullScreen(it1))})
                         ) {
 
-                            val imagePath =
-                                AppPath.cache_download_red + "/" + it1.userName + "/" + it1.id + ".jpg"
-
-                            val mp4Path =
-                                AppPath.cache_download_red + "/" + it1.userName + "/" + it1.id + ".mp4"
+                            val imagePath = AppPath.cache_download_red + "/" + it1.userName + "/" + it1.id + ".jpg"
+                            val mp4Path = AppPath.cache_download_red + "/" + it1.userName + "/" + it1.id + ".mp4"
 
                             val size = File(mp4Path).length().toPrettyCount3()
 
@@ -219,18 +210,24 @@ object SavedDownloadTab : Screen {
                                         .fillMaxSize(),
                                     verticalArrangement = Arrangement.SpaceBetween
                                 ) {
+
                                     Text(
                                         "Name: " + it1.userName,
                                         color = Color.White,
                                         fontFamily = ThemeRed.fontFamilyPopinsRegular,
                                         fontSize = 18.sp
                                     )
-                                    Text(
-                                        "ID: " + it1.id,
-                                        color = Color.White,
-                                        fontFamily = ThemeRed.fontFamilyPopinsRegular,
-                                        fontSize = 18.sp
+
+                                    BasicText(
+                                        text = "ID: " + it1.id,
+                                        autoSize = TextAutoSize.StepBased(minFontSize = 10.sp, maxFontSize = 18.sp),
+                                        style = TextStyle(
+                                            color = Color.White,
+                                            fontFamily = ThemeRed.fontFamilyPopinsRegular,
+                                            fontSize = 18.sp
+                                        )
                                     )
+
                                     Text(
                                         "Size: $size",
                                         color = Color.White,

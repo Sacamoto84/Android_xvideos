@@ -13,6 +13,7 @@ import com.redgifs.common.saved.collection.readAllCollections
 import com.redgifs.common.snackBar.SnackBarEvent
 import com.redgifs.model.GifsInfo
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 
 class SavedRed_Collection(val snackBarEvent : SnackBarEvent) {
 
@@ -23,7 +24,9 @@ class SavedRed_Collection(val snackBarEvent : SnackBarEvent) {
 
     var collectionVisibleDialogCreateNew by mutableStateOf(false)  //║ Показ диалога на добавление в блок лист
 
-    var selectedCollection by mutableStateOf<String?>(null)
+    var selectedCollection = MutableStateFlow<String?>(null)//mutableStateOf<String?>(null)
+
+
 
     fun addCollection(item: GifsInfo, collectionName: String) {
         println("!!! addCollection() item:${item.id} collectionName:$collectionName")

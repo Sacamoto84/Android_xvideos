@@ -79,9 +79,9 @@ fun VideoPlayerWithMenuContent(
         }
 
         if (playerHost.poster) {
-            Box( modifier = Modifier.fillMaxSize().background(Color.Magenta), contentAlignment = Alignment.Center ) {
-
-            }
+//            Box( modifier = Modifier.fillMaxSize().background(Color.Magenta), contentAlignment = Alignment.Center ) {
+//
+//            }
         }
 
     }

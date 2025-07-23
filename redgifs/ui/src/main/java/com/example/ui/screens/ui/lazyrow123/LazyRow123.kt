@@ -55,7 +55,6 @@ import com.example.ui.screens.fullscreen.ScreenRedFullScreen
 import com.example.ui.screens.top_this_week.ProfileInfo1
 import com.redgifs.common.expand_menu_video.ExpandMenuVideoTags
 import com.redgifs.common.video.player_row_mini.RedUrlVideoImageAndLongClick
-import com.redgifs.common.video.player_row_mini.RedUrlVideoImageAndLongClickTikTok
 import timber.log.Timber
 
 @Composable
@@ -70,7 +69,7 @@ fun LazyRow123(
     onAppendLoaded: (LazyPagingItems<GifsInfo>) -> Unit = {},
 ) {
 
-    val listGifs = host.pager.collectAsLazyPagingItems() as LazyPagingItems<GifsInfo>
+    val listGifs : LazyPagingItems<GifsInfo> = host.pager.collectAsLazyPagingItems() as LazyPagingItems<GifsInfo>
 
     SideEffect { Timber.d("!!! LazyRow123::SideEffect columns: ${host.columns} : $listGifs") }
 
@@ -82,34 +81,14 @@ fun LazyRow123(
 
     // Отображаем индикатор загрузки поверх контента, если это первая загрузка
     // a) ПЕРВОНАЧАЛЬНАЯ загрузка (+ pull‑to‑refresh)
-    val isInitialLoading = listGifs.loadState.refresh is LoadState.Loading
-            && listGifs.itemCount == 0          // важно!
+    val isInitialLoading = listGifs.loadState.refresh is LoadState.Loading && listGifs.itemCount == 0          // важно!
     val isErrorInitial = listGifs.loadState.refresh is LoadState.Error
 
     val block = host.hostDI.block
 
     val downloadList = host.hostDI.downloadRed.downloadList.collectAsState().value
 
-
-//    BackHandler {
-//        if (fullScreen)
-//            fullScreen = false
-//        else {
-//            navigator.pop()
-//        }
-//    }
-
-    if (listGifs.itemCount == 0) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text(
-                "Отсутствуют данные",
-                color = Color.White,
-                fontFamily = ThemeRed.fontFamilyDMsanss,
-                fontSize = 20.sp
-            )
-        }
-        //return
-    }
+    if (listGifs.itemCount == 0) { Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text( "Отсутствуют данные", color = Color.White, fontFamily = ThemeRed.fontFamilyDMsanss, fontSize = 20.sp ) }; return }
 
     val loadState = listGifs.loadState
     var wasRefreshLoading by remember { mutableStateOf(false) }
@@ -140,47 +119,6 @@ fun LazyRow123(
         }
     }
 
-//    val centrallyLocatedOrMostVisibleItemIndex by remember {
-//        derivedStateOf {
-//            val layoutInfo = state.layoutInfo
-//            val visibleItemsInfo = layoutInfo.visibleItemsInfo
-//            if (visibleItemsInfo.isEmpty()) {
-//                return@derivedStateOf state.firstVisibleItemIndex // Или 0, или -1 как индикатор отсутствия
-//            }
-//
-//            val viewportHeight = layoutInfo.viewportSize.height
-//
-//            val viewportCenterY = layoutInfo.viewportStartOffset + viewportHeight / 2
-//
-//            var bestCandidateIndex = -1
-//
-//            bestCandidateIndex = visibleItemsInfo.maxByOrNull { itemInfo ->
-//                val itemTop = itemInfo.offset.y
-//                val itemBottom = itemInfo.offset.y + itemInfo.size.height
-//                val visibleTop = max(itemTop, layoutInfo.viewportStartOffset)
-//                val visibleBottom = min(itemBottom, layoutInfo.viewportEndOffset)
-//                val visibleHeight = max(0f, (visibleBottom - visibleTop).toFloat())
-//                visibleHeight // Можно использовать просто видимую высоту, если ширина у всех элементов одинаковая в LazyVerticalGrid
-//                // visibleHeight * itemInfo.size.width // Если ширина может отличаться (маловероятно в Fixed)
-//            }?.index ?: state.firstVisibleItemIndex
-//
-//
-//            // --- ВАРИАНТ 2: Ближайший к центру viewport ---
-////            bestCandidateIndex = visibleItemsInfo.minByOrNull { itemInfo ->
-////                val itemCenterY = itemInfo.offset.y + itemInfo.size.height / 2f
-////                abs(itemCenterY - viewportCenterY)
-////            }?.index ?: state.firstVisibleItemIndex
-//
-//
-//            bestCandidateIndex
-//        }
-//    }
-
-//    LaunchedEffect(gotoPosition) {
-//        if (gotoPosition >= 0 && gotoPosition < listGifs.itemCount) {state.scrollToItem(gotoPosition)}
-//    }
-
-
     //Диалог для блокировки
     if (block.blockVisibleDialog) {
         DialogBlock(
@@ -198,26 +136,36 @@ fun LazyRow123(
 
     Box(modifier.fillMaxSize()) {
 
-
         if (host.columns in 1..4) {
 
-            LazyVerticalGrid(
-                state = state,
-                columns = GridCells.Fixed(host.columns.coerceIn(1..4)),
-                modifier = Modifier.then(modifier),
-                contentPadding = contentPadding,
-            )
-            {
-                item(key = "before", span = { GridItemSpan(maxLineSpan) }) { contentBeforeList() }
+            if (listGifs.itemCount > 0) {
 
-                items(
-                    count = listGifs.itemCount,
-                ) { index ->
+                LazyVerticalGrid(
+                    state = state,
+                    columns = GridCells.Fixed(host.columns),
+                    modifier = Modifier//.then(modifier)
+                    ,
+                    contentPadding = contentPadding,
+                )
+                {
+                    item(
+                        key = "before",
+                        span = { GridItemSpan(maxLineSpan) }) { contentBeforeList() }
 
-                    var isVideo by remember { mutableStateOf(false) }
-                    val item = listGifs[index]
+                    items(
+                        count = listGifs.itemCount,
+                        //key = { index -> listGifs[index]?.id ?: index}
+                    ) { index ->
 
-                    if (item != null) {
+                        Timber.i("777 index:$index itemCount:${listGifs.itemCount}")
+
+                        if (index >= listGifs.itemCount) return@items
+
+                        var isVideo by remember { mutableStateOf(false) }
+
+                        val item = listGifs[index]
+                        Timber.i("777 index:$index item id:${item?.id}")
+                        if (item == null) return@items
 
                         Box(
                             modifier = Modifier
@@ -277,10 +225,11 @@ fun LazyRow123(
                                         item = item,
                                         modifier = Modifier,
                                         onClick = { it1 ->
-                                            host.hostDI.search.searchText.value = TextFieldValue(
-                                                text = it1,
-                                                selection = TextRange(it1.length)
-                                            )
+                                            host.hostDI.search.searchText.value =
+                                                TextFieldValue(
+                                                    text = it1,
+                                                    selection = TextRange(it1.length)
+                                                )
                                             host.hostDI.search.searchTextDone.value = it1
                                             ScreenRedExplorer.screenType = 0
                                             navigator.popAll()
@@ -291,7 +240,9 @@ fun LazyRow123(
 
                             AnimatedVisibility(
                                 !isVideo,
-                                modifier = Modifier.fillMaxWidth().align(Alignment.BottomStart),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .align(Alignment.BottomStart),
                                 enter = slideInVertically(
                                     initialOffsetY = { fullHeight -> fullHeight }, // снизу вверх
                                     animationSpec = tween(durationMillis = 200)
@@ -319,24 +270,19 @@ fun LazyRow123(
                                         )
                                     }
 
-                                    LazyRow123Icons(
-                                        modifier = Modifier.align(Alignment.BottomEnd).offset(2.dp, 2.dp),
-                                        host.hostDI,
-                                        item,
-                                        downloadList
-                                    )
+                                    LazyRow123Icons( modifier = Modifier.align(Alignment.BottomEnd).offset(2.dp, 2.dp), host.hostDI, item, downloadList )
                                 }
-
                             }
-
                         }
                     }
                 }
+
             }
         } else {
-            val pageCount = listGifs.itemCount
 
+            val pageCount = listGifs.itemCount
             val statePager = rememberPagerState { pageCount }
+
             VerticalPager(
                 state = statePager,
                 modifier = Modifier.fillMaxSize(),
@@ -347,77 +293,36 @@ fun LazyRow123(
                 var isVideo by remember { mutableStateOf(false) }
 
                 if (item == null) {
-
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator()
-                    }
-
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
                 } else {
-
 
                     Box(
                         modifier = Modifier
-                            .padding(vertical = 2.dp)
-                            .padding(horizontal = 2.dp)
-                            .fillMaxSize()
-                            .clip(RoundedCornerShape(12.dp))
-                            .border(1.dp, Color.DarkGray, RoundedCornerShape(12.dp)),
+                            .padding(vertical = 2.dp).padding(horizontal = 2.dp).fillMaxSize().clip(RoundedCornerShape(12.dp)).border(1.dp, Color.DarkGray, RoundedCornerShape(12.dp)),
                         contentAlignment = Alignment.Center
                     ) {
 
-
-                        RedUrlVideoImageAndLongClick(
-                            item,
-                            index,
+                        RedUrlVideoImageAndLongClick( item, index,
                             onLongClick = {
                                 blockItem = item
                                 navigator.push(ScreenRedFullScreen(item))
-                            },
-                            onVideo = { isVideo = it },
-                            isVisibleView = false,
-                            isVisibleDuration = false,
-                            play = index == statePager.currentPage,//centrallyLocatedOrMostVisibleItemIndex == index && host.columns == 1,
-                            isNetConnected = isConnected,
+                            }, onVideo = { isVideo = it }, isVisibleView = false,isVisibleDuration = false, play = index == statePager.currentPage, isNetConnected = isConnected,
                             onFullScreen = {
                                 blockItem = item
                                 navigator.push(ScreenRedFullScreen(item))
-                            },
-                            downloadRed = host.hostDI.downloadRed,
+                            }, downloadRed = host.hostDI.downloadRed,
                         )
 
                         Column(modifier = Modifier.align(Alignment.TopEnd)) {
 
                             //Меню на 3 точки
-                            ExpandMenuVideo(
-                                item = item,
-                                modifier = Modifier,
-                                onClick = {
-                                    blockItem = item //Для блока и идентификации и тема
-                                },
-                                onRunLike = {
-                                    if (isRunLike) {
-                                        listGifs.refresh()
-                                    }
-                                },
-                                onRefresh = {
-                                    listGifs.refresh()
-                                },
-                                host.isCollection,
-                                block,
-                                host.hostDI.redApi,
-                                host.hostDI.savedRed,
-                                downloadRed = host.hostDI.downloadRed
-                            )
+                            ExpandMenuVideo( item = item, modifier = Modifier, onClick = { blockItem = item }, onRunLike = { if (isRunLike) { listGifs.refresh() } },
+                                onRefresh = { listGifs.refresh() }, host.isCollection, block, host.hostDI.redApi, host.hostDI.savedRed, downloadRed = host.hostDI.downloadRed )
 
                             if (item.tags.isNotEmpty()) {
-                                ExpandMenuVideoTags(
-                                    item = item,
-                                    modifier = Modifier,
+                                ExpandMenuVideoTags( item = item, modifier = Modifier,
                                     onClick = { it1 ->
-                                        host.hostDI.search.searchText.value = TextFieldValue(
-                                            text = it1,
-                                            selection = TextRange(it1.length)
-                                        )
+                                        host.hostDI.search.searchText.value = TextFieldValue( text = it1, selection = TextRange(it1.length) )
                                         host.hostDI.search.searchTextDone.value = it1
                                         ScreenRedExplorer.screenType = 0
                                         navigator.popAll()
@@ -426,76 +331,18 @@ fun LazyRow123(
                             }
                         }
 
-
-                        AnimatedVisibility(
-                            !isVideo,
-                            modifier = Modifier.fillMaxWidth(),
-                            enter = slideInVertically(
-                                initialOffsetY = { fullHeight -> fullHeight }, // снизу вверх
-                                animationSpec = tween(durationMillis = 200)
-                            ),
-                            exit = slideOutVertically(
-                                targetOffsetY = { fullHeight -> fullHeight }, // сверху вниз
-                                animationSpec = tween(durationMillis = 200)
-                            )
-                        ) {
-
-                            if (host.visibleProfileInfo) {
-                                ProfileInfo1(
-                                    modifier = Modifier
-                                        .padding(start = 2.dp, bottom = 2.dp)
-                                        .align(Alignment.BottomStart),
-                                    onClick = { onClickOpenProfile(item.userName) },
-                                    videoItem = item,
-                                    listUsers = UsersRed.listAllUsers,
-                                    visibleUserName = true,
-                                    sizeIcon = 32.dp,
-                                    cornerRadius = 8.dp
-                                )
-                            }
-
-                            LazyRow123Icons(
-                                modifier = Modifier.align(Alignment.BottomCenter),
-                                host.hostDI,
-                                item,
-                                downloadList
-                            )
-
-
+                        AnimatedVisibility( !isVideo, modifier = Modifier.fillMaxWidth(),
+                            enter = slideInVertically( initialOffsetY = { fullHeight -> fullHeight }, animationSpec = tween(durationMillis = 200)
+                            ), exit = slideOutVertically( targetOffsetY = { fullHeight -> fullHeight }, animationSpec = tween(durationMillis = 200) ) ) {
+                            if (host.visibleProfileInfo) { ProfileInfo1( modifier = Modifier.padding(start = 2.dp, bottom = 2.dp).align(Alignment.BottomStart), onClick = { onClickOpenProfile(item.userName) }, videoItem = item, listUsers = UsersRed.listAllUsers, visibleUserName = true, sizeIcon = 32.dp, cornerRadius = 8.dp ) }
+                            LazyRow123Icons( modifier = Modifier.align(Alignment.BottomCenter), host.hostDI, item, downloadList )
                         }
-
-
                     }
-
-
-                }
-
-
-            }
-
-
-
-
-            if (isInitialLoading) {
-                Box(
-                    modifier = modifier
-                        .align(Alignment.Center)
-                        .offset(0.dp, 40.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(color = ThemeRed.colorYellow)
                 }
             }
 
-            if (listGifs.loadState.append is LoadState.Loading && listGifs.itemCount > 0) {
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(16.dp)
-                ) {
-                    CircularProgressIndicator(color = ThemeRed.colorYellow) // Может быть меньше размером
-                }
-            }
+            if (isInitialLoading) { Box( modifier = modifier.align(Alignment.Center).offset(0.dp, 40.dp), contentAlignment = Alignment.Center ) { CircularProgressIndicator(color = ThemeRed.colorYellow) } }
+            if (listGifs.loadState.append is LoadState.Loading && listGifs.itemCount > 0) { Box( modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp) ) { CircularProgressIndicator(color = ThemeRed.colorYellow) } }
 
         }
 

@@ -44,6 +44,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import cafe.adriel.voyager.core.model.ScreenModel
@@ -54,10 +55,12 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.common.connectivityObserver.ConnectivityObserver
 import com.client.common.urlVideImage.UrlImage
 import com.composeunstyled.Text
+import com.example.ui.screens.explorer.tab.saved.tab.collection.ScreenCollectionName
 import com.example.ui.screens.ui.lazyrow123.LazyRow123
 import com.example.ui.screens.ui.lazyrow123.LazyRow123Host
 import com.example.ui.screens.ui.lazyrow123.TypePager
@@ -102,33 +105,12 @@ object SavedCollectionTab : Screen {
 
         val savedRed = vm.hostDI.savedRed
 
+        val selectedCollection = savedRed.collections.selectedCollection.collectAsStateWithLifecycle().value
+
         BackHandler {
             Timber.i("iii BackHandler SavedCollectionTab")
-            savedRed.collections.selectedCollection = null
+            savedRed.collections.selectedCollection.value = null
         }
-
-        val list: SnapshotStateList<GifsInfo> = emptyList<GifsInfo>().toMutableStateList()
-
-        val listGifs: LazyPagingItems<Any> = vm.likedHost.pager.collectAsLazyPagingItems()
-
-        LaunchedEffect(column.intValue) {
-            vm.likedHost.columns = column.intValue
-        }
-
-        LaunchedEffect(savedRed.collections.selectedCollection) {
-            if (savedRed.collections.selectedCollection != null) {
-                list.clear()
-                list.addAll(savedRed.collections.collectionList.first { it.collection == savedRed.collections.selectedCollection }.list)
-                vm.likedHost.extraString = savedRed.collections.selectedCollection!!
-                listGifs.refresh()
-            } else {
-                list.clear()
-            }
-        }
-
-//        LaunchedEffect(SavedRed.collectionList) {
-//            listGifs.refresh()
-//        }
 
         /**  ➜ сюда запоминаем элемент, который пользователь хочет удалить  */
         var itemPendingDelete by remember { mutableStateOf<String?>(null) }
@@ -212,7 +194,7 @@ object SavedCollectionTab : Screen {
 
         Scaffold(topBar = {
             Text(
-                ">Коллекция>" + savedRed.collections.selectedCollection ?: "---",
+                ">Коллекция>" + selectedCollection ?: "---",
                 modifier = Modifier.padding(start = 8.dp),
                 color = ThemeRed.colorYellow,
                 fontSize = 18.sp,
@@ -221,12 +203,12 @@ object SavedCollectionTab : Screen {
         }) { padding ->
 
 
-            if (savedRed.collections.selectedCollection == null) {
+            if (selectedCollection == null) {
+
                 LazyVerticalGrid(
                     modifier = Modifier.padding(padding),
                     state = vm.gridState,
                     columns = GridCells.Fixed(2),
-
                     ) {
 
                     items(savedRed.collections.collectionList) {
@@ -236,7 +218,7 @@ object SavedCollectionTab : Screen {
                                 .padding(horizontal = 8.dp)
                                 .padding(vertical = 4.dp)
                                 .combinedClickable(
-                                    onClick = { savedRed.collections.selectedCollection = it.collection },
+                                    onClick = { savedRed.collections.selectedCollection.value = it.collection },
                                     onLongClick = { itemPendingDelete = it.collection }),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -290,159 +272,7 @@ object SavedCollectionTab : Screen {
                     }
                 }
             } else {
-
-                LazyRow123(
-                    host = vm.likedHost,
-                    modifier = Modifier
-                        .padding(top = padding.calculateTopPadding())
-                        .fillMaxSize(),
-                    onClickOpenProfile = {},
-                )
-
-//                LazyVerticalGrid(state = vm.listState,
-//                    modifier = Modifier.padding(padding))
-//                {
-//
-//
-//                    item {
-//                        Box(
-//                            modifier = Modifier
-//                                .size(64.dp)
-//                                .background(Color.Gray)
-//                                .clickable(onClick = { selectedCollection = null })
-//                        )
-//                    }
-//
-//                    itemsIndexed(list) { index, item ->
-//
-//                        var isVideo by remember { mutableStateOf(false) }
-//
-//                        Box(
-//                            modifier = Modifier
-//                                .padding(vertical = 8.dp)
-//                                .padding(horizontal = 4.dp)
-//                                .fillMaxSize()
-//                                .clip(RoundedCornerShape(16.dp))
-//                                .border(1.dp, Color.DarkGray, RoundedCornerShape(16.dp)),
-//                            contentAlignment = Alignment.Center
-//                        ) {
-//
-//                            RedUrlVideoImageAndLongClick(
-//                                item, index, onLongClick = {},
-//                                onVideo = { isVideo = it },
-//                                isVisibleView = false,
-//                                isVisibleDuration = false,
-//                                play = false,//centrallyLocatedOrMostVisibleItemIndex == index && host.columns == 1,
-//                                isNetConnected = true,
-//                                onVideoUri = { },
-//                                onFullScreen = {
-//                                    //blockItem = item
-//                                    navigator.push(ScreenRedFullScreen(item))
-//                                }
-//                            )
-//
-//                            //Меню на 3 точки
-//                            ExpandMenuVideo(
-//                                item = item,
-//                                modifier = Modifier.align(Alignment.TopEnd),
-//                                onClick = {
-//                                    blockItem = item //Для блока и идентификации и тема
-//                                },
-//                                onRunLike = {},
-//                                isCollection = true,
-//                            )
-//
-//
-//                            ProfileInfo1(
-//                                modifier = Modifier
-//                                    .fillMaxWidth()
-//                                    .align(Alignment.BottomStart)
-//                                    .offset((4).dp, (-4).dp),
-//                                onClick = { navigator.push(ScreenRedProfile(item.userName)) },
-//                                videoItem = item,
-//                                listUsers = UsersRed.listAllUsers,
-//                                visibleUserName = column.intValue <= 2 && !isVideo,
-//                                visibleIcon = !isVideo
-//                            )
-//
-//
-//                            AnimatedVisibility(
-//                                !isVideo, modifier = Modifier
-//                                    .fillMaxSize()
-//                                    .align(Alignment.BottomCenter),
-//                                enter = slideInVertically(
-//                                    initialOffsetY = { fullHeight -> fullHeight }, // снизу вверх
-//                                    animationSpec = tween(durationMillis = 200)
-//                                ),
-//                                exit = slideOutVertically(
-//                                    targetOffsetY = { fullHeight -> fullHeight }, // сверху вниз
-//                                    animationSpec = tween(durationMillis = 200)
-//                                )
-//                            ) {
-//                                Row(
-//                                    modifier = Modifier.fillMaxWidth(),
-//                                    verticalAlignment = Alignment.Bottom,
-//                                    horizontalArrangement = Arrangement.End
-//                                ) {
-//
-//
-//                                    if (SavedRed.collectionList.any { it.list.any { it2 -> it2.id == item.id } }) {
-//                                        Icon(
-//                                            painter = painterResource(R.drawable.collection_multi_input_svgrepo_com),
-//                                            contentDescription = null,
-//                                            tint = Color.White,
-//                                            modifier = Modifier
-//                                                .padding(bottom = 6.dp, end = 6.dp)
-//                                                .size(18.dp)
-//                                        )
-//                                    }
-//
-//                                    //
-//                                    if (SavedRed.creatorsList.any { it.username == item.userName }) {
-//                                        Icon(
-//                                            Icons.Filled.Person,
-//                                            contentDescription = null,
-//                                            tint = Color.White,
-//                                            modifier = Modifier
-//                                                .padding(bottom = 6.dp, end = 6.dp)
-//                                                .size(18.dp)
-//                                        )
-//                                    }
-//
-//                                    //✅ Лайк
-//                                    if (SavedRed.likesList.any { it.id == item.id }) {
-//                                        Icon(
-//                                            Icons.Filled.FavoriteBorder,
-//                                            contentDescription = null,
-//                                            tint = Color.White,
-//                                            modifier = Modifier
-//                                                .padding(bottom = 6.dp, end = 6.dp)
-//                                                .size(18.dp)
-//                                        )
-//                                    }
-//
-//                                    //✅ Иконка того что видео скачано
-//                                    if (DownloadRed.downloadList.contains(item.id)) {
-//                                        Icon(
-//                                            Icons.Default.Save,
-//                                            contentDescription = null,
-//                                            tint = Color.White,
-//                                            modifier = Modifier
-//                                                .padding(bottom = 6.dp, end = 6.dp)
-//                                                .size(18.dp)
-//                                        )
-//                                    }
-//
-//                                }
-//
-//                            }
-//
-//
-//                        }
-//                    }
-//                }
-
-
+                Navigator(ScreenCollectionName(selectedCollection))
             }
 
         }
@@ -452,21 +282,10 @@ object SavedCollectionTab : Screen {
 
 
 class ScreenSavedCollectionSM @Inject constructor(
-    connectivityObserver: ConnectivityObserver,
     val block: BlockRed,
     val hostDI : HostDI,
 ) : ScreenModel {
     val gridState = LazyGridState()
-
-    val likedHost = LazyRow123Host(
-        connectivityObserver = connectivityObserver,
-        scope = screenModelScope,
-        typePager = TypePager.SAVED_COLLECTION,
-        extraString = "",
-        startOrder = Order.LATEST,
-        isCollection = true,
-        hostDI = hostDI
-    )
 }
 
 @Module
