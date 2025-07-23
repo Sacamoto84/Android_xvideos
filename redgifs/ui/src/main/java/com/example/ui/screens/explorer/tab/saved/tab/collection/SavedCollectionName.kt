@@ -60,6 +60,7 @@ import com.client.common.connectivityObserver.ConnectivityObserver
 import com.client.common.preference.PreferencesRepository
 import com.client.common.urlVideImage.UrlImage
 import com.composeunstyled.Text
+import com.example.ui.screens.explorer.tab.saved.tab.SavedCollectionTab
 import com.example.ui.screens.profile.ScreenRedProfileSM
 import com.example.ui.screens.ui.lazyrow123.LazyRow123
 import com.example.ui.screens.ui.lazyrow123.LazyRow123Host
@@ -86,14 +87,6 @@ class ScreenCollectionName(val collectionName: String) : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
 
-    val column = mutableIntStateOf(2)
-
-    fun addColumn() {
-        column.intValue += 1
-        if (column.intValue > 3)
-            column.intValue = 0
-    }
-
     @OptIn(DelicateCoroutinesApi::class)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
@@ -110,12 +103,8 @@ class ScreenCollectionName(val collectionName: String) : Screen {
             savedRed.collections.selectedCollection.value = null
         }
 
-        val list: SnapshotStateList<GifsInfo> = emptyList<GifsInfo>().toMutableStateList()
-
-        val listGifs: LazyPagingItems<GifsInfo> = vm.likedHost.pager.collectAsLazyPagingItems() as LazyPagingItems<GifsInfo>
-
-        LaunchedEffect(column.intValue) {
-            vm.likedHost.columns = column.intValue
+        LaunchedEffect(SavedCollectionTab.column.intValue) {
+            vm.likedHost.columns = SavedCollectionTab.column.intValue
         }
 
         /* ---------- /Диалог ---------- */

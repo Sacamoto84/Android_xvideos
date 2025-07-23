@@ -47,10 +47,12 @@ enum class TypePager {
     EMPTY
 }
 
-private data class SearchParams(val query: String,
-                                val sort: Order,
-                                val tags : String,
-                                val queryNiches : String)
+private data class SearchParams(
+    val query: String,
+    val sort: Order,
+    val tags: String,
+    val queryNiches: String
+)
 
 @OptIn(FlowPreview::class)
 class LazyRow123Host(
@@ -61,43 +63,29 @@ class LazyRow123Host(
     val startOrder: Order = Order.LATEST,
     val startColumns: Int = 2,
     val visibleProfileInfo: Boolean = true,
-    val tags : StateFlow<Set<String>> = MutableStateFlow(emptySet()),
-    val hostDI : HostDI,
+    val tags: StateFlow<Set<String>> = MutableStateFlow(emptySet()),
+    val hostDI: HostDI,
     val isCollection: Boolean = false
 ) {
 
-    private val refreshTrigger = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
-
     val state: LazyGridState = LazyGridState()
-
-    //val pagerState : PagerState = PagerState()
 
     val stateColumn = LazyListState()
 
-    val isConnected = connectivityObserver.isConnected.stateIn(
-        scope,
-        SharingStarted.WhileSubscribed(5000L),
-        false
-    )
+    val isConnected = connectivityObserver.isConnected.stateIn( scope, SharingStarted.WhileSubscribed(5000L), false )
 
     //////////////
     // StateFlow текущего типа сортировки
     private val _sortType = MutableStateFlow(startOrder) // или "popular", "oldest"
     val sortType: StateFlow<Order> = _sortType.asStateFlow()
 
-    //private val _sortType = MutableSharedFlow<Order>(replay = 1)
-    //val sortType: SharedFlow<Order> = _sortType.asSharedFlow()
-
     fun changeSortType(newSort: Order) {
-        //if (_sortType.value != newSort) { // Меняем, только если тип действительно новый
         _sortType.value = newSort
-        //_sortType.tryEmit(newSort)
         Timber.d("!!! *** Sort тип изменен в $newSort")
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val pager: Flow<PagingData<Any>> =
-
         combine(
             hostDI.search.searchTextDone,
             sortType,
@@ -120,7 +108,15 @@ class LazyRow123Host(
                         Timber.d("!!! >>>pagingSourceFactory{...}")
                         gotoUp()
                         gotoUpColumn()
-                        createPager(typePager, params.sort, extraString, params.query, tags.value.toList(), hostDI = hostDI, textNiches = params.queryNiches)
+                        createPager(
+                            typePager = typePager,
+                            sort = params.sort,
+                            extraString = extraString,
+                            searchText = params.query,
+                            tags = tags.value.toList(),
+                            hostDI = hostDI,
+                            textNiches = params.queryNiches
+                        )
                     }
                 ).flow
             }
@@ -131,18 +127,9 @@ class LazyRow123Host(
     var currentIndex by mutableIntStateOf(0)
     var currentIndexGoto by mutableIntStateOf(0)
 
-    fun gotoUp() {
-        scope.launch { state.scrollToItem(0) }
-    }
+    fun gotoUp() { scope.launch { state.scrollToItem(0) } }
 
-    fun gotoUpColumn() {
-        scope.launch { stateColumn.scrollToItem(0) }
-    }
-
-    fun refresh() {
-        refreshTrigger.tryEmit(Unit)   // пересоздать Flow
-    }
-
+    fun gotoUpColumn() { scope.launch { stateColumn.scrollToItem(0) } }
 
 }
 
@@ -151,17 +138,30 @@ fun createPager(
     sort: Order,
     extraString: String,
     searchText: String,
-    tags : List<String> = emptyList(),
-    hostDI : HostDI,
-    textNiches : String,
+    tags: List<String> = emptyList(),
+    hostDI: HostDI,
+    textNiches: String,
 ): PagingSource<Int, Any> {
     val pagingSourceFactory = when (typePager) {
+
         TypePager.NICHES -> {
-            ItemNailsPagingSource(order = sort, nichesName = extraString, block = hostDI.block, redApi = hostDI.redApi, hostDI.snackBarEvent)
+            ItemNailsPagingSource(
+                order = sort,
+                nichesName = extraString,
+                block = hostDI.block,
+                redApi = hostDI.redApi,
+                hostDI.snackBarEvent
+            )
         }
 
         TypePager.TOP -> {
-            ItemTopPagingSource(sort = sort, searchText = searchText, block = hostDI.block, redApi = hostDI.redApi, hostDI.snackBarEvent)
+            ItemTopPagingSource(
+                sort = sort,
+                searchText = searchText,
+                block = hostDI.block,
+                redApi = hostDI.redApi,
+                hostDI.snackBarEvent
+            )
         }
 
         TypePager.SAVED_LIKES -> {
@@ -169,11 +169,24 @@ fun createPager(
         }
 
         TypePager.EXPLORER_NICHES -> {
-            ItemExplorerNailsPagingSource(order = sort, textNiches = textNiches, redApi = hostDI.redApi, hostDI.snackBarEvent, hostDI.savedRed.nichesCache)
+            ItemExplorerNailsPagingSource(
+                order = sort,
+                textNiches = textNiches,
+                redApi = hostDI.redApi,
+                hostDI.snackBarEvent,
+                hostDI.savedRed.nichesCache
+            )
         }
 
         TypePager.PROFILE -> {
-            ItemProfilePagingSource(profileName = extraString, sort = sort, block = hostDI.block, redApi = hostDI.redApi, tags = tags, hostDI.snackBarEvent)
+            ItemProfilePagingSource(
+                profileName = extraString,
+                sort = sort,
+                block = hostDI.block,
+                redApi = hostDI.redApi,
+                tags = tags,
+                hostDI.snackBarEvent
+            )
         }
 
         TypePager.EMPTY -> {
@@ -181,7 +194,11 @@ fun createPager(
         }
 
         TypePager.SAVED_COLLECTION -> {
-            ItemCollectionPagingSource(collection = extraString, savedRed =  hostDI.savedRed, snackBarEvent =  hostDI.snackBarEvent)
+            ItemCollectionPagingSource(
+                collection = extraString,
+                savedRed = hostDI.savedRed,
+                snackBarEvent = hostDI.snackBarEvent
+            )
         }
 
     }

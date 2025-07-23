@@ -234,11 +234,8 @@ object GifsTab : Screen {
                             isRefreshing = true
                             delay(500)
                             isRefreshing = false
-
                         }
-
                         host.refresh()
-
                     },
                     modifier = Modifier,
                     state = state,
