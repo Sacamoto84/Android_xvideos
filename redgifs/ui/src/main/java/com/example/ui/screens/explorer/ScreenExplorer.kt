@@ -82,12 +82,12 @@ class ScreenRedExplorer() : Screen {
                 onChangeState = {
                     if (it == screenType) {
                         when (it) {
-                            0 -> GifsTab.addColumn(g0, g1, g2, g3, g4)
+                            0 -> GifsTab.columnSelect.addColumn(g0, g1, g2, g3, g4)
                         }
                     }
                     screenType = it
                 },
-                overlay0 = { TabBarPoints(GifsTab.column.intValue, screenType == 0) },
+                overlay0 = { TabBarPoints(GifsTab.columnSelect.column.intValue, screenType == 0) },
             )
 
 

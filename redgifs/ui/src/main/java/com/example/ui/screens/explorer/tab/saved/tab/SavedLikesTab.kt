@@ -23,6 +23,7 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.common.connectivityObserver.ConnectivityObserver
+import com.example.ui.screens.explorer.tab.gifs.ColumnSelect
 import com.example.ui.screens.profile.ScreenRedProfile
 import com.example.ui.screens.profile.atom.VerticalScrollbar
 import com.example.ui.screens.profile.rememberVisibleRangePercentIgnoringFirstNForGrid
@@ -45,13 +46,7 @@ object SavedLikesTab : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
 
-    val column = mutableIntStateOf(2)
-
-    fun addColumn() {
-        column.intValue += 1
-        if(column.intValue > 3)
-            column.intValue = 0
-    }
+    val columnSelect  = ColumnSelect()
 
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
@@ -59,8 +54,8 @@ object SavedLikesTab : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val vm: ScreenSavedLikesSM = getScreenModel()
 
-        LaunchedEffect(column.intValue) {
-            vm.likedHost.columns = column.intValue
+        LaunchedEffect(columnSelect.column.intValue) {
+            vm.likedHost.columns = columnSelect.column.intValue
         }
 
         LaunchedEffect(vm.hostDI.savedRed.likes.list){
@@ -68,7 +63,7 @@ object SavedLikesTab : Screen {
         }
 
         val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForGrid(
-            gridState = vm.likedHost.state, itemsToIgnore = 0, numberOfColumns = column.intValue
+            gridState = vm.likedHost.state, itemsToIgnore = 0, numberOfColumns = columnSelect.column.intValue
         )
 
         Box(modifier = Modifier.fillMaxSize()) {

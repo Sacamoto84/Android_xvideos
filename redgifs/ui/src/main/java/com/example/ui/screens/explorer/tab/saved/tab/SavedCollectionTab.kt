@@ -60,6 +60,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.common.connectivityObserver.ConnectivityObserver
 import com.client.common.urlVideImage.UrlImage
 import com.composeunstyled.Text
+import com.example.ui.screens.explorer.tab.gifs.ColumnSelect
 import com.example.ui.screens.explorer.tab.saved.tab.collection.ScreenCollectionName
 import com.example.ui.screens.ui.lazyrow123.LazyRow123
 import com.example.ui.screens.ui.lazyrow123.LazyRow123Host
@@ -86,13 +87,7 @@ object SavedCollectionTab : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
 
-    val column = mutableIntStateOf(2)
-
-    fun addColumn() {
-        column.intValue += 1
-        if (column.intValue > 3)
-            column.intValue = 0
-    }
+    val columnSelect  = ColumnSelect()
 
     @OptIn(DelicateCoroutinesApi::class)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")

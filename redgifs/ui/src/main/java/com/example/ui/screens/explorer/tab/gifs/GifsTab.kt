@@ -70,11 +70,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-object GifsTab : Screen {
 
-    private fun readResolve(): Any = GifsTab
 
-    override val key: ScreenKey = uniqueScreenKey
+class ColumnSelect(){
 
     val column = mutableIntStateOf(
         when {
@@ -93,11 +91,26 @@ object GifsTab : Screen {
             flags.mapIndexedNotNull { index, enabled -> if (enabled) index else null }
         if (enabledIndices.isEmpty()) return // ничего не включено
         val currentIndex = column.intValue
-        //val currentPos = enabledIndices.indexOf(currentIndex)
         val currentPos = enabledIndices.indexOf(currentIndex).takeIf { it != -1 } ?: 2
         val nextPos = (currentPos + 1) % enabledIndices.size
         column.intValue = enabledIndices[nextPos]
     }
+
+}
+
+
+
+
+
+
+
+object GifsTab : Screen {
+
+    private fun readResolve(): Any = GifsTab
+
+    override val key: ScreenKey = uniqueScreenKey
+
+    val columnSelect  = ColumnSelect()
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
@@ -105,13 +118,6 @@ object GifsTab : Screen {
         val vm: ScreenRedExplorerGifsSM = getScreenModel()
 
         val navigator = LocalNavigator.currentOrThrow
-
-        //val root = LocalRootScreenModel.current
-
-        //val block = vm.hostDI.block
-
-
-        //val searchTextSuggestions = vm.hostDI.search.searchTextSuggestions.collectAsStateWithLifecycle().value
 
         val state = rememberPullToRefreshState()
         var isRefreshing by remember { mutableStateOf(false) }
@@ -123,15 +129,15 @@ object GifsTab : Screen {
         val haptic = LocalHapticFeedback.current
 
         val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForGrid(
-            gridState = vm.lazyHost.state, itemsToIgnore = 0, numberOfColumns = column.intValue
+            gridState = vm.lazyHost.state, itemsToIgnore = 0, numberOfColumns = columnSelect.column.intValue
         )
 
         val search = vm.hostDI.search
 
         val searchR = search.searchText.collectAsStateWithLifecycle().value
 
-        LaunchedEffect(column.intValue) {
-            vm.lazyHost.columns = column.intValue
+        LaunchedEffect(columnSelect.column.intValue) {
+            vm.lazyHost.columns = columnSelect.column.intValue
         }
 
         val isFocused = vm.hostDI.search.focused.collectAsStateWithLifecycle().value
