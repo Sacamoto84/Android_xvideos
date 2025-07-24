@@ -2,11 +2,15 @@ package com.client.xvideos.l.ui
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
@@ -30,6 +34,7 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.filterNotNull
@@ -50,22 +55,17 @@ class ScreenLRoot() : Screen {
 
         val album = vm.album.collectAsStateWithLifecycle().value
 
-        val pics = vm.pics.collectAsStateWithLifecycle().value
-
-
         Scaffold {
 
-
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
-                items(pics) {
-                    if (it.url_to_original != null) {
-                        UrlImage(it.url_to_original)
+            if (album?.pics != null) {
+                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                    items(album.pics) {
+                        if (it.url_to_original != null) {
+                            UrlImage(it.url_to_original, modifier = Modifier.size(200.dp))
+                        }
                     }
                 }
-
-
             }
-
 
         }
 
@@ -82,20 +82,13 @@ class ScreenLRootSM @Inject constructor(
 
     val album = MutableStateFlow<Album?>(null)
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val pics = album.filterNotNull().flatMapLatest { it.pics }.stateIn(
-        screenModelScope,
-        SharingStarted.WhileSubscribed(5000),
-        emptyList()
-    )
-
     init {
         screenModelScope.launch {
+
             if (!luscious.loggedIn) {
                 luscious.login()
-            } else {
-                album.value = luscious.getAlbum(374481)
             }
+            album.value = luscious.getAlbum(499900)//(374481)
         }
     }
 

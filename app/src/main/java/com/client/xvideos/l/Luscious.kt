@@ -1,24 +1,26 @@
 package com.client.xvideos.l
 
 import com.client.xvideos.Secrets
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.runBlocking
 
-fun main(){
-    runBlocking {
-        val luscious = Luscious(Secrets.lusciousEmail, Secrets.lusciousPassword)
-        luscious.login()
-        if (luscious.loggedIn) {
-
-            // дальше можно делать авторизованные запросы через luscious.handler
-            val a = luscious.getAlbum(374481)
-            a
-
-        }
-    }
-}
+//fun main(){
+//    runBlocking {
+//        val luscious = Luscious(Secrets.lusciousEmail, Secrets.lusciousPassword)
+//        luscious.login()
+//        if (luscious.loggedIn) {
+//
+//            // дальше можно делать авторизованные запросы через luscious.handler
+//            val a = luscious.getAlbum(374481)
+//            a
+//
+//        }
+//    }
+//}
 
 
 class Luscious(
+    val scope : CoroutineScope,
     private val username: String? = null,
     private val password: String? = null,
     timeoutMillis: Long = 5000,
@@ -88,7 +90,7 @@ class Luscious(
             else -> throw IllegalArgumentException("albumInput must be Int or String")
         }
 
-        return Album(id.toInt(), download, handler)
+        return Album(id.toInt(), download, handler,  scope)
     }
 
 

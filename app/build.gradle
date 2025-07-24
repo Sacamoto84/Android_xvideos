@@ -14,7 +14,7 @@ plugins {
 }
 
 
-def secretsFile = rootProject.file("secrets.properties")
+def secretsFile = rootProject.file("../secrets.properties")
 def secrets = new Properties()
 if (secretsFile.exists()) {
     secrets.load(new FileInputStream(secretsFile))
