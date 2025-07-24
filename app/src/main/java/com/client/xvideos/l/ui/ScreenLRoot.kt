@@ -1,10 +1,12 @@
 package com.client.xvideos.l.ui
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
@@ -25,10 +27,15 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -43,20 +50,17 @@ class ScreenLRoot() : Screen {
 
         val album = vm.album.collectAsStateWithLifecycle().value
 
-        val pics = album?.pics?.collectAsStateWithLifecycle()?.value
+        val pics = vm.pics.collectAsStateWithLifecycle().value
+
 
         Scaffold {
 
-            if (pics != null) {
 
-                LazyColumn {
-                    items(pics) {
-                        if (it.url_to_original != null) {
-                            UrlImage(it.url_to_original)
-                        }
+            LazyColumn(modifier = Modifier.fillMaxSize()) {
+                items(pics) {
+                    if (it.url_to_original != null) {
+                        UrlImage(it.url_to_original)
                     }
-
-
                 }
 
 
@@ -71,18 +75,25 @@ class ScreenLRoot() : Screen {
 
 }
 
+
 class ScreenLRootSM @Inject constructor(
-
+    val luscious: Luscious
 ) : ScreenModel {
-
-    val luscious = Luscious(Secrets.lusciousEmail, Secrets.lusciousPassword)
 
     val album = MutableStateFlow<Album?>(null)
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val pics = album.filterNotNull().flatMapLatest { it.pics }.stateIn(
+        screenModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        emptyList()
+    )
+
     init {
         screenModelScope.launch {
-            luscious.login()
-            if (luscious.loggedIn) {
+            if (!luscious.loggedIn) {
+                luscious.login()
+            } else {
                 album.value = luscious.getAlbum(374481)
             }
         }

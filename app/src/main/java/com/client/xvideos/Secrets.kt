@@ -5,10 +5,12 @@ import java.util.*
 
 object Secrets {
     private val props: Properties by lazy {
-        val file = File("local.properties")
+        val file = File(System.getProperty("user.dir"), "local.properties")
         Properties().apply {
             if (file.exists()) {
                 file.inputStream().use { load(it) }
+            } else {
+                println("⚠️ local.properties not found at: ${file.absolutePath}")
             }
         }
     }
