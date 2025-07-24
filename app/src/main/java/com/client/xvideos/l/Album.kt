@@ -1,34 +1,37 @@
 package com.client.xvideos.l
 
+import androidx.compose.runtime.mutableStateListOf
 import com.google.gson.Gson
 import com.google.gson.JsonParser
 import com.google.gson.annotations.SerializedName
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 
 class Album(
     val id: Int,
     download: Boolean = false,
-    val handler: KtorRequestHandler? = null
+    val handler: KtorRequestHandler? = null,
+    scope : CoroutineScope,
 ) {
     //private val handler: KtorRequestHandler = handler ?: KtorRequestHandler()
 
     var url: String = ""
 
-    var parsed: AlbumDetails
+    lateinit var parsed: AlbumDetails
 
     init {
-        runBlocking {
+        scope.launch {
             val info = getAlbumInfo(id)
             val res = handler?.postJson(Luscious.API, info)
             val json = JsonParser.parseString(res).asJsonObject
-            val get =
-                json["data"]?.asJsonObject?.get("album")?.asJsonObject?.get("get")?.asJsonObject
+            val get = json["data"]?.asJsonObject?.get("album")?.asJsonObject?.get("get")?.asJsonObject
             val gson = Gson()
             parsed = gson.fromJson(get, AlbumDetails::class.java)
             url = Luscious.HOME + parsed.url
-            url
-
             contentUrls()
         }
     }
@@ -57,11 +60,11 @@ class Album(
     val downloadUrl: String by lazy { Luscious.HOME + parsed.download_url }
 
 
-    val pics = MutableStateFlow<List<PicsDetails>>(emptyList())
+    val pics = mutableStateListOf<PicsDetails>()
     var total_pages: Int? = null
 
-    fun contentUrls() {
-        runBlocking {
+    suspend fun contentUrls() {
+
             val  time = System.currentTimeMillis()
             try {
                 val list = mutableListOf<PicsDetails>()
@@ -69,13 +72,14 @@ class Album(
                 for (i in 2..total_pages!!) {
                     list.addAll(openPage(i))
                 }
-                pics.value = list
+                withContext(Dispatchers.Main) {
+                    pics.addAll(list)
+                }
             }catch (e: Exception){
                 val ee = e.message
             }
             val  timeA = System.currentTimeMillis() - time
             println("Time: $timeA")
-        }
     }
 
     suspend fun openPage(page: Int): List<PicsDetails> {

@@ -13,6 +13,13 @@ plugins {
 
 }
 
+
+def secretsFile = rootProject.file("secrets.properties")
+def secrets = new Properties()
+if (secretsFile.exists()) {
+    secrets.load(new FileInputStream(secretsFile))
+}
+
 android {
     namespace 'com.client.xvideos'
     compileSdk 36
@@ -31,6 +38,11 @@ android {
                 arguments += ["room.schemaLocation": "$projectDir/schemas".toString()]
             }
         }
+
+
+        buildConfigField "String", "luscious_email", "\"${secrets['luscious_email']}\""
+        buildConfigField "String", "luscious_password", "\"${secrets['luscious_password']}\""
+
 
     }
 
@@ -220,8 +232,8 @@ dependencies {
 
     // Room
     implementation(libs.androidx.room.runtime)
-    ksp (libs.androidx.room.compiler)
-    implementation (libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.ktx)
 
     implementation(libs.core)
 
@@ -240,24 +252,24 @@ dependencies {
 
     implementation(libs.material3)
 
-    implementation (libs.androidx.paging.runtime)   // core
-    implementation (libs.androidx.paging.compose)   // compose
+    implementation(libs.androidx.paging.runtime)   // core
+    implementation(libs.androidx.paging.compose)   // compose
 
     //implementation("network.chaintech:sdp-ssp-compose-multiplatform:1.0.6")
 
     implementation libs.zoomable
 
-    implementation (libs.androidx.lifecycle.process)
-    implementation (libs.image.loader)
+    implementation(libs.androidx.lifecycle.process)
+    implementation(libs.image.loader)
 
-    implementation (libs.kdownloader)
+    implementation(libs.kdownloader)
 
     //https://github.com/amitshekhariitbhu/PRDownloader
     //implementation("com.github.amitshekhariitbhu:PRDownloader:1.0.2")
 
-    implementation (libs.warden)
+    implementation(libs.warden)
 
-    implementation (libs.accompanist.systemuicontroller)
+    implementation(libs.accompanist.systemuicontroller)
 
     //implementation("androidx.compose.runtime:runtime-tracing:1.8.1")
     //implementation("androidx.compose.runtime:runtime-tracing")
@@ -275,7 +287,7 @@ dependencies {
     implementation(project(":redgifs:db"))
 
     implementation(project(":redgifs:ui"))
-    
+
 }
 
 ksp {
