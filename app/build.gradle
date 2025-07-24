@@ -9,6 +9,8 @@ plugins {
     id("com.google.dagger.hilt.android")
     alias(libs.plugins.google.gms.google.services)
 
+    alias(libs.plugins.apollo)
+
 }
 
 android {
@@ -73,6 +75,9 @@ android {
 }
 
 dependencies {
+
+    implementation(libs.apollo.runtime)
+    implementation("com.github.javafaker:javafaker:1.0.2")
 
     implementation libs.androidx.activity.ktx
     implementation libs.androidx.lifecycle.viewmodel.compose

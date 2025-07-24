@@ -26,8 +26,32 @@ class isAlbum(
             val gson = Gson()
             parsed = gson.fromJson(get, AlbumDetails::class.java)
             url = Luscious.HOME + parsed.url
+            url
         }
     }
+
+    /**
+     * Возвращает количество фотографий в альбоме (в это число входят и gif-файлы).
+     */
+    val pictureCount: Int by lazy { parsed.number_of_pictures }
+
+    /**
+     * Возвращает количество анимированных картинок в альбоме
+     */
+    val animatedCount: Int by lazy { parsed.number_of_animated_pictures }
+
+    /**
+     * Возвращает url миниатюры альбома
+     */
+    val thumbnail: String by lazy {  parsed.cover.url }
+
+    /**
+     * Возвращает описание альбома
+     */
+    val description: String by lazy { parsed.description }
+
+
+    val downloadUrl: String by lazy { Luscious.HOME + parsed.download_url }
 
 //    override fun toString(): String = name
 //
@@ -57,16 +81,6 @@ class isAlbum(
 //    }
 
 
-//    /**
-//     * Возвращает количество фотографий в альбоме (в это число входят и gif-файлы).
-//     */
-//    val pictureCount: Int by lazy { (json["number_of_pictures"] as Number).toInt() }
-//
-//    val animatedCount: Int by lazy { (json["number_of_animated_pictures"] as Number).toInt() }
-//
-//    val thumbnail: String by lazy { (json["cover"] as Map<*, *>)["url"] as String }
-//
-//    val description: String by lazy { json["description"] as String }
 //
 //    val genres: List<Genre> by lazy {
 //        (json["genres"] as List<Map<String, Any>>).map {

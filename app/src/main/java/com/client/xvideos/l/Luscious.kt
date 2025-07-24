@@ -1,10 +1,11 @@
 package com.client.xvideos.l
 
+import com.client.xvideos.Secrets
 import kotlinx.coroutines.runBlocking
 
 fun main(){
     runBlocking {
-        val luscious = Luscious("zorromen@mail.ru", "K2Y.z6PNCXQgmS*")
+        val luscious = Luscious(Secrets.lusciousEmail, Secrets.lusciousPassword)
         luscious.login()
         if (luscious.loggedIn) {
 
