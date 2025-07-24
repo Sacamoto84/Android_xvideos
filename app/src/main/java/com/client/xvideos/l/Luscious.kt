@@ -17,8 +17,6 @@ fun main(){
     }
 }
 
-
-
 class Luscious(
     private val username: String? = null,
     private val password: String? = null,
@@ -81,7 +79,7 @@ class Luscious(
      *         Or it can be a string, the link itself
      *
      */
-    fun getAlbum(albumInput: Any, download: Boolean = false): isAlbum {
+    fun getAlbum(albumInput: Any, download: Boolean = false): Album {
 
         val id = when (albumInput) {
             is Int -> albumInput.toString()
@@ -89,7 +87,7 @@ class Luscious(
             else -> throw IllegalArgumentException("albumInput must be Int or String")
         }
 
-        return isAlbum(id.toInt(), download, handler)
+        return Album(id.toInt(), download, handler)
     }
 
 
@@ -99,4 +97,13 @@ class Luscious(
         val matchResult = regex.find(url)
         return matchResult?.groupValues?.get(1)
     }
+
+
+
+
+
+
+
+
+
 }

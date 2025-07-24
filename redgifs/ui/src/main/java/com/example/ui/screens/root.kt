@@ -39,6 +39,7 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
+import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.Navigator
@@ -85,7 +86,7 @@ data class UiSnackbarVisuals(
 
 class ScreenRedRoot() : Screen {
 
-    override val key: ScreenKey = "ScreenRedTopThisWeek"
+    override val key: ScreenKey = uniqueScreenKey
 
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable

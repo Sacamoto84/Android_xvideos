@@ -1,5 +1,7 @@
 package com.client.xvideos.l
 
+import com.google.gson.Gson
+
 fun getAlbumInfo(albumId: Int): String {
     val query = """
         query getAlbumInfo(${'$'}id: ID!) {
@@ -49,7 +51,7 @@ fun getVideoInfo(videoId: Int): Map<String, Any> {
     )
 }
 
-fun getPictures(albumId: Int, page: Int = 1): Map<String, Any> {
+fun getPicturesJson(albumId: Int, page: Int = 1): String {
     val query = """
         query ListAlbumPictures(${'$'}input: PictureListInput!) {
             picture {
@@ -63,11 +65,11 @@ fun getPictures(albumId: Int, page: Int = 1): Map<String, Any> {
             page total_items total_pages items_per_page url_complete
         }
         fragment PicUrls on Picture {
-            url_to_original url_to_video url
+            url_to_original url_to_video
         }
     """.trimIndent()
 
-    return mapOf(
+    val json = mapOf(
         "query" to query,
         "variables" to mapOf(
             "input" to mapOf(
@@ -79,6 +81,8 @@ fun getPictures(albumId: Int, page: Int = 1): Map<String, Any> {
             )
         )
     )
+
+    return Gson().toJson(json)
 }
 
 fun albumSearchQuery(

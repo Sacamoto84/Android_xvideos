@@ -3,13 +3,13 @@ package com.client.xvideos.l
 import com.google.gson.Gson
 import com.google.gson.JsonParser
 import com.google.gson.annotations.SerializedName
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.Serializer
 
-class isAlbum(
+class Album(
     val id: Int,
     download: Boolean = false,
-    handler: KtorRequestHandler? = null
+    val handler: KtorRequestHandler? = null
 ) {
     //private val handler: KtorRequestHandler = handler ?: KtorRequestHandler()
 
@@ -22,11 +22,14 @@ class isAlbum(
             val info = getAlbumInfo(id)
             val res = handler?.postJson(Luscious.API, info)
             val json = JsonParser.parseString(res).asJsonObject
-            val get = json["data"]?.asJsonObject?.get("album")?.asJsonObject?.get("get")?.asJsonObject
+            val get =
+                json["data"]?.asJsonObject?.get("album")?.asJsonObject?.get("get")?.asJsonObject
             val gson = Gson()
             parsed = gson.fromJson(get, AlbumDetails::class.java)
             url = Luscious.HOME + parsed.url
             url
+
+            contentUrls()
         }
     }
 
@@ -43,7 +46,7 @@ class isAlbum(
     /**
      * Возвращает url миниатюры альбома
      */
-    val thumbnail: String by lazy {  parsed.cover.url }
+    val thumbnail: String by lazy { parsed.cover.url }
 
     /**
      * Возвращает описание альбома
@@ -53,32 +56,43 @@ class isAlbum(
 
     val downloadUrl: String by lazy { Luscious.HOME + parsed.download_url }
 
-//    override fun toString(): String = name
-//
-//    val name: String by lazy { json["title"] as String }
-//
-//    val sanitizedName: String by lazy { sanitizeFilePath(name) }
-//
-//    val downloadUrl: String by lazy { Luscious.HOME + (json["download_url"] as? String ?: "") }
 
-//    val contentUrls: List<String> by lazy {
-//        val picsJson = handler.post(Luscious.API, getPicturesJson(id))
-//            .getJSONObject("data")
-//            .getJSONObject("picture")
-//            .getJSONObject("list")
-//        val totalPages = picsJson.getJSONObject("info").getInt("total_pages")
-//        val urls = mutableListOf<String>()
-//        urls.addAll(picsJson.getJSONArray("items").map { it.asJsonObject.getString("url_to_original") })
-//
-//        for (page in 2..totalPages) {
-//            val pagePics = handler.post(Luscious.API, getPicturesJson(id, page))
-//                .getJSONObject("data")
-//                .getJSONObject("picture")
-//                .getJSONObject("list")
-//            urls.addAll(pagePics.getJSONArray("items").map { it.asJsonObject.getString("url_to_original") })
-//        }
-//        urls
-//    }
+    val pics = MutableStateFlow<List<PicsDetails>>(emptyList())
+    var total_pages: Int? = null
+
+    fun contentUrls() {
+        runBlocking {
+            val  time = System.currentTimeMillis()
+            try {
+                val list = mutableListOf<PicsDetails>()
+                list.addAll(openPage(1))
+                for (i in 2..total_pages!!) {
+                    list.addAll(openPage(i))
+                }
+                pics.value = list
+            }catch (e: Exception){
+                val ee = e.message
+            }
+            val  timeA = System.currentTimeMillis() - time
+            println("Time: $timeA")
+        }
+    }
+
+    suspend fun openPage(page: Int): List<PicsDetails> {
+        val gson = Gson()
+        val list = mutableListOf<PicsDetails>()
+        val picsJson = handler?.postJson(Luscious.API, getPicturesJson(id, page))
+        val json = JsonParser.parseString(picsJson).asJsonObject
+        val get = json["data"]?.asJsonObject?.get("picture")?.asJsonObject?.get("list")?.asJsonObject
+        total_pages = get?.get("info")?.asJsonObject?.get("total_pages")?.asInt
+        val itemsArray = get?.get("items")?.asJsonArray
+        itemsArray?.forEach { element ->
+            val pic = gson.fromJson(element, PicsDetails::class.java)
+            list.add(pic)
+        }
+        return list
+    }
+
 
 
 //
@@ -173,21 +187,26 @@ class isAlbum(
 }
 
 
+data class PicsDetails(
+    @SerializedName("url_to_original") val url_to_original: String?,
+    @SerializedName("url_to_video") val url_to_video: String?,
+)
+
 
 data class AlbumDetails(
-    @SerializedName("id")    val id: String,
-    @SerializedName("title")    val title: String,
-    @SerializedName("tags")    val tags: List<Tag>,
-    @SerializedName("is_manga")    val is_manga: Boolean,
-    @SerializedName("content")   val content: Content,
-    @SerializedName("genres")    val genres: List<Genre>,
-    @SerializedName("cover")  val cover: Cover,
-    @SerializedName("description")   val description: String,
-    @SerializedName("audiences")   val audiences: List<Audience>,
-    @SerializedName("number_of_pictures")  val number_of_pictures: Int,
-    @SerializedName("number_of_animated_pictures")  val number_of_animated_pictures: Int,
-    @SerializedName("url")   val url: String,
-    @SerializedName("download_url")   val download_url: String
+    @SerializedName("id") val id: String,
+    @SerializedName("title") val title: String,
+    @SerializedName("tags") val tags: List<Tag>,
+    @SerializedName("is_manga") val is_manga: Boolean,
+    @SerializedName("content") val content: Content,
+    @SerializedName("genres") val genres: List<Genre>,
+    @SerializedName("cover") val cover: Cover,
+    @SerializedName("description") val description: String,
+    @SerializedName("audiences") val audiences: List<Audience>,
+    @SerializedName("number_of_pictures") val number_of_pictures: Int,
+    @SerializedName("number_of_animated_pictures") val number_of_animated_pictures: Int,
+    @SerializedName("url") val url: String,
+    @SerializedName("download_url") val download_url: String
 )
 
 data class Tag(
@@ -199,23 +218,23 @@ data class Tag(
 )
 
 data class Content(
-    @SerializedName("id")  val id: String,
+    @SerializedName("id") val id: String,
     @SerializedName("title") val title: String,
-    @SerializedName("url")  val url: String
+    @SerializedName("url") val url: String
 )
 
 data class Genre(
-    @SerializedName("id")  val id: String,
-    @SerializedName("title")  val title: String,
-    @SerializedName("acts_as_warning")  val acts_as_warning: Boolean,
-    @SerializedName("url")  val url: String
+    @SerializedName("id") val id: String,
+    @SerializedName("title") val title: String,
+    @SerializedName("acts_as_warning") val acts_as_warning: Boolean,
+    @SerializedName("url") val url: String
 )
 
 data class Cover(
-    @SerializedName("width")  val width: Int,
+    @SerializedName("width") val width: Int,
     @SerializedName("height") val height: Int,
     @SerializedName("size") val size: String,
-    @SerializedName("url")val url: String
+    @SerializedName("url") val url: String
 )
 
 data class Audience(
