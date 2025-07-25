@@ -88,6 +88,9 @@ android {
 
 dependencies {
 
+    implementation("com.github.SmartToolFactory:Compose-Zoom:0.5.0")
+    implementation 'com.github.SmartToolFactory:Compose-Extended-Gestures:2.0.0'
+
     implementation(libs.apollo.runtime)
     implementation("com.github.javafaker:javafaker:1.0.2")
 
