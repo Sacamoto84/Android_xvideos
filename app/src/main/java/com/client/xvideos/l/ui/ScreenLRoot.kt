@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
@@ -264,20 +265,22 @@ fun FullScreenImage(
     val widthDp = with(density) { startWidth.toDp() }
     val heightDp = with(density) { startHeight.toDp() }
 
+    val scope = rememberCoroutineScope()
+
     LaunchedEffect(Unit) {
         coroutineScope {
-            launch { scale.animateTo(targetScale, tween(3000)) }
-            launch { offsetX.animateTo(targetOffsetX, tween(3000)) }
-            launch { offsetY.animateTo(targetOffsetY, tween(3000)) }
+            launch { scale.animateTo(targetScale, tween(300)) }
+            launch { offsetX.animateTo(targetOffsetX, tween(300)) }
+            launch { offsetY.animateTo(targetOffsetY, tween(300)) }
         }
     }
 
     LaunchedEffect(isClosing) {
         if (isClosing) {
             coroutineScope {
-                launch { scale.animateTo(1f, tween(3000)) }
-                launch { offsetX.animateTo(startOffsetX, tween(3000)) }
-                launch { offsetY.animateTo(startOffsetY, tween(3000)) }
+                launch { scale.animateTo(1f, tween(300)) }
+                launch { offsetX.animateTo(startOffsetX, tween(300)) }
+                launch { offsetY.animateTo(startOffsetY, tween(300)) }
             }
             onClose()
         }
@@ -287,7 +290,12 @@ fun FullScreenImage(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.Black)
-                .clickable { isClosing = true },
+                .zoomable(zoomState, onTap = {
+                    scope.launch {
+                        zoomState.changeScale(1f, Offset.Zero, tween(100))
+                        isClosing = true
+                    }
+                }),
             contentAlignment = Alignment.TopStart
         ) {
 
