@@ -58,9 +58,7 @@ class Album(
      */
     val thumbnail: String by lazy { parsed.value.cover.url }
 
-
     val downloadUrl: String by lazy { Luscious.HOME + parsed.value.download_url }
-
 
     val pics = mutableStateListOf<PicsDetails>()
 
@@ -70,9 +68,9 @@ class Album(
         try {
             val list = mutableListOf<PicsDetails>()
             list.addAll(openPage(1))
-            for (i in 2..total_pages!!) {
-                list.addAll(openPage(i))
-            }
+//            for (i in 2..total_pages!!) {
+//                list.addAll(openPage(i))
+//            }
             withContext(Dispatchers.Main) {
                 pics.addAll(list)
             }

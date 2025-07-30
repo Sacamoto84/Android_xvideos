@@ -26,7 +26,7 @@ import timber.log.Timber
 
 
 @Composable
-fun UrlImageLusciousZoomedGifs(url: String, modifier: Modifier = Modifier,  contentScale : ContentScale = ContentScale.FillWidth, loadIndicator : Boolean = true, isGrayscale: Boolean = false) {
+fun UrlImageLusciousGifs(url: String, modifier: Modifier = Modifier, contentScale : ContentScale = ContentScale.FillWidth, loadIndicator : Boolean = true, isGrayscale: Boolean = false) {
 
     val context = LocalContext.current
     val colorFilter = ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0.9f) })
@@ -75,8 +75,5 @@ fun UrlImageLusciousZoomedGifs(url: String, modifier: Modifier = Modifier,  cont
                 }
             }
         )
-
-
-
 
 }
