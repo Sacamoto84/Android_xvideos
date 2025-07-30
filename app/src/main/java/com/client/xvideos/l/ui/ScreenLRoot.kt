@@ -6,8 +6,13 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.calculateCentroid
+import androidx.compose.foundation.gestures.calculatePan
+import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -63,7 +68,9 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
@@ -246,15 +253,16 @@ fun FullScreenImage(
     val startHeight = startRect.height
     val aspectRatio = startWidth / startHeight
 
-    val finalWidth = screenWidthPx
-    val finalHeight = finalWidth / aspectRatio
-    val finalX = (screenWidthPx - startWidth * (finalWidth / startWidth)) / 2
-    val finalY = (screenHeightPx - startHeight * (finalWidth / startWidth)) / 2
+    val targetWidth = screenWidthPx
+    val targetHeight = targetWidth / aspectRatio
+    val targetScale = targetWidth / startWidth
+
+    val targetOffsetX = (screenWidthPx - startWidth * targetScale) / 2
+    val targetOffsetY = (screenHeightPx - startHeight * targetScale) / 2
 
     val baseWidthDp = with(density) { startWidth.toDp() }
     val baseHeightDp = with(density) { startHeight.toDp() }
 
-    // Анимации
     val scaleAnim = remember { Animatable(1f) }
     val offsetXAnim = remember { Animatable(startX) }
     val offsetYAnim = remember { Animatable(startY) }
@@ -263,34 +271,26 @@ fun FullScreenImage(
 
     var isClosing by remember { mutableStateOf(false) }
 
-    // Начальная анимация появления
+    var isResetting by remember { mutableStateOf(false) }
+
+    // Анимация появления
     LaunchedEffect(Unit) {
-        val targetScale = finalWidth / startWidth
-        scope.launch { scaleAnim.animateTo(targetScale, tween(300)) }
-        scope.launch { offsetXAnim.animateTo(finalX, tween(300)) }
-        scope.launch { offsetYAnim.animateTo(finalY, tween(300)) }
+        coroutineScope {
+            launch { scaleAnim.animateTo(targetScale, tween(300)) }
+            launch { offsetXAnim.animateTo(targetOffsetX, tween(300)) }
+            launch { offsetYAnim.animateTo(targetOffsetY, tween(300)) }
+        }
     }
 
-    // Закрытие по тапу
-//    LaunchedEffect(isClosing) {
-//        if (isClosing) {
-//            scope.launch { scaleAnim.animateTo(1f, tween(300)) }
-//            scope.launch { offsetXAnim.animateTo(startX, tween(300)) }
-//            scope.launch { offsetYAnim.animateTo(startY, tween(300)) }
-//            onClose()
-//        }
-//
-//    }
-
+    // Анимация закрытия
     LaunchedEffect(isClosing) {
         if (isClosing) {
-            val job = coroutineScope {
-                listOf(
-                    launch { scaleAnim.animateTo(1f, tween(300)) },
-                    launch { offsetXAnim.animateTo(startX, tween(300)) },
-                    launch { offsetYAnim.animateTo(startY, tween(300)) }
-                ).joinAll() // Ждём завершения всех трёх анимаций
+            coroutineScope {
+                launch { scaleAnim.animateTo(1f, tween(300)) }
+                launch { offsetXAnim.animateTo(startX, tween(300)) }
+                launch { offsetYAnim.animateTo(startY, tween(300)) }
             }
+            //delay(300)
             onClose()
         }
     }
@@ -301,31 +301,37 @@ fun FullScreenImage(
             .background(Color.Black)
             .pointerInput(Unit) {
                 detectTransformGestures { centroid, pan, zoom, _ ->
-                    scope.launch {
-                        val oldScale = scaleAnim.value
-                        val newScale = (oldScale * zoom).coerceIn(1f, 30f)
 
-                        // Точка (Offset) между пальцами относительно изображения
-                        val focalX = centroid.x
-                        val focalY = centroid.y
+                    if (isResetting) return@detectTransformGestures
 
-                        val offsetX = offsetXAnim.value
-                        val offsetY = offsetYAnim.value
+                    val oldScale = scaleAnim.value
+                    val newScale = (oldScale * zoom).coerceIn(0.5f, 30f)
 
-                        val imageX = (focalX - offsetX) / oldScale
-                        val imageY = (focalY - offsetY) / oldScale
+                    val offsetX = offsetXAnim.value
+                    val offsetY = offsetYAnim.value
 
-                        val newOffsetX = focalX - imageX * newScale
-                        val newOffsetY = focalY - imageY * newScale
+                    val imageX = (centroid.x - offsetX) / oldScale
+                    val imageY = (centroid.y - offsetY) / oldScale
 
-                        // Мгновенно обновляем через snapTo — чтобы зум не "вытягивался"
-                        scaleAnim.snapTo(newScale)
-                        offsetXAnim.snapTo(newOffsetX)
-                        offsetYAnim.snapTo(newOffsetY)
+                    val newOffsetX = centroid.x - imageX * newScale
+                    val newOffsetY = centroid.y - imageY * newScale
 
-                        // При панорамировании можно анимировать плавно:
-                        offsetXAnim.snapTo(offsetXAnim.value + pan.x)
-                        offsetYAnim.snapTo(offsetYAnim.value + pan.y)
+                    // Применяем масштаб и пан
+                    scope.launch { scaleAnim.snapTo(newScale) }
+                    scope.launch { offsetXAnim.snapTo(newOffsetX + pan.x) }
+                    scope.launch { offsetYAnim.snapTo(newOffsetY + pan.y) }
+
+                    // Если слишком уменьшили — вернём обратно анимацией
+                    if (newScale < targetScale * 0.8f) {
+                        isResetting = true
+                        scope.launch {
+                            listOf(
+                                launch { scaleAnim.animateTo(targetScale, tween(300)) },
+                                launch { offsetXAnim.animateTo(targetOffsetX, tween(300)) },
+                                launch { offsetYAnim.animateTo(targetOffsetY, tween(300)) }
+                            ).joinAll()
+                        }
+                        isResetting = false
                     }
                 }
             }
@@ -341,7 +347,10 @@ fun FullScreenImage(
         Box(
             modifier = Modifier
                 .offset {
-                    IntOffset(offsetXAnim.value.roundToInt(), offsetYAnim.value.roundToInt())
+                    IntOffset(
+                        offsetXAnim.value.roundToInt(),
+                        offsetYAnim.value.roundToInt()
+                    )
                 }
                 .graphicsLayer(
                     scaleX = scaleAnim.value,
@@ -358,7 +367,6 @@ fun FullScreenImage(
         }
     }
 }
-
 
 
 class ScreenLRootSM @Inject constructor(
