@@ -79,6 +79,8 @@ import net.engawapg.lib.zoomable.rememberZoomState
 import net.engawapg.lib.zoomable.zoomable
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.roundToInt
 
 class ScreenLRoot() : Screen {
@@ -242,8 +244,9 @@ fun FullScreenImage(
     onClose: () -> Unit
 ) {
     val density = LocalDensity.current
-    val screenWidthPx = with(density) { LocalConfiguration.current.screenWidthDp.dp.toPx() }
-    val screenHeightPx = with(density) { LocalConfiguration.current.screenHeightDp.dp.toPx() }
+    val configuration = LocalConfiguration.current
+    val screenWidthPx = with(density) { configuration.screenWidthDp.dp.toPx() }
+    val screenHeightPx = with(density) { configuration.screenHeightDp.dp.toPx() }
 
     val startRect = startBounds ?: return
 
@@ -268,12 +271,10 @@ fun FullScreenImage(
     val offsetYAnim = remember { Animatable(startY) }
 
     val scope = rememberCoroutineScope()
-
     var isClosing by remember { mutableStateOf(false) }
-
     var isResetting by remember { mutableStateOf(false) }
 
-    // Анимация появления
+    // Анимация открытия
     LaunchedEffect(Unit) {
         coroutineScope {
             launch { scaleAnim.animateTo(targetScale, tween(300)) }
@@ -290,10 +291,12 @@ fun FullScreenImage(
                 launch { offsetXAnim.animateTo(startX, tween(300)) }
                 launch { offsetYAnim.animateTo(startY, tween(300)) }
             }
-            //delay(300)
             onClose()
         }
     }
+
+    val maxOverflowPx = screenWidthPx - 8f
+    val maxOverflowPxY = screenHeightPx - 8f
 
     Box(
         modifier = Modifier
@@ -301,7 +304,6 @@ fun FullScreenImage(
             .background(Color.Black)
             .pointerInput(Unit) {
                 detectTransformGestures { centroid, pan, zoom, _ ->
-
                     if (isResetting) return@detectTransformGestures
 
                     val oldScale = scaleAnim.value
@@ -310,18 +312,35 @@ fun FullScreenImage(
                     val offsetX = offsetXAnim.value
                     val offsetY = offsetYAnim.value
 
+                    val imageWidth = startWidth * newScale
+                    val imageHeight = startHeight * newScale
+
                     val imageX = (centroid.x - offsetX) / oldScale
                     val imageY = (centroid.y - offsetY) / oldScale
 
                     val newOffsetX = centroid.x - imageX * newScale
                     val newOffsetY = centroid.y - imageY * newScale
 
-                    // Применяем масштаб и пан
-                    scope.launch { scaleAnim.snapTo(newScale) }
-                    scope.launch { offsetXAnim.snapTo(newOffsetX + pan.x) }
-                    scope.launch { offsetYAnim.snapTo(newOffsetY + pan.y) }
+                    val minOffsetX = screenWidthPx - imageWidth - maxOverflowPx
+                    val maxOffsetX = maxOverflowPx
+                    val minOffsetY = screenHeightPx - imageHeight - maxOverflowPxY
+                    val maxOffsetY = maxOverflowPxY
 
-                    // Если слишком уменьшили — вернём обратно анимацией
+                    val clampedOffsetX = (newOffsetX + pan.x).coerceIn(
+                        min(minOffsetX, maxOffsetX),
+                        max(minOffsetX, maxOffsetX)
+                    )
+                    val clampedOffsetY = (newOffsetY + pan.y).coerceIn(
+                        min(minOffsetY, maxOffsetY),
+                        max(minOffsetY, maxOffsetY)
+                    )
+
+                    scope.launch {
+                        scaleAnim.snapTo(newScale)
+                        offsetXAnim.snapTo(clampedOffsetX)
+                        offsetYAnim.snapTo(clampedOffsetY)
+                    }
+
                     if (newScale < targetScale * 0.8f) {
                         isResetting = true
                         scope.launch {
@@ -330,17 +349,13 @@ fun FullScreenImage(
                                 launch { offsetXAnim.animateTo(targetOffsetX, tween(300)) },
                                 launch { offsetYAnim.animateTo(targetOffsetY, tween(300)) }
                             ).joinAll()
+                            isResetting = false
                         }
-                        isResetting = false
                     }
                 }
             }
             .pointerInput(Unit) {
-                detectTapGestures(
-                    onTap = {
-                        isClosing = true
-                    }
-                )
+                detectTapGestures(onTap = { isClosing = true })
             },
         contentAlignment = Alignment.TopStart
     ) {
@@ -368,6 +383,12 @@ fun FullScreenImage(
     }
 }
 
+
+fun Float.safeCoerceIn(a: Float, b: Float): Float {
+    val min = min(a, b)
+    val max = max(a, b)
+    return this.coerceIn(min, max)
+}
 
 class ScreenLRootSM @Inject constructor(
     val luscious: Luscious
