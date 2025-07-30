@@ -19,11 +19,9 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.VolumeOff
 import androidx.compose.material.icons.filled.VolumeUp
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,8 +42,6 @@ private fun Divider(){
     Spacer(modifier = Modifier.height(8.dp).width(2.dp).background(Color.DarkGray))
 }
 
-
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun FeedControls_Container_Line0(vm: ScreenRedFullScreenSM) {
 

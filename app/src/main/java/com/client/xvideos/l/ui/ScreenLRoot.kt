@@ -1,15 +1,22 @@
 package com.client.xvideos.l.ui
 
 import android.annotation.SuppressLint
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.EaseOutCubic
+import androidx.compose.animation.core.animateDecay
+import androidx.compose.animation.core.calculateTargetValue
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.splineBasedDecay
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.calculateCentroid
 import androidx.compose.foundation.gestures.calculatePan
 import androidx.compose.foundation.gestures.calculateZoom
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.gestures.forEachGesture
@@ -45,11 +52,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -60,6 +70,7 @@ import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
+import cafe.adriel.voyager.navigator.internal.BackHandler
 import com.client.common.urlVideImage.UrlImage
 import com.client.xvideos.l.Album
 import com.client.xvideos.l.Luscious
@@ -79,6 +90,7 @@ import net.engawapg.lib.zoomable.rememberZoomState
 import net.engawapg.lib.zoomable.zoomable
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -237,6 +249,9 @@ class ScreenLRoot() : Screen {
 }
 
 
+
+
+
 @Composable
 fun FullScreenImage(
     imageUrl: String,
@@ -273,6 +288,7 @@ fun FullScreenImage(
     val scope = rememberCoroutineScope()
     var isClosing by remember { mutableStateOf(false) }
     var isResetting by remember { mutableStateOf(false) }
+    var isDragging by remember { mutableStateOf(false) }
 
     // Анимация открытия
     LaunchedEffect(Unit) {
@@ -295,61 +311,183 @@ fun FullScreenImage(
         }
     }
 
+    BackHandler {
+        isClosing = true
+    }
+
     val maxOverflowPx = screenWidthPx - 8f
     val maxOverflowPxY = screenHeightPx - 8f
+
+    // Функция для вычисления границ
+    fun calculateBounds(scale: Float): Pair<Pair<Float, Float>, Pair<Float, Float>> {
+        val imageWidth = startWidth * scale
+        val imageHeight = startHeight * scale
+
+        val minOffsetX = screenWidthPx - imageWidth - maxOverflowPx
+        val maxOffsetX = maxOverflowPx
+        val minOffsetY = screenHeightPx - imageHeight - maxOverflowPxY
+        val maxOffsetY = maxOverflowPxY
+
+        return Pair(
+            Pair(min(minOffsetX, maxOffsetX), max(minOffsetX, maxOffsetX)),
+            Pair(min(minOffsetY, maxOffsetY), max(minOffsetY, maxOffsetY))
+        )
+    }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
             .pointerInput(Unit) {
-                detectTransformGestures { centroid, pan, zoom, _ ->
-                    if (isResetting) return@detectTransformGestures
+                // Единая обработка всех жестов
+                val decay = splineBasedDecay<Float>(this)
 
-                    val oldScale = scaleAnim.value
-                    val newScale = (oldScale * zoom).coerceIn(0.5f, 30f)
+                forEachGesture {
+                    awaitPointerEventScope {
+                        val down = awaitFirstDown(requireUnconsumed = false)
+                        var zoom = 1f
+                        var pan = Offset.Zero
+                        var pastTouchSlop = false
+                        val touchSlop = viewConfiguration.touchSlop
 
-                    val offsetX = offsetXAnim.value
-                    val offsetY = offsetYAnim.value
+                        val velocityTracker = VelocityTracker()
+                        velocityTracker.addPosition(down.uptimeMillis, down.position)
 
-                    val imageWidth = startWidth * newScale
-                    val imageHeight = startHeight * newScale
 
-                    val imageX = (centroid.x - offsetX) / oldScale
-                    val imageY = (centroid.y - offsetY) / oldScale
 
-                    val newOffsetX = centroid.x - imageX * newScale
-                    val newOffsetY = centroid.y - imageY * newScale
+                        do {
+                            val event = awaitPointerEvent()
+                            val canceled = event.changes.any { it.isConsumed }
+                            if (!canceled) {
+                                val zoomChange = event.calculateZoom()
+                                val panChange = event.calculatePan()
+                                val centroid = event.calculateCentroid(useCurrent = false)
 
-                    val minOffsetX = screenWidthPx - imageWidth - maxOverflowPx
-                    val maxOffsetX = maxOverflowPx
-                    val minOffsetY = screenHeightPx - imageHeight - maxOverflowPxY
-                    val maxOffsetY = maxOverflowPxY
+                                if (!pastTouchSlop) {
+                                    zoom *= zoomChange
+                                    pan += panChange
 
-                    val clampedOffsetX = (newOffsetX + pan.x).coerceIn(
-                        min(minOffsetX, maxOffsetX),
-                        max(minOffsetX, maxOffsetX)
-                    )
-                    val clampedOffsetY = (newOffsetY + pan.y).coerceIn(
-                        min(minOffsetY, maxOffsetY),
-                        max(minOffsetY, maxOffsetY)
-                    )
+                                    val centroidSize = centroid.getDistanceSquared()
+                                    val zoomMotion = abs(1 - zoom) * centroidSize
+                                    val panMotion = pan.getDistanceSquared()
 
-                    scope.launch {
-                        scaleAnim.snapTo(newScale)
-                        offsetXAnim.snapTo(clampedOffsetX)
-                        offsetYAnim.snapTo(clampedOffsetY)
-                    }
+                                    if (zoomMotion > touchSlop * touchSlop || panMotion > touchSlop * touchSlop) {
+                                        pastTouchSlop = true
+                                    }
+                                }
 
-                    if (newScale < targetScale * 0.8f) {
-                        isResetting = true
-                        scope.launch {
-                            listOf(
-                                launch { scaleAnim.animateTo(targetScale, tween(300)) },
-                                launch { offsetXAnim.animateTo(targetOffsetX, tween(300)) },
-                                launch { offsetYAnim.animateTo(targetOffsetY, tween(300)) }
-                            ).joinAll()
-                            isResetting = false
+                                if (pastTouchSlop) {
+                                    // Обработка зума
+                                    if (zoomChange != 1f && !isResetting) {
+                                        val oldScale = scaleAnim.value
+                                        val newScale = (oldScale * zoomChange).coerceIn(0.5f, 30f)
+
+                                        val offsetX = offsetXAnim.value
+                                        val offsetY = offsetYAnim.value
+
+                                        val imageX = (centroid.x - offsetX) / oldScale
+                                        val imageY = (centroid.y - offsetY) / oldScale
+
+                                        val newOffsetX = centroid.x - imageX * newScale
+                                        val newOffsetY = centroid.y - imageY * newScale
+
+                                        val (xBounds, yBounds) = calculateBounds(newScale)
+
+                                        val clampedOffsetX = (newOffsetX + panChange.x).coerceIn(xBounds.first, xBounds.second)
+                                        val clampedOffsetY = (newOffsetY + panChange.y).coerceIn(yBounds.first, yBounds.second)
+
+                                        scope.launch {
+                                            scaleAnim.snapTo(newScale)
+                                            offsetXAnim.snapTo(clampedOffsetX)
+                                            offsetYAnim.snapTo(clampedOffsetY)
+                                        }
+
+                                        // Проверяем сброс масштаба
+                                        if (newScale < targetScale * 0.8f) {
+                                            isResetting = true
+                                            scope.launch {
+                                                listOf(
+                                                    launch { scaleAnim.animateTo(targetScale, tween(300)) },
+                                                    launch { offsetXAnim.animateTo(targetOffsetX, tween(300)) },
+                                                    launch { offsetYAnim.animateTo(targetOffsetY, tween(300)) }
+                                                ).joinAll()
+                                                isResetting = false
+                                            }
+                                        }
+                                    }
+                                    // Обработка пана (только если нет зума)
+                                    else if (panChange != Offset.Zero && !isResetting && event.changes.size == 1) {
+                                        isDragging = true
+
+                                        val currentScale = scaleAnim.value
+                                        val (xBounds, yBounds) = calculateBounds(currentScale)
+
+                                        val newOffsetX = (offsetXAnim.value + panChange.x).coerceIn(xBounds.first, xBounds.second)
+                                        val newOffsetY = (offsetYAnim.value + panChange.y).coerceIn(yBounds.first, yBounds.second)
+
+                                        scope.launch {
+                                            offsetXAnim.snapTo(newOffsetX)
+                                            offsetYAnim.snapTo(newOffsetY)
+                                        }
+
+                                        // Отслеживаем скорость для инерции
+                                        velocityTracker.addPosition(event.changes.first().uptimeMillis, event.changes.first().position)
+                                    }
+
+                                    event.changes.forEach { it.consume() }
+                                }
+                            }
+                        } while (!canceled && event.changes.any { it.pressed })
+
+                        isDragging = false
+
+                        // Применяем инерцию после завершения жеста
+                        if (pastTouchSlop) {
+                            val velocity = velocityTracker.calculateVelocity()
+
+                            if (abs(velocity.x) > 300 || abs(velocity.y) > 300) {
+                                val currentScale = scaleAnim.value
+                                val (xBounds, yBounds) = calculateBounds(currentScale)
+
+                                scope.launch {
+                                    listOf(
+                                        launch {
+                                            val targetX = decay.calculateTargetValue(offsetXAnim.value, velocity.x)
+                                            val clampedTargetX = targetX.coerceIn(xBounds.first, xBounds.second)
+
+                                            if (clampedTargetX != targetX) {
+                                                offsetXAnim.animateTo(
+                                                    targetValue = clampedTargetX,
+                                                    initialVelocity = velocity.x,
+                                                    animationSpec = tween(300, easing = EaseOutCubic)
+                                                )
+                                            } else {
+                                                offsetXAnim.animateDecay(
+                                                    initialVelocity = velocity.x,
+                                                    animationSpec = decay
+                                                )
+                                            }
+                                        },
+                                        launch {
+                                            val targetY = decay.calculateTargetValue(offsetYAnim.value, velocity.y)
+                                            val clampedTargetY = targetY.coerceIn(yBounds.first, yBounds.second)
+
+                                            if (clampedTargetY != targetY) {
+                                                offsetYAnim.animateTo(
+                                                    targetValue = clampedTargetY,
+                                                    initialVelocity = velocity.y,
+                                                    animationSpec = tween(300, easing = EaseOutCubic)
+                                                )
+                                            } else {
+                                                offsetYAnim.animateDecay(
+                                                    initialVelocity = velocity.y,
+                                                    animationSpec = decay
+                                                )
+                                            }
+                                        }
+                                    ).joinAll()
+                                }
+                            }
                         }
                     }
                 }
@@ -383,6 +521,162 @@ fun FullScreenImage(
     }
 }
 
+
+
+
+//@Composable
+//fun FullScreenImage(
+//    imageUrl: String,
+//    startBounds: Rect?,
+//    onClose: () -> Unit
+//) {
+//
+//
+//    val density = LocalDensity.current
+//    val configuration = LocalConfiguration.current
+//    val screenWidthPx = with(density) { configuration.screenWidthDp.dp.toPx() }
+//    val screenHeightPx = with(density) { configuration.screenHeightDp.dp.toPx() }
+//
+//    val startRect = startBounds ?: return
+//
+//    val startX = startRect.left
+//    val startY = startRect.top
+//    val startWidth = startRect.width
+//    val startHeight = startRect.height
+//    val aspectRatio = startWidth / startHeight
+//
+//    val targetWidth = screenWidthPx
+//    val targetHeight = targetWidth / aspectRatio
+//    val targetScale = targetWidth / startWidth
+//
+//    val targetOffsetX = (screenWidthPx - startWidth * targetScale) / 2
+//    val targetOffsetY = (screenHeightPx - startHeight * targetScale) / 2
+//
+//    val baseWidthDp = with(density) { startWidth.toDp() }
+//    val baseHeightDp = with(density) { startHeight.toDp() }
+//
+//    val scaleAnim = remember { Animatable(1f) }
+//    val offsetXAnim = remember { Animatable(startX) }
+//    val offsetYAnim = remember { Animatable(startY) }
+//
+//    val scope = rememberCoroutineScope()
+//    var isClosing by remember { mutableStateOf(false) }
+//    var isResetting by remember { mutableStateOf(false) }
+//
+//    // Анимация открытия
+//    LaunchedEffect(Unit) {
+//        coroutineScope {
+//            launch { scaleAnim.animateTo(targetScale, tween(300)) }
+//            launch { offsetXAnim.animateTo(targetOffsetX, tween(300)) }
+//            launch { offsetYAnim.animateTo(targetOffsetY, tween(300)) }
+//        }
+//    }
+//
+//    // Анимация закрытия
+//    LaunchedEffect(isClosing) {
+//        if (isClosing) {
+//            coroutineScope {
+//                launch { scaleAnim.animateTo(1f, tween(300)) }
+//                launch { offsetXAnim.animateTo(startX, tween(300)) }
+//                launch { offsetYAnim.animateTo(startY, tween(300)) }
+//            }
+//            onClose()
+//        }
+//    }
+//
+//    BackHandler{
+//        isClosing = true
+//    }
+//
+//
+//    val maxOverflowPx = screenWidthPx - 8f
+//    val maxOverflowPxY = screenHeightPx - 8f
+//
+//    Box(
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .background(Color.Black)
+//            .pointerInput(Unit) {
+//                detectTransformGestures { centroid, pan, zoom, _ ->
+//                    if (isResetting) return@detectTransformGestures
+//
+//                    val oldScale = scaleAnim.value
+//                    val newScale = (oldScale * zoom).coerceIn(0.5f, 30f)
+//
+//                    val offsetX = offsetXAnim.value
+//                    val offsetY = offsetYAnim.value
+//
+//                    val imageWidth = startWidth * newScale
+//                    val imageHeight = startHeight * newScale
+//
+//                    val imageX = (centroid.x - offsetX) / oldScale
+//                    val imageY = (centroid.y - offsetY) / oldScale
+//
+//                    val newOffsetX = centroid.x - imageX * newScale
+//                    val newOffsetY = centroid.y - imageY * newScale
+//
+//                    val minOffsetX = screenWidthPx - imageWidth - maxOverflowPx
+//                    val maxOffsetX = maxOverflowPx
+//                    val minOffsetY = screenHeightPx - imageHeight - maxOverflowPxY
+//                    val maxOffsetY = maxOverflowPxY
+//
+//                    val clampedOffsetX = (newOffsetX + pan.x).coerceIn(
+//                        min(minOffsetX, maxOffsetX),
+//                        max(minOffsetX, maxOffsetX)
+//                    )
+//                    val clampedOffsetY = (newOffsetY + pan.y).coerceIn(
+//                        min(minOffsetY, maxOffsetY),
+//                        max(minOffsetY, maxOffsetY)
+//                    )
+//
+//                    scope.launch {
+//                        scaleAnim.snapTo(newScale)
+//                        offsetXAnim.snapTo(clampedOffsetX)
+//                        offsetYAnim.snapTo(clampedOffsetY)
+//                    }
+//
+//                    if (newScale < targetScale * 0.8f) {
+//                        isResetting = true
+//                        scope.launch {
+//                            listOf(
+//                                launch { scaleAnim.animateTo(targetScale, tween(300)) },
+//                                launch { offsetXAnim.animateTo(targetOffsetX, tween(300)) },
+//                                launch { offsetYAnim.animateTo(targetOffsetY, tween(300)) }
+//                            ).joinAll()
+//                            isResetting = false
+//                        }
+//                    }
+//                }
+//            }
+//            .pointerInput(Unit) {
+//                detectTapGestures(onTap = { isClosing = true })
+//            },
+//        contentAlignment = Alignment.TopStart
+//    ) {
+//        Box(
+//            modifier = Modifier
+//                .offset {
+//                    IntOffset(
+//                        offsetXAnim.value.roundToInt(),
+//                        offsetYAnim.value.roundToInt()
+//                    )
+//                }
+//                .graphicsLayer(
+//                    scaleX = scaleAnim.value,
+//                    scaleY = scaleAnim.value,
+//                    transformOrigin = TransformOrigin(0f, 0f)
+//                )
+//                .size(baseWidthDp, baseHeightDp)
+//        ) {
+//            UrlImageLusciousGifs(
+//                url = imageUrl,
+//                modifier = Modifier.fillMaxSize(),
+//                contentScale = ContentScale.FillBounds
+//            )
+//        }
+//    }
+//}
+//
 
 fun Float.safeCoerceIn(a: Float, b: Float): Float {
     val min = min(a, b)
