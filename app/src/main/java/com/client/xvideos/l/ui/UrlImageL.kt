@@ -126,23 +126,10 @@ fun UrlImageLusciousGifsFull(
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.FillWidth,
     loadIndicator: Boolean = true,
-    isGrayscale: Boolean = false,
     onSuccess: (Boolean) -> Unit = {},
-    fullScreen: Boolean = false
 ) {
 
     val context = LocalContext.current
-
-    val colorFilter = ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0.9f) })
-
-//    val imageRequest = remember {
-//        ImageRequest.Builder(context)
-//            .data(url)
-//            .crossfade(true)
-//            .diskCachePolicy(CachePolicy.DISABLED) // Не использовать disk cache
-//            .memoryCachePolicy(CachePolicy.DISABLED) // Не использовать memory cache
-//            .build()
-//    }
 
     val imageRequest = remember {
         ImageRequest.Builder(context)
@@ -161,9 +148,7 @@ fun UrlImageLusciousGifsFull(
     val imageLoader = remember {
         ImageLoader.Builder(context)
             .components {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                    add(ImageDecoderDecoder.Factory())
-                } // Использует modern API
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) { add(ImageDecoderDecoder.Factory()) }
                 add(GifDecoder.Factory()) // Fallback для старых API
             }
             .build()
@@ -175,7 +160,6 @@ fun UrlImageLusciousGifsFull(
         imageOptions = ImageOptions(
             contentScale = contentScale,
             alignment = Alignment.Center,
-            colorFilter = if (isGrayscale) colorFilter else null
         ),
         modifier = Modifier.then(modifier),
 
@@ -199,7 +183,6 @@ fun UrlImageLusciousGifsFull(
                 }
             }
         },
-
 
         failure = {
             Timber.e(">>>>>>>>>>>>" + it.reason)

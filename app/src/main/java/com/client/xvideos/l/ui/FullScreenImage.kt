@@ -435,8 +435,7 @@ fun FullScreenImage(
                 modifier = Modifier,//.fillMaxSize(),
                 contentScale = ContentScale.FillBounds,
                 onSuccess = { success = it },
-                loadIndicator = false,
-                fullScreen = true
+                loadIndicator = true,
             )
         }
     }

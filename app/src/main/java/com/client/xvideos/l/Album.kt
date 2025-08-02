@@ -159,7 +159,7 @@ data class Tag(
     @SerializedName("category") val category: String?,
     @SerializedName("text") val text: String,
     @SerializedName("url") val url: String,
-    @SerializedName("count") val count: Int
+    @SerializedName("count") val count: Long
 )
 
 data class Content(

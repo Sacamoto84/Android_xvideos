@@ -24,17 +24,23 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.gestures.forEachGesture
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.staggeredgrid.LazyHorizontalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
@@ -65,6 +71,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.ViewConfiguration
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -77,8 +84,12 @@ import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.internal.BackHandler
 import com.client.common.urlVideImage.UrlImage
+import com.client.common.util.toPrettyCount
+import com.client.common.util.toPrettyCountInt
 import com.client.xvideos.l.Album
 import com.client.xvideos.l.Luscious
+import com.client.xvideos.l.ThemeL
+import com.redgifs.common.ThemeRed
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -94,6 +105,13 @@ import net.engawapg.lib.zoomable.ExperimentalZoomableApi
 import net.engawapg.lib.zoomable.rememberZoomState
 import net.engawapg.lib.zoomable.zoomable
 import timber.log.Timber
+import java.text.SimpleDateFormat
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.TextStyle
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 import kotlin.math.abs
 import kotlin.math.max
@@ -112,104 +130,104 @@ class ScreenLRoot() : Screen {
 
         val album = vm.album.collectAsStateWithLifecycle().value
 
-        val parsed =
-            vm.album.collectAsStateWithLifecycle().value?.parsed?.collectAsStateWithLifecycle()?.value
+        val parsed = vm.album.collectAsStateWithLifecycle().value?.parsed?.collectAsStateWithLifecycle()?.value
 
-        val selectZoomItemUrl: String? = null
 
         var selectedImage by remember { mutableStateOf<String?>(null) }
         var selectedBounds by remember { mutableStateOf<Rect?>(null) }
 
-        val density = LocalDensity.current
-        val scope = rememberCoroutineScope()
-
 
         Scaffold(
-            containerColor = Color(0xFF262626)
+            containerColor = ThemeL.greyBackground
 
         ) {
-
-            //LazyColumn(modifier = Modifier.fillMaxSize().zoomableWithScroll(rememberZoomState())) {
 
             LazyVerticalStaggeredGrid(
                 columns = StaggeredGridCells.Fixed(6),
                 modifier = Modifier.fillMaxSize()
             ) {
 
-                item {
+
+
+                item( span =  StaggeredGridItemSpan.FullLine){
                     Column {
                         Row {
-                            UrlImage(parsed?.cover?.url.toString(), modifier = Modifier.size(96.dp))
+                            UrlImage(parsed?.cover?.url.toString(), modifier = Modifier.size(72.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
                             Column {
-                                Text(parsed?.title.toString(), color = Color.White)
-                                Text(parsed?.created.toString(), color = Color.White)
+                                if (parsed != null) {
+                                    Text( parsed.title, color = ThemeL.textColor, fontFamily = ThemeL.fontFamilyDMsanss )
+                                    Text("${parsed.number_of_animated_pictures} gifs / ${parsed.number_of_pictures} pictures", color = ThemeL.textColor )
+                                }
                             }
                         }
-
-
                     }
 
                 }
 
-                item {
-
-                    Row {
-                        Text(
-                            parsed?.number_of_animated_pictures.toString() + " gifs",
-                            color = Color.White
-                        )
-                        Text(" / ", color = Color.White)
-                        Text(
-                            parsed?.number_of_pictures.toString() + " pictures",
-                            color = Color.White
-                        )
+                item(span = StaggeredGridItemSpan.FullLine){
+                    if (parsed != null) {
+                            FlowRow {
+                                Text("Genres: ", color = ThemeL.textColor, fontFamily = ThemeL.fontFamilyKarla, fontWeight = FontWeight.ExtraBold)
+                                parsed.genres.forEachIndexed { index, item ->
+                                    Text(
+                                        text = buildString {
+                                            append(item.title)
+                                            if (index != parsed.audiences.lastIndex) append(",")
+                                        },
+                                        color = ThemeL.primaryColor,
+                                        fontFamily = ThemeL.fontFamilyKarla,
+                                    )
+                                    if (index != parsed.audiences.lastIndex) {
+                                        Text(" ", color = ThemeL.primaryColor)
+                                    }
+                                }
+                            }
                     }
-
                 }
-                item {
-                    Row {
-                        Text("Genres:", color = Color.White)
-                        parsed?.genres?.forEach {
-                            Text(it.title, color = Color.White)
+
+                item(span =  StaggeredGridItemSpan.FullLine)  {
+                    if (parsed != null) {
+                        FlowRow {
+                            Text("Audiences: ", color = ThemeL.textColor, fontFamily = ThemeL.fontFamilyKarla,)
+                            parsed.audiences.forEachIndexed { index, item ->
+                                Text(
+                                    text = buildString {
+                                        append(item.title)
+                                        if (index != parsed.audiences.lastIndex) append(",")
+                                    },
+                                    color = ThemeL.primaryColor,
+                                    fontFamily = ThemeL.fontFamilyKarla,
+                                )
+                                if (index != parsed.audiences.lastIndex) {
+                                    Text(" ", color = ThemeL.primaryColor)
+                                }
+                            }
                         }
-
                     }
                 }
-                item {
-                    Row {
-                        Text("Audiences:", color = Color.White)
-                        parsed?.audiences?.forEach {
-                            Text(it.title, color = Color.White)
+
+                item(span =  StaggeredGridItemSpan.FullLine)  {
+                    if (parsed != null) {
+                        FlowRow(verticalArrangement = Arrangement.Center) {
+                            parsed.tags.reversed().forEach {
+                                Text("${it.text.capitalizeEachWord()} (${it.count.toPrettyCountInt()})" , modifier = Modifier.padding(horizontal = 2.dp).padding(vertical = 2.dp).border(1.dp, ThemeL.secondaryColor, RoundedCornerShape(4.dp)).padding(4.dp), color = ThemeL.textColor, fontFamily = ThemeL.fontFamilyKarla)
+                            }
                         }
-                    }
-                }
-
-                item {
-                    Text("Tags:", color = Color.White)
-                    parsed?.tags?.forEach {
-                        Text(it.text, color = Color.White)
                     }
                 }
 
                 items(album?.pics ?: emptyList()) {
-
                     var imageBounds by remember { mutableStateOf<Rect?>(null) }
-
                     if (it.url_to_original != null) {
                         Box(
                             modifier = Modifier.fillMaxWidth(),
                             contentAlignment = Alignment.Center
                         ) {
-
                             val aspect = it.width.toFloat() / it.height
-
                             UrlImageLusciousGifs(
                                 it.url_to_original,
-                                modifier = Modifier
-                                    .padding(2.dp)
-                                    .aspectRatio(aspect)
-                                    .clipToBounds()
-                                    .border(0.5.dp, Color.Gray)
+                                modifier = Modifier.padding(2.dp).aspectRatio(aspect).clipToBounds().border(0.5.dp, Color.Gray)
                                     .onGloballyPositioned { coordinates ->
                                         val rect = coordinates.boundsInRoot()
                                         imageBounds = rect
@@ -233,18 +251,7 @@ class ScreenLRoot() : Screen {
                                 label = "imageAlpha"
                             )
 
-                            if (selectedImage == it.url_to_original) {
-                                Box(
-                                    modifier = Modifier
-                                        .alpha(animatedAlpha)
-                                        .padding(2.dp)
-                                        .aspectRatio(aspect)
-                                        .clipToBounds()
-                                        .border(0.5.dp, Color.Gray)
-                                        .background(Color.Gray)
-                                )
-                            }
-
+                            if (selectedImage == it.url_to_original) { Box( modifier = Modifier.alpha(animatedAlpha).padding(2.dp).aspectRatio(aspect).clipToBounds().border(0.5.dp, Color.Gray).background(Color.Gray) ) }
                         }
                     }
                 }
@@ -270,12 +277,10 @@ class ScreenLRoot() : Screen {
 
 }
 
-
-fun Float.safeCoerceIn(a: Float, b: Float): Float {
-    val min = min(a, b)
-    val max = max(a, b)
-    return this.coerceIn(min, max)
-}
+fun String.capitalizeEachWord(): String =
+    lowercase(Locale.getDefault())
+        .split(" ")
+        .joinToString(" ") { it.replaceFirstChar { c -> c.uppercaseChar() } }
 
 class ScreenLRootSM @Inject constructor(
     val luscious: Luscious
@@ -289,7 +294,7 @@ class ScreenLRootSM @Inject constructor(
             if (!luscious.loggedIn) {
                 luscious.login()
             }
-            album.value = luscious.getAlbum(336743)//(499900)//(374481)
+            album.value = luscious.getAlbum(556543)//336743)//(499900)//(374481)
             album
         }
     }
