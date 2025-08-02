@@ -1,6 +1,8 @@
-package com.client.xvideos.l
+package com.client.xvideos.l.ui.screens.net
 
 import androidx.compose.runtime.mutableStateListOf
+import com.client.xvideos.l.KtorRequestHandler
+import com.client.xvideos.l.Luscious
 import com.client.xvideos.l.graphQl.getAlbumInfo
 import com.client.xvideos.l.graphQl.getPicturesJson
 import com.google.gson.Gson
@@ -20,6 +22,8 @@ class Album(
 ) {
 
     var url: String = ""
+
+    val albumPicsDetails = AlbumPicsDetails(id,  handler)
 
     val parsed = MutableStateFlow(
         AlbumDetails(
@@ -42,59 +46,25 @@ class Album(
 
     init {
         scope.launch {
-            val res = handler?.postJson(Luscious.API, getAlbumInfo(id))
+            val res = handler?.postJson(Luscious.Companion.API, getAlbumInfo(id))
             val json = JsonParser.parseString(res).asJsonObject
             val get =
                 json["data"]?.asJsonObject?.get("album")?.asJsonObject?.get("get")?.asJsonObject
             val gson = Gson()
             parsed.value = gson.fromJson(get, AlbumDetails::class.java)
-            url = Luscious.HOME + parsed.value.url
-            contentUrls()
+            url = Luscious.Companion.HOME + parsed.value.url
+            albumPicsDetails.contentUrls()
         }
     }
+
+
 
     /**
      * Возвращает url миниатюры альбома
      */
     val thumbnail: String by lazy { parsed.value.cover.url }
 
-    val downloadUrl: String by lazy { Luscious.HOME + parsed.value.download_url }
-
-    val pics = mutableStateListOf<PicsDetails>()
-
-    var total_pages: Int? = null
-
-    suspend fun contentUrls() {
-        try {
-            val list = mutableListOf<PicsDetails>()
-            list.addAll(openPage(1))
-//            for (i in 2..total_pages!!) {
-//                list.addAll(openPage(i))
-//            }
-            withContext(Dispatchers.Main) {
-                pics.addAll(list)
-            }
-        } catch (e: Exception) {
-            val ee = e.message
-        }
-    }
-
-    suspend fun openPage(page: Int): List<PicsDetails> {
-        val gson = Gson()
-        val list = mutableListOf<PicsDetails>()
-        val picsJson = handler?.postJson(Luscious.API, getPicturesJson(id, page))
-        val json = JsonParser.parseString(picsJson).asJsonObject
-        val get =
-            json["data"]?.asJsonObject?.get("picture")?.asJsonObject?.get("list")?.asJsonObject
-        total_pages = get?.get("info")?.asJsonObject?.get("total_pages")?.asInt
-        val itemsArray = get?.get("items")?.asJsonArray
-        itemsArray?.forEach { element ->
-            val pic = gson.fromJson(element, PicsDetails::class.java)
-            list.add(pic)
-        }
-        return list
-    }
-
+    val downloadUrl: String by lazy { Luscious.Companion.HOME + parsed.value.download_url }
 
 
 //    val artists: List<String> by lazy {

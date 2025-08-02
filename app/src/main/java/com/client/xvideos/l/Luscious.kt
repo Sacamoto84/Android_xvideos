@@ -1,8 +1,7 @@
 package com.client.xvideos.l
 
-import com.client.xvideos.Secrets
+import com.client.xvideos.l.ui.screens.net.Album
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.runBlocking
 
 //fun main(){
 //    runBlocking {
@@ -90,7 +89,7 @@ class Luscious(
             else -> throw IllegalArgumentException("albumInput must be Int or String")
         }
 
-        return Album(id.toInt(), download, handler,  scope)
+        return Album(id.toInt(), download, handler, scope)
     }
 
 
