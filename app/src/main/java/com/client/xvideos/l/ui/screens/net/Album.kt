@@ -1,18 +1,14 @@
 package com.client.xvideos.l.ui.screens.net
 
-import androidx.compose.runtime.mutableStateListOf
 import com.client.xvideos.l.KtorRequestHandler
 import com.client.xvideos.l.Luscious
 import com.client.xvideos.l.graphQl.getAlbumInfo
-import com.client.xvideos.l.graphQl.getPicturesJson
 import com.google.gson.Gson
 import com.google.gson.JsonParser
 import com.google.gson.annotations.SerializedName
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class Album(
     val id: Int,

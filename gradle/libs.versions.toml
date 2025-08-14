@@ -2,10 +2,10 @@
 accompanistSystemuicontroller = "0.36.0"
 activityKtx = "1.12.0-alpha05"
 agp = "8.12.0"
-apolloRuntime = "4.3.1"
+apolloRuntime = "4.3.2"
 componentsResources = "1.8.2"
 composeThemeAdapter = "1.2.1"
-core = "1.39.0"
+core = "1.40.0"
 diskLruCache = "1.5"
 gson = "2.13.1"
 hiltAndroid = "2.57"
@@ -17,23 +17,24 @@ kdownloader = "1.0.4"
 kotlin = "2.2.0"
 coreKtx = "1.16.0"
 junit = "4.13.2"
-junitVersion = "1.2.1"
-espressoCore = "3.6.1"
+junitVersion = "1.3.0"
+espressoCore = "3.7.0"
 
 kotlinxSerializationJson = "1.9.0"
 ktor= "3.2.3"
 
-landscapistCoil = "2.5.1"
-landscapistPlaceholder = "2.5.1"
+landscapist = "2.5.1"
+
+landscapistFrescoWebsupport = "2.5.1"
 lifecycleProcess = "2.9.2"
 lifecycleRuntimeKtx = "2.9.2"
 activityCompose = "1.10.1"
-composeBom = "2025.07.01"
+composeBom = "2025.08.00"
 
 lifecycleViewmodelCompose = "2.9.2"
 material = "1.14.0-alpha03"
-materialVersion = "1.8.3"
-material3 = "1.4.0-beta01"
+materialVersion = "1.9.0"
+material3 = "1.4.0-beta02"
 
 media3 = "1.8.0"
 
@@ -44,7 +45,7 @@ room = "2.7.2"
 slf4jApi = "2.0.17"
 slf4jSimple = "2.0.17"
 timber = "5.0.1"
-storage = "1.5.0"
+storage = "1.6.0"
 googleGmsGoogleServices = "4.4.3"
 datastoreCoreAndroid = "1.1.7"
 volley = "1.2.1"
@@ -55,12 +56,12 @@ appcompat = "1.7.1"
 voyager = "1.1.0-beta03"
 warden = "1.0.0-alpha2"
 zoomable = "2.8.1"
-uiTooling = "1.8.3"
-uiGraphics = "1.8.3"
 
-apollo = "4.3.1"
-animationCore = "1.8.3"
-ui = "1.8.3"
+ui = "1.9.0"
+
+apollo = "4.3.2"
+
+
 
 [libraries]
 accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanistSystemuicontroller" }
@@ -79,8 +80,13 @@ components-resources = { module = "org.jetbrains.compose.components:components-r
 image-loader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "imageLoader" }
 kdownloader = { module = "com.github.varungulatii:Kdownloader", version.ref = "kdownloader" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
-landscapist-coil = { module = "com.github.skydoves:landscapist-coil", version.ref = "landscapistCoil" }
-landscapist-placeholder = { module = "com.github.skydoves:landscapist-placeholder", version.ref = "landscapistPlaceholder" }
+
+landscapist-coil = { module = "com.github.skydoves:landscapist-coil", version.ref = "landscapist" }
+landscapist-fresco-websupport = { module = "com.github.skydoves:landscapist-fresco-websupport", version.ref = "landscapist" }
+landscapist-glide = { module = "com.github.skydoves:landscapist-glide", version.ref = "landscapist" }
+landscapist-fresco = { module = "com.github.skydoves:landscapist-fresco", version.ref = "landscapist" }
+landscapist-placeholder = { module = "com.github.skydoves:landscapist-placeholder", version.ref = "landscapist" }
+
 material = { module = "com.google.android.material:material", version.ref = "material" }
 androidx-material = { module = "androidx.compose.material:material", version.ref = "materialVersion" }
 androidx-material-icons-core = { module = "androidx.compose.material:material-icons-core" }
@@ -147,8 +153,8 @@ androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "j
 
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 
-androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version = "1.12.0-alpha03" }
-androidx-compose-bom = { group = "androidx.compose", name = "compose-bom-beta", version.ref = "composeBom" }
+androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version = "1.12.0-alpha05" }
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
 
 
 
@@ -197,9 +203,9 @@ voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", vers
 warden = { module = "com.alexstyl:warden", version.ref = "warden" }
 
 zoomable = { module = "net.engawapg.lib:zoomable", version.ref = "zoomable" }
-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "uiTooling" }
-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics", version.ref = "uiGraphics" }
-androidx-animation-core = { group = "androidx.compose.animation", name = "animation-core", version.ref = "animationCore" }
+ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "ui" }
+ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics", version.ref = "ui" }
+androidx-animation-core = { group = "androidx.compose.animation", name = "animation-core", version.ref = "ui" }
 ui = { group = "androidx.compose.ui", name = "ui", version.ref = "ui" }
 
 

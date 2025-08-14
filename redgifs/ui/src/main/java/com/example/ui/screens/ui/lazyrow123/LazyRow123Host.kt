@@ -1,11 +1,14 @@
 package com.example.ui.screens.ui.lazyrow123
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.lazy.layout.LazyLayoutCacheWindow
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.unit.dp
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -68,7 +71,11 @@ class LazyRow123Host(
     val isCollection: Boolean = false
 ) {
 
-    val state: LazyGridState = LazyGridState()
+    @OptIn(ExperimentalFoundationApi::class)
+    val dpCacheWindow = LazyLayoutCacheWindow(ahead = 350.dp, behind = 300.dp)
+
+    @OptIn(ExperimentalFoundationApi::class)
+    val state: LazyGridState = LazyGridState(cacheWindow = dpCacheWindow)
 
     val stateColumn = LazyListState()
 

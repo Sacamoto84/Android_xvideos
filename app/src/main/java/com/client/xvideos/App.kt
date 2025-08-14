@@ -6,6 +6,10 @@ import android.os.Build
 import android.preference.PreferenceManager
 import com.client.common.sharedPref.Settings
 import com.client.xvideos.PermissionScreenActivity.PermissionStorage
+import com.facebook.drawee.backends.pipeline.Fresco
+import com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory
+import com.facebook.imagepipeline.common.ResizeOptions
+import com.facebook.imagepipeline.core.ImagePipelineConfig
 import com.redgifs.common.block.BlockRed
 import com.redgifs.common.saved.SavedRed
 import com.redgifs.db.AppRedGifsDatabase
@@ -14,6 +18,7 @@ import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import okhttp3.OkHttpClient
 import timber.log.Timber
 import timber.log.Timber.DebugTree
 import java.security.SecureRandom
@@ -81,6 +86,16 @@ class App : Application() {
 
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
         Settings.init(prefs)
+
+        val pipelineConfig =
+            OkHttpImagePipelineConfigFactory
+                .newBuilder(this, OkHttpClient.Builder().build())
+                .setDiskCacheEnabled(true)
+                .setDownsampleEnabled(true)
+                .setResizeAndRotateEnabledForNetwork(true)
+                .build()
+
+        Fresco.initialize(this, pipelineConfig)
 
         if (PermissionStorage.hasPermissions(this)) {
 

@@ -51,6 +51,7 @@ import com.client.xvideos.l.Luscious
 import com.client.xvideos.l.ThemeL
 import com.client.xvideos.l.ui.FullScreenImage
 import com.client.xvideos.l.ui.UrlImageLusciousGifs
+import com.client.xvideos.l.ui.UrlImageLusciousGifsFull
 import com.client.xvideos.l.ui.screens.atom.AlbumInfoAudiences
 import com.client.xvideos.l.ui.screens.atom.AlbumInfoGreeting
 import com.client.xvideos.l.ui.screens.atom.AlbumInfoTags
@@ -64,7 +65,7 @@ import kotlinx.coroutines.launch
 import net.engawapg.lib.zoomable.ExperimentalZoomableApi
 import javax.inject.Inject
 
-class ScreenLAlbum() : Screen {
+class ScreenLAlbum(idAlbum : Int) : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
 
@@ -181,7 +182,8 @@ class ScreenLAlbumSM @Inject constructor(
             if (!luscious.loggedIn) {
                 luscious.login()
             }
-            album.value = luscious.getAlbum(556543)//336743)//(499900)//(374481)
+
+            album.value = luscious.getAlbum(336743)//(556543)//336743)//(499900)//(374481)
             album
         }
     }

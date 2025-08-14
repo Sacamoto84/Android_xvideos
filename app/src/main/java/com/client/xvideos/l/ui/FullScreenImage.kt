@@ -17,6 +17,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -38,6 +42,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import com.composeunstyled.DropdownPanelAnchor
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
@@ -415,6 +420,10 @@ fun FullScreenImage(
                 .background(Color.Black.copy(alpha = alphaAnim.value))
         )
 
+        IconButton(modifier = Modifier.align(Alignment.TopEnd), onClick = {}) {
+            Icon(Icons.Default.MoreVert, tint = Color.White, contentDescription = null)
+        }
+
         Box(
             modifier = Modifier
                 .offset {
@@ -435,7 +444,6 @@ fun FullScreenImage(
                 modifier = Modifier,//.fillMaxSize(),
                 contentScale = ContentScale.FillBounds,
                 onSuccess = { success = it },
-                loadIndicator = true,
             )
         }
     }

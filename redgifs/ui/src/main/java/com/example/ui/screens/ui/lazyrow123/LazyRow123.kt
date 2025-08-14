@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -16,6 +17,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.layout.LazyLayoutCacheWindow
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -57,6 +60,7 @@ import com.redgifs.common.expand_menu_video.ExpandMenuVideoTags
 import com.redgifs.common.video.player_row_mini.RedUrlVideoImageAndLongClick
 import timber.log.Timber
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun LazyRow123(
     host: LazyRow123Host,
@@ -133,6 +137,8 @@ fun LazyRow123(
             }
         )
     }
+
+
 
     Box(modifier.fillMaxSize()) {
 

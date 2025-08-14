@@ -39,6 +39,7 @@ import com.client.xvideos.l.ui.screens.ScreenLAlbum
 import com.client.xvideos.screens.videoplayer.video.cache.VideoPlayerCacheManager
 import com.client.xvideos.ui.theme.XvideosTheme
 import com.example.ui.screens.ScreenRedRoot
+import com.example.ui.screens.niche.ScreenRedNiche
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import timber.log.Timber
@@ -125,8 +126,8 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
                     //ScreenRedProfile
                     //Navigator(ScreenRedProfile("lilijunex")
                     //Navigator(startScreen, key = "1")
-                    //Navigator(ScreenRedNiche())
-                    Navigator( screen = ScreenLAlbum())
+                    Navigator(ScreenRedRoot())
+                    //Navigator( screen = ScreenLAlbum(0))
                 }
 
             }
