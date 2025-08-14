@@ -1,6 +1,9 @@
 package com.client.xvideos.l.ui.screenAlbum.net
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.setValue
 import com.client.xvideos.l.KtorRequestHandler
 import com.client.xvideos.l.Luscious
 import com.client.xvideos.l.graphQl.getPicturesJson
@@ -16,15 +19,17 @@ class AlbumPicsDetails(
 
     val pics = mutableStateListOf<PicsDetails>()
 
-    var total_pages: Int? = null
+    var totalPages: Int? = null
+
+    var percentLoad by mutableFloatStateOf(0f)
 
     suspend fun openPage(page: Int): List<PicsDetails> {
         val gson = Gson()
         val list = mutableListOf<PicsDetails>()
-        val picsJson = handler?.postJson(Luscious.Companion.API, getPicturesJson(id, page))
+        val picsJson = handler?.postJsonCached(Luscious.Companion.API, getPicturesJson(id, page))
         val json = JsonParser.parseString(picsJson).asJsonObject
         val get = json["data"]?.asJsonObject?.get("picture")?.asJsonObject?.get("list")?.asJsonObject
-        total_pages = get?.get("info")?.asJsonObject?.get("total_pages")?.asInt
+        totalPages = get?.get("info")?.asJsonObject?.get("total_pages")?.asInt
         val itemsArray = get?.get("items")?.asJsonArray
         itemsArray?.forEach { element ->
             val pic = gson.fromJson(element, PicsDetails::class.java)
@@ -35,13 +40,17 @@ class AlbumPicsDetails(
 
     suspend fun contentUrls() {
         try {
-            val list = mutableListOf<PicsDetails>()
-            list.addAll(openPage(1))
-            for (i in 2..total_pages!!) {
-                list.addAll(openPage(i))
-            }
+            val l = openPage(1)
             withContext(Dispatchers.Main) {
-                pics.addAll(list)
+                pics.addAll(l)
+                percentLoad = 1.0f/totalPages!!
+            }
+            for (i in 2..totalPages!!) {
+                val l = openPage(i)
+                withContext(Dispatchers.Main) {
+                    percentLoad = i.toFloat()/totalPages!!
+                    pics.addAll(l)
+                }
             }
         } catch (e: Exception) {
             val ee = e.message

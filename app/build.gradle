@@ -152,6 +152,11 @@ dependencies {
     implementation libs.timber
     implementation libs.disk.lru.cache
 
+    //implementation ('com.github.kittinunf.fuse:fuse:1.3.0')
+    //implementation ('com.github.kittinunf.fuse:fuse-android:1.3.0')
+
+    //implementation ("com.github.kernel0x:falcon:1.0.3")
+
 //    implementation(libs.coil.compose)
 //    implementation(libs.coil.network.okhttp)
 //    implementation(libs.coil.compose.core)

@@ -1,5 +1,8 @@
 package com.client.xvideos.l
 
+import com.client.common.AppPath
+import com.client.xvideos.l.db.PostJsonDao
+import com.client.xvideos.l.db.PostJsonEntity
 import com.github.javafaker.Faker
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -25,22 +28,12 @@ import io.ktor.serialization.gson.gson
 import kotlinx.coroutines.delay
 import java.io.IOException
 
-
-
-
-
-
-
-
-
-
-
-
 class KtorRequestHandler(
     private val timeoutMillis: Long = 5000,
     private val maxRetries: Int = 5,
     private val retryStatusCodes: Set<Int> = setOf(413, 429, 500, 502, 503, 504),
-    private val backoffFactor: Long = 1000
+    private val backoffFactor: Long = 1000,
+    private val dao : PostJsonDao
 ) {
     private val faker = Faker()
 
@@ -125,6 +118,38 @@ class KtorRequestHandler(
         }
 
         throw lastError ?: IllegalStateException("Unknown error during retry")
+    }
+
+
+    private val cacheTtlMillis = 24 * 60 * 60 * 1000L * 60 //60 сутки
+
+    suspend fun postJsonCached(url: String, data: String): String {
+        val cacheKey = data.hashCode().toString()
+
+        val res = dao.get(cacheKey)
+
+        if(res != null){
+            return res.content
+        }
+
+        //val cacheFile = File(AppPath.netCache_l, cacheKey)
+
+        // Читаем из кеша, если он свежий
+//        if (cacheFile.exists() && (System.currentTimeMillis() - cacheFile.lastModified()) < cacheTtlMillis) {
+//            return cacheFile.readText()
+//        }
+
+        // Делаем запрос
+        val response = postJson(url, data)
+
+        dao.insert(PostJsonEntity(
+            url = cacheKey,
+            content = response
+        ))
+        // Сохраняем в кеш
+        //cacheFile.writeText(response)
+
+        return response
     }
 }
 

@@ -42,10 +42,9 @@ class Album(
 
     init {
         scope.launch {
-            val res = handler?.postJson(Luscious.Companion.API, getAlbumInfo(id))
+            val res = handler?.postJsonCached(Luscious.Companion.API, getAlbumInfo(id))
             val json = JsonParser.parseString(res).asJsonObject
-            val get =
-                json["data"]?.asJsonObject?.get("album")?.asJsonObject?.get("get")?.asJsonObject
+            val get = json["data"]?.asJsonObject?.get("album")?.asJsonObject?.get("get")?.asJsonObject
             val gson = Gson()
             parsed.value = gson.fromJson(get, AlbumDetails::class.java)
             url = Luscious.Companion.HOME + parsed.value.url

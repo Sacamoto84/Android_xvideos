@@ -1,6 +1,7 @@
 package com.client.xvideos.l.ui.screenAlbum
 
 import android.annotation.SuppressLint
+import android.widget.ProgressBar
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -20,6 +22,8 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,6 +42,7 @@ import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.room.util.TableInfo
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
@@ -49,6 +54,8 @@ import com.client.xvideos.l.ui.UrlImageLusciousGifs
 import com.client.xvideos.l.ui.screenAlbum.atom.AlbumInfoAudiences
 import com.client.xvideos.l.ui.screenAlbum.atom.AlbumInfoGreeting
 import com.client.xvideos.l.ui.screenAlbum.atom.AlbumInfoTags
+import com.composeunstyled.ProgressIndicator
+import com.example.ui.screens.manager_block.bottomr_bar.BottomrBar
 import net.engawapg.lib.zoomable.ExperimentalZoomableApi
 
 class ScreenLAlbum(val idAlbum : Long) : Screen {
@@ -75,12 +82,34 @@ class ScreenLAlbum(val idAlbum : Long) : Screen {
         var selectedBounds by remember { mutableStateOf<Rect?>(null) }
 
         Scaffold(
+
+            bottomBar = {
+
+                Column {
+
+                    Box(modifier = Modifier.fillMaxWidth().height(48.dp).background(ThemeL.grey7)){
+
+                    }
+
+                }
+
+                if (album?.albumPicsDetails?.percentLoad != 1.0f) {
+                    LinearProgressIndicator(
+                        progress = { album?.albumPicsDetails?.percentLoad ?: 0f },
+                        modifier = Modifier.fillMaxWidth(),
+                        color =  ProgressIndicatorDefaults.linearColor,
+                        trackColor = ProgressIndicatorDefaults.linearTrackColor,
+                        strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
+                    )
+                }
+            },
+
             containerColor = ThemeL.greyBackground
         ) {
 
             LazyVerticalStaggeredGrid(
                 columns = StaggeredGridCells.Fixed(6),
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.padding(bottom = it.calculateBottomPadding()).fillMaxSize()
             ) {
 
                 item( span =  StaggeredGridItemSpan.FullLine){

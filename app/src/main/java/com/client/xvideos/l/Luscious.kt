@@ -1,5 +1,6 @@
 package com.client.xvideos.l
 
+import com.client.xvideos.l.db.AppLDatabase
 import com.client.xvideos.l.ui.screenAlbum.net.Album
 import kotlinx.coroutines.CoroutineScope
 
@@ -25,7 +26,8 @@ class Luscious(
     timeoutMillis: Long = 5000,
     maxRetries: Int = 5,
     retryStatusCodes: Set<Int> = setOf(413, 429, 500, 502, 503, 504),
-    backoffFactor: Long = 1000
+    backoffFactor: Long = 1000,
+    db: AppLDatabase
 ) {
     companion object {
         const val API = "https://members.luscious.net/graphql/nobatch/"
@@ -37,7 +39,8 @@ class Luscious(
         timeoutMillis = timeoutMillis,
         maxRetries = maxRetries,
         retryStatusCodes = retryStatusCodes,
-        backoffFactor = backoffFactor
+        backoffFactor = backoffFactor,
+        dao = db.postJsonDao()
     )
 
     var loggedIn: Boolean = false

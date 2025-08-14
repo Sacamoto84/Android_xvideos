@@ -7,7 +7,7 @@ import java.io.File
 private enum class Folder(val value: String) {
     CACHE_DOWNLOAD_RED("Download"),
     RED("Red"),
-
+    L("L"),
 }
 
 /**
@@ -43,6 +43,9 @@ object AppPath {
     val nichesCache_red : String = "${main}/${Folder.RED.value}/Saved/NichesCache"
     val creators_red : String = "${main}/${Folder.RED.value}/Saved/Creators"
 
+    //L
+    val netCache_l: String = "${main}/${Folder.L.value}/Cache/PostJson"
+    val db_l: String = "${main}/${Folder.L.value}/db"
 
     init {
 
@@ -74,6 +77,9 @@ object AppPath {
         File(creators_red).mkdirs()
 
         File(nichesCache_red).mkdirs()
+
+        File(netCache_l).mkdirs()
+        File(db_l).mkdirs()
 
     }
 
