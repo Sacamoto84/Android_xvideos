@@ -1,6 +1,6 @@
 package com.client.xvideos.l
 
-import com.client.xvideos.l.ui.screens.net.Album
+import com.client.xvideos.l.ui.screenAlbum.net.Album
 import kotlinx.coroutines.CoroutineScope
 
 //fun main(){
@@ -85,6 +85,7 @@ class Luscious(
 
         val id = when (albumInput) {
             is Int -> albumInput.toString()
+            is Long -> albumInput.toString()
             is String -> extractIdFromUrl(albumInput) ?: albumInput // Если URL, извлекаем ID, иначе используем как есть
             else -> throw IllegalArgumentException("albumInput must be Int or String")
         }

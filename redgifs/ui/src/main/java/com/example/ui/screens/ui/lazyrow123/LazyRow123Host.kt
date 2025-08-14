@@ -72,7 +72,7 @@ class LazyRow123Host(
 ) {
 
     @OptIn(ExperimentalFoundationApi::class)
-    val dpCacheWindow = LazyLayoutCacheWindow(ahead = 350.dp, behind = 300.dp)
+    val dpCacheWindow = LazyLayoutCacheWindow(ahead = 100.dp, behind = 0.dp)
 
     @OptIn(ExperimentalFoundationApi::class)
     val state: LazyGridState = LazyGridState(cacheWindow = dpCacheWindow)

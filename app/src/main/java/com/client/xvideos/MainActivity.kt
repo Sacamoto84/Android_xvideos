@@ -9,13 +9,8 @@ import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.ime
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -34,15 +29,12 @@ import coil.memory.MemoryCache
 import coil.request.CachePolicy
 import com.client.common.util.KeepScreenOn
 import com.client.xvideos.PermissionScreenActivity.PermissionStorage
-import com.client.xvideos.l.ui.ScreenLRoot
-import com.client.xvideos.l.ui.screens.ScreenLAlbum
+import com.client.xvideos.l.ui.screenAlbum.ScreenLAlbum
 import com.client.xvideos.screens.videoplayer.video.cache.VideoPlayerCacheManager
 import com.client.xvideos.ui.theme.XvideosTheme
 import com.example.ui.screens.ScreenRedRoot
-import com.example.ui.screens.niche.ScreenRedNiche
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
-import timber.log.Timber
 
 const val urlStart = "https://www.xv-ru.com"
 
@@ -126,8 +118,8 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
                     //ScreenRedProfile
                     //Navigator(ScreenRedProfile("lilijunex")
                     //Navigator(startScreen, key = "1")
-                    Navigator(ScreenRedRoot())
-                    //Navigator( screen = ScreenLAlbum(0))
+                    //Navigator(ScreenRedRoot())
+                    Navigator( screen = ScreenLAlbum(556543))
                 }
 
             }

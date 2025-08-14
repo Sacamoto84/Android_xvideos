@@ -2,10 +2,8 @@ package com.client.xvideos.l.ui
 
 import android.os.Build
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
@@ -29,10 +27,7 @@ import coil.request.ImageRequest
 import com.composeunstyled.Text
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.controller.BaseControllerListener
-import com.facebook.imagepipeline.common.ResizeOptions
-import com.facebook.imagepipeline.common.RotationOptions
 import com.facebook.imagepipeline.image.ImageInfo
-import com.facebook.imagepipeline.request.ImageRequestBuilder
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil.CoilImage
 import com.skydoves.landscapist.fresco.websupport.FrescoWebImage
@@ -178,95 +173,4 @@ fun UrlImageLusciousGifsFull(
         }
     }
 
-//    GlideImage(
-//        imageModel = { url },
-//        requestOptions = {
-//            RequestOptions()
-//                .override(256, 256)
-//                .diskCacheStrategy(DiskCacheStrategy.ALL)
-//                .centerCrop()
-//        },
-//        imageOptions = ImageOptions(
-//            contentScale = ContentScale.Crop,
-//            alignment = Alignment.Center
-//        )
-//    )
-
 }
-
-
-//@Composable
-//fun UrlImageLusciousGifsFull(
-//    url: String,
-//    modifier: Modifier = Modifier,
-//    contentScale: ContentScale = ContentScale.FillWidth,
-//    loadIndicator: Boolean = true,
-//    onSuccess: (Boolean) -> Unit = {},
-//) {
-//
-//    val context = LocalContext.current
-//
-//    val imageRequest = remember {
-//        ImageRequest.Builder(context)
-//            .data(url)
-//            .crossfade(true)
-//            .size(Size.ORIGINAL)
-//            .apply {
-//                memoryCacheKey("${url}_full")
-//                diskCacheKey("${url}_full")
-//            }
-//            .diskCachePolicy(CachePolicy.ENABLED)
-//            .memoryCachePolicy(CachePolicy.ENABLED)
-//            .build()
-//    }
-//
-//    val imageLoader = remember {
-//        ImageLoader.Builder(context)
-//            .components {
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) { add(ImageDecoderDecoder.Factory()) }
-//                add(GifDecoder.Factory()) // Fallback для старых API
-//            }
-//            .build()
-//    }
-//
-//    CoilImage(
-//        imageLoader = { imageLoader },
-//        imageRequest = { imageRequest },
-//        imageOptions = ImageOptions(
-//            contentScale = contentScale,
-//            alignment = Alignment.Center,
-//        ),
-//        modifier = Modifier.then(modifier),
-//
-//        success = { state, painter ->
-//            onSuccess(true)
-//            Image(
-//                painter = painter,
-//                modifier = Modifier, // draw a resized image.
-//                contentDescription = "Image"
-//            )
-//        },
-//
-//        loading = {
-//            //Box(modifier = Modifier.fillMaxSize().background(Color.Magenta))
-//            if (loadIndicator) {
-//                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-//                    CircularProgressIndicator(
-//                        modifier = Modifier.size(32.dp)//.align(Alignment.Center)
-//                        , color = Color.Gray
-//                    )
-//                }
-//            }
-//        },
-//
-//        failure = {
-//            Timber.e(">>>>>>>>>>>>" + it.reason)
-//            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-//                Text("Ошибка загрузки", color = Color.Gray)
-//            }
-//        }
-//
-//
-//    )
-//
-//}

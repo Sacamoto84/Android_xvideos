@@ -1,4 +1,4 @@
-package com.client.xvideos.l.ui.screens
+package com.client.xvideos.l.ui.screenAlbum
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.core.animateFloatAsState
@@ -38,34 +38,20 @@ import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import cafe.adriel.voyager.core.model.ScreenModel
-import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
-import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import com.client.common.urlVideImage.UrlImage
-import com.client.xvideos.l.ui.screens.net.Album
-import com.client.xvideos.l.Luscious
 import com.client.xvideos.l.ThemeL
 import com.client.xvideos.l.ui.FullScreenImage
 import com.client.xvideos.l.ui.UrlImageLusciousGifs
-import com.client.xvideos.l.ui.UrlImageLusciousGifsFull
-import com.client.xvideos.l.ui.screens.atom.AlbumInfoAudiences
-import com.client.xvideos.l.ui.screens.atom.AlbumInfoGreeting
-import com.client.xvideos.l.ui.screens.atom.AlbumInfoTags
-import dagger.Binds
-import dagger.Module
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
-import dagger.multibindings.IntoMap
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
+import com.client.xvideos.l.ui.screenAlbum.atom.AlbumInfoAudiences
+import com.client.xvideos.l.ui.screenAlbum.atom.AlbumInfoGreeting
+import com.client.xvideos.l.ui.screenAlbum.atom.AlbumInfoTags
 import net.engawapg.lib.zoomable.ExperimentalZoomableApi
-import javax.inject.Inject
 
-class ScreenLAlbum(idAlbum : Int) : Screen {
+class ScreenLAlbum(val idAlbum : Long) : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
 
@@ -73,7 +59,13 @@ class ScreenLAlbum(idAlbum : Int) : Screen {
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
     override fun Content() {
-        val vm: ScreenLAlbumSM = getScreenModel()
+
+        //val vm: ScreenLAlbumSM = getScreenModel()
+
+        val vm = getScreenModel<ScreenLAlbumSM, ScreenLAlbumSM.Factory> { factory ->
+            factory.create(idAlbum)
+        }
+
 
         val album = vm.album.collectAsStateWithLifecycle().value
 
@@ -92,7 +84,7 @@ class ScreenLAlbum(idAlbum : Int) : Screen {
             ) {
 
                 item( span =  StaggeredGridItemSpan.FullLine){
-                    Column {
+                    Column(modifier = Modifier.padding(horizontal = 4.dp)) {
                         Row {
                             UrlImage(parsed?.cover?.url.toString(), modifier = Modifier.size(72.dp))
                             Spacer(modifier = Modifier.width(4.dp))
@@ -103,13 +95,17 @@ class ScreenLAlbum(idAlbum : Int) : Screen {
                                 }
                             }
                         }
+                        if (parsed != null) { AlbumInfoGreeting(parsed)  }
+                        if (parsed != null) { AlbumInfoAudiences(parsed) }
                     }
 
                 }
 
-                item(span = StaggeredGridItemSpan.FullLine) { if (parsed != null) { AlbumInfoGreeting(parsed)  } }
-                item(span = StaggeredGridItemSpan.FullLine) { if (parsed != null) { AlbumInfoAudiences(parsed) } }
+//                item(span = StaggeredGridItemSpan.FullLine) { if (parsed != null) { AlbumInfoGreeting(parsed)  } }
+//                item(span = StaggeredGridItemSpan.FullLine) { if (parsed != null) { AlbumInfoAudiences(parsed) } }
                 item(span = StaggeredGridItemSpan.FullLine) { if (parsed != null) { AlbumInfoTags(parsed) } }
+
+
 
                 items(album?.albumPicsDetails?.pics ?: emptyList()) {
                     var imageBounds by remember { mutableStateOf<Rect?>(null) }
@@ -165,37 +161,4 @@ class ScreenLAlbum(idAlbum : Int) : Screen {
 
     }
 
-}
-
-
-
-
-class ScreenLAlbumSM @Inject constructor(
-    val luscious: Luscious
-) : ScreenModel {
-
-    val album = MutableStateFlow<Album?>(null)
-
-    init {
-        screenModelScope.launch {
-
-            if (!luscious.loggedIn) {
-                luscious.login()
-            }
-
-            album.value = luscious.getAlbum(336743)//(556543)//336743)//(499900)//(374481)
-            album
-        }
-    }
-
-
-}
-
-@Module
-@InstallIn(SingletonComponent::class)
-abstract class ScreenModuleLAlbum {
-    @Binds
-    @IntoMap
-    @ScreenModelKey(ScreenLAlbumSM::class)
-    abstract fun bindScreenLAlbumScreenModel(hiltListScreenModel: ScreenLAlbumSM): ScreenModel
 }
