@@ -15,25 +15,41 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 class AlbumListImpl(
     val handler: KtorRequestHandler? = null,
     val scope: CoroutineScope,
 ) {
 
-    var info by mutableStateOf( FacetCollectionInfo(page = -1, hasNextPage = false, hasPreviousPage = false, totalItems = -1, totalPages = -1, itemsPerPage = -1, urlComplete = "" ))
-    var items  = mutableStateListOf<Album>()
+    var info by mutableStateOf(
+        FacetCollectionInfo(
+            page = -1,
+            hasNextPage = false,
+            hasPreviousPage = false,
+            totalItems = -1,
+            totalPages = -1,
+            itemsPerPage = -1,
+            urlComplete = ""
+        )
+    )
+    var items = mutableStateListOf<Album>()
 
-   suspend fun getAlbumList(id : Int){
+    suspend fun getAlbumList(id: Int) {
 
-            val q = getAlbumListQuery(id)
-            val res = handler?.postJson(Luscious.Companion.API, q)
-            val gson = Gson()
-            val a = gson.fromJson(res, AlbumResponse::class.java)
-            withContext(Dispatchers.Main) {
-                info = a.data.album.list.info
-                items.addAll(a.data.album.list.items)
-            }
+        Timber.i("!!! getAlbumList $id")
+        val q = getAlbumListQuery(id)
+        val res = handler?.postJson(Luscious.Companion.API, q)
+        val gson = Gson()
+        val a = gson.fromJson(res, AlbumResponse::class.java)
+        withContext(Dispatchers.Main) {
+            info = a.data.album.list.info
+            items.clear()
+            items.addAll(a.data.album.list.items)
+            Timber.i("!!! getAlbumList info ${info.page} ${items.toList()}")
+        }
+
+
 
     }
 }
