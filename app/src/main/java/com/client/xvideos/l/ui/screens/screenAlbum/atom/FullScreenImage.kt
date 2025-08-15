@@ -1,4 +1,4 @@
-package com.client.xvideos.l.ui
+package com.client.xvideos.l.ui.screens.screenAlbum.atom
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.Animatable
@@ -42,7 +42,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import com.composeunstyled.DropdownPanelAnchor
+import com.client.xvideos.l.ui.UrlImageLusciousGifsFull
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch

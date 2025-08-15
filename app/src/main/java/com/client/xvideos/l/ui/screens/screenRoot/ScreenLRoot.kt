@@ -1,4 +1,4 @@
-package com.client.xvideos.l.ui
+package com.client.xvideos.l.ui.screens.screenRoot
 
 import android.annotation.SuppressLint
 import androidx.compose.material3.Scaffold

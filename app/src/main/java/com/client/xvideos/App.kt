@@ -2,6 +2,7 @@ package com.client.xvideos
 
 import android.annotation.SuppressLint
 import android.app.Application
+import android.os.Build
 import android.preference.PreferenceManager
 import com.client.common.sharedPref.Settings
 import com.client.xvideos.PermissionScreenActivity.PermissionStorage
@@ -25,7 +26,6 @@ import javax.net.ssl.HttpsURLConnection
 import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
-
 
 fun allowAllSSL() {
     try {
@@ -78,21 +78,12 @@ class App : Application() {
         if (BuildConfig.DEBUG)
             Timber.plant(DebugTree())
 
-//        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) {
-//            allowAllSSL()
-//        }
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) {
+            allowAllSSL()
+        }
 
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
         Settings.init(prefs)
-
-
-//        val tempDir = createTempDir().absolutePath // use any readable/writable directory of your choice
-//        val convertible = StringDataConvertible() // there are couple of built-in Convertibles such as DataConvertible, StringDataConvertible
-//        val cache = CacheBuilder.config(tempDir, convertible) {
-//        }.build()
-
-
-
 
         val pipelineConfig =
             OkHttpImagePipelineConfigFactory

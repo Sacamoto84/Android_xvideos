@@ -1,7 +1,6 @@
-package com.client.xvideos.l.ui.screenAlbum
+package com.client.xvideos.l.ui.screens.screenAlbum
 
 import android.annotation.SuppressLint
-import android.widget.ProgressBar
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -42,20 +41,17 @@ import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.room.util.TableInfo
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import com.client.common.urlVideImage.UrlImage
 import com.client.xvideos.l.ThemeL
-import com.client.xvideos.l.ui.FullScreenImage
 import com.client.xvideos.l.ui.UrlImageLusciousGifs
-import com.client.xvideos.l.ui.screenAlbum.atom.AlbumInfoAudiences
-import com.client.xvideos.l.ui.screenAlbum.atom.AlbumInfoGreeting
-import com.client.xvideos.l.ui.screenAlbum.atom.AlbumInfoTags
-import com.composeunstyled.ProgressIndicator
-import com.example.ui.screens.manager_block.bottomr_bar.BottomrBar
+import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoAudiences
+import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoGreeting
+import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoTags
+import com.client.xvideos.l.ui.screens.screenAlbum.atom.FullScreenImage
 import net.engawapg.lib.zoomable.ExperimentalZoomableApi
 
 class ScreenLAlbum(val idAlbum : Long) : Screen {

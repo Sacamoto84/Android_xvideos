@@ -1,0 +1,75 @@
+query AlbumList($input: AlbumListInput!) {
+  album {
+    list(input: $input) {
+      info {
+        ...FacetCollectionInfo
+      }
+      items {
+        ...AlbumInSearchList
+      }
+    }
+  }
+}
+
+fragment FacetCollectionInfo on FacetCollectionInfo {
+  page
+  has_next_page
+  has_previous_page
+  total_items
+  total_pages
+  items_per_page
+  url_complete
+}
+
+fragment AlbumInSearchList on Album {
+  __typename
+  id
+  title
+  description
+  created
+  modified
+  like_status
+  moderation_status
+  number_of_favorites
+  number_of_dislikes
+  number_of_pictures
+  number_of_animated_pictures
+  number_of_duplicates
+  slug
+  is_manga
+  url
+  download_url
+  labels
+  permissions
+  cover {
+    width
+    height
+    size
+    url
+  }
+  created_by {
+    id
+    url
+    name
+    display_name
+    user_title
+    avatar_url
+  }
+  language {
+    id
+    title
+    url
+  }
+  tags {
+    category
+    text
+    url
+    count
+  }
+  genres {
+    id
+    title
+    slug
+    url
+  }
+}

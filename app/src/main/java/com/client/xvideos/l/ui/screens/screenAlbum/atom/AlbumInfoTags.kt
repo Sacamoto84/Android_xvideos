@@ -1,4 +1,4 @@
-package com.client.xvideos.l.ui.screenAlbum.atom
+package com.client.xvideos.l.ui.screens.screenAlbum.atom
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.dp
 import com.client.common.util.capitalizeEachWord
 import com.client.common.util.toPrettyCountInt
 import com.client.xvideos.l.ThemeL
-import com.client.xvideos.l.ui.screenAlbum.net.AlbumDetails
+import com.client.xvideos.l.ui.screens.screenAlbum.net.AlbumDetails
 
 @Composable
 fun AlbumInfoTags(parsed: AlbumDetails) {

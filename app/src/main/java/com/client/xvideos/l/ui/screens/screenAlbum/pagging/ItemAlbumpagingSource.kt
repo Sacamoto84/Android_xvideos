@@ -1,4 +1,4 @@
-package com.client.xvideos.l.ui.screenAlbum.pagging
+package com.client.xvideos.l.ui.screens.screenAlbum.pagging
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState

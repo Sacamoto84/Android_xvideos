@@ -44,7 +44,7 @@ object AppPath {
     val creators_red : String = "${main}/${Folder.RED.value}/Saved/Creators"
 
     //L
-    val netCache_l: String = "${main}/${Folder.L.value}/Cache/PostJson"
+    val likes_l: String = "${main}/${Folder.L.value}/Saved/Likes"
     val db_l: String = "${main}/${Folder.L.value}/db"
 
     init {
@@ -78,7 +78,7 @@ object AppPath {
 
         File(nichesCache_red).mkdirs()
 
-        File(netCache_l).mkdirs()
+        File(likes_l).mkdirs()
         File(db_l).mkdirs()
 
     }

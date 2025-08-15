@@ -4,9 +4,6 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.redgifs.db.entity.CacheMediaResponseEntity
-
-
 
 @Dao
 interface PostJsonDao {

@@ -1,97 +1,201 @@
+
+type FacetCollectionInfo {
+  page: Int!
+  has_next_page: Boolean!
+  has_previous_page: Boolean!
+  total_items: Int!
+  total_pages: Int!
+  items_per_page: Int!
+  url_complete: String!
+}
+
+
+
 type Query {
-  launches("The number of results to show. Must be >= 1. Default = 20" pageSize: Int, "If you add a cursor here, it will only return results _after_ this cursor" after: String): LaunchConnection!
-
-  launch(id: ID!): Launch
-
-  me: User
-
-  totalTripsBooked: Int
+  album: AlbumList!
 }
 
-"""
-Simple wrapper around our list of launches that contains a cursor to the
-last item in the list. Pass this cursor to the launches query to fetch results
-after these.
-"""
-type LaunchConnection {
-  cursor: String!
-
-  hasMore: Boolean!
-
-  launches: [Launch]!
+type AlbumList {
+  info: ListInfo!
+  items: [Album!]!
 }
 
-type Launch {
-  id: ID!
-
-  site: String
-
-  mission: Mission
-
-  rocket: Rocket
-
-  isBooked: Boolean!
+type ListInfo {
+  page: Int!
+  has_next_page: Boolean!
+  has_previous_page: Boolean!
+  total_items: Int!
+  total_pages: Int!
+  items_per_page: Int!
+  url_complete: String!
 }
 
-type Mission {
-  name: String
-
-  missionPatch(size: PatchSize): String
+type Album {
+  __typename: String!
+  id: String!
+  title: String!
+  description: String!
+  created: Int!
+  modified: Int!
+  like_status: String!
+  moderation_status: String!
+  number_of_favorites: Int!
+  number_of_dislikes: Int!
+  number_of_pictures: Int!
+  number_of_animated_pictures: Int!
+  number_of_duplicates: Int!
+  slug: String!
+  is_manga: Boolean!
+  url: String!
+  download_url: String!
+  labels: [String!]!
+  permissions: [String!]!
+  cover: Cover!
+  language: Language
+  created_by: User!
+  tags: [Tag!]!
+  genres: [Genre!]!
 }
 
-enum PatchSize {
-  SMALL
-
-  LARGE
+type Cover {
+  width: Int!
+  height: Int!
+  size: String!
+  url: String!
 }
 
-type Rocket {
-  id: ID!
-
-  name: String
-
-  type: String
+type Language {
+  id: String!
+  title: String!
+  url: String!
 }
 
 type User {
-  id: ID!
-
-  email: String!
-
-  profileImage: String
-
-  trips: [Launch]!
-
-  token: String
+  id: String!
+  name: String!
+  display_name: String!
+  url: String!
 }
 
-type Mutation {
-  bookTrips(launchIds: [ID]!): TripUpdateResponse!
-
-  cancelTrip(launchId: ID!): TripUpdateResponse!
-
-  login(email: String): User
+type Tag {
+  id: String!
+  category: String
+  text: String!
+  url: String!
+  count: Int!
 }
 
-type TripUpdateResponse {
-  success: Boolean!
-
-  message: String
-
-  launches: [Launch]
+type Genre {
+  id: String!
+  title: String!
+  acts_as_warning: Boolean!
+  url: String!
 }
 
-type Subscription {
-  tripsBooked: Int
-}
 
-"""
-The `Upload` scalar type represents a file upload.
-"""
-scalar Upload
 
-schema {
-  query: Query
-  mutation: Mutation
-  subscription: Subscription
-}
+
+
+
+#
+#
+#
+#
+#
+#type Query {
+#  launches("The number of results to show. Must be >= 1. Default = 20" pageSize: Int, "If you add a cursor here, it will only return results _after_ this cursor" after: String): LaunchConnection!
+#
+#  launch(id: ID!): Launch
+#
+#  me: User
+#
+#  totalTripsBooked: Int
+#}
+#
+#"""
+#Simple wrapper around our list of launches that contains a cursor to the
+#last item in the list. Pass this cursor to the launches query to fetch results
+#after these.
+#"""
+#type LaunchConnection {
+#  cursor: String!
+#
+#  hasMore: Boolean!
+#
+#  launches: [Launch]!
+#}
+#
+#type Launch {
+#  id: ID!
+#
+#  site: String
+#
+#  mission: Mission
+#
+#  rocket: Rocket
+#
+#  isBooked: Boolean!
+#}
+#
+#type Mission {
+#  name: String
+#
+#  missionPatch(size: PatchSize): String
+#}
+#
+#enum PatchSize {
+#  SMALL
+#
+#  LARGE
+#}
+#
+#type Rocket {
+#  id: ID!
+#
+#  name: String
+#
+#  type: String
+#}
+#
+#type User {
+#  id: ID!
+#
+#  email: String!
+#
+#  profileImage: String
+#
+#  trips: [Launch]!
+#
+#  token: String
+#}
+#
+#type Mutation {
+#  bookTrips(launchIds: [ID]!): TripUpdateResponse!
+#
+#  cancelTrip(launchId: ID!): TripUpdateResponse!
+#
+#  login(email: String): User
+#}
+#
+#type TripUpdateResponse {
+#  success: Boolean!
+#
+#  message: String
+#
+#  launches: [Launch]
+#}
+#
+#type Subscription {
+#  tripsBooked: Int
+#}
+#
+#"""
+#The `Upload` scalar type represents a file upload.
+#"""
+#scalar Upload
+#
+#schema {
+#  query: Query
+#  mutation: Mutation
+#  subscription: Subscription
+#}

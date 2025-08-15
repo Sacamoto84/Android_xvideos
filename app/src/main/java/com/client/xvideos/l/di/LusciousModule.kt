@@ -17,7 +17,6 @@ import kotlinx.coroutines.CoroutineScope
 import java.io.File
 import javax.inject.Singleton
 
-
 @Module
 @InstallIn(SingletonComponent::class)
 object LusciousModule {
@@ -30,7 +29,7 @@ object LusciousModule {
     ): Luscious {
         val email = BuildConfig.luscious_email
         val password = BuildConfig.luscious_password
-        val luscious = Luscious(scope, email, password, db)
+        val luscious = Luscious(scope, email, password, db = db)
         return luscious
     }
 
@@ -38,13 +37,12 @@ object LusciousModule {
     @Singleton
     fun provideLStockDatabase(@ApplicationContext context: Context): AppLDatabase {
         println("!!! DI L ROOM")
-        val dbPath = File(AppPath.db_red, "l_database.db").apply {
+        val dbPath = File(AppPath.db_l, "l_database.db").apply {
             parentFile?.mkdirs()      // гарантируем, что директория есть
         }.absolutePath
         return Room.databaseBuilder(context, AppLDatabase::class.java, dbPath)
             .fallbackToDestructiveMigration()
             .build()
     }
-
 
 }

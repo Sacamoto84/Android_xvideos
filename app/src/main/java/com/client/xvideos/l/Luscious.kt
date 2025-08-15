@@ -1,23 +1,9 @@
 package com.client.xvideos.l
 
 import com.client.xvideos.l.db.AppLDatabase
-import com.client.xvideos.l.ui.screenAlbum.net.Album
+import com.client.xvideos.l.ui.screens.screenAlbum.net.Album
+import com.client.xvideos.l.ui.screens.screenAlbumList.net.AlbumListImpl
 import kotlinx.coroutines.CoroutineScope
-
-//fun main(){
-//    runBlocking {
-//        val luscious = Luscious(Secrets.lusciousEmail, Secrets.lusciousPassword)
-//        luscious.login()
-//        if (luscious.loggedIn) {
-//
-//            // дальше можно делать авторизованные запросы через luscious.handler
-//            val a = luscious.getAlbum(374481)
-//            a
-//
-//        }
-//    }
-//}
-
 
 class Luscious(
     val scope : CoroutineScope,
@@ -105,11 +91,8 @@ class Luscious(
     }
 
 
-
-
-
-
-
-
+    fun getAlbumList(): AlbumListImpl {
+        return AlbumListImpl(handler, scope)
+    }
 
 }

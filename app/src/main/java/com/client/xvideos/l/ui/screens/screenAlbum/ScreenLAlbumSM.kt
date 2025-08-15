@@ -1,11 +1,11 @@
-package com.client.xvideos.l.ui.screenAlbum
+package com.client.xvideos.l.ui.screens.screenAlbum
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
 import com.client.xvideos.l.Luscious
-import com.client.xvideos.l.ui.screenAlbum.net.Album
+import com.client.xvideos.l.ui.screens.screenAlbum.net.Album
 import dagger.Binds
 import dagger.Module
 import dagger.assisted.Assisted
@@ -36,8 +36,8 @@ class ScreenLAlbumSM @AssistedInject constructor(
                 luscious.login()
             }
 
-            album.value = luscious.getAlbum(idAlbum)//(556543)//336743)//(499900)//(374481)
-            album
+            album.value = luscious.getAlbum(idAlbum)
+
         }
     }
 

@@ -1,4 +1,4 @@
-package com.client.xvideos.l
+package com.client.xvideos.l.model
 
 enum class ContentTypeOptions(val value: Int) {
     All(0),

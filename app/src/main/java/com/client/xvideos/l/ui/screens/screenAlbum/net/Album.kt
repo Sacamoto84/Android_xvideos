@@ -1,4 +1,4 @@
-package com.client.xvideos.l.ui.screenAlbum.net
+package com.client.xvideos.l.ui.screens.screenAlbum.net
 
 import com.client.xvideos.l.KtorRequestHandler
 import com.client.xvideos.l.Luscious
