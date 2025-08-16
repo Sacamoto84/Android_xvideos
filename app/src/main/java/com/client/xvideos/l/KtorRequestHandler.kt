@@ -3,6 +3,8 @@ package com.client.xvideos.l
 import com.client.common.AppPath
 import com.client.xvideos.l.db.PostJsonDao
 import com.client.xvideos.l.db.PostJsonEntity
+import com.client.xvideos.l.db.PostJsonRamDao
+import com.client.xvideos.l.db.PostJsonRamEntity
 import com.github.javafaker.Faker
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -33,7 +35,8 @@ class KtorRequestHandler(
     private val maxRetries: Int = 5,
     private val retryStatusCodes: Set<Int> = setOf(413, 429, 500, 502, 503, 504),
     private val backoffFactor: Long = 1000,
-    private val dao : PostJsonDao
+    private val dao : PostJsonDao,
+    private val daoRam : PostJsonRamDao
 ) {
     private val faker = Faker()
 
@@ -132,13 +135,6 @@ class KtorRequestHandler(
             return res.content
         }
 
-        //val cacheFile = File(AppPath.netCache_l, cacheKey)
-
-        // Читаем из кеша, если он свежий
-//        if (cacheFile.exists() && (System.currentTimeMillis() - cacheFile.lastModified()) < cacheTtlMillis) {
-//            return cacheFile.readText()
-//        }
-
         // Делаем запрос
         val response = postJson(url, data)
 
@@ -146,11 +142,32 @@ class KtorRequestHandler(
             url = cacheKey,
             content = response
         ))
-        // Сохраняем в кеш
-        //cacheFile.writeText(response)
 
         return response
     }
+
+    suspend fun postJsonCachedRam(url: String, data: String): String {
+        val cacheKey = data.hashCode().toString()
+
+        val res = dao.get(cacheKey)
+
+        if(res != null){
+            return res.content
+        }
+
+        // Делаем запрос
+        val response = postJson(url, data)
+
+        daoRam.insert(
+            PostJsonRamEntity(
+                url = cacheKey,
+                content = response
+            )
+        )
+
+        return response
+    }
+
 }
 
 

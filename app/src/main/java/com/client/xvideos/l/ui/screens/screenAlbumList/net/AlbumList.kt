@@ -6,14 +6,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.client.xvideos.l.KtorRequestHandler
 import com.client.xvideos.l.Luscious
-import com.client.xvideos.l.graphQl.getAlbumListQuery
+import com.client.xvideos.l.graphQl.getAlbumListGraphQL
 import com.client.xvideos.l.model.Album
 import com.client.xvideos.l.model.AlbumResponse
 import com.client.xvideos.l.model.FacetCollectionInfo
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -38,8 +37,8 @@ class AlbumListImpl(
     suspend fun getAlbumList(id: Int) {
 
         Timber.i("!!! getAlbumList $id")
-        val q = getAlbumListQuery(id)
-        val res = handler?.postJson(Luscious.Companion.API, q)
+        val q = getAlbumListGraphQL(id)
+        val res = handler?.postJsonCachedRam(Luscious.Companion.API, q)
         val gson = Gson()
         val a = gson.fromJson(res, AlbumResponse::class.java)
         withContext(Dispatchers.Main) {
@@ -48,8 +47,6 @@ class AlbumListImpl(
             items.addAll(a.data.album.list.items)
             Timber.i("!!! getAlbumList info ${info.page} ${items.toList()}")
         }
-
-
 
     }
 }

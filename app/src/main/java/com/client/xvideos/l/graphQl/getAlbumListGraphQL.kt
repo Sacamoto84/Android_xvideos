@@ -1,10 +1,10 @@
 package com.client.xvideos.l.graphQl
 
 
-fun getAlbumListQuery(
+fun getAlbumListGraphQL(
     page: Int = 3,
     itemsPerPage: Int = 30,
-    display: String = "alpha_any",
+    display: String = "rating_14_days",
     audienceIds: String = "+1+10+12+2+3+5+6+8+9",
     languageIds: String = "+1+100+101+2+3+4+5+6+8+9+99"
 ): String {

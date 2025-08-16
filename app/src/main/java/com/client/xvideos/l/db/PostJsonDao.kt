@@ -22,3 +22,18 @@ interface PostJsonDao {
     suspend fun deleteAll()
 
 }
+
+@Dao
+interface PostJsonRamDao {
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(doc: PostJsonRamEntity)
+
+    @Query("SELECT * FROM cache_post_json_ram WHERE url = :url")
+    suspend fun get(url: String): PostJsonRamEntity?
+
+    // ✅ Удаление всего кеша
+    @Query("DELETE FROM cache_post_json_ram")
+    suspend fun deleteAll()
+
+}

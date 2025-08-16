@@ -16,3 +16,12 @@ data class PostJsonEntity(
     val timeCreate: Long = System.currentTimeMillis(),
     val timeCreateText: String = getCurrentTimeText()// добавляем поле для времени в текстовом формате = getCurrentTimeText()
 )
+
+@Entity(tableName = "cache_post_json_ram")
+data class PostJsonRamEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val url: String,
+    val content: String,
+    val timeCreate: Long = System.currentTimeMillis(),
+    val timeCreateText: String = getCurrentTimeText()// добавляем поле для времени в текстовом формате = getCurrentTimeText()
+)

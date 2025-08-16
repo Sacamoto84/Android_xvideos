@@ -4,8 +4,8 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 
 @Database(
-    entities = [PostJsonEntity::class],
-    version = 1,
+    entities = [PostJsonEntity::class, PostJsonRamEntity::class],
+    version = 2,
     autoMigrations = [
         //AutoMigration(from = 4, to = 5)
     ],
@@ -13,4 +13,5 @@ import androidx.room.RoomDatabase
 )
 abstract class AppLDatabase : RoomDatabase() {
     abstract fun postJsonDao(): PostJsonDao
+    abstract fun postJsonRamDao(): PostJsonRamDao
 }

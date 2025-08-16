@@ -1,4 +1,4 @@
-package com.client.xvideos.l.ui.screens.screenAlbumList.molecule.filter
+package com.client.xvideos.l.model
 
 //BytopRated
 //"display":"rating_14_days

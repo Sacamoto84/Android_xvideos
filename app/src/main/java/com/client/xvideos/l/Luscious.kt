@@ -26,7 +26,8 @@ class Luscious(
         maxRetries = maxRetries,
         retryStatusCodes = retryStatusCodes,
         backoffFactor = backoffFactor,
-        dao = db.postJsonDao()
+        dao = db.postJsonDao(),
+        daoRam = db.postJsonRamDao()
     )
 
     var loggedIn: Boolean = false

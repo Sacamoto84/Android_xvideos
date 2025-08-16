@@ -6,6 +6,7 @@ import android.os.Build
 import android.preference.PreferenceManager
 import com.client.common.sharedPref.Settings
 import com.client.xvideos.PermissionScreenActivity.PermissionStorage
+import com.client.xvideos.l.db.AppLDatabase
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory
 import com.redgifs.common.block.BlockRed
@@ -71,6 +72,10 @@ class App : Application() {
     @Inject
     lateinit var savedRed: javax.inject.Provider<SavedRed>
 
+    @Inject
+    lateinit var dbL: javax.inject.Provider<AppLDatabase>
+
+
     @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate() {
         super.onCreate()
@@ -78,9 +83,9 @@ class App : Application() {
         if (BuildConfig.DEBUG)
             Timber.plant(DebugTree())
 
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) {
-            allowAllSSL()
-        }
+//        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) {
+//            allowAllSSL()
+//        }
 
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
         Settings.init(prefs)
@@ -110,6 +115,7 @@ class App : Application() {
 
             GlobalScope.launch {
                 clearOldCache(redGifsDb.get().cacheMediaResponseDao())
+                dbL.get().postJsonRamDao().deleteAll()
             }
         }
 

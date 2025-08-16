@@ -76,9 +76,6 @@ class ScreenLAlbumList(val idAlbum: Long) : Screen {
         val items = vm.albumList.collectAsStateWithLifecycle().value?.items
         val info = vm.albumList.collectAsStateWithLifecycle().value?.info
 
-
-
-
         Scaffold(
             bottomBar = {
                 Column {
