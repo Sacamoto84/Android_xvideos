@@ -1,8 +1,7 @@
-package com.client.xvideos.l
+package com.client.xvideos.l.net
 
+import com.client.xvideos.l.KtorRequestHandler
 import com.client.xvideos.l.db.AppLDatabase
-import com.client.xvideos.l.ui.screens.screenAlbum.net.Album
-import com.client.xvideos.l.ui.screens.screenAlbumList.net.AlbumListImpl
 import kotlinx.coroutines.CoroutineScope
 
 class Luscious(
@@ -94,6 +93,10 @@ class Luscious(
 
     fun getAlbumList(): AlbumListImpl {
         return AlbumListImpl(handler, scope)
+    }
+
+    fun getAlbumTopHits(): AlbumTopHitsImpl {
+        return AlbumTopHitsImpl(handler, scope)
     }
 
 }

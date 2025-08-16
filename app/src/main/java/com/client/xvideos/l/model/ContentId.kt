@@ -10,7 +10,7 @@ package com.client.xvideos.l.model
  * Non-Erotic 5
  * Real People 6
  */
-enum class ContentTypeOptions(val value: Int) {
+enum class ContentId(val value: Int) {
     All(0),
     Hentai(2),
     NonErotic(5),

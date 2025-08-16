@@ -1,4 +1,4 @@
-package com.client.xvideos.l.graphQl
+package com.client.xvideos.l.net.graphQl
 
 import com.google.gson.Gson
 

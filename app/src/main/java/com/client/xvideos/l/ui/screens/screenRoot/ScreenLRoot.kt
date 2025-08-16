@@ -9,7 +9,7 @@ import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
-import com.client.xvideos.l.Luscious
+import com.client.xvideos.l.net.Luscious
 import com.client.xvideos.l.ThemeL
 import dagger.Binds
 import dagger.Module

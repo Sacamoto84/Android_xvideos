@@ -1,8 +1,7 @@
-package com.client.xvideos.l.ui.screens.screenAlbum.net
+package com.client.xvideos.l.net
 
 import com.client.xvideos.l.KtorRequestHandler
-import com.client.xvideos.l.Luscious
-import com.client.xvideos.l.graphQl.getAlbumInfo
+import com.client.xvideos.l.net.graphQl.getAlbumInfo
 import com.google.gson.Gson
 import com.google.gson.JsonParser
 import com.google.gson.annotations.SerializedName

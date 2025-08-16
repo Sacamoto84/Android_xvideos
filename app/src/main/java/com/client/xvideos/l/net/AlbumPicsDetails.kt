@@ -1,12 +1,11 @@
-package com.client.xvideos.l.ui.screens.screenAlbum.net
+package com.client.xvideos.l.net
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.setValue
 import com.client.xvideos.l.KtorRequestHandler
-import com.client.xvideos.l.Luscious
-import com.client.xvideos.l.graphQl.getPicturesJson
+import com.client.xvideos.l.net.graphQl.getPicturesJson
 import com.google.gson.Gson
 import com.google.gson.JsonParser
 import kotlinx.coroutines.Dispatchers

@@ -5,7 +5,7 @@ import androidx.room.Room
 import com.client.common.AppPath
 import com.client.common.di.ApplicationScope
 import com.client.xvideos.BuildConfig
-import com.client.xvideos.l.Luscious
+import com.client.xvideos.l.net.Luscious
 import com.client.xvideos.l.db.AppLDatabase
 import com.redgifs.db.AppRedGifsDatabase
 import dagger.Module

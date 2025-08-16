@@ -31,6 +31,7 @@ import com.client.common.util.KeepScreenOn
 import com.client.xvideos.PermissionScreenActivity.PermissionStorage
 import com.client.xvideos.l.ui.screens.screenAlbum.ScreenLAlbum
 import com.client.xvideos.l.ui.screens.screenAlbumList.ScreenLAlbumList
+import com.client.xvideos.l.ui.screens.screenAlbumTopHits.ScreenLAlbumTopHits
 import com.client.xvideos.screens.videoplayer.video.cache.VideoPlayerCacheManager
 import com.client.xvideos.ui.theme.XvideosTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -120,7 +121,8 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
                     //Navigator(startScreen, key = "1")
                     //Navigator(ScreenRedRoot())
                     //Navigator( screen = ScreenLAlbum(556543))
-                    Navigator( screen = ScreenLAlbumList(556543))
+                    //Navigator( screen = ScreenLAlbumList(556543))
+                    Navigator( screen = ScreenLAlbumTopHits())
                 }
 
             }

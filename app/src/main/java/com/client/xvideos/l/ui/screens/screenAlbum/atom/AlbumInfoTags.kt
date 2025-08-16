@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.dp
 import com.client.common.util.capitalizeEachWord
 import com.client.common.util.toPrettyCountInt
 import com.client.xvideos.l.ThemeL
-import com.client.xvideos.l.ui.screens.screenAlbum.net.AlbumDetails
+import com.client.xvideos.l.net.AlbumDetails
 
 @Composable
 fun AlbumInfoTags(parsed: AlbumDetails) {

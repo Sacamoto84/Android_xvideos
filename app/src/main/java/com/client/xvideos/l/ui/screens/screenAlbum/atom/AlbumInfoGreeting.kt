@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.font.FontWeight
-import com.client.xvideos.l.ui.screens.screenAlbum.net.AlbumDetails
+import com.client.xvideos.l.net.AlbumDetails
 import com.client.xvideos.l.ThemeL
 
 @Composable
