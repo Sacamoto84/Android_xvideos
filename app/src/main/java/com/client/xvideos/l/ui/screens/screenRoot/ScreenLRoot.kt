@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,10 +31,15 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -76,16 +82,24 @@ class ScreenLRoot() : Screen {
         val drawerState = rememberDrawerState(DrawerValue.Closed)
         val scope = rememberCoroutineScope()
 
-        LaunchedEffect(mediaCategories) {
-
-        }
+        var selectIndexDrawer by remember { mutableStateOf(SelectIndex.Unselect) }
 
         Scaffold(
             bottomBar = {
                 ScreenLRootBottomNavigator(
-                    onClickOpenDrawer = {
+                    selectIndexDrawer,
+                    onSelected = {
+                        selectIndexDrawer = it
                         scope.launch {
-                            if (drawerState.isClosed) drawerState.open() else drawerState.close()
+                            if (drawerState.isClosed) {
+                                selectIndexDrawer = it
+                                drawerState.open()
+                            } else {
+                                drawerState.close()
+                                selectIndexDrawer = it
+                                drawerState.open()
+                            }
+
                         }
                     }
                 )
@@ -104,28 +118,14 @@ class ScreenLRoot() : Screen {
                         drawerContainerColor = ThemeL.grey6 // для примера
                     ) {
 
-                        if (mediaCategories != null) {
-                            val a =
-                                mediaCategories?.genres//?//.filter { it.onlyContent?.id == "2" || it.onlyContent == null }
-                                    ?: emptyList()
-                            LazyColumn {
-                                items(a) {
-                                    Text(
-                                        it.title,
-                                        fontSize = 16.sp,
-                                        color = ThemeL.textColor,
-                                        modifier = Modifier
-                                            .padding(vertical = 4.dp)
-                                            .clickable(
-                                                onClick = {
-
-                                                }
-                                            )
-
-                                    )
-                                }
-                            }
+                        when (selectIndexDrawer) {
+                            SelectIndex.Default -> DrawerContentDefault()
+                            SelectIndex.Manga -> DrawerContentManga()
+                            SelectIndex.Hentai -> DrawerContentHentai()
+                            SelectIndex.Porn -> DrawerContentPorn()
+                            else -> {}
                         }
+
 
 //                        Column {
 //
@@ -163,11 +163,79 @@ class ScreenLRoot() : Screen {
 
 }
 
+enum class SelectIndex(val value: Int) {
+    Unselect(-1),
+    Default(0),
+    Manga(1),
+    Hentai(2),
+    Porn(3)
+}
+
+
+@Composable
+fun DrawerContentDefault() {
+
+
+}
+
+@Composable
+fun DrawerContentManga() {
+
+}
+
+@Composable
+fun DrawerContentHentai() {
+    if (mediaCategories != null) {
+        val a =
+            mediaCategories?.genres?.filter { it.onlyContent?.id == "2" || it.onlyContent == null }
+                ?: emptyList()
+        LazyColumn {
+            items(a) {
+                Text(
+                    it.title,
+                    fontSize = 16.sp,
+                    color = ThemeL.textColor,
+                    modifier = Modifier
+                        .padding(vertical = 4.dp)
+                        .clickable(onClick = { })
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun DrawerContentPorn() {
+    if (mediaCategories != null) {
+        val a =
+            mediaCategories?.genres?.filter { it.onlyContent?.id == "6" || it.onlyContent == null }
+                ?: emptyList()
+        LazyColumn {
+            items(a) {
+                Text(
+                    it.title,
+                    fontSize = 16.sp,
+                    color = ThemeL.textColor,
+                    modifier = Modifier
+                        .padding(vertical = 4.dp)
+                        .clickable(onClick = { })
+                )
+            }
+        }
+    }
+}
+
+
 @Composable
 fun ScreenLRootBottomNavigator(
-    onClickOpenDrawer: () -> Unit = {},
+    selectIndex: SelectIndex,
+    onSelected: (SelectIndex) -> Unit
+) {
 
-    ) {
+    val haptic = LocalHapticFeedback.current
+
+    val colorSelect = ThemeL.grey2
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -181,18 +249,102 @@ fun ScreenLRootBottomNavigator(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
 
-            Box(modifier = Modifier.height(46.dp).weight(1f).clickable(onClick = onClickOpenDrawer), contentAlignment = Alignment.Center) {
-                Icon( Icons.Filled.Menu, contentDescription = null, tint = ThemeL.textColor )
+            Box(
+                modifier = Modifier
+                    .height(46.dp)
+                    .weight(1f)
+                    .background(if (selectIndex == SelectIndex.Default) colorSelect else Color.Transparent)
+                    .combinedClickable(
+                        onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            onSelected(SelectIndex.Default)
+                        },
+                        onLongClick = {
+
+                        }
+                    )
+                , contentAlignment = Alignment.Center
+            ) {
+                Icon(Icons.Filled.Menu, contentDescription = null, tint = ThemeL.textColor)
             }
             VerticalDivider()
-            Box( modifier = Modifier.height(46.dp).weight(1f), contentAlignment = Alignment.Center)
-            { Text("Manga", color = ThemeL.textColor, fontSize = 16.sp, fontFamily = ThemeL.fontFamilyKarla) }
+            Box(
+                modifier = Modifier
+                    .height(46.dp)
+                    .weight(1f)
+                    .background(if (selectIndex == SelectIndex.Manga) colorSelect else Color.Transparent)
+                    .combinedClickable(
+                        onClick = {
+
+                        },
+                        onLongClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            onSelected(SelectIndex.Manga)
+                        }
+                    ),
+
+
+
+                contentAlignment = Alignment.Center
+            )
+            {
+                Text(
+                    "Manga",
+                    color = ThemeL.textColor,
+                    fontSize = 16.sp,
+                    fontFamily = ThemeL.fontFamilyKarla
+                )
+            }
             VerticalDivider()
-            Box( modifier = Modifier.height(46.dp).weight(1f), contentAlignment = Alignment.Center)
-            { Text("Hentai", color = ThemeL.textColor, fontSize = 16.sp, fontFamily = ThemeL.fontFamilyKarla) }
+            Box(
+                modifier = Modifier
+                    .height(46.dp)
+                    .weight(1f)
+                    .background(if (selectIndex == SelectIndex.Hentai) colorSelect else Color.Transparent)
+                    .combinedClickable(
+                        onClick = {
+
+                        },
+                        onLongClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            onSelected(SelectIndex.Hentai)
+                        }
+                    ),
+                contentAlignment = Alignment.Center
+            )
+            {
+                Text(
+                    "Hentai",
+                    color = ThemeL.textColor,
+                    fontSize = 16.sp,
+                    fontFamily = ThemeL.fontFamilyKarla
+                )
+            }
             VerticalDivider()
-            Box( modifier = Modifier.height(46.dp).weight(1f), contentAlignment = Alignment.Center)
-            { Text("Porn", color = ThemeL.textColor, fontSize = 16.sp, fontFamily = ThemeL.fontFamilyKarla) }
+            Box(
+                modifier = Modifier
+                    .height(46.dp)
+                    .weight(1f)
+                    .background(if (selectIndex == SelectIndex.Porn) colorSelect else Color.Transparent)
+                    .combinedClickable(
+                        onClick = {
+
+                        },
+                        onLongClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            onSelected(SelectIndex.Porn)
+                        }
+                    ),
+                contentAlignment = Alignment.Center
+            )
+            {
+                Text(
+                    "Porn",
+                    color = ThemeL.textColor,
+                    fontSize = 16.sp,
+                    fontFamily = ThemeL.fontFamilyKarla
+                )
+            }
 
         }
 
