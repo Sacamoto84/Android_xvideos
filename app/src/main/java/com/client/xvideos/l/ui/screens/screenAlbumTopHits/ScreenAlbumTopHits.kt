@@ -1,7 +1,28 @@
 package com.client.xvideos.l.ui.screens.screenAlbumTopHits
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.screen.Screen
@@ -12,10 +33,11 @@ import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.client.xvideos.l.net.AlbumListImpl
+import com.client.xvideos.l.ThemeL
 import com.client.xvideos.l.net.AlbumTopHitsImpl
 import com.client.xvideos.l.net.Luscious
-import com.client.xvideos.l.ui.screens.screenAlbumList.ScreenLAlbumListSM
+import com.client.xvideos.l.ui.screens.screenAlbum.ScreenLAlbum
+import com.client.xvideos.l.ui.screens.screenAlbumList.atom.AlbumListItem
 import dagger.Binds
 import dagger.Module
 import dagger.assisted.Assisted
@@ -29,7 +51,6 @@ import kotlinx.coroutines.launch
 import net.engawapg.lib.zoomable.ExperimentalZoomableApi
 
 
-
 class ScreenLAlbumTopHits() : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
@@ -41,16 +62,62 @@ class ScreenLAlbumTopHits() : Screen {
 
         val navigator = LocalNavigator.currentOrThrow
 
-        val vm = getScreenModel<ScreenLAlbumTopHitsSM, ScreenLAlbumTopHitsSM.Factory> { factory ->  factory.create(0) }
+        val vm = getScreenModel<ScreenLAlbumTopHitsSM, ScreenLAlbumTopHitsSM.Factory> { factory ->
+            factory.create(0)
+        }
 
+        val items = vm.albumTopHits.collectAsState().value?.items
 
+        Scaffold(
+            containerColor = ThemeL.greyBackground,
+        ) {
 
+            LazyColumn(state = rememberLazyListState()) {
 
+                items(items?.size ?: 0) { index ->
+                    val item = items?.get(index)
+                    if (item == null) return@items
 
+                    Text(
+                        item.title,
+                        color = ThemeL.textColor,
+                        fontSize = 24.sp,
+                        fontFamily = ThemeL.fontFamilyKarla,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(start = 4.dp, top = 16.dp)
+                    )
 
+                    LazyHorizontalGrid(
+                        rows = GridCells.Fixed(2),
+                        modifier = Modifier.height(360.dp)
+                    ) {
+                        items(items = item.items) {
+                            Box(modifier = Modifier.padding(horizontal = 2.dp)) {
+                                AlbumListItem( item = it, onClick = { navigator.push(ScreenLAlbum(it.id.toLong())) })
+                            }
+                        }
+                    }
 
+                    Box( modifier = Modifier
+                        .padding(top = 4.dp)
+                        .padding(horizontal = 4.dp)
+                        .fillMaxWidth()
+                        .height(32.dp)
+                        .border(1.dp, ThemeL.grey3, RoundedCornerShape(8.dp)),contentAlignment = Alignment.Center) {
+                        Text(
+                            "See All >",
+                            color = ThemeL.textColor,
+                            modifier = Modifier,
+                            textAlign = TextAlign.Center,
+                            fontSize = 20.sp,
+                            fontFamily = ThemeL.fontFamilyKarla,
+                            fontWeight = FontWeight.Medium,
+                        )
+                    }
+                }
+            }
+        }
     }
-
 }
 
 class ScreenLAlbumTopHitsSM @AssistedInject constructor(
@@ -67,15 +134,14 @@ class ScreenLAlbumTopHitsSM @AssistedInject constructor(
 
     init {
         screenModelScope.launch {
-            if (!luscious.loggedIn) { luscious.login() }
+            if (!luscious.loggedIn) {
+                luscious.login()
+            }
             albumTopHits.value = luscious.getAlbumTopHits()
-            albumTopHits.value?.getAlbumTopHits()
-            //albumList.value?.getAlbumList(1)
         }
     }
 
 }
-
 
 
 @Module

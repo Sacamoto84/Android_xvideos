@@ -20,12 +20,12 @@ import com.client.common.urlVideImage.UrlImage
 import com.client.xvideos.l.ThemeL
 import com.client.xvideos.l.model.Album
 
-
+//.aspectRatio(640f/935)
 @Composable
 fun AlbumListItem(item: Album, onClick: () -> Unit = {}) {
 
-    Column(modifier = Modifier.padding(vertical = 2.dp).fillMaxWidth().border(1.dp, ThemeL.grey3).clickable(onClick = onClick)) {
-        UrlImage(item.cover.url, modifier = Modifier.aspectRatio(640f/935).height(200.dp), contentScale = ContentScale.Crop)
+    Column(modifier = Modifier.padding(vertical = 2.dp).width(137.dp).border(1.dp, ThemeL.grey3).clickable(onClick = onClick)) {
+        UrlImage(item.cover.url, modifier = Modifier.width(137.dp).height(200.dp), contentScale = ContentScale.Crop)
 
         Text(item.title.removePrefix(" "), modifier = Modifier, color = ThemeL.textColor, fontFamily = ThemeL.fontFamilyKarla, maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 16.sp)
 

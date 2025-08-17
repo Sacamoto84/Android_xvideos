@@ -2,7 +2,10 @@ package com.client.xvideos.l.net
 
 import com.client.xvideos.l.KtorRequestHandler
 import com.client.xvideos.l.db.AppLDatabase
+import com.client.xvideos.l.net.graphQl.refreshMediaCategories
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class Luscious(
     val scope : CoroutineScope,
@@ -28,6 +31,13 @@ class Luscious(
         dao = db.postJsonDao(),
         daoRam = db.postJsonRamDao()
     )
+
+    init {
+        scope.launch(Dispatchers.Main) {
+            refreshMediaCategories(handler)
+        }
+    }
+
 
     var loggedIn: Boolean = false
         private set
@@ -98,5 +108,8 @@ class Luscious(
     fun getAlbumTopHits(): AlbumTopHitsImpl {
         return AlbumTopHitsImpl(handler, scope)
     }
+
+
+
 
 }

@@ -2,20 +2,24 @@ package com.client.xvideos.l.model
 
 import com.google.gson.annotations.SerializedName
 
-data class AlbumTopHitsResponse(
-    @SerializedName("data")
-    val data: AlbumDataTopHits
+
+data class AlbumListTopHits(
+    @SerializedName("title")
+    val title: String,
+
+    @SerializedName("url")
+    val url: String,
+
+    @SerializedName("count")
+    val count: Int,
+
+    @SerializedName("item_type")
+    val itemType: String,
+
+    @SerializedName("items")
+    val items: List<Album>
 )
 
-data class AlbumDataTopHits(
-    @SerializedName("album")
-    val album: AlbumListWrapperTopHits
-)
-
-data class AlbumListWrapperTopHits(
-    @SerializedName("list_top_hits")
-    val list_top_hits: List<AlbumList>
-)
 
 
 // Корневой класс для JSON
