@@ -1,5 +1,8 @@
 package com.client.xvideos.l.net.graphQl
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import com.client.xvideos.l.KtorRequestHandler
 import com.client.xvideos.l.net.Luscious
 import com.google.gson.Gson
@@ -9,7 +12,7 @@ import timber.log.Timber
 private val mediaCategoriesBootstrap =
     """{"operationName":"MediaCategoriesBootstrap","query":"\n    query MediaCategoriesBootstrap {\n  media_categories {\n    genres {\n      id\n      title\n      slug\n      description\n      uploading_rules\n      poster_url\n      acts_as_warning\n      acts_as_default\n      represents_uncategorized\n      url\n      parent {\n        id\n      }\n      only_allows_model\n      only_content {\n        id\n        title\n        url\n      }\n    }\n    filter_settings {\n      user_id\n      has_custom_filters\n      uses_default_warnings\n      audience_ids\n      genres_blocked_ids\n      genres_subscribed_ids\n      preferred_language_ids\n      default_dashboard_content_id\n    }\n    languages {\n      id\n      title\n      url\n    }\n    content_types {\n      id\n      title\n      url\n    }\n    audiences {\n      id\n      title\n      description\n      poster_url\n      url\n    }\n  }\n}\n    ","variables":{}}"""
 
-lateinit var mediaCategories: MediaCategories
+var mediaCategories by mutableStateOf<MediaCategories?>(null)
 
 suspend fun refreshMediaCategories(handler: KtorRequestHandler) {
     Timber.i("!!! refreshMediaCategories")
