@@ -80,31 +80,10 @@ class ScreenLRoot() : Screen {
         //val vm: ScreenLRootSM = getScreenModel()
 
         val drawerState = rememberDrawerState(DrawerValue.Closed)
-        val scope = rememberCoroutineScope()
 
-        var selectIndexDrawer by remember { mutableStateOf(SelectIndex.Unselect) }
 
-        Scaffold(
-            bottomBar = {
-                ScreenLRootBottomNavigator(
-                    selectIndexDrawer,
-                    onSelected = {
-                        selectIndexDrawer = it
-                        scope.launch {
-                            if (drawerState.isClosed) {
-                                selectIndexDrawer = it
-                                drawerState.open()
-                            } else {
-                                drawerState.close()
-                                selectIndexDrawer = it
-                                drawerState.open()
-                            }
 
-                        }
-                    }
-                )
-            },
-            containerColor = ThemeL.greyBackground
+        Scaffold( containerColor = ThemeL.greyBackground
         ) { paddingValues ->
 
             ModalNavigationDrawer(
@@ -117,14 +96,14 @@ class ScreenLRoot() : Screen {
                             .padding(bottom = paddingValues.calculateBottomPadding()), // 👈 фиксированная ширина
                         drawerContainerColor = ThemeL.grey6 // для примера
                     ) {
-
-                        when (selectIndexDrawer) {
-                            SelectIndex.Default -> DrawerContentDefault()
-                            SelectIndex.Manga -> DrawerContentManga()
-                            SelectIndex.Hentai -> DrawerContentHentai()
-                            SelectIndex.Porn -> DrawerContentPorn()
-                            else -> {}
-                        }
+//
+//                        when (selectIndexDrawer) {
+//                            SelectIndex.Default -> DrawerContentDefault()
+//                            SelectIndex.Manga -> DrawerContentManga()
+//                            SelectIndex.Hentai -> DrawerContentHentai()
+//                            SelectIndex.Porn -> DrawerContentPorn()
+//                            else -> {}
+//                        }
 
 
 //                        Column {
@@ -171,198 +150,3 @@ enum class SelectIndex(val value: Int) {
     Porn(3)
 }
 
-
-@Composable
-fun DrawerContentDefault() {
-
-
-}
-
-@Composable
-fun DrawerContentManga() {
-
-}
-
-@Composable
-fun DrawerContentHentai() {
-    if (mediaCategories != null) {
-        val a =
-            mediaCategories?.genres?.filter { it.onlyContent?.id == "2" || it.onlyContent == null }
-                ?: emptyList()
-        LazyColumn {
-            items(a) {
-                Text(
-                    it.title,
-                    fontSize = 16.sp,
-                    color = ThemeL.textColor,
-                    modifier = Modifier
-                        .padding(vertical = 4.dp)
-                        .clickable(onClick = { })
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun DrawerContentPorn() {
-    if (mediaCategories != null) {
-        val a =
-            mediaCategories?.genres?.filter { it.onlyContent?.id == "6" || it.onlyContent == null }
-                ?: emptyList()
-        LazyColumn {
-            items(a) {
-                Text(
-                    it.title,
-                    fontSize = 16.sp,
-                    color = ThemeL.textColor,
-                    modifier = Modifier
-                        .padding(vertical = 4.dp)
-                        .clickable(onClick = { })
-                )
-            }
-        }
-    }
-}
-
-
-@Composable
-fun ScreenLRootBottomNavigator(
-    selectIndex: SelectIndex,
-    onSelected: (SelectIndex) -> Unit
-) {
-
-    val haptic = LocalHapticFeedback.current
-
-    val colorSelect = ThemeL.grey2
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(48.dp)
-            .background(ThemeL.grey4),
-    ) {
-
-        Row(
-            modifier = Modifier.fillMaxSize(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-
-            Box(
-                modifier = Modifier
-                    .height(46.dp)
-                    .weight(1f)
-                    .background(if (selectIndex == SelectIndex.Default) colorSelect else Color.Transparent)
-                    .combinedClickable(
-                        onClick = {
-                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                            onSelected(SelectIndex.Default)
-                        },
-                        onLongClick = {
-
-                        }
-                    )
-                , contentAlignment = Alignment.Center
-            ) {
-                Icon(Icons.Filled.Menu, contentDescription = null, tint = ThemeL.textColor)
-            }
-            VerticalDivider()
-            Box(
-                modifier = Modifier
-                    .height(46.dp)
-                    .weight(1f)
-                    .background(if (selectIndex == SelectIndex.Manga) colorSelect else Color.Transparent)
-                    .combinedClickable(
-                        onClick = {
-
-                        },
-                        onLongClick = {
-                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                            onSelected(SelectIndex.Manga)
-                        }
-                    ),
-
-
-
-                contentAlignment = Alignment.Center
-            )
-            {
-                Text(
-                    "Manga",
-                    color = ThemeL.textColor,
-                    fontSize = 16.sp,
-                    fontFamily = ThemeL.fontFamilyKarla
-                )
-            }
-            VerticalDivider()
-            Box(
-                modifier = Modifier
-                    .height(46.dp)
-                    .weight(1f)
-                    .background(if (selectIndex == SelectIndex.Hentai) colorSelect else Color.Transparent)
-                    .combinedClickable(
-                        onClick = {
-
-                        },
-                        onLongClick = {
-                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                            onSelected(SelectIndex.Hentai)
-                        }
-                    ),
-                contentAlignment = Alignment.Center
-            )
-            {
-                Text(
-                    "Hentai",
-                    color = ThemeL.textColor,
-                    fontSize = 16.sp,
-                    fontFamily = ThemeL.fontFamilyKarla
-                )
-            }
-            VerticalDivider()
-            Box(
-                modifier = Modifier
-                    .height(46.dp)
-                    .weight(1f)
-                    .background(if (selectIndex == SelectIndex.Porn) colorSelect else Color.Transparent)
-                    .combinedClickable(
-                        onClick = {
-
-                        },
-                        onLongClick = {
-                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                            onSelected(SelectIndex.Porn)
-                        }
-                    ),
-                contentAlignment = Alignment.Center
-            )
-            {
-                Text(
-                    "Porn",
-                    color = ThemeL.textColor,
-                    fontSize = 16.sp,
-                    fontFamily = ThemeL.fontFamilyKarla
-                )
-            }
-
-        }
-
-    }
-}
-
-
-//class ScreenLRootSM @Inject constructor(
-//    val luscious: Luscious
-//) : ScreenModel {
-//
-//}
-
-//@Module
-//@InstallIn(SingletonComponent::class)
-//abstract class ScreenModuleLRootBlock {
-//    @Binds
-//    @IntoMap
-//    @ScreenModelKey(ScreenLRootSM::class)
-//    abstract fun bindScreenLRootScreenModel(hiltListScreenModel: ScreenLRootSM): ScreenModel
-//}
