@@ -8,7 +8,10 @@ import com.client.xvideos.l.KtorRequestHandler
 import com.client.xvideos.l.net.graphQl.getAlbumListGraphQL
 import com.client.xvideos.l.model.Album
 import com.client.xvideos.l.model.AlbumResponse
+import com.client.xvideos.l.model.AlbumType
 import com.client.xvideos.l.model.FacetCollectionInfo
+import com.client.xvideos.l.net.graphQl.AlbumListFilter
+import com.client.xvideos.l.net.graphQl.getAlbumListGraphQL1
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -36,7 +39,15 @@ class AlbumListImpl(
     suspend fun getAlbumList(id: Int) {
 
         Timber.i("!!! getAlbumList $id")
-        val q = getAlbumListGraphQL(id)
+        //val q = getAlbumListGraphQL(id)
+
+        val q  = getAlbumListGraphQL1(
+            id,
+            AlbumListFilter(
+                album_type = AlbumType.Manga,
+            )
+        )
+
         val res = handler?.postJsonCachedRam(Luscious.Companion.API, q)
         val gson = Gson()
         val a = gson.fromJson(res, AlbumResponse::class.java)
