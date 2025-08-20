@@ -3,12 +3,25 @@ package com.client.xvideos.l.net.graphQl
 import com.client.xvideos.l.model.AlbumType
 
 
+enum class PictureCountRank(val count: Int){
+    all(-1),
+    c0_25(0),       //0 to 25
+    c25_50(1),      //25 to 50
+    c50_100(2),     //50 to 100
+    c100_200(3),    //100 to 200
+    c200_800(4),    //200 to 800
+    c800_3200(5),   //800 to 3200
+    c3200_12800(6), //3200 to 12800
+}
+
+
 data class AlbumListFilter(
     val display: String = "rating_14_days",
     val album_type: AlbumType = AlbumType.All, //manga pictures или все при отсуствии
     val audienceIds: String = "+1+10+12+2+3+5+6+8+9",
     val languageIds: String = "+1+100+101+2+3+4+5+6+7+8+9+99", //Все языки
-    val itemsPerPage: Int = 30
+    val itemsPerPage: Int = 30,
+    val picture_count_rank : PictureCountRank = PictureCountRank.all,
 )
 
 fun getAlbumListGraphQL1(
@@ -82,6 +95,10 @@ fun getAlbumListGraphQL1(
         str.append("""{ "name": "album_type", "value": "${filter.album_type.value}" },""")
     }
 
+
+    if (filter.picture_count_rank != PictureCountRank.all) {
+        str.append("""{ "name": "picture_count_rank", "value": "${filter.picture_count_rank.count}" },""")
+    }
 
     str.append("""{ "name": "audience_ids", "value": "${filter.audienceIds}" },""")
 
