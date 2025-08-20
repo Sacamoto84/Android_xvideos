@@ -23,6 +23,8 @@ class AlbumListImpl(
     val scope: CoroutineScope,
 ) {
 
+    var filter by mutableStateOf( AlbumListFilter() )
+
     var info by mutableStateOf(
         FacetCollectionInfo(
             page = -1,
@@ -41,12 +43,7 @@ class AlbumListImpl(
         Timber.i("!!! getAlbumList $id")
         //val q = getAlbumListGraphQL(id)
 
-        val q  = getAlbumListGraphQL1(
-            id,
-            AlbumListFilter(
-                album_type = AlbumType.Manga,
-            )
-        )
+        val q  = getAlbumListGraphQL1( id, filter )
 
         val res = handler?.postJsonCachedRam(Luscious.Companion.API, q)
         val gson = Gson()

@@ -2,6 +2,7 @@ package com.client.xvideos.l.ui.screens.screenAlbumList.molecule.filter.atom
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -47,19 +48,22 @@ import com.redgifs.common.ThemeRed
 @Preview(showSystemUi = false, showBackground = false)
 @Composable
 fun PreviewAlbumFilterDisplay() {
-
-    val select by remember { mutableStateOf(albumFilterDisplay[0]) }
-    AlbumFilterDisplay(albumFilterDisplay, select, {})
+    val select by remember { mutableStateOf("alpha_a") }
+    AlbumFilterDisplay(select, onRequestApply = {})
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AlbumFilterDisplay(list: List<DataAlbumFilterDisplay>, selected: DataAlbumFilterDisplay, onRequest : (String)-> Unit) {
+fun AlbumFilterDisplay(startString: String, onRequestApply: (String) -> Unit) {
 
-    val uniquePrimaryList = list.map { it.primary }.distinct()
+    val list = albumFilterDisplay
+
+    val uniquePrimaryList = albumFilterDisplay.map { it.primary }.distinct()
 
     var expanded by remember { mutableStateOf(false) }
     var expanded2 by remember { mutableStateOf(false) }
+
+    var selected by remember { mutableStateOf(list.first { it.request == startString }) }
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -93,7 +97,11 @@ fun AlbumFilterDisplay(list: List<DataAlbumFilterDisplay>, selected: DataAlbumFi
                         fontSize = 16.sp
                     )
                 )
-                Icon(Icons.Default.ArrowDropDown, contentDescription = null, tint = ThemeL.textColor)
+                Icon(
+                    Icons.Default.ArrowDropDown,
+                    contentDescription = null,
+                    tint = ThemeL.textColor
+                )
             }
 
             ExposedDropdownMenu(
@@ -104,9 +112,15 @@ fun AlbumFilterDisplay(list: List<DataAlbumFilterDisplay>, selected: DataAlbumFi
                 uniquePrimaryList.forEach { item ->
                     DropdownMenuItem(
                         text = {
-                            Text(item, color = ThemeL.textColor, fontFamily = ThemeL.fontFamilyKarla, fontSize = 16.sp)
+                            Text(
+                                item,
+                                color = ThemeL.textColor,
+                                fontFamily = ThemeL.fontFamilyKarla,
+                                fontSize = 16.sp
+                            )
                         },
                         onClick = {
+                            selected = list.first{it.primary == item}
                             expanded = false
                         }
                     )
@@ -144,7 +158,11 @@ fun AlbumFilterDisplay(list: List<DataAlbumFilterDisplay>, selected: DataAlbumFi
                         fontSize = 16.sp
                     )
                 )
-                Icon(Icons.Default.ArrowDropDown, contentDescription = null, tint = ThemeL.textColor)
+                Icon(
+                    Icons.Default.ArrowDropDown,
+                    contentDescription = null,
+                    tint = ThemeL.textColor
+                )
             }
 
             ExposedDropdownMenu(
@@ -156,9 +174,17 @@ fun AlbumFilterDisplay(list: List<DataAlbumFilterDisplay>, selected: DataAlbumFi
                 items.forEach { item ->
                     DropdownMenuItem(
                         text = {
-                            Text(item.secondary, color = ThemeL.textColor, fontFamily = ThemeL.fontFamilyKarla, fontSize = 16.sp, maxLines = 1)
+                            Text(
+                                item.secondary,
+                                color = ThemeL.textColor,
+                                fontFamily = ThemeL.fontFamilyKarla,
+                                fontSize = 16.sp,
+                                maxLines = 1
+                            )
                         },
                         onClick = {
+                            selected = list.first{it.secondary == item.secondary}
+
                             expanded2 = false
                         }
                     )
@@ -175,7 +201,8 @@ fun AlbumFilterDisplay(list: List<DataAlbumFilterDisplay>, selected: DataAlbumFi
                 .height(43.dp)
                 .clip(RoundedCornerShape(4.dp))
                 .border(1.dp, ThemeL.grey5, RoundedCornerShape(4.dp))
-                .background(ThemeL.red),
+                .background(ThemeL.red)
+                .clickable(onClick = { onRequestApply(selected.request) }),
             contentAlignment = Alignment.Center
         ) {
             Text("Apply", color = Color.White, fontSize = 20.sp)

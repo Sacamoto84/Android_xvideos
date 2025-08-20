@@ -118,6 +118,7 @@ dependencies {
     implementation libs.volley
     implementation libs.androidx.animation.core
     implementation libs.ui
+    implementation libs.androidx.foundation.layout
 
     //implementation libs.firebase.auth
     //implementation libs.firebase.firestore.ktx

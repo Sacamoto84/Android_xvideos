@@ -11,8 +11,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -32,6 +38,7 @@ import com.client.xvideos.l.ui.screens.screenAlbum.ScreenLAlbum
 import com.client.xvideos.l.ui.screens.screenAlbumList.atom.AlbumListItem
 import com.client.xvideos.l.ui.screens.screenAlbumList.atom.AlbumListPageSelector
 import com.client.xvideos.l.net.AlbumListImpl
+import com.client.xvideos.l.ui.screens.screenAlbumList.molecule.filter.AlbumListFilter
 import dagger.Binds
 import dagger.Module
 import dagger.assisted.Assisted
@@ -64,6 +71,10 @@ class ScreenLAlbumList(val idAlbum: Long) : Screen {
         val items = vm.albumList.collectAsStateWithLifecycle().value?.items
         val info = vm.albumList.collectAsStateWithLifecycle().value?.info
 
+        val filter = vm.albumList.collectAsStateWithLifecycle().value?.filter
+
+        var visibleFilter by remember { mutableStateOf(false) }
+
         Scaffold(
             bottomBar = {
                 Column {
@@ -73,10 +84,16 @@ class ScreenLAlbumList(val idAlbum: Long) : Screen {
                             .height(48.dp)
                             .background(ThemeL.grey7)
                     ) {
+                        Button(onClick = {
+                            visibleFilter = !visibleFilter
+                        }) {
+                            Text("Filter")
+                        }
                     }
                 }
             }, containerColor = ThemeL.greyBackground
         ) { padding ->
+
 
 
             LazyVerticalGrid(
@@ -100,22 +117,24 @@ class ScreenLAlbumList(val idAlbum: Long) : Screen {
                 }
 
                 items(items?.size ?: 0) { index ->
-
                     val item = items?.get(index)
                     if (item != null) {
                         AlbumListItem(item){
                             navigator.push(ScreenLAlbum(item.id.toLong()))
                         }
                     }
-
                 }
-
-
             }
 
-
+            if (filter != null) {
+                if (visibleFilter) AlbumListFilter(filter, {
+                    vm.albumList.value?.filter = it
+                    vm.screenModelScope.launch {
+                        vm.albumList.value?.getAlbumList(1)
+                    }
+                })
+            }
         }
-
     }
 }
 
