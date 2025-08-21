@@ -17,7 +17,7 @@ enum class PictureCountRank(val count: Int){
 
 data class AlbumListFilter(
     val display: String = "rating_14_days",
-    val album_type: AlbumType = AlbumType.All, //manga pictures или все при отсуствии
+    val album_type: AlbumType = AlbumType.Pictures, //manga pictures или все при отсуствии
     val audienceIds: String = "+1+10+12+2+3+5+6+8+9",
     val languageIds: String = "+1+100+101+2+3+4+5+6+7+8+9+99", //Все языки
     val itemsPerPage: Int = 30,

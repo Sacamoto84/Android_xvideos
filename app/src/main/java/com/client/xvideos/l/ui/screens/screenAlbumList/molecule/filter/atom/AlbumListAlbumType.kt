@@ -28,7 +28,9 @@ fun AlbumListAlbumType(onChange: (Int) -> Unit) {
         options.forEachIndexed { index, label ->
             SegmentedButton(
                 colors = SegmentedButtonDefaults.colors(
-                    activeContainerColor = ThemeL.grey4
+                    activeContainerColor = ThemeL.grey4,
+                    activeBorderColor = ThemeL.grey3,
+                    inactiveBorderColor = ThemeL.grey3,
                 ),
 
                 shape = SegmentedButtonDefaults.itemShape(

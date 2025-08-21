@@ -38,6 +38,7 @@ import com.client.xvideos.l.model.AlbumType
 import com.client.xvideos.l.net.graphQl.AlbumListFilter
 import com.client.xvideos.l.ui.screens.screenAlbumList.molecule.filter.atom.AlbumFilterDisplay
 import com.client.xvideos.l.ui.screens.screenAlbumList.molecule.filter.atom.AlbumListAlbumType
+import com.client.xvideos.l.ui.screens.screenAlbumList.molecule.filter.atom.AlbumListContentType
 import com.composeunstyled.Disclosure
 import com.composeunstyled.DisclosureHeading
 import com.composeunstyled.DisclosurePanel
@@ -95,5 +96,6 @@ fun AlbumListFilter(filter: AlbumListFilter, onFilterApply: (AlbumListFilter) ->
             onFilterApply(filter.copy(album_type = type))
         }
 
+        AlbumListContentType()
     }
 }
