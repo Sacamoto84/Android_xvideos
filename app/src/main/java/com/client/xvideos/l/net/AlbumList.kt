@@ -5,12 +5,10 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.client.xvideos.l.KtorRequestHandler
-import com.client.xvideos.l.net.graphQl.getAlbumListGraphQL
 import com.client.xvideos.l.model.Album
+import com.client.xvideos.l.model.AlbumListFilter
 import com.client.xvideos.l.model.AlbumResponse
-import com.client.xvideos.l.model.AlbumType
 import com.client.xvideos.l.model.FacetCollectionInfo
-import com.client.xvideos.l.net.graphQl.AlbumListFilter
 import com.client.xvideos.l.net.graphQl.getAlbumListGraphQL1
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope

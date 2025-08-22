@@ -104,7 +104,7 @@ class ScreenLAlbum(val idAlbum : Long) : Screen {
         ) {
 
             LazyVerticalStaggeredGrid(
-                columns = StaggeredGridCells.Fixed(6),
+                columns = StaggeredGridCells.Fixed(2),
                 modifier = Modifier.padding(bottom = it.calculateBottomPadding()).fillMaxSize()
             ) {
 

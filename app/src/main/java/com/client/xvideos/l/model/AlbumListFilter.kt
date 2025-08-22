@@ -1,0 +1,14 @@
+package com.client.xvideos.l.model
+
+data class AlbumListFilter(
+    val display: String = "date_newest",
+    val album_type: AlbumType = AlbumType.Pictures, //manga pictures или все при отсуствии
+    val audienceIds: String = "+1+10+12+2+3+5+6+8+9",
+    val languageIds: String = "+1+100+101+2+3+4+5+6+7+8+9+99", //Все языки
+    val itemsPerPage: Int = 30,
+    val picture_count_rank : PictureCountRank = PictureCountRank.all,
+    val content_id : ContentId = ContentId.All,
+
+    val genresPlus : List<String> = emptyList(),
+    val genresMinus: List<String> = emptyList()
+)
