@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
@@ -32,7 +33,7 @@ private val style = TextStyle(
 
 @Composable
 fun AlbumListFilter(filter: AlbumListFilter, filterGCount: List<AlbumListFilterGenreCountResponse>?, onFilterApply: (AlbumListFilter) -> Unit) {
-    Column(modifier = Modifier.alpha(0.92f).background(ThemeL.grey4)) {
+    Column(modifier = Modifier.alpha(0.95f).background(ThemeL.grey4)) {
 
         Spacer(Modifier.height(48.dp))
 
@@ -59,6 +60,8 @@ fun AlbumListFilter(filter: AlbumListFilter, filterGCount: List<AlbumListFilterG
         AlbumListFilterContentType(filter.content_id) {
             onFilterApply(filter.copy(content_id = it))
         }
+
+        HorizontalDivider()
 
         AlbumListFilterSize(filter.picture_count_rank) {
             onFilterApply(filter.copy(picture_count_rank = it))

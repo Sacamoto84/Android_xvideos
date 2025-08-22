@@ -5,11 +5,14 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
@@ -69,7 +72,7 @@ fun AlbumListFilterSize(value: PictureCountRank, onChanged: (PictureCountRank) -
 
     // --- Первое меню (Primary) ---
 
-    Row(modifier = Modifier. fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+    Row(modifier = Modifier.padding(start = 4.dp). fillMaxWidth(),verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
 
         Text("Album Size", style = style)
 
@@ -82,7 +85,8 @@ fun AlbumListFilterSize(value: PictureCountRank, onChanged: (PictureCountRank) -
         {
             Row(
                 modifier = Modifier
-                    .fillMaxSize() // заполняет всю выделенную ширину
+                    .width(200.dp)
+                    .fillMaxHeight()
                     .clip(RoundedCornerShape(4.dp))
                     .border(1.dp, ThemeL.grey5, RoundedCornerShape(4.dp))
                     .background(ThemeL.grey3)
@@ -93,7 +97,7 @@ fun AlbumListFilterSize(value: PictureCountRank, onChanged: (PictureCountRank) -
 
                 BasicText(
                     a,
-                    modifier = Modifier.padding(start = 4.dp),
+                    modifier = Modifier.padding(start = 8.dp),
                     maxLines = 1,
                     style = TextStyle(
                         color = ThemeL.textColor,
