@@ -32,7 +32,7 @@ private val style = TextStyle(
 
 @Composable
 fun AlbumListFilter(filter: AlbumListFilter, filterGCount: List<AlbumListFilterGenreCountResponse>?, onFilterApply: (AlbumListFilter) -> Unit) {
-    Column(modifier = Modifier.alpha(0.9f).background(ThemeL.grey4)) {
+    Column(modifier = Modifier.alpha(0.92f).background(ThemeL.grey4)) {
 
         Spacer(Modifier.height(48.dp))
 
@@ -60,7 +60,9 @@ fun AlbumListFilter(filter: AlbumListFilter, filterGCount: List<AlbumListFilterG
             onFilterApply(filter.copy(content_id = it))
         }
 
-        AlbumListFilterSize()
+        AlbumListFilterSize(filter.picture_count_rank) {
+            onFilterApply(filter.copy(picture_count_rank = it))
+        }
 
         AlbumListFilterGenres(filter, filterGCount) {
             onFilterApply(it)

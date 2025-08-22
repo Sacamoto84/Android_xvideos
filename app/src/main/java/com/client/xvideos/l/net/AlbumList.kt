@@ -44,6 +44,10 @@ class AlbumListImpl(
 
     val filterGenreStateCount = mutableStateListOf<AlbumListFilterGenreCountResponse>()
 
+    val filterTaggedStateCount = mutableStateListOf<AlbumListFilterGenreCountResponse>()
+
+    val filterPictureCountStateCount = mutableStateListOf<AlbumListFilterGenreCountResponse>()
+
 
     var info by mutableStateOf(
         FacetCollectionInfo(
@@ -71,7 +75,7 @@ class AlbumListImpl(
         val aggregations = get?.get("aggregations")?.asJsonArray
         aggregations
 
-
+        ////
         val indexGenre = aggregations?.mapIndexedNotNull { i, el ->
             val obj = el.asJsonObject
             val shortName = obj.getAsJsonObject("field")?.get("short_name")?.asString
@@ -93,10 +97,68 @@ class AlbumListImpl(
                 Timber.i("!!! getAlbumListAggregations list размер : ${list.size}")
             }
         }
-        else
+        else {
             withContext(Dispatchers.Main) {
                 filterGenreStateCount.clear()
             }
+        }
+        ////
+        val indexTagged = aggregations?.mapIndexedNotNull { i, el ->
+            val obj = el.asJsonObject
+            val shortName = obj.getAsJsonObject("field")?.get("short_name")?.asString
+            if (shortName == "tagged") i else null
+        }
+            ?.firstOrNull()
+
+        if (indexTagged!= null) {
+            val taggedValues = aggregations.get(indexTagged)?.getAsJsonObject()?.get("values")?.asJsonArray
+            val gson = Gson()
+            val list = mutableListOf<AlbumListFilterGenreCountResponse>()
+            taggedValues?.forEach { element ->
+                val pic = gson.fromJson(element, AlbumListFilterGenreCountResponse::class.java)
+                list.add(pic)
+            }
+            withContext(Dispatchers.Main) {
+                filterTaggedStateCount.clear()
+                filterTaggedStateCount.addAll(list)
+                Timber.i("!!! getAlbumListAggregations list Tagged размер : ${list.size}")
+            }
+        }
+        else {
+            withContext(Dispatchers.Main) {
+                filterTaggedStateCount.clear()
+            }
+        }
+        ///
+        val indexPicture = aggregations?.mapIndexedNotNull { i, el ->
+            val obj = el.asJsonObject
+            val shortName = obj.getAsJsonObject("field")?.get("short_name")?.asString
+            if (shortName == "picture_count_rank") i else null
+        }
+            ?.firstOrNull()
+
+        if (indexPicture!= null) {
+            val pictureValues = aggregations.get(indexPicture)?.getAsJsonObject()?.get("values")?.asJsonArray
+            val gson = Gson()
+            val list = mutableListOf<AlbumListFilterGenreCountResponse>()
+            pictureValues?.forEach { element ->
+                val pic = gson.fromJson(element, AlbumListFilterGenreCountResponse::class.java)
+                list.add(pic)
+            }
+            withContext(Dispatchers.Main) {
+                filterPictureCountStateCount.clear()
+                filterPictureCountStateCount.addAll(list)
+                Timber.i("!!! getAlbumListAggregations list filterPictureCountStateCount размер : ${list.size}")
+            }
+        }
+        else {
+            withContext(Dispatchers.Main) {
+                filterPictureCountStateCount.clear()
+            }
+        }
+
+        filterPictureCountStateCount
+
 
     }
 
