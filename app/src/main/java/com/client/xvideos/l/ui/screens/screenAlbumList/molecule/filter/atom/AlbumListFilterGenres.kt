@@ -1,6 +1,5 @@
 package com.client.xvideos.l.ui.screens.screenAlbumList.molecule.filter.atom
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,9 +11,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Color
 import com.client.xvideos.l.ThemeL
 import com.client.xvideos.l.model.AlbumListFilter
+import com.client.xvideos.l.net.graphQl.Genre
 import com.client.xvideos.l.net.graphQl.mediaCategories
 import com.composeunstyled.Icon
 import com.composeunstyled.Text
@@ -32,11 +31,11 @@ fun AlbumListFilterGenres(filter : AlbumListFilter, onChange: (AlbumListFilter) 
 
         LazyColumn {
             items(genresPlus) {
-                Text(it, color = ThemeL.textColor, modifier = Modifier)
+                Text(it.title, color = ThemeL.textColor, modifier = Modifier)
             }
 
             items(genresMinus) {
-                Text("NOT $it", color = ThemeL.textColor, modifier = Modifier)
+                Text("NOT ${it.title}", color = ThemeL.textColor, modifier = Modifier)
             }
         }
 
@@ -51,9 +50,9 @@ fun AlbumListFilterGenres(filter : AlbumListFilter, onChange: (AlbumListFilter) 
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.clickable(onClick = {
-                                val plus = mutableListOf<String>()
+                                val plus = mutableListOf<Genre>()
                                 plus.addAll(genresPlus)
-                                plus.add(item.title)
+                                plus.add(item)
                                 val filter1 = filter.copy(genresPlus = plus)
                                 onChange(filter1)
                             })

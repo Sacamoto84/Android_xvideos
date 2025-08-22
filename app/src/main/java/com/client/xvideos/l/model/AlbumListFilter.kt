@@ -1,5 +1,7 @@
 package com.client.xvideos.l.model
 
+import com.client.xvideos.l.net.graphQl.Genre
+
 data class AlbumListFilter(
     val display: String = "date_newest",
     val album_type: AlbumType = AlbumType.Pictures, //manga pictures или все при отсуствии
@@ -9,6 +11,6 @@ data class AlbumListFilter(
     val picture_count_rank : PictureCountRank = PictureCountRank.all,
     val content_id : ContentId = ContentId.All,
 
-    val genresPlus : List<String> = emptyList(),
-    val genresMinus: List<String> = emptyList()
+    val genresPlus : List<Genre> = emptyList(),
+    val genresMinus: List<Genre> = emptyList()
 )
