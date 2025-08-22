@@ -73,6 +73,8 @@ class ScreenLAlbumList(val idAlbum: Long) : Screen {
 
         val filter = vm.albumList.collectAsStateWithLifecycle().value?.filter
 
+        val filterGCount = vm.albumList.collectAsStateWithLifecycle().value?.filterGenreStateCount
+
         var visibleFilter by remember { mutableStateOf(false) }
 
         Scaffold(
@@ -127,12 +129,13 @@ class ScreenLAlbumList(val idAlbum: Long) : Screen {
             }
 
             if (filter != null) {
-                if (visibleFilter) AlbumListFilter(filter, {
+                if (visibleFilter) AlbumListFilter(filter, filterGCount) {
                     vm.albumList.value?.filter = it
                     vm.screenModelScope.launch {
                         vm.albumList.value?.getAlbumList(1)
+                        vm.albumList.value?.getAlbumListAggregations(1)
                     }
-                })
+                }
             }
         }
     }
@@ -159,12 +162,14 @@ class ScreenLAlbumListSM @AssistedInject constructor(
 
             albumList.value = luscious.getAlbumList()
             albumList.value?.getAlbumList(1)
+            albumList.value?.getAlbumListAggregations(1)
         }
     }
 
     fun loadAlbumList(page: Int) {
         screenModelScope.launch {
             albumList.value?.getAlbumList(page)
+            albumList.value?.getAlbumListAggregations(page)
         }
     }
 

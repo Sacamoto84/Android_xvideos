@@ -16,6 +16,9 @@ object ThemeL {
     val grey6= Color(0xFF262626)
     val grey7= Color(0xFF1c1c1c)
 
+
+    val lavender = Color(0xFFa3aff5)
+
     val primaryColor = Color(0xFFff96a3)
 
     val red = Color(0xFFC9554C)

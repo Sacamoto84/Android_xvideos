@@ -5,7 +5,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -13,6 +15,7 @@ import androidx.compose.ui.unit.sp
 import com.client.xvideos.l.ThemeL
 import com.client.xvideos.l.model.AlbumListFilter
 import com.client.xvideos.l.model.AlbumType
+import com.client.xvideos.l.net.AlbumListFilterGenreCountResponse
 import com.client.xvideos.l.ui.screens.screenAlbumList.molecule.filter.atom.AlbumFilterDisplay
 import com.client.xvideos.l.ui.screens.screenAlbumList.molecule.filter.atom.AlbumListFilterAlbumType
 import com.client.xvideos.l.ui.screens.screenAlbumList.molecule.filter.atom.AlbumListFilterContentType
@@ -28,8 +31,8 @@ private val style = TextStyle(
 
 
 @Composable
-fun AlbumListFilter(filter: AlbumListFilter, onFilterApply: (AlbumListFilter) -> Unit) {
-    Column(modifier = Modifier.background(ThemeL.greyBackground)) {
+fun AlbumListFilter(filter: AlbumListFilter, filterGCount: List<AlbumListFilterGenreCountResponse>?, onFilterApply: (AlbumListFilter) -> Unit) {
+    Column(modifier = Modifier.alpha(0.9f).background(ThemeL.grey4)) {
 
         Spacer(Modifier.height(48.dp))
 
@@ -59,7 +62,7 @@ fun AlbumListFilter(filter: AlbumListFilter, onFilterApply: (AlbumListFilter) ->
 
         AlbumListFilterSize()
 
-        AlbumListFilterGenres(filter) {
+        AlbumListFilterGenres(filter, filterGCount) {
             onFilterApply(it)
         }
 
