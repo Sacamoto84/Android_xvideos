@@ -122,9 +122,9 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
                     //Navigator(startScreen, key = "1")
                     //Navigator(ScreenRedRoot())
                     //Navigator( screen = ScreenLAlbum(556543))
-                    Navigator( screen = ScreenLAlbumList(556543))
+                    //Navigator( screen = ScreenLAlbumList(556543))
                     //Navigator( screen = ScreenLAlbumTopHits())
-                    //Navigator( screen = ScreenLRoot())
+                    Navigator( screen = ScreenLRoot())
                 }
 
             }
