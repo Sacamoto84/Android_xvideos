@@ -1,8 +1,8 @@
 package com.client.xvideos.l.net.graphQl
 
 import com.client.xvideos.l.model.AlbumListFilter
-import com.client.xvideos.l.model.AlbumType
-import com.client.xvideos.l.model.ContentId
+import com.client.xvideos.l.model.enum.AlbumType
+import com.client.xvideos.l.model.enum.ContentId
 
 fun getAlbumListWithAggregations(
     page: Int = 1,

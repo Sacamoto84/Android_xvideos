@@ -2,14 +2,14 @@
 accompanistSystemuicontroller = "0.36.0"
 activityKtx = "1.12.0-alpha06"
 agp = "8.12.1"
-apolloRuntime = "4.3.2"
+apolloRuntime = "4.3.3"
 componentsResources = "1.8.2"
 composeThemeAdapter = "1.2.1"
-core = "1.40.0"
+core = "1.41.0"
 diskLruCache = "1.7"
 gson = "2.13.1"
-hiltAndroid = "2.57"
-hiltAndroidCompiler = "2.57"
+hiltAndroid = "2.57.1"
+hiltAndroidCompiler = "2.57.1"
 hiltNavigationCompose = "1.2.0"
 imageLoader = "1.10.0"
 jsoup = "1.21.1"
@@ -23,7 +23,7 @@ espressoCore = "3.7.0"
 kotlinxSerializationJson = "1.9.0"
 ktor= "3.2.3"
 
-landscapist = "2.5.1"
+landscapist = "2.5.2"
 
 landscapistFrescoWebsupport = "2.5.1"
 lifecycleProcess = "2.9.2"
@@ -32,7 +32,7 @@ activityCompose = "1.10.1"
 composeBom = "2025.08.00"
 
 lifecycleViewmodelCompose = "2.9.2"
-material = "1.14.0-alpha03"
+material = "1.14.0-alpha04"
 materialVersion = "1.9.0"
 material3 = "1.4.0-beta02"
 
@@ -59,7 +59,7 @@ zoomable = "2.8.1"
 
 ui = "1.9.0"
 
-apollo = "4.3.2"
+apollo = "4.3.3"
 foundationLayout = "1.9.0"
 
 

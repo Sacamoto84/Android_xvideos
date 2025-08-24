@@ -1,6 +1,12 @@
 package com.client.xvideos.l.net
 
 import com.client.xvideos.l.KtorRequestHandler
+import com.client.xvideos.l.model.AlbumDetails
+import com.client.xvideos.l.model.Audience
+import com.client.xvideos.l.model.Content
+import com.client.xvideos.l.model.Cover
+import com.client.xvideos.l.model.Genre
+import com.client.xvideos.l.model.Tag
 import com.client.xvideos.l.net.graphQl.getAlbumInfo
 import com.google.gson.Gson
 import com.google.gson.JsonParser
@@ -92,62 +98,3 @@ class Album(
 }
 
 
-data class PicsDetails(
-    @SerializedName("height") val height: Int, //"846"
-    @SerializedName("width") val width: Int, //"1280"
-    @SerializedName("is_animated") val is_animated: Boolean,
-    @SerializedName("url_to_original") val url_to_original: String?,
-    @SerializedName("url_to_video") val url_to_video: String?,
-)
-
-
-data class AlbumDetails(
-    @SerializedName("created") val created: Long,
-    @SerializedName("id") val id: String,
-    @SerializedName("title") val title: String,
-    @SerializedName("tags") val tags: List<Tag>,
-    @SerializedName("is_manga") val is_manga: Boolean,
-    @SerializedName("content") val content: Content,
-    @SerializedName("genres") val genres: List<Genre>,
-    @SerializedName("cover") val cover: Cover,
-    @SerializedName("description") val description: String,            //Возвращает описание альбома
-    @SerializedName("audiences") val audiences: List<Audience>,
-    @SerializedName("number_of_pictures") val number_of_pictures: Int, //Возвращает количество фотографий в альбоме (в это число входят и gif-файлы).
-    @SerializedName("number_of_animated_pictures") val number_of_animated_pictures: Int, //
-    @SerializedName("url") val url: String,
-    @SerializedName("download_url") val download_url: String
-)
-
-data class Tag(
-    @SerializedName("id") val id: String,
-    @SerializedName("category") val category: String?,
-    @SerializedName("text") val text: String,
-    @SerializedName("url") val url: String,
-    @SerializedName("count") val count: Long
-)
-
-data class Content(
-    @SerializedName("id") val id: String,
-    @SerializedName("title") val title: String,
-    @SerializedName("url") val url: String
-)
-
-data class Genre(
-    @SerializedName("id") val id: String,
-    @SerializedName("title") val title: String,
-    @SerializedName("acts_as_warning") val acts_as_warning: Boolean,
-    @SerializedName("url") val url: String
-)
-
-data class Cover(
-    @SerializedName("width") val width: Int,
-    @SerializedName("height") val height: Int,
-    @SerializedName("size") val size: String,
-    @SerializedName("url") val url: String
-)
-
-data class Audience(
-    @SerializedName("id") val id: String,
-    @SerializedName("title") val title: String,
-    @SerializedName("url") val url: String
-)

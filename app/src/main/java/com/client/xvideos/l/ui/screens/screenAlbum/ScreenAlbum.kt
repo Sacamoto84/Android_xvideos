@@ -49,6 +49,7 @@ import com.client.common.urlVideImage.UrlImage
 import com.client.xvideos.l.ThemeL
 import com.client.xvideos.l.ui.UrlImageLusciousGifs
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoAudiences
+import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoDownload
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoGreeting
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoTags
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.FullScreenImage
@@ -68,7 +69,6 @@ class ScreenLAlbum(val idAlbum : Long) : Screen {
         val vm = getScreenModel<ScreenLAlbumSM, ScreenLAlbumSM.Factory> { factory ->
             factory.create(idAlbum)
         }
-
 
         val album = vm.album.collectAsStateWithLifecycle().value
 
@@ -129,6 +129,8 @@ class ScreenLAlbum(val idAlbum : Long) : Screen {
 //                item(span = StaggeredGridItemSpan.FullLine) { if (parsed != null) { AlbumInfoGreeting(parsed)  } }
 //                item(span = StaggeredGridItemSpan.FullLine) { if (parsed != null) { AlbumInfoAudiences(parsed) } }
                 item(span = StaggeredGridItemSpan.FullLine) { if (parsed != null) { AlbumInfoTags(parsed) } }
+
+                item(span = StaggeredGridItemSpan.FullLine) { if (parsed != null) { AlbumInfoDownload(parsed) } }
 
 
 

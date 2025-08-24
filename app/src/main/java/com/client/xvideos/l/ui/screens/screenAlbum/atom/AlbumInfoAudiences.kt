@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import com.client.xvideos.l.ThemeL
-import com.client.xvideos.l.net.AlbumDetails
+import com.client.xvideos.l.model.AlbumDetails
 
 @Composable
 fun AlbumInfoAudiences(parsed: AlbumDetails) {

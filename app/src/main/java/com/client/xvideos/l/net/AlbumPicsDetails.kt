@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.setValue
 import com.client.xvideos.l.KtorRequestHandler
+import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.net.graphQl.getPicturesJson
 import com.google.gson.Gson
 import com.google.gson.JsonParser

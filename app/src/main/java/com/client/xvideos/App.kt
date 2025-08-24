@@ -2,7 +2,6 @@ package com.client.xvideos
 
 import android.annotation.SuppressLint
 import android.app.Application
-import android.os.Build
 import android.preference.PreferenceManager
 import com.client.common.sharedPref.Settings
 import com.client.xvideos.PermissionScreenActivity.PermissionStorage

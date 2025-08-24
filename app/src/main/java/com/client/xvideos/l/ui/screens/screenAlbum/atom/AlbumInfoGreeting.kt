@@ -4,8 +4,8 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.font.FontWeight
-import com.client.xvideos.l.net.AlbumDetails
 import com.client.xvideos.l.ThemeL
+import com.client.xvideos.l.model.AlbumDetails
 
 @Composable
 fun AlbumInfoGreeting(parsed: AlbumDetails) {
@@ -16,18 +16,18 @@ fun AlbumInfoGreeting(parsed: AlbumDetails) {
             fontFamily = ThemeL.fontFamilyKarla,
             fontWeight = FontWeight.ExtraBold
         )
+
         parsed.genres.forEachIndexed { index, item ->
+
+            var s = item.title
+            if (index != parsed.genres.lastIndex) { s += ", " }
+
             Text(
-                text = buildString {
-                    append(item.title)
-                    if (index != parsed.audiences.lastIndex) append(",")
-                },
+                text = s,
                 color = ThemeL.primaryColor,
                 fontFamily = ThemeL.fontFamilyKarla
             )
-            if (index != parsed.audiences.lastIndex) {
-                Text(" ", color = ThemeL.primaryColor)
-            }
+
         }
     }
 }

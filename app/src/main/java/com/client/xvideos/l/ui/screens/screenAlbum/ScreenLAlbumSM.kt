@@ -31,16 +31,10 @@ class ScreenLAlbumSM @AssistedInject constructor(
 
     init {
         screenModelScope.launch {
-
-            if (!luscious.loggedIn) {
-                luscious.login()
-            }
-
+            if (!luscious.loggedIn) { luscious.login() }
             album.value = luscious.getAlbum(idAlbum)
-
         }
     }
-
 
 }
 

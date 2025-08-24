@@ -16,7 +16,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.client.xvideos.l.ThemeL
-import com.client.xvideos.l.model.ContentId
+import com.client.xvideos.l.model.enum.ContentId
 
 private val style = TextStyle(
     color = ThemeL.textColor,

@@ -1,4 +1,4 @@
-package com.client.xvideos.l.model
+package com.client.xvideos.l.model.enum
 
 enum class AudiencesType(
     val id: Int,

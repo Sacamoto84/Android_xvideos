@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.client.xvideos.l.ThemeL
 import com.client.xvideos.l.model.AlbumListFilter
-import com.client.xvideos.l.model.AlbumType
+import com.client.xvideos.l.model.enum.AlbumType
 import com.client.xvideos.l.net.AlbumListFilterGenreCountResponse
 import com.client.xvideos.l.ui.screens.screenAlbumList.molecule.filter.atom.AlbumFilterDisplay
 import com.client.xvideos.l.ui.screens.screenAlbumList.molecule.filter.atom.AlbumListFilterAlbumType

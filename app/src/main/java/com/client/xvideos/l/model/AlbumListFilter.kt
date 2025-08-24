@@ -1,5 +1,7 @@
 package com.client.xvideos.l.model
 
+import com.client.xvideos.l.model.enum.AlbumType
+import com.client.xvideos.l.model.enum.ContentId
 import com.client.xvideos.l.net.graphQl.Genre
 
 data class AlbumListFilter(
@@ -10,9 +12,6 @@ data class AlbumListFilter(
     val itemsPerPage: Int = 30,
     val picture_count_rank : PictureCountRank = PictureCountRank.all,
     val content_id : ContentId = ContentId.All,
-
     val genresPlus : List<Genre> = emptyList(),
     val genresMinus: List<Genre> = emptyList(),
-
-
 )
