@@ -15,7 +15,7 @@ class ItemCollectionPagingSource(val collection: String?, val savedRed: SavedRed
             Timber.d("!!! ItemCollectionPagingSource::load() collection:${collection}")
 
             val a = if (!collection.isNullOrEmpty()) {
-                savedRed.collections.collectionList.first { it.collection == collection }.list
+                savedRed.collections.collectionList.first { it.collection == collection }.items
             } else
                 emptyList()
 

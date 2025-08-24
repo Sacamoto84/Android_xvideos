@@ -43,12 +43,12 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.Navigator
+import com.client.common.collection.ui.DaialogNewCollection
 import com.example.ui.screens.explorer.ScreenRedExplorer
 import com.redgifs.common.ThemeRed
 import com.redgifs.common.di.HostDI
 import com.redgifs.common.downloader.ui.DownloadIndicator
-import com.redgifs.common.saved.collection.ui.DaialogNewCollection
-import com.redgifs.common.saved.collection.ui.DialogCollection
+import com.redgifs.common.saved.DialogCollection
 import com.redgifs.common.snackBar.UiMessage
 import dagger.Binds
 import dagger.Module

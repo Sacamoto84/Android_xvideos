@@ -29,7 +29,7 @@ fun LazyRow123Icons(modifier : Modifier = Modifier,hostDI : HostDI, item : GifsI
             horizontalArrangement = Arrangement.End
         ) {
 
-            if (hostDI.savedRed.collections.collectionList.any { it.list.any { it2 -> it2.id == item.id } }) {
+            if (hostDI.savedRed.collections.collectionList.any { it.items.any { it2 -> it2.id == item.id } }) {
                 Icon(
                     painter = painterResource(R.drawable.collection_multi_input_svgrepo_com),
                     contentDescription = null,

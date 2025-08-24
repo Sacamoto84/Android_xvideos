@@ -4,12 +4,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.redgifs.common.saved.collection.collectionCreateToDisk
-import com.redgifs.common.saved.collection.collectionDeleteFromDisk
-import com.redgifs.common.saved.collection.collectionItemDeleteFromDisk
-import com.redgifs.common.saved.collection.collectionItemSaveToDisk
-import com.redgifs.common.saved.collection.model.CollectionEntity
-import com.redgifs.common.saved.collection.readAllCollections
+import com.client.common.AppPath
+import com.client.common.collection.CollectionDB
+import com.client.common.collection.model.CollectionEntity
 import com.redgifs.common.snackBar.SnackBarEvent
 import com.redgifs.model.GifsInfo
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -17,7 +14,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 
 class SavedRed_Collection(val snackBarEvent : SnackBarEvent) {
 
-    var collectionList = mutableStateListOf<CollectionEntity>()
+    var collectionList = mutableStateListOf<CollectionEntity<GifsInfo>>()
+
+
+    val collectionDb = CollectionDB<GifsInfo>(AppPath.collection_red, GifsInfo::class.java)
 
     var collectionVisibleDialog by mutableStateOf(false)  //║ Показ диалога на добавление в блок лист
     var collectionItemGifInfo by mutableStateOf<GifsInfo?>(null)
@@ -30,13 +30,14 @@ class SavedRed_Collection(val snackBarEvent : SnackBarEvent) {
 
     fun addCollection(item: GifsInfo, collectionName: String) {
         println("!!! addCollection() item:${item.id} collectionName:$collectionName")
-        collectionItemSaveToDisk(item, collectionName)
+        //collectionItemSaveToDisk(item, collectionName)
+        collectionDb.insert(item.id, collectionName, item)
         refreshCollectionList()
     }
 
     fun deleteItemFromCollection(item: GifsInfo, collectionName: String) {
         println("!!! deleteItemFromCollection() item:${item.id} collectionName:$collectionName")
-        collectionItemDeleteFromDisk(item.id, collectionName)
+        collectionDb.deleteItem(item.id, collectionName)
             .onSuccess {
                 snackBarEvent.success("GIF удален из коллекции $collectionName")
                 refreshCollectionList()
@@ -47,7 +48,7 @@ class SavedRed_Collection(val snackBarEvent : SnackBarEvent) {
     }
 
     fun deleteCollection(collectionName: String) {
-        collectionDeleteFromDisk(collectionName)
+            collectionDb.deleteCollection(collectionName)
             .onSuccess {
                 snackBarEvent.success("Коллекция $collectionName удалена")
                 refreshCollectionList()
@@ -59,7 +60,7 @@ class SavedRed_Collection(val snackBarEvent : SnackBarEvent) {
 
     fun createCollection(collectionName: String) {
         println("!!! createCollection() collectionName:$collectionName")
-        collectionCreateToDisk(collectionName)
+            collectionDb.create(collectionName)
             .onSuccess {
                 snackBarEvent.success("Коллекция $collectionName создана")
                 refreshCollectionList()
@@ -71,7 +72,7 @@ class SavedRed_Collection(val snackBarEvent : SnackBarEvent) {
 
     @OptIn(DelicateCoroutinesApi::class)
     fun refreshCollectionList() {
-        val a = readAllCollections()
+        val a = collectionDb.readAllCollections()
         if (a.isSuccess) {
             collectionList.clear()
             collectionList.addAll(a.getOrThrow())

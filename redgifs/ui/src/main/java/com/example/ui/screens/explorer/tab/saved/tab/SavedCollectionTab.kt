@@ -8,7 +8,6 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -25,15 +24,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,34 +40,24 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.paging.compose.LazyPagingItems
-import androidx.paging.compose.collectAsLazyPagingItems
 import cafe.adriel.voyager.core.model.ScreenModel
-import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
-import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
-import cafe.adriel.voyager.navigator.currentOrThrow
-import com.client.common.connectivityObserver.ConnectivityObserver
+import com.client.common.collection.ui.DaialogNewCollection
 import com.client.common.sharedPref.Settings
 import com.client.common.urlVideImage.UrlImage
 import com.composeunstyled.Text
 import com.example.ui.screens.explorer.tab.gifs.ColumnSelect
 import com.example.ui.screens.explorer.tab.saved.tab.collection.ScreenCollectionName
-import com.example.ui.screens.ui.lazyrow123.LazyRow123
-import com.example.ui.screens.ui.lazyrow123.LazyRow123Host
-import com.example.ui.screens.ui.lazyrow123.TypePager
 import com.redgifs.common.ThemeRed
 import com.redgifs.common.block.BlockRed
 import com.redgifs.common.block.ui.DialogBlock
 import com.redgifs.common.di.HostDI
-import com.redgifs.common.saved.collection.ui.DaialogNewCollection
 import com.redgifs.model.GifsInfo
-import com.redgifs.model.Order
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -219,9 +204,9 @@ object SavedCollectionTab : Screen {
                                     onLongClick = { itemPendingDelete = it.collection }),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            if (it.list.isNotEmpty()) {
+                            if (it.items.isNotEmpty()) {
                                 UrlImage(
-                                    url = it.list.last().urls.thumbnail,
+                                    url = it.items.last().urls.thumbnail,
                                     modifier = Modifier
                                         .clip(RoundedCornerShape(25))
                                         .size(72.dp)

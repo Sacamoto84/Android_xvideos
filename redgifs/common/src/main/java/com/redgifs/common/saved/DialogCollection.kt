@@ -1,4 +1,4 @@
-package com.redgifs.common.saved.collection.ui
+package com.redgifs.common.saved
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -34,10 +35,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.client.common.urlVideImage.UrlImage
-import com.redgifs.common.ThemeRed
-import com.redgifs.common.saved.SavedRed
-//import com.client.xvideos.screens.common.urlVideImage.UrlImage
 import com.composables.core.HorizontalSeparator
+import com.redgifs.common.ThemeRed
 
 @Composable
 fun DialogCollection(
@@ -56,51 +55,42 @@ fun DialogCollection(
 
             Column(
                 modifier = Modifier
-                    //.displayCutoutPadding()
-                    //.systemBarsPadding()
-
-                    //.widthIn(min = 280.dp, max = 560.dp)
-                    //.padding(16.dp)
-
                     .heightIn(min = 280.dp, max = 560.dp)
                     .clip(RoundedCornerShape(12.dp))
                     .border(1.dp, Color(0xFF3F3F3F), RoundedCornerShape(12.dp))
                     .background(Color(0xFF090909))
             ) {
-
-
-                Text(
-                    text = "Добавить в коллекцию", style = TextStyle(fontWeight = FontWeight.Medium, fontSize = 16.sp)
-                )
-
-                //Spacer(Modifier.height(8.dp))
-
+                Text( text = "Добавить в коллекцию", style = TextStyle(fontWeight = FontWeight.Medium, fontSize = 16.sp) )
                 Box(
-                    modifier = Modifier
-                        //.fillMaxHeight()
-                        .fillMaxWidth()
-                        .weight(1f)
-                        //.background(Color.Blue)
+                    modifier = Modifier.fillMaxWidth().weight(1f)
                 ){
-
                     LazyColumn(state = rememberLazyListState()) {
-                        items(savedRed.collections.collectionList){
-                              Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp).padding(vertical = 4.dp)
-                                  .clickable(onClick = { onSelectCollection(it.collection) })
-                                  , verticalAlignment = Alignment.CenterVertically){
-                                  if(it.list.isNotEmpty()) {UrlImage(url = it.list.last().urls.thumbnail, modifier = Modifier.clip(RoundedCornerShape(25)).size(72.dp))}
-                                  else{Box(modifier = Modifier.size(72.dp).background(Color.Gray))}
-                                  Spacer(Modifier.width(8.dp))
-                                  Text(it.collection, color = Color.White, fontFamily = ThemeRed.fontFamilyDMsanss)
-                              }
+                        items(savedRed.collections.collectionList) {
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)
+                                .padding(vertical = 4.dp)
+                                .clickable(onClick = { onSelectCollection(it.collection) }),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                if (it.items.isNotEmpty()) {
+                                    UrlImage(
+                                        url = it.items.last().urls.thumbnail,
+                                        modifier = Modifier.clip(RoundedCornerShape(25)).size(72.dp)
+                                    )
+                                } else {
+                                    Box(modifier = Modifier.size(72.dp).background(Color.Gray))
+                                }
+                                Spacer(Modifier.width(8.dp))
+                                Text(
+                                    it.collection,
+                                    color = Color.White,
+                                    fontFamily = ThemeRed.fontFamilyDMsanss
+                                )
+                            }
                         }
                     }
-
-
                 }
-
-
-                //Spacer(Modifier.height(16.dp))
 
                 HorizontalSeparator(Color(0xFF363636))
 
@@ -114,11 +104,7 @@ fun DialogCollection(
                     horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically
                 ) {
 
-                    TextButton(
-                        onClick = onDismiss
-                    ) {
-                        Text("Отмена")
-                    }
+                    TextButton( onClick = onDismiss ) { Text("Отмена") }
 
                     Spacer(Modifier.width(8.dp))
 
@@ -131,10 +117,7 @@ fun DialogCollection(
                         shape = RoundedCornerShape(8.dp),
                         contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
                     ) {
-                        Text(
-                            text = "New Collection",
-                            color = Color.Black
-                        )
+                        Text( text = "New Collection", color = Color.Black )
                     }
                 }
             }
