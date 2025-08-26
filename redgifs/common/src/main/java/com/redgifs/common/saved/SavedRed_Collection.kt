@@ -24,9 +24,7 @@ class SavedRed_Collection(val snackBarEvent : SnackBarEvent) {
 
     var collectionVisibleDialogCreateNew by mutableStateOf(false)  //║ Показ диалога на добавление в блок лист
 
-    var selectedCollection = MutableStateFlow<String?>(null)//mutableStateOf<String?>(null)
-
-
+    var selectedCollection = MutableStateFlow<String?>(null)
 
     fun addCollection(item: GifsInfo, collectionName: String) {
         println("!!! addCollection() item:${item.id} collectionName:$collectionName")

@@ -22,9 +22,7 @@ class FileDB<T>(val dirPath: String, val extension: String,  private val type: T
 
             val dir = File(dirPath)
             if (!dir.exists()) {
-                if (!dir.mkdirs()) {
-                    throw IOException("Не удалось создать директорию: ${dir.absolutePath}")
-                }
+                if (!dir.mkdirs()) { throw IOException("Не удалось создать директорию: ${dir.absolutePath}") }
             }
 
             val file = File(dirPath, "${nameFile}.${extension}")
@@ -76,9 +74,7 @@ class FileDB<T>(val dirPath: String, val extension: String,  private val type: T
     fun refresh(): Result<Boolean> {
         return try {
             val dir = File(dirPath)
-            if (!dir.exists() || !dir.isDirectory) {
-                return Result.failure(IOException("!!! Директория не существует: $dirPath"))
-            }
+            if (!dir.exists() || !dir.isDirectory) { return Result.failure(IOException("!!! Директория не существует: $dirPath")) }
 
             val files = dir.listFiles { file -> file.extension == extension } ?: emptyArray()
 
