@@ -88,6 +88,10 @@ android {
 
 dependencies {
 
+    implementation ("com.couchbase.lite:couchbase-lite-android-ee-ktx:3.2.3")
+    //implementation ("com.couchbase.lite:couchbase-lite-android-vector-search-arm64-1.0.0")
+    //implementation ("com.couchbase.lite:couchbase-lite-android-vector-search-x86_64-1.0.0")
+
     implementation("com.github.SmartToolFactory:Compose-Zoom:0.5.0")
     implementation 'com.github.SmartToolFactory:Compose-Extended-Gestures:2.0.0'
 

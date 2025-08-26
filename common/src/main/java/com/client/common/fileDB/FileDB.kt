@@ -8,11 +8,14 @@ import java.io.FileNotFoundException
 import java.io.IOException
 import java.lang.reflect.Type
 
+/**
+ * val nichesDb = FileDB<NichesInfo>(AppPath.niches_red, "niches", object : TypeToken<NichesInfo>() {}.type)
+ */
 class FileDB<T>(val dirPath: String, val extension: String,  private val type: Type) {
 
     var list = mutableStateListOf<T>()
 
-    val gson = Gson()
+    private val gson = Gson()
 
     fun insert(nameFile: String, value: T): Result<Boolean> {
         return try {

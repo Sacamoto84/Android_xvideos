@@ -11,6 +11,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.BookmarkBorder
+import androidx.compose.material.icons.outlined.Group
+import androidx.compose.material.icons.outlined.Movie
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -38,7 +44,12 @@ import com.client.xvideos.l.ui.screens.screenAlbum.ScreenLAlbum
 import com.client.xvideos.l.ui.screens.screenAlbumList.atom.AlbumListItem
 import com.client.xvideos.l.ui.screens.screenAlbumList.atom.AlbumListPageSelector
 import com.client.xvideos.l.net.AlbumListImpl
+import com.client.xvideos.l.ui.screens.TabRow
 import com.client.xvideos.l.ui.screens.screenAlbumList.molecule.filter.AlbumListFilter
+import com.example.ui.screens.explorer.ScreenRedExplorer.Companion.screenType
+import com.example.ui.screens.explorer.tab.gifs.GifsTab
+import com.example.ui.screens.ui.atom.TabBarPoints
+import com.redgifs.common.ThemeRed
 import dagger.Binds
 import dagger.Module
 import dagger.assisted.Assisted
@@ -92,10 +103,42 @@ class ScreenLAlbumList(val idAlbum: Long) : Screen {
                             Text("Filter")
                         }
                     }
+                    val l = listOf(
+                        Icons.Outlined.Movie,
+                        Icons.Outlined.Group,
+                        Icons.Outlined.BookmarkBorder,
+                        Icons.Outlined.Search,
+                        Icons.Outlined.Settings
+                    )
+                    TabRow(
+                        containerColor = ThemeRed.colorTabLevel0,
+                        titlesIcon = l,
+                        value = screenType,
+                        onChangeState = {
+                            if (it == screenType) {
+                                when (it) {
+                                    0 -> {
+
+                                    }
+
+                                    1 -> {
+
+                                    }
+                                }
+                            }
+                            screenType = it
+                        },
+                        overlay0 = {
+                            TabBarPoints(
+                                GifsTab.columnSelect.column,
+                                screenType == 0
+                            )
+                        },
+                    )
+
                 }
             }, containerColor = ThemeL.greyBackground
         ) { padding ->
-
 
 
             LazyVerticalGrid(
@@ -114,14 +157,14 @@ class ScreenLAlbumList(val idAlbum: Long) : Screen {
                     key = "page_selector",
                     span = { GridItemSpan(maxLineSpan) }) {
                     if (info != null) {
-                        AlbumListPageSelector( info.page, info.totalPages, { vm.loadAlbumList(it) } )
+                        AlbumListPageSelector(info.page, info.totalPages, { vm.loadAlbumList(it) })
                     }
                 }
 
                 items(items?.size ?: 0) { index ->
                     val item = items?.get(index)
                     if (item != null) {
-                        AlbumListItem(item){
+                        AlbumListItem(item) {
                             navigator.push(ScreenLAlbum(item.id.toLong()))
                         }
                     }

@@ -11,6 +11,10 @@ pluginManagement {
         gradlePluginPortal()
 
         maven { url 'https://artifactory-external.vkpartner.ru/artifactory/maven/' }
+        maven {
+            url "https://mobile.maven.couchbase.com/maven2/dev/"
+            content { includeGroupByRegex "com\\.couchbase\\.lite.*" }
+        }
     }
 }
 dependencyResolutionManagement {
@@ -20,7 +24,10 @@ dependencyResolutionManagement {
         mavenCentral()
         maven { url 'https://jitpack.io' }
         maven { url 'https://artifactory-external.vkpartner.ru/artifactory/maven/' }
-
+        maven {
+            url "https://mobile.maven.couchbase.com/maven2/dev/"
+            content { includeGroupByRegex "com\\.couchbase\\.lite.*" }
+        }
     }
 }
 
