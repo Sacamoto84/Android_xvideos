@@ -243,7 +243,7 @@ fun DropdownMenuItem_RemoveFromCollection(item: GifsInfo? = null, onRefresh: () 
                 onDismiss.invoke()
                 return@DropdownMenuItem
             }
-            savedRed.collections.deleteItemFromCollection(item, selectedCollection)
+            savedRed.collections.deleteItemFromCollection(item.id, selectedCollection)
             onRefresh.invoke()
 
             onDismiss.invoke()

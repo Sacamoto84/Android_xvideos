@@ -11,8 +11,6 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 
 class SavedL_Collection(val snackBarEvent : SnackBarEvent): ISavedLCollection<PicsDetails>() {
 
-    private val collectionDb = CollectionDB<PicsDetails>( AppPath.collection_l, object : TypeToken<PicsDetails>() {}.type )
-
     override fun addCollection(item: PicsDetails, collectionName: String) {
         println("!!! addCollection() item:${item.url_to_original?.toMD5() ?: "0"} collectionName:$collectionName")
         collectionDb.insert(item.url_to_original?.toMD5() ?: "0", collectionName, item)

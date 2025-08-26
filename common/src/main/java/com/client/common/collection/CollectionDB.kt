@@ -8,10 +8,10 @@ import java.io.File
 import java.io.IOException
 import java.lang.reflect.Type
 
-class  CollectionDB<T>(
-    val path : String = AppPath.collection_red,
-    val type: Type,
-) {
+/**
+ *
+ */
+class  CollectionDB<T>( val path : String = AppPath.collection_red, val type: Type) {
 
     fun create(collectionName: String): Result<Boolean> {
         return try {

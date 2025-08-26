@@ -4,9 +4,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.client.common.AppPath
+import com.client.common.collection.CollectionDB
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.MutableStateFlow
 
 abstract class ISavedLCollection<T> {
+
+    val collectionDb = CollectionDB<T>( AppPath.collection_l, object : TypeToken<T>() {}.type )
 
     var collectionList = mutableStateListOf<CollectionEntity<T>>()
 
