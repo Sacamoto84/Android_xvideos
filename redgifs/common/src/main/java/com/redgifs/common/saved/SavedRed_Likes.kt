@@ -10,7 +10,7 @@ import kotlin.onSuccess
 
 class SavedRed_Likes(val snackBarEvent : SnackBarEvent) {
 
-    val likesDb = FileDB<GifsInfo>(AppPath.likes_red, "likes", object : TypeToken<GifsInfo>() {}.type)
+    val likesDb = FileDB(AppPath.likes_red, "likes", GifsInfo::class.java)
 
     var list = likesDb.list
 

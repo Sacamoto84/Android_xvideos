@@ -1,4 +1,4 @@
-package com.client.xvideos.l.featured.Saved
+package com.client.xvideos.l.featured.saved
 
 import com.client.common.di.ApplicationScope
 import com.client.xvideos.l.db.AppLDatabase
@@ -19,6 +19,7 @@ class SavedL @Inject constructor(
 
    val collection =  SavedL_Collection(snackBarEvent)
 
+   val albums = SavedL_Albums(snackBarEvent)
 
 
 

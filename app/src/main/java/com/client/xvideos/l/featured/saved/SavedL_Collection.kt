@@ -1,15 +1,12 @@
-package com.client.xvideos.l.featured.Saved
+package com.client.xvideos.l.featured.saved
 
-import com.client.common.AppPath
-import com.client.common.collection.CollectionDB
 import com.client.common.collection.model.ISavedLCollection
 import com.client.common.util.toMD5
 import com.client.xvideos.l.model.PicsDetails
-import com.google.gson.reflect.TypeToken
 import com.redgifs.common.snackBar.SnackBarEvent
 import kotlinx.coroutines.DelicateCoroutinesApi
 
-class SavedL_Collection(val snackBarEvent : SnackBarEvent): ISavedLCollection<PicsDetails>() {
+class SavedL_Collection(val snackBarEvent : SnackBarEvent): ISavedLCollection<PicsDetails>(PicsDetails::class.java) {
 
     override fun addCollection(item: PicsDetails, collectionName: String) {
         println("!!! addCollection() item:${item.url_to_original?.toMD5() ?: "0"} collectionName:$collectionName")

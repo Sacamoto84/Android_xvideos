@@ -10,7 +10,7 @@ import kotlin.onSuccess
 
 class SavedRed_Creator(val snackBarEvent : SnackBarEvent) {
 
-    val creatorDb = FileDB<UserInfo>(AppPath.creators_red, "creator", object : TypeToken<UserInfo>() {}.type)
+    val creatorDb = FileDB(AppPath.creators_red, "creator", UserInfo::class.java)
 
     var list = creatorDb.list
 

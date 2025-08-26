@@ -5,11 +5,10 @@ import com.redgifs.common.snackBar.SnackBarEvent
 import com.redgifs.model.GifsInfo
 import kotlinx.coroutines.DelicateCoroutinesApi
 
-class SavedRed_Collection(val snackBarEvent : SnackBarEvent) : ISavedLCollection<GifsInfo>(){
+class SavedRed_Collection(val snackBarEvent : SnackBarEvent) : ISavedLCollection<GifsInfo>(GifsInfo::class.java){
 
     override fun addCollection(item: GifsInfo, collectionName: String) {
         println("!!! addCollection() item:${item.id} collectionName:$collectionName")
-        //collectionItemSaveToDisk(item, collectionName)
         collectionDb.insert(item.id, collectionName, item)
         refreshCollectionList()
     }
@@ -21,22 +20,8 @@ class SavedRed_Collection(val snackBarEvent : SnackBarEvent) : ISavedLCollection
                 snackBarEvent.success("GIF удален из коллекции $collectionName")
                 refreshCollectionList()
             }
-            .onFailure { e ->
-                snackBarEvent.error("Ошибка удаления GIF из коллекции $collectionName ${e.message}")
-            }
+            .onFailure { e -> snackBarEvent.error("Ошибка удаления GIF из коллекции $collectionName ${e.message}") }
     }
-
-//    override fun deleteItemFromCollection(item: GifsInfo, collectionName: String) {
-//        println("!!! deleteItemFromCollection() item:${item.id} collectionName:$collectionName")
-//        collectionDb.deleteItem(item.id, collectionName)
-//            .onSuccess {
-//                snackBarEvent.success("GIF удален из коллекции $collectionName")
-//                refreshCollectionList()
-//            }
-//            .onFailure { e ->
-//                snackBarEvent.error("Ошибка удаления GIF из коллекции $collectionName ${e.message}")
-//            }
-//    }
 
     override fun deleteCollection(collectionName: String) {
             collectionDb.deleteCollection(collectionName)
@@ -44,9 +29,7 @@ class SavedRed_Collection(val snackBarEvent : SnackBarEvent) : ISavedLCollection
                 snackBarEvent.success("Коллекция $collectionName удалена")
                 refreshCollectionList()
             }
-            .onFailure { e ->
-                snackBarEvent.error("Ошибка удаления коллекции $collectionName ${e.message}")
-            }
+            .onFailure { e -> snackBarEvent.error("Ошибка удаления коллекции $collectionName ${e.message}") }
     }
 
     override fun createCollection(collectionName: String) {

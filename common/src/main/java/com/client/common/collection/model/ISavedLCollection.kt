@@ -9,9 +9,12 @@ import com.client.common.collection.CollectionDB
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.MutableStateFlow
 
-abstract class ISavedLCollection<T> {
+abstract class ISavedLCollection<T>(
+    clazz: Class<T>
+){
+    private val type = TypeToken.getParameterized(List::class.java, clazz).type
 
-    val collectionDb = CollectionDB<T>( AppPath.collection_l, object : TypeToken<T>() {}.type )
+    protected val collectionDb = CollectionDB<T>( AppPath.collection_l, type )
 
     var collectionList = mutableStateListOf<CollectionEntity<T>>()
 

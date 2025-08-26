@@ -4,6 +4,7 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
+import com.client.xvideos.l.featured.saved.SavedL
 import com.client.xvideos.l.net.Luscious
 import com.client.xvideos.l.net.Album
 import dagger.Binds
@@ -19,7 +20,8 @@ import kotlinx.coroutines.launch
 
 class ScreenLAlbumSM @AssistedInject constructor(
     @Assisted val idAlbum: Long,
-    val luscious: Luscious
+    val luscious: Luscious,
+    val saved: SavedL
 ) : ScreenModel {
 
     @AssistedFactory
@@ -33,6 +35,16 @@ class ScreenLAlbumSM @AssistedInject constructor(
         screenModelScope.launch {
             if (!luscious.loggedIn) { luscious.login() }
             album.value = luscious.getAlbum(idAlbum)
+        }
+    }
+
+    fun saveAlbum(){
+        screenModelScope.launch {
+
+            val album = album.value
+
+
+
         }
     }
 

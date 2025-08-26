@@ -2,6 +2,7 @@ package com.client.common.fileDB
 
 import androidx.compose.runtime.mutableStateListOf
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import timber.log.Timber
 import java.io.File
 import java.io.FileNotFoundException
@@ -11,7 +12,11 @@ import java.lang.reflect.Type
 /**
  * val nichesDb = FileDB<NichesInfo>(AppPath.niches_red, "niches", object : TypeToken<NichesInfo>() {}.type)
  */
-class FileDB<T>(val dirPath: String, val extension: String,  private val type: Type) {
+class FileDB<T>(val dirPath: String, val extension: String, clazz: Class<T> ) {
+
+
+
+    private val type = TypeToken.getParameterized(List::class.java, clazz).type
 
     var list = mutableStateListOf<T>()
 

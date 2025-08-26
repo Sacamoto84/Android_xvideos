@@ -10,7 +10,7 @@ import kotlin.onSuccess
 
 class SavedRed_Niches(val snackBarEvent : SnackBarEvent) {
 
-    val nichesDb = FileDB<NichesInfo>(AppPath.niches_red, "niches", object : TypeToken<NichesInfo>() {}.type)
+    val nichesDb = FileDB(AppPath.niches_red, "niches", NichesInfo::class.java)
     val list = nichesDb.list
 
     fun add(item: NichesInfo) {
