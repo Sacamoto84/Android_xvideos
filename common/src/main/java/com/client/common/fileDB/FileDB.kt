@@ -88,7 +88,7 @@ class FileDB<T>(val dirPath: String, val extension: String, clazz: Class<T> ) {
                     //val type = object : TypeToken<T>() {}.type
                     gson.fromJson<T>(json, type)
                 } catch (e: Exception) {
-                    Timber.e(e, "!!! Ошибка при чтении файла ${file.name}")
+                    Timber.e(e, "!!! FileDB refresh Ошибка при чтении файла $dirPath ${file.name}")
                     null
                 }
             }
@@ -98,7 +98,7 @@ class FileDB<T>(val dirPath: String, val extension: String, clazz: Class<T> ) {
 
             Result.success(true)
         } catch (e: Exception) {
-            Timber.e(e, "Ошибка при обновлении списка из директории $dirPath")
+            Timber.e(e, "!!! Ошибка при обновлении списка из директории $dirPath")
             Result.failure(e)
         }
     }

@@ -2,29 +2,28 @@ package com.client.xvideos.l.net
 
 import com.client.xvideos.l.KtorRequestHandler
 import com.client.xvideos.l.model.AlbumDetails
-import com.client.xvideos.l.model.Audience
 import com.client.xvideos.l.model.Content
 import com.client.xvideos.l.model.Cover
-import com.client.xvideos.l.model.Genre
-import com.client.xvideos.l.model.Tag
 import com.client.xvideos.l.net.graphQl.getAlbumInfo
+import com.client.xvideos.l.repository.Repository
+import com.client.xvideos.l.repository.RepositoryUriConfig
 import com.google.gson.Gson
 import com.google.gson.JsonParser
-import com.google.gson.annotations.SerializedName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
-class Album(
+class AlbumInfo(
     val id: Int,
     download: Boolean = false,
-    val handler: KtorRequestHandler? = null,
+    repository: Repository,
     scope: CoroutineScope,
 ) {
 
     var url: String = ""
 
-    val albumPicsDetails = AlbumPicsDetails(id,  handler)
+    val albumPicsDetails = AlbumPicsDetails(id,  repository)
 
     val parsed = MutableStateFlow(
         AlbumDetails(
@@ -47,7 +46,12 @@ class Album(
 
     init {
         scope.launch {
-            val res = handler?.postJsonCached(Luscious.Companion.API, getAlbumInfo(id))
+            val result = repository.openURI(Luscious.Companion.API, getAlbumInfo(id), config = RepositoryUriConfig.CACHE_ROM)
+            if (result.isFailure) {
+                Timber.e("!!! getAlbumInfo $id error ${result.exceptionOrNull()}")
+                return@launch
+            }
+            val res = result.getOrThrow()
             val json = JsonParser.parseString(res).asJsonObject
             val get = json["data"]?.asJsonObject?.get("album")?.asJsonObject?.get("get")?.asJsonObject
             val gson = Gson()

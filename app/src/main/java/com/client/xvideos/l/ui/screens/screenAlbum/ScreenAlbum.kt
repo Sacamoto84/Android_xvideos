@@ -1,11 +1,15 @@
 package com.client.xvideos.l.ui.screens.screenAlbum
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,14 +22,19 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Scaffold
@@ -35,6 +44,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -67,8 +77,8 @@ import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoGreeting
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoTags
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.FullScreenImage
 import com.example.ui.screens.profile.atom.VerticalScrollbar
-import com.example.ui.screens.profile.atom.VerticalScrollbar2
 import com.example.ui.screens.profile.rememberVisibleRangePercentIgnoringFirstNForLazyStaggeredGrid
+import kotlinx.coroutines.launch
 import net.engawapg.lib.zoomable.ExperimentalZoomableApi
 
 class ScreenLAlbum(val idAlbum: Long) : Screen {
@@ -86,10 +96,10 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
             factory.create(idAlbum)
         }
 
-        val album = vm.album.collectAsStateWithLifecycle().value
+        val album = vm.albumInfo.collectAsStateWithLifecycle().value
 
         val parsed =
-            vm.album.collectAsStateWithLifecycle().value?.parsed?.collectAsStateWithLifecycle()?.value
+            vm.albumInfo.collectAsStateWithLifecycle().value?.parsed?.collectAsStateWithLifecycle()?.value
 
         var selectedImage by remember { mutableStateOf<String?>(null) }
         var selectedBounds by remember { mutableStateOf<Rect?>(null) }
@@ -111,11 +121,17 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
             AlertDialog(
                 icon = { UrlImage(pending.cover.url, modifier = Modifier.size(96.dp)) },
                 onDismissRequest = { itemPendingDelete = null },
-                title = { com.composeunstyled.Text( "Удалить Альбом?", fontWeight = FontWeight.Bold, fontSize = 20.sp) },
+                title = {
+                    com.composeunstyled.Text(
+                        "Удалить Альбом?",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp
+                    )
+                },
                 text = {
                     com.composeunstyled.Text(buildAnnotatedString {
                         append("Удалить «")
-                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) { append(pending.title)}
+                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) { append(pending.title) }
                         append("» из сохранённых?")
                     }, fontSize = 16.sp)
                 },
@@ -127,11 +143,23 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
                             itemPendingDelete = null          // закрываем диалог
                         }
                     ) {
-                        com.composeunstyled.Text( "Удалить", fontSize = 16.sp, color = Color(0xFF6552A5) )
+                        com.composeunstyled.Text(
+                            "Удалить",
+                            fontSize = 16.sp,
+                            color = Color(0xFF6552A5)
+                        )
                     }
                 },
                 dismissButton = {
-                    TextButton( onClick = { itemPendingDelete = null } ) { com.composeunstyled.Text( "Отмена", fontSize = 16.sp, color = Color(0xFF6552A5) ) }
+                    TextButton(onClick = {
+                        itemPendingDelete = null
+                    }) {
+                        com.composeunstyled.Text(
+                            "Отмена",
+                            fontSize = 16.sp,
+                            color = Color(0xFF6552A5)
+                        )
+                    }
                 },
 
                 /* Доп. стили при желании */
@@ -141,16 +169,19 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
         /* ---------- /Диалог ---------- */
 
         Scaffold(
+            floatingActionButton = {
 
+                AnimatedVisibility(
+                    state.firstVisibleItemIndex > 3,
+                    enter = fadeIn(),
+                    exit = fadeOut(),
+                ) {
+                    ScrollToTopButton(state)
+                }
+
+
+            },
             bottomBar = {
-
-//                Column {
-//
-//                    Box( modifier = Modifier.fillMaxWidth().height(48.dp).background(ThemeL.grey7) ) {
-//
-//                    }
-//
-//                }
 
                 if (album?.albumPicsDetails?.percentLoad != 1.0f) {
                     LinearProgressIndicator(
@@ -161,198 +192,194 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
                         strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
                     )
                 }
+
             },
 
             containerColor = ThemeL.greyBackground
         ) { padding ->
 
 
-            Box(modifier = Modifier
-                .padding(top = padding.calculateTopPadding())
-                .fillMaxSize()) {
-
-            LazyVerticalStaggeredGrid(
-                state = state,
-                columns = StaggeredGridCells.Fixed(2),
+            Box(
                 modifier = Modifier
+                    .padding(top = padding.calculateTopPadding())
                     .fillMaxSize()
-            ) {
+            )
+            {
 
-                item(span = StaggeredGridItemSpan.FullLine) {
-                    Column(modifier = Modifier.padding(horizontal = 4.dp)) {
-                        Row {
-                            UrlImage(parsed?.cover?.url.toString(), modifier = Modifier.size(72.dp))
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Column {
-                                if (parsed != null) {
-                                    Text(
-                                        parsed.title,
-                                        color = ThemeL.textColor,
-                                        fontFamily = ThemeL.fontFamilyDMsanss
-                                    )
-                                    Text(
-                                        "${parsed.number_of_animated_pictures} gifs / ${parsed.number_of_pictures} pictures",
-                                        color = ThemeL.textColor
-                                    )
+                LazyVerticalStaggeredGrid(
+                    state = state,
+                    columns = StaggeredGridCells.Fixed(2),
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
+
+                    item(span = StaggeredGridItemSpan.FullLine) {
+                        Column(modifier = Modifier.padding(horizontal = 4.dp)) {
+                            Row {
+                                UrlImage(
+                                    parsed?.cover?.url.toString(),
+                                    modifier = Modifier.size(72.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Column {
+                                    if (parsed != null) {
+                                        Text(
+                                            parsed.title,
+                                            color = ThemeL.textColor,
+                                            fontFamily = ThemeL.fontFamilyDMsanss
+                                        )
+                                        Text(
+                                            "${parsed.number_of_animated_pictures} gifs / ${parsed.number_of_pictures} pictures",
+                                            color = ThemeL.textColor
+                                        )
+                                    }
                                 }
                             }
+                            if (parsed != null) {
+                                AlbumInfoGreeting(parsed)
+                            }
+                            if (parsed != null) {
+                                AlbumInfoAudiences(parsed)
+                            }
                         }
-                        if (parsed != null) {
-                            AlbumInfoGreeting(parsed)
-                        }
-                        if (parsed != null) {
-                            AlbumInfoAudiences(parsed)
-                        }
-                    }
 
-                }
+                    }
 
 //                item(span = StaggeredGridItemSpan.FullLine) { if (parsed != null) { AlbumInfoGreeting(parsed)  } }
 //                item(span = StaggeredGridItemSpan.FullLine) { if (parsed != null) { AlbumInfoAudiences(parsed) } }
-                item(span = StaggeredGridItemSpan.FullLine) {
-                    if (parsed != null) {
-                        AlbumInfoTags(parsed)
-                    }
-                }
-
-                item(span = StaggeredGridItemSpan.FullLine) {
-                    if (parsed != null) {
-                        AlbumInfoDownload(parsed)
-                    }
-                }
-
-                item(span = StaggeredGridItemSpan.FullLine) {
-                    if (parsed != null) {
-
-
-                        Box(
-                            modifier = Modifier
-                                .padding(horizontal = 2.dp)
-                                .padding(top = 2.dp, bottom = 4.dp)
-                                .height(46.dp)
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(4.dp))
-                                .border(
-                                    1.dp, ThemeL.grey3,
-                                    RoundedCornerShape(4.dp)
-                                ).background(if (!saved) ThemeL.red else ThemeL.grey6)
-                                .clickable(onClick = {
-                                    if (!saved) {
-                                        vm.saveAlbum()
-                                    } else {
-                                        itemPendingDelete = parsed
-                                    }
-                                }),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier
-                            ) {
-                                if (vm.albumSaveWait) CircularProgressIndicator(
-                                    modifier = Modifier.size(24.dp),
-                                    trackColor = Color.DarkGray
-                                ) else
-                                    Box(modifier = Modifier.size(24.dp))
-                                Spacer(modifier = Modifier.width(4.dp))
-                                if (!saved)
-                                    Text(
-                                        "Save Album",
-                                        color = Color.White,
-                                        fontFamily = ThemeL.fontFamilyKarla
-                                    )
-                                else
-                                    Text(
-                                        "Remove Album",
-                                        color = Color.White,
-                                        fontFamily = ThemeL.fontFamilyKarla
-                                    )
-                            }
+                    item(span = StaggeredGridItemSpan.FullLine) {
+                        if (parsed != null) {
+                            AlbumInfoTags(parsed)
                         }
                     }
 
+                    item(span = StaggeredGridItemSpan.FullLine) {
+                        if (parsed != null) {
+                            AlbumInfoDownload(parsed)
+                        }
+                    }
 
-                }
+                    item(span = StaggeredGridItemSpan.FullLine) {
+                        if (parsed != null) {
 
-                items(album?.albumPicsDetails?.pics ?: emptyList()) {
-                    var imageBounds by remember { mutableStateOf<Rect?>(null) }
-                    if (it.url_to_original != null) {
-                        Box(
-                            modifier = Modifier.fillMaxWidth(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            val aspect = it.width.toFloat() / it.height
-                            UrlImageLusciousGifs(
-                                it.url_to_original,
-                                modifier = Modifier
-                                    .padding(2.dp)
-                                    .aspectRatio(aspect)
-                                    .clipToBounds()
-                                    .border(0.5.dp, Color.Gray)
-                                    .onGloballyPositioned { coordinates ->
-                                        val rect = coordinates.boundsInRoot()
-                                        imageBounds = rect
-                                    }
-                                    .clickable {
-                                        selectedImage = it.url_to_original
-                                        selectedBounds = imageBounds
-                                    },
-                                contentScale = ContentScale.FillBounds,
-                            )
 
-                            val targetAlpha = if (selectedImage == it.url_to_original) 1f else 0f
+                            Box(
+                                modifier = Modifier.padding(horizontal = 2.dp).padding(top = 2.dp, bottom = 4.dp)
+                                    .height(46.dp).fillMaxWidth().clip(RoundedCornerShape(4.dp))
+                                    .border( 1.dp, ThemeL.grey3, RoundedCornerShape(4.dp) )
+                                    .background(if (!saved) ThemeL.red else ThemeL.grey6)
+                                    .clickable(onClick = { if (!saved) { vm.saveAlbum() } else { itemPendingDelete = parsed } }),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                if (!saved) Text( "Save Album", color = Color.White, fontFamily = ThemeL.fontFamilyKarla )
+                                else Text( "Remove Album", color = Color.White, fontFamily = ThemeL.fontFamilyKarla )
+                            }
+                        }
 
-                            val animatedAlpha by animateFloatAsState(
-                                targetValue = targetAlpha,
-                                animationSpec = if (targetAlpha == 1f) {
-                                    tween(durationMillis = 300) // Появление с задержкой
-                                } else {
-                                    tween(durationMillis = 0)   // Мгновенное исчезновение
-                                },
-                                label = "imageAlpha"
-                            )
 
-                            if (selectedImage == it.url_to_original) {
-                                Box(
+                    }
+
+                    items(album?.albumPicsDetails?.pics ?: emptyList()) {
+                        var imageBounds by remember { mutableStateOf<Rect?>(null) }
+                        if (it.url_to_original != null) {
+                            Box(
+                                modifier = Modifier.fillMaxWidth(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                val aspect = it.width.toFloat() / it.height
+                                UrlImageLusciousGifs(
+                                    it.url_to_original,
                                     modifier = Modifier
-                                        .alpha(animatedAlpha)
                                         .padding(2.dp)
                                         .aspectRatio(aspect)
                                         .clipToBounds()
                                         .border(0.5.dp, Color.Gray)
-                                        .background(Color.Gray)
+                                        .onGloballyPositioned { coordinates ->
+                                            val rect = coordinates.boundsInRoot()
+                                            imageBounds = rect
+                                        }
+                                        .clickable {
+                                            selectedImage = it.url_to_original
+                                            selectedBounds = imageBounds
+                                        },
+                                    contentScale = ContentScale.FillBounds,
                                 )
+
+                                val targetAlpha =
+                                    if (selectedImage == it.url_to_original) 1f else 0f
+
+                                val animatedAlpha by animateFloatAsState(
+                                    targetValue = targetAlpha,
+                                    animationSpec = if (targetAlpha == 1f) {
+                                        tween(durationMillis = 300) // Появление с задержкой
+                                    } else {
+                                        tween(durationMillis = 0)   // Мгновенное исчезновение
+                                    },
+                                    label = "imageAlpha"
+                                )
+
+                                if (selectedImage == it.url_to_original) {
+                                    Box(
+                                        modifier = Modifier
+                                            .alpha(animatedAlpha)
+                                            .padding(2.dp)
+                                            .aspectRatio(aspect)
+                                            .clipToBounds()
+                                            .border(0.5.dp, Color.Gray)
+                                            .background(Color.Gray)
+                                    )
+                                }
                             }
                         }
                     }
+
                 }
 
-            }
 
+                //---- Скролл ----
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .align(Alignment.CenterEnd)
+                        .width(2.dp)
+                ) {
+                    VerticalScrollbar(scrollPercent)
+                    //VerticalScrollbar2(scrollPercent)
+                }
 
-            //---- Скролл ----
-            Box(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .align(Alignment.CenterEnd)
-                    .width(2.dp)
-            ) {
-                VerticalScrollbar(scrollPercent)
-                //VerticalScrollbar2(scrollPercent)
+                // Полноэкранное изображение с анимацией
+                selectedImage?.let { imageUrl ->
+                    FullScreenImage(
+                        imageUrl = imageUrl,
+                        startBounds = selectedBounds,
+                        onClose = { selectedImage = null },
+                    )
+                }
             }
-
-            // Полноэкранное изображение с анимацией
-            selectedImage?.let { imageUrl ->
-                FullScreenImage(
-                    imageUrl = imageUrl,
-                    startBounds = selectedBounds,
-                    onClose = { selectedImage = null },
-                )
-            }
-        }
 
         }
 
     }
 
+}
+
+@Composable
+fun ScrollToTopButton(
+    staggeredGridState: LazyStaggeredGridState
+) {
+    val scope = rememberCoroutineScope()
+
+    FloatingActionButton(
+        onClick = {
+            scope.launch {
+                staggeredGridState.animateScrollToItem(0)
+            }
+        },
+        content = {
+            Icon(
+                imageVector = Icons.Default.KeyboardArrowUp,
+                contentDescription = "Scroll to top"
+            )
+        }
+    )
 }

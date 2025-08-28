@@ -5,6 +5,49 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 
+
+
+
+
+@Dao
+interface RepositoryCacheFullDao {
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(doc: RepositoryCacheFullEntity)
+
+    @Query("SELECT * FROM repository_cache_full WHERE url = :url")
+    suspend fun get(url: String): RepositoryCacheFullEntity?
+
+    @Query("DELETE FROM repository_cache_full WHERE timeCreate < :time")
+    suspend fun deleteOld(time: Long)
+
+    // ✅ Удаление всего кеша
+    @Query("DELETE FROM repository_cache_full")
+    suspend fun deleteAll()
+
+}
+
+@Dao
+interface RepositoryCacheTempDao {
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(doc: RepositoryCacheTempEntity)
+
+    @Query("SELECT * FROM repository_cache_temp WHERE url = :url")
+    suspend fun get(url: String): RepositoryCacheTempEntity?
+
+    @Query("DELETE FROM repository_cache_temp WHERE timeCreate < :time")
+    suspend fun deleteOld(time: Long)
+
+    // ✅ Удаление всего кеша
+    @Query("DELETE FROM repository_cache_temp")
+    suspend fun deleteAll()
+
+}
+
+
+
+
 @Dao
 interface PostJsonDao {
 

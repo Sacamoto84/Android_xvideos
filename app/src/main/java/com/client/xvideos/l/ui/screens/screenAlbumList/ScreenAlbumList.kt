@@ -198,11 +198,6 @@ class ScreenLAlbumListSM @AssistedInject constructor(
 
     init {
         screenModelScope.launch {
-
-            if (!luscious.loggedIn) {
-                luscious.login()
-            }
-
             albumList.value = luscious.getAlbumList()
             albumList.value?.getAlbumList(1)
             albumList.value?.getAlbumListAggregations(1)

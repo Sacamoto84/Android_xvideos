@@ -5,6 +5,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.client.xvideos.l.KtorRequestHandler
 import com.client.xvideos.l.net.Luscious
+import com.client.xvideos.l.repository.Repository
+import com.client.xvideos.l.repository.RepositoryUriConfig
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import timber.log.Timber
@@ -14,12 +16,15 @@ private val mediaCategoriesBootstrap =
 
 var mediaCategories by mutableStateOf<MediaCategories?>(null)
 
-suspend fun refreshMediaCategories(handler: KtorRequestHandler) {
+suspend fun refreshMediaCategories(repository: Repository) {
     Timber.i("!!! refreshMediaCategories")
     val q = mediaCategoriesBootstrap
-    val res = handler.postJsonCached(Luscious.Companion.API, q)
+
+    val res = repository.openURI(Luscious.Companion.API, q, config = RepositoryUriConfig.CACHE_ROM)
+    if (res.isFailure) return
+
     val gson = Gson()
-    val response = gson.fromJson(res, MediaCategoriesBootstrapResponse::class.java)
+    val response = gson.fromJson(res.getOrNull(), MediaCategoriesBootstrapResponse::class.java)
 
     mediaCategories = MediaCategories(
         response.data.mediaCategories.genres,

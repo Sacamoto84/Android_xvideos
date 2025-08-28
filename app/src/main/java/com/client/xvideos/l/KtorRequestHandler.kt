@@ -5,6 +5,7 @@ import com.client.xvideos.l.db.PostJsonDao
 import com.client.xvideos.l.db.PostJsonEntity
 import com.client.xvideos.l.db.PostJsonRamDao
 import com.client.xvideos.l.db.PostJsonRamEntity
+import com.client.xvideos.l.net.Luscious.Companion.LOGIN
 import com.github.javafaker.Faker
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -35,8 +36,8 @@ class KtorRequestHandler(
     private val maxRetries: Int = 5,
     private val retryStatusCodes: Set<Int> = setOf(413, 429, 500, 502, 503, 504),
     private val backoffFactor: Long = 1000,
-    private val dao : PostJsonDao,
-    private val daoRam : PostJsonRamDao
+    private val username : String? = null,
+    private val password : String? = null
 ) {
     private val faker = Faker()
 
@@ -124,49 +125,65 @@ class KtorRequestHandler(
     }
 
 
-    private val cacheTtlMillis = 24 * 60 * 60 * 1000L * 60 //60 сутки
+//    private val cacheTtlMillis = 24 * 60 * 60 * 1000L * 60 //60 сутки
 
-    suspend fun postJsonCached(url: String, data: String): String {
-        val cacheKey = data.hashCode().toString()
+//    suspend fun postJsonCached(url: String, data: String): String {
+//        val cacheKey = data.hashCode().toString()
+//
+//        val res = dao.get(cacheKey)
+//
+//        if(res != null){
+//            return res.content
+//        }
+//
+//        // Делаем запрос
+//        val response = postJson(url, data)
+//
+//        dao.insert(PostJsonEntity(
+//            url = cacheKey,
+//            content = response
+//        ))
+//
+//        return response
+//    }
 
-        val res = dao.get(cacheKey)
 
-        if(res != null){
-            return res.content
+
+    // --- Login ---
+    var loggedIn: Boolean = false
+        private set
+
+    suspend fun login(
+        //username: String? = null,
+        //password: String? = null,
+    ) {
+        if (username == null || password == null) {
+            println("Username or password not provided")
+            return
         }
 
-        // Делаем запрос
-        val response = postJson(url, data)
-
-        dao.insert(PostJsonEntity(
-            url = cacheKey,
-            content = response
-        ))
-
-        return response
-    }
-
-    suspend fun postJsonCachedRam(url: String, data: String): String {
-        val cacheKey = data.hashCode().toString()
-
-        val res = dao.get(cacheKey)
-
-        if(res != null){
-            return res.content
-        }
-
-        // Делаем запрос
-        val response = postJson(url, data)
-
-        daoRam.insert(
-            PostJsonRamEntity(
-                url = cacheKey,
-                content = response
-            )
+        val formData = mapOf(
+            "login" to username,
+            "password" to password,
+            "remember" to "on"
         )
 
-        return response
+        val response = try {
+            post(LOGIN, formData)
+        } catch (e: Exception) {
+            println("Login request failed: ${e.message}")
+            return
+        }
+
+        if ("The username and/or password you specified are not correct." in response) {
+            println("!!! Login failed. Please check your credentials")
+            loggedIn = false
+        } else {
+            loggedIn = true
+            println("Login successful")
+        }
     }
+    // ! --- Login --- !
 
 }
 

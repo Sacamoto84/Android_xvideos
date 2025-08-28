@@ -9,6 +9,8 @@ import com.client.common.di.ApplicationScope
 import com.client.xvideos.BuildConfig
 import com.client.xvideos.l.net.Luscious
 import com.client.xvideos.l.db.AppLDatabase
+import com.client.xvideos.l.repository.Repository
+import com.redgifs.common.snackBar.SnackBarEvent
 import com.redgifs.db.AppRedGifsDatabase
 import dagger.Module
 import dagger.Provides
@@ -17,6 +19,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import java.io.File
+import javax.inject.Inject
 import javax.inject.Singleton
 
 @Module
@@ -25,14 +28,22 @@ object LusciousModule {
 
     @Singleton
     @Provides
+    fun provideRepository(
+        db: AppLDatabase,
+        @ApplicationScope scope: CoroutineScope,
+        snackBarEvent: SnackBarEvent
+    ):Repository
+    {
+        return Repository(db, snackBarEvent, scope, BuildConfig.luscious_email, BuildConfig.luscious_password)
+    }
+
+    @Singleton
+    @Provides
     fun provideLuscious(
         @ApplicationScope scope: CoroutineScope,
-        db: AppLDatabase
+        repository: Repository
     ): Luscious {
-        val email = BuildConfig.luscious_email
-        val password = BuildConfig.luscious_password
-        val luscious = Luscious(scope, email, password, db = db)
-        return luscious
+        return Luscious(scope, repository)
     }
 
     @Provides

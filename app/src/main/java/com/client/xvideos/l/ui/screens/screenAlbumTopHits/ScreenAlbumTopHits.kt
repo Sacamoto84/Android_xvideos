@@ -211,9 +211,6 @@ class ScreenLAlbumTopHitsSM @AssistedInject constructor(
 
     init {
         screenModelScope.launch {
-            if (!luscious.loggedIn) {
-                luscious.login()
-            }
             albumTopHits.value = luscious.getAlbumTopHits()
         }
     }

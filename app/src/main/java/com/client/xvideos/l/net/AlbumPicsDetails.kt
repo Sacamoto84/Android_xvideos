@@ -7,6 +7,8 @@ import androidx.compose.runtime.setValue
 import com.client.xvideos.l.KtorRequestHandler
 import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.net.graphQl.getPicturesJson
+import com.client.xvideos.l.repository.Repository
+import com.client.xvideos.l.repository.RepositoryUriConfig
 import com.google.gson.Gson
 import com.google.gson.JsonParser
 import kotlinx.coroutines.Dispatchers
@@ -14,7 +16,7 @@ import kotlinx.coroutines.withContext
 
 class AlbumPicsDetails(
     val id: Int,
-    val handler: KtorRequestHandler? = null
+    val repository: Repository
 ) {
 
     val pics = mutableStateListOf<PicsDetails>()
@@ -26,7 +28,11 @@ class AlbumPicsDetails(
     suspend fun openPage(page: Int): List<PicsDetails> {
         val gson = Gson()
         val list = mutableListOf<PicsDetails>()
-        val picsJson = handler?.postJsonCached(Luscious.Companion.API, getPicturesJson(id, page))
+
+        val result = repository.openURI(Luscious.Companion.API, getPicturesJson(id, page), config = RepositoryUriConfig.CACHE_ROM)
+        if (result.isFailure) return list
+        val picsJson = result.getOrNull()
+        //val picsJson = handler?.postJsonCached(Luscious.Companion.API, getPicturesJson(id, page))
         val json = JsonParser.parseString(picsJson).asJsonObject
         val get = json["data"]?.asJsonObject?.get("picture")?.asJsonObject?.get("list")?.asJsonObject
         totalPages = get?.get("info")?.asJsonObject?.get("total_pages")?.asInt

@@ -11,6 +11,8 @@ import com.client.xvideos.l.model.AlbumResponse
 import com.client.xvideos.l.model.FacetCollectionInfo
 import com.client.xvideos.l.net.graphQl.getAlbumListGraphQL1
 import com.client.xvideos.l.net.graphQl.getAlbumListWithAggregations
+import com.client.xvideos.l.repository.Repository
+import com.client.xvideos.l.repository.RepositoryUriConfig
 import com.google.gson.Gson
 import com.google.gson.JsonParser
 import com.google.gson.annotations.SerializedName
@@ -36,7 +38,7 @@ data class AlbumListFilterGenreCountResponseList(
 )
 
 class AlbumListImpl(
-    val handler: KtorRequestHandler? = null,
+    val repository: Repository,
     val scope: CoroutineScope,
 ) {
 
@@ -51,12 +53,12 @@ class AlbumListImpl(
 
     var info by mutableStateOf(
         FacetCollectionInfo(
-            page = -1,
+            page = 1,
             hasNextPage = false,
             hasPreviousPage = false,
-            totalItems = -1,
-            totalPages = -1,
-            itemsPerPage = -1,
+            totalItems = 0,
+            totalPages = 1,
+            itemsPerPage = 30,
             urlComplete = ""
         )
     )
@@ -66,14 +68,16 @@ class AlbumListImpl(
     suspend fun getAlbumListAggregations(id: Int) {
 
         try {
-
-
             Timber.i("!!! getAlbumListAggregations $id")
             val q = getAlbumListWithAggregations(id, filter)
-            val res = handler?.postJson(Luscious.Companion.API, q)
+            val result = repository.openURI(Luscious.Companion.API, q)
+            if (result.isFailure){
+                Timber.i("!!! getAlbumListAggregations error ${result.exceptionOrNull()}")
+                return
+            }
+            val res = result.getOrNull()
             val json = JsonParser.parseString(res).asJsonObject
-            val get =
-                json["data"]?.asJsonObject?.get("album")?.asJsonObject?.get("list_with_aggregations")?.asJsonObject
+            val get = json["data"]?.asJsonObject?.get("album")?.asJsonObject?.get("list_with_aggregations")?.asJsonObject
             val activeFilters = get?.get("active_filters")?.asJsonArray
             val aggregations = get?.get("aggregations")?.asJsonArray
             aggregations
@@ -169,22 +173,30 @@ class AlbumListImpl(
     }
 
 
+    /**
+     * Получить список альбомов с учетом фильтра
+     */
     suspend fun getAlbumList(id: Int) {
 
         Timber.i("!!! getAlbumList $id")
-        //val q = getAlbumListGraphQL(id)
 
         val q = getAlbumListGraphQL1(id, filter)
 
-        val res = handler?.postJsonCachedRam(Luscious.Companion.API, q)
+        val result = repository.openURI(Luscious.Companion.API, q, config = RepositoryUriConfig.CACHE_RAM)
+        if (result.isFailure) {
+            Timber.e("!!! getAlbumList error ${result.exceptionOrNull()}")
+            return
+        }
+        val res = result.getOrNull()
         val gson = Gson()
+
         val a = gson.fromJson(res, AlbumResponse::class.java)
+
         withContext(Dispatchers.Main) {
             info = a.data.album.list.info
             items.clear()
             items.addAll(a.data.album.list.items)
             Timber.i("!!! getAlbumList info ${info.page} ${items.toList()}")
         }
-
     }
 }

@@ -1,75 +1,28 @@
 package com.client.xvideos.l.net
 
-import com.client.xvideos.l.KtorRequestHandler
-import com.client.xvideos.l.db.AppLDatabase
 import com.client.xvideos.l.net.graphQl.refreshMediaCategories
+import com.client.xvideos.l.repository.Repository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+
 class Luscious(
     val scope : CoroutineScope,
-    private val username: String? = null,
-    private val password: String? = null,
-    timeoutMillis: Long = 5000,
-    maxRetries: Int = 5,
-    retryStatusCodes: Set<Int> = setOf(413, 429, 500, 502, 503, 504),
-    backoffFactor: Long = 1000,
-    db: AppLDatabase
+    val repository: Repository
 ) {
+
     companion object {
         const val API = "https://members.luscious.net/graphql/nobatch/"
         const val HOME = "https://members.luscious.net"
         const val LOGIN = "https://members.luscious.net/accounts/login/"
     }
 
-    private val handler = KtorRequestHandler(
-        timeoutMillis = timeoutMillis,
-        maxRetries = maxRetries,
-        retryStatusCodes = retryStatusCodes,
-        backoffFactor = backoffFactor,
-        dao = db.postJsonDao(),
-        daoRam = db.postJsonRamDao()
-    )
-
     init {
         scope.launch(Dispatchers.Main) {
-            refreshMediaCategories(handler)
+            refreshMediaCategories(repository)
         }
     }
-
-
-    var loggedIn: Boolean = false
-        private set
-
-    suspend fun login() {
-        if (username == null || password == null) {
-            println("Username or password not provided")
-            return
-        }
-
-        val formData = mapOf(
-            "login" to username,
-            "password" to password,
-            "remember" to "on"
-        )
-
-        val response = try {
-            handler.post(LOGIN, formData)
-        } catch (e: Exception) {
-            println("Login request failed: ${e.message}")
-            return
-        }
-
-        if ("The username and/or password you specified are not correct." in response) {
-            println("!!! Login failed. Please check your credentials")
-            loggedIn = false
-        } else {
-            loggedIn = true
-            println("Login successful")
-        }
-    }
-
 
     /**
      *
@@ -80,7 +33,7 @@ class Luscious(
      *         Or it can be a string, the link itself
      *
      */
-    fun getAlbum(albumInput: Any, download: Boolean = false): Album {
+    fun getAlbum(albumInput: Any, download: Boolean = false): AlbumInfo {
 
         val id = when (albumInput) {
             is Int -> albumInput.toString()
@@ -89,9 +42,8 @@ class Luscious(
             else -> throw IllegalArgumentException("albumInput must be Int or String")
         }
 
-        return Album(id.toInt(), download, handler, scope)
+        return AlbumInfo(id.toInt(), download, repository, scope)
     }
-
 
     // Вспомогательная функция для извлечения ID из URL
     private fun extractIdFromUrl(url: String): String? {
@@ -100,16 +52,12 @@ class Luscious(
         return matchResult?.groupValues?.get(1)
     }
 
-
     fun getAlbumList(): AlbumListImpl {
-        return AlbumListImpl(handler, scope)
+        return AlbumListImpl(repository, scope)
     }
 
     fun getAlbumTopHits(): AlbumTopHitsImpl {
-        return AlbumTopHitsImpl(handler, scope)
+        return AlbumTopHitsImpl(repository, scope)
     }
-
-
-
 
 }

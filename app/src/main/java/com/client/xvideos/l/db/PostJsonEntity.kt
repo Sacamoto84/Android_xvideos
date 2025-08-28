@@ -5,6 +5,28 @@ import androidx.room.PrimaryKey
 import com.redgifs.db.entity.getCurrentTimeText
 
 
+
+
+@Entity(tableName = "repository_cache_full")
+data class RepositoryCacheFullEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val url: String,
+    val content: String,
+    val timeCreate: Long = System.currentTimeMillis(),
+    val timeCreateText: String = getCurrentTimeText()// добавляем поле для времени в текстовом формате = getCurrentTimeText()
+)
+
+@Entity(tableName = "repository_cache_temp")
+data class RepositoryCacheTempEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val url: String,
+    val content: String,
+    val timeCreate: Long = System.currentTimeMillis(),
+    val timeCreateText: String = getCurrentTimeText()// добавляем поле для времени в текстовом формате = getCurrentTimeText()
+)
+
+
+
 /**
  * Таблица с кешем строк ответов от сервера
  */

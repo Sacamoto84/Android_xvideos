@@ -1,13 +1,9 @@
 package com.client.xvideos.l.net
 
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import com.client.xvideos.l.KtorRequestHandler
-import com.client.xvideos.l.model.Album
-import com.client.xvideos.l.model.AlbumList
 import com.client.xvideos.l.model.AlbumListTopHits
 import com.client.xvideos.l.net.graphQl.getAlbumListTopHitsQuery
+import com.client.xvideos.l.repository.Repository
 import com.google.common.reflect.TypeToken
 import com.google.gson.Gson
 import com.google.gson.JsonParser
@@ -18,7 +14,7 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 class AlbumTopHitsImpl(
-    val handler: KtorRequestHandler? = null,
+    val repository: Repository,
     val scope: CoroutineScope,
 ) {
 
@@ -28,8 +24,9 @@ class AlbumTopHitsImpl(
         scope.launch {
             Timber.i("!!! getAlbumTopHits")
             val q = getAlbumListTopHitsQuery()
-            val res = handler?.postJson(Luscious.Companion.API, q)
-            val json = JsonParser.parseString(res).asJsonObject
+            val res = repository.openURI(Luscious.Companion.API, q)
+            if (res.isFailure) return@launch
+            val json = JsonParser.parseString(res.getOrNull()).asJsonObject
             val get =
                 json["data"]?.asJsonObject?.get("album")?.asJsonObject?.get("list_top_hits")?.asJsonArray
             val gson = Gson()
