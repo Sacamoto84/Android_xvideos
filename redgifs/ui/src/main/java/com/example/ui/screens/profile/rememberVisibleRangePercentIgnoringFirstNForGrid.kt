@@ -2,6 +2,7 @@ package com.example.ui.screens.profile
 
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
@@ -239,3 +240,91 @@ fun rememberVisibleRangePercentIgnoringFirstNForLazyColumn(
     }
     return result
 }
+
+@Composable
+fun rememberVisibleRangePercentIgnoringFirstNForLazyStaggeredGrid(
+    staggeredGridState: LazyStaggeredGridState,
+    itemsToIgnore: Int = 0,
+): State<Pair<Float, Float>> {
+    val result = remember { mutableStateOf(0f to 1f) }
+
+    LaunchedEffect(staggeredGridState, itemsToIgnore) {
+        snapshotFlow { staggeredGridState.layoutInfo }
+            .distinctUntilChanged()
+            .collect { layoutInfo ->
+                if (layoutInfo.visibleItemsInfo.isEmpty() || layoutInfo.totalItemsCount == 0) {
+                    result.value = 0f to 1f
+                    return@collect
+                }
+
+                val relevantTotalItemsCount = layoutInfo.totalItemsCount - itemsToIgnore
+                if (relevantTotalItemsCount <= 0) {
+                    result.value = 0f to 1f
+                    return@collect
+                }
+
+                // Первый видимый элемент, который НЕ игнорируется
+                val firstRelevantVisibleItem = layoutInfo.visibleItemsInfo.firstOrNull { it.index >= itemsToIgnore }
+
+                // Последний видимый элемент
+                val lastRelevantVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()
+
+                if (firstRelevantVisibleItem == null || lastRelevantVisibleItem == null) {
+                    val allItemsIgnoredOrBelowThreshold = layoutInfo.visibleItemsInfo.all { it.index < itemsToIgnore }
+                    if (allItemsIgnoredOrBelowThreshold && layoutInfo.totalItemsCount > itemsToIgnore) {
+                        result.value = 0f to 0f
+                    } else if (relevantTotalItemsCount > 0) {
+                        result.value = 1f to 1f
+                    } else {
+                        result.value = 0f to 1f
+                    }
+                    return@collect
+                }
+
+                // --- Расчет StartPercent ---
+                val firstRelevantItemEffectiveIndex = firstRelevantVisibleItem.index - itemsToIgnore
+
+                // Для StaggeredGrid нужно учесть offset элемента относительно viewport
+                val viewportStartOffset = layoutInfo.viewportStartOffset
+                val firstItemTopEdge = firstRelevantVisibleItem.offset.y.toFloat()
+                val firstItemHeight = firstRelevantVisibleItem.size.height.toFloat()
+
+                // Сколько от высоты первого релевантного элемента скрыто сверху
+                val fractionOfFirstItemHidden = if (firstItemHeight > 0) {
+                    (-(firstItemTopEdge - viewportStartOffset) / firstItemHeight).coerceIn(0f, 1f)
+                } else 0f
+
+                // StartPercent - какая доля релевантных элементов находится выше видимой области
+                val startPercent = if (relevantTotalItemsCount > 0) {
+                    (firstRelevantItemEffectiveIndex + fractionOfFirstItemHidden) / relevantTotalItemsCount
+                } else 0f
+
+                // --- Расчет EndPercent ---
+                val lastRelevantItemEffectiveIndex = lastRelevantVisibleItem.index - itemsToIgnore
+
+                val viewportEndOffset = layoutInfo.viewportEndOffset.toFloat()
+                val lastItemTopEdge = lastRelevantVisibleItem.offset.y.toFloat()
+                val lastItemHeight = lastRelevantVisibleItem.size.height.toFloat()
+
+                // Какая часть высоты последнего элемента видна в viewport
+                val visibleHeightOfLastItem = if (lastItemHeight > 0) {
+                    (viewportEndOffset - lastItemTopEdge).coerceAtMost(lastItemHeight).coerceAtLeast(0f)
+                } else 0f
+
+                val fractionOfLastItemVisible = if (lastItemHeight > 0) {
+                    visibleHeightOfLastItem / lastItemHeight
+                } else 0f
+
+                // EndPercent - какая доля релевантных элементов видна
+                val endPercent = if (relevantTotalItemsCount > 0) {
+                    ((lastRelevantItemEffectiveIndex + fractionOfLastItemVisible) / relevantTotalItemsCount)
+                        .coerceAtMost(1f)
+                } else 0f
+
+                result.value = startPercent.coerceIn(0f, 1f) to endPercent.coerceIn(startPercent, 1f)
+            }
+    }
+
+    return result
+}
+

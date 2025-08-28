@@ -25,3 +25,11 @@ data class PostJsonRamEntity(
     val timeCreate: Long = System.currentTimeMillis(),
     val timeCreateText: String = getCurrentTimeText()// добавляем поле для времени в текстовом формате = getCurrentTimeText()
 )
+
+@Entity(tableName = "album_picture_cache")
+data class AlbumPictureCacheEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0, //Номер альбома
+    val content: String, //Json список PicsDetails
+    val timeCreate: Long = System.currentTimeMillis(),
+    val timeCreateText: String = getCurrentTimeText()// добавляем поле для времени в текстовом формате = getCurrentTimeText()
+)

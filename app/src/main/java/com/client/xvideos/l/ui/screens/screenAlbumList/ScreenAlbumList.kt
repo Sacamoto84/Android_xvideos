@@ -212,7 +212,7 @@ class ScreenLAlbumListSM @AssistedInject constructor(
     fun loadAlbumList(page: Int) {
         screenModelScope.launch {
             albumList.value?.getAlbumList(page)
-            albumList.value?.getAlbumListAggregations(page)
+            //albumList.value?.getAlbumListAggregations(page)
         }
     }
 

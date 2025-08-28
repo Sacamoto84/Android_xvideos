@@ -2,6 +2,8 @@ package com.client.xvideos.l.di
 
 import android.content.Context
 import androidx.room.Room
+import androidx.room.RoomDatabase
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.client.common.AppPath
 import com.client.common.di.ApplicationScope
 import com.client.xvideos.BuildConfig
@@ -42,6 +44,12 @@ object LusciousModule {
         }.absolutePath
         return Room.databaseBuilder(context, AppLDatabase::class.java, dbPath)
             .fallbackToDestructiveMigration()
+            .addCallback(object : RoomDatabase.Callback() {
+                override fun onCreate(db: SupportSQLiteDatabase) {
+                    // Устанавливаем размер страницы (по умолчанию 4096)
+                    db.execSQL("PRAGMA page_size = 65536") // Максимальный размер
+                }
+            })
             .build()
     }
 

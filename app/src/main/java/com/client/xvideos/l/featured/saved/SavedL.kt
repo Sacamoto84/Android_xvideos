@@ -19,7 +19,7 @@ class SavedL @Inject constructor(
 
    val collection =  SavedL_Collection(snackBarEvent)
 
-   val albums = SavedL_Albums(snackBarEvent)
+   val albums = SavedL_Albums(snackBarEvent, db, scope)
 
 
 

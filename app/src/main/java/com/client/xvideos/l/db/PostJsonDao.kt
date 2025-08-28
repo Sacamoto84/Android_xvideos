@@ -37,3 +37,18 @@ interface PostJsonRamDao {
     suspend fun deleteAll()
 
 }
+
+@Dao
+interface AlbumPictureCacheDao {
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(doc: AlbumPictureCacheEntity)
+
+    @Query("SELECT * FROM album_picture_cache WHERE id = :id")
+    suspend fun get(id: Long): AlbumPictureCacheEntity?
+
+    // ✅ Удаление всего кеша
+    @Query("DELETE FROM album_picture_cache")
+    suspend fun deleteAll()
+
+}

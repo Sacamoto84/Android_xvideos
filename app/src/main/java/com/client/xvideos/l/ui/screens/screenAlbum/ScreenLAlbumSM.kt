@@ -1,9 +1,14 @@
 package com.client.xvideos.l.ui.screens.screenAlbum
 
+import androidx.compose.material3.TimeInput
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
+import com.client.common.di.ApplicationScope
 import com.client.xvideos.l.featured.saved.SavedL
 import com.client.xvideos.l.net.Luscious
 import com.client.xvideos.l.net.Album
@@ -15,13 +20,17 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class ScreenLAlbumSM @AssistedInject constructor(
     @Assisted val idAlbum: Long,
     val luscious: Luscious,
-    val saved: SavedL
+    val saved: SavedL,
+    @ApplicationScope val scope: CoroutineScope
 ) : ScreenModel {
 
     @AssistedFactory
@@ -33,23 +42,40 @@ class ScreenLAlbumSM @AssistedInject constructor(
 
     init {
         screenModelScope.launch {
-            if (!luscious.loggedIn) { luscious.login() }
+            if (!luscious.loggedIn) {
+                luscious.login()
+            }
             album.value = luscious.getAlbum(idAlbum)
         }
     }
 
-    fun saveAlbum(){
-        screenModelScope.launch {
 
-            val album = album.value
+    var albumSaveWait by mutableStateOf(false)
 
-
-
+    /**
+     * Сохранить альбом
+     */
+    fun saveAlbum() {
+        scope.launch {
+            if (!luscious.loggedIn) { luscious.login() }
+            val album = luscious.getAlbum(idAlbum)
+            albumSaveWait = true
+            while (album.albumPicsDetails.percentLoad < 1.0f) { delay(100) }
+            albumSaveWait = false
+            val list = album.albumPicsDetails.pics
+            saved.albums.addAndPicsDetails(album.parsed.value, picsDetails = list)
         }
     }
 
-}
+    init {
+        Timber.e("!!! ScreenLAlbumSM init")
+    }
 
+    override fun onDispose() {
+        super.onDispose()
+        Timber.e("!!! ScreenLAlbumSM onDispose")
+    }
+}
 
 @Module
 @InstallIn(SingletonComponent::class)

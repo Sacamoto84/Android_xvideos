@@ -2,6 +2,7 @@ package com.client.common.fileDB
 
 import androidx.compose.runtime.mutableStateListOf
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import timber.log.Timber
 import java.io.File
@@ -14,13 +15,11 @@ import java.lang.reflect.Type
  */
 class FileDB<T>(val dirPath: String, val extension: String, clazz: Class<T> ) {
 
-
-
     private val type = TypeToken.getParameterized(List::class.java, clazz).type
 
     var list = mutableStateListOf<T>()
 
-    private val gson = Gson()
+    private val gson = GsonBuilder().setPrettyPrinting().create()
 
     fun insert(nameFile: String, value: T): Result<Boolean> {
         return try {
