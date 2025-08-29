@@ -38,13 +38,13 @@ import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.client.xvideos.l.net.Luscious
 import com.client.xvideos.l.ThemeL
-import com.client.xvideos.l.ui.screens.screenAlbum.ScreenLAlbum
-import com.client.xvideos.l.ui.screens.screenAlbumList.atom.AlbumListItem
-import com.client.xvideos.l.ui.screens.screenAlbumList.atom.AlbumListPageSelector
 import com.client.xvideos.l.net.AlbumListImpl
+import com.client.xvideos.l.net.Luscious
+import com.client.xvideos.l.ui.element.AlbumListItem
 import com.client.xvideos.l.ui.screens.TabRow
+import com.client.xvideos.l.ui.screens.screenAlbum.ScreenLAlbum
+import com.client.xvideos.l.ui.screens.screenAlbumList.atom.AlbumListPageSelector
 import com.client.xvideos.l.ui.screens.screenAlbumList.molecule.filter.AlbumListFilter
 import com.example.ui.screens.explorer.ScreenRedExplorer.Companion.screenType
 import com.example.ui.screens.explorer.tab.gifs.GifsTab
@@ -164,7 +164,12 @@ class ScreenLAlbumList(val idAlbum: Long) : Screen {
                 items(items?.size ?: 0) { index ->
                     val item = items?.get(index)
                     if (item != null) {
-                        AlbumListItem(item) {
+                        AlbumListItem(
+                            title = item.title,
+                            coverUrl = item.cover.url,
+                            numberOfAnimatedPictures = item.numberOfAnimatedPictures,
+                            numberOfPictures = item.numberOfPictures,
+                        ) {
                             navigator.push(ScreenLAlbum(item.id.toLong()))
                         }
                     }

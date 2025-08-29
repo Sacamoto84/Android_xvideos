@@ -4,21 +4,17 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -29,7 +25,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -49,8 +44,8 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.l.ThemeL
 import com.client.xvideos.l.net.AlbumTopHitsImpl
 import com.client.xvideos.l.net.Luscious
+import com.client.xvideos.l.ui.element.AlbumListItem
 import com.client.xvideos.l.ui.screens.screenAlbum.ScreenLAlbum
-import com.client.xvideos.l.ui.screens.screenAlbumList.atom.AlbumListItem
 import com.client.xvideos.l.ui.screens.screenAlbumTopHits.atom.DrawerContentDefault
 import com.client.xvideos.l.ui.screens.screenAlbumTopHits.atom.DrawerContentHentai
 import com.client.xvideos.l.ui.screens.screenAlbumTopHits.atom.DrawerContentManga
@@ -166,7 +161,10 @@ class ScreenLAlbumTopHits() : Screen {
                         items(items = item.items) {
                             Box(modifier = Modifier.padding(horizontal = 2.dp)) {
                                 AlbumListItem(
-                                    item = it,
+                                    title = it.title,
+                                    coverUrl = it.cover.url,
+                                    numberOfAnimatedPictures = it.numberOfAnimatedPictures,
+                                    numberOfPictures = it.numberOfPictures,
                                     onClick = { navigator.push(ScreenLAlbum(it.id.toLong())) })
                             }
                         }

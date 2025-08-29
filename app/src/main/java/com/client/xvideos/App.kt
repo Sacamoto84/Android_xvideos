@@ -3,18 +3,9 @@ package com.client.xvideos
 import android.annotation.SuppressLint
 import android.app.Application
 import android.preference.PreferenceManager
-import android.util.Log
-import com.client.common.AppPath
 import com.client.common.sharedPref.Settings
 import com.client.xvideos.PermissionScreenActivity.PermissionStorage
 import com.client.xvideos.l.db.AppLDatabase
-import com.couchbase.lite.CouchbaseLite
-import com.couchbase.lite.Database
-import com.couchbase.lite.DatabaseConfiguration
-import com.couchbase.lite.DatabaseConfigurationFactory
-import com.couchbase.lite.Collection
-import com.couchbase.lite.MutableDocument
-import com.couchbase.lite.newConfig
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory
 import com.redgifs.common.block.BlockRed
@@ -35,7 +26,6 @@ import javax.net.ssl.HttpsURLConnection
 import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
-
 
 fun allowAllSSL() {
     try {
@@ -126,35 +116,6 @@ class App : Application() {
                 clearOldCache(redGifsDb.get().cacheMediaResponseDao())
                 dbL.get().postJsonRamDao().deleteAll()
             }
-
-
-            CouchbaseLite.init(this)
-            Log.i("TAG", "!!! CBL Initialized")
-            val db = Database(
-                "getting-started", DatabaseConfigurationFactory.newConfig(
-                    databasePath = AppPath.albums_l,
-                    fullSync = false
-                )
-            )
-            // create the collection "Verlaine" in the default scope ("_default")
-            var collection1: Collection? = db.createCollection("Verlaine")
-
-            collection1 = db.getCollection("Verlaine")
-
-
-            val mutableDocument = MutableDocument()
-                .setFloat("version", 2.0f)
-                .setString("language", "Java")
-            collection1?.save(mutableDocument)
-
-
-//            collection1 = db.defaultScope.getCollection("Verlaine")
-//
-//// create the collection "Verlaine" in the scope "Television"
-//            var collection2: Collection? = db.createCollection("Television", "Verlaine")
-//// both of these retrieve  collection2 created above
-//            collection2 = db.getCollection("Television", "Verlaine")
-//            collection2 = db.getScope("Television")!!.getCollection("Verlaine")
 
         }
 
