@@ -36,12 +36,18 @@ import com.client.xvideos.l.ui.screens.screenRoot.ScreenLRoot
 import com.client.xvideos.screens.videoplayer.video.cache.VideoPlayerCacheManager
 import com.client.xvideos.ui.theme.XvideosTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.asCoroutineDispatcher
+import java.util.concurrent.Executors
 
 const val urlStart = "https://www.xv-ru.com"
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity(), ImageLoaderFactory {
+
+
 
     override fun newImageLoader(): ImageLoader {
         return ImageLoader.Builder(this)
@@ -62,7 +68,7 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
             .interceptorDispatcher(Dispatchers.IO)
             .memoryCachePolicy(CachePolicy.ENABLED)
             .diskCachePolicy(CachePolicy.ENABLED)
-            .dispatcher(Dispatchers.IO)
+            .dispatcher(Dispatchers.Default)
             .bitmapFactoryMaxParallelism(8)
             .build()
     }

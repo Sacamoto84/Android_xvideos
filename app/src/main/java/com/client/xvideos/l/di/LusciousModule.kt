@@ -18,7 +18,10 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.asCoroutineDispatcher
 import java.io.File
+import java.util.concurrent.Executors
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -40,9 +43,10 @@ object LusciousModule {
     @Singleton
     @Provides
     fun provideLuscious(
-        @ApplicationScope scope: CoroutineScope,
         repository: Repository
     ): Luscious {
+        val downloadDispatcher = Executors.newFixedThreadPool(8).asCoroutineDispatcher()
+        val scope = CoroutineScope(SupervisorJob() + downloadDispatcher)
         return Luscious(scope, repository)
     }
 

@@ -78,6 +78,7 @@ import com.client.xvideos.l.ThemeL
 import com.client.xvideos.l.model.AlbumDetails
 import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.ui.UrlImageLusciousGifs
+import com.client.xvideos.l.ui.UrlImageLusciousGifsFull
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoAudiences
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoDownload
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoGreeting
@@ -371,7 +372,8 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
                                 contentAlignment = Alignment.Center
                             ) {
                                 val aspect = it.width.toFloat() / it.height
-                                UrlImageLusciousGifs(
+
+                                UrlImageLusciousGifsFull(
                                     it.url_to_original,
                                     modifier = Modifier
                                         .padding(2.dp)
@@ -389,6 +391,26 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
                                     contentScale = ContentScale.FillBounds,
                                     albumName = idAlbum.toString()
                                 )
+
+
+//                                UrlImageLusciousGifs(
+//                                    it.url_to_original,
+//                                    modifier = Modifier
+//                                        .padding(2.dp)
+//                                        .aspectRatio(aspect)
+//                                        .clipToBounds()
+//                                        .border(0.5.dp, Color.Gray)
+//                                        .onGloballyPositioned { coordinates ->
+//                                            val rect = coordinates.boundsInRoot()
+//                                            imageBounds = rect
+//                                        }
+//                                        .clickable {
+//                                            selectedImage = it.url_to_original
+//                                            selectedBounds = imageBounds
+//                                        },
+//                                    contentScale = ContentScale.FillBounds,
+//                                    albumName = idAlbum.toString()
+//                                )
 
                                 val targetAlpha =
                                     if (selectedImage == it.url_to_original) 1f else 0f

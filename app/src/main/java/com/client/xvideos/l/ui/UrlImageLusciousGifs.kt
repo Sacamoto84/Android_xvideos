@@ -33,6 +33,7 @@ import com.facebook.imagepipeline.image.ImageInfo
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil.CoilImage
 import com.skydoves.landscapist.fresco.websupport.FrescoWebImage
+import kotlinx.coroutines.Dispatchers
 import timber.log.Timber
 import java.io.File
 
@@ -67,6 +68,7 @@ fun UrlImageLusciousGifs(
             }
             .diskCachePolicy(CachePolicy.ENABLED)
             .memoryCachePolicy(CachePolicy.ENABLED)
+            .dispatcher(Dispatchers.Default)
             .build()
     }
 
