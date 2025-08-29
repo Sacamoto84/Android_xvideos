@@ -42,6 +42,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.l.ThemeL
 import com.client.xvideos.l.ui.screens.screenAlbumList.ScreenLAlbumList
+import com.client.xvideos.l.ui.screens.screenSavedAlbums.ScreenLSavedAlbums
 import com.example.ui.screens.UiSnackbarVisuals
 import com.example.ui.screens.show
 import com.redgifs.common.ThemeRed
@@ -182,7 +183,8 @@ class ScreenLRoot() : Screen {
                     }
                 }
             ) { paddingValues ->
-                Navigator( screen = ScreenLAlbumList(556543))
+                //Navigator( screen = ScreenLAlbumList(556543))
+                Navigator( screen = ScreenLSavedAlbums())
             }
         }
     }

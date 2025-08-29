@@ -92,14 +92,11 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
 
         //val vm: ScreenLAlbumSM = getScreenModel()
 
-        val vm = getScreenModel<ScreenLAlbumSM, ScreenLAlbumSM.Factory> { factory ->
-            factory.create(idAlbum)
-        }
+        val vm = getScreenModel<ScreenLAlbumSM, ScreenLAlbumSM.Factory> { factory ->  factory.create(idAlbum) }
 
         val album = vm.albumInfo.collectAsStateWithLifecycle().value
 
-        val parsed =
-            vm.albumInfo.collectAsStateWithLifecycle().value?.parsed?.collectAsStateWithLifecycle()?.value
+        val parsed = vm.albumInfo.collectAsStateWithLifecycle().value?.parsed?.collectAsStateWithLifecycle()?.value
 
         var selectedImage by remember { mutableStateOf<String?>(null) }
         var selectedBounds by remember { mutableStateOf<Rect?>(null) }
@@ -108,9 +105,7 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
 
         val state = rememberLazyStaggeredGridState()
 
-        val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForLazyStaggeredGrid(
-            state, 0
-        )
+        val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForLazyStaggeredGrid( state, 0 )
 
 
         /**  ➜ сюда запоминаем элемент, который пользователь хочет удалить  */
@@ -151,14 +146,8 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
                     }
                 },
                 dismissButton = {
-                    TextButton(onClick = {
-                        itemPendingDelete = null
-                    }) {
-                        com.composeunstyled.Text(
-                            "Отмена",
-                            fontSize = 16.sp,
-                            color = Color(0xFF6552A5)
-                        )
+                    TextButton(onClick = { itemPendingDelete = null }) {
+                        com.composeunstyled.Text( "Отмена",  fontSize = 16.sp, color = Color(0xFF6552A5) )
                     }
                 },
 
@@ -169,20 +158,8 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
         /* ---------- /Диалог ---------- */
 
         Scaffold(
-            floatingActionButton = {
-
-                AnimatedVisibility(
-                    state.firstVisibleItemIndex > 3,
-                    enter = fadeIn(),
-                    exit = fadeOut(),
-                ) {
-                    ScrollToTopButton(state)
-                }
-
-
-            },
+            floatingActionButton = {  AnimatedVisibility( state.firstVisibleItemIndex > 3, enter = fadeIn(), exit = fadeOut() ) { ScrollToTopButton(state) } },
             bottomBar = {
-
                 if (album?.albumPicsDetails?.percentLoad != 1.0f) {
                     LinearProgressIndicator(
                         progress = { album?.albumPicsDetails?.percentLoad ?: 0f },
@@ -192,76 +169,49 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
                         strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
                     )
                 }
-
             },
 
             containerColor = ThemeL.greyBackground
         ) { padding ->
 
 
-            Box(
-                modifier = Modifier
-                    .padding(top = padding.calculateTopPadding())
-                    .fillMaxSize()
-            )
+            Box( modifier = Modifier.padding(top = padding.calculateTopPadding()).fillMaxSize() )
             {
 
                 LazyVerticalStaggeredGrid(
                     state = state,
                     columns = StaggeredGridCells.Fixed(2),
-                    modifier = Modifier
-                        .fillMaxSize()
+                    modifier = Modifier.fillMaxSize()
                 ) {
 
                     item(span = StaggeredGridItemSpan.FullLine) {
                         Column(modifier = Modifier.padding(horizontal = 4.dp)) {
                             Row {
-                                UrlImage(
-                                    parsed?.cover?.url.toString(),
-                                    modifier = Modifier.size(72.dp)
-                                )
+                                UrlImage( parsed?.cover?.url.toString(), modifier = Modifier.size(72.dp) )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Column {
                                     if (parsed != null) {
-                                        Text(
-                                            parsed.title,
-                                            color = ThemeL.textColor,
-                                            fontFamily = ThemeL.fontFamilyDMsanss
-                                        )
-                                        Text(
-                                            "${parsed.number_of_animated_pictures} gifs / ${parsed.number_of_pictures} pictures",
-                                            color = ThemeL.textColor
-                                        )
+                                        Text( parsed.title, color = ThemeL.textColor, fontFamily = ThemeL.fontFamilyDMsanss )
+                                        Text( "${parsed.number_of_animated_pictures} gifs / ${parsed.number_of_pictures} pictures", color = ThemeL.textColor )
                                     }
                                 }
                             }
-                            if (parsed != null) {
-                                AlbumInfoGreeting(parsed)
-                            }
-                            if (parsed != null) {
-                                AlbumInfoAudiences(parsed)
-                            }
+                            if (parsed != null) { AlbumInfoGreeting(parsed) }
+                            if (parsed != null) { AlbumInfoAudiences(parsed) }
                         }
 
                     }
 
-//                item(span = StaggeredGridItemSpan.FullLine) { if (parsed != null) { AlbumInfoGreeting(parsed)  } }
-//                item(span = StaggeredGridItemSpan.FullLine) { if (parsed != null) { AlbumInfoAudiences(parsed) } }
                     item(span = StaggeredGridItemSpan.FullLine) {
                         if (parsed != null) {
                             AlbumInfoTags(parsed)
                         }
                     }
 
-                    item(span = StaggeredGridItemSpan.FullLine) {
-                        if (parsed != null) {
-                            AlbumInfoDownload(parsed)
-                        }
-                    }
+                    item(span = StaggeredGridItemSpan.FullLine) { if (parsed != null) { AlbumInfoDownload(parsed) } }
 
                     item(span = StaggeredGridItemSpan.FullLine) {
                         if (parsed != null) {
-
 
                             Box(
                                 modifier = Modifier.padding(horizontal = 2.dp).padding(top = 2.dp, bottom = 4.dp)
@@ -305,8 +255,7 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
                                     contentScale = ContentScale.FillBounds,
                                 )
 
-                                val targetAlpha =
-                                    if (selectedImage == it.url_to_original) 1f else 0f
+                                val targetAlpha = if (selectedImage == it.url_to_original) 1f else 0f
 
                                 val animatedAlpha by animateFloatAsState(
                                     targetValue = targetAlpha,
@@ -335,17 +284,8 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
 
                 }
 
-
                 //---- Скролл ----
-                Box(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .align(Alignment.CenterEnd)
-                        .width(2.dp)
-                ) {
-                    VerticalScrollbar(scrollPercent)
-                    //VerticalScrollbar2(scrollPercent)
-                }
+                Box( modifier = Modifier.fillMaxHeight().align(Alignment.CenterEnd).width(2.dp) ) { VerticalScrollbar(scrollPercent) }
 
                 // Полноэкранное изображение с анимацией
                 selectedImage?.let { imageUrl ->

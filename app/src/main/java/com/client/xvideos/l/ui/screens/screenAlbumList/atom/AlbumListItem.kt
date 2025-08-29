@@ -29,7 +29,6 @@ fun AlbumListItem(item: Album, onClick: () -> Unit = {}) {
 
         Text(item.title.removePrefix(" "), modifier = Modifier, color = ThemeL.textColor, fontFamily = ThemeL.fontFamilyKarla, maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 16.sp)
 
-
         Row {
             val str = StringBuilder()
             if (item.numberOfAnimatedPictures > 0){
@@ -42,10 +41,6 @@ fun AlbumListItem(item: Album, onClick: () -> Unit = {}) {
             }
             Text(str.toString(), modifier = Modifier, color = ThemeL.textColor, fontFamily = ThemeL.fontFamilyKarla, fontSize = 14.sp)
         }
-
-
-
-
 
     }
 

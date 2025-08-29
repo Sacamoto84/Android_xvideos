@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 
 class SavedL_Albums(val snackBarEvent: SnackBarEvent, val db: AppLDatabase, val scope: CoroutineScope) {
 
-    val albumDb = FileDB(AppPath.albums_l, "album", AlbumDetails::class.java)
+    val albumDb = FileDB<AlbumDetails>(AppPath.albums_l, "album", AlbumDetails::class.java)
     val list = albumDb.list
 
     fun add(item: AlbumDetails) {

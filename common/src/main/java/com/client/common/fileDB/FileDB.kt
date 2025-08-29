@@ -13,7 +13,7 @@ import java.lang.reflect.Type
 /**
  * val nichesDb = FileDB<NichesInfo>(AppPath.niches_red, "niches", object : TypeToken<NichesInfo>() {}.type)
  */
-class FileDB<T>(val dirPath: String, val extension: String, clazz: Class<T> ) {
+class FileDB<T>(val dirPath: String, val extension: String, private val clazz: Class<T> ) {
 
     private val type = TypeToken.getParameterized(List::class.java, clazz).type
 
@@ -78,15 +78,16 @@ class FileDB<T>(val dirPath: String, val extension: String, clazz: Class<T> ) {
     fun refresh(): Result<Boolean> {
         return try {
             val dir = File(dirPath)
-            if (!dir.exists() || !dir.isDirectory) { return Result.failure(IOException("!!! Директория не существует: $dirPath")) }
+            if (!dir.exists() || !dir.isDirectory) {
+                return Result.failure(IOException("!!! Директория не существует: $dirPath"))
+            }
 
             val files = dir.listFiles { file -> file.extension == extension } ?: emptyArray()
 
             val loaded = files.mapNotNull { file ->
                 try {
                     val json = file.readText(Charsets.UTF_8)
-                    //val type = object : TypeToken<T>() {}.type
-                    gson.fromJson<T>(json, type)
+                    gson.fromJson(json, clazz)
                 } catch (e: Exception) {
                     Timber.e(e, "!!! FileDB refresh Ошибка при чтении файла $dirPath ${file.name}")
                     null
@@ -102,6 +103,35 @@ class FileDB<T>(val dirPath: String, val extension: String, clazz: Class<T> ) {
             Result.failure(e)
         }
     }
+
+
+//    fun refresh(): Result<Boolean> {
+//        return try {
+//            val dir = File(dirPath)
+//            if (!dir.exists() || !dir.isDirectory) { return Result.failure(IOException("!!! Директория не существует: $dirPath")) }
+//
+//            val files = dir.listFiles { file -> file.extension == extension } ?: emptyArray()
+//
+//            val loaded = files.mapNotNull { file ->
+//                try {
+//                    val json = file.readText(Charsets.UTF_8)
+//                    //val type = object : TypeToken<T>() {}.type
+//                    gson.fromJson<T>(json, type)
+//                } catch (e: Exception) {
+//                    Timber.e(e, "!!! FileDB refresh Ошибка при чтении файла $dirPath ${file.name}")
+//                    null
+//                }
+//            }
+//
+//            list.clear()
+//            list.addAll(loaded)
+//
+//            Result.success(true)
+//        } catch (e: Exception) {
+//            Timber.e(e, "!!! Ошибка при обновлении списка из директории $dirPath")
+//            Result.failure(e)
+//        }
+//    }
 
 }
 
