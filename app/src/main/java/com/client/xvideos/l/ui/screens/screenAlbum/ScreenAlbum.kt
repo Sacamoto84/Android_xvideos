@@ -44,6 +44,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -72,6 +73,7 @@ import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import com.client.common.urlVideImage.UrlImage
+import com.client.common.util.toPrettyCountInt
 import com.client.xvideos.l.ThemeL
 import com.client.xvideos.l.model.AlbumDetails
 import com.client.xvideos.l.model.PicsDetails
@@ -99,11 +101,14 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
 
         //val vm: ScreenLAlbumSM = getScreenModel()
 
-        val vm = getScreenModel<ScreenLAlbumSM, ScreenLAlbumSM.Factory> { factory ->  factory.create(idAlbum) }
+        val vm = getScreenModel<ScreenLAlbumSM, ScreenLAlbumSM.Factory> { factory ->
+            factory.create(idAlbum)
+        }
 
         val album = vm.albumInfo.collectAsStateWithLifecycle().value
 
-        val parsed = vm.albumInfo.collectAsStateWithLifecycle().value?.parsed?.collectAsStateWithLifecycle()?.value
+        val parsed =
+            vm.albumInfo.collectAsStateWithLifecycle().value?.parsed?.collectAsStateWithLifecycle()?.value
 
         var selectedImage by remember { mutableStateOf<String?>(null) }
         var selectedBounds by remember { mutableStateOf<Rect?>(null) }
@@ -112,16 +117,16 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
 
         val state = rememberLazyStaggeredGridState()
 
-        val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForLazyStaggeredGrid( state, 0 )
+        val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForLazyStaggeredGrid(state, 0)
 
         val filteredPic = remember { mutableStateListOf<PicsDetails>() }
 
-        LaunchedEffect(vm.showOnlyAnimated, parsed){
+        LaunchedEffect(vm.showOnlyAnimated, parsed) {
 
             Timber.d("!!! LaunchedEffect vm.showOnlyAnimated = ${vm.showOnlyAnimated} parsed = $parsed")
             if (parsed == null) return@LaunchedEffect
 
-            val a  = album?.albumPicsDetails?.pics?.filter { it.is_animated == vm.showOnlyAnimated }
+            val a = album?.albumPicsDetails?.pics?.filter { it.is_animated == vm.showOnlyAnimated }
 
             filteredPic.clear()
             delay(100)
@@ -129,6 +134,11 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
 
         }
 
+        val folderSize = vm.downloader.folderSize.collectAsStateWithLifecycle().value
+        val fileCountDownloaded =
+            vm.downloader.fileCountDownloaded.collectAsStateWithLifecycle().value
+        val fileCountRaw = vm.downloader.fileCountRaw.collectAsStateWithLifecycle().value
+        val fileCountError = vm.downloader.fileCountError.collectAsStateWithLifecycle().value
 
 
         /**  ➜ сюда запоминаем элемент, который пользователь хочет удалить  */
@@ -170,7 +180,11 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
                 },
                 dismissButton = {
                     TextButton(onClick = { itemPendingDelete = null }) {
-                        com.composeunstyled.Text( "Отмена",  fontSize = 16.sp, color = Color(0xFF6552A5) )
+                        com.composeunstyled.Text(
+                            "Отмена",
+                            fontSize = 16.sp,
+                            color = Color(0xFF6552A5)
+                        )
                     }
                 },
 
@@ -181,7 +195,13 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
         /* ---------- /Диалог ---------- */
 
         Scaffold(
-            floatingActionButton = {  AnimatedVisibility( state.firstVisibleItemIndex > 3, enter = fadeIn(), exit = fadeOut() ) { ScrollToTopButton(state) } },
+            floatingActionButton = {
+                AnimatedVisibility(
+                    state.firstVisibleItemIndex > 3,
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) { ScrollToTopButton(state) }
+            },
             bottomBar = {
                 if (album?.albumPicsDetails?.percentLoad != 1.0f) {
                     LinearProgressIndicator(
@@ -198,7 +218,9 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
         ) { padding ->
 
 
-            Box( modifier = Modifier.padding(top = padding.calculateTopPadding()).fillMaxSize() )
+            Box(modifier = Modifier
+                .padding(top = padding.calculateTopPadding())
+                .fillMaxSize())
             {
 
                 LazyVerticalStaggeredGrid(
@@ -210,17 +232,31 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
                     item(span = StaggeredGridItemSpan.FullLine) {
                         Column(modifier = Modifier.padding(horizontal = 4.dp)) {
                             Row {
-                                UrlImage( parsed?.cover?.url.toString(), modifier = Modifier.size(72.dp) )
+                                UrlImage(
+                                    parsed?.cover?.url.toString(),
+                                    modifier = Modifier.size(72.dp)
+                                )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Column {
                                     if (parsed != null) {
-                                        Text( parsed.title, color = ThemeL.textColor, fontFamily = ThemeL.fontFamilyDMsanss )
-                                        Text( "${parsed.number_of_animated_pictures} gifs / ${parsed.number_of_pictures} pictures", color = ThemeL.textColor )
+                                        Text(
+                                            parsed.title,
+                                            color = ThemeL.textColor,
+                                            fontFamily = ThemeL.fontFamilyDMsanss
+                                        )
+                                        Text(
+                                            "${parsed.number_of_animated_pictures} gifs / ${parsed.number_of_pictures} pictures",
+                                            color = ThemeL.textColor
+                                        )
                                     }
                                 }
                             }
-                            if (parsed != null) { AlbumInfoGreeting(parsed) }
-                            if (parsed != null) { AlbumInfoAudiences(parsed) }
+                            if (parsed != null) {
+                                AlbumInfoGreeting(parsed)
+                            }
+                            if (parsed != null) {
+                                AlbumInfoAudiences(parsed)
+                            }
                         }
 
                     }
@@ -231,21 +267,43 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
                         }
                     }
 
-                    item(span = StaggeredGridItemSpan.FullLine) { if (parsed != null) { AlbumInfoDownload(parsed) } }
+                    item(span = StaggeredGridItemSpan.FullLine) {
+                        if (parsed != null) {
+                            AlbumInfoDownload(parsed)
+                        }
+                    }
 
                     item(span = StaggeredGridItemSpan.FullLine) {
                         if (parsed != null) {
 
                             Box(
-                                modifier = Modifier.padding(horizontal = 2.dp).padding(top = 2.dp, bottom = 4.dp)
-                                    .height(46.dp).fillMaxWidth().clip(RoundedCornerShape(4.dp))
-                                    .border( 1.dp, ThemeL.grey3, RoundedCornerShape(4.dp) )
+                                modifier = Modifier
+                                    .padding(horizontal = 2.dp)
+                                    .padding(top = 2.dp, bottom = 4.dp)
+                                    .height(46.dp)
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(4.dp))
+                                    .border(1.dp, ThemeL.grey3, RoundedCornerShape(4.dp))
                                     .background(if (!saved) ThemeL.red else ThemeL.grey6)
-                                    .clickable(onClick = { if (!saved) { vm.saveAlbum() } else { itemPendingDelete = parsed } }),
+                                    .clickable(onClick = {
+                                        if (!saved) {
+                                            vm.saveAlbum()
+                                        } else {
+                                            itemPendingDelete = parsed
+                                        }
+                                    }),
                                 contentAlignment = Alignment.Center
                             ) {
-                                if (!saved) Text( "Save Album", color = Color.White, fontFamily = ThemeL.fontFamilyKarla )
-                                else Text( "Remove Album", color = Color.White, fontFamily = ThemeL.fontFamilyKarla )
+                                if (!saved) Text(
+                                    "Save Album",
+                                    color = Color.White,
+                                    fontFamily = ThemeL.fontFamilyKarla
+                                )
+                                else Text(
+                                    "Remove Album",
+                                    color = Color.White,
+                                    fontFamily = ThemeL.fontFamilyKarla
+                                )
                             }
                         }
                     }
@@ -253,14 +311,38 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
 
                     item(span = StaggeredGridItemSpan.FullLine) {
 
-                        Button(onClick = { vm.saveFullAlbum() }) {
-                            Text(text = "Load All Pics")
+                        Column()
+                        {
+                            Text(
+                                "Size: " + folderSize.toPrettyCountInt(),
+                                color = ThemeL.textColor
+                            )
+                            Row {
+                                Text(
+                                    "$fileCountDownloaded / ",
+                                    color = ThemeL.textColor
+                                )
+                                Text(
+                                    "$fileCountRaw / ",
+                                    color = ThemeL.textColor
+                                )
+                                Text(
+                                    fileCountError.toString(),
+                                    color = ThemeL.textColor
+                                )
+                            }
+
+                            Button(onClick = { vm.saveFullAlbum() }) {
+                                Text(text = "Load All Pics")
+                            }
                         }
+
+
                     }
                     item(span = StaggeredGridItemSpan.FullLine) {
                         if (parsed != null) {
 
-                            if(parsed.number_of_animated_pictures == 0 ) return@item
+                            if (parsed.number_of_animated_pictures == 0) return@item
 
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
@@ -308,7 +390,8 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
                                     albumName = idAlbum.toString()
                                 )
 
-                                val targetAlpha = if (selectedImage == it.url_to_original) 1f else 0f
+                                val targetAlpha =
+                                    if (selectedImage == it.url_to_original) 1f else 0f
 
                                 val animatedAlpha by animateFloatAsState(
                                     targetValue = targetAlpha,
@@ -338,7 +421,12 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
                 }
 
                 //---- Скролл ----
-                Box( modifier = Modifier.fillMaxHeight().align(Alignment.CenterEnd).width(2.dp) ) { VerticalScrollbar(scrollPercent) }
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .align(Alignment.CenterEnd)
+                        .width(2.dp)
+                ) { VerticalScrollbar(scrollPercent) }
 
                 // Полноэкранное изображение с анимацией
                 selectedImage?.let { imageUrl ->
@@ -346,7 +434,8 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
                         imageUrl = imageUrl,
                         startBounds = selectedBounds,
                         onClose = { selectedImage = null },
-                        albumName = idAlbum.toString()
+                        albumName = idAlbum.toString(),
+                        filteredPic = filteredPic
                     )
                 }
             }

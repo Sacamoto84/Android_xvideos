@@ -42,6 +42,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.ui.UrlImageLusciousGifsFull
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.joinAll
@@ -56,7 +57,8 @@ fun FullScreenImage(
     imageUrl: String,
     startBounds: Rect?,
     onClose: () -> Unit,
-    albumName: String
+    albumName: String,
+    filteredPic: List<PicsDetails>
 ) {
     val density = LocalDensity.current
     val configuration = LocalConfiguration.current

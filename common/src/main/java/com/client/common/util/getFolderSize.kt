@@ -1,4 +1,4 @@
-package com.client.common
+package com.client.common.util
 
 import java.io.File
 

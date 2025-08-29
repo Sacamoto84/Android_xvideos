@@ -74,7 +74,7 @@ class Repository(
                         val cacheKey = data.toMD5()
                         val res = repositoryCacheFullDao.get(cacheKey)
                         if (res != null) {
-                            Timber.i("!!! openURI() CACHE_ROM res != null response:${res.content}")
+                            //Timber.i("!!! openURI() CACHE_ROM res != null response:${res.content}")
                             return Result.success(res.content)
                         }
                         val response = handler.postJson(url, data)
@@ -90,7 +90,7 @@ class Repository(
                                 content = response
                             )
                         )
-                        Timber.i("!!! openURI() CACHE_ROM net response:$response")
+                        //Timber.i("!!! openURI() CACHE_ROM net response:$response")
                         return Result.success(response)
                     }
                     catch (e: Exception){
@@ -104,7 +104,7 @@ class Repository(
                         val cacheKey = data.toMD5()
                         val res = repositoryCacheTempDao.get(cacheKey)
                         if (res != null) {
-                            Timber.i("!!! openURI() CACHE_RAM res != null response:${res.content}")
+                            //Timber.i("!!! openURI() CACHE_RAM res != null response:${res.content}")
                             return Result.success(res.content)
                         }
                         val response = handler.postJson(url, data)
@@ -120,7 +120,7 @@ class Repository(
                                 content = response
                             )
                         )
-                        Timber.i("!!! openURI() CACHE_RAM net response:$response")
+                        //Timber.i("!!! openURI() CACHE_RAM net response:$response")
 
                         if (response.contains("{\"errors\":"))
                         {

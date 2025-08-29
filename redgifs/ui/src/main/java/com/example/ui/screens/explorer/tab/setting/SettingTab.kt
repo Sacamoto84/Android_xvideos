@@ -46,7 +46,7 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import com.client.common.AppPath
-import com.client.common.getFolderSize
+import com.client.common.util.getFolderSize
 import com.client.common.sharedPref.Settings
 import com.client.common.util.toPrettyCount3
 import com.redgifs.common.ThemeRed
