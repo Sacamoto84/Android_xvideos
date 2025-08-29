@@ -32,16 +32,20 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -70,6 +74,7 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import com.client.common.urlVideImage.UrlImage
 import com.client.xvideos.l.ThemeL
 import com.client.xvideos.l.model.AlbumDetails
+import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.ui.UrlImageLusciousGifs
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoAudiences
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoDownload
@@ -78,8 +83,10 @@ import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoTags
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.FullScreenImage
 import com.example.ui.screens.profile.atom.VerticalScrollbar
 import com.example.ui.screens.profile.rememberVisibleRangePercentIgnoringFirstNForLazyStaggeredGrid
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.engawapg.lib.zoomable.ExperimentalZoomableApi
+import timber.log.Timber
 
 class ScreenLAlbum(val idAlbum: Long) : Screen {
 
@@ -106,6 +113,22 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
         val state = rememberLazyStaggeredGridState()
 
         val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForLazyStaggeredGrid( state, 0 )
+
+        val filteredPic = remember { mutableStateListOf<PicsDetails>() }
+
+        LaunchedEffect(vm.showOnlyAnimated, parsed){
+
+            Timber.d("!!! LaunchedEffect vm.showOnlyAnimated = ${vm.showOnlyAnimated} parsed = $parsed")
+            if (parsed == null) return@LaunchedEffect
+
+            val a  = album?.albumPicsDetails?.pics?.filter { it.is_animated == vm.showOnlyAnimated }
+
+            filteredPic.clear()
+            delay(100)
+            filteredPic.addAll(a ?: emptyList())
+
+        }
+
 
 
         /**  ➜ сюда запоминаем элемент, который пользователь хочет удалить  */
@@ -225,11 +248,40 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
                                 else Text( "Remove Album", color = Color.White, fontFamily = ThemeL.fontFamilyKarla )
                             }
                         }
-
-
                     }
 
-                    items(album?.albumPicsDetails?.pics ?: emptyList()) {
+
+                    item(span = StaggeredGridItemSpan.FullLine) {
+
+                        Button(onClick = { vm.saveFullAlbum() }) {
+                            Text(text = "Load All Pics")
+                        }
+                    }
+                    item(span = StaggeredGridItemSpan.FullLine) {
+                        if (parsed != null) {
+
+                            if(parsed.number_of_animated_pictures == 0 ) return@item
+
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.End
+                            ) {
+                                Text(
+                                    "Show only animated",
+                                    color = ThemeL.textColor,
+                                    fontFamily = ThemeL.fontFamilyKarla
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Switch(
+                                    vm.showOnlyAnimated,
+                                    onCheckedChange = { vm.showOnlyAnimated = it },
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                            }
+                        }
+                    }
+
+                    items(filteredPic) {
                         var imageBounds by remember { mutableStateOf<Rect?>(null) }
                         if (it.url_to_original != null) {
                             Box(
@@ -253,6 +305,7 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
                                             selectedBounds = imageBounds
                                         },
                                     contentScale = ContentScale.FillBounds,
+                                    albumName = idAlbum.toString()
                                 )
 
                                 val targetAlpha = if (selectedImage == it.url_to_original) 1f else 0f
@@ -293,6 +346,7 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
                         imageUrl = imageUrl,
                         startBounds = selectedBounds,
                         onClose = { selectedImage = null },
+                        albumName = idAlbum.toString()
                     )
                 }
             }

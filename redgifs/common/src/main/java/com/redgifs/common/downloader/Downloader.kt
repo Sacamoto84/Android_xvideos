@@ -46,11 +46,7 @@ class Downloader @Inject constructor(
             return
         }
 
-
-
-
         percent.value = -2f
-
 
         //Проверка того что в кеше есть запись с этим именем и кретором
 

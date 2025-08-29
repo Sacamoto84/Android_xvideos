@@ -1,13 +1,18 @@
 package com.client.xvideos.l.ui.screens.screenAlbum
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
 import com.client.common.di.ApplicationScope
+import com.client.xvideos.l.featured.downloader.DownloaderL
 import com.client.xvideos.l.featured.saved.SavedL
 import com.client.xvideos.l.net.AlbumInfo
 import com.client.xvideos.l.net.Luscious
+import com.kdownloader.KDownloader
 import dagger.Binds
 import dagger.Module
 import dagger.assisted.Assisted
@@ -27,6 +32,7 @@ class ScreenLAlbumSM @AssistedInject constructor(
     val saved: SavedL,
     @ApplicationScope val scope: CoroutineScope,
     //val repository: Repository
+    val kDownloader: KDownloader
 ) : ScreenModel {
 
     @AssistedFactory
@@ -35,6 +41,15 @@ class ScreenLAlbumSM @AssistedInject constructor(
     }
 
     val albumInfo = MutableStateFlow<AlbumInfo?>(null)
+
+    /**
+     * Показ только анимированных картинок
+     */
+    var showOnlyAnimated by mutableStateOf(false)
+
+    var showOnlyPicture by mutableStateOf(false)
+
+    val downloader = DownloaderL(kDownloader)
 
     init {
         screenModelScope.launch {
@@ -52,6 +67,15 @@ class ScreenLAlbumSM @AssistedInject constructor(
             }
         }
     }
+
+    fun saveFullAlbum() {
+        scope.launch {
+            val pic = albumInfo.value?.albumPicsDetails?.pics?.toList()
+                ?.map { it.url_to_original } as List<String>
+            downloader.saveAlbums(pic, albumInfo.value!!.id.toString())
+        }
+    }
+
 
     init {
         Timber.e("!!! ScreenLAlbumSM init")

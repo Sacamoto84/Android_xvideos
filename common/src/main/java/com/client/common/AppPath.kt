@@ -48,6 +48,8 @@ object AppPath {
 
     val albums_l: String = "${main}/${Folder.L.value}/Saved/Album"
 
+    val downloaded_albums_l: String = "${main}/${Folder.L.value}/Saved/Downloaded/Album"
+
     val collection_l: String = "${main}/${Folder.L.value}/Saved/Collection"
 
     val db_l: String = "${main}/${Folder.L.value}/db"
@@ -88,6 +90,8 @@ object AppPath {
 
         File(albums_l).mkdirs()
         File(collection_l).mkdirs()
+
+        File(downloaded_albums_l).mkdirs()
 
     }
 

@@ -55,7 +55,8 @@ import kotlin.math.roundToInt
 fun FullScreenImage(
     imageUrl: String,
     startBounds: Rect?,
-    onClose: () -> Unit
+    onClose: () -> Unit,
+    albumName: String
 ) {
     val density = LocalDensity.current
     val configuration = LocalConfiguration.current
@@ -444,6 +445,7 @@ fun FullScreenImage(
                 modifier = Modifier,//.fillMaxSize(),
                 contentScale = ContentScale.FillBounds,
                 onSuccess = { success = it },
+                albumName = albumName
             )
         }
     }

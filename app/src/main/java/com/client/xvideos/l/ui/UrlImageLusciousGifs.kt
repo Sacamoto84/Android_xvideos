@@ -1,5 +1,6 @@
 package com.client.xvideos.l.ui
 
+import android.net.Uri
 import android.os.Build
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -24,6 +25,7 @@ import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import coil.request.CachePolicy
 import coil.request.ImageRequest
+import com.client.common.AppPath
 import com.composeunstyled.Text
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.controller.BaseControllerListener
@@ -32,6 +34,7 @@ import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil.CoilImage
 import com.skydoves.landscapist.fresco.websupport.FrescoWebImage
 import timber.log.Timber
+import java.io.File
 
 @Composable
 fun UrlImageLusciousGifs(
@@ -42,15 +45,21 @@ fun UrlImageLusciousGifs(
     isGrayscale: Boolean = false,
     onLoading: (Boolean) -> Unit = {},
     onSuccess: (Boolean) -> Unit = {},
+    albumName : String
 ) {
 
     val context = LocalContext.current
 
     val colorFilter = ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0.9f) })
 
+    // Определяем имя файла и проверяем наличие
+    val fileName = url.substringAfterLast('/').substringBefore('?')
+    val file = File(AppPath.downloaded_albums_l, "$albumName/$fileName")
+    val dataSource: Any = if (file.exists()) file else url  // либо локальный файл, либо сеть
+
     val imageRequest = remember {
         ImageRequest.Builder(context)
-            .data(url)
+            .data(dataSource)
             .crossfade(true)
             .apply {
                 memoryCacheKey("${url}_preview")
@@ -121,36 +130,47 @@ fun UrlImageLusciousGifsFull(
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.FillWidth,
     onSuccess: (Boolean) -> Unit = {},
+    albumName: String
 ) {
+    // Определяем имя файла и проверяем наличие
+    val fileName = url.substringAfterLast('/').substringBefore('?')
+    val file = File(AppPath.downloaded_albums_l, "$albumName/$fileName")
+    val dataSource: Uri = if (file.exists()) {
+        Uri.fromFile(file) // локальный файл
+    } else {
+        Uri.parse(url) // сетевой url
+    }
 
     var isLoading by remember { mutableStateOf(true) }
     var hasError by remember { mutableStateOf(false) }
 
-    val controllerBuilder = {
-        Fresco.newDraweeControllerBuilder()
-            .setUri(url)
-            .setControllerListener(object : BaseControllerListener<ImageInfo>() {
-                override fun onSubmit(id: String?, callerContext: Any?) {
-                    isLoading = true
-                    hasError = false
-                }
+    val controllerBuilder = remember(dataSource) {
+        {
+            Fresco.newDraweeControllerBuilder()
+                .setUri(dataSource)
+                .setControllerListener(object : BaseControllerListener<ImageInfo>() {
+                    override fun onSubmit(id: String?, callerContext: Any?) {
+                        isLoading = true
+                        hasError = false
+                    }
 
-                override fun onFinalImageSet(
-                    id: String?,
-                    imageInfo: ImageInfo?,
-                    animatable: android.graphics.drawable.Animatable?
-                ) {
-                    isLoading = false
-                    hasError = false
-                    onSuccess(true)
-                }
+                    override fun onFinalImageSet(
+                        id: String?,
+                        imageInfo: ImageInfo?,
+                        animatable: android.graphics.drawable.Animatable?
+                    ) {
+                        isLoading = false
+                        hasError = false
+                        onSuccess(true)
+                    }
 
-                override fun onFailure(id: String?, throwable: Throwable?) {
-                    isLoading = false
-                    hasError = true
-                }
-            })
-            .setAutoPlayAnimations(true)
+                    override fun onFailure(id: String?, throwable: Throwable?) {
+                        isLoading = false
+                        hasError = true
+                    }
+                })
+                .setAutoPlayAnimations(true)
+        }
     }
 
     Box {
@@ -162,15 +182,16 @@ fun UrlImageLusciousGifsFull(
         if (isLoading) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(
-                    modifier = Modifier.size(32.dp)//.align(Alignment.Center)
-                    , color = Color.Gray
+                    modifier = Modifier.size(32.dp),
+                    color = Color.Gray
                 )
             }
         }
 
         if (hasError) {
-            Text("Ошибка загрузки", Modifier.align(Alignment.Center))
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("Ошибка загрузки", color = Color.Gray)
+            }
         }
     }
-
 }

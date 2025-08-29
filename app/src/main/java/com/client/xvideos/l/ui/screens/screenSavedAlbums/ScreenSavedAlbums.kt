@@ -42,7 +42,6 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
-import my.nanihadesuka.compose.LazyColumnScrollbar
 import my.nanihadesuka.compose.LazyVerticalGridScrollbar
 import my.nanihadesuka.compose.ScrollbarSettings
 import javax.inject.Inject
@@ -62,31 +61,31 @@ class ScreenLSavedAlbums() : Screen {
 
         Scaffold()
         { padding ->
-            Box(modifier = Modifier.padding(padding))
+            Box(modifier = Modifier.padding(padding)) {
 
-            LazyVerticalGridScrollbar(
-                state = state,
-                settings = ScrollbarSettings.Default
-            ) {
-
-                LazyVerticalGrid(
+                LazyVerticalGridScrollbar(
                     state = state,
-                    columns = GridCells.Fixed(2), modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(0.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                    settings = ScrollbarSettings.Default
+                ) {
 
+                    LazyVerticalGrid(
+                        state = state,
+                        columns = GridCells.Fixed(2),
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
-                    items(vm.albums) {
-                        AlbumListItem(
-                            title = it.title,
-                            coverUrl = it.cover.url,
-                            numberOfAnimatedPictures = it.number_of_animated_pictures,
-                            numberOfPictures = it.number_of_pictures,
-                            modifier = Modifier.padding(horizontal = 2.dp, vertical = 2.dp)
-                        ) { navigator.push(ScreenLAlbum(it.id.toLong())) }
+                        items(vm.albums) {
+                            AlbumListItem(
+                                title = it.title,
+                                coverUrl = it.cover.url,
+                                numberOfAnimatedPictures = it.number_of_animated_pictures,
+                                numberOfPictures = it.number_of_pictures,
+                                modifier = Modifier.padding(horizontal = 2.dp, vertical = 2.dp)
+                            ) { navigator.push(ScreenLAlbum(it.id.toLong())) }
+                        }
                     }
-                }
 
+                }
             }
         }
 
@@ -104,7 +103,6 @@ class ScreenLSavedAlbumsSM @Inject constructor(
     init {
         if (albums.isEmpty()) saved.albums.refresh()
     }
-
 
 }
 
