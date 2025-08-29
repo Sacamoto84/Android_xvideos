@@ -1,4 +1,4 @@
-package com.client.common.kdownloader
+package com.kdownloader
 
 import android.content.Context
 import com.client.common.kdownloader.database.AppDbHelper

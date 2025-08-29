@@ -13,8 +13,7 @@ import com.client.xvideos.l.featured.downloader.DownloaderL
 import com.client.xvideos.l.featured.saved.SavedL
 import com.client.xvideos.l.net.AlbumInfo
 import com.client.xvideos.l.net.Luscious
-import com.client.xvideos.feature.kdownloader.KDownloader
-import com.ketch.Ketch
+import com.kdownloader.KDownloader
 import dagger.Binds
 import dagger.Module
 import dagger.assisted.Assisted
@@ -36,7 +35,6 @@ class ScreenLAlbumSM @AssistedInject constructor(
     //val repository: Repository
     val kDownloader: KDownloader,
     val dowloaderL: DownloaderL,
-    val keth : Ketch
 ) : ScreenModel {
 
     @AssistedFactory
@@ -53,7 +51,7 @@ class ScreenLAlbumSM @AssistedInject constructor(
         //Поиск экземпляра DownloaderAlbum в dowloaderL
         val f = dowloaderL.listDownloaderAlbum.find { it.albumName == idAlbum.toString() }
         if (f == null) {
-            dowloaderL.listDownloaderAlbum.add(DownloaderAlbum(idAlbum.toString(), kDownloader, dowloaderL.scope, keth))
+            dowloaderL.listDownloaderAlbum.add(DownloaderAlbum(idAlbum.toString(), kDownloader, dowloaderL.scope))
         }
         downloader = dowloaderL.listDownloaderAlbum.first { it.albumName == idAlbum.toString() }
 

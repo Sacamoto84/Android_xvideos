@@ -1,10 +1,9 @@
 package com.client.common.kdownloader.internal
 
-
-import com.client.common.kdownloader.Status
 import com.client.common.kdownloader.database.DbHelper
 import com.client.common.kdownloader.database.DownloadModel
-import com.client.common.kdownloader.utils.getTempPath
+import com.kdownloader.Status
+import com.kdownloader.utils.getTempPath
 import kotlinx.coroutines.*
 import java.io.File
 

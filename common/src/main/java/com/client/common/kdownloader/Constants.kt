@@ -1,4 +1,4 @@
-package com.client.common.kdownloader
+package com.kdownloader
 
 object Constants {
     const val RANGE = "Range"

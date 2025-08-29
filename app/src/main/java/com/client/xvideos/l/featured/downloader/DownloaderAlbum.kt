@@ -2,10 +2,8 @@ package com.client.xvideos.l.featured.downloader
 
 import com.client.common.AppPath
 import com.client.common.util.getFolderSize
-import com.client.xvideos.feature.kdownloader.KDownloader
-import com.ketch.Ketch
+import com.kdownloader.KDownloader
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.asCoroutineDispatcher
@@ -13,7 +11,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
@@ -41,8 +39,8 @@ class DownloaderAlbum(
     val albumName: String,
     private val kDownloader: KDownloader,
     private val scope: CoroutineScope,
-    val ketch: Ketch
-) {
+
+    ) {
 
     /**
      * Общее количество файлов в альбоме
@@ -89,6 +87,11 @@ class DownloaderAlbum(
         triggerAlbumSize.tryEmit(Unit)
     }
 
+    fun deleteAlbum() {
+        val dir = File(AppPath.downloaded_albums_l + "/" + albumName)
+        dir.deleteRecursively()
+    }
+
     fun saveAlbums(listUrl: List<String>, albumName: String) {
         scope.launch {
 
@@ -120,53 +123,33 @@ class DownloaderAlbum(
 
                 val fileName = item.substringAfterLast('/').substringBefore('?')
 
-                val id = ketch.download(
-                    url = item,
-                    fileName = fileName,
-                    path = dir.absolutePath,
-                    tag = fileName,
-                    metaData = fileName,
-                    supportPauseResume = false
-                )
+                val request = kDownloader
+                    .newRequestBuilder(item, dir.absolutePath, fileName)
+                    .tag(fileName)
+                    .build()
 
-
-                ketch.observeDownloadById(id)
-                    .flowOn(Dispatchers.IO)
-                    .collect { downloadModel ->
-                        // use downloadModel
-                        val status = downloadModel?.status
-                        val id = downloadModel?.id
-                        Timber.i("!!!! DownloaderAlbum id:$id status: $status")
+                // Using all of these lambdas is not mandatory. for example - you can only use onStart or onProgress also
+                kDownloader.enqueue(
+                    request,
+                    onStart = {
+                        Timber.d(">>> Download Started $fileName")
+                        //requestAlbumSizeUpdate()
+                    },
+                    onProgress = {
+                    },
+                    onCompleted = {
+                        Timber.d(">>> Download onCompleted $fileName")
+                        fileCountDownloaded.update { it + 1 }
+                        //requestAlbumSizeUpdate()
+                    },
+                    onError = {
+                        Timber.e(">>> Download onError $fileName")
+                        fileCountError.update { it + 1 }
+                        //requestAlbumSizeUpdate()
+                    },
+                    onPause = {
                     }
-
-
-//                val request = kDownloader
-//                    .newRequestBuilder(item, dir.absolutePath, fileName)
-//                    .tag(fileName)
-//                    .build()
-//
-//                // Using all of these lambdas is not mandatory. for example - you can only use onStart or onProgress also
-//                kDownloader.enqueue(
-//                    request,
-//                    onStart = {
-//                        Timber.d(">>> Download Started $fileName")
-//                        //requestAlbumSizeUpdate()
-//                    },
-//                    onProgress = {
-//                    },
-//                    onCompleted = {
-//                        Timber.d(">>> Download onCompleted $fileName")
-//                        fileCountDownloaded.update { it + 1 }
-//                        //requestAlbumSizeUpdate()
-//                    },
-//                    onError = {
-//                        Timber.e(">>> Download onError $fileName")
-//                        fileCountError.update { it + 1 }
-//                        //requestAlbumSizeUpdate()
-//                    },
-//                    onPause = {
-//                    }
-//                )
+                )
 
 
             }

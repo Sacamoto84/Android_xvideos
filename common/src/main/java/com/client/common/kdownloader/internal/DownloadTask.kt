@@ -1,7 +1,5 @@
 package com.client.common.kdownloader.internal
 
-import com.client.common.kdownloader.Constants
-import com.client.common.kdownloader.Status
 import com.client.common.kdownloader.database.AppDbHelper
 import com.client.common.kdownloader.database.DbHelper
 import com.client.common.kdownloader.database.DownloadModel
@@ -9,10 +7,12 @@ import com.client.common.kdownloader.httpclient.DefaultHttpClient
 import com.client.common.kdownloader.httpclient.HttpClient
 import com.client.common.kdownloader.internal.stream.FileDownloadOutputStream
 import com.client.common.kdownloader.internal.stream.FileDownloadRandomAccessFile
-import com.client.common.kdownloader.utils.getPath
-import com.client.common.kdownloader.utils.getRedirectedConnectionIfAny
-import com.client.common.kdownloader.utils.getTempPath
-import com.client.common.kdownloader.utils.renameFileName
+import com.kdownloader.Constants
+import com.kdownloader.Status
+import com.kdownloader.utils.getPath
+import com.kdownloader.utils.getRedirectedConnectionIfAny
+import com.kdownloader.utils.getTempPath
+import com.kdownloader.utils.renameFileName
 import kotlinx.coroutines.*
 import java.io.File
 import java.io.IOException

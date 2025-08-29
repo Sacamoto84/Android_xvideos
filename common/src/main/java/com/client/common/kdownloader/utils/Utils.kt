@@ -1,9 +1,9 @@
-package com.client.common.kdownloader.utils
+package com.kdownloader.utils
 
-import com.client.common.kdownloader.Constants
+import com.kdownloader.Constants
+import com.client.common.kdownloader.internal.DownloadRequest
 import com.client.common.kdownloader.httpclient.DefaultHttpClient
 import com.client.common.kdownloader.httpclient.HttpClient
-import com.client.common.kdownloader.internal.DownloadRequest
 import java.io.File
 import java.io.IOException
 import java.io.UnsupportedEncodingException

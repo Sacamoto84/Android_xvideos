@@ -337,6 +337,10 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
                             Button(onClick = { vm.saveFullAlbum() }) {
                                 Text(text = "Load All Pics")
                             }
+
+                            Button(onClick = { vm.downloader.deleteAlbum() }) {
+                                Text(text = "Удалить все файлы")
+                            }
                         }
 
 

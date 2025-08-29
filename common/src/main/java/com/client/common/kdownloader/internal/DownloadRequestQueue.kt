@@ -1,6 +1,6 @@
 package com.client.common.kdownloader.internal
 
-import com.client.common.kdownloader.Status
+import com.kdownloader.Status
 
 class DownloadRequestQueue(private val downloader: DownloadDispatchers) {
 
