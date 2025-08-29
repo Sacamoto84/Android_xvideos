@@ -13,7 +13,8 @@ import com.client.xvideos.l.featured.downloader.DownloaderL
 import com.client.xvideos.l.featured.saved.SavedL
 import com.client.xvideos.l.net.AlbumInfo
 import com.client.xvideos.l.net.Luscious
-import com.kdownloader.KDownloader
+import com.client.xvideos.feature.kdownloader.KDownloader
+import com.ketch.Ketch
 import dagger.Binds
 import dagger.Module
 import dagger.assisted.Assisted
@@ -23,8 +24,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -36,7 +35,8 @@ class ScreenLAlbumSM @AssistedInject constructor(
     @ApplicationScope val scope: CoroutineScope,
     //val repository: Repository
     val kDownloader: KDownloader,
-    val dowloaderL: DownloaderL
+    val dowloaderL: DownloaderL,
+    val keth : Ketch
 ) : ScreenModel {
 
     @AssistedFactory
@@ -53,7 +53,7 @@ class ScreenLAlbumSM @AssistedInject constructor(
         //Поиск экземпляра DownloaderAlbum в dowloaderL
         val f = dowloaderL.listDownloaderAlbum.find { it.albumName == idAlbum.toString() }
         if (f == null) {
-            dowloaderL.listDownloaderAlbum.add(DownloaderAlbum(idAlbum.toString(), kDownloader, dowloaderL.scope))
+            dowloaderL.listDownloaderAlbum.add(DownloaderAlbum(idAlbum.toString(), kDownloader, dowloaderL.scope, keth))
         }
         downloader = dowloaderL.listDownloaderAlbum.first { it.albumName == idAlbum.toString() }
 

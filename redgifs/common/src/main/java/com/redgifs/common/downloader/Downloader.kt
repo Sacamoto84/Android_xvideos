@@ -1,19 +1,16 @@
 package com.redgifs.common.downloader
 
-import androidx.paging.PagingDataEvent
 import com.client.common.AppPath
-import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.redgifs.common.snackBar.SnackBarEvent
 import com.redgifs.common.snackBar.UiMessage
+import com.redgifs.model.GifsInfo
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
-import com.kdownloader.KDownloader
-import com.redgifs.model.GifsInfo
-
+import com.client.xvideos.feature.kdownloader.KDownloader
 
 //Текущее содержимое готового кеша
 data class ItemsRedDownload(

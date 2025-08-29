@@ -79,7 +79,6 @@ androidx-paging-runtime = { module = "androidx.paging:paging-runtime", version.r
 apollo-runtime = { module = "com.apollographql.apollo:apollo-runtime", version.ref = "apolloRuntime" }
 components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "componentsResources" }
 image-loader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "imageLoader" }
-kdownloader = { module = "com.github.varungulatii:Kdownloader", version.ref = "kdownloader" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 
 landscapist-coil = { module = "com.github.skydoves:landscapist-coil", version.ref = "landscapist" }

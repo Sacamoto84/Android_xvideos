@@ -79,6 +79,7 @@ import com.client.xvideos.l.model.AlbumDetails
 import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.ui.UrlImageLusciousGifs
 import com.client.xvideos.l.ui.UrlImageLusciousGifsFull
+import com.client.xvideos.l.ui.UrlImageLusciousGifsGlide
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoAudiences
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoDownload
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoGreeting
@@ -220,7 +221,7 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
 
 
             Box(modifier = Modifier
-                .padding(top = padding.calculateTopPadding())
+                //.padding(top = padding.calculateTopPadding())
                 .fillMaxSize())
             {
 
@@ -373,7 +374,7 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
                             ) {
                                 val aspect = it.width.toFloat() / it.height
 
-                                UrlImageLusciousGifsFull(
+                                UrlImageLusciousGifsGlide(
                                     it.url_to_original,
                                     modifier = Modifier
                                         .padding(2.dp)

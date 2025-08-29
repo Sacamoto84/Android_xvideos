@@ -214,8 +214,6 @@ dependencies {
     implementation(libs.androidx.lifecycle.process)
     implementation(libs.image.loader)
 
-    implementation(libs.kdownloader)
-
     //https://github.com/amitshekhariitbhu/PRDownloader
     //implementation("com.github.amitshekhariitbhu:PRDownloader:1.0.2")
 

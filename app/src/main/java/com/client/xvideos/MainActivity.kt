@@ -45,33 +45,32 @@ import java.util.concurrent.Executors
 const val urlStart = "https://www.xv-ru.com"
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity(), ImageLoaderFactory {
+class MainActivity : ComponentActivity()// ImageLoaderFactory
+{
 
-
-
-    override fun newImageLoader(): ImageLoader {
-        return ImageLoader.Builder(this)
-            .diskCache {
-                DiskCache.Builder()
-                    .directory(cacheDir.resolve("image_cache"))
-                    .maxSizePercent(0.5)
-                    .build()
-            }
-            .memoryCache {
-                MemoryCache.Builder(this)
-                    .maxSizePercent(0.5)
-                    .build()
-            }
-            .respectCacheHeaders(false)
-            .allowHardware(true)
-            .allowRgb565(true)
-            .interceptorDispatcher(Dispatchers.IO)
-            .memoryCachePolicy(CachePolicy.ENABLED)
-            .diskCachePolicy(CachePolicy.ENABLED)
-            .dispatcher(Dispatchers.Default)
-            .bitmapFactoryMaxParallelism(8)
-            .build()
-    }
+//    override fun newImageLoader(): ImageLoader {
+//        return ImageLoader.Builder(this)
+//            .diskCache {
+//                DiskCache.Builder()
+//                    .directory(cacheDir.resolve("image_cache"))
+//                    .maxSizePercent(0.5)
+//                    .build()
+//            }
+//            .memoryCache {
+//                MemoryCache.Builder(this)
+//                    .maxSizePercent(0.5)
+//                    .build()
+//            }
+//            .respectCacheHeaders(false)
+//            .allowHardware(true)
+//            .allowRgb565(true)
+//            .interceptorDispatcher(Dispatchers.IO)
+//            .memoryCachePolicy(CachePolicy.ENABLED)
+//            .diskCachePolicy(CachePolicy.ENABLED)
+//            .dispatcher(Dispatchers.Default)
+//            .bitmapFactoryMaxParallelism(8)
+//            .build()
+//    }
 
     @OptIn(ExperimentalVoyagerApi::class, ExperimentalLayoutApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {

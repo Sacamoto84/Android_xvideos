@@ -6,12 +6,13 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.client.common.AppPath
 import com.client.common.di.ApplicationScope
+import com.client.common.kdownloader.DownloaderConfig
+import com.client.common.kdownloader.KDownloader
 import com.client.xvideos.BuildConfig
-import com.client.xvideos.l.net.Luscious
 import com.client.xvideos.l.db.AppLDatabase
+import com.client.xvideos.l.net.Luscious
 import com.client.xvideos.l.repository.Repository
 import com.redgifs.common.snackBar.SnackBarEvent
-import com.redgifs.db.AppRedGifsDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -22,7 +23,6 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.asCoroutineDispatcher
 import java.io.File
 import java.util.concurrent.Executors
-import javax.inject.Inject
 import javax.inject.Singleton
 
 @Module
@@ -31,13 +31,26 @@ object LusciousModule {
 
     @Singleton
     @Provides
+    fun provideDownloader(
+        @ApplicationContext context: Context
+    ): KDownloader {
+        return KDownloader.create(context, DownloaderConfig(false))
+    }
+
+    @Singleton
+    @Provides
     fun provideRepository(
         db: AppLDatabase,
         @ApplicationScope scope: CoroutineScope,
         snackBarEvent: SnackBarEvent
-    ):Repository
-    {
-        return Repository(db, snackBarEvent, scope, BuildConfig.luscious_email, BuildConfig.luscious_password)
+    ): Repository {
+        return Repository(
+            db,
+            snackBarEvent,
+            scope,
+            BuildConfig.luscious_email,
+            BuildConfig.luscious_password
+        )
     }
 
     @Singleton

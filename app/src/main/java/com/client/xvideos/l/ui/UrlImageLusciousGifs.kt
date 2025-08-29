@@ -33,9 +33,65 @@ import com.facebook.imagepipeline.image.ImageInfo
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil.CoilImage
 import com.skydoves.landscapist.fresco.websupport.FrescoWebImage
+import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.coroutines.Dispatchers
 import timber.log.Timber
 import java.io.File
+
+
+@Composable
+fun UrlImageLusciousGifsGlide(
+    url: String,
+    modifier: Modifier = Modifier,
+    contentScale: ContentScale = ContentScale.FillWidth,
+    loadIndicator: Boolean = true,
+    isGrayscale: Boolean = false,
+    onLoading: (Boolean) -> Unit = {},
+    onSuccess: (Boolean) -> Unit = {},
+    albumName: String
+) {
+    val context = LocalContext.current
+
+    val colorFilter = ColorFilter.colorMatrix(
+        ColorMatrix().apply { setToSaturation(0.9f) }
+    )
+
+    // Определяем имя файла и проверяем наличие
+    val fileName = url.substringAfterLast('/').substringBefore('?')
+    val file = File(AppPath.downloaded_albums_l, "$albumName/$fileName")
+    val dataSource: Any = if (file.exists()) file else url
+
+    GlideImage(
+        imageModel = { dataSource }, // локальный файл или URL
+        modifier = modifier,
+        imageOptions = ImageOptions(
+            contentScale = contentScale,
+            alignment = Alignment.Center,
+            colorFilter = if (isGrayscale) colorFilter else null
+        ),
+        loading = {
+            onLoading(true)
+            if (loadIndicator) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(32.dp),
+                        color = Color.Gray
+                    )
+                }
+            }
+        },
+        failure = {
+            onLoading(false)
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("Ошибка загрузки", color = Color.Gray)
+            }
+        },
+//        success = {
+//            onLoading(false)
+//            onSuccess(true)
+//        }
+    )
+}
 
 @Composable
 fun UrlImageLusciousGifs(

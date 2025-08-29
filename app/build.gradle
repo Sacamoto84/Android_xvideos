@@ -87,7 +87,7 @@ android {
 }
 
 dependencies {
-    
+
     implementation 'com.github.nanihadesuka:LazyColumnScrollbar:2.2.0'
 
     implementation("com.github.SmartToolFactory:Compose-Zoom:0.5.0")
@@ -277,8 +277,6 @@ dependencies {
 
     implementation(libs.androidx.lifecycle.process)
     implementation(libs.image.loader)
-
-    implementation(libs.kdownloader)
 
     //https://github.com/amitshekhariitbhu/PRDownloader
     //implementation("com.github.amitshekhariitbhu:PRDownloader:1.0.2")
