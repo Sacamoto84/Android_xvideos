@@ -35,6 +35,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.client.xvideos.l.model.PicsDetails
 import com.redgifs.network.api.RedApi
 import com.redgifs.model.GifsInfo
 import com.redgifs.common.ThemeRed
@@ -53,10 +54,10 @@ private val style =
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AlbumItemExpandMenu(
-    item: String? = null,
+    item: PicsDetails? = null,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
-    onDownload : (String) -> Unit = {},
+    onDownload : (PicsDetails) -> Unit = {},
     haptic : ()->Unit = {}
 ) {
 
@@ -100,7 +101,7 @@ fun AlbumItemExpandMenu(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DropdownMenuItem_Download(url: String? = null, onClick: (String) -> Unit = {}, onDismiss: () -> Unit){
+fun DropdownMenuItem_Download(url: PicsDetails? = null, onClick: (PicsDetails) -> Unit = {}, onDismiss: () -> Unit){
     DropdownMenuItem(
         leadingIcon = {Icon(Icons.Filled.FileDownload, contentDescription = "", tint = tintColor)},
         text = {Text("Скачать", style = style)},

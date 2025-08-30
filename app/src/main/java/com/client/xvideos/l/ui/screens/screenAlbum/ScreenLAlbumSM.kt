@@ -14,6 +14,7 @@ import com.client.xvideos.l.featured.saved.SavedL
 import com.client.xvideos.l.net.AlbumInfo
 import com.client.xvideos.l.net.Luscious
 import com.client.common.kdownloader.KDownloader
+import com.client.xvideos.l.model.PicsDetails
 import com.redgifs.common.snackBar.SnackBarEvent
 import dagger.Binds
 import dagger.Module
@@ -96,9 +97,9 @@ class ScreenLAlbumSM @AssistedInject constructor(
         }
     }
 
-    fun downloadLike(url : String){
+    fun downloadLike(item : PicsDetails){
         scope.launch {
-            saved.likes.add(url)
+            saved.likes.add(item)
         }
     }
 

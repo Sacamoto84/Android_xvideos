@@ -14,13 +14,10 @@ import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -54,12 +51,12 @@ import kotlin.math.roundToInt
 
 @Composable
 fun FullScreenImage(
-    imageUrl: String,
+    item: PicsDetails,
     startBounds: Rect?,
     onClose: () -> Unit,
     albumName: String,
     filteredPic: List<PicsDetails>,
-    onDownload: (String) -> Unit = {}
+    onDownload: (PicsDetails) -> Unit = {}
 ) {
     val density = LocalDensity.current
     val configuration = LocalConfiguration.current
@@ -428,7 +425,7 @@ fun FullScreenImage(
 //            Icon(Icons.Default.MoreVert, tint = Color.White, contentDescription = null)
 //        }
 
-        AlbumItemExpandMenu(item = imageUrl, modifier = Modifier.align(Alignment.TopEnd), onDownload = {onDownload(it)})
+        AlbumItemExpandMenu(item = item, modifier = Modifier.align(Alignment.TopEnd), onDownload = {onDownload(it)})
 
 
         Box(
@@ -447,8 +444,8 @@ fun FullScreenImage(
                 .size(baseWidthDp, baseHeightDp)
         ) {
             UrlImageLusciousGifsFull(
-                url = imageUrl,
-                modifier = Modifier,//.fillMaxSize(),
+                url = item.url_to_original!!,
+                modifier = Modifier.aspectRatio(item.width.toFloat()/item.height),//.fillMaxSize(),
                 contentScale = ContentScale.FillBounds,
                 onSuccess = { success = it },
                 albumName = albumName

@@ -3,22 +3,23 @@ package com.client.xvideos.l.featured.saved
 import androidx.compose.runtime.mutableStateListOf
 import com.client.common.AppPath
 import com.client.common.kdownloader.KDownloader
+import com.client.xvideos.l.model.PicsDetails
 import com.redgifs.common.snackBar.SnackBarEvent
 import timber.log.Timber
 import java.io.File
 
 class SavedL_Likes( val snackBarEvent: SnackBarEvent, val kDownloader: KDownloader) {
 
-    val listUrl = mutableStateListOf<String>()
+    val listUrl = mutableStateListOf<PicsDetails>()
 
     init {
         refresh()
     }
 
-    fun add(url: String) {
-        println("!!! SavedL_Likes addLikes() url:${url}")
+    fun add(item: PicsDetails) {
+        println("!!! SavedL_Likes addLikes() item:${item.url_to_original}")
 
-        downloadLikes(url, kDownloader, onComplete = {
+        downloadLikes(item, kDownloader, onComplete = {
             snackBarEvent.success("Like")
             refresh()
         }, onError = {
@@ -45,11 +46,11 @@ class SavedL_Likes( val snackBarEvent: SnackBarEvent, val kDownloader: KDownload
 
         try {
             println("!!! SavedL_Likes refresh()")
-            val files = File(AppPath.likes_l).list()
-            if (files != null) {
-                listUrl.clear()
-                listUrl.addAll(files)
-            }
+            val files = File(AppPath.likes_l).list()?.mapNotNull{ fileNameToPicsDetails(File(it)) }
+           if (files != null) {
+               listUrl.clear()
+               listUrl.addAll(files)
+           }
         } catch (e: Exception) {
             snackBarEvent.error("Ошибка получения списка likes")
         }
@@ -58,20 +59,43 @@ class SavedL_Likes( val snackBarEvent: SnackBarEvent, val kDownloader: KDownload
 
 }
 
+
+private fun fileNameToPicsDetails(file: File): PicsDetails? {
+
+    val name = file.nameWithoutExtension// убираем .jpg / .png и т.п.
+
+    val parts = name.split("_", limit = 3)
+
+    if (parts.size < 3) return null
+
+    val width = parts[0].toIntOrNull() ?: return null
+    val height = parts[1].toIntOrNull() ?: return null
+
+    val path = File(AppPath.likes_l, file.name).absolutePath
+
+    return PicsDetails(
+        height = height,
+        width = width,
+        is_animated = false, // тут надо решать самому, инфы в имени нет
+        url_to_original = path,
+        url_to_video = null
+    )
+}
+
 private fun downloadLikes(
-    url: String,
+    item: PicsDetails,
     kDownloader: KDownloader,
     onComplete: () -> Unit,
     onError: () -> Unit
 ) {
 
-    val fileName = url.substringAfterLast('/').substringBefore('?')
+    val fileName = item.width.toString() +"_"+item.height+"_"+item.url_to_original?.substringAfterLast('/')?.substringBefore('?')
 
     val dir = File(AppPath.likes_l)
     dir.mkdirs()
 
     val request = kDownloader
-        .newRequestBuilder(url, dir.absolutePath, fileName)
+        .newRequestBuilder(item.url_to_original!!, dir.absolutePath, fileName)
         .tag("likes")
         .build()
 

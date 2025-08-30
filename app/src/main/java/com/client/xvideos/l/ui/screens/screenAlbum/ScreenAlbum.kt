@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -27,7 +26,6 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
-import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.lazy.staggeredgrid.itemsIndexed
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.foundation.shape.CircleShape
@@ -38,11 +36,9 @@ import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
@@ -81,12 +77,9 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import com.client.common.urlVideImage.UrlImage
 import com.client.common.util.toPrettyCount2
-import com.client.common.util.toPrettyCountInt
 import com.client.xvideos.l.ThemeL
 import com.client.xvideos.l.model.AlbumDetails
 import com.client.xvideos.l.model.PicsDetails
-import com.client.xvideos.l.ui.UrlImageLusciousGifs
-import com.client.xvideos.l.ui.UrlImageLusciousGifsFull
 import com.client.xvideos.l.ui.UrlImageLusciousGifsGlide
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoAudiences
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoDownload
@@ -94,11 +87,9 @@ import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoGreeting
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoTags
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumItemExpandMenu
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.FullScreenImage
-import com.client.xvideos.ui.theme.Purple80
 import com.client.xvideos.ui.theme.PurpleGrey80
 import com.example.ui.screens.profile.atom.VerticalScrollbar
 import com.example.ui.screens.profile.rememberVisibleRangePercentIgnoringFirstNForLazyStaggeredGrid
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.engawapg.lib.zoomable.ExperimentalZoomableApi
 import timber.log.Timber
@@ -123,7 +114,7 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
         val parsed =
             vm.albumInfo.collectAsStateWithLifecycle().value?.parsed?.collectAsStateWithLifecycle()?.value
 
-        var selectedImage by remember { mutableStateOf<String?>(null) }
+        var selectedImage by remember { mutableStateOf<PicsDetails?>(null) }
         var selectedBounds by remember { mutableStateOf<Rect?>(null) }
 
         val saved = vm.saved.albums.list.any { it.id == parsed?.id }
@@ -498,7 +489,7 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
                                             imageBounds = rect
                                         }
                                         .clickable {
-                                            selectedImage = it.url_to_original
+                                            selectedImage = it
                                             selectedBounds = imageBounds
                                         },
                                     contentScale = ContentScale.FillBounds,
@@ -515,7 +506,7 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
                                 )
 
                                 AlbumItemExpandMenu(
-                                    item = it.url_to_original,
+                                    item = it,
                                     modifier = Modifier.align(Alignment.TopEnd),
                                     onDownload = { it1 -> vm.downloadLike(it1) })
 
@@ -539,8 +530,7 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
 //                                    albumName = idAlbum.toString()
 //                                )
 
-                                val targetAlpha =
-                                    if (selectedImage == it.url_to_original) 1f else 0f
+                                val targetAlpha = if (selectedImage == it) 1f else 0f
 
                                 val animatedAlpha by animateFloatAsState(
                                     targetValue = targetAlpha,
@@ -552,7 +542,7 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
                                     label = "imageAlpha"
                                 )
 
-                                if (selectedImage == it.url_to_original) {
+                                if (selectedImage == it) {
                                     Box(
                                         modifier = Modifier
                                             .alpha(animatedAlpha)
@@ -580,7 +570,7 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
                 // Полноэкранное изображение с анимацией
                 selectedImage?.let { imageUrl ->
                     FullScreenImage(
-                        imageUrl = imageUrl,
+                        item = imageUrl,
                         startBounds = selectedBounds,
                         onClose = { selectedImage = null },
                         albumName = idAlbum.toString(),
