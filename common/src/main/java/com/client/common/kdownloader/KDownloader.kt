@@ -81,4 +81,11 @@ class KDownloader private constructor(dbHelper: DbHelper, private val config: Do
 
     }
 
+    /**
+     * Получить статусы всех запросов с указанным тегом
+     */
+    fun getStatusesByTag(tag: String): List<Pair<Int, Status>>{
+        return reqQueue.getStatusesByTag(tag)
+    }
+
 }

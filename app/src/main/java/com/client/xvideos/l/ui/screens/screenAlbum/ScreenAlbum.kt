@@ -32,6 +32,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -77,6 +78,7 @@ import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import com.client.common.urlVideImage.UrlImage
+import com.client.common.util.toPrettyCount2
 import com.client.common.util.toPrettyCountInt
 import com.client.xvideos.l.ThemeL
 import com.client.xvideos.l.model.AlbumDetails
@@ -89,6 +91,8 @@ import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoDownload
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoGreeting
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoTags
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.FullScreenImage
+import com.client.xvideos.ui.theme.Purple80
+import com.client.xvideos.ui.theme.PurpleGrey80
 import com.example.ui.screens.profile.atom.VerticalScrollbar
 import com.example.ui.screens.profile.rememberVisibleRangePercentIgnoringFirstNForLazyStaggeredGrid
 import kotlinx.coroutines.delay
@@ -325,39 +329,69 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
 
                     item(span = StaggeredGridItemSpan.FullLine) {
 
-                        Column()
-                        {
-                            Text(
-                                "Size: " + folderSize.toPrettyCountInt(),
-                                color = ThemeL.textColor
-                            )
-                            Row {
+                        Column {
+
+                            Row()
+                            {
                                 Text(
-                                    "$fileCountDownloaded / ",
+                                    " Size: " + folderSize.toPrettyCount2(),
                                     color = ThemeL.textColor
                                 )
-                                Text(
-                                    "$fileCountRaw / ",
-                                    color = ThemeL.textColor
-                                )
-                                Text(
-                                    fileCountError.toString(),
-                                    color = ThemeL.textColor
-                                )
-                            }
 
+                                Row {
+                                    val a = album?.albumPicsDetails?.pics?.size
 
-                            Row(modifier = Modifier.height(64.dp).padding(horizontal = 4.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                    Text(
+                                        " All: $a ",
+                                        color = ThemeL.textColor
+                                    )
 
-                                Button(onClick = { vm.saveFullAlbum() }) {
-                                    Text(text = "Load All Pics")
+                                    if(a != fileCountDownloaded + fileCountError) {
+                                        Text(
+                                            "D: $fileCountDownloaded E:",
+                                            color = ThemeL.textColor
+                                        )
+                                        Text(
+                                            fileCountError.toString(),
+                                            color = ThemeL.textColor
+                                        )
+                                    }
                                 }
 
-                                if(isDownloading) {
-                                    Box(
-                                        modifier = Modifier.size(40.dp).clip(CircleShape)
-                                            .background(Color.Red).clickable { vm.downloader.stop() },
-                                    )
+                            }
+
+                            Row(
+                                modifier = Modifier
+                                    .height(64.dp)
+                                    .padding(horizontal = 4.dp)
+                                    .fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+
+
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+
+                                    Button(onClick = { vm.saveFullAlbum() }) {
+                                        Text(text = "Load All Pics")
+                                    }
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    if (isDownloading) {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(40.dp)
+                                                .clip(CircleShape)
+                                                .background(PurpleGrey80)
+                                                .clickable { vm.downloader.stop() },
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Stop,
+                                                contentDescription = null,
+                                                tint = ThemeL.grey7
+                                            )
+                                        }
+                                    }
                                 }
 
                                 Spacer(modifier = Modifier.width(4.dp))
@@ -400,8 +434,8 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
                                 }
                             }
 
-                        }
 
+                        }
 
                     }
                     item(span = StaggeredGridItemSpan.FullLine) {

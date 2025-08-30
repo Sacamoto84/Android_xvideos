@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
@@ -78,8 +79,8 @@ class DownloaderAlbum(
 
     fun stop() {
         //Отстановить закачку
-        stop.value = true
-        //kDownloader.cancelAll()
+        //stop.value = true
+        kDownloader.cancel(albumName)
     }
 
 
@@ -114,6 +115,8 @@ class DownloaderAlbum(
         // Список имён файлов, которые уже есть
         val existingFiles = dir.listFiles()?.map { it.name }?.toSet() ?: emptySet()
         fileCountDownloaded.value = existingFiles.size
+
+
 
     }
 
@@ -184,8 +187,6 @@ class DownloaderAlbum(
 
                 stop.value = false
 
-                isDownloading.value = true
-
                 fileCountError.value = 0
                 fileCountDownloaded.value = 0
                 fileCountRaw.value = 0
@@ -208,6 +209,10 @@ class DownloaderAlbum(
                     fileName !in existingFiles
                 }
 
+                //isDownloading.value = fileCountRaw.value >= fileCountDownloaded.value + fileCountError.value
+                val s = kDownloader.getStatusesByTag(albumName)
+                isDownloading.value = s.any { it.second == com.client.common.kdownloader.Status.RUNNING }
+
                 urlsToDownload.distinct().forEach { item ->
 
                     if (stop.value) {
@@ -221,30 +226,33 @@ class DownloaderAlbum(
 
                     val request = kDownloader
                         .newRequestBuilder(item, dir.absolutePath, fileName)
-                        .tag(fileName)
+                        .tag(albumName)
                         .build()
 
                     // Using all of these lambdas is not mandatory. for example - you can only use onStart or onProgress also
                     kDownloader.enqueue(
                         request,
-                        onStart = {
-                            Timber.d(">>> Download Started $fileName")
-                            //requestAlbumSizeUpdate()
-                        },
-                        onProgress = {
-                        },
+
                         onCompleted = {
                             Timber.d(">>> Download onCompleted $fileName")
                             fileCountDownloaded.update { it + 1 }
                             requestAlbumSizeUpdate()
+
+                            //isDownloading.value = fileCountRaw.value >= fileCountDownloaded.value + fileCountError.value
+                            val s = kDownloader.getStatusesByTag(albumName)
+                            isDownloading.value = s.any { it.second == com.client.common.kdownloader.Status.RUNNING }
+
                         },
                         onError = {
                             Timber.e(">>> Download onError $fileName")
                             fileCountError.update { it + 1 }
                             requestAlbumSizeUpdate()
-                        },
-                        onPause = {
+                            val s = kDownloader.getStatusesByTag(albumName)
+                            isDownloading.value = s.any { it.second == com.client.common.kdownloader.Status.RUNNING }
+
+                            //isDownloading.value = fileCountRaw.value >= fileCountDownloaded.value + fileCountError.value
                         }
+
                     )
 
 
