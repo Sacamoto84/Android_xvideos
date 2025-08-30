@@ -10,8 +10,8 @@ import com.client.xvideos.BuildConfig
 import com.client.xvideos.l.db.AppLDatabase
 import com.client.xvideos.l.net.Luscious
 import com.client.xvideos.l.repository.Repository
-import com.kdownloader.DownloaderConfig
-import com.kdownloader.KDownloader
+import com.client.common.kdownloader.DownloaderConfig
+import com.client.common.kdownloader.KDownloader
 import com.redgifs.common.snackBar.SnackBarEvent
 import dagger.Module
 import dagger.Provides

@@ -2,7 +2,7 @@ package com.redgifs.common.downloader
 
 import com.client.common.AppPath
 import com.google.gson.GsonBuilder
-import com.kdownloader.KDownloader
+import com.client.common.kdownloader.KDownloader
 import com.redgifs.common.snackBar.SnackBarEvent
 import com.redgifs.common.snackBar.UiMessage
 import com.redgifs.model.GifsInfo

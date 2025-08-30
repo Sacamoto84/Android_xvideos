@@ -13,7 +13,7 @@ import com.client.xvideos.l.featured.downloader.DownloaderL
 import com.client.xvideos.l.featured.saved.SavedL
 import com.client.xvideos.l.net.AlbumInfo
 import com.client.xvideos.l.net.Luscious
-import com.kdownloader.KDownloader
+import com.client.common.kdownloader.KDownloader
 import dagger.Binds
 import dagger.Module
 import dagger.assisted.Assisted
@@ -87,8 +87,11 @@ class ScreenLAlbumSM @AssistedInject constructor(
     }
 
     fun saveFullAlbum() {
-        val pic = albumInfo.value?.albumPicsDetails?.pics?.toList()?.map { it.url_to_original } as List<String>
-        downloader.saveAlbums(pic, albumInfo.value!!.id.toString())
+        scope.launch {
+            val pic = albumInfo.value?.albumPicsDetails?.pics?.toList()
+                ?.map { it.url_to_original } as List<String>
+            downloader.saveAlbums(pic, albumInfo.value!!.id.toString())
+        }
     }
 
 

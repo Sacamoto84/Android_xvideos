@@ -7,13 +7,15 @@ import com.client.common.kdownloader.httpclient.DefaultHttpClient
 import com.client.common.kdownloader.httpclient.HttpClient
 import com.client.common.kdownloader.internal.stream.FileDownloadOutputStream
 import com.client.common.kdownloader.internal.stream.FileDownloadRandomAccessFile
-import com.kdownloader.Constants
-import com.kdownloader.Status
-import com.kdownloader.utils.getPath
-import com.kdownloader.utils.getRedirectedConnectionIfAny
-import com.kdownloader.utils.getTempPath
-import com.kdownloader.utils.renameFileName
+import com.client.common.kdownloader.Constants
+import com.client.common.kdownloader.Status
+import com.client.common.kdownloader.utils.getPath
+import com.client.common.kdownloader.utils.getRedirectedConnectionIfAny
+import com.client.common.kdownloader.utils.getTempPath
+import com.client.common.kdownloader.utils.renameFileName
 import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
@@ -38,7 +40,7 @@ class DownloadTask(
 
     private var eTag: String = ""
 
-    private val dbScope = CoroutineScope(SupervisorJob() + Dispatchers.IO +
+    private val dbScope = CoroutineScope(SupervisorJob() + Dispatchers.IO.limitedParallelism(1) +
             CoroutineExceptionHandler { _, _ ->
 
             })
@@ -87,114 +89,100 @@ class DownloadTask(
         }
     }
 
+
+    //private val downloadDispatcher = Dispatchers.IO.limitedParallelism(8)
+
+    // Семафор на 8 разрешений
+    private val downloadSemaphore = Semaphore(4)
+
     suspend fun run(listener: DownloadRequest.Listener) {
+        downloadSemaphore.withPermit {
+            withContext(Dispatchers.IO.limitedParallelism(1)) {
+                try {
+                    tempPath = getTempPath(req.dirPath, req.fileName)
+                    var file = File(tempPath)
 
-        withContext(Dispatchers.IO) {
-            try {
-                tempPath = getTempPath(req.dirPath, req.fileName)
-                var file = File(tempPath)
+                    var model = getDownloadModelIfAlreadyPresentInDatabase()
 
-                var model = getDownloadModelIfAlreadyPresentInDatabase()
-
-                if (model == null && file.exists() && dbHelper is AppDbHelper) {
-                    if (!deleteTempFile()) {
-                        tempPath = tempPath.split(".")[0] + "2." + tempPath.split(".", limit = 2)[1]
-                        file = File(tempPath)
+                    if (model == null && file.exists() && dbHelper is AppDbHelper) {
+                        if (!deleteTempFile()) {
+                            tempPath =
+                                tempPath.split(".")[0] + "2." + tempPath.split(".", limit = 2)[1]
+                            file = File(tempPath)
+                        }
                     }
-                }
 
-                if (model != null) {
-                    if (file.exists()) {
-                        req.totalBytes = (model.totalBytes)
-                        req.downloadedBytes = (model.downloadedBytes)
-                    } else {
-                        removeNoMoreNeededModelFromDatabase()
-                        req.downloadedBytes = 0
-                        req.totalBytes = 0
+                    if (model != null) {
+                        if (file.exists()) {
+                            req.totalBytes = (model.totalBytes)
+                            req.downloadedBytes = (model.downloadedBytes)
+                        } else {
+                            removeNoMoreNeededModelFromDatabase()
+                            req.downloadedBytes = 0
+                            req.totalBytes = 0
+                            model = null
+                        }
+                    }
+
+                    // use the url to download the file with HTTP Client
+                    httpClient = DefaultHttpClient().clone()
+
+                    req.status = Status.RUNNING
+
+                    listener.onStart()
+
+                    httpClient.connect(req)
+
+                    eTag = httpClient.getResponseHeader(Constants.ETAG)
+
+                    if (checkIfFreshStartRequiredAndStart(model)) {
                         model = null
                     }
-                }
 
-                // use the url to download the file with HTTP Client
-                httpClient = DefaultHttpClient().clone()
+                    httpClient = getRedirectedConnectionIfAny(httpClient, req)
+                    responseCode = httpClient.getResponseCode()
 
-                req.status = Status.RUNNING
+                    if (!isSuccessful()) {
+                        listener.onError("Wrong link")
+                    }
 
-                listener.onStart()
+                    setResumeSupportedOrNot()
 
-                httpClient.connect(req)
+                    totalBytes = req.totalBytes
 
-                eTag = httpClient.getResponseHeader(Constants.ETAG)
+                    if (!isResumeSupported) {
+                        deleteTempFile()
+                        req.downloadedBytes = 0
+                    }
 
-                if (checkIfFreshStartRequiredAndStart(model)) {
-                    model = null
-                }
+                    if (totalBytes == 0L) {
+                        totalBytes = httpClient.getContentLength()
+                        req.totalBytes = (totalBytes)
+                    }
 
-                httpClient = getRedirectedConnectionIfAny(httpClient, req)
-                responseCode = httpClient.getResponseCode()
+                    if (isResumeSupported && model == null) {
+                        createAndInsertNewModel()
+                    }
 
-                if (!isSuccessful()) {
-                    listener.onError("Wrong link")
-                }
+                    inputStream = httpClient.getInputStream()
+                    if (inputStream == null) {
+                        return@withContext
+                    }
 
-                setResumeSupportedOrNot()
+                    val buff = ByteArray(BUFFER_SIZE)
 
-                totalBytes = req.totalBytes
-
-                if (!isResumeSupported) {
-                    deleteTempFile()
-                    req.downloadedBytes = 0
-                }
-
-                if (totalBytes == 0L) {
-                    totalBytes = httpClient.getContentLength()
-                    req.totalBytes = (totalBytes)
-                }
-
-                if (isResumeSupported && model == null) {
-                    createAndInsertNewModel()
-                }
-
-                inputStream = httpClient.getInputStream()
-                if (inputStream == null) {
-                    return@withContext
-                }
-
-                val buff = ByteArray(BUFFER_SIZE)
-
-                if (!file.exists()) {
-                    val parentFile = file.parentFile
-                    if (parentFile != null && !parentFile.exists()) {
-                        if (parentFile.mkdirs()) {
+                    if (!file.exists()) {
+                        val parentFile = file.parentFile
+                        if (parentFile != null && !parentFile.exists()) {
+                            if (parentFile.mkdirs()) {
+                                file.createNewFile()
+                            }
+                        } else {
                             file.createNewFile()
                         }
-                    } else {
-                        file.createNewFile()
                     }
-                }
 
-                this@DownloadTask.outputStream = FileDownloadRandomAccessFile.create(file)
-
-                if (req.status === Status.CANCELLED) {
-                    deleteTempFile()
-                    req.reset()
-                    listener.onError("Cancelled")
-                    return@withContext
-                } else if (req.status === Status.PAUSED) {
-                    sync(outputStream)
-                    listener.onPause()
-                    return@withContext
-                }
-
-                if (isResumeSupported && req.downloadedBytes != 0L) {
-                    outputStream.seek(req.downloadedBytes)
-                }
-
-                do {
-                    val byteCount = inputStream!!.read(buff, 0, BUFFER_SIZE)
-                    if (byteCount == -1) {
-                        break
-                    }
+                    this@DownloadTask.outputStream = FileDownloadRandomAccessFile.create(file)
 
                     if (req.status === Status.CANCELLED) {
                         deleteTempFile()
@@ -207,61 +195,83 @@ class DownloadTask(
                         return@withContext
                     }
 
-                    if (!isActive) {
+                    if (isResumeSupported && req.downloadedBytes != 0L) {
+                        outputStream.seek(req.downloadedBytes)
+                    }
+
+                    do {
+                        val byteCount = inputStream!!.read(buff, 0, BUFFER_SIZE)
+                        if (byteCount == -1) {
+                            break
+                        }
+
+                        if (req.status === Status.CANCELLED) {
+                            deleteTempFile()
+                            req.reset()
+                            listener.onError("Cancelled")
+                            return@withContext
+                        } else if (req.status === Status.PAUSED) {
+                            sync(outputStream)
+                            listener.onPause()
+                            return@withContext
+                        }
+
+                        if (!isActive) {
+                            deleteTempFile()
+                            req.reset()
+                            break
+                        }
+                        if (!req.job.isActive) {
+                            deleteTempFile()
+                            req.reset()
+                            break
+                        }
+                        outputStream.write(buff, 0, byteCount)
+                        req.downloadedBytes = req.downloadedBytes + byteCount
+                        withContext(Dispatchers.IO) {
+                            syncIfRequired(outputStream)
+                        }
+
+                        var progress = 0
+                        if (totalBytes > 0) {
+                            progress = ((req.downloadedBytes * 100) / totalBytes).toInt()
+                        }
+                        listener.onProgress(progress)
+                    } while (true)
+
+                    if (req.status === Status.CANCELLED) {
                         deleteTempFile()
                         req.reset()
-                        break
+                        listener.onError("Cancelled")
+                        return@withContext
+                    } else if (req.status === Status.PAUSED) {
+                        sync(outputStream)
+                        listener.onPause()
+                        return@withContext
                     }
-                    if (!req.job.isActive) {
+
+                    val path = getPath(req.dirPath, req.fileName)
+                    renameFileName(tempPath, path)
+                    listener.onCompleted()
+                    req.status = Status.COMPLETED
+                    return@withContext
+                } catch (e: CancellationException) {
+                    deleteTempFile()
+                    req.reset()
+                    req.status = Status.FAILED
+                    listener.onError(e.toString())
+                    return@withContext
+                } catch (e: Exception) {
+                    if (!isResumeSupported) {
                         deleteTempFile()
                         req.reset()
-                        break
                     }
-                    outputStream.write(buff, 0, byteCount)
-                    req.downloadedBytes = req.downloadedBytes + byteCount
-                    withContext(Dispatchers.IO) {
-                        syncIfRequired(outputStream)
-                    }
-
-                    var progress = 0
-                    if (totalBytes > 0) {
-                        progress = ((req.downloadedBytes * 100) / totalBytes).toInt()
-                    }
-                    listener.onProgress(progress)
-                } while (true)
-
-                if (req.status === Status.CANCELLED) {
-                    deleteTempFile()
-                    req.reset()
-                    listener.onError("Cancelled")
+                    req.status = Status.FAILED
+                    listener.onError(e.toString())
                     return@withContext
-                } else if (req.status === Status.PAUSED) {
-                    sync(outputStream)
-                    listener.onPause()
-                    return@withContext
+                } finally {
+                    closeAllSafely(outputStream)
                 }
-
-                val path = getPath(req.dirPath, req.fileName)
-                renameFileName(tempPath, path)
-                listener.onCompleted()
-                req.status = Status.COMPLETED
-                return@withContext
-            } catch (e: CancellationException) {
-                deleteTempFile()
-                req.reset()
-                req.status = Status.FAILED
-                listener.onError(e.toString())
-                return@withContext
-            } catch (e: Exception) {
-                if (!isResumeSupported) {
-                    deleteTempFile()
-                    req.reset()
-                }
-                req.status = Status.FAILED
-                listener.onError(e.toString())
-                return@withContext
-            } finally {
-                closeAllSafely(outputStream)
             }
         }
     }

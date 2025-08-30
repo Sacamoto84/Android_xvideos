@@ -2,19 +2,20 @@ package com.client.common.kdownloader.internal
 
 import com.client.common.kdownloader.database.DbHelper
 import com.client.common.kdownloader.database.DownloadModel
-import com.kdownloader.Status
-import com.kdownloader.utils.getTempPath
+import com.client.common.kdownloader.Status
+import com.client.common.kdownloader.utils.getTempPath
 import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
 import java.io.File
 
 class DownloadDispatchers(private val dbHelper: DbHelper) {
 
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main +
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO.limitedParallelism(1) +     //main
             CoroutineExceptionHandler { _, _ ->
 
             })
 
-    private val dbScope = CoroutineScope(SupervisorJob() + Dispatchers.IO +
+    private val dbScope = CoroutineScope(SupervisorJob() + Dispatchers.IO.limitedParallelism(1) +
             CoroutineExceptionHandler { _, _ ->
 
             })

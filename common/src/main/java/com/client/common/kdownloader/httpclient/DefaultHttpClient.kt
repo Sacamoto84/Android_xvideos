@@ -1,6 +1,6 @@
 package com.client.common.kdownloader.httpclient
 
-import com.kdownloader.Constants
+import com.client.common.kdownloader.Constants
 import com.client.common.kdownloader.internal.DownloadRequest
 import java.io.IOException
 import java.io.InputStream

@@ -2,17 +2,22 @@ package com.client.xvideos.l.featured.downloader
 
 import com.client.common.AppPath
 import com.client.common.util.getFolderSize
-import com.kdownloader.KDownloader
+import com.client.common.kdownloader.KDownloader
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
 import java.util.concurrent.Executors
@@ -23,7 +28,7 @@ import javax.inject.Singleton
 @Singleton
 class DownloaderL @Inject constructor() {
 
-    private val downloadDispatcher = Executors.newFixedThreadPool(8).asCoroutineDispatcher()
+    private val downloadDispatcher = Executors.newFixedThreadPool(1).asCoroutineDispatcher()
     val scope = CoroutineScope(SupervisorJob() + downloadDispatcher)
 
     val listDownloaderAlbum = mutableSetOf<DownloaderAlbum>()
@@ -92,69 +97,79 @@ class DownloaderAlbum(
         dir.deleteRecursively()
     }
 
-    fun saveAlbums(listUrl: List<String>, albumName: String) {
-        scope.launch {
+    private val downloadSemaphore = Semaphore(1)
 
-            fileCountError.value = 0
-            fileCountDownloaded.value = 0
-            fileCountRaw.value = 0
+    private val singleThreadDispatcher = Dispatchers.IO.limitedParallelism(1)
 
-            requestAlbumSizeUpdate()
+    private val downloadSemaphore4 = Semaphore(1)
 
-            val dir = File(AppPath.downloaded_albums_l + "/" + albumName)
-            dir.mkdirs()
+    suspend fun saveAlbums(listUrl: List<String>, albumName: String) {
 
-            fileCountRaw.value = listUrl.size
+        downloadSemaphore.withPermit {
 
-            // Список имён файлов, которые уже есть
-            val existingFiles = dir.listFiles()?.map { it.name }?.toSet() ?: emptySet()
+            withContext(singleThreadDispatcher) {
 
-            fileCountDownloaded.value = existingFiles.size
+                fileCountError.value = 0
+                fileCountDownloaded.value = 0
+                fileCountRaw.value = 0
 
-            // Фильтруем список URL — оставляем только те, которых нет на диске
-            val urlsToDownload = listUrl.filter { url ->
-                val fileName = url.substringAfterLast('/').substringBefore('?')
-                fileName !in existingFiles
-            }
+                requestAlbumSizeUpdate()
+
+                val dir = File(AppPath.downloaded_albums_l + "/" + albumName)
+                dir.mkdirs()
+
+                fileCountRaw.value = listUrl.size
+
+                // Список имён файлов, которые уже есть
+                val existingFiles = dir.listFiles()?.map { it.name }?.toSet() ?: emptySet()
+
+                fileCountDownloaded.value = existingFiles.size
+
+                // Фильтруем список URL — оставляем только те, которых нет на диске
+                val urlsToDownload = listUrl.filter { url ->
+                    val fileName = url.substringAfterLast('/').substringBefore('?')
+                    fileName !in existingFiles
+                }
+
+                urlsToDownload.distinct().forEach { item ->
+
+                        delay(50)
+
+                        val fileName = item.substringAfterLast('/').substringBefore('?')
+
+                        val request = kDownloader
+                            .newRequestBuilder(item, dir.absolutePath, fileName)
+                            .tag(fileName)
+                            .build()
+
+                        // Using all of these lambdas is not mandatory. for example - you can only use onStart or onProgress also
+                        kDownloader.enqueue(
+                            request,
+                            onStart = {
+                                Timber.d(">>> Download Started $fileName")
+                                //requestAlbumSizeUpdate()
+                            },
+                            onProgress = {
+                            },
+                            onCompleted = {
+                                Timber.d(">>> Download onCompleted $fileName")
+                                fileCountDownloaded.update { it + 1 }
+                                requestAlbumSizeUpdate()
+                            },
+                            onError = {
+                                Timber.e(">>> Download onError $fileName")
+                                fileCountError.update { it + 1 }
+                                //requestAlbumSizeUpdate()
+                            },
+                            onPause = {
+                            }
+                        )
 
 
 
-            urlsToDownload.distinct().forEach { item ->
-
-                val fileName = item.substringAfterLast('/').substringBefore('?')
-
-                val request = kDownloader
-                    .newRequestBuilder(item, dir.absolutePath, fileName)
-                    .tag(fileName)
-                    .build()
-
-                // Using all of these lambdas is not mandatory. for example - you can only use onStart or onProgress also
-                kDownloader.enqueue(
-                    request,
-                    onStart = {
-                        Timber.d(">>> Download Started $fileName")
-                        //requestAlbumSizeUpdate()
-                    },
-                    onProgress = {
-                    },
-                    onCompleted = {
-                        Timber.d(">>> Download onCompleted $fileName")
-                        fileCountDownloaded.update { it + 1 }
-                        //requestAlbumSizeUpdate()
-                    },
-                    onError = {
-                        Timber.e(">>> Download onError $fileName")
-                        fileCountError.update { it + 1 }
-                        //requestAlbumSizeUpdate()
-                    },
-                    onPause = {
-                    }
-                )
-
-
+                }
             }
         }
-
     }
 
 }

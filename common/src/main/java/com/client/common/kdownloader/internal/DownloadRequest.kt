@@ -1,8 +1,8 @@
 package com.client.common.kdownloader.internal
 
-import com.kdownloader.Constants
-import com.kdownloader.Status
-import com.kdownloader.utils.getUniqueId
+import com.client.common.kdownloader.Constants
+import com.client.common.kdownloader.Status
+import com.client.common.kdownloader.utils.getUniqueId
 import kotlinx.coroutines.Job
 
 class DownloadRequest private constructor(

@@ -1,4 +1,4 @@
-package com.kdownloader
+package com.client.common.kdownloader
 
 enum class Status {
 
