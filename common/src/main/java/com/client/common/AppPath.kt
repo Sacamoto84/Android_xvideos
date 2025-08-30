@@ -44,7 +44,7 @@ object AppPath {
     val creators_red : String = "${main}/${Folder.RED.value}/Saved/Creators"
 
     //L
-    val likes_l: String = "${main}/${Folder.L.value}/Saved/Likes"
+    val likes_l: String = "${main}/${Folder.L.value}/Saved/Downloaded/Likes"
 
     val albums_l: String = "${main}/${Folder.L.value}/Saved/Album"
 

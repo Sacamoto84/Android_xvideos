@@ -175,6 +175,22 @@ class ScreenLAlbumList(val idAlbum: Long) : Screen {
                         }
                     }
                 }
+
+                item(
+                    key = "page_selector2",
+                    span = { GridItemSpan(maxLineSpan) }) {
+
+                    if (items?.isNotEmpty() ?: false) {
+                        if (info != null) {
+                            AlbumListPageSelector(
+                                info.page,
+                                info.totalPages,
+                                { vm.loadAlbumList(it) })
+                        }
+                    }
+
+                }
+
             }
 
             if (filter != null) {

@@ -14,6 +14,7 @@ import com.client.xvideos.l.featured.saved.SavedL
 import com.client.xvideos.l.net.AlbumInfo
 import com.client.xvideos.l.net.Luscious
 import com.client.common.kdownloader.KDownloader
+import com.client.xvideos.l.featured.downloader.downloadLikes
 import com.redgifs.common.snackBar.SnackBarEvent
 import dagger.Binds
 import dagger.Module
@@ -93,6 +94,12 @@ class ScreenLAlbumSM @AssistedInject constructor(
             val pic = albumInfo.value?.albumPicsDetails?.pics?.toList()
                 ?.map { it.url_to_original } as List<String>
             downloader.saveAlbums(pic, albumInfo.value!!.id.toString())
+        }
+    }
+
+    fun downloadLike(url : String){
+        scope.launch {
+            downloadLikes(url, kDownloader, onComplete = {snackBarEvent.success("Лайк сохранен")}, onError = {snackBarEvent.error("Ошибка сохранения")})
         }
     }
 

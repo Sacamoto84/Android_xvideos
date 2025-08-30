@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -27,6 +28,7 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.staggeredgrid.itemsIndexed
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -90,6 +92,7 @@ import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoAudiences
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoDownload
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoGreeting
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoTags
+import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumItemExpandMenu
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.FullScreenImage
 import com.client.xvideos.ui.theme.Purple80
 import com.client.xvideos.ui.theme.PurpleGrey80
@@ -137,17 +140,60 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
         val isDownloading = vm.downloader.isDownloading.collectAsStateWithLifecycle().value
 
 
-        LaunchedEffect(vm.showOnlyAnimated, parsed) {
+//        LaunchedEffect(vm.showOnlyAnimated, parsed, album?.albumPicsDetails?.pics?.size) {
+//
+//            Timber.d("!!! LaunchedEffect vm.showOnlyAnimated = ${vm.showOnlyAnimated} parsed = $parsed")
+//            if (parsed == null) return@LaunchedEffect
+//
+//            val a = album?.albumPicsDetails?.pics?.filter { it.is_animated == vm.showOnlyAnimated }
+//
+//            filteredPic.clear()
+//            delay(100)
+//            filteredPic.addAll(a ?: emptyList())
+//
+//        }
 
+//        LaunchedEffect(vm.showOnlyAnimated, parsed, album?.albumPicsDetails?.pics?.size) {
+//            Timber.d("!!! LaunchedEffect vm.showOnlyAnimated = ${vm.showOnlyAnimated} parsed = $parsed")
+//            if (parsed == null) return@LaunchedEffect
+//
+//            val newPics =
+//                album?.albumPicsDetails?.pics?.filter { it.is_animated == vm.showOnlyAnimated }
+//                    ?: emptyList()
+//
+//            // Находим новые элементы, которых еще нет в filteredPic
+//            val existingIds = filteredPic.map { it.url_to_original }
+//                .toSet() // предполагаю что у PicsDetails есть id
+//            val newItems = newPics.filter { it.url_to_original !in existingIds }
+//
+//            // Добавляем только новые элементы
+//            if (newItems.isNotEmpty()) {
+//                filteredPic.addAll(newItems)
+//            }
+//        }
+
+        LaunchedEffect(vm.showOnlyAnimated, parsed, album?.albumPicsDetails?.pics?.size) {
             Timber.d("!!! LaunchedEffect vm.showOnlyAnimated = ${vm.showOnlyAnimated} parsed = $parsed")
             if (parsed == null) return@LaunchedEffect
 
-            val a = album?.albumPicsDetails?.pics?.filter { it.is_animated == vm.showOnlyAnimated }
+            val allPics = album?.albumPicsDetails?.pics ?: emptyList()
+            val newFilteredPics = allPics.filter { it.is_animated == vm.showOnlyAnimated }
 
-            filteredPic.clear()
-            delay(100)
-            filteredPic.addAll(a ?: emptyList())
+            // Если изменился фильтр - полностью пересчитываем список
+            val currentFilteredUrls = filteredPic.map { it.url_to_original }.toSet()
+            val shouldBeFilteredUrls = newFilteredPics.map { it.url_to_original }.toSet()
 
+            // Проверяем, изменился ли набор URL после фильтрации
+            if (currentFilteredUrls != shouldBeFilteredUrls) {
+                // Удаляем элементы, которых не должно быть
+                val toRemove = filteredPic.filter { it.url_to_original !in shouldBeFilteredUrls }
+                filteredPic.removeAll(toRemove.toSet())
+
+                // Добавляем новые элементы
+                val existingUrls = filteredPic.map { it.url_to_original }.toSet()
+                val toAdd = newFilteredPics.filter { it.url_to_original !in existingUrls }
+                filteredPic.addAll(toAdd)
+            }
         }
 
         val folderSize = vm.downloader.folderSize.collectAsStateWithLifecycle().value
@@ -213,7 +259,7 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
         Scaffold(
             floatingActionButton = {
                 AnimatedVisibility(
-                    state.firstVisibleItemIndex > 3,
+                    state.firstVisibleItemIndex > 3 && selectedImage == null,
                     enter = fadeIn(),
                     exit = fadeOut()
                 ) { ScrollToTopButton(state) }
@@ -346,7 +392,7 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
                                         color = ThemeL.textColor
                                     )
 
-                                    if(a != fileCountDownloaded + fileCountError) {
+                                    if (a != fileCountDownloaded + fileCountError) {
                                         Text(
                                             "D: $fileCountDownloaded E:",
                                             color = ThemeL.textColor
@@ -396,40 +442,42 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
 
                                 Spacer(modifier = Modifier.width(4.dp))
 
-                                Button(
-                                    onClick = {
-                                        vm.downloader.deleteAlbum(
-                                            onStart = {
-                                                isDeletingFiles = true
-                                                vm.snackBarEvent.info("Удаление файлов альбома")
-                                            },
-                                            onComplete = {
-                                                isDeletingFiles = false
-                                                vm.snackBarEvent.success("Удаление файлов альбома завершено")
-                                            },
+                                if (folderSize > 0) {
+                                    Button(
+                                        onClick = {
+                                            vm.downloader.deleteAlbum(
+                                                onStart = {
+                                                    isDeletingFiles = true
+                                                    vm.snackBarEvent.info("Удаление файлов альбома")
+                                                },
+                                                onComplete = {
+                                                    isDeletingFiles = false
+                                                    vm.snackBarEvent.success("Удаление файлов альбома завершено")
+                                                },
+                                            )
+                                        }, enabled = !isDeletingFiles, // Блокируем кнопку
+                                        colors = ButtonDefaults.buttonColors(
+                                            //containerColor = Color.Unspecified,
+                                            //contentColor = Color.Unspecified,
+                                            disabledContainerColor = Color.Gray,
+                                            disabledContentColor = Color.White,
                                         )
-                                    }, enabled = !isDeletingFiles, // Блокируем кнопку
-                                    colors = ButtonDefaults.buttonColors(
-                                        //containerColor = Color.Unspecified,
-                                        //contentColor = Color.Unspecified,
-                                        disabledContainerColor = Color.Gray,
-                                        disabledContentColor = Color.White,
-                                    )
-                                ) {
-                                    if (deletionState.isDeleting) {
-                                        Column {
-                                            Text(text = "Удаление...")
-                                            LinearProgressIndicator(
-                                                progress = if (deletionState.total > 0)
-                                                    deletionState.current.toFloat() / deletionState.total.toFloat()
-                                                else 0f
-                                            )
-                                            Text(
-                                                text = "${deletionState.current}/${deletionState.total}",
-                                            )
+                                    ) {
+                                        if (deletionState.isDeleting) {
+                                            Column {
+                                                Text(text = "Удаление...")
+                                                LinearProgressIndicator(
+                                                    progress = if (deletionState.total > 0)
+                                                        deletionState.current.toFloat() / deletionState.total.toFloat()
+                                                    else 0f
+                                                )
+                                                Text(
+                                                    text = "${deletionState.current}/${deletionState.total}",
+                                                )
+                                            }
+                                        } else {
+                                            Text(text = "Удалить все файлы")
                                         }
-                                    } else {
-                                        Text(text = "Удалить все файлы")
                                     }
                                 }
                             }
@@ -462,7 +510,7 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
                         }
                     }
 
-                    items(filteredPic) {
+                    itemsIndexed(filteredPic) { index, it ->
                         var imageBounds by remember { mutableStateOf<Rect?>(null) }
                         if (it.url_to_original != null) {
                             Box(
@@ -489,6 +537,20 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
                                     contentScale = ContentScale.FillBounds,
                                     albumName = idAlbum.toString()
                                 )
+
+                                Text(
+                                    index.toString(),
+                                    modifier = Modifier.padding(start = 4.dp)
+                                        .align(Alignment.TopStart),
+                                    color = ThemeL.textColor,
+                                    fontFamily = ThemeL.fontFamilyKarla,
+                                    fontSize = 14.sp
+                                )
+
+                                AlbumItemExpandMenu(
+                                    item = it.url_to_original,
+                                    modifier = Modifier.align(Alignment.TopEnd),
+                                    onDownload = { it1 -> vm.downloadLike(it1) })
 
 
 //                                UrlImageLusciousGifs(
@@ -555,7 +617,10 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
                         startBounds = selectedBounds,
                         onClose = { selectedImage = null },
                         albumName = idAlbum.toString(),
-                        filteredPic = filteredPic
+                        filteredPic = filteredPic,
+                        onDownload = {
+                            vm.downloadLike(it)
+                        }
                     )
                 }
             }
@@ -575,7 +640,7 @@ fun ScrollToTopButton(
     FloatingActionButton(
         onClick = {
             scope.launch {
-                staggeredGridState.animateScrollToItem(0)
+                staggeredGridState.scrollToItem(0)
             }
         },
         content = {
