@@ -1,8 +1,8 @@
 package com.client.xvideos.l.featured.saved
 
 import com.client.common.di.ApplicationScope
+import com.client.common.kdownloader.KDownloader
 import com.client.xvideos.l.db.AppLDatabase
-import com.client.xvideos.l.net.Luscious
 import com.redgifs.common.snackBar.SnackBarEvent
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
@@ -11,17 +11,15 @@ import javax.inject.Singleton
 @Singleton
 class SavedL @Inject constructor(
     val db: AppLDatabase,
-    val api : Luscious,
-    snackBarEvent : SnackBarEvent,
-    @ApplicationScope val scope : CoroutineScope
+    snackBarEvent: SnackBarEvent,
+    @ApplicationScope val scope: CoroutineScope,
+    kDownloader: KDownloader,
 ) {
 
+    val collection = SavedL_Collection(snackBarEvent)
 
-   val collection =  SavedL_Collection(snackBarEvent)
-
-   val albums = SavedL_Albums(snackBarEvent, db, scope)
-
-
+    val albums = SavedL_Albums(snackBarEvent, db, scope)
+    val likes = SavedL_Likes(snackBarEvent, kDownloader)
 
 }
 

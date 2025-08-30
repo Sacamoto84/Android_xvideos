@@ -3,7 +3,6 @@ package com.redgifs.common.saved
 import com.client.common.fileDB.FileDB
 import com.client.common.AppPath
 import com.redgifs.model.GifsInfo
-import com.google.gson.reflect.TypeToken
 import com.redgifs.common.snackBar.SnackBarEvent
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlin.onSuccess

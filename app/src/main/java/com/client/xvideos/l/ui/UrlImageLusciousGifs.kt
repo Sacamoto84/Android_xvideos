@@ -58,7 +58,14 @@ fun UrlImageLusciousGifsGlide(
 
     // Определяем имя файла и проверяем наличие
     val fileName = url.substringAfterLast('/').substringBefore('?')
-    val file = File(AppPath.downloaded_albums_l, "$albumName/$fileName")
+
+    val file  = if (albumName != "likes") {
+        File(AppPath.downloaded_albums_l, "$albumName/$fileName")
+    }
+    else{
+        File(AppPath.likes_l, url)
+    }
+
     val dataSource: Any = if (file.exists()) file else url
 
     GlideImage(

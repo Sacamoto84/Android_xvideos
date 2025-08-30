@@ -22,25 +22,12 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import cafe.adriel.voyager.core.annotation.ExperimentalVoyagerApi
 import cafe.adriel.voyager.navigator.Navigator
-import coil.ImageLoader
-import coil.ImageLoaderFactory
-import coil.disk.DiskCache
-import coil.memory.MemoryCache
-import coil.request.CachePolicy
 import com.client.common.util.KeepScreenOn
 import com.client.xvideos.PermissionScreenActivity.PermissionStorage
-import com.client.xvideos.l.ui.screens.screenAlbum.ScreenLAlbum
-import com.client.xvideos.l.ui.screens.screenAlbumList.ScreenLAlbumList
-import com.client.xvideos.l.ui.screens.screenAlbumTopHits.ScreenLAlbumTopHits
 import com.client.xvideos.l.ui.screens.screenRoot.ScreenLRoot
 import com.client.xvideos.screens.videoplayer.video.cache.VideoPlayerCacheManager
 import com.client.xvideos.ui.theme.XvideosTheme
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.asCoroutineDispatcher
-import java.util.concurrent.Executors
 
 const val urlStart = "https://www.xv-ru.com"
 

@@ -1,4 +1,4 @@
-package com.client.xvideos.l.ui.screens.screenAlbumTopHits.atom
+package com.client.xvideos.l.ui.screens.explorer.tab.albumTopHits.atom
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box

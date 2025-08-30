@@ -43,10 +43,10 @@ import com.client.xvideos.l.net.AlbumListImpl
 import com.client.xvideos.l.net.Luscious
 import com.client.xvideos.l.ui.element.AlbumListItem
 import com.client.xvideos.l.ui.screens.TabRow
+import com.client.xvideos.l.ui.screens.explorer.tab.saved.albums.ScreenLSavedAlbumsTab
 import com.client.xvideos.l.ui.screens.screenAlbum.ScreenLAlbum
 import com.client.xvideos.l.ui.screens.screenAlbumList.atom.AlbumListPageSelector
 import com.client.xvideos.l.ui.screens.screenAlbumList.molecule.filter.AlbumListFilter
-import com.client.xvideos.l.ui.screens.screenSavedAlbums.ScreenLSavedAlbums
 import com.example.ui.screens.explorer.ScreenRedExplorer.Companion.screenType
 import com.example.ui.screens.explorer.tab.gifs.GifsTab
 import com.example.ui.screens.ui.atom.TabBarPoints
@@ -65,9 +65,12 @@ import net.engawapg.lib.zoomable.ExperimentalZoomableApi
 
 //https://members.luscious.net/graphql/nobatch/?operationName=AlbumList
 
-class ScreenLAlbumList(val idAlbum: Long) : Screen {
+object ScreenLAlbumList : Screen {
+
 
     override val key: ScreenKey = uniqueScreenKey
+
+    private fun readResolve(): Any = ScreenLAlbumList
 
     @OptIn(ExperimentalZoomableApi::class)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -77,7 +80,7 @@ class ScreenLAlbumList(val idAlbum: Long) : Screen {
         val navigator = LocalNavigator.currentOrThrow
 
         val vm = getScreenModel<ScreenLAlbumListSM, ScreenLAlbumListSM.Factory> { factory ->
-            factory.create(idAlbum)
+            factory.create(0)
         }
 
         val items = vm.albumList.collectAsStateWithLifecycle().value?.items
@@ -104,39 +107,6 @@ class ScreenLAlbumList(val idAlbum: Long) : Screen {
                             Text("Filter")
                         }
                     }
-                    val l = listOf(
-                        Icons.Outlined.Movie,
-                        Icons.Outlined.Group,
-                        Icons.Outlined.BookmarkBorder,
-                        Icons.Outlined.Search,
-                        Icons.Outlined.Settings
-                    )
-                    TabRow(
-                        containerColor = ThemeRed.colorTabLevel0,
-                        titlesIcon = l,
-                        value = screenType,
-                        onChangeState = {
-                            if (it == screenType) {
-                                when (it) {
-                                    0 -> {
-                                        navigator.push(ScreenLSavedAlbums())
-                                    }
-
-                                    1 -> {
-
-                                    }
-                                }
-                            }
-                            screenType = it
-                        },
-                        overlay0 = {
-                            TabBarPoints(
-                                GifsTab.columnSelect.column,
-                                screenType == 0
-                            )
-                        },
-                    )
-
                 }
             }, containerColor = ThemeL.greyBackground
         ) { padding ->

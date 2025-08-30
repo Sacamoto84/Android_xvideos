@@ -1,15 +1,19 @@
-package com.client.xvideos.l.ui.screens.screenAlbumTopHits
+package com.client.xvideos.l.ui.screens.explorer.tab.albumTopHits
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -46,11 +51,11 @@ import com.client.xvideos.l.net.AlbumTopHitsImpl
 import com.client.xvideos.l.net.Luscious
 import com.client.xvideos.l.ui.element.AlbumListItem
 import com.client.xvideos.l.ui.screens.screenAlbum.ScreenLAlbum
-import com.client.xvideos.l.ui.screens.screenAlbumTopHits.atom.DrawerContentDefault
-import com.client.xvideos.l.ui.screens.screenAlbumTopHits.atom.DrawerContentHentai
-import com.client.xvideos.l.ui.screens.screenAlbumTopHits.atom.DrawerContentManga
-import com.client.xvideos.l.ui.screens.screenAlbumTopHits.atom.DrawerContentPorn
-import com.client.xvideos.l.ui.screens.screenAlbumTopHits.atom.ScreenLRootBottomNavigator
+import com.client.xvideos.l.ui.screens.explorer.tab.albumTopHits.atom.DrawerContentDefault
+import com.client.xvideos.l.ui.screens.explorer.tab.albumTopHits.atom.DrawerContentHentai
+import com.client.xvideos.l.ui.screens.explorer.tab.albumTopHits.atom.DrawerContentManga
+import com.client.xvideos.l.ui.screens.explorer.tab.albumTopHits.atom.DrawerContentPorn
+import com.client.xvideos.l.ui.screens.explorer.tab.albumTopHits.atom.ScreenLRootBottomNavigator
 import com.client.xvideos.l.ui.screens.screenRoot.SelectIndex
 import dagger.Binds
 import dagger.Module
@@ -64,10 +69,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import net.engawapg.lib.zoomable.ExperimentalZoomableApi
 
-
-class ScreenLAlbumTopHits() : Screen {
+object ScreenLAlbumTopHits : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
+
+    private fun readResolve(): Any = ScreenLAlbumTopHits
 
     @OptIn(ExperimentalZoomableApi::class)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -154,18 +160,29 @@ class ScreenLAlbumTopHits() : Screen {
                         modifier = Modifier.padding(start = 4.dp, top = 16.dp)
                     )
 
-                    LazyHorizontalGrid(
-                        rows = GridCells.Fixed(2),
-                        modifier = Modifier.height(360.dp)
+                    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+
+                    FlowRow(
+                        maxItemsInEachRow = 3,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 2.dp), horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        items(items = item.items) {
-                            Box(modifier = Modifier.padding(horizontal = 2.dp)) {
+                        val itemWidth = (screenWidth - 8.dp) / 3  // учитываем padding
+                        item.items.dropLast(1).forEach { item ->
+                            Box(
+                                modifier = Modifier
+                                    .width(itemWidth)
+                                    .padding(vertical = 2.dp)
+                            ) {
                                 AlbumListItem(
-                                    title = it.title,
-                                    coverUrl = it.cover.url,
-                                    numberOfAnimatedPictures = it.numberOfAnimatedPictures,
-                                    numberOfPictures = it.numberOfPictures,
-                                    onClick = { navigator.push(ScreenLAlbum(it.id.toLong())) })
+                                    modifier = Modifier.fillMaxWidth(),
+                                    title = item.title,
+                                    coverUrl = item.cover.url,
+                                    numberOfAnimatedPictures = item.numberOfAnimatedPictures,
+                                    numberOfPictures = item.numberOfPictures,
+                                    onClick = { navigator.push(ScreenLAlbum(item.id.toLong())) }
+                                )
                             }
                         }
                     }

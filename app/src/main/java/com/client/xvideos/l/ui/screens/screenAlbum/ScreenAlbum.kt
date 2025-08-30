@@ -139,39 +139,6 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
 
         val isDownloading = vm.downloader.isDownloading.collectAsStateWithLifecycle().value
 
-
-//        LaunchedEffect(vm.showOnlyAnimated, parsed, album?.albumPicsDetails?.pics?.size) {
-//
-//            Timber.d("!!! LaunchedEffect vm.showOnlyAnimated = ${vm.showOnlyAnimated} parsed = $parsed")
-//            if (parsed == null) return@LaunchedEffect
-//
-//            val a = album?.albumPicsDetails?.pics?.filter { it.is_animated == vm.showOnlyAnimated }
-//
-//            filteredPic.clear()
-//            delay(100)
-//            filteredPic.addAll(a ?: emptyList())
-//
-//        }
-
-//        LaunchedEffect(vm.showOnlyAnimated, parsed, album?.albumPicsDetails?.pics?.size) {
-//            Timber.d("!!! LaunchedEffect vm.showOnlyAnimated = ${vm.showOnlyAnimated} parsed = $parsed")
-//            if (parsed == null) return@LaunchedEffect
-//
-//            val newPics =
-//                album?.albumPicsDetails?.pics?.filter { it.is_animated == vm.showOnlyAnimated }
-//                    ?: emptyList()
-//
-//            // Находим новые элементы, которых еще нет в filteredPic
-//            val existingIds = filteredPic.map { it.url_to_original }
-//                .toSet() // предполагаю что у PicsDetails есть id
-//            val newItems = newPics.filter { it.url_to_original !in existingIds }
-//
-//            // Добавляем только новые элементы
-//            if (newItems.isNotEmpty()) {
-//                filteredPic.addAll(newItems)
-//            }
-//        }
-
         LaunchedEffect(vm.showOnlyAnimated, parsed, album?.albumPicsDetails?.pics?.size) {
             Timber.d("!!! LaunchedEffect vm.showOnlyAnimated = ${vm.showOnlyAnimated} parsed = $parsed")
             if (parsed == null) return@LaunchedEffect
