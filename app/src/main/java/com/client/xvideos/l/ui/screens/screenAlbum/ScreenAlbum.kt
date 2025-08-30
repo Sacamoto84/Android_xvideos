@@ -28,15 +28,18 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
@@ -50,6 +53,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -122,6 +126,12 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
         val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForLazyStaggeredGrid(state, 0)
 
         val filteredPic = remember { mutableStateListOf<PicsDetails>() }
+
+        var isDeletingFiles by rememberSaveable { mutableStateOf(false) }
+        val deletionState by vm.downloader.deletionProgress.collectAsState()
+
+        val isDownloading = vm.downloader.isDownloading.collectAsStateWithLifecycle().value
+
 
         LaunchedEffect(vm.showOnlyAnimated, parsed) {
 
@@ -220,9 +230,11 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
         ) { padding ->
 
 
-            Box(modifier = Modifier
-                //.padding(top = padding.calculateTopPadding())
-                .fillMaxSize())
+            Box(
+                modifier = Modifier
+                    //.padding(top = padding.calculateTopPadding())
+                    .fillMaxSize()
+            )
             {
 
                 LazyVerticalStaggeredGrid(
@@ -334,13 +346,60 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
                                 )
                             }
 
-                            Button(onClick = { vm.saveFullAlbum() }) {
-                                Text(text = "Load All Pics")
+
+                            Row(modifier = Modifier.height(64.dp).padding(horizontal = 4.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+
+                                Button(onClick = { vm.saveFullAlbum() }) {
+                                    Text(text = "Load All Pics")
+                                }
+
+                                if(isDownloading) {
+                                    Box(
+                                        modifier = Modifier.size(40.dp).clip(CircleShape)
+                                            .background(Color.Red).clickable { vm.downloader.stop() },
+                                    )
+                                }
+
+                                Spacer(modifier = Modifier.width(4.dp))
+
+                                Button(
+                                    onClick = {
+                                        vm.downloader.deleteAlbum(
+                                            onStart = {
+                                                isDeletingFiles = true
+                                                vm.snackBarEvent.info("Удаление файлов альбома")
+                                            },
+                                            onComplete = {
+                                                isDeletingFiles = false
+                                                vm.snackBarEvent.success("Удаление файлов альбома завершено")
+                                            },
+                                        )
+                                    }, enabled = !isDeletingFiles, // Блокируем кнопку
+                                    colors = ButtonDefaults.buttonColors(
+                                        //containerColor = Color.Unspecified,
+                                        //contentColor = Color.Unspecified,
+                                        disabledContainerColor = Color.Gray,
+                                        disabledContentColor = Color.White,
+                                    )
+                                ) {
+                                    if (deletionState.isDeleting) {
+                                        Column {
+                                            Text(text = "Удаление...")
+                                            LinearProgressIndicator(
+                                                progress = if (deletionState.total > 0)
+                                                    deletionState.current.toFloat() / deletionState.total.toFloat()
+                                                else 0f
+                                            )
+                                            Text(
+                                                text = "${deletionState.current}/${deletionState.total}",
+                                            )
+                                        }
+                                    } else {
+                                        Text(text = "Удалить все файлы")
+                                    }
+                                }
                             }
 
-                            Button(onClick = { vm.downloader.deleteAlbum() }) {
-                                Text(text = "Удалить все файлы")
-                            }
                         }
 
 

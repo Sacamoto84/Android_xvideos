@@ -14,6 +14,7 @@ import com.client.xvideos.l.featured.saved.SavedL
 import com.client.xvideos.l.net.AlbumInfo
 import com.client.xvideos.l.net.Luscious
 import com.client.common.kdownloader.KDownloader
+import com.redgifs.common.snackBar.SnackBarEvent
 import dagger.Binds
 import dagger.Module
 import dagger.assisted.Assisted
@@ -35,6 +36,7 @@ class ScreenLAlbumSM @AssistedInject constructor(
     //val repository: Repository
     val kDownloader: KDownloader,
     val dowloaderL: DownloaderL,
+    val snackBarEvent: SnackBarEvent
 ) : ScreenModel {
 
     @AssistedFactory

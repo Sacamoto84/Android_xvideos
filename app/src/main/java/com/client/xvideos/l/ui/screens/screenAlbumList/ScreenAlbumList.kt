@@ -46,6 +46,7 @@ import com.client.xvideos.l.ui.screens.TabRow
 import com.client.xvideos.l.ui.screens.screenAlbum.ScreenLAlbum
 import com.client.xvideos.l.ui.screens.screenAlbumList.atom.AlbumListPageSelector
 import com.client.xvideos.l.ui.screens.screenAlbumList.molecule.filter.AlbumListFilter
+import com.client.xvideos.l.ui.screens.screenSavedAlbums.ScreenLSavedAlbums
 import com.example.ui.screens.explorer.ScreenRedExplorer.Companion.screenType
 import com.example.ui.screens.explorer.tab.gifs.GifsTab
 import com.example.ui.screens.ui.atom.TabBarPoints
@@ -118,7 +119,7 @@ class ScreenLAlbumList(val idAlbum: Long) : Screen {
                             if (it == screenType) {
                                 when (it) {
                                     0 -> {
-
+                                        navigator.push(ScreenLSavedAlbums())
                                     }
 
                                     1 -> {

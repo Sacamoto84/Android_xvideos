@@ -21,7 +21,7 @@ class DownloadDispatchers(private val dbHelper: DbHelper) {
             })
 
     fun enqueue(req: DownloadRequest): Int {
-        val job = scope.launch {
+        val job = scope.launch(Dispatchers.IO.limitedParallelism(1)) {
             execute(req)
         }
         req.job = job
