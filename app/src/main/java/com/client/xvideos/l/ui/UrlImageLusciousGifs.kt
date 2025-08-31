@@ -34,6 +34,7 @@ import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil.CoilImage
 import com.skydoves.landscapist.fresco.websupport.FrescoWebImage
 import com.skydoves.landscapist.glide.GlideImage
+import io.ktor.client.plugins.cache.storage.FileStorage
 import kotlinx.coroutines.Dispatchers
 import timber.log.Timber
 import java.io.File
@@ -207,12 +208,11 @@ fun UrlImageLusciousGifsFull(
 ) {
     // Определяем имя файла и проверяем наличие
     val fileName = url.substringAfterLast('/').substringBefore('?')
-    val file = File(AppPath.downloaded_albums_l, "$albumName/$fileName")
+    val file = if (albumName != "likes") File(AppPath.downloaded_albums_l, "$albumName/$fileName") else File(url)
     val dataSource: Uri = if (file.exists()) {
         Uri.fromFile(file) // локальный файл
-    } else {
-        Uri.parse(url) // сетевой url
-    }
+    } else {Uri.parse(url) }// сетевой url
+
 
     var isLoading by remember { mutableStateOf(true) }
     var hasError by remember { mutableStateOf(false) }

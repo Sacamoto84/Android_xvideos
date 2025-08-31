@@ -1,5 +1,6 @@
 package com.client.xvideos.l.featured.saved
 
+import androidx.compose.material3.TimeInput
 import androidx.compose.runtime.mutableStateListOf
 import com.client.common.AppPath
 import com.client.common.kdownloader.KDownloader
@@ -52,6 +53,7 @@ class SavedL_Likes( val snackBarEvent: SnackBarEvent, val kDownloader: KDownload
                listUrl.addAll(files)
            }
         } catch (e: Exception) {
+            Timber.e("eee Ошибка получения списка likes ${e.localizedMessage}")
             snackBarEvent.error("Ошибка получения списка likes")
         }
 
@@ -64,21 +66,24 @@ private fun fileNameToPicsDetails(file: File): PicsDetails? {
 
     val name = file.nameWithoutExtension// убираем .jpg / .png и т.п.
 
-    val parts = name.split("_", limit = 3)
+    val parts = name.split("_", limit = 4)
 
-    if (parts.size < 3) return null
+    if (parts.size < 4) return null
 
     val width = parts[0].toIntOrNull() ?: return null
     val height = parts[1].toIntOrNull() ?: return null
+    val is_animated = parts[2].toBooleanStrictOrNull() ?: false
+    val album = parts[3].toIntOrNull().toString()
 
     val path = File(AppPath.likes_l, file.name).absolutePath
 
     return PicsDetails(
         height = height,
         width = width,
-        is_animated = false, // тут надо решать самому, инфы в имени нет
+        is_animated = is_animated, // тут надо решать самому, инфы в имени нет
         url_to_original = path,
-        url_to_video = null
+        url_to_video = null,
+        album = album
     )
 }
 
@@ -89,7 +94,7 @@ private fun downloadLikes(
     onError: () -> Unit
 ) {
 
-    val fileName = item.width.toString() +"_"+item.height+"_"+item.url_to_original?.substringAfterLast('/')?.substringBefore('?')
+    val fileName = item.width.toString()+"_"+item.height+"_"+item.is_animated+"_"+item.album+"_"+item.url_to_original?.substringAfterLast('/')?.substringBefore('?')
 
     val dir = File(AppPath.likes_l)
     dir.mkdirs()

@@ -34,6 +34,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.client.xvideos.l.ThemeL
+import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.ui.UrlImageLusciousGifsGlide
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumItemExpandMenu
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.FullScreenImage
@@ -44,6 +45,7 @@ import com.example.ui.screens.profile.rememberVisibleRangePercentIgnoringFirstNF
 fun LazyRowPictureDetails(
     host: LazyRowPictureDetailsHost,
     itemBefore: @Composable () -> Unit = {},
+    expandMenu : @Composable (PicsDetails) -> Unit = {}
 ) {
 
     val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForLazyStaggeredGrid(host.state, 0)
@@ -97,13 +99,15 @@ fun LazyRowPictureDetails(
                             fontSize = 14.sp
                         )
 
-                        AlbumItemExpandMenu(
-                            item = it,
-                            modifier = Modifier.align(Alignment.TopEnd),
-                            onDownload = { it1 ->
-                                //vm.downloadLike(it1)
-                            })
-
+                        Box(modifier = Modifier.align(Alignment.TopEnd))
+                        {
+                            expandMenu(it)
+//                            AlbumItemExpandMenu(        item = it,
+//                            modifier = Modifier.align(Alignment.TopEnd),
+//                            onDownload = { it1 ->
+//                                //vm.downloadLike(it1)
+//                            })
+                        }
                         val targetAlpha = if (host.selectedImage == it) 1f else 0f
 
                         val animatedAlpha by animateFloatAsState(

@@ -41,6 +41,7 @@ import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoDownloadButton
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoFilterButton
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoGreeting
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoTags
+import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumItemExpandMenu
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.ScrollToTopButton
 import net.engawapg.lib.zoomable.ExperimentalZoomableApi
 import timber.log.Timber
@@ -77,8 +78,8 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
             val newFilteredPics = allPics.filter { it.is_animated == vm.showOnlyAnimated }
 
             // Если изменился фильтр - полностью пересчитываем список
-            val currentFilteredUrls = vm.host.filteredPic.map { it.url_to_original }.toSet()
-            val shouldBeFilteredUrls = newFilteredPics.map { it.url_to_original }.toSet()
+            val currentFilteredUrls = vm.host.filteredPic.mapNotNull{ it.url_to_original }.toSet()
+            val shouldBeFilteredUrls = newFilteredPics.mapNotNull{ it.url_to_original }.toSet()
 
             // Проверяем, изменился ли набор URL после фильтрации
             if (currentFilteredUrls != shouldBeFilteredUrls) {
@@ -88,7 +89,7 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
                 vm.host.filteredPic.removeAll(toRemove.toSet())
 
                 // Добавляем новые элементы
-                val existingUrls = vm.host.filteredPic.map { it.url_to_original }.toSet()
+                val existingUrls = vm.host.filteredPic.mapNotNull{ it.url_to_original }.toSet()
                 val toAdd = newFilteredPics.filter { it.url_to_original !in existingUrls }
                 vm.host.filteredPic.addAll(toAdd)
             }
@@ -137,7 +138,10 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
 
 
             LazyRowPictureDetails(
-                vm.host,
+                host = vm.host,
+                expandMenu = {
+                    AlbumItemExpandMenu( item = it, onDownload = { it1 ->  vm.downloadLike(it1) })
+                },
                 itemBefore = {
 
                     Column(modifier = Modifier.padding(horizontal = 4.dp)) {

@@ -103,9 +103,7 @@ class ScreenLAlbumSM @AssistedInject constructor(
     }
 
     fun downloadLike(item : PicsDetails){
-        scope.launch {
-            saved.likes.add(item)
-        }
+        saved.likes.add(item.copy(album = idAlbum.toString()))
     }
 
 

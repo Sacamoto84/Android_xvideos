@@ -8,4 +8,5 @@ data class PicsDetails(
     @SerializedName("is_animated")     val is_animated: Boolean,
     @SerializedName("url_to_original") val url_to_original: String?,
     @SerializedName("url_to_video")    val url_to_video: String?,
+    @SerializedName("album")           val album: String = "null",
 )
