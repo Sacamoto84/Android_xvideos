@@ -49,9 +49,7 @@ object SavedLTab : Screen {
         val g4 = Settings.gallery_count[4].field.collectAsStateWithLifecycle().value
 
         val l = listOf(
-            Icons.Outlined.FavoriteBorder,
-            Icons.Outlined.Person,
-            Icons.Outlined.Group,
+            //Icons.Outlined.FavoriteBorder,
             Icons.Outlined.Save,
             Icons.Outlined.Folder,
             Icons.Outlined.Apps,

@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
@@ -64,6 +65,7 @@ import dagger.multibindings.IntoMap
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import net.engawapg.lib.zoomable.ExperimentalZoomableApi
+import timber.log.Timber
 
 object ScreenLAlbumTopHits : Screen {
 
@@ -141,7 +143,7 @@ object ScreenLAlbumTopHits : Screen {
 
 
 
-            LazyColumn(state = rememberLazyListState()) {
+            LazyColumn(state = vm.state) {
 
                 items(items?.size ?: 0) { index ->
                     val item = items?.get(index)
@@ -218,12 +220,20 @@ class ScreenLAlbumTopHitsSM @AssistedInject constructor(
         fun create(idAlbum: Long): ScreenLAlbumTopHitsSM
     }
 
+    val state = LazyListState()
+
     var albumTopHits = MutableStateFlow<AlbumTopHitsImpl?>(null)
 
     init {
+        Timber.i("iii ScreenLAlbumTopHitsSM init")
         screenModelScope.launch {
             albumTopHits.value = luscious.getAlbumTopHits()
         }
+    }
+
+    override fun onDispose() {
+        super.onDispose()
+        Timber.i("iii ScreenLAlbumTopHitsSM onDispose")
     }
 
 }

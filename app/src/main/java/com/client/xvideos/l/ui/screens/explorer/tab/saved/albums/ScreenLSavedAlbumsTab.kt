@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
@@ -30,6 +31,7 @@ import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
 import my.nanihadesuka.compose.LazyVerticalGridScrollbar
 import my.nanihadesuka.compose.ScrollbarSettings
+import timber.log.Timber
 import javax.inject.Inject
 
 object ScreenLSavedAlbumsTab : Screen {
@@ -45,7 +47,7 @@ object ScreenLSavedAlbumsTab : Screen {
 
         val vm: ScreenLSavedAlbumsSM = getScreenModel()
 
-        val state = rememberLazyGridState()
+        val state = vm.state
 
         Scaffold()
         { padding ->
@@ -86,10 +88,18 @@ class ScreenLSavedAlbumsSM @Inject constructor(
     val saved: SavedL
 ) : ScreenModel {
 
+    val state = LazyGridState()
+
     val albums = saved.albums.list
 
     init {
+        Timber.i("iii ScreenLSavedAlbumsSM init")
         if (albums.isEmpty()) saved.albums.refresh()
+    }
+
+    override fun onDispose() {
+        super.onDispose()
+        Timber.i("iii ScreenLSavedAlbumsSM onDispose")
     }
 
 }

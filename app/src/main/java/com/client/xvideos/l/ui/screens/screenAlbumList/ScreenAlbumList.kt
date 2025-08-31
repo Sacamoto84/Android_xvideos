@@ -62,6 +62,7 @@ import dagger.multibindings.IntoMap
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import net.engawapg.lib.zoomable.ExperimentalZoomableApi
+import timber.log.Timber
 
 //https://members.luscious.net/graphql/nobatch/?operationName=AlbumList
 
@@ -189,11 +190,17 @@ class ScreenLAlbumListSM @AssistedInject constructor(
     var albumList = MutableStateFlow<AlbumListImpl?>(null)
 
     init {
+        Timber.i("iii ScreenLAlbumListSM init")
         screenModelScope.launch {
             albumList.value = luscious.getAlbumList()
             albumList.value?.getAlbumList(1)
             albumList.value?.getAlbumListAggregations(1)
         }
+    }
+
+    override fun onDispose() {
+        super.onDispose()
+        Timber.i("iii ScreenLAlbumListSM onDispose")
     }
 
     fun loadAlbumList(page: Int) {
