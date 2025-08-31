@@ -1,16 +1,34 @@
 package com.client.xvideos.l.ui.screens.screenAlbumList.molecule.filter
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.client.xvideos.l.ThemeL
@@ -32,10 +50,25 @@ private val style = TextStyle(
 
 
 @Composable
-fun AlbumListFilter(filter: AlbumListFilter, filterGCount: List<AlbumListFilterGenreCountResponse>?, onFilterApply: (AlbumListFilter) -> Unit) {
+fun AlbumListFilter(filter: AlbumListFilter, filterGCount: List<AlbumListFilterGenreCountResponse>?, onClose : () -> Unit, onFilterApply: (AlbumListFilter) -> Unit ) {
     Column(modifier = Modifier.alpha(0.95f).background(ThemeL.grey4)) {
 
-        Spacer(Modifier.height(48.dp))
+
+
+        Box(Modifier.fillMaxWidth().height(48.dp)) {
+
+            Row( modifier = Modifier.padding(end = 0.dp).fillMaxWidth().height(46.dp).align(Alignment.CenterEnd).clickable(onClick = {onClose()}), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start ){
+                //Icon(Icons.Filled.Close, contentDescription = null, tint = ThemeL.textColor)
+                Spacer(modifier = Modifier.fillMaxHeight().fillMaxWidth().weight(1f))
+                Spacer(modifier = Modifier.fillMaxHeight().width(4.dp))
+                Spacer(modifier = Modifier.fillMaxHeight().fillMaxWidth().weight(1f))
+                Spacer(modifier = Modifier.fillMaxHeight().width(4.dp))
+                Box(modifier = Modifier.fillMaxHeight().fillMaxWidth().weight(1f).border(0.5.dp, ThemeL.grey2, RoundedCornerShape(4.dp)), contentAlignment = Alignment.Center){
+                    Text("Close", textAlign = TextAlign.Center, color = ThemeL.textColor, fontFamily = ThemeL.fontFamilyKarla, fontSize = 20.sp, modifier = Modifier)
+                }
+
+            }
+        }
 
         AlbumFilterDisplay(
             filter.display,

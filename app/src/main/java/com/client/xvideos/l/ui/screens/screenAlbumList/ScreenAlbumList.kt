@@ -164,7 +164,7 @@ object ScreenLAlbumList : Screen {
             }
 
             if (filter != null) {
-                if (visibleFilter) AlbumListFilter(filter, filterGCount) {
+                if (visibleFilter) AlbumListFilter(filter, filterGCount, onClose = { visibleFilter = false }) {
                     vm.albumList.value?.filter = it
                     vm.screenModelScope.launch {
                         vm.albumList.value?.getAlbumList(1)

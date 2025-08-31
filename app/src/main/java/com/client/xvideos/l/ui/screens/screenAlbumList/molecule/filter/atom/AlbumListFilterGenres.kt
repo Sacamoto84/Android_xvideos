@@ -1,5 +1,6 @@
 package com.client.xvideos.l.ui.screens.screenAlbumList.molecule.filter.atom
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,6 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Remove
@@ -121,7 +124,10 @@ fun AlbumListFilterGenres(
                                         contentDescription = null,
                                         tint = ThemeL.textColor,
                                         modifier = Modifier
-                                            .size(48.dp)
+                                            .padding(vertical = 2.dp)
+                                            .padding(horizontal = 4.dp)
+                                            .size(40.dp)
+                                            .border(1.dp, ThemeL.grey2, RoundedCornerShape(4.dp))
                                             .clickable(onClick = {
                                                 val plus = mutableListOf<Genre>()
                                                 plus.addAll(genresPlus)
@@ -137,7 +143,7 @@ fun AlbumListFilterGenres(
                                         item.title,
                                         color = ThemeL.textColor,
                                         fontFamily = ThemeL.fontFamilyKarla,
-                                        fontSize = 22.sp,
+                                        fontSize = 20.sp,
                                         fontWeight = FontWeight.Bold
                                     )
 
@@ -146,7 +152,10 @@ fun AlbumListFilterGenres(
                                         contentDescription = null,
                                         tint = ThemeL.textColor,
                                         modifier = Modifier
-                                            .size(48.dp)
+                                            .padding(vertical = 2.dp)
+                                            .padding(horizontal = 4.dp)
+                                            .size(40.dp)
+                                            .border(1.dp, ThemeL.grey2, RoundedCornerShape(4.dp))
                                             .clickable(onClick = {
                                                 val minus = mutableListOf<Genre>()
                                                 minus.addAll(genresMinus)
