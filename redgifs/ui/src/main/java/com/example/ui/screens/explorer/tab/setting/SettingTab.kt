@@ -48,6 +48,9 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import com.client.common.AppPath
 import com.client.common.util.getFolderSize
 import com.client.common.sharedPref.Settings
+import com.client.common.ui.element.setting.ConfigText
+import com.client.common.ui.element.setting.ConfigTextAndButtonWithDialog
+import com.client.common.ui.element.setting.ConfigTextAndCheckBox
 import com.client.common.util.toPrettyCount3
 import com.redgifs.common.ThemeRed
 import com.redgifs.common.di.HostDI
@@ -117,7 +120,7 @@ object SettingTab : Screen {
                 textDialogButton = "Очистить"
             ) {
                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                    vm.hostDI.downloadRed.deleteAll{
+                vm.hostDI.downloadRed.deleteAll {
                     vm.sizeXvideos = getFolderSize(File(AppPath.main))
                     vm.sizeRedDownload = getFolderSize(File(AppPath.cache_download_red))
                 }
@@ -173,11 +176,26 @@ object SettingTab : Screen {
 
             HorizontalDivider(color = Color.DarkGray)
 
-            ConfigTextAndCheckBox("Тикток стиль", galey0) { vm.screenModelScope.launch { Settings.gallery_count[0].setValue(it) }}
-            ConfigTextAndCheckBox("Один столбец", galey1) { vm.screenModelScope.launch { Settings.gallery_count[1].setValue(it) }}
-            ConfigTextAndCheckBox("Два столбца", galey2) { vm.screenModelScope.launch { Settings.gallery_count[2].setValue(it) }}
-            ConfigTextAndCheckBox("Три столбца", galey3) { vm.screenModelScope.launch { Settings.gallery_count[3].setValue(it) }}
-            ConfigTextAndCheckBox("Четыре столбца", galey4) { vm.screenModelScope.launch { Settings.gallery_count[4].setValue(it) }}
+            ConfigTextAndCheckBox(
+                "Тикток стиль",
+                galey0
+            ) { vm.screenModelScope.launch { Settings.gallery_count[0].setValue(it) } }
+            ConfigTextAndCheckBox(
+                "Один столбец",
+                galey1
+            ) { vm.screenModelScope.launch { Settings.gallery_count[1].setValue(it) } }
+            ConfigTextAndCheckBox(
+                "Два столбца",
+                galey2
+            ) { vm.screenModelScope.launch { Settings.gallery_count[2].setValue(it) } }
+            ConfigTextAndCheckBox(
+                "Три столбца",
+                galey3
+            ) { vm.screenModelScope.launch { Settings.gallery_count[3].setValue(it) } }
+            ConfigTextAndCheckBox(
+                "Четыре столбца",
+                galey4
+            ) { vm.screenModelScope.launch { Settings.gallery_count[4].setValue(it) } }
 
         }
     }

@@ -24,7 +24,7 @@ import cafe.adriel.voyager.core.annotation.ExperimentalVoyagerApi
 import cafe.adriel.voyager.navigator.Navigator
 import com.client.common.util.KeepScreenOn
 import com.client.xvideos.PermissionScreenActivity.PermissionStorage
-import com.client.xvideos.l.ui.screens.screenRoot.ScreenLRoot
+import com.client.xvideos.l.ui.screens.ScreenLRoot
 import com.client.xvideos.screens.videoplayer.video.cache.VideoPlayerCacheManager
 import com.client.xvideos.ui.theme.XvideosTheme
 import dagger.hilt.android.AndroidEntryPoint

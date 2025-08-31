@@ -8,8 +8,6 @@ import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.FormatListBulleted
-import androidx.compose.material.icons.outlined.Group
-import androidx.compose.material.icons.outlined.Movie
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Topic
@@ -29,6 +27,7 @@ import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import com.client.common.sharedPref.Settings
 import com.client.xvideos.l.ui.screens.explorer.tab.albumTopHits.ScreenLAlbumTopHits
+import com.client.xvideos.l.ui.screens.explorer.tab.config.ScreenLConfigTab
 import com.client.xvideos.l.ui.screens.explorer.tab.saved.SavedLTab
 import com.client.xvideos.l.ui.screens.screenAlbumList.ScreenLAlbumList
 import com.example.ui.screens.explorer.tab.gifs.GifsTab
@@ -70,7 +69,6 @@ class ScreenLExplorer() : Screen {
             Icons.Outlined.FormatListBulleted,
             Icons.Outlined.Topic,
             Icons.Outlined.BookmarkBorder,
-            Icons.Outlined.Search,
             Icons.Outlined.Settings
         )
         Scaffold(bottomBar = {
@@ -102,8 +100,7 @@ class ScreenLExplorer() : Screen {
                     0 -> ScreenLAlbumList.Content()
                     1 -> ScreenLAlbumTopHits.Content()
                     2 -> SavedLTab.Content()
-                    3 -> {}
-                    4 -> {}
+                    3 -> ScreenLConfigTab.Content()
                     else -> SavedLTab.Content()
                 }
             }

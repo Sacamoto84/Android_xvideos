@@ -56,7 +56,8 @@ fun FullScreenImage(
     onClose: () -> Unit,
     albumName: String,
     filteredPic: List<PicsDetails>,
-    onDownload: (PicsDetails) -> Unit = {}
+    //onDownload: (PicsDetails) -> Unit = {},
+    expandMenu: @Composable (PicsDetails) -> Unit = {},
 ) {
     val density = LocalDensity.current
     val configuration = LocalConfiguration.current
@@ -421,12 +422,15 @@ fun FullScreenImage(
                 .background(Color.Black.copy(alpha = alphaAnim.value))
         )
 
-//        IconButton(modifier = Modifier.align(Alignment.TopEnd), onClick = {}) {
-//            Icon(Icons.Default.MoreVert, tint = Color.White, contentDescription = null)
-//        }
+//      IconButton(modifier = Modifier.align(Alignment.TopEnd), onClick = {}) {
+//          Icon(Icons.Default.MoreVert, tint = Color.White, contentDescription = null)
+//      }
 
-        AlbumItemExpandMenu(item = item, modifier = Modifier.align(Alignment.TopEnd), onDownload = {onDownload(it)})
+//      AlbumItemExpandMenu(item = item, modifier = Modifier.align(Alignment.TopEnd), onDownload = {onDownload(it)})
 
+        Box(modifier = Modifier.align(Alignment.TopEnd)) {
+            expandMenu(item)
+        }
 
         Box(
             modifier = Modifier

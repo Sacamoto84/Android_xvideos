@@ -1,4 +1,4 @@
-package com.example.ui.screens.explorer.tab.setting
+package com.client.common.ui.element.setting
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Text
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -20,9 +20,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
-import com.redgifs.common.ThemeRed
 
 @Composable
 fun ConfigTextAndButtonWithDialog(
@@ -43,7 +44,7 @@ fun ConfigTextAndButtonWithDialog(
         body = textDialogBody,
         buttonText = textDialogButton,
         onDismiss = { visible = false },
-        onBlockConfirmed = {onClick.invoke()})
+        onBlockConfirmed = { onClick.invoke() })
 
     Row(
         modifier = Modifier
@@ -54,18 +55,34 @@ fun ConfigTextAndButtonWithDialog(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text, style = styleTest)
+        Text(text, style = styleTextConfig)
         Box(
             modifier = Modifier
                 .height(48.dp)
                 .width(100.dp)
                 .clip(RoundedCornerShape(8.dp))
-                .border(1.dp, ThemeRed.colorTabLevel3, RoundedCornerShape(8.dp))
-                .background(ThemeRed.colorBottomBarDivider)
+                .border(1.dp, Color(0xFF333333), RoundedCornerShape(8.dp))
+                .background(Color(0xFF323153))
                 .clickable(onClick = { visible = true }), contentAlignment = Alignment.Center
         ) {
-            Text(value, style = styleTest.copy(fontSize = 18.sp))
+            Text(value, style = styleTextConfig.copy(fontSize = 18.sp))
         }
     }
+}
+
+@Preview
+@Composable
+fun ConfigTextAndButtonWithDialogPreview() {
+    ConfigTextAndButtonWithDialog(
+        text = "Sample Text",
+        value = "100",
+        textDialogTitle = "Dialog Title",
+        textDialogBody = "This is a sample dialog body.",
+        textDialogButton = "Confirm",
+        onClick = {
+            // Handle click action for preview
+            println("Button clicked in preview")
+        }
+    )
 }
 

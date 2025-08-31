@@ -1,8 +1,11 @@
-package com.client.xvideos.l.ui.screens.screenRoot
+package com.client.xvideos.l.ui.screens
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -23,6 +26,8 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
@@ -61,9 +66,7 @@ import kotlinx.coroutines.launch
 import net.engawapg.lib.zoomable.ExperimentalZoomableApi
 import javax.inject.Inject
 
-val LocalRootLScreenModel = staticCompositionLocalOf<ScreenLRootSM> {
-    error("No ScreenLRootSM provided")
-}
+val LocalRootLScreenModel = staticCompositionLocalOf<ScreenLRootSM> { error("No ScreenLRootSM provided") }
 
 class ScreenLRoot() : Screen {
 
@@ -74,22 +77,15 @@ class ScreenLRoot() : Screen {
     @Composable
     override fun Content() {
 
-        val navigator = LocalNavigator.currentOrThrow
         val haptic = LocalHapticFeedback.current
 
         val vm: ScreenLRootSM = getScreenModel()
-
-        val drawerState = rememberDrawerState(DrawerValue.Closed)
 
         val snackbarHostState = remember { SnackbarHostState() }
 
         val snackBarEvent = vm.hostDI.snackBarEvent
 
-        LaunchedEffect(Unit) {
-            vm.snackbarEvents.collect { message ->
-                snackbarHostState.showSnackbar(message)
-            }
-        }
+        LaunchedEffect(Unit) { vm.snackbarEvents.collect { message -> snackbarHostState.showSnackbar(message) } }
 
         LaunchedEffect(Unit) {
             snackBarEvent.messages.receiveAsFlow().collect { message ->
@@ -103,90 +99,42 @@ class ScreenLRoot() : Screen {
                 containerColor = ThemeL.greyBackground,
                 snackbarHost = {
                     SnackbarHost(snackbarHostState) { data ->
-
-
-                        val uiMsg = (data.visuals as? UiSnackbarVisuals)?.ui
-                            ?: UiMessage.Info(data.visuals.message)
-
+                        val uiMsg = (data.visuals as? UiSnackbarVisuals)?.ui ?: UiMessage.Info(data.visuals.message)
                         val (bg, fg, icon) = when (uiMsg) {
-                            is UiMessage.Success -> Triple(
-                                Color(0xFF0F9960),
-                                Color.White,
-                                Icons.Default.Check
-                            )
-
-                            is UiMessage.Error -> Triple(
-                                Color(0xFFD13913),
-                                Color.White,
-                                Icons.Default.ErrorOutline
-                            )
-
-                            is UiMessage.Info -> Triple(
-                                Color(0xFF137CBD),
-                                Color.White,
-                                Icons.Default.Info
-                            )
+                            is UiMessage.Success -> Triple( Color(0xFF0F9960), Color.White, Icons.Default.Check )
+                            is UiMessage.Error ->   Triple( Color(0xFFD13913), Color.White, Icons.Default.ErrorOutline )
+                            is UiMessage.Info ->    Triple( Color(0xFF137CBD), Color.White, Icons.Default.Info )
                         }
-
                         LaunchedEffect(data) {
                             when (uiMsg) {
-                                is UiMessage.Success -> {
-                                    delay(2000)
-                                    data.dismiss()
-                                }
-
-                                is UiMessage.Error -> {
-                                    delay(5000)
-                                    data.dismiss()
-                                }
-
-                                is UiMessage.Info -> {
-                                    delay(2000)
-                                    data.dismiss()
-                                }
+                                is UiMessage.Success -> { delay(2000); data.dismiss() }
+                                is UiMessage.Error -> { delay(5000); data.dismiss() }
+                                is UiMessage.Info -> { delay(2000);  data.dismiss() }
                             }
                         }
-
                         Surface(
-                            modifier = Modifier
-                                .wrapContentWidth()
-                                .padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
-
-                            color = bg,
-                            contentColor = fg,
-                            shape = RoundedCornerShape(12.dp),
-                            tonalElevation = 6.dp,
-                            shadowElevation = 6.dp,
+                            modifier = Modifier.wrapContentWidth().padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
+                            color = bg, contentColor = fg, shape = RoundedCornerShape(12.dp), tonalElevation = 6.dp, shadowElevation = 6.dp,
                         ) {
-                            Row(
-                                Modifier.padding(horizontal = 12.dp, vertical = 12.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
+                            Row( Modifier.padding(horizontal = 12.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically )
+                            {
                                 Icon(icon, contentDescription = null)
                                 Spacer(Modifier.width(8.dp))
-
-                                Text(
-                                    data.visuals.message, Modifier//.weight(1f)
-                                    , fontFamily = ThemeRed.fontFamilyDMsanss
-                                )
-
+                                Text( data.visuals.message, Modifier, fontFamily = ThemeRed.fontFamilyDMsanss )
                                 data.visuals.actionLabel?.let { label ->
-                                    TextButton(onClick = { data.performAction() }) {
-                                        Text(label)
-                                    }
+                                    TextButton(onClick = { data.performAction() }) { Text(label) }
                                 }
                             }
                         }
-
-
                     }
                 }
-            ) { paddingValues ->
-                //Navigator( screen = ScreenLAlbumList(556543))
-                //Navigator( screen = ScreenLSavedAlbums())
-                Navigator( screen = ScreenLExplorer())
+            ) { paddingValues -> Navigator( screen = ScreenLExplorer()) }
 
+            // Оверлей рисуется поверх Scaffold
+            vm.overlayContent.value?.let { content ->
+                Box( modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.5f)) ) { content() }
             }
+
         }
     }
 
@@ -201,11 +149,15 @@ class ScreenLRootSM @Inject constructor(
 
     @OptIn(DelicateCoroutinesApi::class)
     fun showSnackbar(message: String) {
-        GlobalScope.launch {
-            _snackbarEvents.send(message)
-        }
+        GlobalScope.launch { _snackbarEvents.send(message) }
     }
 
+
+    // состояние для фуллскрин-оверлея
+    private val _overlayContent = mutableStateOf<(@Composable () -> Unit)?>(null)
+    val overlayContent: State <(@Composable () -> Unit)?> = _overlayContent
+    fun showOverlay(content: @Composable () -> Unit) { _overlayContent.value = content }
+    fun hideOverlay() { _overlayContent.value = null }
 
 }
 

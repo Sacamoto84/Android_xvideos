@@ -1,4 +1,4 @@
-package com.example.ui.screens.explorer.tab.setting
+package com.client.common.ui.element.setting
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -14,7 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Text
+import androidx.compose.material3.Text
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.TextButton
@@ -26,6 +26,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.window.Dialog
 import com.composables.core.HorizontalSeparator
 
@@ -59,7 +60,7 @@ fun DialogButton(
 
                 Column {
                     Column(Modifier.padding(start = 24.dp, top = 16.dp, end = 24.dp)) {
-                        androidx.compose.material3.Text(
+                        Text(
                             text = title,
                             style = TextStyle(
                                 color = Color.Black,
@@ -68,7 +69,7 @@ fun DialogButton(
                             )
                         )
                         Spacer(Modifier.height(8.dp))
-                        androidx.compose.material3.Text(
+                        Text(
                             text = body,
                             style = TextStyle(color = Color(0xFF474747), fontSize = 14.sp)
                         )
@@ -88,7 +89,7 @@ fun DialogButton(
                         TextButton(
                             onClick = onDismiss
                         ) {
-                            androidx.compose.material3.Text("Отмена")
+                            Text("Отмена")
                         }
 
                         Spacer(Modifier.width(8.dp))
@@ -114,3 +115,18 @@ fun DialogButton(
     }
 
 }
+
+@Preview
+@Composable
+fun DialogButtonPreview() {
+    DialogButton(
+        visible = true,
+        title = "Dialog Title",
+        body = "This is the body of the dialog.",
+        buttonText = "Confirm",
+        onDismiss = {},
+        onBlockConfirmed = {}
+    )
+}
+
+

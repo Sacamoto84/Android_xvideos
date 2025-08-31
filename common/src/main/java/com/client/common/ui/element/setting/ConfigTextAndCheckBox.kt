@@ -1,11 +1,11 @@
-package com.example.ui.screens.explorer.tab.setting
+package com.client.common.ui.element.setting
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Text
+import androidx.compose.material3.Text
 import androidx.compose.material.Checkbox
 import androidx.compose.material.CheckboxDefaults
 import androidx.compose.runtime.Composable
@@ -38,7 +38,7 @@ fun ConfigTextAndCheckBox(text: String, value: Boolean, onValueChange: (Boolean)
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text, style = styleTest)
+        Text(text, style = styleTextConfig)
         Checkbox(value, onValueChange, colors = CheckboxDefaults.colors(disabledColor = Color.White, uncheckedColor = Color.Gray))
     }
 }

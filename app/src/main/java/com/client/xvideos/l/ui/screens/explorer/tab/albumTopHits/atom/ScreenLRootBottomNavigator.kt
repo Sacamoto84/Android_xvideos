@@ -22,7 +22,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.client.xvideos.l.ThemeL
-import com.client.xvideos.l.ui.screens.screenRoot.SelectIndex
+import com.client.xvideos.l.ui.screens.SelectIndex
 
 @Composable
 fun ScreenLRootBottomNavigator(

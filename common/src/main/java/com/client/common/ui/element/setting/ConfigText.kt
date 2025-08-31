@@ -1,21 +1,16 @@
-package com.example.ui.screens.explorer.tab.setting
+package com.client.common.ui.element.setting
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Text
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-
-//@Preview(showBackground = false)
-//@Composable
-//private fun Preview(){
-//    ConfigText("Test", "Test")
-//}
 
 @Composable
 fun ConfigText(text: String, value: String) {
@@ -28,7 +23,14 @@ fun ConfigText(text: String, value: String) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text, style = styleTest)
-        Text(value, style = styleTest)
+        Text(text, style = styleTextConfig)
+        Text(value, style = styleTextConfig)
     }
 }
+
+@Preview
+@Composable
+fun ConfigTextPreview() {
+    ConfigText(text = "Sample Text", value = "Sample Value")
+}
+

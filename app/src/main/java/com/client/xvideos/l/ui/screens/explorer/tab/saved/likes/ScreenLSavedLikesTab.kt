@@ -41,10 +41,8 @@ object ScreenLSavedLikesTab : Screen {
         val vm: ScreenSavedLLikesSM = getScreenModel()
 
         Scaffold(modifier = Modifier.fillMaxSize()) {
-
             LazyRowPictureDetails(
                 vm.host,{})
-
         }
 
     }
