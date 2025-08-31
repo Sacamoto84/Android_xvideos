@@ -28,14 +28,10 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.lazy.staggeredgrid.itemsIndexed
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
@@ -76,23 +72,26 @@ import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import com.client.common.urlVideImage.UrlImage
-import com.client.common.util.toPrettyCount2
 import com.client.xvideos.l.ThemeL
 import com.client.xvideos.l.model.AlbumDetails
 import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.ui.UrlImageLusciousGifsGlide
+import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumDialogDeleteAlbum
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoAudiences
-import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoDownload
+import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoButtonSaveAlbum
+import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoDownloadButton
+import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoFilterButton
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoGreeting
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoTags
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumItemExpandMenu
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.FullScreenImage
-import com.client.xvideos.ui.theme.PurpleGrey80
+import com.client.xvideos.l.ui.screens.screenAlbum.atom.ScrollToTopButton
 import com.example.ui.screens.profile.atom.VerticalScrollbar
 import com.example.ui.screens.profile.rememberVisibleRangePercentIgnoringFirstNForLazyStaggeredGrid
 import kotlinx.coroutines.launch
 import net.engawapg.lib.zoomable.ExperimentalZoomableApi
 import timber.log.Timber
+import kotlin.collections.remove
 
 class ScreenLAlbum(val idAlbum: Long) : Screen {
 
@@ -166,51 +165,10 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
 
         /* ---------- Диалог подтверждения ---------- */
         itemPendingDelete?.let { pending ->
-            AlertDialog(
-                icon = { UrlImage(pending.cover.url, modifier = Modifier.size(96.dp)) },
-                onDismissRequest = { itemPendingDelete = null },
-                title = {
-                    com.composeunstyled.Text(
-                        "Удалить Альбом?",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
-                    )
-                },
-                text = {
-                    com.composeunstyled.Text(buildAnnotatedString {
-                        append("Удалить «")
-                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) { append(pending.title) }
-                        append("» из сохранённых?")
-                    }, fontSize = 16.sp)
-                },
-
-                confirmButton = {
-                    TextButton(
-                        onClick = {
-                            vm.saved.albums.remove(pending)   // удаляем
-                            itemPendingDelete = null          // закрываем диалог
-                        }
-                    ) {
-                        com.composeunstyled.Text(
-                            "Удалить",
-                            fontSize = 16.sp,
-                            color = Color(0xFF6552A5)
-                        )
-                    }
-                },
-                dismissButton = {
-                    TextButton(onClick = { itemPendingDelete = null }) {
-                        com.composeunstyled.Text(
-                            "Отмена",
-                            fontSize = 16.sp,
-                            color = Color(0xFF6552A5)
-                        )
-                    }
-                },
-
-                /* Доп. стили при желании */
-                containerColor = Color(0xFFEBE6EE)
-            )
+            AlbumDialogDeleteAlbum(pending, onDismiss = { itemPendingDelete = null }, {
+                vm.saved.albums.remove(pending)
+                itemPendingDelete = null
+            })
         }
         /* ---------- /Диалог ---------- */
 
@@ -237,235 +195,48 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
             containerColor = ThemeL.greyBackground
         ) { padding ->
 
-
-            Box(
-                modifier = Modifier
-                    //.padding(top = padding.calculateTopPadding())
-                    .fillMaxSize()
-            )
+            Box( modifier = Modifier.fillMaxSize() )
             {
 
                 LazyVerticalStaggeredGrid(
-                    state = state,
-                    columns = StaggeredGridCells.Fixed(2),
-                    modifier = Modifier.fillMaxSize()
+                    state = state, columns = StaggeredGridCells.Fixed(2), modifier = Modifier.fillMaxSize()
                 ) {
 
                     item(span = StaggeredGridItemSpan.FullLine) {
                         Column(modifier = Modifier.padding(horizontal = 4.dp)) {
-                            Row {
-                                UrlImage(
-                                    parsed?.cover?.url.toString(),
-                                    modifier = Modifier.size(72.dp)
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Column {
-                                    if (parsed != null) {
-                                        Text(
-                                            parsed.title,
-                                            color = ThemeL.textColor,
-                                            fontFamily = ThemeL.fontFamilyDMsanss
-                                        )
-                                        Text(
-                                            "${parsed.number_of_animated_pictures} gifs / ${parsed.number_of_pictures} pictures",
-                                            color = ThemeL.textColor
-                                        )
-                                    }
-                                }
-                            }
+
                             if (parsed != null) {
-                                AlbumInfoGreeting(parsed)
-                            }
-                            if (parsed != null) {
-                                AlbumInfoAudiences(parsed)
-                            }
-                        }
-
-                    }
-
-                    item(span = StaggeredGridItemSpan.FullLine) {
-                        if (parsed != null) {
-                            AlbumInfoTags(parsed)
-                        }
-                    }
-
-                    item(span = StaggeredGridItemSpan.FullLine) {
-                        if (parsed != null) {
-                            AlbumInfoDownload(parsed)
-                        }
-                    }
-
-                    item(span = StaggeredGridItemSpan.FullLine) {
-                        if (parsed != null) {
-
-                            Box(
-                                modifier = Modifier
-                                    .padding(horizontal = 2.dp)
-                                    .padding(top = 2.dp, bottom = 4.dp)
-                                    .height(46.dp)
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(4.dp))
-                                    .border(1.dp, ThemeL.grey3, RoundedCornerShape(4.dp))
-                                    .background(if (!saved) ThemeL.red else ThemeL.grey6)
-                                    .clickable(onClick = {
-                                        if (!saved) {
-                                            vm.saveAlbum()
-                                        } else {
-                                            itemPendingDelete = parsed
-                                        }
-                                    }),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                if (!saved) Text(
-                                    "Save Album",
-                                    color = Color.White,
-                                    fontFamily = ThemeL.fontFamilyKarla
-                                )
-                                else Text(
-                                    "Remove Album",
-                                    color = Color.White,
-                                    fontFamily = ThemeL.fontFamilyKarla
-                                )
-                            }
-                        }
-                    }
-
-
-                    item(span = StaggeredGridItemSpan.FullLine) {
-
-                        Column {
-
-                            Row()
-                            {
-                                Text(
-                                    " Size: " + folderSize.toPrettyCount2(),
-                                    color = ThemeL.textColor
-                                )
 
                                 Row {
-                                    val a = album?.albumPicsDetails?.pics?.size
-
-                                    Text(
-                                        " All: $a ",
-                                        color = ThemeL.textColor
+                                    UrlImage(
+                                        parsed?.cover?.url.toString(),
+                                        modifier = Modifier.size(72.dp)
                                     )
-
-                                    if (a != fileCountDownloaded + fileCountError) {
-                                        Text(
-                                            "D: $fileCountDownloaded E:",
-                                            color = ThemeL.textColor
-                                        )
-                                        Text(
-                                            fileCountError.toString(),
-                                            color = ThemeL.textColor
-                                        )
-                                    }
-                                }
-
-                            }
-
-                            Row(
-                                modifier = Modifier
-                                    .height(64.dp)
-                                    .padding(horizontal = 4.dp)
-                                    .fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-
-
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-
-                                    Button(onClick = { vm.saveFullAlbum() }) {
-                                        Text(text = "Load All Pics")
-                                    }
                                     Spacer(modifier = Modifier.width(4.dp))
-                                    if (isDownloading) {
-                                        Box(
-                                            modifier = Modifier
-                                                .size(40.dp)
-                                                .clip(CircleShape)
-                                                .background(PurpleGrey80)
-                                                .clickable { vm.downloader.stop() },
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            Icon(
-                                                imageVector = Icons.Default.Stop,
-                                                contentDescription = null,
-                                                tint = ThemeL.grey7
+                                    Column {
+                                        if (parsed != null) {
+                                            Text(
+                                                parsed.title,
+                                                color = ThemeL.textColor,
+                                                fontFamily = ThemeL.fontFamilyDMsanss
+                                            )
+                                            Text(
+                                                "${parsed.number_of_animated_pictures} gifs / ${parsed.number_of_pictures} pictures",
+                                                color = ThemeL.textColor
                                             )
                                         }
                                     }
                                 }
 
-                                Spacer(modifier = Modifier.width(4.dp))
-
-                                if (folderSize > 0) {
-                                    Button(
-                                        onClick = {
-                                            vm.downloader.deleteAlbum(
-                                                onStart = {
-                                                    isDeletingFiles = true
-                                                    vm.snackBarEvent.info("Удаление файлов альбома")
-                                                },
-                                                onComplete = {
-                                                    isDeletingFiles = false
-                                                    vm.snackBarEvent.success("Удаление файлов альбома завершено")
-                                                },
-                                            )
-                                        }, enabled = !isDeletingFiles, // Блокируем кнопку
-                                        colors = ButtonDefaults.buttonColors(
-                                            //containerColor = Color.Unspecified,
-                                            //contentColor = Color.Unspecified,
-                                            disabledContainerColor = Color.Gray,
-                                            disabledContentColor = Color.White,
-                                        )
-                                    ) {
-                                        if (deletionState.isDeleting) {
-                                            Column {
-                                                Text(text = "Удаление...")
-                                                LinearProgressIndicator(
-                                                    progress = if (deletionState.total > 0)
-                                                        deletionState.current.toFloat() / deletionState.total.toFloat()
-                                                    else 0f
-                                                )
-                                                Text(
-                                                    text = "${deletionState.current}/${deletionState.total}",
-                                                )
-                                            }
-                                        } else {
-                                            Text(text = "Удалить все файлы")
-                                        }
-                                    }
-                                }
-                            }
-
-
-                        }
-
-                    }
-                    item(span = StaggeredGridItemSpan.FullLine) {
-                        if (parsed != null) {
-
-                            if (parsed.number_of_animated_pictures == 0) return@item
-
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.End
-                            ) {
-                                Text(
-                                    "Show only animated",
-                                    color = ThemeL.textColor,
-                                    fontFamily = ThemeL.fontFamilyKarla
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Switch(
-                                    vm.showOnlyAnimated,
-                                    onCheckedChange = { vm.showOnlyAnimated = it },
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
+                                AlbumInfoGreeting(parsed)
+                                AlbumInfoAudiences(parsed)
+                                AlbumInfoTags(parsed)
+                                AlbumInfoButtonSaveAlbum(saved, onClick = { if (!saved) { vm.saveAlbum() } else { itemPendingDelete = parsed } })
+                                AlbumInfoDownloadButton( folderSize, album, fileCountDownloaded, fileCountError, vm, isDownloading, isDeletingFiles, deletionState, isDeletingChange = { isDeletingFiles = it } )
+                                AlbumInfoFilterButton(parsed, vm.showOnlyAnimated, { vm.showOnlyAnimated = it })
                             }
                         }
+
                     }
 
                     itemsIndexed(filteredPic) { index, it ->
@@ -498,7 +269,8 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
 
                                 Text(
                                     index.toString(),
-                                    modifier = Modifier.padding(start = 4.dp)
+                                    modifier = Modifier
+                                        .padding(start = 4.dp)
                                         .align(Alignment.TopStart),
                                     color = ThemeL.textColor,
                                     fontFamily = ThemeL.fontFamilyKarla,
@@ -560,12 +332,7 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
                 }
 
                 //---- Скролл ----
-                Box(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .align(Alignment.CenterEnd)
-                        .width(2.dp)
-                ) { VerticalScrollbar(scrollPercent) }
+                Box( modifier = Modifier.fillMaxHeight().align(Alignment.CenterEnd).width(2.dp) ) { VerticalScrollbar(scrollPercent) }
 
                 // Полноэкранное изображение с анимацией
                 selectedImage?.let { imageUrl ->
@@ -588,23 +355,4 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
 
 }
 
-@Composable
-fun ScrollToTopButton(
-    staggeredGridState: LazyStaggeredGridState
-) {
-    val scope = rememberCoroutineScope()
 
-    FloatingActionButton(
-        onClick = {
-            scope.launch {
-                staggeredGridState.scrollToItem(0)
-            }
-        },
-        content = {
-            Icon(
-                imageVector = Icons.Default.KeyboardArrowUp,
-                contentDescription = "Scroll to top"
-            )
-        }
-    )
-}
