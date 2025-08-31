@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.lazy.staggeredgrid.itemsIndexed
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,7 +42,8 @@ import com.example.ui.screens.profile.rememberVisibleRangePercentIgnoringFirstNF
 
 @Composable
 fun LazyRowPictureDetails(
-    host: LazyRowPictureDetailsHost
+    host: LazyRowPictureDetailsHost,
+    itemBefore: @Composable () -> Unit = {},
 ) {
 
     val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForLazyStaggeredGrid(host.state, 0)
@@ -53,6 +55,10 @@ fun LazyRowPictureDetails(
             columns = StaggeredGridCells.Fixed(host.columns),
             modifier = Modifier.fillMaxSize()
         ) {
+
+            item(span = StaggeredGridItemSpan.FullLine) {
+                itemBefore()
+            }
 
             itemsIndexed(host.filteredPic) { index, it ->
                 var imageBounds by remember { mutableStateOf<Rect?>(null) }

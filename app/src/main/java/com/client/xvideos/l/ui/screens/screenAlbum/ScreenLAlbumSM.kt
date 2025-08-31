@@ -15,6 +15,7 @@ import com.client.xvideos.l.net.AlbumInfo
 import com.client.xvideos.l.net.Luscious
 import com.client.common.kdownloader.KDownloader
 import com.client.xvideos.l.model.PicsDetails
+import com.client.xvideos.l.ui.element.lazyRowPictureDetails.LazyRowPictureDetailsHost
 import com.redgifs.common.snackBar.SnackBarEvent
 import dagger.Binds
 import dagger.Module
@@ -44,6 +45,10 @@ class ScreenLAlbumSM @AssistedInject constructor(
     interface Factory : ScreenModelFactory {
         fun create(idAlbum: Long): ScreenLAlbumSM
     }
+
+    val host = LazyRowPictureDetailsHost(idAlbum.toString())
+
+
 
     val downloader: DownloaderAlbum
 
