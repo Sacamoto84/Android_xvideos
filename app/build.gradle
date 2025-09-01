@@ -226,6 +226,7 @@ dependencies {
     implementation(libs.landscapist.fresco)
     implementation(libs.landscapist.fresco.websupport)
     implementation(libs.landscapist.glide)
+    ksp "com.github.bumptech.glide:compiler:4.16.0"
 
     //implementation('network.chaintech:compose-multiplatform-media-player:1.0.40')
 

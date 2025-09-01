@@ -40,7 +40,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.client.xvideos.l.model.PicsDetails
-import com.client.xvideos.l.ui.UrlImageLusciousGifsFull
+import com.client.xvideos.l.ui.urlImage.UrlImageLusciousGifsFull
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch

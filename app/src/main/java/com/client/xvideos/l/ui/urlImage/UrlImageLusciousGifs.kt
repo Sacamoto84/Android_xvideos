@@ -1,5 +1,6 @@
-package com.client.xvideos.l.ui
+package com.client.xvideos.l.ui.urlImage
 
+import android.graphics.drawable.Animatable
 import android.net.Uri
 import android.os.Build
 import androidx.compose.foundation.Image
@@ -26,6 +27,7 @@ import coil.decode.ImageDecoderDecoder
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.client.xvideos.common.AppPath
+import com.client.xvideos.common.encrypting.EncryptedFileModel
 import com.composeunstyled.Text
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.controller.BaseControllerListener
@@ -66,7 +68,15 @@ fun UrlImageLusciousGifsGlide(
         File(url)
     }
 
-    val dataSource: Any = if (file.exists()) file else url
+    //val dataSource: Any = if (file.exists()) file else url
+
+    val dataSource: Any = if (file.exists()) {
+        // тут отдаём НЕ файл напрямую, а специальную обёртку
+        EncryptedFileModel(file)
+    } else {
+        url
+    }
+
 
     GlideImage(
         imageModel = { dataSource }, // локальный файл или URL
@@ -229,7 +239,7 @@ fun UrlImageLusciousGifsFull(
                     override fun onFinalImageSet(
                         id: String?,
                         imageInfo: ImageInfo?,
-                        animatable: android.graphics.drawable.Animatable?
+                        animatable: Animatable?
                     ) {
                         isLoading = false
                         hasError = false
