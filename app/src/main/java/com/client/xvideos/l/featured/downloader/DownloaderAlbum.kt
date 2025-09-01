@@ -1,24 +1,19 @@
 package com.client.xvideos.l.featured.downloader
 
-import com.client.common.AppPath
-import com.client.common.util.getFolderSize
-import com.client.common.kdownloader.KDownloader
-import com.client.common.util.toPrettyCount3
+import com.client.xvideos.common.AppPath
+import com.client.xvideos.common.util.getFolderSize
+import com.client.xvideos.common.kdownloader.KDownloader
+import com.client.xvideos.common.util.toPrettyCount3
+import com.client.xvideos.common.kdownloader.Status
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
@@ -27,7 +22,6 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
 import java.util.concurrent.Executors
-import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.random.Random
@@ -218,7 +212,7 @@ class DownloaderAlbum(
 
                 //isDownloading.value = fileCountRaw.value >= fileCountDownloaded.value + fileCountError.value
                 val s = kDownloader.getStatusesByTag(albumName)
-                isDownloading.value = s.any { it.second == com.client.common.kdownloader.Status.RUNNING }
+                isDownloading.value = s.any { it.second == Status.RUNNING }
 
                 urlsToDownload.distinct().forEach { item ->
 
@@ -247,7 +241,7 @@ class DownloaderAlbum(
 
                             //isDownloading.value = fileCountRaw.value >= fileCountDownloaded.value + fileCountError.value
                             val s = kDownloader.getStatusesByTag(albumName)
-                            isDownloading.value = s.any { it.second == com.client.common.kdownloader.Status.RUNNING }
+                            isDownloading.value = s.any { it.second == Status.RUNNING }
 
                         },
                         onError = {
@@ -255,7 +249,7 @@ class DownloaderAlbum(
                             fileCountError.update { it + 1 }
                             requestAlbumSizeUpdate()
                             val s = kDownloader.getStatusesByTag(albumName)
-                            isDownloading.value = s.any { it.second == com.client.common.kdownloader.Status.RUNNING }
+                            isDownloading.value = s.any { it.second == Status.RUNNING }
 
                             //isDownloading.value = fileCountRaw.value >= fileCountDownloaded.value + fileCountError.value
                         }

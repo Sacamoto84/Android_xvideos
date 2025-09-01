@@ -14,7 +14,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.client.common.urlVideImage.UrlImage
+import com.client.xvideos.common.urlVideImage.UrlImage
 import com.client.xvideos.l.ThemeL
 
 //.aspectRatio(640f/935)

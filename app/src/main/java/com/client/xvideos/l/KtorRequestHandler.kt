@@ -1,10 +1,5 @@
 package com.client.xvideos.l
 
-import com.client.common.AppPath
-import com.client.xvideos.l.db.PostJsonDao
-import com.client.xvideos.l.db.PostJsonEntity
-import com.client.xvideos.l.db.PostJsonRamDao
-import com.client.xvideos.l.db.PostJsonRamEntity
 import com.client.xvideos.l.net.Luscious.Companion.LOGIN
 import com.github.javafaker.Faker
 import io.ktor.client.HttpClient

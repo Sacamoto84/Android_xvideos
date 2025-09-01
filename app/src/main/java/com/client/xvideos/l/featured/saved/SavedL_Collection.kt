@@ -1,7 +1,7 @@
 package com.client.xvideos.l.featured.saved
 
-import com.client.common.collection.model.ISavedLCollection
-import com.client.common.util.toMD5
+import com.client.xvideos.common.collection.model.ISavedLCollection
+import com.client.xvideos.common.util.toMD5
 import com.client.xvideos.l.model.PicsDetails
 import com.redgifs.common.snackBar.SnackBarEvent
 import kotlinx.coroutines.DelicateCoroutinesApi

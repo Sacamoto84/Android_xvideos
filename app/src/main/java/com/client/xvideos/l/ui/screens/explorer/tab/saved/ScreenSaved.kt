@@ -7,10 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Apps
-import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Folder
-import androidx.compose.material.icons.outlined.Group
-import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
@@ -23,12 +20,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
-import com.client.common.sharedPref.Settings
+import com.client.xvideos.common.sharedPref.Settings
 import com.client.xvideos.l.ui.screens.explorer.tab.saved.albums.ScreenLSavedAlbumsTab
 import com.client.xvideos.l.ui.screens.explorer.tab.saved.likes.ScreenLSavedLikesTab
-import com.example.ui.screens.explorer.top.TabRow
-import com.example.ui.screens.ui.atom.TabBarPoints
-import com.redgifs.common.ThemeRed
+import com.client.xvideos.redgifs.ui.explorer.top.TabRow
+import com.client.xvideos.redgifs.ui.ui.atom.TabBarPoints
+import com.client.xvideos.redgifs.common.ThemeRed
 
 object SavedLTab : Screen {
 

@@ -2,7 +2,7 @@ package com.client.xvideos.l.db
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.redgifs.db.entity.getCurrentTimeText
+import com.client.xvideos.redgifs.db.entity.getCurrentTimeText
 
 
 

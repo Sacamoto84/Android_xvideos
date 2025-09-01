@@ -1,0 +1,98 @@
+package com.client.xvideos.common
+
+import android.os.Environment
+import java.io.IOException
+import java.io.File
+
+private enum class Folder(val value: String) {
+    CACHE_DOWNLOAD_RED("Download"),
+    RED("Red"),
+    L("L"),
+}
+
+/**
+ * Предоставляет пути хранения файлов
+ */
+object AppPath {
+
+    private const val appMain = "xvideos"
+
+    /**
+     * Путь до внешнего хранилища
+     */
+    val sdcard: String = Environment.getExternalStorageDirectory().toString()
+
+    val main : String = "$sdcard/$appMain"
+
+    /**
+     * Пусть к папке с кешем загруженных файлов для предросмотра
+     */
+    val cache_download_red : String = "${main}/${Folder.RED.value}/${Folder.CACHE_DOWNLOAD_RED.value}"
+    val offline_red : String = "${main}/${Folder.RED.value}/Offline"
+    val block_red : String = "${main}/${Folder.RED.value}/Block"
+    val favorite_red : String = "${main}/${Folder.RED.value}/Favorite"
+
+    val users_red : String = "${main}/${Folder.RED.value}/Users"
+
+    val db_red : String = "${main}/${Folder.RED.value}/db"
+
+    val likes_red : String = "${main}/${Folder.RED.value}/Saved/Likes"
+    val collection_red : String = "${main}/${Folder.RED.value}/Saved/Collection"
+    val niches_red : String = "${main}/${Folder.RED.value}/Saved/Niches"
+
+    val nichesCache_red : String = "${main}/${Folder.RED.value}/Saved/NichesCache"
+    val creators_red : String = "${main}/${Folder.RED.value}/Saved/Creators"
+
+    //L
+    val likes_l: String = "${main}/${Folder.L.value}/Saved/Downloaded/Likes"
+
+    val albums_l: String = "${main}/${Folder.L.value}/Saved/Album"
+
+    val downloaded_albums_l: String = "${main}/${Folder.L.value}/Saved/Downloaded/Album"
+
+    val collection_l: String = "${main}/${Folder.L.value}/Saved/Collection"
+
+    val db_l: String = "${main}/${Folder.L.value}/db"
+
+    init {
+
+        println("---AppPath---")
+        println("sdcard: $sdcard")
+
+        File(main).mkdirs()
+
+        // Создание .nomedia
+        val nomedia = File(main, ".nomedia")
+        if (!nomedia.exists()) {
+            try {
+                nomedia.createNewFile()
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
+
+        File(cache_download_red).mkdirs()
+        File(offline_red).mkdirs()
+        File(block_red).mkdirs()
+        File(favorite_red).mkdirs()
+        File(users_red).mkdirs()
+        File(db_red).mkdirs()
+
+        File(likes_red).mkdirs()
+        File(collection_red).mkdirs()
+        File(niches_red).mkdirs()
+        File(creators_red).mkdirs()
+
+        File(nichesCache_red).mkdirs()
+
+        File(likes_l).mkdirs()
+        File(db_l).mkdirs()
+
+        File(albums_l).mkdirs()
+        File(collection_l).mkdirs()
+
+        File(downloaded_albums_l).mkdirs()
+
+    }
+
+}

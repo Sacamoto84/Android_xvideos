@@ -33,13 +33,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.client.xvideos.l.model.PicsDetails
-import com.redgifs.network.api.RedApi
-import com.redgifs.model.GifsInfo
-import com.redgifs.common.ThemeRed
+import com.client.xvideos.redgifs.network.api.RedApi
+import com.client.xvideos.redgifs.model.GifsInfo
+import com.client.xvideos.redgifs.common.ThemeRed
 import com.redgifs.common.block.BlockRed
 import com.redgifs.common.saved.SavedRed
 import kotlinx.coroutines.DelicateCoroutinesApi

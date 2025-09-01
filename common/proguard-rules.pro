@@ -20,11 +20,11 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
--dontwarn com.client.common.AppPath
--dontwarn com.client.common.connectivityObserver.ConnectivityObserver
+-dontwarn com.client.xvideos.common.AppPath
+-dontwarn com.client.xvideos.common.connectivityObserver.ConnectivityObserver
 -dontwarn com.client.common.connectivityObserver.modileConnectivityObserver_ProvideConnectivityObserverFactory
 -dontwarn com.client.common.di.CoroutinesModule_ProvideApplicationScopeFactory
--dontwarn com.client.common.preference.PreferencesRepository
+-dontwarn com.client.xvideos.common.preference.PreferencesRepository
 -dontwarn com.client.common.preference.di.PreferencesModule_ProvidePreferencesDataStoreFactory
 -dontwarn com.client.common.preference.di.PreferencesModule_ProvidePreferencesRepositoryFactory
 -dontwarn com.client.common.util.KeepScreenOnKt

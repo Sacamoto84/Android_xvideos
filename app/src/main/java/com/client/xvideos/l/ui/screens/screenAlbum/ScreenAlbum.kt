@@ -30,7 +30,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.getScreenModel
-import com.client.common.urlVideImage.UrlImage
+import com.client.xvideos.common.urlVideImage.UrlImage
 import com.client.xvideos.l.ThemeL
 import com.client.xvideos.l.model.AlbumDetails
 import com.client.xvideos.l.ui.element.lazyRowPictureDetails.LazyRowPictureDetails

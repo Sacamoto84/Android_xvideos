@@ -3,7 +3,7 @@ package com.client.xvideos.l
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import com.client.common.R
+import com.client.xvideos.R
 
 object ThemeL {
 

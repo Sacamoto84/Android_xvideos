@@ -34,8 +34,8 @@ import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.ui.UrlImageLusciousGifsGlide
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.FullScreenImage
 import com.client.xvideos.l.ui.screens.LocalRootLScreenModel
-import com.example.ui.screens.profile.atom.VerticalScrollbar
-import com.example.ui.screens.profile.rememberVisibleRangePercentIgnoringFirstNForLazyStaggeredGrid
+import com.client.xvideos.redgifs.ui.profile.atom.VerticalScrollbar
+import com.client.xvideos.redgifs.ui.profile.rememberVisibleRangePercentIgnoringFirstNForLazyStaggeredGrid
 
 @Composable
 fun LazyRowPictureDetails(

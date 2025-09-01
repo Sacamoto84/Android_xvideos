@@ -1,6 +1,6 @@
 package com.client.xvideos.l.repository
 
-import com.client.common.util.toMD5
+import com.client.xvideos.common.util.toMD5
 import com.client.xvideos.l.KtorRequestHandler
 import com.client.xvideos.l.db.AppLDatabase
 import com.client.xvideos.l.db.RepositoryCacheFullEntity

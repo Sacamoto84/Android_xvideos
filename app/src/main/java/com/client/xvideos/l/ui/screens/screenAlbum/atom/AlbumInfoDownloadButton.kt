@@ -27,8 +27,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.client.common.AppPath
-import com.client.common.util.toPrettyCount2
+import com.client.xvideos.common.util.toPrettyCount2
+import com.client.xvideos.common.kdownloader.KDownloader
 import com.client.xvideos.l.ThemeL
 import com.client.xvideos.l.featured.downloader.DownloaderAlbum
 import com.client.xvideos.l.net.AlbumInfo
@@ -183,9 +183,9 @@ fun AlbumInfoDownloadButtonPreview() {
     val vm = ScreenLAlbumSM(
         idAlbum = 1L,
         luscious = Luscious( kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Main), com.client.xvideos.l.repository.Repository(db = androidx.room.Room.inMemoryDatabaseBuilder(androidx.compose.ui.platform.LocalContext.current, com.client.xvideos.l.db.AppLDatabase::class.java).build(), snackBarEvent = com.redgifs.common.snackBar.SnackBarEvent(), scope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Main))),
-        saved = com.client.xvideos.l.featured.saved.SavedL(db = androidx.room.Room.inMemoryDatabaseBuilder(androidx.compose.ui.platform.LocalContext.current, com.client.xvideos.l.db.AppLDatabase::class.java).build(), snackBarEvent = com.redgifs.common.snackBar.SnackBarEvent(), scope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Main), kDownloader = com.client.common.kdownloader.KDownloader.create(androidx.compose.ui.platform.LocalContext.current)),
+        saved = com.client.xvideos.l.featured.saved.SavedL(db = androidx.room.Room.inMemoryDatabaseBuilder(androidx.compose.ui.platform.LocalContext.current, com.client.xvideos.l.db.AppLDatabase::class.java).build(), snackBarEvent = com.redgifs.common.snackBar.SnackBarEvent(), scope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Main), kDownloader = KDownloader.create(androidx.compose.ui.platform.LocalContext.current)),
         scope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Main),
-        kDownloader = com.client.common.kdownloader.KDownloader.create(androidx.compose.ui.platform.LocalContext.current),
+        kDownloader = KDownloader.create(androidx.compose.ui.platform.LocalContext.current),
         dowloaderL = com.client.xvideos.l.featured.downloader.DownloaderL(),
         snackBarEvent = com.redgifs.common.snackBar.SnackBarEvent()
     )

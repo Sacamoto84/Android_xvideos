@@ -1,10 +1,9 @@
 package com.client.xvideos.l.featured.saved
 
-import com.client.common.AppPath
-import com.client.common.fileDB.FileDB
+import com.client.xvideos.common.AppPath
+import com.client.xvideos.common.fileDB.FileDB
 import com.client.xvideos.l.db.AlbumPictureCacheEntity
 import com.client.xvideos.l.db.AppLDatabase
-import com.client.xvideos.l.model.Album
 import com.client.xvideos.l.model.AlbumDetails
 import com.client.xvideos.l.model.PicsDetails
 import com.google.gson.Gson

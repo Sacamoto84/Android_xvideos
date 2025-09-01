@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Application
 import android.preference.PreferenceManager
 import android.util.Log
-import com.client.common.sharedPref.Settings
+import com.client.xvideos.common.sharedPref.Settings
 import com.client.xvideos.PermissionScreenActivity.PermissionStorage
 import com.client.xvideos.l.db.AppLDatabase
 import com.facebook.drawee.backends.pipeline.Fresco

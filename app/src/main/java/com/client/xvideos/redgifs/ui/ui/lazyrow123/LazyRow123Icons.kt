@@ -1,0 +1,87 @@
+package com.client.xvideos.redgifs.ui.ui.lazyrow123
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Save
+import androidx.compose.material3.Icon
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import com.client.xvideos.R
+import com.client.xvideos.redgifs.model.GifsInfo
+import com.redgifs.common.di.HostDI
+
+
+@Composable
+fun LazyRow123Icons(modifier : Modifier = Modifier, hostDI : HostDI, item : GifsInfo, downloadList: List<GifsInfo>) {
+
+        Row(
+            modifier = Modifier.fillMaxWidth().then(modifier),
+            verticalAlignment = Alignment.Bottom,
+            horizontalArrangement = Arrangement.End
+        ) {
+
+            if (hostDI.savedRed.collections.collectionList.any { it.items.any { it2 -> it2.id == item.id } }) {
+                Icon(
+                    painter = painterResource(R.drawable.collection_multi_input_svgrepo_com),
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier
+                        .padding(bottom = 6.dp, end = 6.dp)
+                        .size(18.dp)
+                )
+            }
+
+            //
+            if (hostDI.savedRed.creators.list.any { it.username == item.userName }) {
+                Icon(
+                    Icons.Filled.Person,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier
+                        .padding(bottom = 6.dp, end = 6.dp)
+                        .size(18.dp)
+                )
+            }
+
+            //✅ Лайк
+            if (hostDI.savedRed.likes.list.any { it.id == item.id }) {
+                Icon(
+                    Icons.Filled.FavoriteBorder,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier
+                        .padding(bottom = 6.dp, end = 6.dp)
+                        .size(18.dp)
+                )
+            }
+
+            //✅ Иконка того что видео скачано
+            if (
+                downloadList.any { it.id == item.id }
+            ) {
+                Icon(
+                    Icons.Default.Save,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier
+                        .padding(bottom = 6.dp, end = 6.dp)
+                        .size(18.dp)
+                )
+            }
+
+
+    }
+
+}
+
+

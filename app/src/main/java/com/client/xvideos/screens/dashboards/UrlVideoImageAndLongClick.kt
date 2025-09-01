@@ -14,10 +14,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
-import com.client.common.vibrate.vibrateWithPatternAndAmplitude
+import com.client.xvideos.common.vibrate.vibrateWithPatternAndAmplitude
 import com.client.xvideos.model.GalleryItem
-import com.client.common.urlVideImage.UrlImage
-import com.client.common.urlVideImage.UrlVideoLite
+import com.client.xvideos.common.urlVideImage.UrlImage
+import com.client.xvideos.common.urlVideImage.UrlVideoLite
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

@@ -13,11 +13,11 @@ import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.client.common.sharedPref.Settings
+import com.client.xvideos.common.sharedPref.Settings
 import com.client.xvideos.l.featured.saved.SavedL
 import com.client.xvideos.l.ui.element.lazyRowPictureDetails.LazyRowPictureDetails
 import com.client.xvideos.l.ui.element.lazyRowPictureDetails.LazyRowPictureDetailsHost
-import com.example.ui.screens.explorer.tab.gifs.ColumnSelect
+import com.client.xvideos.redgifs.ui.explorer.tab.gifs.ColumnSelect
 import com.redgifs.common.snackBar.SnackBarEvent
 import dagger.Binds
 import dagger.Module

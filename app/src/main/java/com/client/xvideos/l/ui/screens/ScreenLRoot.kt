@@ -14,7 +14,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -22,7 +21,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -42,14 +40,10 @@ import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.Navigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.l.ThemeL
-import com.client.xvideos.l.ui.screens.explorer.ScreenLExplorer
-import com.example.ui.screens.UiSnackbarVisuals
-import com.example.ui.screens.show
-import com.redgifs.common.ThemeRed
+import com.client.xvideos.redgifs.ui.UiSnackbarVisuals
+import com.client.xvideos.redgifs.ui.show
+import com.client.xvideos.redgifs.common.ThemeRed
 import com.redgifs.common.di.HostDI
 import com.redgifs.common.snackBar.UiMessage
 import dagger.Binds

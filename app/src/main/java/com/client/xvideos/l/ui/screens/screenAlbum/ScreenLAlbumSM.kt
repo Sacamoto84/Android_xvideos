@@ -7,13 +7,13 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
-import com.client.common.di.ApplicationScope
+import com.client.xvideos.common.di.ApplicationScope
 import com.client.xvideos.l.featured.downloader.DownloaderAlbum
 import com.client.xvideos.l.featured.downloader.DownloaderL
 import com.client.xvideos.l.featured.saved.SavedL
 import com.client.xvideos.l.net.AlbumInfo
 import com.client.xvideos.l.net.Luscious
-import com.client.common.kdownloader.KDownloader
+import com.client.xvideos.common.kdownloader.KDownloader
 import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.ui.element.lazyRowPictureDetails.LazyRowPictureDetailsHost
 import com.redgifs.common.snackBar.SnackBarEvent
