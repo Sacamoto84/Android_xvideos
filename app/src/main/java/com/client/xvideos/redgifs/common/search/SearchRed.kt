@@ -87,6 +87,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -126,9 +127,13 @@ class SearchRed @Inject constructor(
     init {
         scope.launch {
             searchText.collect {
-                val request = if (it.text == "") " " else it.text
-                val a = redApi.getTagSuggestions(request)
-                searchTextSuggestions.value = a.getOrNull() ?: emptyList()
+                try {
+                    val request = if (it.text == "") " " else it.text
+                    val a = redApi.getTagSuggestions(request)
+                    searchTextSuggestions.value = a.getOrThrow()
+                }catch (e: Exception){
+                    Timber.e("!!! SearchRed searchText.collect ${e.localizedMessage}")
+                }
             }
         }
     }

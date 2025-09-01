@@ -75,8 +75,7 @@ object ApiClient {
     suspend fun login(): Result<Boolean> {
         return try {
             Timber.i("!!! Red ApiClient login()")
-            val tokenResponse = client.get("https://api.redgifs.com/v2/auth/temporary")
-                .body<TokenResponse>()
+            val tokenResponse = client.get("https://api.redgifs.com/v2/auth/temporary").body<TokenResponse>()
             bearerToken = tokenResponse.token
             Timber.i("!!! Red ApiClient login() SUCCESS - token received")
             Result.success(true)

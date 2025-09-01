@@ -40,7 +40,9 @@ import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
+import cafe.adriel.voyager.navigator.Navigator
 import com.client.xvideos.l.ThemeL
+import com.client.xvideos.l.ui.screens.explorer.ScreenLExplorer
 import com.client.xvideos.redgifs.ui.UiSnackbarVisuals
 import com.client.xvideos.redgifs.ui.show
 import com.client.xvideos.redgifs.common.ThemeRed
@@ -123,7 +125,7 @@ class ScreenLRoot() : Screen {
                     }
                 }
             ) { paddingValues ->
-                //Navigator( screen = ScreenLExplorer())
+                Navigator( screen = ScreenLExplorer())
             }
 
             // Оверлей рисуется поверх Scaffold

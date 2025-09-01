@@ -140,22 +140,6 @@ class App : Application() {
             }
         }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         // Настроить SLF4J для использования Timber
         // Настроить SLF4J для использования Timber
         //System.setProperty("slf4j.provider", "com.arcao.slf4j.timber.TimberLoggerProvider")
@@ -166,8 +150,6 @@ class App : Application() {
 
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
         Settings.init(prefs)
-
-
 
         val loggingInterceptor = Interceptor { chain ->
             val request = chain.request()
@@ -207,8 +189,7 @@ class App : Application() {
 
         val pipelineConfig =
             OkHttpImagePipelineConfigFactory
-                .newBuilder(this, OkHttpClient.Builder().addInterceptor(loggingInterceptor).build())
-
+                .newBuilder(this, OkHttpClient.Builder().build())
                 .setDiskCacheEnabled(true)
                 .setDownsampleEnabled(true)
                 .setResizeAndRotateEnabledForNetwork(true)
