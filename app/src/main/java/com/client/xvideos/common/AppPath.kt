@@ -46,6 +46,8 @@ object AppPath {
     //L
     val likes_l: String = "${main}/${Folder.L.value}/Saved/Downloaded/Likes"
 
+    val likesCrypto_l: String = "${main}/${Folder.L.value}/Saved/Downloaded/LikesCrypto"
+
     val albums_l: String = "${main}/${Folder.L.value}/Saved/Album"
 
     val downloaded_albums_l: String = "${main}/${Folder.L.value}/Saved/Downloaded/Album"
@@ -92,6 +94,7 @@ object AppPath {
         File(collection_l).mkdirs()
 
         File(downloaded_albums_l).mkdirs()
+        File(likesCrypto_l).mkdirs()
 
     }
 
