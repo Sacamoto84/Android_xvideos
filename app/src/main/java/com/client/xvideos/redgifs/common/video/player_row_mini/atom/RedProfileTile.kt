@@ -1,4 +1,4 @@
-package com.redgifs.common.video.player_row_mini.atom
+package com.client.xvideos.redgifs.common.video.player_row_mini.atom
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,7 +16,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.client.common.R
+import com.client.xvideos.R
 import com.client.xvideos.redgifs.model.GifsInfo
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.common.util.toMinSec

@@ -1,10 +1,10 @@
 package com.client.xvideos.redgifs.network.api
 
+import com.client.xvideos.redgifs.model.MediaResponse
+import com.client.xvideos.redgifs.model.Order
+import com.client.xvideos.redgifs.model.search.SearchCreatorsResponse
 import com.client.xvideos.redgifs.network.http.ApiClient
 import com.client.xvideos.redgifs.network.http.Route
-import com.redgifs.model.MediaResponse
-import com.redgifs.model.Order
-import com.redgifs.model.search.SearchCreatorsResponse
 
 class RedApi_Search(val api: ApiClient) {
 

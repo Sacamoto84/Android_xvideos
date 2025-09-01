@@ -13,7 +13,7 @@ import com.client.xvideos.redgifs.model.NichesResponse
 import com.client.xvideos.redgifs.model.TopCreatorsResponse
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.LazyRow123Host
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.TypePager
-import com.redgifs.common.di.HostDI
+import com.client.xvideos.redgifs.common.di.HostDI
 import dagger.Binds
 import dagger.Module
 import dagger.assisted.Assisted
@@ -54,9 +54,9 @@ class ScreenNicheSM @AssistedInject constructor(
         lazyHost.columns = 2
 
         screenModelScope.launch {
-            niche = hostDI.redApi.getNiche(nicheName).niche            // Нужно кешировать
-            related = hostDI.redApi.getNichesRelated(nicheName).getOrNull()       // Нужно кешировать
-            topCreator = hostDI.redApi.getNichesTopCreators(nicheName).getOrNull() // Нужно кешировать
+            niche = hostDI.redApi.getNiche(nicheName).getOrThrow() .niche            // Нужно кешировать
+            related = hostDI.redApi.getNichesRelated(nicheName).getOrThrow()      // Нужно кешировать
+            topCreator = hostDI.redApi.getNichesTopCreators(nicheName).getOrThrow()  // Нужно кешировать
         }
     }
 

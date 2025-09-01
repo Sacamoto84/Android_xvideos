@@ -19,10 +19,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.client.xvideos.BuildConfig
 import com.client.xvideos.common.videoplayer.host.MediaPlayerEvent
 import com.client.xvideos.common.videoplayer.host.MediaPlayerHost
 import com.client.xvideos.common.videoplayer.model.ScreenResize
-import com.redgifs.common.BuildConfig
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.redgifs.common.video.player_with_menu.atom.VideoPlayerWithMenuContent
 import kotlinx.coroutines.DelicateCoroutinesApi

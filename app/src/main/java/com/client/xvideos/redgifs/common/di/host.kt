@@ -1,12 +1,12 @@
-package com.redgifs.common.di
+package com.client.xvideos.redgifs.common.di
 
 import com.client.xvideos.common.connectivityObserver.ConnectivityObserver
-import com.redgifs.common.block.BlockRed
+import com.client.xvideos.redgifs.common.block.BlockRed
 import com.redgifs.common.downloader.DownloadRed
-import com.redgifs.common.saved.SavedRed
+import com.client.xvideos.redgifs.common.saved.SavedRed
 import com.redgifs.common.search.SearchNichesRed
 import com.redgifs.common.search.SearchRed
-import com.redgifs.common.snackBar.SnackBarEvent
+import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
 import com.client.xvideos.redgifs.network.api.RedApi
 import javax.inject.Inject
 import javax.inject.Singleton

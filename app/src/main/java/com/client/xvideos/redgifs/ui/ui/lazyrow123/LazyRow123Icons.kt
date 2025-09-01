@@ -18,7 +18,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.client.xvideos.R
 import com.client.xvideos.redgifs.model.GifsInfo
-import com.redgifs.common.di.HostDI
+import com.client.xvideos.redgifs.common.di.HostDI
 
 
 @Composable

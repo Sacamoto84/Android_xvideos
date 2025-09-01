@@ -44,7 +44,7 @@ import com.client.xvideos.l.ThemeL
 import com.client.xvideos.redgifs.ui.UiSnackbarVisuals
 import com.client.xvideos.redgifs.ui.show
 import com.client.xvideos.redgifs.common.ThemeRed
-import com.redgifs.common.di.HostDI
+import com.client.xvideos.redgifs.common.di.HostDI
 import com.redgifs.common.snackBar.UiMessage
 import dagger.Binds
 import dagger.Module

@@ -72,7 +72,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.client.xvideos.common.di.ApplicationScope
 import com.client.xvideos.common.util.toPrettyCount2
 import com.client.xvideos.redgifs.common.ThemeRed
-import com.redgifs.common.saved.SavedRed
+import com.client.xvideos.redgifs.common.saved.SavedRed
 import com.client.xvideos.redgifs.db.dao.SearchRedHistoryDao
 import com.client.xvideos.redgifs.db.entity.SearchRedHistoryEntity
 import com.client.xvideos.redgifs.model.search.SearchItemNichesResponse

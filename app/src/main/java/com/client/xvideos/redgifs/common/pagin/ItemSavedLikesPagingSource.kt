@@ -4,7 +4,7 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.client.xvideos.redgifs.model.GifsInfo
 import com.client.xvideos.redgifs.model.Order
-import com.redgifs.common.saved.SavedRed
+import com.client.xvideos.redgifs.common.saved.SavedRed
 import timber.log.Timber
 
 

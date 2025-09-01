@@ -16,7 +16,7 @@ import com.client.xvideos.l.net.Luscious
 import com.client.xvideos.common.kdownloader.KDownloader
 import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.ui.element.lazyRowPictureDetails.LazyRowPictureDetailsHost
-import com.redgifs.common.snackBar.SnackBarEvent
+import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
 import dagger.Binds
 import dagger.Module
 import dagger.assisted.Assisted

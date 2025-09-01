@@ -25,11 +25,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.redgifs.model.GifsInfo
-import com.redgifs.model.UserInfo
-import com.redgifs.model.URL1
 import com.client.xvideos.common.urlVideImage.UrlImage
 import com.client.xvideos.redgifs.common.ThemeRed
+import com.client.xvideos.redgifs.model.GifsInfo
+import com.client.xvideos.redgifs.model.URL1
+import com.client.xvideos.redgifs.model.UserInfo
 
 @Composable
 fun ProfileInfo1(

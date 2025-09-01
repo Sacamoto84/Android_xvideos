@@ -1,4 +1,4 @@
-package com.redgifs.common.video.player_with_menu
+package com.client.xvideos.redgifs.common.video.player_with_menu
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,15 +20,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.client.xvideos.BuildConfig
 import com.client.xvideos.common.videoplayer.host.MediaPlayerEvent
 import com.client.xvideos.common.videoplayer.host.MediaPlayerHost
 import com.client.xvideos.common.videoplayer.model.ScreenResize
-import com.redgifs.common.BuildConfig
-
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.redgifs.common.video.PlayerControls
 import com.redgifs.common.video.player_with_menu.atom.VideoPlayerWithMenuContent
-
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest

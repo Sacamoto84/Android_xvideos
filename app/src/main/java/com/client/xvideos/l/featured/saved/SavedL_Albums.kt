@@ -7,7 +7,7 @@ import com.client.xvideos.l.db.AppLDatabase
 import com.client.xvideos.l.model.AlbumDetails
 import com.client.xvideos.l.model.PicsDetails
 import com.google.gson.Gson
-import com.redgifs.common.snackBar.SnackBarEvent
+import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers

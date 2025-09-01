@@ -18,12 +18,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
-import com.redgifs.model.GifsInfo
-import com.redgifs.model.Order
-import com.redgifs.model.UserInfo
 import com.client.xvideos.common.urlVideImage.UrlImage
 import com.client.xvideos.redgifs.ui.top_this_week.ProfileInfo1
 import com.client.xvideos.redgifs.common.ThemeRed
+import com.client.xvideos.redgifs.model.GifsInfo
+import com.client.xvideos.redgifs.model.Order
+import com.client.xvideos.redgifs.model.UserInfo
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import timber.log.Timber

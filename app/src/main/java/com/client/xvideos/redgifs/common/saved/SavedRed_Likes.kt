@@ -3,7 +3,7 @@ package com.redgifs.common.saved
 import com.client.xvideos.common.fileDB.FileDB
 import com.client.xvideos.common.AppPath
 import com.client.xvideos.redgifs.model.GifsInfo
-import com.redgifs.common.snackBar.SnackBarEvent
+import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlin.onSuccess
 

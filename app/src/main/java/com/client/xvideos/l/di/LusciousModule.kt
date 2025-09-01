@@ -12,7 +12,7 @@ import com.client.xvideos.l.net.Luscious
 import com.client.xvideos.l.repository.Repository
 import com.client.xvideos.common.kdownloader.DownloaderConfig
 import com.client.xvideos.common.kdownloader.KDownloader
-import com.redgifs.common.snackBar.SnackBarEvent
+import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

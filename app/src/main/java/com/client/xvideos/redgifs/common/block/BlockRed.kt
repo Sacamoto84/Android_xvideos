@@ -1,11 +1,11 @@
-package com.redgifs.common.block
+package com.client.xvideos.redgifs.common.block
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.room.withTransaction
 import com.client.xvideos.common.di.ApplicationScope
-import com.redgifs.common.snackBar.SnackBarEvent
+import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
 import com.client.xvideos.redgifs.db.AppRedGifsDatabase
 import com.client.xvideos.redgifs.db.dao.BlockDao
 import com.client.xvideos.redgifs.db.dao.GifsInfoDao

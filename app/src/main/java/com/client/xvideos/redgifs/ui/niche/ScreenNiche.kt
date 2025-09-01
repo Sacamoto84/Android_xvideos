@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.TextAutoSize
@@ -50,7 +51,7 @@ import com.client.xvideos.redgifs.ui.ui.atom.TabBarPoints
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.LazyRow123
 import com.client.xvideos.redgifs.ui.ui.sortByOrder.SortByOrder
 import com.client.xvideos.redgifs.common.ThemeRed
-import com.redgifs.model.Order
+import com.client.xvideos.redgifs.model.Order
 
 class ScreenRedNiche(val nicheName: String = "pumped-pussy") : Screen {
 

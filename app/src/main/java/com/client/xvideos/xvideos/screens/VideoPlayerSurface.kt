@@ -104,7 +104,7 @@ fun VideoPlayerSurface(
 //                ///////////////////////////////////////////////////////////////////////////////
 //                //Кнопка изменения отношения сторон
                 val customButtonResize = ImageButton(context).apply {
-                    setImageResource(com.client.common.R.drawable.resize1) // Ваш значок кнопки
+                    setImageResource(R.drawable.resize1) // Ваш значок кнопки
                     contentDescription = "Change Aspect Ratio"
                     setBackgroundResource(R.color.transparent) // Убираем фон
                     setOnClickListener {

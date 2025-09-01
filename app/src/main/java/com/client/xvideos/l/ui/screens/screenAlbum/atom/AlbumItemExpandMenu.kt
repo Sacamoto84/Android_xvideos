@@ -39,8 +39,8 @@ import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.redgifs.network.api.RedApi
 import com.client.xvideos.redgifs.model.GifsInfo
 import com.client.xvideos.redgifs.common.ThemeRed
-import com.redgifs.common.block.BlockRed
-import com.redgifs.common.saved.SavedRed
+import com.client.xvideos.redgifs.common.block.BlockRed
+import com.client.xvideos.redgifs.common.saved.SavedRed
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -171,8 +171,8 @@ fun DropdownMenuItem_Follow(item: GifsInfo? = null, redApi: RedApi, savedRed: Sa
                 delay(200)
                 if (!isFollowed) {
                     try {
-                        val a = redApi.readCreator(item.userName)
-                        savedRed.creators.add(a)
+                        val a = redApi.readCreator(item.userName).getOrNull()
+                        savedRed.creators.add(a!!)
                     } catch (e: Exception) { e.printStackTrace() }
                 }
                 else {

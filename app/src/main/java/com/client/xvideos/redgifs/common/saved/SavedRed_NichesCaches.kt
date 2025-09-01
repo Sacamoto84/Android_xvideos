@@ -9,7 +9,7 @@ import androidx.compose.runtime.setValue
 import com.client.xvideos.common.AppPath
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
-import com.redgifs.common.snackBar.SnackBarEvent
+import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
 import com.client.xvideos.redgifs.model.Niche
 import com.client.xvideos.redgifs.network.api.RedApi
 import kotlinx.coroutines.CoroutineScope
@@ -42,14 +42,14 @@ class SavedRed_NichesCaches(
                 isDownloading = true
                 progress = 0f
                 val niches = mutableListOf<Niche>()
-                val res = redApi.explorer.getExplorerNiches(page = 1, count = 100)
-                val pages = res.pages
+                val res = redApi.explorer.getExplorerNiches(page = 1, count = 100).getOrNull()
+                val pages = res!!.pages
                 val step = 1f / (pages - 1)
                 niches.addAll(res.niches)
                 for (i in 2..pages) {
                     delay(200)
-                    val res2 = redApi.explorer.getExplorerNiches(page = i, count = 100)
-                    niches.addAll(res2.niches)
+                    val res2 = redApi.explorer.getExplorerNiches(page = i, count = 100).getOrNull()
+                    niches.addAll(res2!!.niches)
                     progress += step
                 }
                 list.clear()

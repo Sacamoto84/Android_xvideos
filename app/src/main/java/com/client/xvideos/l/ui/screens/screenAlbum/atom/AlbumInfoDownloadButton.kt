@@ -34,6 +34,7 @@ import com.client.xvideos.l.featured.downloader.DownloaderAlbum
 import com.client.xvideos.l.net.AlbumInfo
 import com.client.xvideos.l.net.Luscious
 import com.client.xvideos.l.ui.screens.screenAlbum.ScreenLAlbumSM
+import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
 import com.client.xvideos.ui.theme.PurpleGrey80
 
 
@@ -175,19 +176,19 @@ fun AlbumInfoDownloadButtonPreview() {
                 androidx.compose.ui.platform.LocalContext.current,
                 com.client.xvideos.l.db.AppLDatabase::class.java
             ).build(),
-            snackBarEvent = com.redgifs.common.snackBar.SnackBarEvent(),
+            snackBarEvent = SnackBarEvent(),
             scope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Main)
         ),
         scope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Main)
     )
     val vm = ScreenLAlbumSM(
         idAlbum = 1L,
-        luscious = Luscious( kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Main), com.client.xvideos.l.repository.Repository(db = androidx.room.Room.inMemoryDatabaseBuilder(androidx.compose.ui.platform.LocalContext.current, com.client.xvideos.l.db.AppLDatabase::class.java).build(), snackBarEvent = com.redgifs.common.snackBar.SnackBarEvent(), scope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Main))),
-        saved = com.client.xvideos.l.featured.saved.SavedL(db = androidx.room.Room.inMemoryDatabaseBuilder(androidx.compose.ui.platform.LocalContext.current, com.client.xvideos.l.db.AppLDatabase::class.java).build(), snackBarEvent = com.redgifs.common.snackBar.SnackBarEvent(), scope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Main), kDownloader = KDownloader.create(androidx.compose.ui.platform.LocalContext.current)),
+        luscious = Luscious( kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Main), com.client.xvideos.l.repository.Repository(db = androidx.room.Room.inMemoryDatabaseBuilder(androidx.compose.ui.platform.LocalContext.current, com.client.xvideos.l.db.AppLDatabase::class.java).build(), snackBarEvent = SnackBarEvent(), scope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Main))),
+        saved = com.client.xvideos.l.featured.saved.SavedL(db = androidx.room.Room.inMemoryDatabaseBuilder(androidx.compose.ui.platform.LocalContext.current, com.client.xvideos.l.db.AppLDatabase::class.java).build(), snackBarEvent = SnackBarEvent(), scope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Main), kDownloader = KDownloader.create(androidx.compose.ui.platform.LocalContext.current)),
         scope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Main),
         kDownloader = KDownloader.create(androidx.compose.ui.platform.LocalContext.current),
         dowloaderL = com.client.xvideos.l.featured.downloader.DownloaderL(),
-        snackBarEvent = com.redgifs.common.snackBar.SnackBarEvent()
+        snackBarEvent = SnackBarEvent()
     )
     AlbumInfoDownloadButton(folderSize = 1000L, album = album, fileCountDownloaded = 10, fileCountError = 2, vm = vm, isDownloading = false, isDeletingFiles = false, deletionState = DownloaderAlbum.DeletionProgress(), isDeletingChange = {})
 }

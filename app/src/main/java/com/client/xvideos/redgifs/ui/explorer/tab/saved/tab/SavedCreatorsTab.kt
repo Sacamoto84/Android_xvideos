@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -29,6 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -59,9 +61,9 @@ import com.client.xvideos.redgifs.ui.ui.lazyrow123.LazyRow123Host
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.TypePager
 import com.composeunstyled.Text
 import com.client.xvideos.redgifs.common.ThemeRed
-import com.redgifs.common.di.HostDI
-import com.redgifs.model.Order
-import com.redgifs.model.UserInfo
+import com.client.xvideos.redgifs.model.Order
+import com.client.xvideos.redgifs.model.UserInfo
+import com.client.xvideos.redgifs.common.di.HostDI
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -251,8 +253,11 @@ object SavedCreatorsTab : Screen {
 
 class ScreenSavedCreatorSM @Inject constructor(
     connectivityObserver: ConnectivityObserver,
-    val hostDI: HostDI
+    hostDIin: javax.inject.Provider<HostDI>
 ) : ScreenModel {
+
+    val hostDI = hostDIin.get()
+
     val gridState = LazyGridState()
 
     val likedHost = LazyRow123Host(

@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
@@ -25,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -44,10 +46,10 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.common.connectivityObserver.ConnectivityObserver
-import com.redgifs.model.NichesInfo
 import com.client.xvideos.redgifs.common.ThemeRed
-import com.redgifs.common.saved.SavedRed
+import com.client.xvideos.redgifs.common.saved.SavedRed
 import com.client.xvideos.common.urlVideImage.UrlImage
+import com.client.xvideos.redgifs.model.NichesInfo
 import com.client.xvideos.redgifs.ui.niche.ScreenRedNiche
 import com.client.xvideos.redgifs.ui.profile.atom.VerticalScrollbar
 import com.client.xvideos.redgifs.ui.profile.rememberVisibleRangePercentIgnoringFirstNForLazyColumn

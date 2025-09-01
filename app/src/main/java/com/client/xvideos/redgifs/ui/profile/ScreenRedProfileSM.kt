@@ -17,7 +17,7 @@ import com.client.xvideos.redgifs.model.MediaType
 import com.client.xvideos.redgifs.model.Order
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.LazyRow123Host
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.TypePager
-import com.redgifs.common.di.HostDI
+import com.client.xvideos.redgifs.common.di.HostDI
 import com.client.xvideos.redgifs.common.network.loadGifs
 import com.redgifs.common.share.useCaseShareGifs
 import com.redgifs.common.video.PlayerControls
@@ -214,7 +214,7 @@ class ScreenRedProfileSM @AssistedInject constructor(
                 ord = order,
                 type = if (typeGifs == TypeGifs.GIFS) MediaType.GIF else MediaType.IMAGE,
                 hostDI.redApi
-            )
+            ).getOrThrow()
             _tags.update { it + r.tags }
             val resp = r.gifs
             _list.update { it + resp }

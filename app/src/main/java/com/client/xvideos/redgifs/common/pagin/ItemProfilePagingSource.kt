@@ -2,13 +2,13 @@ package com.redgifs.common.pagin
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.redgifs.common.UsersRed
+import com.client.xvideos.redgifs.common.UsersRed
 import com.client.xvideos.redgifs.network.api.RedApi
 import com.client.xvideos.redgifs.model.GifsInfo
 import com.client.xvideos.redgifs.model.MediaType
 import com.client.xvideos.redgifs.model.Order
-import com.redgifs.common.block.BlockRed
-import com.redgifs.common.snackBar.SnackBarEvent
+import com.client.xvideos.redgifs.common.block.BlockRed
+import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
 import timber.log.Timber
 
 class ItemProfilePagingSource (val profileName : String, val sort : Order, val block: BlockRed, val redApi: RedApi, val tags : List<String> = emptyList(), val snackBarEvent: SnackBarEvent): PagingSource<Int, GifsInfo>() {
@@ -33,17 +33,17 @@ class ItemProfilePagingSource (val profileName : String, val sort : Order, val b
             else
                 redApi.searchCreator(userName = profileName, page = page,  count = 100, type = MediaType.GIF,  order = sort , tags = tags)
 
-            val isEndReached = response.gifs.isEmpty() // или, если ты знаешь, что сервер вернул всё
+            val isEndReached = response.getOrThrow().gifs.isEmpty() // или, если ты знаешь, что сервер вернул всё
 
             val nextKey = if (isEndReached) { null } else { page + 1 }
 
-            Timber.d("!!! load() a.gif.size = ${response.gifs.size}")
+            Timber.d("!!! load() a.gif.size = ${response.getOrThrow().gifs.size}")
 
-            val gifs : List<GifsInfo> = response.gifs.distinctBy { it.id }
+            val gifs : List<GifsInfo> = response.getOrThrow().gifs.distinctBy { it.id }
             val blockedSet = block.blockList.value.map{it.id}.toSet()
             val gifs1 = gifs.filterNot { it.id in blockedSet }
 
-            val user = response.users.distinctBy { it.username }
+            val user = response.getOrThrow().users.distinctBy { it.username }
 
             for (info in user) {
                 UsersRed.addUser(info)

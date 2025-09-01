@@ -3,7 +3,7 @@ package com.redgifs.common.pagin
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.redgifs.common.saved.SavedRed_NichesCaches
-import com.redgifs.common.snackBar.SnackBarEvent
+import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
 import com.client.xvideos.redgifs.model.Niche
 import com.client.xvideos.redgifs.model.Order
 import com.client.xvideos.redgifs.network.api.RedApi

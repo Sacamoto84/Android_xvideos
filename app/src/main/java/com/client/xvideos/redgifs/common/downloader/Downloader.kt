@@ -3,7 +3,7 @@ package com.redgifs.common.downloader
 import com.client.xvideos.common.AppPath
 import com.google.gson.GsonBuilder
 import com.client.xvideos.common.kdownloader.KDownloader
-import com.redgifs.common.snackBar.SnackBarEvent
+import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
 import com.redgifs.common.snackBar.UiMessage
 import com.client.xvideos.redgifs.model.GifsInfo
 import kotlinx.coroutines.DelicateCoroutinesApi

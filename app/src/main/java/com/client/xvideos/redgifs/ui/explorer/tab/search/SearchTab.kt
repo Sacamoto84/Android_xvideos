@@ -39,7 +39,7 @@ import com.client.xvideos.common.urlVideImage.UrlImage
 import com.client.xvideos.redgifs.model.search.SearchItemCreatorsResponse
 import com.client.xvideos.redgifs.model.search.SearchItemNichesResponse
 import com.client.xvideos.redgifs.model.search.SearchItemTagsResponse
-import com.redgifs.common.di.HostDI
+import com.client.xvideos.redgifs.common.di.HostDI
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -148,7 +148,7 @@ class ScreenRedExplorerSearchSM @Inject constructor(
                     return@collect
                 }
 
-                val creator = hostDI.redApi.search.searchCreatorsShort(text)
+                val creator = hostDI.redApi.search.searchCreatorsShort(text).getOrThrow()
 
                 creatorsList.clear()
                 creatorsList.addAll(creator.items)

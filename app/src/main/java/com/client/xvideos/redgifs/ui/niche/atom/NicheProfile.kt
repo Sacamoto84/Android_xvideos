@@ -23,8 +23,8 @@ import androidx.compose.ui.unit.dp
 import com.client.xvideos.common.urlVideImage.UrlImage
 import com.client.xvideos.common.util.toPrettyCount
 import com.client.xvideos.redgifs.common.ThemeRed
-import com.redgifs.common.saved.SavedRed
-import com.redgifs.model.NichesInfo
+import com.client.xvideos.redgifs.common.saved.SavedRed
+import com.client.xvideos.redgifs.model.NichesInfo
 
 @Composable
 fun NicheProfile(savedRed: SavedRed, niche: NichesInfo) {

@@ -30,7 +30,7 @@ import com.client.xvideos.redgifs.ui.profile.rememberVisibleRangePercentIgnoring
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.LazyRow123
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.LazyRow123Host
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.TypePager
-import com.redgifs.common.di.HostDI
+import com.client.xvideos.redgifs.common.di.HostDI
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

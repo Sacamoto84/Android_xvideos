@@ -24,8 +24,8 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
+import com.client.xvideos.BuildConfig
 import com.client.xvideos.common.videoplayer.host.MediaPlayerHost
-import com.redgifs.common.BuildConfig
 import net.engawapg.lib.zoomable.rememberZoomState
 import net.engawapg.lib.zoomable.zoomable
 import timber.log.Timber

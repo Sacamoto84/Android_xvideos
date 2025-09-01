@@ -34,11 +34,11 @@ import com.client.xvideos.redgifs.ui.ui.lazyrow123.LazyRow123Host
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.TypePager
 import com.composeunstyled.Text
 import com.client.xvideos.redgifs.common.ThemeRed
-import com.redgifs.common.block.BlockRed
+import com.client.xvideos.redgifs.common.di.HostDI
+import com.client.xvideos.redgifs.model.GifsInfo
+import com.client.xvideos.redgifs.model.Order
+import com.client.xvideos.redgifs.common.block.BlockRed
 import com.redgifs.common.block.ui.DialogBlock
-import com.redgifs.common.di.HostDI
-import com.redgifs.model.GifsInfo
-import com.redgifs.model.Order
 import dagger.Binds
 import dagger.Module
 import dagger.assisted.Assisted

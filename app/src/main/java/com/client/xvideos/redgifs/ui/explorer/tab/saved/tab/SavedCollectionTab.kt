@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -56,9 +55,9 @@ import com.client.xvideos.redgifs.ui.explorer.tab.gifs.ColumnSelect
 import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.collection.ScreenCollectionName
 import com.composeunstyled.Text
 import com.client.xvideos.redgifs.common.ThemeRed
-import com.redgifs.common.block.BlockRed
+import com.client.xvideos.redgifs.common.block.BlockRed
 import com.redgifs.common.block.ui.DialogBlock
-import com.redgifs.common.di.HostDI
+import com.client.xvideos.redgifs.common.di.HostDI
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -194,7 +193,7 @@ object SavedCollectionTab : Screen {
                     columns = GridCells.Fixed(2),
                     ) {
 
-                    LazyGridScope.items(savedRed.collections.collectionList) {
+                    items(savedRed.collections.collectionList) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -202,8 +201,7 @@ object SavedCollectionTab : Screen {
                                 .padding(vertical = 4.dp)
                                 .combinedClickable(
                                     onClick = {
-                                        savedRed.collections.selectedCollection.value =
-                                            it.collection
+                                        savedRed.collections.selectedCollection.value = it.collection
                                     },
                                     onLongClick = { itemPendingDelete = it.collection }),
                             verticalAlignment = Alignment.CenterVertically
@@ -269,8 +267,11 @@ object SavedCollectionTab : Screen {
 
 class ScreenSavedCollectionSM @Inject constructor(
     val block: BlockRed,
-    val hostDI : HostDI,
+    hostDIin : javax.inject.Provider<HostDI>,
 ) : ScreenModel {
+
+    val hostDI = hostDIin.get()
+
     val gridState = LazyGridState()
 }
 

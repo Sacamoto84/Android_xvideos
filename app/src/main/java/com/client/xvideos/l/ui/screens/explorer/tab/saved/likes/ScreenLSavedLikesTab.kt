@@ -18,7 +18,7 @@ import com.client.xvideos.l.featured.saved.SavedL
 import com.client.xvideos.l.ui.element.lazyRowPictureDetails.LazyRowPictureDetails
 import com.client.xvideos.l.ui.element.lazyRowPictureDetails.LazyRowPictureDetailsHost
 import com.client.xvideos.redgifs.ui.explorer.tab.gifs.ColumnSelect
-import com.redgifs.common.snackBar.SnackBarEvent
+import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

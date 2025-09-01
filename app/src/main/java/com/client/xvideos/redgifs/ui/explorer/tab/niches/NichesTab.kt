@@ -51,10 +51,10 @@ import com.client.xvideos.redgifs.ui.ui.lazyrow123.NichePreview2
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.TypePager
 import com.client.xvideos.redgifs.ui.ui.sortByOrder.SortByOrder
 import com.client.xvideos.redgifs.common.ThemeRed
-import com.redgifs.common.di.HostDI
+import com.client.xvideos.redgifs.common.di.HostDI
+import com.client.xvideos.redgifs.model.Niche
+import com.client.xvideos.redgifs.model.Order
 import com.redgifs.common.search.SearchNichesRed
-import com.redgifs.model.Niche
-import com.redgifs.model.Order
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

@@ -1,5 +1,6 @@
-package com.redgifs.common.snackBar
+package com.client.xvideos.redgifs.common.snackBar
 
+import com.redgifs.common.snackBar.UiMessage
 import kotlinx.coroutines.channels.Channel
 import javax.inject.Inject
 import javax.inject.Singleton

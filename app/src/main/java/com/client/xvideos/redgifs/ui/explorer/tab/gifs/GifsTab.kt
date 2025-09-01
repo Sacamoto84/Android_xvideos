@@ -60,8 +60,8 @@ import com.client.xvideos.redgifs.ui.ui.lazyrow123.LazyRow123Host
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.TypePager
 import com.client.xvideos.redgifs.ui.ui.sortByOrder.SortByOrder
 import com.client.xvideos.redgifs.common.ThemeRed
-import com.redgifs.common.di.HostDI
-import com.redgifs.model.Order
+import com.client.xvideos.redgifs.common.di.HostDI
+import com.client.xvideos.redgifs.model.Order
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

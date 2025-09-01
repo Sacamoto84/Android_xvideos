@@ -1,4 +1,4 @@
-package com.redgifs.common
+package com.client.xvideos.redgifs.common
 
 import com.client.xvideos.redgifs.model.UserInfo
 import java.util.concurrent.ConcurrentHashMap

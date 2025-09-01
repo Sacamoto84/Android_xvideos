@@ -5,7 +5,7 @@ import com.client.xvideos.l.KtorRequestHandler
 import com.client.xvideos.l.db.AppLDatabase
 import com.client.xvideos.l.db.RepositoryCacheFullEntity
 import com.client.xvideos.l.db.RepositoryCacheTempEntity
-import com.redgifs.common.snackBar.SnackBarEvent
+import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay

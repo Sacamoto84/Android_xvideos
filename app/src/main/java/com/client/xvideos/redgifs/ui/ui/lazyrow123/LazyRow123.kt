@@ -45,12 +45,12 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.redgifs.ui.explorer.ScreenRedExplorer
 import com.client.xvideos.redgifs.ui.fullscreen.ScreenRedFullScreen
 import com.client.xvideos.redgifs.ui.top_this_week.ProfileInfo1
-import com.redgifs.model.GifsInfo
 import com.client.xvideos.redgifs.common.ThemeRed
+import com.client.xvideos.redgifs.model.GifsInfo
+import com.composeunstyled.Text
+import com.client.xvideos.redgifs.common.UsersRed
 import com.redgifs.common.block.ui.DialogBlock
 import com.redgifs.common.expand_menu_video.ExpandMenuVideo
-import com.redgifs.common.UsersRed
-import com.composeunstyled.Text
 import com.redgifs.common.expand_menu_video.ExpandMenuVideoTags
 import com.redgifs.common.video.player_row_mini.RedUrlVideoImageAndLongClick
 import timber.log.Timber

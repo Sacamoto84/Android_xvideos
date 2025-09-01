@@ -46,7 +46,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import com.client.xvideos.common.collection.ui.DaialogNewCollection
 import com.client.xvideos.redgifs.ui.explorer.ScreenRedExplorer
 import com.client.xvideos.redgifs.common.ThemeRed
-import com.redgifs.common.di.HostDI
+import com.client.xvideos.redgifs.common.di.HostDI
 import com.redgifs.common.downloader.ui.DownloadIndicator
 import com.redgifs.common.saved.DialogCollection
 import com.redgifs.common.snackBar.UiMessage

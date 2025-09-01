@@ -36,6 +36,7 @@ import androidx.compose.ui.window.Dialog
 import com.client.xvideos.common.urlVideImage.UrlImage
 import com.composables.core.HorizontalSeparator
 import com.client.xvideos.redgifs.common.ThemeRed
+import com.client.xvideos.redgifs.common.saved.SavedRed
 
 @Composable
 fun DialogCollection(

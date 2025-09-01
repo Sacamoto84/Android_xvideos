@@ -100,19 +100,19 @@
 -dontwarn com.example.ui.screens.niche.ScreenNicheSM$Factory
 -dontwarn com.example.ui.screens.profile.ScreenRedProfileSM$Factory
 -dontwarn com.client.xvideos.redgifs.ui.top_this_week.ScreenRedTopThisWeekSM
--dontwarn com.redgifs.common.block.BlockRed
--dontwarn com.redgifs.common.di.HostDI
+-dontwarn com.client.xvideos.redgifs.common.block.BlockRed
+-dontwarn com.client.xvideos.redgifs.common.di.HostDI
 -dontwarn com.redgifs.common.downloader.DownloadRed
 -dontwarn com.redgifs.common.downloader.Downloader
 -dontwarn com.redgifs.common.downloader.di.moduleKDownloader_ProvideKDownloaderFactory
--dontwarn com.redgifs.common.saved.SavedRed
+-dontwarn com.client.xvideos.redgifs.common.saved.SavedRed
 -dontwarn com.redgifs.common.saved.SavedRed_Collection
 -dontwarn com.redgifs.common.saved.SavedRed_Creator
 -dontwarn com.redgifs.common.saved.SavedRed_Likes
 -dontwarn com.redgifs.common.saved.SavedRed_Niches
 -dontwarn com.redgifs.common.search.SearchNichesRed
 -dontwarn com.redgifs.common.search.SearchRed
--dontwarn com.redgifs.common.snackBar.SnackBarEvent
+-dontwarn com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
 -dontwarn com.client.xvideos.redgifs.network.api.RedApi
 
 -keep class com.client.common.videoplayer.util.PlaybackPreference { *; }
@@ -121,6 +121,6 @@
 -keep class com.client.common.** { *; }
 
 # Сохраняем SavedRed и всё, что внутри пакета common.saved
--keep class com.redgifs.common.saved.SavedRed { *; }
--keep class com.redgifs.common.saved.SavedRed$* { *; }
+-keep class com.client.xvideos.redgifs.common.saved.SavedRed { *; }
+-keep class com.client.xvideos.redgifs.common.saved.SavedRed$* { *; }
 -keep class com.redgifs.common.saved.** { *; }

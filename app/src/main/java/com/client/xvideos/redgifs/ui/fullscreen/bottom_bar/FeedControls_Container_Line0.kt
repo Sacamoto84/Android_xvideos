@@ -32,7 +32,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.client.common.R
+import com.client.xvideos.R
 import com.client.xvideos.common.util.toTwoDecimalPlacesWithColon
 import com.client.xvideos.redgifs.ui.fullscreen.ScreenRedFullScreenSM
 import com.client.xvideos.redgifs.common.ThemeRed

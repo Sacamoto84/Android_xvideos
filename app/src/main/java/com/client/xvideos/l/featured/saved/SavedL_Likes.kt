@@ -4,7 +4,7 @@ import androidx.compose.runtime.mutableStateListOf
 import com.client.xvideos.common.AppPath
 import com.client.xvideos.common.kdownloader.KDownloader
 import com.client.xvideos.l.model.PicsDetails
-import com.redgifs.common.snackBar.SnackBarEvent
+import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
 import timber.log.Timber
 import java.io.File
 

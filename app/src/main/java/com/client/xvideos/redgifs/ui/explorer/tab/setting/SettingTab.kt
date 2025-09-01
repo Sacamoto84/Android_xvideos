@@ -53,7 +53,7 @@ import com.client.xvideos.common.setting.ConfigTextAndButtonWithDialog
 import com.client.xvideos.common.setting.ConfigTextAndCheckBox
 import com.client.xvideos.common.util.toPrettyCount3
 import com.client.xvideos.redgifs.common.ThemeRed
-import com.redgifs.common.di.HostDI
+import com.client.xvideos.redgifs.common.di.HostDI
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
