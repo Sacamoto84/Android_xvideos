@@ -64,6 +64,8 @@ private fun createUnsafeImageLoader(context: Context): ImageLoader {
 @Composable
 fun UrlImage(url: String, modifier: Modifier = Modifier,  contentScale : ContentScale = ContentScale.FillWidth, loadIndicator : Boolean = true, isGrayscale: Boolean = false) {
 
+    Timber.d("!!! UrlImage: $url")
+
     val context = LocalContext.current
 
     val colorFilter = ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0.9f) })
@@ -79,10 +81,10 @@ fun UrlImage(url: String, modifier: Modifier = Modifier,  contentScale : Content
 
     if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) {
 
-        val imageLoader = remember { createUnsafeImageLoader(context) }
+        //val imageLoader = remember { createUnsafeImageLoader(context) }
 
         CoilImage(
-            imageLoader = { imageLoader },
+            //imageLoader = { imageLoader },
             imageRequest = { imageRequest },
             imageOptions = ImageOptions(
                 contentScale = contentScale,

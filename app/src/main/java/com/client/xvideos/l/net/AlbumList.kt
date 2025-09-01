@@ -71,13 +71,14 @@ class AlbumListImpl(
             Timber.i("!!! getAlbumListAggregations $id")
             val q = getAlbumListWithAggregations(id, filter)
             val result = repository.openURI(Luscious.Companion.API, q)
-            if (result.isFailure){
+            if (result.isFailure) {
                 Timber.i("!!! getAlbumListAggregations error ${result.exceptionOrNull()}")
                 return
             }
             val res = result.getOrNull()
             val json = JsonParser.parseString(res).asJsonObject
-            val get = json["data"]?.asJsonObject?.get("album")?.asJsonObject?.get("list_with_aggregations")?.asJsonObject
+            val get =
+                json["data"]?.asJsonObject?.get("album")?.asJsonObject?.get("list_with_aggregations")?.asJsonObject
             val activeFilters = get?.get("active_filters")?.asJsonArray
             val aggregations = get?.get("aggregations")?.asJsonArray
             aggregations
@@ -165,8 +166,7 @@ class AlbumListImpl(
             }
 
             filterPictureCountStateCount
-        }
-        catch (e: Exception) {
+        } catch (e: Exception) {
             Timber.i("!!! getAlbumListAggregations Exception $e")
         }
 
@@ -178,25 +178,32 @@ class AlbumListImpl(
      */
     suspend fun getAlbumList(id: Int) {
 
-        Timber.i("!!! getAlbumList $id")
+        try {
 
-        val q = getAlbumListGraphQL1(id, filter)
 
-        val result = repository.openURI(Luscious.Companion.API, q, config = RepositoryUriConfig.CACHE_RAM)
-        if (result.isFailure) {
-            Timber.e("!!! getAlbumList error ${result.exceptionOrNull()}")
-            return
-        }
-        val res = result.getOrNull()
-        val gson = Gson()
+            Timber.i("!!! getAlbumList $id")
 
-        val a = gson.fromJson(res, AlbumResponse::class.java)
+            val q = getAlbumListGraphQL1(id, filter)
 
-        withContext(Dispatchers.Main) {
-            info = a.data.album.list.info
-            items.clear()
-            items.addAll(a.data.album.list.items)
-            Timber.i("!!! getAlbumList info ${info.page} ${items.toList()}")
+            val result = repository.openURI( Luscious.Companion.API, q, config = RepositoryUriConfig.CACHE_RAM )
+            if (result.isFailure) {
+                Timber.e("!!! getAlbumList error ${result.exceptionOrNull()}")
+                return
+            }
+            val res = result.getOrNull()
+            val gson = Gson()
+
+            val a = gson.fromJson(res, AlbumResponse::class.java)
+
+            withContext(Dispatchers.Main) {
+                info = a.data.album.list.info
+                items.clear()
+                items.addAll(a.data.album.list.items)
+                Timber.i("!!! getAlbumList info ${info.page} ${items.toList()}")
+            }
+        } catch (e: Exception) {
+            Timber.i("!!! getAlbumList Exception ${e.localizedMessage}")
+            e.printStackTrace()
         }
     }
 }

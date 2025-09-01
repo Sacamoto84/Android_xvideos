@@ -101,7 +101,7 @@ class RedApi @Inject constructor(
         count: Int,                      // количество элементов на страницу.
         page: Int,                       // номер страницы (1-based).
         type: MediaType = MediaType.GIF, // тип медиа (GIF, image и т.д.).
-    ): MediaResponse {
+    ): Result<MediaResponse> {
         val route = Route(
             method = "GET",
             path = "/v2/gifs/search?order=new&count={count}&page={page}&type={type}",
@@ -112,9 +112,21 @@ class RedApi @Inject constructor(
 
         Timber.i("!!! getTopLatest ${route.url}")
         // Запрос из сети
-        val res: MediaResponse = api.request(route)
 
-        return res
+
+        val r = api.request<MediaResponse>(route)
+        return r
+        //val res: MediaResponse = api.request(route)
+
+//        res.onSuccess { dto ->
+//            Timber.i("Got user: $dto")
+//        }.onFailure { e ->
+//            Timber.e(e, "Request failed")
+//        }
+//
+//
+//        return res
+
     }
 
     //--------------------------- User/Creator methods ---------------------------
@@ -123,14 +135,14 @@ class RedApi @Inject constructor(
     //https://api.redgifs.com/v1/users/drfunkenfootz_md
     suspend fun readCreator(
         userName: String = "lilijunex",
-    ): UserInfo {
+    ): Result<UserInfo> {
         val route = Route(
             method = "GET",
             path = "/v1/users/{username}",
             "username" to userName,
         )
 
-        val res: UserInfo = api.request(route)
+        val res = api.request<UserInfo>(route)
         return res
     }
 
@@ -142,7 +154,7 @@ class RedApi @Inject constructor(
         count: Int = 100,
         order: Order = Order.NEW,
         type: MediaType = MediaType.GIF,
-    ): CreatorResponse {
+    ): Result<CreatorResponse> {
         val route = Route(
             method = "GET",
             path = "/v2/users/{username}/search?page={page}&count={count}&order={order}&type={type}",
@@ -152,7 +164,7 @@ class RedApi @Inject constructor(
             "order" to order.value,
             "type" to type.value
         )
-        val res: CreatorResponse = api.request(route)
+        val res = api.request<CreatorResponse>(route)
         return res
     }
 

@@ -17,6 +17,8 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.cookies.AcceptAllCookiesStorage
 import io.ktor.client.plugins.cookies.HttpCookies
 import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.forms.FormDataContent
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
@@ -69,6 +71,10 @@ class KtorRequestHandler(
 
         defaultRequest {
             headers.append("User-Agent", faker.internet().userAgentAny())
+        }
+
+        install(Logging) {
+            level = LogLevel.ALL
         }
     }
 

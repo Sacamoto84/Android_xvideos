@@ -23,9 +23,7 @@ class Repository(
     password: String? = null,
 ) {
 
-    init {
-        clearTemp()
-    }
+    init { clearTemp() }
 
     private val handler = KtorRequestHandler(
         timeoutMillis = 5000,
@@ -39,7 +37,6 @@ class Repository(
     private val repositoryCacheFullDao = db.repositoryCacheFullDao()
     private val repositoryCacheTempDao = db.repositoryCacheTempDao()
 
-
     suspend fun openURI(
         url: String,
         data: String,
@@ -49,11 +46,17 @@ class Repository(
 
         Timber.i("!!! openURI() data:$data type:$type config:$config")
 
-        if (!handler.loggedIn) {
-            handler.login()
-            while (!handler.loggedIn){
-                delay(1000)
+        try {
+            if (!handler.loggedIn) {
+                handler.login()
+                while (!handler.loggedIn) {
+                    delay(1000)
+                }
             }
+        }
+        catch (e: Exception){
+            Timber.e(e, "!!! openURI() login error")
+            return Result.failure(e)
         }
 
         if (type == RepositoryUriType.POST) {

@@ -28,7 +28,10 @@ class ItemTopPagingSource(val sort: Order, val searchText: String, val block: Bl
                     Order.TOP_WEEK -> redApi.getTopThisWeek(100, page)
                     Order.TOP_MONTH -> redApi.getTopThisMonth(100, page)
                     Order.TRENDING -> redApi.getTopTrending(100, page)
-                    Order.LATEST -> redApi.getTopLatest(100, page)
+                    Order.LATEST -> {
+                        val result = redApi.getTopLatest(100, page)
+                        result.getOrElse { throw it }
+                    }
                     else -> {
                         redApi.getTopThisWeek(100, page)
                     }

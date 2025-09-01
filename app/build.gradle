@@ -88,6 +88,10 @@ android {
 
 dependencies {
 
+    // SLF4J к Timber мост
+
+    implementation 'org.slf4j:slf4j-android:1.7.36'
+
     implementation 'com.github.nanihadesuka:LazyColumnScrollbar:2.2.0'
 
     implementation("com.github.SmartToolFactory:Compose-Zoom:0.5.0")
@@ -139,6 +143,7 @@ dependencies {
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.cio)
     implementation(libs.ktor.client.okhttp)
+    implementation(libs.ktor.client.logging)
     //implementation("io.ktor:ktor-client-jetty:2.2.3")
     implementation(libs.ktor.client.android)
     implementation(libs.ktor.network)

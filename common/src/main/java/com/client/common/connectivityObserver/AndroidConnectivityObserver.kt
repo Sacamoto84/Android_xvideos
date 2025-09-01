@@ -16,29 +16,20 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Singleton
-
-
-//@Module
-//@InstallIn(SingletonComponent::class)
-//object modileConnectivityObserver {
-//
-//    @Provides
-//    @Singleton
-//    fun provideConnectivityObserver(@ApplicationContext context: Context): ConnectivityObserver {
-//        println("!!! DI ConnectivityObserver")
-//        return AndroidConnectivityObserver(context = context)
-//    }
-//
-//}
 
 interface ConnectivityObserver {
     val isConnected: StateFlow<Boolean>
@@ -52,33 +43,74 @@ object ConnectivityModule {
     @Singleton
     fun provideConnectivityObserver(
         @ApplicationContext context: Context,
-        @ApplicationScope scope: CoroutineScope
+        //@ApplicationScope scope: CoroutineScope
     ): ConnectivityObserver {
-        return AndroidConnectivityObserver(context, scope)
+        return AndroidConnectivityObserver(context, CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate))
     }
+
 }
 
 
 
 class AndroidConnectivityObserver(
-    context: Context,
-    scope: CoroutineScope // <-- нужно передавать извне, например, ApplicationScope
+    private val context: Context,
+    private val scope: CoroutineScope
 ) : ConnectivityObserver {
 
     private val connectivityManager = context.getSystemService<ConnectivityManager>()!!
-
     private val _isConnected = MutableStateFlow(false)
-    override val isConnected: StateFlow<Boolean> = _isConnected
+    override val isConnected: StateFlow<Boolean> = _isConnected.asStateFlow()
+
+    private var networkCallback: ConnectivityManager.NetworkCallback? = null
 
     init {
+        updateInitialConnectionState()
+        registerNetworkCallback()
+
+        // Автоматически отменяем callback при отмене scope
+        scope.launch {
+            try {
+                awaitCancellation()
+            } finally {
+                unregisterNetworkCallback()
+            }
+        }
+    }
+
+    private fun updateInitialConnectionState() {
+        try {
+            val activeNetwork = connectivityManager.activeNetwork
+            val networkCapabilities = activeNetwork?.let {
+                connectivityManager.getNetworkCapabilities(it)
+            }
+
+            val hasInternet = networkCapabilities?.hasCapability(
+                NetworkCapabilities.NET_CAPABILITY_INTERNET
+            ) == true
+
+            val isValidated = networkCapabilities?.hasCapability(
+                NetworkCapabilities.NET_CAPABILITY_VALIDATED
+            ) == true
+
+            val isConnected = hasInternet && isValidated
+            _isConnected.value = isConnected
+
+            Timber.w("!!! 999 Initial state - hasInternet: $hasInternet, isValidated: $isValidated, connected: $isConnected")
+        } catch (e: Exception) {
+            Timber.e(e, "!!! 999 Failed to get initial connection state")
+            _isConnected.value = false
+        }
+    }
+
+    private fun registerNetworkCallback() {
         val callback = object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
-                Timber.w("!!! 999 onAvailable")
-                _isConnected.value = true
+                Timber.w("!!! 999 onAvailable: $network")
+                // Не устанавливаем сразу true, ждем onCapabilitiesChanged
             }
 
             override fun onLost(network: Network) {
-                Timber.w("!!! 999 onLost")
+                Timber.w("!!! 999 onLost: $network")
                 _isConnected.value = false
             }
 
@@ -91,11 +123,21 @@ class AndroidConnectivityObserver(
                 network: Network,
                 networkCapabilities: NetworkCapabilities
             ) {
-                Timber.w("!!! 999 onCapabilitiesChanged")
-                val isValidated = networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
-                _isConnected.value = isValidated
+                val hasInternet = networkCapabilities.hasCapability(
+                    NetworkCapabilities.NET_CAPABILITY_INTERNET
+                )
+                val isValidated = networkCapabilities.hasCapability(
+                    NetworkCapabilities.NET_CAPABILITY_VALIDATED
+                )
+
+                val isConnected = hasInternet && isValidated
+
+                Timber.w("!!! 999 onCapabilitiesChanged - network: $network, hasInternet: $hasInternet, isValidated: $isValidated, connected: $isConnected")
+                _isConnected.value = isConnected
             }
         }
+
+        networkCallback = callback
 
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -103,11 +145,26 @@ class AndroidConnectivityObserver(
                 connectivityManager.registerDefaultNetworkCallback(callback)
             } else {
                 Timber.w("!!! 999 registerNetworkCallback (legacy)")
-                val request = NetworkRequest.Builder().build()
+                val request = NetworkRequest.Builder()
+                    .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                    .build()
                 connectivityManager.registerNetworkCallback(request, callback)
             }
         } catch (e: Exception) {
             Timber.e(e, "!!! 999 Failed to register network callback")
         }
     }
+
+    private fun unregisterNetworkCallback() {
+        networkCallback?.let { callback ->
+            try {
+                connectivityManager.unregisterNetworkCallback(callback)
+                Timber.w("!!! 999 unregisterNetworkCallback success")
+            } catch (e: Exception) {
+                Timber.e(e, "!!! 999 Failed to unregister network callback")
+            }
+            networkCallback = null
+        }
+    }
 }
+

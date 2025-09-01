@@ -128,7 +128,9 @@ class ScreenLRoot() : Screen {
                         }
                     }
                 }
-            ) { paddingValues -> Navigator( screen = ScreenLExplorer()) }
+            ) { paddingValues ->
+                //Navigator( screen = ScreenLExplorer())
+            }
 
             // Оверлей рисуется поверх Scaffold
             vm.overlayContent.value?.let { content ->

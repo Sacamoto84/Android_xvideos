@@ -106,9 +106,11 @@ import javax.inject.Singleton
 class SearchRed @Inject constructor(
     val dao: SearchRedHistoryDao,
     val savedRed: SavedRed,
-    val redApi: RedApi,
+    redApiIn: javax.inject.Provider<RedApi>,
     @ApplicationScope val scope: CoroutineScope
 ) {
+
+    val  redApi = redApiIn.get()
 
     /**
      * Отображаемый текст
