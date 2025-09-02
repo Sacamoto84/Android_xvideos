@@ -24,7 +24,6 @@ object Password {
 
     var key: SecretKeySpec? = null
 
-
     private const val KEY_SIZE = 256
     private const val IV_SIZE = 12 // рекомендовано для GCM
     private const val TAG_SIZE = 128 // 16 байт аутентификационного тега

@@ -1,5 +1,6 @@
 package com.client.xvideos.l.ui.screens.screenAlbum
 
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -7,7 +8,10 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
+import com.client.xvideos.common.AppPath
 import com.client.xvideos.common.di.ApplicationScope
+import com.client.xvideos.common.encrypting.Crypto
+import com.client.xvideos.common.encrypting.Password
 import com.client.xvideos.l.featured.downloader.DownloaderAlbum
 import com.client.xvideos.l.featured.downloader.DownloaderL
 import com.client.xvideos.l.featured.saved.SavedL
@@ -23,12 +27,14 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.io.File
 
 class ScreenLAlbumSM @AssistedInject constructor(
     @Assisted val idAlbum: Long,
@@ -38,7 +44,8 @@ class ScreenLAlbumSM @AssistedInject constructor(
     //val repository: Repository
     val kDownloader: KDownloader,
     val dowloaderL: DownloaderL,
-    val snackBarEvent: SnackBarEvent
+    val snackBarEvent: SnackBarEvent,
+    @ApplicationContext val context: Context
 ) : ScreenModel {
 
     @AssistedFactory
@@ -47,7 +54,6 @@ class ScreenLAlbumSM @AssistedInject constructor(
     }
 
     val host = LazyRowPictureDetailsHost(idAlbum.toString())
-
 
 
     val downloader: DownloaderAlbum
@@ -59,10 +65,15 @@ class ScreenLAlbumSM @AssistedInject constructor(
         //Поиск экземпляра DownloaderAlbum в dowloaderL
         val f = dowloaderL.listDownloaderAlbum.find { it.albumName == idAlbum.toString() }
         if (f == null) {
-            dowloaderL.listDownloaderAlbum.add(DownloaderAlbum(idAlbum.toString(), kDownloader, dowloaderL.scope))
+            dowloaderL.listDownloaderAlbum.add(
+                DownloaderAlbum(
+                    idAlbum.toString(),
+                    kDownloader,
+                    dowloaderL.scope
+                )
+            )
         }
         downloader = dowloaderL.listDownloaderAlbum.first { it.albumName == idAlbum.toString() }
-
 
 
     }
@@ -102,8 +113,28 @@ class ScreenLAlbumSM @AssistedInject constructor(
         }
     }
 
-    fun downloadLike(item : PicsDetails){
+    fun downloadLike(item: PicsDetails) {
         saved.likes.add(item.copy(album = idAlbum.toString()))
+    }
+
+    fun downloadLikeCrypto(item: PicsDetails) {
+        //saved.likes.add(item.copy(album = idAlbum.toString()))
+        scope.launch {
+            val fileName = item.url_to_original!!.substringAfterLast('/').substringBefore('?')
+            val key = Password.key
+            if (key == null){
+                Timber.i("!!! ScreenLAlbumSM downloadLikeCrypto key == null")
+                Password.initKey(context, ByteArray(16) { 0x01 })
+            }
+
+
+            Crypto.downloadAndEncryptFile(
+                item.url_to_original,
+                File( AppPath.likesCrypto_l, fileName ),
+                Password.key!!
+            )
+
+        }
     }
 
 

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircleOutline
 import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.EnhancedEncryption
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.FileDownload
@@ -58,6 +59,7 @@ fun AlbumItemExpandMenu(
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
     onDownload : (PicsDetails) -> Unit = {},
+    onDownloadCrypto : (PicsDetails) -> Unit = {},
     haptic : ()->Unit = {}
 ) {
 
@@ -87,6 +89,8 @@ fun AlbumItemExpandMenu(
             DropdownMenuItem_Download(item, onClick = {onDownload(it)}
             ){ expanded = false }
 
+            DropdownMenuItem_DownloadCrypto(item, onClick = {onDownloadCrypto(it)}
+            ){ expanded = false }
 
         }
 
@@ -99,6 +103,20 @@ fun DropdownMenuItem_Download(url: PicsDetails? = null, onClick: (PicsDetails) -
     DropdownMenuItem(
         leadingIcon = {Icon(Icons.Filled.FileDownload, contentDescription = "", tint = tintColor)},
         text = {Text("Скачать", style = style)},
+        onClick = {
+            if (url == null) return@DropdownMenuItem
+            onClick.invoke(url)
+            onDismiss.invoke()
+        }, contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DropdownMenuItem_DownloadCrypto(url: PicsDetails? = null, onClick: (PicsDetails) -> Unit = {}, onDismiss: () -> Unit){
+    DropdownMenuItem(
+        leadingIcon = {Icon(Icons.Filled.EnhancedEncryption, contentDescription = "", tint = tintColor)},
+        text = {Text("Скачать Крипто", style = style)},
         onClick = {
             if (url == null) return@DropdownMenuItem
             onClick.invoke(url)

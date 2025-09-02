@@ -138,7 +138,8 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
 
             LazyRowPictureDetails(
                 host = vm.host,
-                expandMenu = { AlbumItemExpandMenu( item = it, onDownload = { it1 ->  vm.downloadLike(it1) }) },
+                expandMenu = { AlbumItemExpandMenu( item = it, onDownload = { it1 ->  vm.downloadLike(it1) } ,
+                    onDownloadCrypto = { it1 ->  vm.downloadLikeCrypto(it1) } ) },
                 expandMenuFullScreen = { AlbumItemExpandMenu( item = it, onDownload = { it1 ->  vm.downloadLike(it1) }) },
                 itemBefore = {
                     Column(modifier = Modifier.padding(horizontal = 4.dp)) {

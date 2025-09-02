@@ -7,8 +7,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.EnhancedEncryption
+import androidx.compose.material.icons.outlined.AdminPanelSettings
 import androidx.compose.material.icons.outlined.Apps
 import androidx.compose.material.icons.outlined.Folder
+import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material.icons.outlined.LockOpen
 import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
@@ -51,7 +54,8 @@ object SavedLTab : Screen {
             Icons.Outlined.Save,
             Icons.Outlined.Folder,
             Icons.Outlined.Apps,
-
+            Icons.Outlined.Lock,
+            //Icons.Outlined.LockOpen,
         )
 
         Scaffold(
