@@ -42,14 +42,16 @@ object LusciousModule {
     fun provideRepository(
         db: AppLDatabase,
         @ApplicationScope scope: CoroutineScope,
-        snackBarEvent: SnackBarEvent
+        snackBarEvent: SnackBarEvent,
+        @ApplicationContext context: Context
     ): Repository {
         return Repository(
             db,
             snackBarEvent,
             scope,
             BuildConfig.luscious_email,
-            BuildConfig.luscious_password
+            BuildConfig.luscious_password,
+            context
         )
     }
 

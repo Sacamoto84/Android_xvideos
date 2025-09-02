@@ -1,6 +1,8 @@
 package com.client.xvideos.l.repository
 
+import android.content.Context
 import com.client.xvideos.common.encrypting.Crypto
+import com.client.xvideos.common.encrypting.Password
 import com.client.xvideos.common.util.toMD5
 import com.client.xvideos.l.KtorRequestHandler
 import com.client.xvideos.l.db.AppLDatabase
@@ -43,9 +45,13 @@ class Repository(
     //private val saved: SavedL
     username: String? = null,
     password: String? = null,
+    context: Context
 ) {
 
-    init { clearTemp() }
+    init {
+        clearTemp()
+        Password.loadPassword(context)
+    }
 
     private val handler = KtorRequestHandler(
         timeoutMillis = 5000,
@@ -65,8 +71,8 @@ class Repository(
         type: RepositoryUriType = RepositoryUriType.POST,
         config: RepositoryUriConfig = RepositoryUriConfig.DIRECT
     ): Result<String> {
-
-        Timber.i("!!! openURI() data:$data type:$type config:$config")
+        Timber.i("!!! openURI()")
+        //Timber.i("!!! openURI() data:$data type:$type config:$config")
 
         try {
             if (!handler.loggedIn) {

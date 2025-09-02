@@ -61,6 +61,7 @@ ui = "1.9.0"
 
 apollo = "4.3.3"
 foundationLayout = "1.9.0"
+junitKtx = "1.3.0"
 
 
 
@@ -153,7 +154,7 @@ androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "j
 
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 
-androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version = "1.12.0-alpha05" }
+androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version = "1.12.0-alpha07" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
 
 
@@ -208,6 +209,7 @@ ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics", version.ref
 androidx-animation-core = { group = "androidx.compose.animation", name = "animation-core", version.ref = "ui" }
 ui = { group = "androidx.compose.ui", name = "ui", version.ref = "ui" }
 androidx-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "foundationLayout" }
+androidx-junit-ktx = { group = "androidx.test.ext", name = "junit-ktx", version.ref = "junitKtx" }
 
 
 [plugins]

@@ -9,6 +9,11 @@ import javax.crypto.spec.SecretKeySpec
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import androidx.core.content.edit
+import timber.log.Timber
+import java.security.SecureRandom
+import javax.crypto.Cipher
+import javax.crypto.SecretKey
+import javax.crypto.spec.GCMParameterSpec
 import kotlin.experimental.xor
 
 /**
@@ -20,42 +25,43 @@ import kotlin.experimental.xor
  */
 object Password {
 
+
+
+    private const val KEY_ALIAS = "UserPasswordKey"
+    private const val ANDROID_KEYSTORE = "AndroidKeyStore"
+    private const val TRANSFORMATION = "AES/GCM/NoPadding"
+    private const val GCM_IV_LENGTH = 12
+    private const val GCM_TAG_LENGTH = 16
+
     var password: String? = null
+        private set
 
     var key: SecretKeySpec? = null
 
     private const val KEY_SIZE = 256
-    private const val IV_SIZE = 12 // рекомендовано для GCM
-    private const val TAG_SIZE = 128 // 16 байт аутентификационного тега
 
-    // ключ для XOR (произвольный, можно изменить)
-    private const val xorKey: Byte = 0x5A
-
-    // "AES/GCM/NoPadding" → Base64 → XOR → массив
-    // Для примера я взял готовый массив, но ты можешь сгенерировать заново через prepareEncoded()
-    private val obfuscated = byteArrayOf( 27, 31, 31, 14, 22, 118, 118, 21, 21, 3, 101, 9, 13, 3, 101, 7, 22, 22, 3, 21, 7, 15, 13, 1, 101, 23, 22, 14, 3, 7, 15, 13 )
+    val CIPHER_ALGORITHM = "AES/GCM/NoPadding"
 
     /**
-     * Декодирование строки алгоритма (AES/GCM/NoPadding).
+     * Сохранить пароль в SharedPreferences
      */
-    val CIPHER_ALGORITHM: String by lazy {
-        // 1. снимаем XOR
-        val decodedBase64 = obfuscated.map { (it xor xorKey) }.toByteArray()
-        // 2. превращаем в строку (это будет Base64 от исходного текста)
-        val base64Str = decodedBase64.toString(Charsets.UTF_8)
-        // 3. Декодируем Base64 в исходный текст
-        Base64.decode(base64Str, Base64.DEFAULT).toString(Charsets.UTF_8)
-    }
-
-
     fun savePassword(context: Context, password: String) {
         val prefs = getSecurePrefs(context)
         prefs.edit { putString("user_password", password) }
+        this.password = password
+        key = keyFromPassword(Password.password!!)
+        Timber.i("!!! savePassword() password:$password")
+        Timber.i("!!! savePassword() key:${key?.encoded?.joinToString(separator = "") { "%02X ".format(it) }}")
     }
 
-    fun loadPassword(context: Context): String? {
+    fun loadPassword(context: Context) {
         val prefs = getSecurePrefs(context)
-        return prefs.getString("user_password", null)
+        password = prefs.getString("user_password", null)
+        Timber.i("!!! loadPassword() password:$password")
+        if (password != null) {
+            key = keyFromPassword(password!!)
+            Timber.i("!!! loadPassword() key:${key?.encoded?.joinToString(separator = "") { "%02X ".format(it) }}")
+        }
     }
 
     /**
@@ -67,27 +73,11 @@ object Password {
      * - 65536 — количество итераций PBKDF2. Чем больше, тем сложнее подобрать ключ подбором.
      * - 256 — длина ключа в битах (AES-256).
      */
-    fun keyFromPassword(password: String, salt: ByteArray): SecretKeySpec {
+    fun keyFromPassword(password: String, salt: ByteArray = ByteArray(16) { 0x01 }): SecretKeySpec {
         val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256")
         val spec = PBEKeySpec(password.toCharArray(), salt, 65_536, KEY_SIZE)
         val tmp = factory.generateSecret(spec)
         return SecretKeySpec(tmp.encoded, CIPHER_ALGORITHM)
-    }
-
-
-    fun initKey(context: Context, salt: ByteArray): SecretKeySpec {
-        val stored = loadPassword(context)
-
-        val password = if (stored == null) {
-            // здесь показываешь экран "Введите пароль"
-            val userInput = "askUserPassword()"
-            savePassword(context, userInput)
-            userInput
-        } else {
-            stored
-        }
-
-        return keyFromPassword(password, salt)
     }
 
     private fun getSecurePrefs(context: Context): SharedPreferences {

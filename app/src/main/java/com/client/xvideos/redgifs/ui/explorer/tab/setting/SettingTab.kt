@@ -117,7 +117,7 @@ object SettingTab : Screen {
                 value = "Очистить",
                 textDialogTitle = "Очистка папки Download",
                 textDialogBody = "Подтвердить очистку: ${vm.sizeRedDownload.toPrettyCount3()}",
-                textDialogButton = "Очистить"
+                textDialogButton = "Очистить",
             ) {
                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                 vm.hostDI.downloadRed.deleteAll {
@@ -149,7 +149,7 @@ object SettingTab : Screen {
                         .clip(RoundedCornerShape(8.dp))
                         .border(1.dp, ThemeRed.colorTabLevel3, RoundedCornerShape(8.dp))
                         .background(ThemeRed.colorBottomBarDivider)
-                        .clickable(onClick = { vm.hostDI.savedRed.nichesCache.refresh()}), contentAlignment = Alignment.Center
+                        .clickable(onClick = { vm.hostDI.savedRed.nichesCache.refresh() }), contentAlignment = Alignment.Center
                 ) {
                     Text("Обновить", style = styleTest.copy(fontSize = 18.sp))
                 }
@@ -159,7 +159,9 @@ object SettingTab : Screen {
             if (vm.hostDI.savedRed.nichesCache.isDownloading) {
                 LinearProgressIndicator(
                     progress = { vm.hostDI.savedRed.nichesCache.progress },
-                    modifier = Modifier.padding(horizontal = 4.dp).fillMaxWidth(),
+                    modifier = Modifier
+                        .padding(horizontal = 4.dp)
+                        .fillMaxWidth(),
                     color = ProgressIndicatorDefaults.linearColor,
                     trackColor = ProgressIndicatorDefaults.linearTrackColor,
                     strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,

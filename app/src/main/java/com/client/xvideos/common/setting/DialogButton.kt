@@ -38,6 +38,7 @@ fun DialogButton(
     buttonText: String,
     onDismiss: () -> Unit,
     onBlockConfirmed: () -> Unit,
+    composable: @Composable () -> Unit = {}
 )
 {
 
@@ -68,13 +69,17 @@ fun DialogButton(
                                 fontSize = 18.sp
                             )
                         )
-                        Spacer(Modifier.height(8.dp))
-                        Text(
-                            text = body,
-                            style = TextStyle(color = Color(0xFF474747), fontSize = 14.sp)
-                        )
+                        if (body.isNotEmpty()) {
+                            Spacer(Modifier.height(8.dp))
+                            Text(
+                                text = body,
+                                style = TextStyle(color = Color(0xFF474747), fontSize = 14.sp)
+                            )
+                        }
                     }
                     Spacer(Modifier.height(16.dp))
+
+                    composable()
 
                     HorizontalSeparator(Color(0xFFCCCCCC))
 

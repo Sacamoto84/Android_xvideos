@@ -6,9 +6,10 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.sp
 import com.client.xvideos.R
+import com.client.xvideos.l.ThemeL
 
 val styleTextConfig = TextStyle(
     fontSize = 20.sp,
-    color = Color.White,
+    color = ThemeL.textColor,
     fontFamily = FontFamily(Font(R.font.dm_sans))
 )

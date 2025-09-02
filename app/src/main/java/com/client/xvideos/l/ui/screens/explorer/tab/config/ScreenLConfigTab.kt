@@ -3,6 +3,7 @@ package com.client.xvideos.l.ui.screens.explorer.tab.config
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -37,6 +38,7 @@ import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import com.client.xvideos.l.ThemeL
 import com.client.xvideos.l.model.enum.AudiencesType
+import com.client.xvideos.l.ui.screens.explorer.tab.config.atom.ScreenLConfig_Encrypt
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -74,14 +76,17 @@ object ScreenLConfigTab : Screen {
 
 
 
-            ConfigText("I want to see this content:")
+            ConfigTextL("I want to see this content:")
             AudiencesType.entries.forEach { it->
                 ConfigTextAndCheckBox(it.title, true,{ })
             }
             Spacer(Modifier.height(4.dp))
             HorizontalDivider(color = Color.DarkGray)
 
+            ScreenLConfig_Encrypt()
 
+
+            HorizontalDivider(color = Color.DarkGray)
 
 
 
@@ -98,7 +103,15 @@ object ScreenLConfigTab : Screen {
 
 
 
-val styleTextConfig = TextStyle(
+
+
+
+
+
+
+
+
+val styleTextConfigL = TextStyle(
     fontSize = 20.sp,
     color = ThemeL.textColor,
     fontFamily = ThemeL.fontFamilyKarla
@@ -121,12 +134,12 @@ fun ConfigTextAndCheckBox(text: String, value: Boolean, onValueChange: (Boolean)
             ,uncheckedColor = ThemeL.grey3
 
         ), modifier = Modifier.width(40.dp))
-        Text(text, style = styleTextConfig)
+        Text(text, style = styleTextConfigL)
     }
 }
 
 @Composable
-fun ConfigText(text: String) {
+fun ConfigTextL(text: String) {
     Row(
         modifier = Modifier
             .padding(horizontal = 8.dp)
@@ -136,7 +149,21 @@ fun ConfigText(text: String) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text, style = styleTextConfig)
+        Text(text, style = styleTextConfigL)
+    }
+}
+
+@Composable
+fun ConfigTextCenter(text: String) {
+    Box(
+        modifier = Modifier
+            .padding(horizontal = 8.dp)
+            .padding(vertical = 2.dp)
+            .height(32.dp)
+            .fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(text, style = styleTextConfigL)
     }
 }
 
@@ -153,6 +180,8 @@ class ScreenLExplorerSettingSM @Inject constructor(
 
     var sizeXvideos by mutableLongStateOf(0L)
     var sizeRedDownload by mutableLongStateOf(0L)
+
+
 
     init {
         Timber.i("iii ScreenLExplorerSettingSM init")
