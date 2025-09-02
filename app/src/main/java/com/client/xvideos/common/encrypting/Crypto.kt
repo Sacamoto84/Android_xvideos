@@ -16,12 +16,18 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.InputStream
+import java.security.SecureRandom
 import javax.crypto.Cipher
 import javax.crypto.CipherInputStream
 import javax.crypto.CipherOutputStream
+import javax.crypto.spec.GCMParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
 object Crypto {
+
+    private const val KEY_SIZE = 256
+    const val IV_SIZE = 12 // рекомендовано для GCM
+    const val TAG_SIZE = 128 // 16 байт аутентификационного тега
 
     /**
      *
@@ -67,34 +73,54 @@ object Crypto {
      * // Расшифровываем обратно
      * decryptFile(encryptedFile, decryptedFile, key)
      * ```
+     *
+     * Шифрует файл с помощью AES/GCM/NoPadding.
+     *
+     * @param inputFile исходный файл (например, jpg/gif)
+     * @param outputFile куда сохранять зашифрованный файл
+     * @param secretKey AES-ключ (256 бит)
      */
     fun encryptFile(inputFile: File, outputFile: File, secretKey: SecretKeySpec) {
-        val cipher = Cipher.getInstance(Password.CIPHER_ALGORITHM)
-        cipher.init(Cipher.ENCRYPT_MODE, secretKey)
+        val iv = ByteArray(IV_SIZE)
+        SecureRandom().nextBytes(iv)
 
-        outputFile.parentFile?.mkdirs()
+        val cipher = Cipher.getInstance(Password.CIPHER_ALGORITHM)
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey, GCMParameterSpec(TAG_SIZE, iv))
 
         FileInputStream(inputFile).use { fis ->
-            CipherOutputStream(FileOutputStream(outputFile), cipher).use { cos ->
-                fis.copyTo(cos)
-            }
-        }
-    }
-
-
-    fun decryptFile(inputFile: File, outputFile: File, secretKey: SecretKeySpec) {
-        val cipher = Cipher.getInstance(Password.CIPHER_ALGORITHM)
-        cipher.init(Cipher.DECRYPT_MODE, secretKey)
-
-        outputFile.parentFile?.mkdirs()
-
-        CipherInputStream(FileInputStream(inputFile), cipher).use { cis ->
             FileOutputStream(outputFile).use { fos ->
-                cis.copyTo(fos)
+                // Сначала записываем IV в начало файла
+                fos.write(iv)
+
+                CipherOutputStream(fos, cipher).use { cos ->
+                    fis.copyTo(cos, bufferSize = 8192)
+                }
             }
         }
     }
 
+    /**
+     * Расшифровывает файл с помощью AES/GCM/NoPadding.
+     *
+     * @param inputFile зашифрованный файл
+     * @param outputFile куда сохранять расшифрованные данные
+     * @param secretKey AES-ключ (256 бит)
+     */
+    fun decryptFile(inputFile: File, outputFile: File, secretKey: SecretKeySpec) {
+        FileInputStream(inputFile).use { fis ->
+            val iv = ByteArray(IV_SIZE)
+            fis.read(iv) // читаем IV из файла
+
+            val cipher = Cipher.getInstance(Password.CIPHER_ALGORITHM)
+            cipher.init(Cipher.DECRYPT_MODE, secretKey, GCMParameterSpec(TAG_SIZE, iv))
+
+            CipherInputStream(fis, cipher).use { cis ->
+                FileOutputStream(outputFile).use { fos ->
+                    cis.copyTo(fos, bufferSize = 8192)
+                }
+            }
+        }
+    }
 
     /**
      * Загружает файл по указанному [url] и шифрует его с использованием переданного AES [key].
@@ -122,7 +148,11 @@ object Crypto {
      *       .onFailure { println("Ошибка: ${it.message}") }
      * ```
      */
-    suspend fun downloadAndEncryptFile(url: String, file: File, key: SecretKeySpec): Result<Unit> {
+    suspend fun downloadAndEncryptFile(
+        url: String,
+        file: File,
+        key: SecretKeySpec
+    ): Result<Unit> {
 
         val client = HttpClient(OkHttp) {
 
@@ -145,22 +175,38 @@ object Crypto {
 
         }
 
-        try {
-            val response: HttpResponse = client.get(url){
-                timeout {
-                    requestTimeoutMillis = 30_000
+        return try {
+            val response: HttpResponse = client.get(url)
+            if (!response.status.isSuccess()) {
+                return Result.failure(Exception("HTTP error: ${response.status}"))
+            }
+
+            // Генерация IV
+            val iv = ByteArray(Crypto.IV_SIZE)
+            SecureRandom().nextBytes(iv)
+
+            val cipher = Cipher.getInstance(Password.CIPHER_ALGORITHM)
+            cipher.init(Cipher.ENCRYPT_MODE, key, GCMParameterSpec(Crypto.TAG_SIZE, iv))
+
+            // Читаем из сети и пишем зашифрованное сразу в файл
+            response.bodyAsChannel().toInputStream().use { input ->
+                FileOutputStream(file).use { fos ->
+                    // Сначала пишем IV
+                    fos.write(iv)
+
+                    CipherOutputStream(fos, cipher).use { cos ->
+                        input.copyTo(cos, bufferSize = 8192)
+                    }
                 }
             }
-            if (!response.status.isSuccess()) { return Result.failure(Exception("HTTP error: ${response.status}")) }
-            // Получаем InputStream из ответа
-            response.bodyAsChannel().toInputStream().use { input -> Crypto.encryptStream( inputStream = input, outputFile = file, secretKey = key ) }
-            return Result.success(Unit)
+            client.close()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
         }
-        catch (e : Exception){
-            e.printStackTrace()
-            return Result.failure(e)
+        finally {
+            client.close()
         }
-
     }
 
 

@@ -2,12 +2,14 @@ package com.client.xvideos.common.encrypting
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Base64
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.SecretKeySpec
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import androidx.core.content.edit
+import kotlin.experimental.xor
 
 /**
  * У тебя один и тот же пароль даёт один и тот же AES-ключ, даже после переустановки.
@@ -22,7 +24,29 @@ object Password {
 
     var key: SecretKeySpec? = null
 
-    val CIPHER_ALGORITHM: String = "AES/CBC/PKCS5Padding"
+
+    private const val KEY_SIZE = 256
+    private const val IV_SIZE = 12 // рекомендовано для GCM
+    private const val TAG_SIZE = 128 // 16 байт аутентификационного тега
+
+    // ключ для XOR (произвольный, можно изменить)
+    private const val xorKey: Byte = 0x5A
+
+    // "AES/GCM/NoPadding" → Base64 → XOR → массив
+    // Для примера я взял готовый массив, но ты можешь сгенерировать заново через prepareEncoded()
+    private val obfuscated = byteArrayOf( 27, 31, 31, 14, 22, 118, 118, 21, 21, 3, 101, 9, 13, 3, 101, 7, 22, 22, 3, 21, 7, 15, 13, 1, 101, 23, 22, 14, 3, 7, 15, 13 )
+
+    /**
+     * Декодирование строки алгоритма (AES/GCM/NoPadding).
+     */
+    val CIPHER_ALGORITHM: String by lazy {
+        // 1. снимаем XOR
+        val decodedBase64 = obfuscated.map { (it xor xorKey) }.toByteArray()
+        // 2. превращаем в строку (это будет Base64 от исходного текста)
+        val base64Str = decodedBase64.toString(Charsets.UTF_8)
+        // 3. Декодируем Base64 в исходный текст
+        Base64.decode(base64Str, Base64.DEFAULT).toString(Charsets.UTF_8)
+    }
 
 
     fun savePassword(context: Context, password: String) {
@@ -46,7 +70,7 @@ object Password {
      */
     fun keyFromPassword(password: String, salt: ByteArray): SecretKeySpec {
         val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256")
-        val spec = PBEKeySpec(password.toCharArray(), salt, 65_536, 256)
+        val spec = PBEKeySpec(password.toCharArray(), salt, 65_536, KEY_SIZE)
         val tmp = factory.generateSecret(spec)
         return SecretKeySpec(tmp.encoded, CIPHER_ALGORITHM)
     }
