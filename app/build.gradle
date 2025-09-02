@@ -88,6 +88,8 @@ android {
 
 dependencies {
 
+    implementation "androidx.security:security-crypto:1.1.0"
+
     // SLF4J к Timber мост
 
     implementation 'org.slf4j:slf4j-android:1.7.36'

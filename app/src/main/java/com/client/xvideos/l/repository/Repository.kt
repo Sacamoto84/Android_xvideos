@@ -1,17 +1,39 @@
 package com.client.xvideos.l.repository
 
+import com.client.xvideos.common.encrypting.Crypto
 import com.client.xvideos.common.util.toMD5
 import com.client.xvideos.l.KtorRequestHandler
 import com.client.xvideos.l.db.AppLDatabase
 import com.client.xvideos.l.db.RepositoryCacheFullEntity
 import com.client.xvideos.l.db.RepositoryCacheTempEntity
 import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
+import com.github.javafaker.Faker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import io.ktor.client.*
+import io.ktor.client.engine.cio.*   // или OkHttp, если хочешь
+import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.plugins.HttpRequestRetry
+import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.cookies.AcceptAllCookiesStorage
+import io.ktor.client.plugins.cookies.HttpCookies
+import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.plugins.timeout
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.isSuccess
+import io.ktor.serialization.gson.gson
+import io.ktor.utils.io.jvm.javaio.*
+import java.io.File
+import javax.crypto.SecretKey
+import javax.crypto.spec.SecretKeySpec
 
 class Repository(
     db: AppLDatabase,
@@ -152,6 +174,8 @@ class Repository(
             }
         }
     }
+
+
 
 
 
