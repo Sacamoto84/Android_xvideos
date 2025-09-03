@@ -21,15 +21,15 @@ class PasswordTest {
         Log.d(TAG, "!!! Package name: ${appContext.packageName}")
         // Проверяем имя пакета
         //assertEquals("com.example.myapp", appContext.packageName)
-        val pass = Password.password
-        Log.d(TAG, "!!! Password: $pass")
+        //val pass = Password.password
+        //Log.d(TAG, "!!! Password: $pass")
         val key = Password.key
         Log.d(TAG, "!!! Key: $key")
         val keyGen = Password.keyFromPassword("123456", ByteArray(16) { 0x01 })
         keyGen
         Log.d(TAG, "!!! keyGen: $keyGen")
-        val a = Password.initKey(appContext, ByteArray(16) { 0x01 }).algorithm
-        Log.d(TAG, "!!! a: $a")
+        //val a = Password.initKey(appContext, ByteArray(16) { 0x01 }).algorithm
+        //Log.d(TAG, "!!! a: $a")
     }
 
     @Test

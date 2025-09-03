@@ -42,17 +42,15 @@ fun ScreenLConfig_Encrypt() {
             isKeyAvailable = Password.isKeyAvailable()
         },
         composable = {
-
             TextField(
                 modifier = Modifier.padding(start = 8.dp, end = 8.dp),
                 value = textFieldValue.value,
-                label = { Text("Пароль") },
+                label = { Text("Новый пароль") },
                 placeholder = { },
                 onValueChange = { newValue ->
                     textFieldValue.value = newValue
                 }
             )
-
         }
         , composableIcon = {
             if (isKeyAvailable) {
@@ -60,6 +58,5 @@ fun ScreenLConfig_Encrypt() {
             }
         }
     )
-
 
 }

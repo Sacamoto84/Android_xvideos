@@ -74,33 +74,6 @@ class EncryptedFileFetcher(
     override fun getDataSource() = DataSource.LOCAL
 }
 
-
-
-//class EncryptedFileFetcher(
-//    private val file: File,
-//    //private val secretKeySpec: SecretKeySpec
-//) : DataFetcher<InputStream> {
-//
-//    override fun loadData(priority: Priority, callback: DataFetcher.DataCallback<in InputStream>) {
-//        try {
-//            val key = Password.key
-//            if (key == null) { Exception("!!! eee EncryptedFileFetcher Key is null") }
-//            val cipher = Cipher.getInstance(Password.CIPHER_ALGORITHM)
-//            cipher.init(Cipher.DECRYPT_MODE, key)
-//            val inputStream = CipherInputStream(FileInputStream(file), cipher)
-//            callback.onDataReady(inputStream)
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//            callback.onLoadFailed(e)
-//        }
-//    }
-//
-//    override fun cleanup() {}
-//    override fun cancel() {}
-//    override fun getDataClass() = InputStream::class.java
-//    override fun getDataSource() = DataSource.LOCAL
-//}
-
 private class EncryptedFileModelLoader(
     //private val secretKeySpec: SecretKeySpec
 ) : ModelLoader<EncryptedFileModel, InputStream> {

@@ -26,6 +26,7 @@ import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import com.client.xvideos.common.sharedPref.Settings
 import com.client.xvideos.l.ui.screens.explorer.tab.saved.albums.ScreenLSavedAlbumsTab
+import com.client.xvideos.l.ui.screens.explorer.tab.saved.crypto.ScreenLSavedLCryptoTab
 import com.client.xvideos.l.ui.screens.explorer.tab.saved.likes.ScreenLSavedLikesTab
 import com.client.xvideos.redgifs.ui.explorer.top.TabRow
 import com.client.xvideos.redgifs.ui.ui.atom.TabBarPoints
@@ -90,10 +91,9 @@ object SavedLTab : Screen {
                 when (screenType) {
                     0 -> ScreenLSavedLikesTab.Content()
                     1 -> ScreenLSavedAlbumsTab.Content()
-                    3 -> ScreenLSavedAlbumsTab.Content()
-                    2 -> ScreenLSavedAlbumsTab.Content()
-                    4 -> ScreenLSavedAlbumsTab.Content()
-                    else -> ScreenLSavedAlbumsTab.Content()
+                    2 -> {}
+                    3 -> ScreenLSavedLCryptoTab.Content()
+                    else -> {}
                 }
             }
         }

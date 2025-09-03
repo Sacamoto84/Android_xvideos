@@ -47,32 +47,26 @@ fun UrlImageLusciousGifsGlide(
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.FillWidth,
     loadIndicator: Boolean = true,
-    isGrayscale: Boolean = false,
     onLoading: (Boolean) -> Unit = {},
     onSuccess: (Boolean) -> Unit = {},
     albumName: String
 ) {
-    val context = LocalContext.current
-
-    val colorFilter = ColorFilter.colorMatrix(
-        ColorMatrix().apply { setToSaturation(0.9f) }
-    )
 
     // Определяем имя файла и проверяем наличие
     val fileName = url.substringAfterLast('/').substringBefore('?')
-
-    val file  = if (albumName != "likes") {
-        File(AppPath.downloaded_albums_l, "$albumName/$fileName")
-    }
-    else{
-        File(url)
+    val file = when (albumName){
+        "likes", "crypto"  -> File(url)
+        else -> File(AppPath.downloaded_albums_l, "$albumName/$fileName")
     }
 
     //val dataSource: Any = if (file.exists()) file else url
 
     val dataSource: Any = if (file.exists()) {
-        // тут отдаём НЕ файл напрямую, а специальную обёртку
-        EncryptedFileModel(file)
+        when (albumName){
+            "likes" -> file
+            "crypto" -> EncryptedFileModel(file)
+            else -> file
+        }
     } else {
         url
     }
@@ -84,7 +78,6 @@ fun UrlImageLusciousGifsGlide(
         imageOptions = ImageOptions(
             contentScale = contentScale,
             alignment = Alignment.Center,
-            colorFilter = if (isGrayscale) colorFilter else null
         ),
         loading = {
             onLoading(true)
@@ -103,10 +96,6 @@ fun UrlImageLusciousGifsGlide(
                 Text("Ошибка загрузки", color = Color.Gray)
             }
         },
-//        success = {
-//            onLoading(false)
-//            onSuccess(true)
-//        }
     )
 }
 
@@ -217,7 +206,12 @@ fun UrlImageLusciousGifsFull(
 ) {
     // Определяем имя файла и проверяем наличие
     val fileName = url.substringAfterLast('/').substringBefore('?')
-    val file = if (albumName != "likes") File(AppPath.downloaded_albums_l, "$albumName/$fileName") else File(url)
+
+    val file = when (albumName){
+        "likes", "crypto"  -> File(url)
+        else -> File(AppPath.downloaded_albums_l, "$albumName/$fileName")
+    }
+
     val dataSource: Uri = if (file.exists()) {
         Uri.fromFile(file) // локальный файл
     } else {Uri.parse(url) }// сетевой url
