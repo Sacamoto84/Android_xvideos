@@ -15,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import androidx.media3.session.CommandButton
 import com.client.xvideos.common.encrypting.Password
 import com.client.xvideos.l.ThemeL
 import com.client.xvideos.l.ui.screens.explorer.tab.config.ConfigTextCenter
@@ -27,21 +26,20 @@ fun ScreenLConfig_Encrypt() {
 
     ConfigTextCenter("Шифрование:")
 
-    var isPasswordSet by remember { mutableStateOf(Password.password != null) }
+    var isKeyAvailable by remember { mutableStateOf(Password.isKeyAvailable()) }
 
     val textFieldValue = remember { mutableStateOf(TextFieldValue("")) }
 
     ConfigTextAndButtonWithDialogL(
         text = "Пароль шифрования",
-        value = if (isPasswordSet) "Задан" else "Задать",
+        value = if (isKeyAvailable) "Задан" else "Задать",
         textDialogTitle = "Задать пароль шифрования",
         textDialogBody = "",
         textDialogButton = "Принять",
         onClick = {
-            val password = textFieldValue.value.text
-            Password.savePassword(context, password)
+            Password.savePassword(context, textFieldValue.value.text)
             textFieldValue.value = TextFieldValue("")
-            isPasswordSet = true
+            isKeyAvailable = Password.isKeyAvailable()
         },
         composable = {
 
@@ -57,7 +55,7 @@ fun ScreenLConfig_Encrypt() {
 
         }
         , composableIcon = {
-            if (isPasswordSet) {
+            if (isKeyAvailable) {
                 Icon(Icons.Default.Key, contentDescription = "Key Icon", tint = ThemeL.textColor)
             }
         }

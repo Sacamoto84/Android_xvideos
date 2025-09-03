@@ -21,7 +21,6 @@ import java.security.SecureRandom
 import javax.crypto.Cipher
 import javax.crypto.CipherInputStream
 import javax.crypto.CipherOutputStream
-import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
@@ -212,34 +211,6 @@ object Crypto {
         finally {
             client.close()
         }
-    }
-
-
-    // Шифрование строки
-    fun encryptString(plainText: String, secretKey: SecretKey): String {
-        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
-        val iv = ByteArray(12) // 12 байт IV для GCM
-        SecureRandom().nextBytes(iv)
-        val spec = GCMParameterSpec(128, iv)
-        cipher.init(Cipher.ENCRYPT_MODE, secretKey, spec)
-        val encryptedBytes = cipher.doFinal(plainText.toByteArray(Charsets.UTF_8))
-
-        // Кодируем IV + зашифрованный текст в Base64
-        val combined = iv + encryptedBytes
-        return Base64.encodeToString(combined, Base64.NO_WRAP)
-    }
-
-    // Расшифровка строки
-    fun decryptString(encryptedBase64: String, secretKey: SecretKey): String {
-        val encryptedData = Base64.decode(encryptedBase64, Base64.NO_WRAP)
-        val iv = encryptedData.copyOfRange(0, 12)
-        val ciphertext = encryptedData.copyOfRange(12, encryptedData.size)
-
-        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
-        cipher.init(Cipher.DECRYPT_MODE, secretKey, GCMParameterSpec(128, iv))
-        val decryptedBytes = cipher.doFinal(ciphertext)
-
-        return String(decryptedBytes, Charsets.UTF_8)
     }
 
 }
