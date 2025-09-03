@@ -124,3 +124,7 @@
 -keep class com.client.xvideos.redgifs.common.saved.SavedRed { *; }
 -keep class com.client.xvideos.redgifs.common.saved.SavedRed$* { *; }
 -keep class com.redgifs.common.saved.** { *; }
+
+-keep class com.client.xvideos.common.encrypting.MyAppGlideModule
+-keep @com.bumptech.glide.annotation.GlideModule class *
+-keep public class * extends com.bumptech.glide.module.AppGlideModule

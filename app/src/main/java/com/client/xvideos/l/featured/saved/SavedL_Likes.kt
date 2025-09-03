@@ -46,7 +46,7 @@ class SavedL_Likes( val snackBarEvent: SnackBarEvent, val kDownloader: KDownload
 
         try {
             println("!!! SavedL_Likes refresh()")
-            val files = File(AppPath.likes_l).list()?.mapNotNull{ fileNameToPicsDetails(File(it)) }
+            val files = File(AppPath.likes_l).list()?.mapNotNull{ fileNameToPicsDetails(File(it), AppPath.likes_l) }
            if (files != null) {
                listUrl.clear()
                listUrl.addAll(files)

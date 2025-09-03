@@ -2,14 +2,16 @@ package com.client.xvideos.l.featured.saved
 
 import androidx.compose.runtime.mutableStateListOf
 import com.client.xvideos.common.AppPath
+import com.client.xvideos.common.encrypting.Crypto
+import com.client.xvideos.common.encrypting.Password
 import com.client.xvideos.common.kdownloader.KDownloader
+import com.client.xvideos.common.util.toMD5
 import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
 import timber.log.Timber
 import java.io.File
 
-
-class SavedL_Crypto( val snackBarEvent: SnackBarEvent, val kDownloader: KDownloader) {
+class SavedL_Crypto(val snackBarEvent: SnackBarEvent, val kDownloader: KDownloader) {
 
     val listUrl = mutableStateListOf<PicsDetails>()
 
@@ -17,39 +19,61 @@ class SavedL_Crypto( val snackBarEvent: SnackBarEvent, val kDownloader: KDownloa
         refresh()
     }
 
-    fun add(item: PicsDetails) {
+    suspend fun add(item: PicsDetails) {
         println("!!! SavedL_Likes addLikes() item:${item.url_to_original}")
 
-//        downloadLikes(item, kDownloader, onComplete = {
-//            snackBarEvent.success("Like")
-//            refresh()
-//        }, onError = {
-//            snackBarEvent.error("Ошибка добавления лайка")
-//        })
+        val key = Password.key
+        if (key == null) {
+            Timber.i("!!! SavedL_Crypto add key == null Ключ отсутствует, не могу сохранять")
+            snackBarEvent.error("Ключ шифрования отсутствует")
+            return
+        }
+
+        val name = item.url_to_original?.substringAfterLast('/')?.substringBefore('?') //xxx.yyy
+        val ext = name?.split(".")?.get(1)
+
+        val fileName =
+            item.width.toString() + "_" + item.height + "_" + item.is_animated + "_" + item.album + "_" +
+                    name?.toMD5()?.dropLast(24) + "." + ext
+
+        Crypto.downloadAndEncryptFile(
+            item.url_to_original!!,
+            File(AppPath.likesCrypto_l, fileName),
+            Password.key!!
+        )
+            .onSuccess {
+                snackBarEvent.success("Сохранен в сейф")
+                Timber.i("!!! ScreenLAlbumSM downloadLikeCrypto success")
+                refresh()
+            }
+            .onFailure {
+                it.printStackTrace()
+                snackBarEvent.error("Ошибка сохранения в сейф")
+                Timber.e(it, "!!! ScreenLAlbumSM downloadLikeCrypto error")
+            }
 
     }
 
-    fun remove(url: String) {
-//        println("!!! removeLikes() url:${url}")
-//        val fileName = url.substringAfterLast('/').substringBefore('?')
-//        val file = File(AppPath.likes_l, fileName)
-//        if (file.exists()) {
-//            if (!file.delete()) {
-//                snackBarEvent.error("Не удалось удалить файл: ${file.absolutePath}")
-//            }else
-//                snackBarEvent.info("Unlike")
-//        }else{
-//            snackBarEvent.error("Файл не найден: ${file.absolutePath}")
-//        }
-//        refresh()
+    fun remove(fileName: String) {
+        println("!!! SavedL_Crypto remove() path:${fileName}")
+        val file = File(AppPath.likesCrypto_l, fileName)
+        if (file.exists()) {
+            if (!file.delete()) {
+                snackBarEvent.error("Не удалось удалить файл: ${file.absolutePath}")
+            } else
+                snackBarEvent.info("Удален из сейфа")
+        } else {
+            snackBarEvent.error("Файл не найден: ${file.absolutePath}")
+        }
+        refresh()
     }
 
     fun refresh() {
 
         try {
             println("!!! SavedL_Crypto refresh()")
-            val files = File(AppPath.likesCrypto_l).list()?.mapNotNull{
-                fileNameToPicsDetails(File(it))
+            val files = File(AppPath.likesCrypto_l).list()?.mapNotNull {
+                fileNameToPicsDetails(File(it), AppPath.likesCrypto_l)
             }
 
             if (files != null) {

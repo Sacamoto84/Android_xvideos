@@ -4,8 +4,11 @@ import android.annotation.SuppressLint
 import android.app.Application
 import android.preference.PreferenceManager
 import android.util.Log
+import com.bumptech.glide.Glide
 import com.client.xvideos.common.sharedPref.Settings
 import com.client.xvideos.PermissionScreenActivity.PermissionStorage
+import com.client.xvideos.common.encrypting.EncryptedFileModel
+import com.client.xvideos.common.encrypting.EncryptedFileModelLoaderFactory
 import com.client.xvideos.l.db.AppLDatabase
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory
@@ -17,6 +20,7 @@ import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import timber.log.Timber
 import timber.log.Timber.DebugTree
+import java.io.InputStream
 import java.security.SecureRandom
 import java.security.cert.X509Certificate
 import javax.inject.Inject
@@ -196,6 +200,12 @@ class App : Application() {
                 .build()
 
         Fresco.initialize(this, pipelineConfig)
+
+        Glide.get(this).registry.append(
+            EncryptedFileModel::class.java,
+            InputStream::class.java,
+            EncryptedFileModelLoaderFactory()
+        )
 
         if (PermissionStorage.hasPermissions(this)) {
 

@@ -119,35 +119,10 @@ class ScreenLAlbumSM @AssistedInject constructor(
     }
 
     fun downloadLikeCrypto(item: PicsDetails) {
-        //saved.likes.add(item.copy(album = idAlbum.toString()))
         scope.launch {
-            val key = Password.key
-            if (key == null){
-                Timber.i("!!! ScreenLAlbumSM downloadLikeCrypto key == null Ключ отсутствует, не могу сохранять")
-                snackBarEvent.error("Ключ шифрования отсутствует")
-                return@launch
-            }
-
-            val name = item.url_to_original?.substringAfterLast('/')?.substringBefore('?') //xxx.yyy
-            val ext = name?.split(".")?.get(1)
-
-            val fileName = item.width.toString()+"_"+item.height+"_"+item.is_animated+"_"+idAlbum.toString()+"_"+
-                    name?.toMD5()?.dropLast(24)+"."+ext
-
-            Crypto.downloadAndEncryptFile( item.url_to_original!!, File( AppPath.likesCrypto_l, fileName ), Password.key!! )
-                .onSuccess {
-                    snackBarEvent.success("Сохранен в сейф")
-                    Timber.i("!!! ScreenLAlbumSM downloadLikeCrypto success")
-                }
-                .onFailure {
-                    it.printStackTrace()
-                    snackBarEvent.error("Ошибка сохранения в сейф")
-                    Timber.e(it, "!!! ScreenLAlbumSM downloadLikeCrypto error")
-                }
-
+            saved.crypto.add(item.copy(album = idAlbum.toString()))
         }
     }
-
 
     init {
         Timber.e("!!! ScreenLAlbumSM init")

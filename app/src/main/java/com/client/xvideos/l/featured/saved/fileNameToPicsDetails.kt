@@ -4,7 +4,7 @@ import com.client.xvideos.common.AppPath
 import com.client.xvideos.l.model.PicsDetails
 import java.io.File
 
-fun fileNameToPicsDetails(file: File): PicsDetails? {
+fun fileNameToPicsDetails(file: File, folder : String): PicsDetails? {
 
     val name = file.nameWithoutExtension// убираем .jpg / .png и т.п.
 
@@ -17,7 +17,7 @@ fun fileNameToPicsDetails(file: File): PicsDetails? {
     val is_animated = parts[2].toBooleanStrictOrNull() ?: false
     val album = parts[3].toIntOrNull().toString()
 
-    val path = File(AppPath.likes_l, file.name).absolutePath
+    val path = File(folder, file.name).absolutePath
 
     return PicsDetails(
         height = height,

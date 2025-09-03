@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.ui.urlImage.UrlImageLusciousGifsFull
+import com.client.xvideos.l.ui.urlImage.UrlImageLusciousGifsGlide
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
@@ -447,7 +448,8 @@ fun FullScreenImage(
                 )
                 .size(baseWidthDp, baseHeightDp)
         ) {
-            UrlImageLusciousGifsFull(
+            //UrlImageLusciousGifsFull(
+            UrlImageLusciousGifsGlide(
                 url = item.url_to_original!!,
                 modifier = Modifier.aspectRatio(item.width.toFloat()/item.height),//.fillMaxSize(),
                 contentScale = ContentScale.FillBounds,

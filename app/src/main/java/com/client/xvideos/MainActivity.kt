@@ -98,6 +98,8 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory
 
         VideoPlayerCacheManager.initialize(this, 1024 * 1024 * 1024)    // 1GB
 
+
+
         setContent {
             KeepScreenOn()
             XvideosTheme(darkTheme = true) {
