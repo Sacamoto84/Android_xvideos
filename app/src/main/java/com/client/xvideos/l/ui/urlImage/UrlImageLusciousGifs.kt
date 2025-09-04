@@ -7,6 +7,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -26,6 +27,9 @@ import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import coil.request.CachePolicy
 import coil.request.ImageRequest
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.gif.GifDrawable
+import com.bumptech.glide.request.RequestOptions
 import com.client.xvideos.common.AppPath
 import com.client.xvideos.common.encrypting.EncryptedFileModel
 import com.composeunstyled.Text
@@ -71,6 +75,8 @@ fun UrlImageLusciousGifsGlide(
         url
     }
 
+    var isPlaying by remember { mutableStateOf(false) }
+    var gifDrawable by remember { mutableStateOf<GifDrawable?>(null) }
 
     GlideImage(
         imageModel = { dataSource }, // локальный файл или URL
@@ -79,6 +85,12 @@ fun UrlImageLusciousGifsGlide(
             contentScale = contentScale,
             alignment = Alignment.Center,
         ),
+        requestOptions = {
+            RequestOptions()
+                //.override(50)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .centerCrop()
+        },
         loading = {
             onLoading(true)
             if (loadIndicator) {
@@ -89,14 +101,59 @@ fun UrlImageLusciousGifsGlide(
                     )
                 }
             }
-        },
+        }
+,
+        success = { state, drawable ->
+
+            Image(
+                painter = drawable,
+                modifier = Modifier.size(128.dp), // draw a resized image.
+                contentDescription = "Image"
+            )
+
+//            if (drawable is GifDrawable) {
+//                gifDrawable = drawable
+//                if (isPlaying) drawable.start()
+//                else
+//                    drawable.stop()
+//                isPlaying = !isPlaying
+//            }
+
+            gifDrawable?.stop()
+
+            onSuccess(true)
+
+        }
+
+
+        ,
         failure = {
             onLoading(false)
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text("Ошибка загрузки", color = Color.Gray)
             }
         },
+
     )
+
+
+
+    // Кнопка Play/Pause
+    if (fileName.endsWith(".gif", true) || fileName.endsWith(".webp", true)) {
+        Button(
+            onClick = {
+                isPlaying = !isPlaying
+                if (isPlaying) {
+                    gifDrawable?.start()
+                } else {
+                    gifDrawable?.stop()
+                }
+            },
+            modifier = Modifier//.align(Alignment.BottomCenter)
+        ) {
+            Text(if (isPlaying) "⏸ Пауза" else "▶ Старт")
+        }
+    }
 }
 
 @Composable
