@@ -40,7 +40,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.client.xvideos.l.model.PicsDetails
-import com.client.xvideos.l.ui.urlImage.UrlImageLusciousGifsFull
 import com.client.xvideos.l.ui.urlImage.UrlImageLusciousGifsGlide
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.joinAll
@@ -452,8 +451,8 @@ fun FullScreenImage(
             UrlImageLusciousGifsGlide(
                 url = item.url_to_original!!,
                 modifier = Modifier.aspectRatio(item.width.toFloat()/item.height),//.fillMaxSize(),
-                contentScale = ContentScale.FillBounds,
-                onSuccess = { success = it },
+                //contentScale = ContentScale.FillBounds,
+                //onSuccess = { success = it },
                 albumName = albumName
             )
         }

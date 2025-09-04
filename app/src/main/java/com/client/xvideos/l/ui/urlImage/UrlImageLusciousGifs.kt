@@ -1,21 +1,12 @@
 package com.client.xvideos.l.ui.urlImage
 
 import android.graphics.drawable.Animatable
-import android.graphics.drawable.AnimationDrawable
-import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
-import android.view.ViewGroup
-import android.view.ViewGroup.LayoutParams.MATCH_PARENT
-import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
-import android.widget.ImageView
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -30,31 +21,18 @@ import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import coil.ImageLoader
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import coil.request.CachePolicy
 import coil.request.ImageRequest
-import com.bumptech.glide.Glide
-import com.bumptech.glide.RequestBuilder
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.load.resource.gif.GifDrawable
-import com.bumptech.glide.request.BaseRequestOptions
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.RequestOptions
-import com.bumptech.glide.request.target.Target
 import com.client.xvideos.common.AppPath
-import com.client.xvideos.common.encrypting.EncryptedFileModel
 import com.composeunstyled.Text
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.controller.BaseControllerListener
 import com.facebook.imagepipeline.image.ImageInfo
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil.CoilImage
-import com.skydoves.landscapist.fresco.websupport.FrescoWebImage
 import kotlinx.coroutines.Dispatchers
 import timber.log.Timber
 import java.io.File
@@ -68,178 +46,349 @@ data class StaticImageWrapper(
     override fun toString(): String = source.toString()
 }
 
-@Composable
-fun UrlImageLusciousGifsGlide(
-    url: String,
-    modifier: Modifier = Modifier,
-    contentScale: ContentScale = ContentScale.FillWidth,
-    loadIndicator: Boolean = true,
-    onLoading: (Boolean) -> Unit = {},
-    onSuccess: (Boolean) -> Unit = {},
-    albumName: String,
-    isAnimated: Boolean = false
-) {
-    // Определяем имя файла и проверяем наличие
-    val fileName = url.substringAfterLast('/').substringBefore('?')
-    val file = when (albumName) {
-        "likes", "crypto" -> File(url)
-        else -> File(AppPath.downloaded_albums_l, "$albumName/$fileName")
-    }
 
-    val dataSource: Any = if (file.exists()) {
-        when (albumName) {
-            "likes" -> file
-            "crypto" -> EncryptedFileModel(file)
-            else -> file
-        }
-    } else {
-        url
-    }
-
-    val context = LocalContext.current
-
-    var isPlaying by remember { mutableStateOf(true) } // Анимация по умолчанию включена
-
-    val animatedFile = isAnimated || fileName.endsWith(".gif", true) || fileName.endsWith(".webp", true)
-
-
-//    // Создаем разные модели для анимированного и статичного контента
-//    val imageModel = remember(dataSource, isPlaying, animatedFile) {
-//        if (isPlaying && animatedFile) {
-//            // Для анимации - возвращаем исходный dataSource
-//            dataSource
-//        } else {
-//            // Для статичного изображения - можем обернуть в специальный wrapper
-//            // или просто использовать dataSource с флагом
-//            StaticImageWrapper(dataSource, isStatic = true).toString()
-//        }
+//@Composable
+//fun UrlImageLusciousGifsGlide(
+//    url: String,
+//    modifier: Modifier = Modifier,
+//    contentScale: ContentScale = ContentScale.FillWidth,
+//    loadIndicator: Boolean = true,
+//    onLoading: (Boolean) -> Unit = {},
+//    onSuccess: (Boolean) -> Unit = {},
+//    albumName: String,
+//    isAnimated: Boolean = false
+//) {
+//    // Определяем имя файла и проверяем наличие
+//    val fileName = url.substringAfterLast('/').substringBefore('?')
+//    val file = when (albumName) {
+//        "likes", "crypto" -> File(url)
+//        else -> File(AppPath.downloaded_albums_l, "$albumName/$fileName")
 //    }
-
-
-//    val gGif = Glide
-//        .with(context)
-//        .asDrawable()
-//        .load(dataSource)
-//        .diskCacheStrategy(DiskCacheStrategy.ALL)
-//        .centerCrop()
 //
-//    val gBitmap = Glide
-//        .with(context)
-//        .asDrawable()
-//        .load(dataSource)
-//        .diskCacheStrategy(DiskCacheStrategy.ALL)
-//        .centerCrop()
-
-
-
-//    GlideImage(
-//        imageModel = { imageModel }, // локальный файл или URL
-//        modifier = modifier.background(Color.Black),
-//        imageOptions = ImageOptions(
-//            contentScale = contentScale,
-//            alignment = Alignment.Center,
-//        ),
-//        requestBuilder = {
+//    val dataSource: Any = if (file.exists()) {
+//        when (albumName) {
+//            "likes" -> file
+//            "crypto" -> EncryptedFileModel(file)
+//            else -> file
+//        }
+//    } else {
+//        url
+//    }
 //
-//            if (isPlaying && animatedFile) {
-//                gGif
-//            }else{
-//                gBitmap
-//            }
+//    val context = LocalContext.current
+//    var isPlaying by remember { mutableStateOf(true) } // Анимация по умолчанию включена
+//    var isLoading by remember { mutableStateOf(true) }
 //
-//        },
+//    val animatedFile = isAnimated ||
+//            fileName.endsWith(".gif", true) ||
+//            fileName.endsWith(".webp", true)
 //
-//        loading = {
-//            onLoading(true)
-//            if (loadIndicator) {
-//                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+//    // Оборачиваем в Column, чтобы кнопка отображалась
+//    Column(
+//        modifier = modifier
+//    ) {
+//        Box(
+//            modifier = Modifier
+//                .weight(1f)
+//                .fillMaxWidth()
+//        ) {
+//            AndroidView(
+//                factory = { context ->
+//                    val view = ImageView(context).apply {
+//                        layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT)
+//                        adjustViewBounds = true
+//                        scaleType = when (contentScale) {
+//                            ContentScale.FillWidth -> ImageView.ScaleType.CENTER_CROP
+//                            ContentScale.Fit -> ImageView.ScaleType.FIT_CENTER
+//                            ContentScale.Crop -> ImageView.ScaleType.CENTER_CROP
+//                            else -> ImageView.ScaleType.CENTER_CROP
+//                        }
+//                    }
+//
+//                    Glide.with(view)
+//                        .asDrawable()
+//                        .load(dataSource)
+//                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+//                        .addListener(object : RequestListener<Drawable> {
+//                            override fun onLoadFailed(
+//                                e: GlideException?,
+//                                model: Any?,
+//                                target: Target<Drawable>,
+//                                isFirstResource: Boolean
+//                            ): Boolean {
+//                                isLoading = false
+//                                onLoading(false)
+//                                return false
+//                            }
+//
+//                            override fun onResourceReady(
+//                                resource: Drawable,
+//                                model: Any,
+//                                target: Target<Drawable>?,
+//                                dataSource: DataSource,
+//                                isFirstResource: Boolean
+//                            ): Boolean {
+//                                isLoading = false
+//                                onLoading(false)
+//                                onSuccess(true)
+//
+//                                if (resource is GifDrawable) {
+//                                    if (isPlaying) {
+//                                        resource.start()
+//                                    } else {
+//                                        resource.stop()
+//                                    }
+//                                }
+//                                return false // Позволяем Glide установить drawable
+//                            }
+//                        })
+//                        .into(view)
+//
+//                    view
+//                },
+//                update = { view ->
+//                    // Обновляем состояние анимации при изменении isPlaying
+//                    (view.drawable as? GifDrawable)?.let { gifDrawable ->
+//                        if (isPlaying) {
+//                            gifDrawable.start()
+//                        } else {
+//                            gifDrawable.stop()
+//                        }
+//                    }
+//                },
+//                modifier = Modifier
+//                    .fillMaxSize()
+//                    .background(Color.Gray)
+//            )
+//
+//            // Индикатор загрузки
+//            if (isLoading && loadIndicator) {
+//                Box(
+//                    modifier = Modifier.fillMaxSize(),
+//                    contentAlignment = Alignment.Center
+//                ) {
 //                    CircularProgressIndicator(
 //                        modifier = Modifier.size(32.dp),
-//                        color = Color.Gray
+//                        color = Color.White
 //                    )
 //                }
 //            }
-//        },
-//        success = { _, drawable ->
-//            Image(
-//                painter = drawable,
-//                modifier = modifier,
-//                contentDescription = "Image"
-//            )
-//        },
-//        failure = {
-//            onLoading(false)
-//            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-//                Text("Ошибка загрузки", color = Color.Gray)
+//        }
+//
+//        // Кнопка Play/Pause для GIF и WebP
+//        if (animatedFile) {
+//            Button(
+//                onClick = {
+//                    isPlaying = !isPlaying
+//                },
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(8.dp),
+//                colors = ButtonDefaults.buttonColors(
+//                    containerColor = MaterialTheme.colorScheme.primary
+//                )
+//            ) {
+//                Text(
+//                    text = if (isPlaying) "⏸ Пауза" else "▶ Старт",
+//                    color = Color.White
+//                )
 //            }
 //        }
+//    }
+//}
+
+
+
+
+
+
+
+
+
+
+
+
+
+//@Composable
+//fun UrlImageLusciousGifsGlide(
+//    url: String,
+//    modifier: Modifier = Modifier,
+//    contentScale: ContentScale = ContentScale.FillWidth,
+//    loadIndicator: Boolean = true,
+//    onLoading: (Boolean) -> Unit = {},
+//    onSuccess: (Boolean) -> Unit = {},
+//    albumName: String,
+//    isAnimated: Boolean = false
+//)
+//{
+//    // Определяем имя файла и проверяем наличие
+//    val fileName = url.substringAfterLast('/').substringBefore('?')
+//    val file = when (albumName) {
+//        "likes", "crypto" -> File(url)
+//        else -> File(AppPath.downloaded_albums_l, "$albumName/$fileName")
+//    }
+//
+//    val dataSource: Any = if (file.exists()) {
+//        when (albumName) {
+//            "likes" -> file
+//            "crypto" -> EncryptedFileModel(file)
+//            else -> file
+//        }
+//    } else {
+//        url
+//    }
+//
+//    val context = LocalContext.current
+//
+//    var isPlaying by remember { mutableStateOf(false) } // Анимация по умолчанию включена
+//
+//    val animatedFile =
+//        isAnimated || fileName.endsWith(".gif", true) || fileName.endsWith(".webp", true)
+//
+//
+////    // Создаем разные модели для анимированного и статичного контента
+////    val imageModel = remember(dataSource, isPlaying, animatedFile) {
+////        if (isPlaying && animatedFile) {
+////            // Для анимации - возвращаем исходный dataSource
+////            dataSource
+////        } else {
+////            // Для статичного изображения - можем обернуть в специальный wrapper
+////            // или просто использовать dataSource с флагом
+////            StaticImageWrapper(dataSource, isStatic = true).toString()
+////        }
+////    }
+//
+//
+////    val gGif = Glide
+////        .with(context)
+////        .asDrawable()
+////        .load(dataSource)
+////        .diskCacheStrategy(DiskCacheStrategy.ALL)
+////        .centerCrop()
+////
+////    val gBitmap = Glide
+////        .with(context)
+////        .asDrawable()
+////        .load(dataSource)
+////        .diskCacheStrategy(DiskCacheStrategy.ALL)
+////        .centerCrop()
+//
+//
+////    GlideImage(
+////        imageModel = { imageModel }, // локальный файл или URL
+////        modifier = modifier.background(Color.Black),
+////        imageOptions = ImageOptions(
+////            contentScale = contentScale,
+////            alignment = Alignment.Center,
+////        ),
+////        requestBuilder = {
+////
+////            if (isPlaying && animatedFile) {
+////                gGif
+////            }else{
+////                gBitmap
+////            }
+////
+////        },
+////
+////        loading = {
+////            onLoading(true)
+////            if (loadIndicator) {
+////                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+////                    CircularProgressIndicator(
+////                        modifier = Modifier.size(32.dp),
+////                        color = Color.Gray
+////                    )
+////                }
+////            }
+////        },
+////        success = { _, drawable ->
+////            Image(
+////                painter = drawable,
+////                modifier = modifier,
+////                contentDescription = "Image"
+////            )
+////        },
+////        failure = {
+////            onLoading(false)
+////            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+////                Text("Ошибка загрузки", color = Color.Gray)
+////            }
+////        }
+////    )
+//
+//
+//    AndroidView(
+//        factory = { context ->
+//            val view = ImageView(context).apply {
+//                layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT)
+//                adjustViewBounds = true
+//            }
+//
+//            Glide.with(view).asDrawable().load(dataSource)
+//                .addListener(object : RequestListener<Drawable> {
+//                    override fun onLoadFailed(
+//                        e: GlideException?,
+//                        model: Any?,
+//                        target: Target<Drawable>,
+//                        isFirstResource: Boolean
+//                    ): Boolean {
+//                        return false
+//                    }
+//
+//                    override fun onResourceReady(
+//                        resource: Drawable,
+//                        model: Any,
+//                        target: Target<Drawable>?,
+//                        dataSource: DataSource,
+//                        isFirstResource: Boolean
+//                    ): Boolean {
+//                        if (resource is GifDrawable) {
+//                            if (isPlaying) {
+//                                resource.start()
+//                                //resource.startFromFirstFrame()
+//                            } else {
+//                                resource.stop()
+//                            }
+//                        }
+//                        view.setImageDrawable(resource)
+//                        return true
+//                    }
+//                }).into(view)
+//
+//            view
+//        },
+//        update = { view ->
+//            (view.drawable as? GifDrawable)?.let { gifDrawable ->
+//
+//                if (isPlaying) {
+//                    gifDrawable.start()
+//                } else {
+//                    gifDrawable.stop()
+//                }
+//                view.setImageDrawable(gifDrawable)
+//            }
+//        }, modifier = modifier
+//            .fillMaxSize()
+//            .background(Color.Gray)
+//
 //    )
-
-
-
-    AndroidView(
-        factory = { context ->
-            val view = ImageView(context).apply {
-                layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT)
-                adjustViewBounds = true
-            }
-
-            Glide.with(view).asGif().load(dataSource).addListener(object : RequestListener<GifDrawable> {
-                override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<GifDrawable>, isFirstResource: Boolean): Boolean {
-                    return false
-                }
-
-                override fun onResourceReady(resource: GifDrawable, model: Any, target: Target<GifDrawable>?, dataSource: DataSource, isFirstResource: Boolean): Boolean {
-                    if (isPlaying) {
-                        resource.stop()
-                        resource.startFromFirstFrame()
-                    } else {
-                        resource.stop()
-                    }
-
-                    view.setImageDrawable(resource)
-                    return true
-                }
-            }).into(view)
-
-            view
-        },
-        update = { view ->
-            (view.drawable as? GifDrawable)?.let { gifDrawable ->
-                if (isPlaying) {
-                    gifDrawable.stop()
-                    gifDrawable.startFromFirstFrame()
-                } else {
-                    gifDrawable.stop()
-                }
-            }
-        }
-    , modifier = modifier.fillMaxSize().background(Color.Gray)
-
-    )
-
-
-    // Кнопка Play/Pause для GIF и WebP
-    if (fileName.endsWith(".gif", true) || fileName.endsWith(".webp", true)) {
-        Button(
-            onClick = {
-                isPlaying = !isPlaying
-            },
-            modifier = Modifier.padding(top = 8.dp)
-        ) {
-            Text(if (isPlaying) "⏸ Пауза" else "▶ Старт")
-        }
-    }
-
-
-
-
-}
-
-
-
-
-
+//
+//
+//    // Кнопка Play/Pause для GIF и WebP
+//    if (fileName.endsWith(".gif", true) || fileName.endsWith(".webp", true)) {
+//        Button(
+//            onClick = {
+//                isPlaying = !isPlaying
+//            },
+//            modifier = Modifier.padding(top = 8.dp)
+//        ) {
+//            Text(if (isPlaying) "⏸ Пауза" else "▶ Старт")
+//        }
+//    }
+//
+//
+//}
 
 
 //@Composable
@@ -405,7 +554,7 @@ fun UrlImageLusciousGifs(
     isGrayscale: Boolean = false,
     onLoading: (Boolean) -> Unit = {},
     onSuccess: (Boolean) -> Unit = {},
-    albumName : String
+    albumName: String
 ) {
 
     val context = LocalContext.current
@@ -416,10 +565,9 @@ fun UrlImageLusciousGifs(
     val fileName = url.substringAfterLast('/').substringBefore('?')
     //val file = File(AppPath.downloaded_albums_l, "$albumName/$fileName")
 
-    val file  = if (albumName != "likes") {
+    val file = if (albumName != "likes") {
         File(AppPath.downloaded_albums_l, "$albumName/$fileName")
-    }
-    else{
+    } else {
         File(AppPath.likes_l, url)
     }
 
@@ -493,77 +641,79 @@ fun UrlImageLusciousGifs(
 
 }
 
-@Composable
-fun UrlImageLusciousGifsFull(
-    url: String,
-    modifier: Modifier = Modifier,
-    contentScale: ContentScale = ContentScale.FillWidth,
-    onSuccess: (Boolean) -> Unit = {},
-    albumName: String
-) {
-    // Определяем имя файла и проверяем наличие
-    val fileName = url.substringAfterLast('/').substringBefore('?')
-
-    val file = when (albumName){
-        "likes", "crypto"  -> File(url)
-        else -> File(AppPath.downloaded_albums_l, "$albumName/$fileName")
-    }
-
-    val dataSource: Uri = if (file.exists()) {
-        Uri.fromFile(file) // локальный файл
-    } else {Uri.parse(url) }// сетевой url
-
-    var isLoading by remember { mutableStateOf(true) }
-    var hasError by remember { mutableStateOf(false) }
-
-    val controllerBuilder = remember(dataSource) {
-        {
-            Fresco.newDraweeControllerBuilder()
-                .setUri(dataSource)
-                .setControllerListener(object : BaseControllerListener<ImageInfo>() {
-                    override fun onSubmit(id: String?, callerContext: Any?) {
-                        isLoading = true
-                        hasError = false
-                    }
-
-                    override fun onFinalImageSet(
-                        id: String?,
-                        imageInfo: ImageInfo?,
-                        animatable: Animatable?
-                    ) {
-                        isLoading = false
-                        hasError = false
-                        onSuccess(true)
-                    }
-
-                    override fun onFailure(id: String?, throwable: Throwable?) {
-                        isLoading = false
-                        hasError = true
-                    }
-                })
-                .setAutoPlayAnimations(true)
-        }
-    }
-
-    Box {
-        FrescoWebImage(
-            controllerBuilder = controllerBuilder,
-            modifier = Modifier.then(modifier)
-        )
-
-        if (isLoading) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(32.dp),
-                    color = Color.Gray
-                )
-            }
-        }
-
-        if (hasError) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("Ошибка загрузки", color = Color.Gray)
-            }
-        }
-    }
-}
+//@Composable
+//fun UrlImageLusciousGifsFull(
+//    url: String,
+//    modifier: Modifier = Modifier,
+//    contentScale: ContentScale = ContentScale.FillWidth,
+//    onSuccess: (Boolean) -> Unit = {},
+//    albumName: String
+//) {
+//    // Определяем имя файла и проверяем наличие
+//    val fileName = url.substringAfterLast('/').substringBefore('?')
+//
+//    val file = when (albumName) {
+//        "likes", "crypto" -> File(url)
+//        else -> File(AppPath.downloaded_albums_l, "$albumName/$fileName")
+//    }
+//
+//    val dataSource: Uri = if (file.exists()) {
+//        Uri.fromFile(file) // локальный файл
+//    } else {
+//        Uri.parse(url)
+//    }// сетевой url
+//
+//    var isLoading by remember { mutableStateOf(true) }
+//    var hasError by remember { mutableStateOf(false) }
+//
+//    val controllerBuilder = remember(dataSource) {
+//        {
+//            Fresco.newDraweeControllerBuilder()
+//                .setUri(dataSource)
+//                .setControllerListener(object : BaseControllerListener<ImageInfo>() {
+//                    override fun onSubmit(id: String?, callerContext: Any?) {
+//                        isLoading = true
+//                        hasError = false
+//                    }
+//
+//                    override fun onFinalImageSet(
+//                        id: String?,
+//                        imageInfo: ImageInfo?,
+//                        animatable: Animatable?
+//                    ) {
+//                        isLoading = false
+//                        hasError = false
+//                        onSuccess(true)
+//                    }
+//
+//                    override fun onFailure(id: String?, throwable: Throwable?) {
+//                        isLoading = false
+//                        hasError = true
+//                    }
+//                })
+//                .setAutoPlayAnimations(true)
+//        }
+//    }
+//
+//    Box {
+//        FrescoWebImage(
+//            controllerBuilder = controllerBuilder,
+//            modifier = Modifier.then(modifier)
+//        )
+//
+//        if (isLoading) {
+//            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+//                CircularProgressIndicator(
+//                    modifier = Modifier.size(32.dp),
+//                    color = Color.Gray
+//                )
+//            }
+//        }
+//
+//        if (hasError) {
+//            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+//                Text("Ошибка загрузки", color = Color.Gray)
+//            }
+//        }
+//    }
+//}

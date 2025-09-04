@@ -128,3 +128,7 @@
 -keep class com.client.xvideos.common.encrypting.MyAppGlideModule
 -keep @com.bumptech.glide.annotation.GlideModule class *
 -keep public class * extends com.bumptech.glide.module.AppGlideModule
+
+-keep class com.facebook.imagepipeline.** { *; }
+-keep class com.facebook.drawee.** { *; }
+-keep class com.facebook.fresco.** { *; }
