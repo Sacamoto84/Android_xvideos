@@ -235,8 +235,12 @@ dependencies {
     implementation libs.landscapist.coil
     implementation(libs.landscapist.fresco)
     implementation(libs.landscapist.fresco.websupport)
-    implementation(libs.landscapist.glide)
-    ksp "com.github.bumptech.glide:compiler:4.16.0"
+    //implementation(libs.landscapist.glide)
+
+    implementation 'com.github.bumptech.glide:glide:5.0.4'
+    //implementation("com.github.bumptech.glide:glide:4.16.0")
+    //ksp "com.github.bumptech.glide:compiler:4.16.0"
+
 
     //implementation('network.chaintech:compose-multiplatform-media-player:1.0.40')
 
