@@ -2,15 +2,29 @@ package com.client.xvideos.common.fresco
 
 import android.app.Application
 import android.util.Log
+import com.client.xvideos.l.ui.urlImage.CryptoFetchState
+import com.client.xvideos.l.ui.urlImage.CryptoSchemeFetcher
+import com.client.xvideos.l.ui.urlImage.FullCustomNetworkFetcher
 import com.facebook.cache.disk.DiskCacheConfig
 import com.facebook.common.internal.Supplier
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory
 import com.facebook.imagepipeline.cache.MemoryCacheParams
 import com.facebook.imagepipeline.core.DefaultExecutorSupplier
+import com.facebook.imagepipeline.image.EncodedImage
 import com.facebook.imagepipeline.listener.RequestListener
+import com.facebook.imagepipeline.memory.PoolConfig
+import com.facebook.imagepipeline.memory.PoolFactory
+import com.facebook.imagepipeline.producers.Consumer
+import com.facebook.imagepipeline.producers.FetchState
+import com.facebook.imagepipeline.producers.HttpUrlConnectionNetworkFetcher
+import com.facebook.imagepipeline.producers.NetworkFetcher
+import com.facebook.imagepipeline.producers.Producer
+import com.facebook.imagepipeline.producers.ProducerContext
 import com.facebook.imagepipeline.request.ImageRequest
 import okhttp3.OkHttpClient
+import timber.log.Timber
+import java.util.concurrent.TimeUnit
 
 fun FrescoInit(application: Application) {
 
@@ -115,8 +129,42 @@ fun FrescoInit(application: Application) {
     }
 
 
+
+
+
+
+
+    val httpFetcher = HttpUrlConnectionNetworkFetcher()
+
+    val poolFactory = PoolFactory(PoolConfig.newBuilder().build()).pooledByteBufferFactory
+
+//    val customFactories = listOf(
+//        object : CustomProducerSequenceFactory(baseProducerSequenceFactory, poolFactory) {
+//            override fun getEncodedImageProducerSequence(imageRequest: ImageRequest): Producer<EncodedImage> {
+//                val uri = imageRequest.sourceUri
+//
+//                return if (uri.scheme == "crypto") {
+//                    CryptoSchemeFetcher(poolFactory) // твой кастомный producer
+//                } else {
+//                    super.getEncodedImageProducerSequence(imageRequest)
+//
+//                }
+//            }
+//        }
+//    )
+
+
     val listeners = HashSet<RequestListener?>()
     listeners.add(MyRequestLoggingListener())
+
+// Применение в конфигурации:
+    val customOkHttpClient = OkHttpClient.Builder()
+        .connectTimeout(90, TimeUnit.SECONDS)
+        .readTimeout(90, TimeUnit.SECONDS)
+        .writeTimeout(90, TimeUnit.SECONDS)
+        .build()
+
+    val customNetworkFetcher = FullCustomNetworkFetcher(customOkHttpClient)
 
     val pipelineConfig = OkHttpImagePipelineConfigFactory
         .newBuilder(application, OkHttpClient.Builder().build())
@@ -127,6 +175,51 @@ fun FrescoInit(application: Application) {
         .setMainDiskCacheConfig(diskCacheConfig)
         .setBitmapMemoryCacheParamsSupplier(memoryCacheParamsSupplier)
         .setEncodedMemoryCacheParamsSupplier(memoryCacheParamsSupplier) // Опционально: для закодированных данных
+
+        .setNetworkFetcher(customNetworkFetcher)
+
+        //.setCustomFetchSequenceFactories()
+
+//        .setNetworkFetcher (
+//
+//            object : NetworkFetcher<FetchState> {
+//                override fun createFetchState(consumer: Consumer<EncodedImage>, producerContext: ProducerContext) = CryptoFetchState(consumer, producerContext)
+//
+//                    override fun fetch(fetchState: FetchState, callback: NetworkFetcher.Callback) {
+//
+//                        Timber.i("!!! iii Fresco CryptoSchemeFetcher fetch")
+//
+//                        val uri = fetchState.uri
+//                        if (uri.scheme == "crypto") {
+//                            CryptoSchemeFetcher(poolFactory).fetch(fetchState as CryptoFetchState, callback)
+//                        }
+//                    }
+//
+//                override fun shouldPropagate(fetchState: FetchState?): Boolean = true
+//
+//                override fun onFetchCompletion(
+//                    fetchState: FetchState?,
+//                    byteSize: Int
+//                ) {
+//
+//                }
+//
+//                override fun getExtraMap(
+//                    fetchState: FetchState?,
+//                    byteSize: Int
+//                ): Map<String?, String?>? = null
+//
+//            }
+
+           // if (uri.scheme == "crypto") {
+            //    CryptoSchemeFetcher(poolFactory)
+           // } else {
+          //      DefaultNetworkFetcher()
+           // }
+          //  )
+
+
+
         .build()
 
     Fresco.initialize(application, pipelineConfig)

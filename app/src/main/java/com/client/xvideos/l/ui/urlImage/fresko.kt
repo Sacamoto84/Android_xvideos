@@ -34,13 +34,25 @@ import com.facebook.imagepipeline.image.ImageInfo
 import com.facebook.imagepipeline.request.ImageRequestBuilder
 import com.skydoves.landscapist.InternalLandscapistApi
 import com.skydoves.landscapist.fresco.websupport.FrescoWebImage
-import io.ktor.util.collections.getValue
-import io.ktor.util.collections.setValue
 import io.ktor.utils.io.InternalAPI
 import kotlinx.coroutines.delay
 import timber.log.Timber
 import java.io.File
-import java.net.URI
+
+
+fun getDataSource(albumName: String, url: String): Uri {
+    val fileName = url.substringAfterLast('/').substringBefore('?')
+    val file = when (albumName) {
+        "crypto" -> File(url)
+        else -> File(AppPath.downloaded_albums_l, "$albumName/$fileName")
+    }
+
+    return if (file.exists() && albumName == "crypto") {
+        Uri.parse("crypto://${file.absolutePath}") // <-- два слэша!
+    } else {
+        file.toUri()
+    }
+}
 
 
 // Альтернативный вариант с более детальным контролем анимации
@@ -53,17 +65,23 @@ fun UrlImageLusciousGifsGlide(
     loadIndicator: Boolean = true,
     albumName: String,
     isAnimated: Boolean = false,
-    onSuccess : () -> Unit = {},
-    onFailure : () -> Unit = {}
+    onSuccess: () -> Unit = {},
+    onFailure: () -> Unit = {},
+    autoPlay: Boolean = false
 ) {
 
     SideEffect {
         Timber.i("!!! iii Recompose UrlImageLusciousGifsGlide albumName:${albumName} url:${url}")
     }
 
-    var isPlaying by remember { mutableStateOf(true) }
+    var isPlaying by remember { mutableStateOf(autoPlay) }
     var isLoading by remember { mutableStateOf(true) }
     var isFailure by remember { mutableStateOf(false) }
+
+    // Стабилизируем колбэки
+    val stableOnSuccess = rememberUpdatedState(onSuccess)
+    val stableOnFailure = rememberUpdatedState(onFailure)
+
 
     val dataSource = remember(url) {
         val fileName = url.substringAfterLast('/').substringBefore('?')
@@ -74,6 +92,7 @@ fun UrlImageLusciousGifsGlide(
         }
 
         if (file.exists()) file.toUri() else url.toUri()
+       // getDataSource(albumName, url)
     }
 
     val imageRequest = remember(dataSource) {
@@ -86,22 +105,35 @@ fun UrlImageLusciousGifsGlide(
             .build()
     }
 
-    // Стабилизируем колбэки
-    val stableOnSuccess = rememberUpdatedState(onSuccess)
-    val stableOnFailure = rememberUpdatedState(onFailure)
 
-    val controllerListener = remember(url){
+    var animation: Animatable? by remember { mutableStateOf(null) }
+    LaunchedEffect(animation, isPlaying) {
+        if (isPlaying) {
+            animation?.start()
+        } else {
+            animation?.stop()
+        }
+    }
+
+    val controllerListener = remember(url) {
         object : BaseControllerListener<ImageInfo>() {
+
             override fun onSubmit(id: String?, callerContext: Any?) {
                 isLoading = true; isFailure = false
             }
-            override fun onIntermediateImageSet(id: String?, imageInfo: ImageInfo?) {
 
-            }
+            override fun onIntermediateImageSet(id: String?, imageInfo: ImageInfo?) { }
+
             override fun onFinalImageSet(id: String?, imageInfo: ImageInfo?, anim: Animatable?) {
                 isLoading = false; isFailure = false
                 stableOnSuccess.value()
+
+                // Управляем анимацией напрямую через Animatable
+                anim?.let { animatable ->
+                    animation = animatable
+                }
             }
+
             override fun onFailure(id: String?, throwable: Throwable?) {
                 isLoading = false
                 isFailure = true
@@ -114,58 +146,58 @@ fun UrlImageLusciousGifsGlide(
     // Добавляем состояние для контроля инициализации
     var isControllerReady by remember { mutableStateOf(false) }
 
-        LaunchedEffect(dataSource) {
-            // Небольшая задержка перед созданием контроллера
-            delay(50)
-            isControllerReady = true
-        }
+    LaunchedEffect(dataSource) {
+        // Небольшая задержка перед созданием контроллера
+        delay(100)
+        isControllerReady = true
+    }
 
-        Box(modifier = modifier) {
+    Box(modifier = modifier) {
 
-            if (isControllerReady) {
-                FrescoWebImage(
-                    controllerBuilder = {
-                        Fresco.newDraweeControllerBuilder()
-                            //.setUri(dataSource)
-                            .setImageRequest(imageRequest)
-                            .setAutoPlayAnimations(true)
-                            .setControllerListener(controllerListener)
-                            .setOldController(null) // Явно сбрасываем старый контроллер
-                    },
-                    modifier = Modifier.fillMaxSize().background(ThemeL.grey6),
-                )
+        if (isControllerReady) {
+            FrescoWebImage(
+                controllerBuilder = {
+                    Fresco.newDraweeControllerBuilder()
+                        //.setUri(dataSource)
+                        .setImageRequest(imageRequest)
+                        .setAutoPlayAnimations(true)
+                        .setControllerListener(controllerListener)
+                        .setOldController(null) // Явно сбрасываем старый контроллер
+                },
+                modifier = Modifier.fillMaxSize().background(ThemeL.grey6),
+            )
 
-                if (isLoading) {
-                    if (loadIndicator) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) { CircularProgressIndicator(modifier = Modifier.size(32.dp)) }
-                    }
-                }
-
-                if (isFailure) {
+            if (isLoading) {
+                if (loadIndicator) {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
-                    ) { Text("Ошибка загрузки", color = Color.Red) }
-                }
-
-                if (isAnimated) {
-                    Button(
-                        onClick = { isPlaying = !isPlaying },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp)
-                    ) {
-                        Text(text = if (isPlaying) "⏸ Пауза" else "▶ Старт")
-                    }
+                    ) { CircularProgressIndicator(modifier = Modifier.size(32.dp)) }
                 }
             }
-            else
-                Box(modifier = Modifier.fillMaxSize().background(Color.Red), contentAlignment = Alignment.Center) {
-                    //CircularProgressIndicator(modifier = Modifier.size(32.dp))
+
+            if (isFailure) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) { Text("Ошибка загрузки", color = Color.Red) }
+            }
+
+            if (isAnimated) {
+                Button( onClick = { isPlaying = !isPlaying }, modifier = Modifier.fillMaxWidth().padding(8.dp)
+                ) {
+                    Text(text = if (isPlaying) "⏸ Пауза" else "▶ Старт")
                 }
+            }
+        } else
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Red),
+                contentAlignment = Alignment.Center
+            ) {
+                //CircularProgressIndicator(modifier = Modifier.size(32.dp))
+            }
     }
 }
 
