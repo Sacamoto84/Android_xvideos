@@ -41,17 +41,7 @@ import java.io.File
 
 
 fun getDataSource(albumName: String, url: String): Uri {
-    val fileName = url.substringAfterLast('/').substringBefore('?')
-    val file = when (albumName) {
-        "crypto" -> File(url)
-        else -> File(AppPath.downloaded_albums_l, "$albumName/$fileName")
-    }
 
-    return if (file.exists() && albumName == "crypto") {
-        Uri.parse("crypto://${file.absolutePath}") // <-- два слэша!
-    } else {
-        file.toUri()
-    }
 }
 
 
@@ -91,8 +81,10 @@ fun UrlImageLusciousGifsGlide(
             else -> File(AppPath.downloaded_albums_l, "$albumName/$fileName")
         }
 
-        if (file.exists()) file.toUri() else url.toUri()
-       // getDataSource(albumName, url)
+        if (file.exists())
+            if (albumName == "crypto") Uri.parse("https://likesCrypto/$fileName") else file.toUri()
+        else url.toUri()
+
     }
 
     val imageRequest = remember(dataSource) {
