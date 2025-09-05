@@ -13,6 +13,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,6 +37,7 @@ import com.skydoves.landscapist.fresco.websupport.FrescoWebImage
 import io.ktor.util.collections.getValue
 import io.ktor.util.collections.setValue
 import io.ktor.utils.io.InternalAPI
+import kotlinx.coroutines.delay
 import timber.log.Timber
 import java.io.File
 import java.net.URI
@@ -109,42 +111,61 @@ fun UrlImageLusciousGifsGlide(
         }
     }
 
+    // Добавляем состояние для контроля инициализации
+    var isControllerReady by remember { mutableStateOf(false) }
 
-    Box(modifier = modifier) {
-        FrescoWebImage(
-            controllerBuilder = {
-                Fresco.newDraweeControllerBuilder()
-                    //.setUri(dataSource)
-                    .setImageRequest(imageRequest)
-                    .setAutoPlayAnimations(true)
-                    .setControllerListener(controllerListener)
-            },
-            modifier = Modifier.fillMaxSize().background(ThemeL.grey6),
-        )
-
-
-        if (isLoading) {
-            if (loadIndicator) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) { CircularProgressIndicator(modifier = Modifier.size(32.dp)) }
-            }
+        LaunchedEffect(dataSource) {
+            // Небольшая задержка перед созданием контроллера
+            delay(50)
+            isControllerReady = true
         }
 
-        if (isFailure) { Box( modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center ) { Text("Ошибка загрузки", color = Color.Red) } }
+        Box(modifier = modifier) {
 
+            if (isControllerReady) {
+                FrescoWebImage(
+                    controllerBuilder = {
+                        Fresco.newDraweeControllerBuilder()
+                            //.setUri(dataSource)
+                            .setImageRequest(imageRequest)
+                            .setAutoPlayAnimations(true)
+                            .setControllerListener(controllerListener)
+                            .setOldController(null) // Явно сбрасываем старый контроллер
+                    },
+                    modifier = Modifier.fillMaxSize().background(ThemeL.grey6),
+                )
 
-        if (isAnimated) {
-            Button(
-                onClick = { isPlaying = !isPlaying },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
-            ) {
-                Text(text = if (isPlaying) "⏸ Пауза" else "▶ Старт")
+                if (isLoading) {
+                    if (loadIndicator) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) { CircularProgressIndicator(modifier = Modifier.size(32.dp)) }
+                    }
+                }
+
+                if (isFailure) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) { Text("Ошибка загрузки", color = Color.Red) }
+                }
+
+                if (isAnimated) {
+                    Button(
+                        onClick = { isPlaying = !isPlaying },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                    ) {
+                        Text(text = if (isPlaying) "⏸ Пауза" else "▶ Старт")
+                    }
+                }
             }
-        }
+            else
+                Box(modifier = Modifier.fillMaxSize().background(Color.Red), contentAlignment = Alignment.Center) {
+                    //CircularProgressIndicator(modifier = Modifier.size(32.dp))
+                }
     }
 }
 
