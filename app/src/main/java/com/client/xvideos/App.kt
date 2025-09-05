@@ -7,6 +7,7 @@ import android.util.Log
 import com.client.xvideos.PermissionScreenActivity.PermissionStorage
 import com.client.xvideos.common.fresco.FrescoInit
 import com.client.xvideos.common.sharedPref.Settings
+import com.client.xvideos.common.traficStatistic.NetworkTrafficMonitor
 import com.client.xvideos.l.db.AppLDatabase
 import com.facebook.cache.disk.DiskCacheConfig
 import com.facebook.common.internal.Supplier
@@ -83,6 +84,12 @@ class App : Application() {
     // Сохраняем оригинальный обработчик
     private var originalHandler: Thread.UncaughtExceptionHandler? = null
 
+
+
+    lateinit var networkTrafficMonitor: NetworkTrafficMonitor
+        private set
+
+
     @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate() {
         super.onCreate()
@@ -92,6 +99,11 @@ class App : Application() {
         if (BuildConfig.DEBUG)
             Timber.plant(DebugTree())
 //
+
+        // Инициализируем монитор трафика
+        networkTrafficMonitor = NetworkTrafficMonitor()
+        networkTrafficMonitor.startMonitoring()
+
         // Сохраняем оригинальный обработчик ПЕРЕД установкой нашего
         originalHandler = Thread.getDefaultUncaughtExceptionHandler()
 
@@ -226,6 +238,11 @@ class App : Application() {
 
     }
 
+
+    override fun onTerminate() {
+        super.onTerminate()
+        networkTrafficMonitor.destroy()
+    }
 
     companion object {
         lateinit var instance: App

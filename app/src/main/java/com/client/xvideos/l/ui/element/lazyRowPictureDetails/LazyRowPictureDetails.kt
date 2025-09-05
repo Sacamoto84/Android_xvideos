@@ -32,7 +32,7 @@ import com.client.xvideos.l.ThemeL
 import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.FullScreenImage
 import com.client.xvideos.l.ui.screens.LocalRootLScreenModel
-import com.client.xvideos.l.ui.urlImage.UrlImageLusciousGifsGlide
+import com.client.xvideos.common.fresco.UrlImageLusciousGifsGlide
 import com.client.xvideos.redgifs.ui.profile.atom.VerticalScrollbar
 import com.client.xvideos.redgifs.ui.profile.rememberVisibleRangePercentIgnoringFirstNForLazyStaggeredGrid
 

@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Checkbox
 import androidx.compose.material.CheckboxDefaults
 import androidx.compose.material.Text
@@ -36,6 +38,7 @@ import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
+import com.client.xvideos.common.traficStatistic.AppNetworkSpeedMonitor
 import com.client.xvideos.l.ThemeL
 import com.client.xvideos.l.model.enum.AudiencesType
 import com.client.xvideos.l.ui.screens.explorer.tab.config.atom.ScreenLConfig_Encrypt
@@ -67,6 +70,7 @@ object ScreenLConfigTab : Screen {
                 .background(ThemeL.greyBackground)
                 .displayCutoutPadding()
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
         ) {
             Text(
                 "Настройки", color = ThemeL.textColor, style = TextStyle(fontWeight = FontWeight.Medium, fontSize = 24.sp, fontFamily = ThemeL.fontFamilyKarla, textAlign = TextAlign.Center ),
@@ -88,6 +92,7 @@ object ScreenLConfigTab : Screen {
 
             HorizontalDivider(color = Color.DarkGray)
 
+            AppNetworkSpeedMonitor()
 
 
         }

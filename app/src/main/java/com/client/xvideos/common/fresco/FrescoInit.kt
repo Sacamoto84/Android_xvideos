@@ -2,28 +2,16 @@ package com.client.xvideos.common.fresco
 
 import android.app.Application
 import android.util.Log
-import com.client.xvideos.l.ui.urlImage.CryptoFetchState
-import com.client.xvideos.l.ui.urlImage.CryptoSchemeFetcher
-import com.client.xvideos.l.ui.urlImage.FullCustomNetworkFetcher
+import com.client.xvideos.common.fresco.FullCustomNetworkFetcher
 import com.facebook.cache.disk.DiskCacheConfig
 import com.facebook.common.internal.Supplier
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory
 import com.facebook.imagepipeline.cache.MemoryCacheParams
 import com.facebook.imagepipeline.core.DefaultExecutorSupplier
-import com.facebook.imagepipeline.image.EncodedImage
 import com.facebook.imagepipeline.listener.RequestListener
-import com.facebook.imagepipeline.memory.PoolConfig
-import com.facebook.imagepipeline.memory.PoolFactory
-import com.facebook.imagepipeline.producers.Consumer
-import com.facebook.imagepipeline.producers.FetchState
-import com.facebook.imagepipeline.producers.HttpUrlConnectionNetworkFetcher
-import com.facebook.imagepipeline.producers.NetworkFetcher
-import com.facebook.imagepipeline.producers.Producer
-import com.facebook.imagepipeline.producers.ProducerContext
 import com.facebook.imagepipeline.request.ImageRequest
 import okhttp3.OkHttpClient
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 fun FrescoInit(application: Application) {
@@ -127,32 +115,6 @@ fun FrescoInit(application: Application) {
 
         override fun requiresExtraMap(requestId: String): Boolean = false
     }
-
-
-
-
-
-
-
-    val httpFetcher = HttpUrlConnectionNetworkFetcher()
-
-    val poolFactory = PoolFactory(PoolConfig.newBuilder().build()).pooledByteBufferFactory
-
-//    val customFactories = listOf(
-//        object : CustomProducerSequenceFactory(baseProducerSequenceFactory, poolFactory) {
-//            override fun getEncodedImageProducerSequence(imageRequest: ImageRequest): Producer<EncodedImage> {
-//                val uri = imageRequest.sourceUri
-//
-//                return if (uri.scheme == "crypto") {
-//                    CryptoSchemeFetcher(poolFactory) // твой кастомный producer
-//                } else {
-//                    super.getEncodedImageProducerSequence(imageRequest)
-//
-//                }
-//            }
-//        }
-//    )
-
 
     val listeners = HashSet<RequestListener?>()
     listeners.add(MyRequestLoggingListener())

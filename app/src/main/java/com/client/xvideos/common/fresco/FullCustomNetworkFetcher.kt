@@ -1,4 +1,4 @@
-package com.client.xvideos.l.ui.urlImage
+package com.client.xvideos.common.fresco
 
 import com.client.xvideos.common.AppPath
 import com.client.xvideos.common.encrypting.Crypto
@@ -11,17 +11,18 @@ import com.facebook.imagepipeline.producers.ProducerContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import okhttp3.Call
+import okhttp3.Callback
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.Response
 import timber.log.Timber
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
-import java.util.concurrent.Executor
 import javax.crypto.Cipher
 import javax.crypto.CipherInputStream
 import javax.crypto.spec.GCMParameterSpec
-
 
 class FullCustomNetworkFetcher(
     private val okHttpClient: OkHttpClient
@@ -39,7 +40,7 @@ class FullCustomNetworkFetcher(
         callback: NetworkFetcher.Callback
     ) {
 
-        Timber.i("!!! iii Fresco FullCustomNetworkFetcher fetch")
+        Timber.Forest.i("!!! iii Fresco FullCustomNetworkFetcher fetch")
 
         val imageRequest = fetchState.context.imageRequest
         val url = imageRequest.sourceUri.toString()
@@ -101,12 +102,12 @@ class FullCustomNetworkFetcher(
 
         val call = okHttpClient.newCall(request)
 
-        call.enqueue(object : okhttp3.Callback {
-            override fun onFailure(call: okhttp3.Call, e: IOException) {
+        call.enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
                 callback.onFailure(e)
             }
 
-            override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
+            override fun onResponse(call: Call, response: Response) {
                 try {
                     if (response.isSuccessful) {
                         response.body?.byteStream()?.let { inputStream ->

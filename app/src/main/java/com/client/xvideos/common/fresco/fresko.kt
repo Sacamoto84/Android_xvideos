@@ -1,4 +1,4 @@
-package com.client.xvideos.l.ui.urlImage
+package com.client.xvideos.common.fresco
 
 import android.content.Context
 import android.graphics.drawable.Animatable
@@ -38,11 +38,6 @@ import io.ktor.utils.io.InternalAPI
 import kotlinx.coroutines.delay
 import timber.log.Timber
 import java.io.File
-
-
-fun getDataSource(albumName: String, url: String): Uri {
-
-}
 
 
 // Альтернативный вариант с более детальным контролем анимации

@@ -41,6 +41,8 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.Navigator
+import com.client.xvideos.common.traficStatistic.AppNetworkSpeedMonitor
+import com.client.xvideos.common.traficStatistic.AppNetworkSpeedMonitorLite
 import com.client.xvideos.l.ThemeL
 import com.client.xvideos.l.ui.screens.explorer.ScreenLExplorer
 import com.client.xvideos.redgifs.ui.UiSnackbarVisuals
@@ -132,6 +134,8 @@ class ScreenLRoot() : Screen {
             vm.overlayContent.value?.let { content ->
                 Box( modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.5f)) ) { content() }
             }
+
+            AppNetworkSpeedMonitorLite()
 
         }
     }
