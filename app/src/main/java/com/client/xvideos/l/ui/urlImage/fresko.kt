@@ -1,10 +1,10 @@
 package com.client.xvideos.l.ui.urlImage
 
 import android.content.Context
+import android.graphics.drawable.Animatable
 import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -13,9 +13,11 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,18 +26,23 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.client.xvideos.common.AppPath
+import com.client.xvideos.l.ThemeL
 import com.facebook.drawee.backends.pipeline.Fresco
-import com.facebook.imagepipeline.common.ResizeOptions
-import com.facebook.imagepipeline.request.ImageRequest
+import com.facebook.drawee.controller.BaseControllerListener
+import com.facebook.imagepipeline.image.ImageInfo
 import com.facebook.imagepipeline.request.ImageRequestBuilder
-import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.InternalLandscapistApi
-import com.skydoves.landscapist.fresco.FrescoImage
+import com.skydoves.landscapist.fresco.websupport.FrescoWebImage
+import io.ktor.util.collections.getValue
+import io.ktor.util.collections.setValue
+import io.ktor.utils.io.InternalAPI
+import timber.log.Timber
 import java.io.File
+import java.net.URI
 
 
 // Альтернативный вариант с более детальным контролем анимации
-@OptIn(InternalLandscapistApi::class)
+@OptIn(InternalLandscapistApi::class, InternalAPI::class)
 @Composable
 fun UrlImageLusciousGifsGlide(
     url: String,
@@ -43,70 +50,92 @@ fun UrlImageLusciousGifsGlide(
     contentScale: ContentScale = ContentScale.Crop,
     loadIndicator: Boolean = true,
     albumName: String,
-    isAnimated: Boolean = false
+    isAnimated: Boolean = false,
+    onSuccess : () -> Unit = {},
+    onFailure : () -> Unit = {}
 ) {
-    var isPlaying by remember { mutableStateOf(true) }
 
-    val fileName = url.substringAfterLast('/').substringBefore('?')
-    val file = when (albumName) {
-        "likes", "crypto" -> File(url)
-        else -> File(AppPath.downloaded_albums_l, "$albumName/$fileName")
+    SideEffect {
+        Timber.i("!!! iii Recompose UrlImageLusciousGifsGlide albumName:${albumName} url:${url}")
     }
 
-    val dataSource: String = remember(url){if (file.exists()) file.path else url}
+    var isPlaying by remember { mutableStateOf(true) }
+    var isLoading by remember { mutableStateOf(true) }
+    var isFailure by remember { mutableStateOf(false) }
 
-    val animatedFile = isAnimated ||
-            fileName.endsWith(".gif", true) ||
-            fileName.endsWith(".webp", true)
+    val dataSource = remember(url) {
+        val fileName = url.substringAfterLast('/').substringBefore('?')
 
+        val file = when (albumName) {
+            "likes", "crypto" -> File(url)
+            else -> File(AppPath.downloaded_albums_l, "$albumName/$fileName")
+        }
+
+        if (file.exists()) file.toUri() else url.toUri()
+    }
 
     val imageRequest = remember(dataSource) {
-        ImageRequestBuilder.newBuilderWithSource(dataSource.toUri())
-            .setLowestPermittedRequestLevel(ImageRequest.RequestLevel.FULL_FETCH)
+        ImageRequestBuilder
+            .newBuilderWithSource(dataSource)
+            //.setLowestPermittedRequestLevel(ImageRequest.RequestLevel.FULL_FETCH)
             .setProgressiveRenderingEnabled(true)
             //.setResizeOptions(ResizeOptions(100, 100)) // Изменение размера
-            .setLocalThumbnailPreviewsEnabled(true) // Включение миниатюр
+            //.setLocalThumbnailPreviewsEnabled(true) // Включение миниатюр
+            .build()
     }
 
-    Column(modifier = modifier) {
-        FrescoImage(
+    // Стабилизируем колбэки
+    val stableOnSuccess = rememberUpdatedState(onSuccess)
+    val stableOnFailure = rememberUpdatedState(onFailure)
 
-            imageUrl = dataSource,
-            imageRequest = {
-                imageRequest
+    val controllerListener = remember(url){
+        object : BaseControllerListener<ImageInfo>() {
+            override fun onSubmit(id: String?, callerContext: Any?) {
+                isLoading = true; isFailure = false
+            }
+            override fun onIntermediateImageSet(id: String?, imageInfo: ImageInfo?) {
+
+            }
+            override fun onFinalImageSet(id: String?, imageInfo: ImageInfo?, anim: Animatable?) {
+                isLoading = false; isFailure = false
+                stableOnSuccess.value()
+            }
+            override fun onFailure(id: String?, throwable: Throwable?) {
+                isLoading = false
+                isFailure = true
+                Timber.e("!!! eee UrlImageLusciousGifsGlide id:{$id} throwable:${throwable}")
+                stableOnFailure.value()
+            }
+        }
+    }
+
+
+    Box(modifier = modifier) {
+        FrescoWebImage(
+            controllerBuilder = {
+                Fresco.newDraweeControllerBuilder()
+                    //.setUri(dataSource)
+                    .setImageRequest(imageRequest)
+                    .setAutoPlayAnimations(true)
+                    .setControllerListener(controllerListener)
             },
-
-            imageOptions = ImageOptions(
-                contentScale = contentScale,
-                alignment = Alignment.Center
-            ),
-
-            modifier = Modifier.fillMaxSize().background(Color.Gray),
+            modifier = Modifier.fillMaxSize().background(ThemeL.grey6),
+        )
 
 
-            loading = {
-                if (loadIndicator) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(modifier = Modifier.size(32.dp))
-                    }
-                }
-            },
-//
-            failure = {
+        if (isLoading) {
+            if (loadIndicator) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
-                ) {
-                    Text("Ошибка загрузки", color = Color.Red)
-                }
-            },
+                ) { CircularProgressIndicator(modifier = Modifier.size(32.dp)) }
+            }
+        }
 
-        )
+        if (isFailure) { Box( modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center ) { Text("Ошибка загрузки", color = Color.Red) } }
 
-        if (animatedFile) {
+
+        if (isAnimated) {
             Button(
                 onClick = { isPlaying = !isPlaying },
                 modifier = Modifier
@@ -118,7 +147,6 @@ fun UrlImageLusciousGifsGlide(
         }
     }
 }
-
 
 
 // Утилитарные функции для работы с Fresco

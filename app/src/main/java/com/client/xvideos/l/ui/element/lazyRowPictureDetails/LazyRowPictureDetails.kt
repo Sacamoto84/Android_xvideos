@@ -24,7 +24,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
@@ -70,6 +69,7 @@ fun LazyRowPictureDetails(
                         val aspect = item.width.toFloat() / item.height
 
                         UrlImageLusciousGifsGlide(
+
                             item.url_to_original,
                             modifier = Modifier
                                 .padding(2.dp)
@@ -92,7 +92,8 @@ fun LazyRowPictureDetails(
                                     }
                                 },
                            // contentScale = ContentScale.FillBounds,
-                            albumName = host.albumName
+                            albumName = host.albumName,
+                            isAnimated = item.is_animated
                         )
 
                         Text(

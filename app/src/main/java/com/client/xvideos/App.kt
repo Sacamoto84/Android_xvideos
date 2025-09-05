@@ -5,6 +5,7 @@ import android.app.Application
 import android.preference.PreferenceManager
 import android.util.Log
 import com.client.xvideos.PermissionScreenActivity.PermissionStorage
+import com.client.xvideos.common.fresco.FrescoInit
 import com.client.xvideos.common.sharedPref.Settings
 import com.client.xvideos.l.db.AppLDatabase
 import com.facebook.cache.disk.DiskCacheConfig
@@ -13,8 +14,8 @@ import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory
 import com.facebook.imagepipeline.cache.MemoryCacheParams
 import com.facebook.imagepipeline.core.DefaultExecutorSupplier
-import com.facebook.imagepipeline.core.ExecutorSupplier
-import com.facebook.imagepipeline.core.ImagePipelineConfig
+import com.facebook.imagepipeline.listener.RequestListener
+import com.facebook.imagepipeline.request.ImageRequest
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
@@ -25,13 +26,12 @@ import timber.log.Timber
 import timber.log.Timber.DebugTree
 import java.security.SecureRandom
 import java.security.cert.X509Certificate
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
 import javax.inject.Inject
 import javax.net.ssl.HttpsURLConnection
 import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
+
 
 fun allowAllSSL() {
     try {
@@ -195,48 +195,7 @@ class App : Application() {
             }
         }
 
-//        val pipelineConfig =
-//            OkHttpImagePipelineConfigFactory
-//                .newBuilder(this, OkHttpClient.Builder().build())
-//                .setDiskCacheEnabled(true)
-//                .setDownsampleEnabled(true)
-//                .setResizeAndRotateEnabledForNetwork(true)
-//                .build()
-
-        //  val networkExecutor = Executors.newFixedThreadPool(8) // 8 потоков для сетевых запросов
-        // val decodeExecutor = Executors.newFixedThreadPool(4)  // 4 потока для декодирования
-
-// 1. Создание параметров кэша в памяти
-// Укажите максимальное количество байт, которое может занимать кэш
-        val memoryCacheParams = MemoryCacheParams(
-            /* maxCacheSize */ 140 * 1024 * 1024, // 140 МБ
-            /* maxCacheEntries */ 256,
-            /* maxEvictionQueueSize */ Int.MAX_VALUE,
-            /* maxEvictionQueueEntries */ Int.MAX_VALUE,
-            /* maxCacheEntrySize */ Int.MAX_VALUE
-        )
-
-        // 2. Создание поставщика параметров кэша (Supplier)
-        // Этот поставщик будет возвращать параметры кэша
-        val memoryCacheParamsSupplier = Supplier { memoryCacheParams }
-
-        val diskCacheConfig = DiskCacheConfig.newBuilder(this)
-            .setBaseDirectoryPath(this.cacheDir) // Укажите путь
-            .setBaseDirectoryName("fresco_cache")
-            .setMaxCacheSize(1000L * 1024 * 1024) // 1000 МБ
-            .build()
-
-        val pipelineConfig1 = OkHttpImagePipelineConfigFactory
-            .newBuilder(this, OkHttpClient.Builder().build())
-            .setDownsampleEnabled(true)
-            .setResizeAndRotateEnabledForNetwork(true)
-            .setExecutorSupplier(DefaultExecutorSupplier(16))
-            .setMainDiskCacheConfig(diskCacheConfig)
-            .setBitmapMemoryCacheParamsSupplier(memoryCacheParamsSupplier)
-            .setEncodedMemoryCacheParamsSupplier(memoryCacheParamsSupplier) // Опционально: для закодированных данных
-            .build()
-
-        Fresco.initialize(this, pipelineConfig1)
+        FrescoInit(this)
 
 //        Glide.get(this).registry.append(
 //            EncryptedFileModel::class.java,
