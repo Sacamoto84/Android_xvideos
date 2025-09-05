@@ -2,24 +2,35 @@ package com.client.xvideos.l.ui.screens.screenAlbumList
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.model.ScreenModel
@@ -39,6 +50,7 @@ import com.client.xvideos.l.ui.element.AlbumListItem
 import com.client.xvideos.l.ui.screens.screenAlbum.ScreenLAlbum
 import com.client.xvideos.l.ui.screens.screenAlbumList.atom.AlbumListPageSelector
 import com.client.xvideos.l.ui.screens.screenAlbumList.molecule.filter.AlbumListFilter
+import com.client.xvideos.redgifs.common.ThemeRed
 import dagger.Binds
 import dagger.Module
 import dagger.assisted.Assisted
@@ -67,57 +79,50 @@ object ScreenLAlbumList : Screen {
     override fun Content() {
 
         val navigator = LocalNavigator.currentOrThrow
-
-        val vm = getScreenModel<ScreenLAlbumListSM, ScreenLAlbumListSM.Factory> { factory ->
-            factory.create(0)
-        }
-
+        val vm = getScreenModel<ScreenLAlbumListSM, ScreenLAlbumListSM.Factory> { factory ->  factory.create(0) }
         val items = vm.albumList.collectAsStateWithLifecycle().value?.items
         val info = vm.albumList.collectAsStateWithLifecycle().value?.info
-
         val filter = vm.albumList.collectAsStateWithLifecycle().value?.filter
-
         val filterGCount = vm.albumList.collectAsStateWithLifecycle().value?.filterGenreStateCount
-
         var visibleFilter by remember { mutableStateOf(false) }
+
+        val haptic = LocalHapticFeedback.current
+
+        val state = rememberLazyGridState()
+
+        val scope = rememberCoroutineScope()
 
         Scaffold(
             bottomBar = {
                 Column {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(48.dp)
-                            .background(ThemeL.grey7)
-                    ) {
-                        Button(onClick = {
-                            visibleFilter = !visibleFilter
-                        }) {
-                            Text("Filter")
+                    HorizontalDivider()
+                    Row(modifier = Modifier.padding(start = 4.dp).fillMaxWidth().height(48.dp).background(ThemeRed.colorTabLevel1), verticalAlignment = Alignment.CenterVertically) {
+                        Box(modifier = Modifier.width(64.dp).height(46.dp).border(1.dp, ThemeL.grey2, RoundedCornerShape(4.dp)).clickable(onClick = {visibleFilter = !visibleFilter}), contentAlignment = Alignment.Center){
+                            Text("Filter", color = ThemeL.textColor, fontFamily = ThemeL.fontFamilyKarla)
                         }
                     }
+                    HorizontalDivider()
                 }
+
             }, containerColor = ThemeL.greyBackground
         ) { padding ->
 
 
             LazyVerticalGrid(
+                state = state,
                 columns = GridCells.Fixed(2),
                 modifier = Modifier.padding(bottom = padding.calculateBottomPadding())
             ) {
-
-                item(
-                    key = "dummy",
-                    span = { GridItemSpan(maxLineSpan) })
-                {
-                    Spacer(Modifier.height(48.dp))
-                }
+                item( key = "dummy", span = { GridItemSpan(maxLineSpan) }) { Spacer(Modifier.height(48.dp)) }
 
                 item(
                     key = "page_selector",
                     span = { GridItemSpan(maxLineSpan) }) {
                     if (info != null) {
-                        AlbumListPageSelector(info.page, info.totalPages, { vm.loadAlbumList(it) })
+                        AlbumListPageSelector(info.page, info.totalPages, {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            vm.loadAlbumList(it)
+                        })
                     }
                 }
 
@@ -141,10 +146,12 @@ object ScreenLAlbumList : Screen {
 
                     if (items?.isNotEmpty() ?: false) {
                         if (info != null) {
-                            AlbumListPageSelector(
-                                info.page,
-                                info.totalPages,
-                                { vm.loadAlbumList(it) })
+                            AlbumListPageSelector( info.page, info.totalPages,
+                                {
+                                    scope.launch { state.scrollToItem(0) }
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    vm.loadAlbumList(it)
+                                })
                         }
                     }
 

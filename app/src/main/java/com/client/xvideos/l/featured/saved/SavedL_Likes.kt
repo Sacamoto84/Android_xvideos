@@ -28,7 +28,7 @@ class SavedL_Likes( val snackBarEvent: SnackBarEvent, val kDownloader: KDownload
     }
 
     fun remove(url: String) {
-        println("!!! removeLikes() url:${url}")
+        println("!!! SavedL_Likes removeLikes() url:${url}")
         val fileName = url.substringAfterLast('/').substringBefore('?')
         val file = File(AppPath.likes_l, fileName)
         if (file.exists()) {
@@ -43,16 +43,16 @@ class SavedL_Likes( val snackBarEvent: SnackBarEvent, val kDownloader: KDownload
     }
 
     fun refresh() {
-
         try {
             println("!!! SavedL_Likes refresh()")
             val files = File(AppPath.likes_l).list()?.mapNotNull{ fileNameToPicsDetails(File(it), AppPath.likes_l) }
            if (files != null) {
                listUrl.clear()
                listUrl.addAll(files)
+               println("!!! SavedL_Likes refresh() files:${listUrl.size}")
            }
         } catch (e: Exception) {
-            Timber.e("eee Ошибка получения списка likes ${e.localizedMessage}")
+            Timber.e("!!! eee SavedL_Likes refresh() Ошибка получения списка likes ${e.localizedMessage}")
             snackBarEvent.error("Ошибка получения списка likes")
         }
 

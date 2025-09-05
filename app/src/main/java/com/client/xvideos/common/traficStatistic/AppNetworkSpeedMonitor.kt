@@ -49,17 +49,15 @@ fun AppNetworkSpeedMonitor() {
 
         // Карточка скорости
 
-            Column(
-                modifier = Modifier.padding(0.dp)
-            ) {
-                Text( text = "Текущая скорость", fontSize = 18.sp, fontWeight = FontWeight.Medium, color = ThemeL.textColor )
-                Spacer(modifier = Modifier.height(8.dp))
-                SpeedRow( label = "⬇ Скачивание:", value = formatSpeed(trafficData.downloadSpeed) )
-                Spacer(modifier = Modifier.height(6.dp))
-                SpeedRow( label = "⬆ Загрузка:", value = formatSpeed(trafficData.uploadSpeed) )
-            }
-
-            HorizontalDivider(color = ThemeL.grey3, modifier = Modifier.fillMaxWidth(0.75f).align(Alignment.CenterHorizontally))
+//            Column(
+//                modifier = Modifier.padding(0.dp)
+//            ) {
+//                Text( text = "Текущая скорость", fontSize = 18.sp, fontWeight = FontWeight.Medium, color = ThemeL.textColor )
+//                Spacer(modifier = Modifier.height(8.dp))
+//                SpeedRow( label = "⬇ Скачивание:", value = formatSpeed(trafficData.downloadSpeed) )
+//                Spacer(modifier = Modifier.height(6.dp))
+//                SpeedRow( label = "⬆ Загрузка:", value = formatSpeed(trafficData.uploadSpeed) )
+//            }
 
             Column( modifier = Modifier.padding(0.dp))
             {

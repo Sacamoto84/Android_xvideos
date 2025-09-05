@@ -54,6 +54,40 @@ class SavedL_Crypto(val snackBarEvent: SnackBarEvent, val kDownloader: KDownload
 
     }
 
+    suspend fun addFromLike(item: PicsDetails) {
+        println("!!! SavedL_Likes addFromLike() item:${item.url_to_original}")
+
+        val key = Password.key
+        if (key == null) {
+            Timber.i("!!! SavedL_Crypto add key == null Ключ отсутствует, не могу сохранять")
+            snackBarEvent.error("Ключ шифрования отсутствует")
+            return
+        }
+
+        val name = item.url_to_original?.substringAfterLast('/')?.substringBefore('?') //xxx.yyy
+        val ext = name?.split(".")?.get(1)
+
+        val fileName =
+            item.width.toString() + "_" + item.height + "_" + item.is_animated + "_" + item.album + "_" +
+                    name?.toMD5()?.dropLast(24) + "." + ext
+
+        Crypto.encryptFile(File(item.url_to_original!!), File(AppPath.likesCrypto_l, fileName), key)
+            .onSuccess {
+                snackBarEvent.success("Сохранен в сейф")
+                Timber.i("!!! ScreenLAlbumSM downloadLikeCrypto success")
+                refresh()
+            }
+            .onFailure {
+                it.printStackTrace()
+                snackBarEvent.error("Ошибка сохранения в сейф")
+                Timber.e(it, "!!! ScreenLAlbumSM downloadLikeCrypto error")
+            }
+
+    }
+
+
+
+
     fun remove(fileName: String) {
         println("!!! SavedL_Crypto remove() path:${fileName}")
         val file = File(AppPath.likesCrypto_l, fileName)

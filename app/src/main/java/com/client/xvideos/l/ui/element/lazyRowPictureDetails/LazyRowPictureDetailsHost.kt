@@ -20,7 +20,7 @@ class LazyRowPictureDetailsHost(
     var selectedImage by  mutableStateOf<PicsDetails?>(null)
     var selectedBounds by  mutableStateOf<Rect?>(null)
 
-    val filteredPic =  mutableStateListOf<PicsDetails>()
+    var filteredPic =  mutableStateListOf<PicsDetails>()
 
 
 

@@ -1,4 +1,4 @@
-package com.client.xvideos.l.ui.screens.screenAlbum.atom
+package com.client.xvideos.l.ui.screens.screenAlbum.expandMenu
 
 
 import androidx.compose.foundation.layout.IntrinsicSize

@@ -61,8 +61,7 @@ class ScreenSavedLCryptoSM @Inject constructor(
     val host =  LazyRowPictureDetailsHost("crypto")
 
     init {
-        //host.filteredPic.addAll(savedL.likes.listUrl)
-        host.filteredPic.addAll(savedL.crypto.listUrl)
+        host.filteredPic = savedL.crypto.listUrl
     }
 
 }

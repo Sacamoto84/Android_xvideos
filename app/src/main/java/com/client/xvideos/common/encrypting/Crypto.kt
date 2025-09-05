@@ -80,22 +80,26 @@ object Crypto {
      * @param outputFile куда сохранять зашифрованный файл
      * @param secretKey AES-ключ (256 бит)
      */
-    fun encryptFile(inputFile: File, outputFile: File, secretKey: SecretKeySpec) {
-        val iv = ByteArray(IV_SIZE)
-        SecureRandom().nextBytes(iv)
+    fun encryptFile(inputFile: File, outputFile: File, secretKey: SecretKeySpec) : Result<Unit> {
 
-        val cipher = Cipher.getInstance(Password.CIPHER_ALGORITHM)
-        cipher.init(Cipher.ENCRYPT_MODE, secretKey, GCMParameterSpec(TAG_SIZE, iv))
-
-        FileInputStream(inputFile).use { fis ->
-            FileOutputStream(outputFile).use { fos ->
-                // Сначала записываем IV в начало файла
-                fos.write(iv)
-
-                CipherOutputStream(fos, cipher).use { cos ->
-                    fis.copyTo(cos, bufferSize = 8192)
+        try {
+            val iv = ByteArray(IV_SIZE)
+            SecureRandom().nextBytes(iv)
+            val cipher = Cipher.getInstance(Password.CIPHER_ALGORITHM)
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey, GCMParameterSpec(TAG_SIZE, iv))
+            FileInputStream(inputFile).use { fis ->
+                FileOutputStream(outputFile).use { fos ->
+                    // Сначала записываем IV в начало файла
+                    fos.write(iv)
+                    CipherOutputStream(fos, cipher).use { cos ->
+                        fis.copyTo(cos, bufferSize = 8192)
+                    }
                 }
             }
+
+            return Result.success(Unit)
+        }catch (e: Exception){
+            return Result.failure(e)
         }
     }
 

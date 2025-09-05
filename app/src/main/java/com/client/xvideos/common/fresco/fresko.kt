@@ -163,12 +163,7 @@ fun UrlImageLusciousGifsGlide(
                 }
             }
 
-            if (isFailure) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) { Text("Ошибка загрузки", color = Color.Red) }
-            }
+            if (isFailure) { Box( modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center ) { Text("Ошибка загрузки", color = Color.Gray) } }
 
             if (isAnimated) {
                 Button( onClick = { isPlaying = !isPlaying }, modifier = Modifier.fillMaxWidth().padding(8.dp)
@@ -177,14 +172,7 @@ fun UrlImageLusciousGifsGlide(
                 }
             }
         } else
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Red),
-                contentAlignment = Alignment.Center
-            ) {
-                //CircularProgressIndicator(modifier = Modifier.size(32.dp))
-            }
+            Box( modifier = Modifier.fillMaxSize().background(Color.Transparent), contentAlignment = Alignment.Center ){}
     }
 }
 

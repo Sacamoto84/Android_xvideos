@@ -180,8 +180,10 @@ class AlbumListImpl(
 
         try {
 
-
             Timber.i("!!! getAlbumList $id")
+            withContext(Dispatchers.Main) {
+                items.clear()
+            }
 
             val q = getAlbumListGraphQL1(id, filter)
 

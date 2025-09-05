@@ -451,7 +451,7 @@ fun FullScreenImage(
                 url = item.url_to_original!!,
                 modifier = Modifier.aspectRatio(item.width.toFloat()/item.height),//.fillMaxSize(),
                 //contentScale = ContentScale.FillBounds,
-                //onSuccess = { success = it },
+                onSuccess = { success = true },
                 albumName = albumName
             )
         }
