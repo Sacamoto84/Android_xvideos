@@ -17,14 +17,13 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.client.xvideos.common.encrypting.Password
 import com.client.xvideos.l.ThemeL
-import com.client.xvideos.l.ui.screens.explorer.tab.config.ConfigTextCenter
 
 @Composable
 fun ScreenLConfig_Encrypt() {
 
     val context = LocalContext.current
 
-    ConfigTextCenter("Шифрование:")
+    ConfigTextCenterL("Шифрование:")
 
     var isKeyAvailable by remember { mutableStateOf(Password.isKeyAvailable()) }
 

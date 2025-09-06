@@ -1,6 +1,5 @@
 package com.client.xvideos.common.fresco
 
-import android.content.Context
 import android.graphics.drawable.Animatable
 import android.net.Uri
 import androidx.compose.foundation.background
@@ -31,7 +30,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import com.client.xvideos.common.AppPath
-import com.client.xvideos.common.traficStatistic.formatBytes
 import com.client.xvideos.l.ThemeL
 import com.facebook.common.executors.UiThreadImmediateExecutorService
 import com.facebook.common.references.CloseableReference

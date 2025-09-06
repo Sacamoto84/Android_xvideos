@@ -17,6 +17,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.client.xvideos.App
+import com.client.xvideos.common.util.formatBytes
+import com.client.xvideos.common.util.formatSpeed
 import com.client.xvideos.l.ThemeL
 
 @Composable

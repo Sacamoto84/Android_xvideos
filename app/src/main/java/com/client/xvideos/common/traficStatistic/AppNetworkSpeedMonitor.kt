@@ -21,6 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.client.xvideos.App
+import com.client.xvideos.common.util.formatBytes
 import com.client.xvideos.l.ThemeL
 import kotlin.math.roundToInt
 
@@ -126,26 +127,4 @@ fun SpeedRow(
 @Composable
 fun SpeedRowPreview() {
     SpeedRow(label = "Download:", value = "10.5 MBs")
-}
-
-// Функция для форматирования скорости
-fun formatSpeed(bytesPerSecond: Long): String {
-    return when {
-        bytesPerSecond < 0 -> "0 Bs"
-        bytesPerSecond < 1024 -> "$bytesPerSecond Bs"
-        bytesPerSecond < 1024 * 1024 -> "${(bytesPerSecond / 1024.0).roundToInt()} KBs"
-        bytesPerSecond < 1024 * 1024 * 1024 -> "${(bytesPerSecond / (1024.0 * 1024.0) * 10).roundToInt() / 10.0} MBs"
-        else -> "${(bytesPerSecond / (1024.0 * 1024.0 * 1024.0) * 100).roundToInt() / 100.0} GBs"
-    }
-}
-
-// Функция для форматирования объема данных
-fun formatBytes(bytes: Long): String {
-    return when {
-        bytes < 0 -> "0 B"
-        bytes < 1024 -> "$bytes B"
-        bytes < 1024 * 1024 -> "${(bytes / 1024.0).roundToInt()} KB"
-        bytes < 1024 * 1024 * 1024 -> "${(bytes / (1024.0 * 1024.0) * 10).roundToInt() / 10.0} MB"
-        else -> "${(bytes / (1024.0 * 1024.0 * 1024.0) * 100).roundToInt() / 100.0} GB"
-    }
 }

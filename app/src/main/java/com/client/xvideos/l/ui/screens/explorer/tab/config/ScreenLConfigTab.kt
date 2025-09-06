@@ -1,6 +1,7 @@
 package com.client.xvideos.l.ui.screens.explorer.tab.config
 
 import android.annotation.SuppressLint
+import android.content.pm.PackageManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -38,18 +40,25 @@ import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
+import com.client.xvideos.App
 import com.client.xvideos.common.fresco.FrescoUtils
 import com.client.xvideos.common.traficStatistic.AppNetworkSpeedMonitor
+import com.client.xvideos.common.util.formatBytes
+import com.client.xvideos.common.util.getFolderSize
 import com.client.xvideos.l.ThemeL
 import com.client.xvideos.l.model.enum.AudiencesType
 import com.client.xvideos.l.ui.screens.explorer.tab.config.atom.ConfigTextAndButtonL
+import com.client.xvideos.l.ui.screens.explorer.tab.config.atom.ConfigTextAndCheckBoxL
+import com.client.xvideos.l.ui.screens.explorer.tab.config.atom.ConfigTextL
 import com.client.xvideos.l.ui.screens.explorer.tab.config.atom.ScreenLConfig_Encrypt
+import com.facebook.drawee.backends.pipeline.Fresco
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
 import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
 
 
@@ -66,6 +75,17 @@ object ScreenLConfigTab : Screen {
         val haptic = LocalHapticFeedback.current
 
         val vm: ScreenLExplorerSettingSM = getScreenModel()
+
+        val context = LocalContext.current
+
+        val bitmapCache = Fresco.getImagePipeline().bitmapMemoryCache.sizeInBytes
+
+        val versionText = try {
+            val pInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+            "Версия: ${pInfo.versionName} (${pInfo.versionCode})"
+        } catch (e: PackageManager.NameNotFoundException) {
+            "Версия: неизвестна"
+        }
 
         Column(
             modifier = Modifier
@@ -84,24 +104,27 @@ object ScreenLConfigTab : Screen {
 
             ConfigTextL("I want to see this content:")
             AudiencesType.entries.forEach { it->
-                ConfigTextAndCheckBox(it.title, true,{ })
+                ConfigTextAndCheckBoxL(it.title, true,{ })
             }
             Spacer(Modifier.height(4.dp))
             HorizontalDivider(color = Color.DarkGray)
-
             ScreenLConfig_Encrypt()
-
-
             HorizontalDivider(color = Color.DarkGray)
-
             AppNetworkSpeedMonitor()
-
-
             HorizontalDivider(color = Color.DarkGray)
             Spacer(Modifier.height(4.dp))
+            ConfigTextL("BitmapCache: ${formatBytes(bitmapCache.toLong())}")
+            val size = getFolderSize(File(context.cacheDir, "fresco_main_cache").absoluteFile)
+            ConfigTextL("Дисковый кеш: " + formatBytes(size))
             ConfigTextAndButtonL("Очистить кеш картинок", "Очистить", {}, { FrescoUtils.clearCache() })
             Spacer(Modifier.height(4.dp))
             HorizontalDivider(color = Color.DarkGray)
+
+
+            Box( modifier = Modifier.padding(horizontal = 8.dp).padding(vertical = 2.dp).height(32.dp).fillMaxWidth(), contentAlignment = Alignment.Center ) {
+                Text(versionText, style = styleTextConfigL.copy(fontSize = 14.sp, color = ThemeL.grey2))
+            }
+
         }
 
 
@@ -128,61 +151,6 @@ val styleTextConfigL = TextStyle(
     color = ThemeL.textColor,
     fontFamily = ThemeL.fontFamilyKarla
 )
-
-@Composable
-fun ConfigTextAndCheckBox(text: String, value: Boolean, onValueChange: (Boolean) -> Unit) {
-    Row(
-        modifier = Modifier
-            .padding(horizontal = 0.dp)
-            .padding(vertical = 0.dp)
-            .height(30.dp)
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.Start,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Checkbox(value, onValueChange, colors = CheckboxDefaults.colors(
-            checkmarkColor = ThemeL.primaryColor,
-             checkedColor = ThemeL.grey3
-            ,uncheckedColor = ThemeL.grey3
-
-        ), modifier = Modifier.width(40.dp))
-        Text(text, style = styleTextConfigL)
-    }
-}
-
-@Composable
-fun ConfigTextL(text: String) {
-    Row(
-        modifier = Modifier
-            .padding(horizontal = 8.dp)
-            .padding(vertical = 2.dp)
-            .height(32.dp)
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(text, style = styleTextConfigL)
-    }
-}
-
-@Composable
-fun ConfigTextCenter(text: String) {
-    Box(
-        modifier = Modifier
-            .padding(horizontal = 8.dp)
-            .padding(vertical = 2.dp)
-            .height(32.dp)
-            .fillMaxWidth(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(text, style = styleTextConfigL)
-    }
-}
-
-
-
-
-
 
 
 

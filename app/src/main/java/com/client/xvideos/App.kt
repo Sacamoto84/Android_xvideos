@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.app.Application
 import android.preference.PreferenceManager
 import android.util.Log
+import androidx.compose.runtime.Composer
+import androidx.compose.runtime.ExperimentalComposeRuntimeApi
 import com.client.xvideos.PermissionScreenActivity.PermissionStorage
 import com.client.xvideos.common.fresco.FrescoInit
 import com.client.xvideos.common.sharedPref.Settings
@@ -84,13 +86,11 @@ class App : Application() {
     // Сохраняем оригинальный обработчик
     private var originalHandler: Thread.UncaughtExceptionHandler? = null
 
-
-
     lateinit var networkTrafficMonitor: NetworkTrafficMonitor
         private set
 
 
-    @OptIn(DelicateCoroutinesApi::class)
+    @OptIn(DelicateCoroutinesApi::class, ExperimentalComposeRuntimeApi::class)
     override fun onCreate() {
         super.onCreate()
 
@@ -98,7 +98,6 @@ class App : Application() {
 
         if (BuildConfig.DEBUG)
             Timber.plant(DebugTree())
-//
 
         // Инициализируем монитор трафика
         networkTrafficMonitor = NetworkTrafficMonitor()
@@ -209,11 +208,9 @@ class App : Application() {
 
         FrescoInit(this)
 
-//        Glide.get(this).registry.append(
-//            EncryptedFileModel::class.java,
-//            InputStream::class.java,
-//            EncryptedFileModelLoaderFactory()
-//        )
+        // Enable only for debug flavor to avoid perf regressions in release
+        Composer.setDiagnosticStackTraceEnabled(BuildConfig.DEBUG)
+
 
         if (PermissionStorage.hasPermissions(this)) {
 
