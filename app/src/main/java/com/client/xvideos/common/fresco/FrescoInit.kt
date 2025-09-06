@@ -1,40 +1,80 @@
 package com.client.xvideos.common.fresco
 
 import android.app.Application
+import android.net.Uri
+import android.os.Build
 import android.util.Log
-import com.client.xvideos.common.fresco.FullCustomNetworkFetcher
+import androidx.annotation.RequiresApi
+import com.facebook.cache.common.CacheErrorLogger
 import com.facebook.cache.disk.DiskCacheConfig
 import com.facebook.common.internal.Supplier
+import com.facebook.common.webp.WebpBitmapFactory
 import com.facebook.drawee.backends.pipeline.Fresco
+import com.facebook.drawee.controller.ControllerListener
+import com.facebook.imageformat.DefaultImageFormats
 import com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory
 import com.facebook.imagepipeline.cache.MemoryCacheParams
+import com.facebook.imagepipeline.common.Priority
 import com.facebook.imagepipeline.core.DefaultExecutorSupplier
+import com.facebook.imagepipeline.core.DownsampleMode
+import com.facebook.imagepipeline.core.ImagePipeline
+import com.facebook.imagepipeline.core.MemoryChunkType
+import com.facebook.imagepipeline.decoder.DefaultImageDecoder
+import com.facebook.imagepipeline.decoder.SimpleProgressiveJpegConfig
+import com.facebook.imagepipeline.image.ImageInfo
 import com.facebook.imagepipeline.listener.RequestListener
+import com.facebook.imagepipeline.producers.ProducerContext
+import com.facebook.imagepipeline.producers.ProducerListener2
 import com.facebook.imagepipeline.request.ImageRequest
+import com.facebook.imagepipeline.request.ImageRequestBuilder
 import okhttp3.OkHttpClient
+import timber.log.Timber
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 fun FrescoInit(application: Application) {
 
+
+
+
+
+
+
     // 1. Создание параметров кэша в памяти
     // Укажите максимальное количество байт, которое может занимать кэш
-    val memoryCacheParams = MemoryCacheParams(
-        /* maxCacheSize */ 140 * 1024 * 1024, // 140 МБ
-        /* maxCacheEntries */ 256,
+    val bitmapCacheParams = MemoryCacheParams(
+        /* maxCacheSize */ Runtime.getRuntime().maxMemory().toInt() / 16, // 25% от доступной памяти
+        /* maxCacheEntries */ 512,
         /* maxEvictionQueueSize */ Int.MAX_VALUE,
         /* maxEvictionQueueEntries */ Int.MAX_VALUE,
         /* maxCacheEntrySize */ Int.MAX_VALUE
     )
+    val bitmapCacheParamsSupplier = Supplier { bitmapCacheParams }
 
-    // 2. Создание поставщика параметров кэша (Supplier)
-    // Этот поставщик будет возвращать параметры кэша
-    val memoryCacheParamsSupplier = Supplier { memoryCacheParams }
 
-    val diskCacheConfig = DiskCacheConfig.newBuilder(application)
+    val encodedCacheParams = MemoryCacheParams(
+        /* maxCacheSize */  32 * 1024 * 1024, // 32MB для закодированных изображений
+        /* maxCacheEntries */ 512,
+        /* maxEvictionQueueSize */ Int.MAX_VALUE,
+        /* maxEvictionQueueEntries */ Int.MAX_VALUE,
+        /* maxCacheEntrySize */ Int.MAX_VALUE
+    )
+    val encodedCacheParamsSupplier = Supplier { encodedCacheParams }
+
+    val diskCacheConfigMain = DiskCacheConfig.newBuilder(application)
         .setBaseDirectoryPath(application.cacheDir) // Укажите путь
-        .setBaseDirectoryName("fresco_cache")
-        .setMaxCacheSize(1000L * 1024 * 1024) // 1000 МБ
+        .setBaseDirectoryName("fresco_main_cache")
+        .setMaxCacheSize(2000L * 1024 * 1024) // 2000 МБ
+        .setMaxCacheSizeOnLowDiskSpace(1000L * 1024 * 1024)
+        .setMaxCacheSizeOnVeryLowDiskSpace(500L * 1024 * 1024)
+        .setCacheErrorLogger { category, clazz, message, cause ->
+            Timber.e("!!! eee Fresco DiskCacheConfig error: $message category: $category clazz: $clazz cause: $cause")
+        }
+        .setVersion(1)
         .build()
+
 
     class MyRequestLoggingListener : RequestListener {
 
@@ -119,71 +159,79 @@ fun FrescoInit(application: Application) {
     val listeners = HashSet<RequestListener?>()
     listeners.add(MyRequestLoggingListener())
 
-// Применение в конфигурации:
-    val customOkHttpClient = OkHttpClient.Builder()
-        .connectTimeout(90, TimeUnit.SECONDS)
-        .readTimeout(90, TimeUnit.SECONDS)
-        .writeTimeout(90, TimeUnit.SECONDS)
-        .build()
 
-    val customNetworkFetcher = FullCustomNetworkFetcher(customOkHttpClient)
+    val customNetworkFetcher = FullCustomNetworkFetcher(createOptimizedOkHttpClient())
 
     val pipelineConfig = OkHttpImagePipelineConfigFactory
         .newBuilder(application, OkHttpClient.Builder().build())
-        .setDownsampleEnabled(true)
+
         .setRequestListeners(listeners as Set<RequestListener>?)
+
         .setResizeAndRotateEnabledForNetwork(true)
         .setExecutorSupplier(DefaultExecutorSupplier(16))
-        .setMainDiskCacheConfig(diskCacheConfig)
-        .setBitmapMemoryCacheParamsSupplier(memoryCacheParamsSupplier)
-        .setEncodedMemoryCacheParamsSupplier(memoryCacheParamsSupplier) // Опционально: для закодированных данных
+
+        .setMainDiskCacheConfig(diskCacheConfigMain)
+        //.setBitmapMemoryCacheParamsSupplier(bitmapCacheParamsSupplier)
+        //.setEncodedMemoryCacheParamsSupplier(encodedCacheParamsSupplier) // Опционально: для закодированных данных
+
+
+        // Прогрессивные JPEG
+        .setProgressiveJpegConfig(SimpleProgressiveJpegConfig())
+
+        // Включаем экспериментальные оптимизации
+        .setMemoryChunkType(MemoryChunkType.BUFFER_MEMORY) // Используем DirectByteBuffer
+
+
+        // КЛЮЧЕВЫЕ ОПТИМИЗАЦИИ:
+        //.setDownsampleEnabled(true) // Автоматическое уменьшение размера
+        .setDownsampleMode(DownsampleMode.NEVER)
+        .setResizeAndRotateEnabledForNetwork(true) // Ресайз для сетевых изображений
 
         .setNetworkFetcher(customNetworkFetcher)
-
-        //.setCustomFetchSequenceFactories()
-
-//        .setNetworkFetcher (
-//
-//            object : NetworkFetcher<FetchState> {
-//                override fun createFetchState(consumer: Consumer<EncodedImage>, producerContext: ProducerContext) = CryptoFetchState(consumer, producerContext)
-//
-//                    override fun fetch(fetchState: FetchState, callback: NetworkFetcher.Callback) {
-//
-//                        Timber.i("!!! iii Fresco CryptoSchemeFetcher fetch")
-//
-//                        val uri = fetchState.uri
-//                        if (uri.scheme == "crypto") {
-//                            CryptoSchemeFetcher(poolFactory).fetch(fetchState as CryptoFetchState, callback)
-//                        }
-//                    }
-//
-//                override fun shouldPropagate(fetchState: FetchState?): Boolean = true
-//
-//                override fun onFetchCompletion(
-//                    fetchState: FetchState?,
-//                    byteSize: Int
-//                ) {
-//
-//                }
-//
-//                override fun getExtraMap(
-//                    fetchState: FetchState?,
-//                    byteSize: Int
-//                ): Map<String?, String?>? = null
-//
-//            }
-
-           // if (uri.scheme == "crypto") {
-            //    CryptoSchemeFetcher(poolFactory)
-           // } else {
-          //      DefaultNetworkFetcher()
-           // }
-          //  )
-
-
-
         .build()
 
     Fresco.initialize(application, pipelineConfig)
 
+    val preloader = ImagePreloader(Fresco.getImagePipeline())
+}
+
+@RequiresApi(Build.VERSION_CODES.N)
+// Дополнительная оптимизация - предзагрузка изображений
+class ImagePreloader(private val imagePipeline: ImagePipeline) {
+
+    private val preloadExecutor = Executors.newFixedThreadPool(4)
+
+    fun preloadImages(urls: List<String>) {
+        preloadExecutor.submit {
+            urls.forEach { url ->
+                try {
+                    val imageRequest = ImageRequestBuilder
+                        .newBuilderWithSource(Uri.parse(url))
+                        .setRequestPriority(Priority.LOW) // Низкий приоритет для предзагрузки
+                        .build()
+
+                    imagePipeline.prefetchToDiskCache(imageRequest, null)
+                } catch (e: Exception) {
+                    Timber.w(e, "Preload failed for: $url")
+                }
+            }
+        }
+    }
+
+    fun preloadImagesWithCallback(urls: List<String>, onComplete: () -> Unit) {
+        preloadExecutor.submit {
+            val futures = urls.map { url ->
+                CompletableFuture.runAsync {
+                    val imageRequest = ImageRequestBuilder
+                        .newBuilderWithSource(Uri.parse(url))
+                        .setRequestPriority(Priority.LOW)
+                        .build()
+                    imagePipeline.prefetchToDiskCache(imageRequest, null)
+                }
+            }
+
+            CompletableFuture.allOf(*futures.toTypedArray()).join()
+            onComplete()
+        }
+    }
 }

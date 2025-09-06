@@ -1,13 +1,16 @@
 package com.client.xvideos.common.traficStatistic
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -26,21 +29,44 @@ fun AppNetworkSpeedMonitorLite() {
     Row(
         modifier = Modifier.padding(end = 16.dp).fillMaxWidth(), horizontalArrangement = Arrangement.End
     ) {
-        Text(
-            formatSpeed(trafficData.downloadSpeed),
-            color = ThemeL.textColor,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Medium,
-            fontFamily = ThemeL.fontFamilyKarla
-        )
+        Box {
+            Text(
+                formatSpeed(trafficData.downloadSpeed),
+                color = Color.Black,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Medium,
+                fontFamily = ThemeL.fontFamilyKarla,
+                modifier = Modifier.offset(0.5.dp, 0.5.dp)
+            )
 
-        Text(
-            " / ${formatBytes(trafficData.sessionDownloaded)}",
-            color = ThemeL.textColor,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Medium,
-            fontFamily = ThemeL.fontFamilyKarla
-        )
+            Text(
+                formatSpeed(trafficData.downloadSpeed),
+                color = ThemeL.textColor,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Medium,
+                fontFamily = ThemeL.fontFamilyKarla
+            )
+        }
+
+        Box {
+
+            Text(
+                " / ${formatBytes(trafficData.sessionDownloaded)}",
+                color = Color.Black,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Medium,
+                fontFamily = ThemeL.fontFamilyKarla,
+                modifier = Modifier.offset(0.5.dp, 0.5.dp)
+            )
+
+            Text(
+                " / ${formatBytes(trafficData.sessionDownloaded)}",
+                color = ThemeL.textColor,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Medium,
+                fontFamily = ThemeL.fontFamilyKarla
+            )
+        }
     }
 
 }

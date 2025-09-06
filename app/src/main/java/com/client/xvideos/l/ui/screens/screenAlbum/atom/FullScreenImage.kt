@@ -38,6 +38,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.common.fresco.UrlImageLusciousGifsGlide
 import kotlinx.coroutines.coroutineScope
@@ -47,6 +48,8 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
+
+
 
 @Composable
 fun FullScreenImage(
@@ -410,7 +413,9 @@ fun FullScreenImage(
                         }
                     }
                 )
-            },
+            }
+            //.background(Color.Black.copy(alpha = alphaAnim.value))
+        ,
         contentAlignment = Alignment.TopStart
     ) {
 
@@ -420,12 +425,6 @@ fun FullScreenImage(
                 .matchParentSize()
                 .background(Color.Black.copy(alpha = alphaAnim.value))
         )
-
-//      IconButton(modifier = Modifier.align(Alignment.TopEnd), onClick = {}) {
-//          Icon(Icons.Default.MoreVert, tint = Color.White, contentDescription = null)
-//      }
-
-//      AlbumItemExpandMenu(item = item, modifier = Modifier.align(Alignment.TopEnd), onDownload = {onDownload(it)})
 
         Box(modifier = Modifier.align(Alignment.TopEnd)) {
             expandMenu(item)

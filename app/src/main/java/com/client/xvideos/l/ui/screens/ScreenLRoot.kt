@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
@@ -49,6 +50,7 @@ import com.client.xvideos.redgifs.ui.UiSnackbarVisuals
 import com.client.xvideos.redgifs.ui.show
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.common.di.HostDI
+import com.google.common.primitives.Floats
 import com.redgifs.common.snackBar.UiMessage
 import dagger.Binds
 import dagger.Module
@@ -64,7 +66,8 @@ import kotlinx.coroutines.launch
 import net.engawapg.lib.zoomable.ExperimentalZoomableApi
 import javax.inject.Inject
 
-val LocalRootLScreenModel = staticCompositionLocalOf<ScreenLRootSM> { error("No ScreenLRootSM provided") }
+val LocalRootLScreenModel =
+    staticCompositionLocalOf<ScreenLRootSM> { error("No ScreenLRootSM provided") }
 
 class ScreenLRoot() : Screen {
 
@@ -83,7 +86,13 @@ class ScreenLRoot() : Screen {
 
         val snackBarEvent = vm.hostDI.snackBarEvent
 
-        LaunchedEffect(Unit) { vm.snackbarEvents.collect { message -> snackbarHostState.showSnackbar(message) } }
+        LaunchedEffect(Unit) {
+            vm.snackbarEvents.collect { message ->
+                snackbarHostState.showSnackbar(
+                    message
+                )
+            }
+        }
 
         LaunchedEffect(Unit) {
             snackBarEvent.messages.receiveAsFlow().collect { message ->
@@ -96,44 +105,93 @@ class ScreenLRoot() : Screen {
             Scaffold(
                 containerColor = ThemeL.greyBackground,
                 snackbarHost = {
-                    SnackbarHost(snackbarHostState) { data ->
-                        val uiMsg = (data.visuals as? UiSnackbarVisuals)?.ui ?: UiMessage.Info(data.visuals.message)
-                        val (bg, fg, icon) = when (uiMsg) {
-                            is UiMessage.Success -> Triple( Color(0xFF0F9960), Color.White, Icons.Default.Check )
-                            is UiMessage.Error ->   Triple( Color(0xFFD13913), Color.White, Icons.Default.ErrorOutline )
-                            is UiMessage.Info ->    Triple( Color(0xFF137CBD), Color.White, Icons.Default.Info )
-                        }
-                        LaunchedEffect(data) {
-                            when (uiMsg) {
-                                is UiMessage.Success -> { delay(2000); data.dismiss() }
-                                is UiMessage.Error -> { delay(5000); data.dismiss() }
-                                is UiMessage.Info -> { delay(2000);  data.dismiss() }
+                    Box(modifier = Modifier.zIndex(Float.MAX_VALUE)) {
+                        SnackbarHost(snackbarHostState) { data ->
+                            val uiMsg = (data.visuals as? UiSnackbarVisuals)?.ui ?: UiMessage.Info(
+                                data.visuals.message
+                            )
+                            val (bg, fg, icon) = when (uiMsg) {
+                                is UiMessage.Success -> Triple(
+                                    Color(0xFF0F9960),
+                                    Color.White,
+                                    Icons.Default.Check
+                                )
+
+                                is UiMessage.Error -> Triple(
+                                    Color(0xFFD13913),
+                                    Color.White,
+                                    Icons.Default.ErrorOutline
+                                )
+
+                                is UiMessage.Info -> Triple(
+                                    Color(0xFF137CBD),
+                                    Color.White,
+                                    Icons.Default.Info
+                                )
                             }
-                        }
-                        Surface(
-                            modifier = Modifier.wrapContentWidth().padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
-                            color = bg, contentColor = fg, shape = RoundedCornerShape(12.dp), tonalElevation = 6.dp, shadowElevation = 6.dp,
-                        ) {
-                            Row( Modifier.padding(horizontal = 12.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically )
-                            {
-                                Icon(icon, contentDescription = null)
-                                Spacer(Modifier.width(8.dp))
-                                Text( data.visuals.message, Modifier, fontFamily = ThemeRed.fontFamilyDMsanss )
-                                data.visuals.actionLabel?.let { label ->
-                                    TextButton(onClick = { data.performAction() }) { Text(label) }
+                            LaunchedEffect(data) {
+                                when (uiMsg) {
+                                    is UiMessage.Success -> {
+                                        delay(2000); data.dismiss()
+                                    }
+
+                                    is UiMessage.Error -> {
+                                        delay(5000); data.dismiss()
+                                    }
+
+                                    is UiMessage.Info -> {
+                                        delay(2000); data.dismiss()
+                                    }
+                                }
+                            }
+                            Surface(
+                                modifier = Modifier
+                                    .zIndex(Float.MAX_VALUE)
+                                    .wrapContentWidth()
+                                    .padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
+                                    .zIndex(Float.MAX_VALUE)
+                                ,
+                                color = bg,
+                                contentColor = fg,
+                                shape = RoundedCornerShape(12.dp),
+                                tonalElevation = 6.dp,
+                                shadowElevation = 6.dp,
+                            ) {
+                                Row(
+                                    Modifier .zIndex(Float.MAX_VALUE).padding(horizontal = 12.dp, vertical = 12.dp).zIndex(Float.MAX_VALUE),
+                                    verticalAlignment = Alignment.CenterVertically
+                                )
+                                {
+                                    Icon(icon, contentDescription = null)
+                                    Spacer(Modifier.width(8.dp))
+                                    Text(
+                                        data.visuals.message,
+                                        Modifier,
+                                        fontFamily = ThemeRed.fontFamilyDMsanss
+                                    )
+                                    data.visuals.actionLabel?.let { label ->
+                                        TextButton(onClick = { data.performAction() }) { Text(label) }
+                                    }
                                 }
                             }
                         }
                     }
                 }
             ) { paddingValues ->
-                Navigator( screen = ScreenLExplorer())
+                Navigator(screen = ScreenLExplorer())
+
+                // Оверлей рисуется поверх Scaffold
+                vm.overlayContent.value?.let { content ->
+                    Box(
+                        modifier = Modifier
+                            //.zIndex(10f)
+                            .fillMaxSize()
+                        //.background(Color.Black.copy(alpha = 0.95f))
+                    ) { content() }
+                }
             }
 
-            // Оверлей рисуется поверх Scaffold
-            vm.overlayContent.value?.let { content ->
-                Box( modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.5f)) ) { content() }
-            }
+
 
             AppNetworkSpeedMonitorLite()
 
@@ -157,9 +215,14 @@ class ScreenLRootSM @Inject constructor(
 
     // состояние для фуллскрин-оверлея
     private val _overlayContent = mutableStateOf<(@Composable () -> Unit)?>(null)
-    val overlayContent: State <(@Composable () -> Unit)?> = _overlayContent
-    fun showOverlay(content: @Composable () -> Unit) { _overlayContent.value = content }
-    fun hideOverlay() { _overlayContent.value = null }
+    val overlayContent: State<(@Composable () -> Unit)?> = _overlayContent
+    fun showOverlay(content: @Composable () -> Unit) {
+        _overlayContent.value = content
+    }
+
+    fun hideOverlay() {
+        _overlayContent.value = null
+    }
 
 }
 
