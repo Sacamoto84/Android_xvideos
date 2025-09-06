@@ -192,46 +192,6 @@ fun FrescoInit(application: Application) {
 
     Fresco.initialize(application, pipelineConfig)
 
-    val preloader = ImagePreloader(Fresco.getImagePipeline())
+    //val preloader = ImagePreloader(Fresco.getImagePipeline())
 }
 
-@RequiresApi(Build.VERSION_CODES.N)
-// Дополнительная оптимизация - предзагрузка изображений
-class ImagePreloader(private val imagePipeline: ImagePipeline) {
-
-    private val preloadExecutor = Executors.newFixedThreadPool(4)
-
-    fun preloadImages(urls: List<String>) {
-        preloadExecutor.submit {
-            urls.forEach { url ->
-                try {
-                    val imageRequest = ImageRequestBuilder
-                        .newBuilderWithSource(Uri.parse(url))
-                        .setRequestPriority(Priority.LOW) // Низкий приоритет для предзагрузки
-                        .build()
-
-                    imagePipeline.prefetchToDiskCache(imageRequest, null)
-                } catch (e: Exception) {
-                    Timber.w(e, "Preload failed for: $url")
-                }
-            }
-        }
-    }
-
-    fun preloadImagesWithCallback(urls: List<String>, onComplete: () -> Unit) {
-        preloadExecutor.submit {
-            val futures = urls.map { url ->
-                CompletableFuture.runAsync {
-                    val imageRequest = ImageRequestBuilder
-                        .newBuilderWithSource(Uri.parse(url))
-                        .setRequestPriority(Priority.LOW)
-                        .build()
-                    imagePipeline.prefetchToDiskCache(imageRequest, null)
-                }
-            }
-
-            CompletableFuture.allOf(*futures.toTypedArray()).join()
-            onComplete()
-        }
-    }
-}

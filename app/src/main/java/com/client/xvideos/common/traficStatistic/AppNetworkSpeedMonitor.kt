@@ -59,28 +59,34 @@ fun AppNetworkSpeedMonitor() {
 //                SpeedRow( label = "⬆ Загрузка:", value = formatSpeed(trafficData.uploadSpeed) )
 //            }
 
-            Column( modifier = Modifier.padding(0.dp))
-            {
-                Text( text = "За текущую сессию", fontSize = 18.sp, fontWeight = FontWeight.Medium, color = ThemeL.textColor )
-                Spacer(modifier = Modifier.height(8.dp))
-                SpeedRow( label = "⬇ Скачано:", value = formatBytes(trafficData.sessionDownloaded) )
-                Spacer(modifier = Modifier.height(6.dp))
-                SpeedRow( label = "⬆ Загружено:", value = formatBytes(trafficData.sessionUploaded) )
-                Spacer(modifier = Modifier.height(6.dp))
-                SpeedRow( label = "📊 Всего:",  value = formatBytes(trafficData.sessionDownloaded + trafficData.sessionUploaded) )
-            }
+        Column(modifier = Modifier.padding(0.dp))
+        {
+            //Text( text = "За текущую сессию", fontSize = 18.sp, fontWeight = FontWeight.Medium, color = ThemeL.textColor )
+            //Spacer(modifier = Modifier.height(8.dp))
+            //SpeedRow( label = "⬇ Скачано:", value = formatBytes(trafficData.sessionDownloaded) )
+            //Spacer(modifier = Modifier.height(6.dp))
+            //SpeedRow( label = "⬆ Загружено:", value = formatBytes(trafficData.sessionUploaded) )
+            //Spacer(modifier = Modifier.height(6.dp))
+            SpeedRow(
+                label = "📊 За текущую сессию:",
+                value = formatBytes(trafficData.sessionDownloaded + trafficData.sessionUploaded)
+            )
+        }
 
-            // Карточка общих объемов
-            Column( modifier = Modifier.padding(0.dp) )
-            {
-                Text(text = "За все время", fontSize = 18.sp, fontWeight = FontWeight.Medium, color = ThemeL.textColor )
-                Spacer(modifier = Modifier.height(8.dp))
-                SpeedRow( label = "⬇ Скачано:", value = formatBytes(trafficData.totalDownloaded) )
-                Spacer(modifier = Modifier.height(6.dp))
-                SpeedRow( label = "⬆ Загружено:", value = formatBytes(trafficData.totalUploaded) )
-                Spacer(modifier = Modifier.height(6.dp))
-                SpeedRow( label = "📊 Всего:", value = formatBytes(trafficData.totalDownloaded + trafficData.totalUploaded) )
-            }
+        // Карточка общих объемов
+        Column(modifier = Modifier.padding(0.dp))
+        {
+            //Text(text = "За все время", fontSize = 18.sp, fontWeight = FontWeight.Medium, color = ThemeL.textColor )
+            //Spacer(modifier = Modifier.height(8.dp))
+            //SpeedRow( label = "⬇ Скачано:", value = formatBytes(trafficData.totalDownloaded) )
+            //Spacer(modifier = Modifier.height(6.dp))
+            //SpeedRow( label = "⬆ Загружено:", value = formatBytes(trafficData.totalUploaded) )
+            //Spacer(modifier = Modifier.height(6.dp))
+            SpeedRow(
+                label = "📊 За все время:",
+                value = formatBytes(trafficData.totalDownloaded + trafficData.totalUploaded)
+            )
+        }
 
     }
 }
@@ -103,15 +109,15 @@ fun SpeedRow(
     ) {
         Text(
             text = label,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium,
-            color = ThemeL.textColor
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Normal,
+            color = ThemeL.textColor, fontFamily = ThemeL.fontFamilyKarla
         )
         Text(
             text = value,
             fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = ThemeL.textColor
+            fontWeight = FontWeight.Normal,
+            color = ThemeL.textColor, fontFamily = ThemeL.fontFamilyKarla
         )
     }
 }
@@ -119,7 +125,7 @@ fun SpeedRow(
 @Preview
 @Composable
 fun SpeedRowPreview() {
-    SpeedRow( label = "Download:", value = "10.5 MBs" )
+    SpeedRow(label = "Download:", value = "10.5 MBs")
 }
 
 // Функция для форматирования скорости

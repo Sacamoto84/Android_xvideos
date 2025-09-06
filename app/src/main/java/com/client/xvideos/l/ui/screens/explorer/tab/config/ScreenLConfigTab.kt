@@ -38,9 +38,11 @@ import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
+import com.client.xvideos.common.fresco.FrescoUtils
 import com.client.xvideos.common.traficStatistic.AppNetworkSpeedMonitor
 import com.client.xvideos.l.ThemeL
 import com.client.xvideos.l.model.enum.AudiencesType
+import com.client.xvideos.l.ui.screens.explorer.tab.config.atom.ConfigTextAndButtonL
 import com.client.xvideos.l.ui.screens.explorer.tab.config.atom.ScreenLConfig_Encrypt
 import dagger.Binds
 import dagger.Module
@@ -95,6 +97,11 @@ object ScreenLConfigTab : Screen {
             AppNetworkSpeedMonitor()
 
 
+            HorizontalDivider(color = Color.DarkGray)
+            Spacer(Modifier.height(4.dp))
+            ConfigTextAndButtonL("Очистить кеш картинок", "Очистить", {}, { FrescoUtils.clearCache() })
+            Spacer(Modifier.height(4.dp))
+            HorizontalDivider(color = Color.DarkGray)
         }
 
 

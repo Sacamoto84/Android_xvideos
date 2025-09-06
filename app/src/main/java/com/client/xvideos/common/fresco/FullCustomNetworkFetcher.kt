@@ -36,11 +36,23 @@ class FullCustomNetworkFetcher(
     private val okHttpClient: OkHttpClient
 ) : NetworkFetcher<OkHttpNetworkFetcher.OkHttpNetworkFetchState> {
 
+
+    interface ProgressListener {
+        fun onProgress(url: String, bytesRead: Long, contentLength: Long, done: Boolean)
+    }
+
+    private var progressListener: ProgressListener? = null
+
+    fun setProgressListener(listener: ProgressListener?) {
+        progressListener = listener
+    }
+
+
+
+
     // Пул потоков для криптографических операций
     private val cryptoExecutor = Executors.newFixedThreadPool(4)
 
-    // Кеш для ключей шифрования
-    private val keyCache = ConcurrentHashMap<String, SecretKey>()
 
     override fun createFetchState(
         consumer: Consumer<EncodedImage>,
