@@ -94,27 +94,23 @@ fun UrlImageLusciousGifsGlide(
     }
 
     val imageRequest = remember(dataSource) {
-        ImageRequestBuilder
+
+        val i = ImageRequestBuilder
             .newBuilderWithSource(dataSource)
             //.setLowestPermittedRequestLevel(ImageRequest.RequestLevel.FULL_FETCH)
             .setProgressiveRenderingEnabled(true)
             //.setResizeOptions(ResizeOptions(100, 100)) // Изменение размера
             //.setLocalThumbnailPreviewsEnabled(true) // Включение миниатюр
             .build()
-    }
 
-
-    LaunchedEffect(url) {
-        //val request = ImageRequestBuilder.newBuilderWithSource(dataSource).build()
-        val dataSource1 = Fresco.getImagePipeline().fetchDecodedImage(imageRequest, null)
+        val dataSource1 = Fresco.getImagePipeline().fetchDecodedImage(i, null)
 
         val subscriber = object : BaseDataSubscriber<CloseableReference<CloseableImage>>() {
 
             override fun onProgressUpdate(dataSource: DataSource<CloseableReference<CloseableImage>?>) {
                 super.onProgressUpdate(dataSource)
-                progress = dataSource.progress * 9633425/47685.453f
-                Timber.i("!!! iii UrlImageLusciousGifsGlide onProgressUpdate progress :${progress} albumName:${albumName} url:${url}")
-
+                progress = dataSource.progress * 9633425 / 47685.453f
+                //Timber.i("!!! iii UrlImageLusciousGifsGlide onProgressUpdate progress :${progress} albumName:${albumName} url:${url}")
             }
 
             override fun onNewResultImpl(dataSource: DataSource<CloseableReference<CloseableImage>?>) {
@@ -129,8 +125,9 @@ fun UrlImageLusciousGifsGlide(
         }
 
         dataSource1.subscribe(subscriber, UiThreadImmediateExecutorService.getInstance())
-    }
 
+        i
+    }
 
     var animation: Animatable? by remember { mutableStateOf(null) }
     LaunchedEffect(animation, isPlaying) {
@@ -148,7 +145,7 @@ fun UrlImageLusciousGifsGlide(
                 isLoading = true; isFailure = false
             }
 
-            override fun onIntermediateImageSet(id: String?, imageInfo: ImageInfo?) { }
+            override fun onIntermediateImageSet(id: String?, imageInfo: ImageInfo?) {}
 
             override fun onFinalImageSet(id: String?, imageInfo: ImageInfo?, anim: Animatable?) {
                 isLoading = false; isFailure = false
@@ -190,7 +187,7 @@ fun UrlImageLusciousGifsGlide(
                         .setControllerListener(controllerListener)
                         .setOldController(null) // Явно сбрасываем старый контроллер
                 },
-                modifier = Modifier.fillMaxSize().background(ThemeL.grey6),
+                modifier = Modifier.fillMaxSize().background(ThemeL.grey5),
             )
 
             if (isLoading) {
@@ -202,22 +199,38 @@ fun UrlImageLusciousGifsGlide(
                 }
             }
 
-            if (isFailure) { Box( modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center ) { Text("Ошибка загрузки", color = Color.Gray) } }
+            if (isFailure) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) { Text("Ошибка загрузки", color = Color.Gray) }
+            }
 
             if (isAnimated) {
-                Button( onClick = { isPlaying = !isPlaying }, modifier = Modifier.fillMaxWidth().padding(8.dp)
+                Button(
+                    onClick = { isPlaying = !isPlaying },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
                 ) {
                     Text(text = if (isPlaying) "⏸ Пауза" else "▶ Старт")
                 }
             }
         } else
-            Box( modifier = Modifier.fillMaxSize().background(Color.Transparent), contentAlignment = Alignment.Center ){}
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Transparent),
+                contentAlignment = Alignment.Center
+            ) {}
 
         if (progress > 1000) {
             Text(
                 formatBytes1(progress.toLong()),
                 color = Color.White,
-                modifier = Modifier.align(Alignment.BottomEnd).offset((-1).dp, 7.dp),
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .offset((-1).dp, 7.dp),
                 fontFamily = ThemeL.fontFamilyKarla,
                 fontSize = 9.sp
             )

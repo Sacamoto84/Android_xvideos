@@ -1,46 +1,18 @@
 package com.client.xvideos.common.fresco
 
 import android.app.Application
-import android.net.Uri
-import android.os.Build
-import android.util.Log
-import androidx.annotation.RequiresApi
-import com.facebook.cache.common.CacheErrorLogger
 import com.facebook.cache.disk.DiskCacheConfig
 import com.facebook.common.internal.Supplier
-import com.facebook.common.webp.WebpBitmapFactory
 import com.facebook.drawee.backends.pipeline.Fresco
-import com.facebook.drawee.controller.ControllerListener
-import com.facebook.imageformat.DefaultImageFormats
 import com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory
 import com.facebook.imagepipeline.cache.MemoryCacheParams
-import com.facebook.imagepipeline.common.Priority
 import com.facebook.imagepipeline.core.DefaultExecutorSupplier
 import com.facebook.imagepipeline.core.DownsampleMode
-import com.facebook.imagepipeline.core.ImagePipeline
 import com.facebook.imagepipeline.core.MemoryChunkType
-import com.facebook.imagepipeline.decoder.DefaultImageDecoder
 import com.facebook.imagepipeline.decoder.SimpleProgressiveJpegConfig
-import com.facebook.imagepipeline.image.ImageInfo
-import com.facebook.imagepipeline.listener.RequestListener
-import com.facebook.imagepipeline.producers.ProducerContext
-import com.facebook.imagepipeline.producers.ProducerListener2
-import com.facebook.imagepipeline.request.ImageRequest
-import com.facebook.imagepipeline.request.ImageRequestBuilder
-import okhttp3.OkHttpClient
 import timber.log.Timber
-import java.util.concurrent.CompletableFuture
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
 
 fun FrescoInit(application: Application) {
-
-
-
-
-
-
 
     // 1. Создание параметров кэша в памяти
     // Укажите максимальное количество байт, которое может занимать кэш
@@ -76,96 +48,88 @@ fun FrescoInit(application: Application) {
         .build()
 
 
-    class MyRequestLoggingListener : RequestListener {
+//    class MyRequestLoggingListener : RequestListener {
+//
+//        override fun onRequestStart(
+//            request: ImageRequest,
+//            callerContext: Any?,
+//            requestId: String,
+//            isPrefetch: Boolean
+//        ) {
+//            Log.d("Fresco", "!!! iii Request started: $requestId")
+//        }
+//
+//        override fun onRequestSuccess(
+//            request: ImageRequest,
+//            requestId: String,
+//            isPrefetch: Boolean
+//        ) {
+//            Log.d("Fresco", "!!! iii Request success: $requestId")
+//        }
+//
+//        override fun onRequestFailure(
+//            request: ImageRequest,
+//            requestId: String,
+//            throwable: Throwable,
+//            isPrefetch: Boolean
+//        ) {
+//            Log.e("Fresco", "!!! iii Request failed: $requestId", throwable)
+//        }
+//
+//        override fun onRequestCancellation(requestId: String) {
+//            Log.d("Fresco", "!!! iii Request cancelled: $requestId")
+//        }
+//
+//        override fun onProducerStart(requestId: String, producerName: String) {
+//            // Опционально логировать начало работы продюсера
+//        }
+//
+//        override fun onProducerEvent(
+//            requestId: String?,
+//            producerName: String?,
+//            eventName: String?
+//        ) {
+//            //TODO("Not yet implemented")
+//        }
+//
+//        override fun onProducerFinishWithSuccess(
+//            requestId: String,
+//            producerName: String,
+//            extraMap: MutableMap<String, String>?
+//        ) {
+//            // Опционально логировать успешное завершение продюсера
+//        }
+//
+//        override fun onProducerFinishWithFailure(
+//            requestId: String,
+//            producerName: String,
+//            throwable: Throwable,
+//            extraMap: MutableMap<String, String>?
+//        ) {
+//            // Опционально логировать ошибку продюсера
+//        }
+//
+//        override fun onProducerFinishWithCancellation(
+//            requestId: String,
+//            producerName: String,
+//            extraMap: MutableMap<String, String>?
+//        ) {
+//            // Опционально логировать отмену продюсера
+//        }
+//
+//        override fun onUltimateProducerReached(requestId: String?, producerName: String?, successful: Boolean ) { }
+//        override fun requiresExtraMap(requestId: String): Boolean = false
+//    }
 
-        override fun onRequestStart(
-            request: ImageRequest,
-            callerContext: Any?,
-            requestId: String,
-            isPrefetch: Boolean
-        ) {
-            Log.d("Fresco", "!!! iii Request started: $requestId")
-        }
-
-        override fun onRequestSuccess(
-            request: ImageRequest,
-            requestId: String,
-            isPrefetch: Boolean
-        ) {
-            Log.d("Fresco", "!!! iii Request success: $requestId")
-        }
-
-        override fun onRequestFailure(
-            request: ImageRequest,
-            requestId: String,
-            throwable: Throwable,
-            isPrefetch: Boolean
-        ) {
-            Log.e("Fresco", "!!! iii Request failed: $requestId", throwable)
-        }
-
-        override fun onRequestCancellation(requestId: String) {
-            Log.d("Fresco", "!!! iii Request cancelled: $requestId")
-        }
-
-        override fun onProducerStart(requestId: String, producerName: String) {
-            // Опционально логировать начало работы продюсера
-        }
-
-        override fun onProducerEvent(
-            requestId: String?,
-            producerName: String?,
-            eventName: String?
-        ) {
-            //TODO("Not yet implemented")
-        }
-
-        override fun onProducerFinishWithSuccess(
-            requestId: String,
-            producerName: String,
-            extraMap: MutableMap<String, String>?
-        ) {
-            // Опционально логировать успешное завершение продюсера
-        }
-
-        override fun onProducerFinishWithFailure(
-            requestId: String,
-            producerName: String,
-            throwable: Throwable,
-            extraMap: MutableMap<String, String>?
-        ) {
-            // Опционально логировать ошибку продюсера
-        }
-
-        override fun onProducerFinishWithCancellation(
-            requestId: String,
-            producerName: String,
-            extraMap: MutableMap<String, String>?
-        ) {
-            // Опционально логировать отмену продюсера
-        }
-
-        override fun onUltimateProducerReached(
-            requestId: String?,
-            producerName: String?,
-            successful: Boolean
-        ) {
-            //TODO("Not yet implemented")
-        }
-
-        override fun requiresExtraMap(requestId: String): Boolean = false
-    }
-
-    val listeners = HashSet<RequestListener?>()
-    listeners.add(MyRequestLoggingListener())
+    //val listeners = HashSet<RequestListener?>()
+    //listeners.add(MyRequestLoggingListener())
 
 
     val customNetworkFetcher = FullCustomNetworkFetcher(createOptimizedOkHttpClient())
 
     val pipelineConfig = OkHttpImagePipelineConfigFactory
-        .newBuilder(application, OkHttpClient.Builder().build())
-
-        .setRequestListeners(listeners as Set<RequestListener>?)
+        //.newBuilder(application, OkHttpClient.Builder().build())
+        .newBuilder(application, createOptimizedOkHttpClient())
 
         .setResizeAndRotateEnabledForNetwork(true)
         .setExecutorSupplier(DefaultExecutorSupplier(16))
@@ -173,7 +137,6 @@ fun FrescoInit(application: Application) {
         .setMainDiskCacheConfig(diskCacheConfigMain)
         //.setBitmapMemoryCacheParamsSupplier(bitmapCacheParamsSupplier)
         //.setEncodedMemoryCacheParamsSupplier(encodedCacheParamsSupplier) // Опционально: для закодированных данных
-
 
         // Прогрессивные JPEG
         .setProgressiveJpegConfig(SimpleProgressiveJpegConfig())

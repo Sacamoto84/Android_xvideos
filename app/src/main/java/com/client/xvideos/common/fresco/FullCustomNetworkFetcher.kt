@@ -69,7 +69,7 @@ data class DownloadQueueState(
 
 // Глобальный реактивный менеджер очереди загрузок
 object DownloadQueueManager {
-    private const val MAX_QUEUE_SIZE = 12
+    private const val MAX_QUEUE_SIZE = 16
 
     // Очередь активных загрузок (URL -> Pair(Call, startTime))
     private val activeDownloads = LinkedHashMap<String, Pair<Call, Long>>()
@@ -357,21 +357,6 @@ object DownloadQueueManager {
         }
     }
 
-    /**
-     * Логирует текущее состояние очереди (для отладки)
-     */
-    fun logCurrentState() {
-        queueLock.withLock {
-            Timber.d("""
-                📊 DownloadQueueManager State:
-                ├─ Active downloads: ${activeDownloads.size}/${MAX_QUEUE_SIZE}
-                ├─ Total completed: $totalCompleted
-                ├─ Total failed: $totalFailed
-                ├─ Queue full: ${activeDownloads.size >= MAX_QUEUE_SIZE}
-                └─ URLs: ${activeDownloads.keys.joinToString { it.substringAfterLast("/") }}
-            """.trimIndent())
-        }
-    }
 }
 
 // Обновленный FullCustomNetworkFetcher с интеграцией реактивной очереди
@@ -620,8 +605,8 @@ fun createOptimizedOkHttpClient(): OkHttpClient {
 
         // Параллельные запросы (должно соответствовать размеру очереди)
         .dispatcher(Dispatcher().apply {
-            maxRequests = 12 // Больше общих запросов
-            maxRequestsPerHost = 6 // Больше запросов на один хост
+            maxRequests = 16 // Больше общих запросов
+            maxRequestsPerHost = 8 // Больше запросов на один хост
         })
 
         // Включаем максимальное сжатие
@@ -643,7 +628,6 @@ fun createOptimizedOkHttpClient(): OkHttpClient {
                     try {
                         val response = chain.proceed(request)
                         val endTime = System.currentTimeMillis()
-
                         Timber.d("🔍 Request completed: ${request.url} in ${endTime - startTime}ms (${response.code})")
                         response
                     } catch (e: Exception) {
@@ -666,6 +650,5 @@ fun createOptimizedOkHttpClient(): OkHttpClient {
 
         // Повторные попытки отключены (управляется очередью)
         .retryOnConnectionFailure(false)
-
         .build()
 }

@@ -7,14 +7,18 @@ import com.client.xvideos.R
 
 object ThemeL {
 
+    val g0 = Color(0xFF4CAF50)
+    val r0 = Color(0xFFF44336)
+    val b0 = Color(0xFF2196F3)
+
     val grey0 = Color(0xFFdedede)
-    val grey1= Color(0xFFbababa)
-    val grey2= Color(0xFF9c9c9c)
-    val grey3= Color(0xFF3b3b3b)
-    val grey4= Color(0xFF333333)
-    val grey5= Color(0xFF292929)
-    val grey6= Color(0xFF262626)
-    val grey7= Color(0xFF1c1c1c)
+    val grey1 = Color(0xFFbababa)
+    val grey2 = Color(0xFF9c9c9c)
+    val grey3 = Color(0xFF3b3b3b)
+    val grey4 = Color(0xFF333333)
+    val grey5 = Color(0xFF292929)
+    val grey6 = Color(0xFF262626)
+    val grey7 = Color(0xFF1c1c1c)
 
 
     val lavender = Color(0xFFa3aff5)
@@ -30,12 +34,12 @@ object ThemeL {
 
 
     val fontFamilyPopinsRegular = FontFamily(Font(R.font.poppins_regular))
-    val fontFamilyPopinsMedium= FontFamily(Font(R.font.poppins_medium))
-    val fontFamilyPopinsSemiBold= FontFamily(Font(R.font.poppins_semibold))
+    val fontFamilyPopinsMedium = FontFamily(Font(R.font.poppins_medium))
+    val fontFamilyPopinsSemiBold = FontFamily(Font(R.font.poppins_semibold))
     val fontFamilyPopinsBold = FontFamily(Font(R.font.poppins_bold))
-    val fontFamilyPopinsExtraBold= FontFamily(Font(R.font.poppins_extrabold))
+    val fontFamilyPopinsExtraBold = FontFamily(Font(R.font.poppins_extrabold))
 
-    val fontFamilyDMsanss= FontFamily(Font(R.font.dm_sans))
+    val fontFamilyDMsanss = FontFamily(Font(R.font.dm_sans))
 
-    val fontFamilyKarla= FontFamily(Font(R.font.karla))
+    val fontFamilyKarla = FontFamily(Font(R.font.karla))
 }

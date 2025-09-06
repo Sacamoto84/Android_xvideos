@@ -1,12 +1,10 @@
 package com.client.xvideos.l.ui.screens
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -35,7 +33,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -46,19 +43,15 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.Navigator
-import com.client.xvideos.common.fresco.ActiveDownloadsList
 import com.client.xvideos.common.fresco.DownloadQueueManager
-import com.client.xvideos.common.fresco.DownloadQueueScreen
-import com.client.xvideos.common.fresco.QueueStatisticsCard
-import com.client.xvideos.common.traficStatistic.AppNetworkSpeedMonitor
+import com.client.xvideos.common.fresco.QueueStatisticsCardLite
 import com.client.xvideos.common.traficStatistic.AppNetworkSpeedMonitorLite
 import com.client.xvideos.l.ThemeL
 import com.client.xvideos.l.ui.screens.explorer.ScreenLExplorer
-import com.client.xvideos.redgifs.ui.UiSnackbarVisuals
-import com.client.xvideos.redgifs.ui.show
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.common.di.HostDI
-import com.google.common.primitives.Floats
+import com.client.xvideos.redgifs.ui.UiSnackbarVisuals
+import com.client.xvideos.redgifs.ui.show
 import com.redgifs.common.snackBar.UiMessage
 import dagger.Binds
 import dagger.Module
@@ -190,6 +183,8 @@ class ScreenLRoot() : Screen {
             ) { paddingValues ->
                 Navigator(screen = ScreenLExplorer())
 
+                QueueStatisticsCardLite(queueState = queueState)
+
                 // Оверлей рисуется поверх Scaffold
                 vm.overlayContent.value?.let { content ->
                     Box(
@@ -199,18 +194,13 @@ class ScreenLRoot() : Screen {
                         //.background(Color.Black.copy(alpha = 0.95f))
                     ) { content() }
                 }
+
+
             }
 
 
 
             AppNetworkSpeedMonitorLite()
-
-            //DownloadQueueScreen()
-            Box(Modifier.height(100.dp)){
-                QueueStatisticsCard(queueState = queueState)
-            }
-            //QueueStatisticsCard(queueState = queueState)
-            //ActiveDownloadsList(queueState = queueState)
         }
     }
 
