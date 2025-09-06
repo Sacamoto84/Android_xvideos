@@ -15,6 +15,8 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.lazy.staggeredgrid.itemsIndexed
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,6 +30,7 @@ import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.client.xvideos.common.fresco.DownloadQueueManager
 import com.client.xvideos.l.ThemeL
 import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.FullScreenImage
@@ -124,6 +127,13 @@ fun LazyRowPictureDetails(
             VerticalScrollbar(scrollPercent)
         }
     }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            DownloadQueueManager.cancelAll()
+        }
+    }
+
 }
 
 
