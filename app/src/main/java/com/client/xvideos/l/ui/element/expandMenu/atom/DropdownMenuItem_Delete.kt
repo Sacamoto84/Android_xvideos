@@ -9,9 +9,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import com.client.xvideos.l.ThemeL.ExpandMenu.style
+import com.client.xvideos.l.ThemeL.ExpandMenu.tintColor
 import com.client.xvideos.l.model.PicsDetails
-import com.client.xvideos.l.ui.element.expandMenu.themeExpandMenu.style
-import com.client.xvideos.l.ui.element.expandMenu.themeExpandMenu.tintColor
 
 @Preview
 @Composable

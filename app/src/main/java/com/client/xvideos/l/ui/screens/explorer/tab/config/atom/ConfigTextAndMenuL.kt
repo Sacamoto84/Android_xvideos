@@ -31,8 +31,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.client.xvideos.common.setting.styleTextConfig
 import com.client.xvideos.l.ThemeL
-import com.client.xvideos.l.ui.element.expandMenu.themeExpandMenu.backgroundColor
-import com.client.xvideos.l.ui.element.expandMenu.themeExpandMenu.style
+import com.client.xvideos.l.ThemeL.ExpandMenu.backgroundColor
+import com.client.xvideos.l.ThemeL.ExpandMenu.style
 
 
 @OptIn(ExperimentalMaterial3Api::class)

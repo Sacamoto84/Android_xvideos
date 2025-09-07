@@ -6,6 +6,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.sp
 import com.client.xvideos.R
+import com.client.xvideos.redgifs.common.ThemeRed
 
 object ThemeL {
 
@@ -48,12 +49,18 @@ object ThemeL {
 
 
 
-    //--- Config ---
+    //--- Screen Config ---
     val styleTextConfigL = TextStyle(fontSize = 20.sp, color = textColor, fontFamily = fontFamilyKarla)
 
 
 
 
+    //--- Expand Menu ---
+    object ExpandMenu {
+        val tintColor = Color(0xFF1F1F1F)  // Почти черный
+        val backgroundColor = Color(0xFFFFFAF5)  // Теплый белый с кремовым оттенком
+        val style = TextStyle(  color = tintColor, fontFamily = ThemeRed.fontFamilyPopinsRegular, fontSize = 20.sp )
+    }
 
 
 

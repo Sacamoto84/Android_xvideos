@@ -38,8 +38,10 @@ fun AlbumListBottomBar(
     Column {
         HorizontalDivider()
         Row(modifier = Modifier.padding(start = 4.dp).fillMaxWidth().height(48.dp).background(ThemeRed.colorTabLevel1), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-            Box(modifier = Modifier.width(64.dp).height(46.dp).border(1.dp, ThemeL.grey2, RoundedCornerShape(4.dp)).clickable(onClick = { onClickVisibleFilter() }), contentAlignment = Alignment.Center){
-                Text("Filter", color = ThemeL.textColor, fontFamily = ThemeL.fontFamilyKarla)
+
+            Box(modifier = Modifier.width(64.dp).height(46.dp).border(2.dp, ThemeL.grey2, RoundedCornerShape(4.dp))
+                .background(ThemeL.lavender.copy(alpha = 0.2f)).clickable(onClick = { onClickVisibleFilter() }), contentAlignment = Alignment.Center){
+                Text("Filter", color = ThemeL.grey0 , fontFamily = ThemeL.fontFamilyKarla)
             }
 
             Row {
