@@ -2,6 +2,7 @@ package com.client.xvideos.common.sharedPref
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.client.xvideos.l.model.ThumbnailsSize
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -40,6 +41,24 @@ class SettingElementInt(private val sharedPrefs: SharedPreferences, val name: St
 }
 
 
+class SettingElementString(private val sharedPrefs: SharedPreferences, val name: String, val default: String = "") {
+    private val _field = MutableStateFlow(sharedPrefs.getString(name, default)!!)
+    val field: StateFlow<String> = _field.asStateFlow()
+
+    fun setValue(value: String) {
+        sharedPrefs.edit { putString(name, value) }
+        _field.value = value
+        println("!!! setValue $value _field ${ _field.value} ")
+    }
+
+    private val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+        if (key == name) { _field.value = sharedPrefs.getString(key, default)!!  }
+    }
+
+    init { sharedPrefs.registerOnSharedPreferenceChangeListener(listener) }
+    fun clear() { sharedPrefs.unregisterOnSharedPreferenceChangeListener(listener) }
+}
+
 object Settings {
 
     private lateinit var pref: SharedPreferences
@@ -64,5 +83,17 @@ object Settings {
 
     val current_count_likesTab by lazy { SettingElementInt(pref, "current_count_likesTab", 2) }
     val current_count_collectionTab by lazy { SettingElementInt(pref, "current_count_collectionTab", 2) }
+
+
+
+
+    //-- luscious ---
+
+    /**
+     * Размер миниатюры в галерее
+     */
+    val thumbalistSize by lazy { SettingElementString(pref, "thumbalistSize", ThumbnailsSize.SMALL.value) }
+
+
 
 }

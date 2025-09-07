@@ -27,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.TextStyle
@@ -34,6 +35,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
@@ -42,15 +44,19 @@ import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import com.client.xvideos.App
 import com.client.xvideos.common.fresco.FrescoUtils
+import com.client.xvideos.common.sharedPref.Settings
 import com.client.xvideos.common.traficStatistic.AppNetworkSpeedMonitor
 import com.client.xvideos.common.util.formatBytes
 import com.client.xvideos.common.util.getFolderSize
 import com.client.xvideos.l.ThemeL
+import com.client.xvideos.l.model.ThumbnailsSize
 import com.client.xvideos.l.model.enum.AudiencesType
 import com.client.xvideos.l.ui.screens.explorer.tab.config.atom.ConfigTextAndButtonL
 import com.client.xvideos.l.ui.screens.explorer.tab.config.atom.ConfigTextAndCheckBoxL
+import com.client.xvideos.l.ui.screens.explorer.tab.config.atom.ConfigTextAndMenuL
 import com.client.xvideos.l.ui.screens.explorer.tab.config.atom.ConfigTextL
 import com.client.xvideos.l.ui.screens.explorer.tab.config.atom.ScreenLConfig_Encrypt
+import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
 import com.facebook.drawee.backends.pipeline.Fresco
 import dagger.Binds
 import dagger.Module
@@ -95,7 +101,14 @@ object ScreenLConfigTab : Screen {
                 .verticalScroll(rememberScrollState()),
         ) {
             Text(
-                "Настройки", color = ThemeL.textColor, style = TextStyle(fontWeight = FontWeight.Medium, fontSize = 24.sp, fontFamily = ThemeL.fontFamilyKarla, textAlign = TextAlign.Center ),
+                "Настройки",
+                color = ThemeL.textColor,
+                style = TextStyle(
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 24.sp,
+                    fontFamily = ThemeL.fontFamilyKarla,
+                    textAlign = TextAlign.Center
+                ),
                 modifier = Modifier.fillMaxWidth()
             )
             HorizontalDivider(color = Color.DarkGray)
@@ -103,8 +116,8 @@ object ScreenLConfigTab : Screen {
 
 
             ConfigTextL("I want to see this content:")
-            AudiencesType.entries.forEach { it->
-                ConfigTextAndCheckBoxL(it.title, true,{ })
+            AudiencesType.entries.forEach { it ->
+                ConfigTextAndCheckBoxL(it.title, true, { })
             }
             Spacer(Modifier.height(4.dp))
             HorizontalDivider(color = Color.DarkGray)
@@ -116,34 +129,48 @@ object ScreenLConfigTab : Screen {
             ConfigTextL("BitmapCache: ${formatBytes(bitmapCache.toLong())}")
             val size = getFolderSize(File(context.cacheDir, "fresco_main_cache").absoluteFile)
             ConfigTextL("Дисковый кеш: " + formatBytes(size))
-            ConfigTextAndButtonL("Очистить кеш картинок", "Очистить", {}, { FrescoUtils.clearCache() })
+
+            ConfigTextAndButtonL("Дисковый кеш: " + formatBytes(size), "Задать", {}, { })
+            ConfigTextAndButtonL(
+                "Очистить кеш картинок",
+                "Очистить",
+                {},
+                { FrescoUtils.clearCache() })
+
+            // --- Миниатюра ---
+            val thumbnailSize = Settings.thumbalistSize.field.collectAsStateWithLifecycle().value
+            val currentDisplayName = ThumbnailsSize.fromValue(thumbnailSize)?.displayName ?: "?"
+            ConfigTextAndMenuL("Размер миниатюры", currentDisplayName, ThumbnailsSize.displayNames) { selectedDisplayName ->
+                ThumbnailsSize.fromDisplayName(selectedDisplayName)?.apply {
+                    Settings.thumbalistSize.setValue(value)
+                    vm.snackBarEvent.success("Размер миниатюры: $displayName")
+                }
+            }
             Spacer(Modifier.height(4.dp))
             HorizontalDivider(color = Color.DarkGray)
 
+            // ---
 
-            Box( modifier = Modifier.padding(horizontal = 8.dp).padding(vertical = 2.dp).height(32.dp).fillMaxWidth(), contentAlignment = Alignment.Center ) {
-                Text(versionText, style = styleTextConfigL.copy(fontSize = 14.sp, color = ThemeL.grey2))
+
+            Box(
+                modifier = Modifier
+                    .padding(horizontal = 8.dp)
+                    .padding(vertical = 2.dp)
+                    .height(32.dp)
+                    .fillMaxWidth(), contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    versionText,
+                    style = styleTextConfigL.copy(fontSize = 14.sp, color = ThemeL.grey2)
+                )
             }
 
         }
 
 
-
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 val styleTextConfigL = TextStyle(
@@ -153,14 +180,12 @@ val styleTextConfigL = TextStyle(
 )
 
 
-
 class ScreenLExplorerSettingSM @Inject constructor(
-
+    val snackBarEvent: SnackBarEvent
 ) : ScreenModel {
 
     var sizeXvideos by mutableLongStateOf(0L)
     var sizeRedDownload by mutableLongStateOf(0L)
-
 
 
     init {

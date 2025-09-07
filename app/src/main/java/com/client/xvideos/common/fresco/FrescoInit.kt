@@ -150,6 +150,9 @@ fun FrescoInit(application: Application) {
         .setDownsampleMode(DownsampleMode.NEVER)
         .setResizeAndRotateEnabledForNetwork(true) // Ресайз для сетевых изображений
 
+
+
+
         .setNetworkFetcher(customNetworkFetcher)
         .build()
 

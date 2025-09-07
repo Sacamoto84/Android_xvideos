@@ -56,7 +56,7 @@ fun ConfigTextAndButtonWithDialogL(
 
     Row(
         modifier = Modifier
-            .padding(start = 8.dp, end = 2.dp)
+            .padding(start = 8.dp, end = 4.dp)
             .padding(vertical = 2.dp)
             .height(48.dp)
             .fillMaxWidth(),

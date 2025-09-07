@@ -16,7 +16,6 @@ import androidx.compose.foundation.lazy.staggeredgrid.itemsIndexed
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,12 +29,15 @@ import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.client.xvideos.common.fresco.DownloadQueueManager
 import com.client.xvideos.l.ThemeL
 import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.FullScreenImage
 import com.client.xvideos.l.ui.screens.LocalRootLScreenModel
 import com.client.xvideos.common.fresco.UrlImageLusciousGifsGlide
+import com.client.xvideos.common.sharedPref.Settings
+import com.client.xvideos.l.model.ThumbnailsSize
 import com.client.xvideos.redgifs.ui.profile.atom.VerticalScrollbar
 import com.client.xvideos.redgifs.ui.profile.rememberVisibleRangePercentIgnoringFirstNForLazyStaggeredGrid
 
@@ -48,6 +50,8 @@ fun LazyRowPictureDetails(
 ) {
     val rootVm = LocalRootLScreenModel.current
     val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForLazyStaggeredGrid(host.state, 0)
+
+    val thumbnailsSize = Settings.thumbalistSize.field.collectAsStateWithLifecycle().value
 
     Box(modifier = Modifier.fillMaxSize()) {
 
@@ -71,9 +75,12 @@ fun LazyRowPictureDetails(
                     ) {
                         val aspect = item.width.toFloat() / item.height
 
-                        UrlImageLusciousGifsGlide(
+                        val url = if (item.thumbnails.isEmpty()) item.url_to_original else{
+                            item.thumbnails.firstOrNull{it.size == thumbnailsSize}?.url ?: item.url_to_original
+                        } //"small" large_thumbnail
 
-                            item.url_to_original,
+                        UrlImageLusciousGifsGlide(
+                            url,
                             modifier = Modifier
                                 .padding(2.dp)
                                 .aspectRatio(aspect)

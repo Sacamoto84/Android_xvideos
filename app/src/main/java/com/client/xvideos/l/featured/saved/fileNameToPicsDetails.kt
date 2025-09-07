@@ -25,6 +25,7 @@ fun fileNameToPicsDetails(file: File, folder : String): PicsDetails? {
         is_animated = is_animated, // тут надо решать самому, инфы в имени нет
         url_to_original = path,
         url_to_video = null,
-        album = album
+        album = album,
+        thumbnails = emptyList()
     )
 }

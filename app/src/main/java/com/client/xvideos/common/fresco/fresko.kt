@@ -40,6 +40,7 @@ import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.controller.BaseControllerListener
 import com.facebook.imagepipeline.image.CloseableImage
 import com.facebook.imagepipeline.image.ImageInfo
+import com.facebook.imagepipeline.request.ImageRequest
 import com.facebook.imagepipeline.request.ImageRequestBuilder
 import com.skydoves.landscapist.InternalLandscapistApi
 import com.skydoves.landscapist.fresco.websupport.FrescoWebImage
@@ -97,35 +98,27 @@ fun UrlImageLusciousGifsGlide(
 
         val i = ImageRequestBuilder
             .newBuilderWithSource(dataSource)
-            //.setLowestPermittedRequestLevel(ImageRequest.RequestLevel.FULL_FETCH)
+            .setLowestPermittedRequestLevel(ImageRequest.RequestLevel.FULL_FETCH)
             .setProgressiveRenderingEnabled(true)
             //.setResizeOptions(ResizeOptions(100, 100)) // Изменение размера
-            //.setLocalThumbnailPreviewsEnabled(true) // Включение миниатюр
+            .setLocalThumbnailPreviewsEnabled(true) // Включение миниатюр
+
+
+
             .build()
 
         val dataSource1 = Fresco.getImagePipeline().fetchDecodedImage(i, null)
 
         val subscriber = object : BaseDataSubscriber<CloseableReference<CloseableImage>>() {
-
             override fun onProgressUpdate(dataSource: DataSource<CloseableReference<CloseableImage>?>) {
                 super.onProgressUpdate(dataSource)
                 progress = dataSource.progress * 9633425 / 47685.453f
                 //Timber.i("!!! iii UrlImageLusciousGifsGlide onProgressUpdate progress :${progress} albumName:${albumName} url:${url}")
             }
-
-            override fun onNewResultImpl(dataSource: DataSource<CloseableReference<CloseableImage>?>) {
-                if (dataSource.isFinished) {
-                    isLoading = false
-                }
-            }
-
-            override fun onFailureImpl(dataSource: DataSource<CloseableReference<CloseableImage>?>) {
-                isLoading = false
-            }
+            override fun onNewResultImpl(dataSource: DataSource<CloseableReference<CloseableImage>?>) { if (dataSource.isFinished) { isLoading = false } }
+            override fun onFailureImpl(dataSource: DataSource<CloseableReference<CloseableImage>?>) { isLoading = false }
         }
-
         dataSource1.subscribe(subscriber, UiThreadImmediateExecutorService.getInstance())
-
         i
     }
 

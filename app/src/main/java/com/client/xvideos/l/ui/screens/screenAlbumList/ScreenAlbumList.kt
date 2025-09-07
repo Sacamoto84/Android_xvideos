@@ -49,6 +49,7 @@ import com.client.xvideos.l.net.Luscious
 import com.client.xvideos.l.ui.element.AlbumListItem
 import com.client.xvideos.l.ui.screens.screenAlbum.ScreenLAlbum
 import com.client.xvideos.l.ui.screens.screenAlbumList.atom.AlbumListPageSelector
+import com.client.xvideos.l.ui.screens.screenAlbumList.bottomBar.AlbumListBottomBar
 import com.client.xvideos.l.ui.screens.screenAlbumList.molecule.filter.AlbumListFilter
 import com.client.xvideos.redgifs.common.ThemeRed
 import dagger.Binds
@@ -87,23 +88,12 @@ object ScreenLAlbumList : Screen {
         var visibleFilter by remember { mutableStateOf(false) }
 
         val haptic = LocalHapticFeedback.current
-
         val state = rememberLazyGridState()
-
         val scope = rememberCoroutineScope()
 
         Scaffold(
             bottomBar = {
-                Column {
-                    HorizontalDivider()
-                    Row(modifier = Modifier.padding(start = 4.dp).fillMaxWidth().height(48.dp).background(ThemeRed.colorTabLevel1), verticalAlignment = Alignment.CenterVertically) {
-                        Box(modifier = Modifier.width(64.dp).height(46.dp).border(1.dp, ThemeL.grey2, RoundedCornerShape(4.dp)).clickable(onClick = {visibleFilter = !visibleFilter}), contentAlignment = Alignment.Center){
-                            Text("Filter", color = ThemeL.textColor, fontFamily = ThemeL.fontFamilyKarla)
-                        }
-                    }
-                    HorizontalDivider()
-                }
-
+                AlbumListBottomBar(onClickVisibleFilter = { visibleFilter = !visibleFilter }, onClickPrev = {vm.loadPrevList()}, onClickNext = {vm.loadNextList()})
             }, containerColor = ThemeL.greyBackground
         ) { padding ->
 
@@ -202,6 +192,21 @@ class ScreenLAlbumListSM @AssistedInject constructor(
         screenModelScope.launch {
             albumList.value?.getAlbumList(page)
             //albumList.value?.getAlbumListAggregations(page)
+        }
+    }
+
+
+    fun loadNextList(){
+          if (albumList.value != null){
+              val page = (albumList.value!!.info.page + 1)//.coerceAtMost(albumList.value!!.info.totalPages)
+              loadAlbumList(page)
+          }
+    }
+
+    fun loadPrevList(){
+        if (albumList.value != null){
+            val page = (albumList.value!!.info.page - 1).coerceAtLeast(1)
+            loadAlbumList(page)
         }
     }
 
