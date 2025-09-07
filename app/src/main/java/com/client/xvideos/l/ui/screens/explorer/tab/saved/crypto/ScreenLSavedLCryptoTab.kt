@@ -5,7 +5,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import cafe.adriel.voyager.core.model.ScreenModel
+import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
@@ -15,8 +18,10 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.common.sharedPref.Settings
 import com.client.xvideos.l.featured.saved.SavedL
+import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.ui.element.lazyRowPictureDetails.LazyRowPictureDetails
 import com.client.xvideos.l.ui.element.lazyRowPictureDetails.LazyRowPictureDetailsHost
+import com.client.xvideos.l.ui.element.expandMenu.SavedCryptoItemExpandMenu
 import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
 import com.client.xvideos.redgifs.ui.explorer.tab.gifs.ColumnSelect
 import dagger.Binds
@@ -24,8 +29,8 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
+import kotlinx.coroutines.launch
 import javax.inject.Inject
-
 
 
 object ScreenLSavedLCryptoTab : Screen {
@@ -33,8 +38,9 @@ object ScreenLSavedLCryptoTab : Screen {
     private fun readResolve(): Any = ScreenLSavedLCryptoTab
 
     override val key: ScreenKey = uniqueScreenKey
+
     @Transient
-    val columnSelect  = ColumnSelect(Settings.current_count_likesTab)
+    val columnSelect = ColumnSelect(Settings.current_count_likesTab)
 
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
@@ -42,13 +48,26 @@ object ScreenLSavedLCryptoTab : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val vm: ScreenSavedLCryptoSM = getScreenModel()
 
+        val haptic = LocalHapticFeedback.current
+
         Scaffold(modifier = Modifier.fillMaxSize()) {
             LazyRowPictureDetails(
-                vm.host,{})
+                vm.host,
+                expandMenu =
+                    { item ->
+                        SavedCryptoItemExpandMenu(
+                            item = item, onDelete = {
+                                vm.delete(item)
+                            },
+                            onDownloadToLikes = {
+
+                            },
+                            haptic = {haptic.performHapticFeedback(HapticFeedbackType.LongPress)})
+                    }
+            )
         }
 
     }
-
 
 
 }
@@ -58,10 +77,16 @@ class ScreenSavedLCryptoSM @Inject constructor(
     val savedL: SavedL
 ) : ScreenModel {
 
-    val host =  LazyRowPictureDetailsHost("crypto")
+    val host = LazyRowPictureDetailsHost("crypto")
 
     init {
         host.filteredPic = savedL.crypto.listUrl
+    }
+
+    fun delete(item: PicsDetails) {
+        screenModelScope.launch {
+            savedL.crypto.remove(item.url_to_original!!)
+        }
     }
 
 }

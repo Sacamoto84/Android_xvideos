@@ -14,7 +14,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.client.xvideos.l.ThemeL
-import com.client.xvideos.l.ui.screens.explorer.tab.config.styleTextConfigL
 
 @Composable
 fun ConfigTextAndCheckBoxL(text: String, value: Boolean, onValueChange: (Boolean) -> Unit) {
@@ -33,6 +32,6 @@ fun ConfigTextAndCheckBoxL(text: String, value: Boolean, onValueChange: (Boolean
             ,uncheckedColor = ThemeL.grey3
 
         ), modifier = Modifier.width(40.dp))
-        Text(text, style = styleTextConfigL)
+        Text(text, style = ThemeL.styleTextConfigL)
     }
 }

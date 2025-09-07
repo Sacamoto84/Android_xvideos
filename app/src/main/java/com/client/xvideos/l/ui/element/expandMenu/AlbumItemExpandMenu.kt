@@ -1,4 +1,4 @@
-package com.client.xvideos.l.ui.screens.explorer.tab.saved.likes.expandMenu
+package com.client.xvideos.l.ui.element.expandMenu
 
 
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -38,6 +38,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.client.xvideos.l.model.PicsDetails
+import com.client.xvideos.l.ui.element.expandMenu.atom.DropdownMenuItem_Download
+import com.client.xvideos.l.ui.element.expandMenu.atom.DropdownMenuItem_DownloadCrypto
+import com.client.xvideos.l.ui.element.expandMenu.themeExpandMenu.backgroundColor
 import com.client.xvideos.redgifs.network.api.RedApi
 import com.client.xvideos.redgifs.model.GifsInfo
 import com.client.xvideos.redgifs.common.ThemeRed
@@ -49,17 +52,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
-private val tintColor = Color(0xFF48454E)
-private val style =
-    TextStyle(color = tintColor, fontFamily = ThemeRed.fontFamilyPopinsRegular, fontSize = 20.sp)
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LikesItemExpandMenu(
+fun AlbumItemExpandMenu(
     item: PicsDetails? = null,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
-    onDelete: (PicsDetails) -> Unit = {},
+    onDownload : (PicsDetails) -> Unit = {},
     onDownloadCrypto : (PicsDetails) -> Unit = {},
     haptic : ()->Unit = {}
 ) {
@@ -85,10 +84,10 @@ fun LikesItemExpandMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
             modifier = Modifier.width(IntrinsicSize.Min),
-            containerColor = Color(0xFFF1EDF4)//ThemeRed.colorCommonBackground
+            containerColor = backgroundColor
         ) {
 
-            DropdownMenuItem_Delete(item, onClick = {onDelete(it)}
+            DropdownMenuItem_Download(item, onClick = {onDownload(it)}
             ){ expanded = false }
 
             DropdownMenuItem_DownloadCrypto(item, onClick = {onDownloadCrypto(it)}
@@ -99,62 +98,12 @@ fun LikesItemExpandMenu(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DropdownMenuItem_Delete(url: PicsDetails? = null, onClick: (PicsDetails) -> Unit = {}, onDismiss: () -> Unit){
-    DropdownMenuItem(
-        leadingIcon = {Icon(Icons.Filled.FileDownload, contentDescription = "", tint = tintColor)},
-        text = {Text("Удалить", style = style)},
-        onClick = {
-            if (url == null) return@DropdownMenuItem
-            onClick.invoke(url)
-            onDismiss.invoke()
-        }, contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
-    )
-}
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DropdownMenuItem_DownloadCrypto(url: PicsDetails? = null, onClick: (PicsDetails) -> Unit = {}, onDismiss: () -> Unit){
-    DropdownMenuItem(
-        leadingIcon = {Icon(Icons.Filled.EnhancedEncryption, contentDescription = "", tint = tintColor)},
-        text = {Text("Скачать Крипто", style = style)},
-        onClick = {
-            if (url == null) return@DropdownMenuItem
-            onClick.invoke(url)
-            onDismiss.invoke()
-        }, contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
-    )
-}
 
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//fun DropdownMenuItem_Share(item: GifsInfo? = null, onClick: (GifsInfo) -> Unit, onDismiss: () -> Unit){
-//    DropdownMenuItem(
-//        leadingIcon = {Icon(Icons.Default.Share, contentDescription = "", tint = tintColor)},
-//        text = { Text("Поделиться", style = style) },
-//        onClick = {
-//            if (item == null) return@DropdownMenuItem
-//            //DownloadRed.downloadItem(item)
-//            onClick.invoke(item)
-//            onDismiss.invoke()
-//        }, contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
-//    )
-//}
-//
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//fun DropdownMenuItem_Block(item: GifsInfo? = null, block: BlockRed, onDismiss: () -> Unit){
-//    DropdownMenuItem(
-//        leadingIcon = {Icon(Icons.Default.Block, contentDescription = "", tint = tintColor)},
-//        text = { Text("Блокировать", style = style) },
-//        onClick = {
-//            if (item == null) return@DropdownMenuItem; block.blockVisibleDialog = true
-//            onDismiss.invoke()
-//        }, contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
-//    )
-//}
-//
+
+
+
+
 //@OptIn(ExperimentalMaterial3Api::class, DelicateCoroutinesApi::class)
 //@Composable
 //fun DropdownMenuItem_Like(item: GifsInfo? = null, onRunLike: () -> Unit, savedRed: SavedRed, onDismiss: () -> Unit){
@@ -175,7 +124,7 @@ fun DropdownMenuItem_DownloadCrypto(url: PicsDetails? = null, onClick: (PicsDeta
 //        }, contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
 //    )
 //}
-//
+
 //@OptIn(ExperimentalMaterial3Api::class, DelicateCoroutinesApi::class)
 //@Composable
 //fun DropdownMenuItem_Follow(item: GifsInfo? = null, redApi: RedApi, savedRed: SavedRed, onDismiss: () -> Unit){
@@ -203,7 +152,7 @@ fun DropdownMenuItem_DownloadCrypto(url: PicsDetails? = null, onClick: (PicsDeta
 //        }, contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
 //    )
 //}
-//
+
 //@OptIn(ExperimentalMaterial3Api::class)
 //@Composable
 //fun DropdownMenuItem_AddCollection(item: GifsInfo? = null, savedRed: SavedRed, onDismiss: () -> Unit){
@@ -224,8 +173,8 @@ fun DropdownMenuItem_DownloadCrypto(url: PicsDetails? = null, onClick: (PicsDeta
 //        }, contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
 //    )
 //}
-//
-//
+
+
 //@OptIn(ExperimentalMaterial3Api::class)
 //@Composable
 //fun DropdownMenuItem_RemoveFromCollection(item: GifsInfo? = null, onRefresh: () -> Unit, savedRed: SavedRed, onDismiss: () -> Unit){

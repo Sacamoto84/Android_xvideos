@@ -41,7 +41,7 @@ import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoDownloadButton
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoFilterButton
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoGreeting
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoTags
-import com.client.xvideos.l.ui.screens.screenAlbum.expandMenu.AlbumItemExpandMenu
+import com.client.xvideos.l.ui.element.expandMenu.AlbumItemExpandMenu
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.ScrollToTopButton
 import net.engawapg.lib.zoomable.ExperimentalZoomableApi
 import timber.log.Timber

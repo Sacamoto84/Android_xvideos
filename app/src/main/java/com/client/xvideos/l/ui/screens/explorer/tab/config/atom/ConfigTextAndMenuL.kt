@@ -2,7 +2,6 @@ package com.client.xvideos.l.ui.screens.explorer.tab.config.atom
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -10,18 +9,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.FileDownload
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,17 +27,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.client.xvideos.common.setting.styleTextConfig
 import com.client.xvideos.l.ThemeL
-import com.client.xvideos.l.ui.screens.explorer.tab.config.styleTextConfigL
-import com.client.xvideos.redgifs.common.ThemeRed
-
-private val tintColor = Color(0xFF48454E)
-private val style =
-    TextStyle(color = tintColor, fontFamily = ThemeRed.fontFamilyPopinsRegular, fontSize = 20.sp)
+import com.client.xvideos.l.ui.element.expandMenu.themeExpandMenu.backgroundColor
+import com.client.xvideos.l.ui.element.expandMenu.themeExpandMenu.style
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -65,7 +54,7 @@ fun ConfigTextAndMenuL(
         verticalAlignment = Alignment.CenterVertically
     ) {
 
-        Text(text, style = styleTextConfigL)
+        Text(text, style = ThemeL.styleTextConfigL)
 
         ExposedDropdownMenuBox(
             expanded = expanded,
@@ -91,18 +80,18 @@ fun ConfigTextAndMenuL(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
                 modifier = Modifier.width(IntrinsicSize.Min),
-                containerColor = Color(0xFFF1EDF4)//ThemeRed.colorCommonBackground
+                containerColor = backgroundColor//ThemeRed.colorCommonBackground
             ) {
                 items.forEach {
 
                     DropdownMenuItem(
-                        leadingIcon = {
-                            Icon(
-                                Icons.Filled.FileDownload,
-                                contentDescription = "",
-                                tint = tintColor
-                            )
-                        },
+//                        leadingIcon = {
+//                            Icon(
+//                                Icons.Filled.FileDownload,
+//                                contentDescription = "",
+//                                tint = tintColor
+//                            )
+//                        },
                         text = { Text(it, style = style) },
                         onClick = {
                             onClick(it)

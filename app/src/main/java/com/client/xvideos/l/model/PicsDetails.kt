@@ -27,7 +27,7 @@ enum class ThumbnailsSize(
     val value: String,
     val displayName: String
 ) {
-    XMAX("xMax", "Big"),
+    XMAX("xMax", "Large"),
     SMALL("small", "Medium"),
     LARGE_THUMBALIST("large_thumbnail", "Small");
 

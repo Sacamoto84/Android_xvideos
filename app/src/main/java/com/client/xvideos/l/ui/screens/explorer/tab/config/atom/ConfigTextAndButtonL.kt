@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.client.xvideos.common.setting.styleTextConfig
 import com.client.xvideos.l.ThemeL
-import com.client.xvideos.l.ui.screens.explorer.tab.config.styleTextConfigL
+
 
 @Composable
 fun ConfigTextAndButtonL(
@@ -42,7 +42,7 @@ fun ConfigTextAndButtonL(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text, style = styleTextConfigL)
+        Text(text, style = ThemeL.styleTextConfigL)
 
 
         Row {

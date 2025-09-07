@@ -16,13 +16,12 @@ import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.client.xvideos.common.AppPath
 import com.client.xvideos.common.sharedPref.Settings
 import com.client.xvideos.l.featured.saved.SavedL
 import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.ui.element.lazyRowPictureDetails.LazyRowPictureDetails
 import com.client.xvideos.l.ui.element.lazyRowPictureDetails.LazyRowPictureDetailsHost
-import com.client.xvideos.l.ui.screens.explorer.tab.saved.likes.expandMenu.LikesItemExpandMenu
+import com.client.xvideos.l.ui.element.expandMenu.SavedLikesItemExpandMenu
 import com.client.xvideos.redgifs.ui.explorer.tab.gifs.ColumnSelect
 import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
 import dagger.Binds
@@ -31,7 +30,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
 import kotlinx.coroutines.launch
-import java.io.File
 import javax.inject.Inject
 
 object ScreenLSavedLikesTab : Screen {
@@ -54,7 +52,7 @@ object ScreenLSavedLikesTab : Screen {
             LazyRowPictureDetails(
                 vm.host,
                 expandMenu = {
-                    LikesItemExpandMenu(it,
+                    SavedLikesItemExpandMenu(it,
                         onDelete = {it ->
                             vm.delete(it)
                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
@@ -66,7 +64,7 @@ object ScreenLSavedLikesTab : Screen {
                     )
                 },
                 expandMenuFullScreen = {
-                    LikesItemExpandMenu(it,
+                    SavedLikesItemExpandMenu(it,
                         onDelete = {it ->
                             vm.delete(it)
                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)

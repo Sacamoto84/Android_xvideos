@@ -85,12 +85,9 @@ class SavedL_Crypto(val snackBarEvent: SnackBarEvent, val kDownloader: KDownload
 
     }
 
-
-
-
     fun remove(fileName: String) {
         println("!!! SavedL_Crypto remove() path:${fileName}")
-        val file = File(AppPath.likesCrypto_l, fileName)
+        val file = File(fileName)
         if (file.exists()) {
             if (!file.delete()) {
                 snackBarEvent.error("Не удалось удалить файл: ${file.absolutePath}")

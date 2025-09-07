@@ -127,15 +127,11 @@ object ScreenLConfigTab : Screen {
             HorizontalDivider(color = Color.DarkGray)
             Spacer(Modifier.height(4.dp))
             ConfigTextL("BitmapCache: ${formatBytes(bitmapCache.toLong())}")
-            val size = getFolderSize(File(context.cacheDir, "fresco_main_cache").absoluteFile)
-            ConfigTextL("Дисковый кеш: " + formatBytes(size))
 
+            val size = getFolderSize(File(context.cacheDir, "fresco_main_cache").absoluteFile)
             ConfigTextAndButtonL("Дисковый кеш: " + formatBytes(size), "Задать", {}, { })
-            ConfigTextAndButtonL(
-                "Очистить кеш картинок",
-                "Очистить",
-                {},
-                { FrescoUtils.clearCache() })
+
+            ConfigTextAndButtonL( "Очистить кеш картинок", "Очистить", {}, { FrescoUtils.clearCache() })
 
             // --- Миниатюра ---
             val thumbnailSize = Settings.thumbalistSize.field.collectAsStateWithLifecycle().value
@@ -161,7 +157,7 @@ object ScreenLConfigTab : Screen {
             ) {
                 Text(
                     versionText,
-                    style = styleTextConfigL.copy(fontSize = 14.sp, color = ThemeL.grey2)
+                    style = ThemeL.styleTextConfigL.copy(fontSize = 14.sp, color = ThemeL.grey2)
                 )
             }
 
@@ -173,11 +169,6 @@ object ScreenLConfigTab : Screen {
 }
 
 
-val styleTextConfigL = TextStyle(
-    fontSize = 20.sp,
-    color = ThemeL.textColor,
-    fontFamily = ThemeL.fontFamilyKarla
-)
 
 
 class ScreenLExplorerSettingSM @Inject constructor(

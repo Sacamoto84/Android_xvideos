@@ -1,8 +1,10 @@
 package com.client.xvideos.l
 
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.unit.sp
 import com.client.xvideos.R
 
 object ThemeL {
@@ -42,4 +44,18 @@ object ThemeL {
     val fontFamilyDMsanss = FontFamily(Font(R.font.dm_sans))
 
     val fontFamilyKarla = FontFamily(Font(R.font.karla))
+
+
+
+
+    //--- Config ---
+    val styleTextConfigL = TextStyle(fontSize = 20.sp, color = textColor, fontFamily = fontFamilyKarla)
+
+
+
+
+
+
+
+
 }
