@@ -227,6 +227,9 @@ class ScreenLAlbumTopHitsSM @AssistedInject constructor(
     init {
         Timber.i("iii ScreenLAlbumTopHitsSM init")
         screenModelScope.launch {
+
+            luscious.getLandingPageAlbumTag("Blonde")
+
             albumTopHits.value = luscious.getAlbumTopHits()
         }
     }

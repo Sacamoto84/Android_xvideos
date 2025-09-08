@@ -1,5 +1,6 @@
 package com.client.xvideos.l.net
 
+import com.client.xvideos.l.net.graphQl.LandingPageAlbumTag
 import com.client.xvideos.l.net.graphQl.refreshMediaCategories
 import com.client.xvideos.l.repository.Repository
 import kotlinx.coroutines.CoroutineScope
@@ -58,6 +59,10 @@ class Luscious(
 
     fun getAlbumTopHits(): AlbumTopHitsImpl {
         return AlbumTopHitsImpl(repository, scope)
+    }
+
+    fun getLandingPageAlbumTag(tag : String =  "Blonde"): LandingPageAlbumTag {
+        return LandingPageAlbumTag(repository, scope, tag)
     }
 
 }
