@@ -86,8 +86,16 @@ fun getAlbumListGraphQL1(
         str.append("""{ "name": "content_id", "value": "${filter.content_id.value}" },""")
     }
 
-    if (filter.taggeded.isNotEmpty()) {
-        str.append("""{ "name": "tagged", "value": "${filter.taggeded}" },""")
+
+    if (filter.tagPlus.isNotEmpty() or filter.tagMinus.isNotEmpty()) {
+        val tags = StringBuilder()
+        filter.tagPlus.forEach {
+            tags.append("+${it}")
+        }
+        filter.tagMinus.forEach {
+            tags.append("-${it}")
+        }
+        str.append("""{ "name": "tagged", "value": "$tags" },""")
     }
 
     str.append("""{ "name": "audience_ids", "value": "${filter.audienceIds}" },""")

@@ -18,5 +18,4 @@ data class AlbumListFilter(
     val tagPlus : List<String> = emptyList(),
     val tagMinus : List<String> = emptyList(),
 
-    val taggeded : String = ""
 )

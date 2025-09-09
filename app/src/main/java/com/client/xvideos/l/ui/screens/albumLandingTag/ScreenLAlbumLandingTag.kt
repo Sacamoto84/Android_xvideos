@@ -229,7 +229,7 @@ class ScreenLAlbumLandingTagSM @AssistedInject constructor(
             display = "date_trending",
             album_type = albumType,
             content_id = contentId,
-            taggeded = "+$tag"
+            tagPlus = listOf("$tag")
         )
 
         return f

@@ -74,6 +74,17 @@ fun getAlbumListWithAggregations(
         str.append("""{ "name": "content_id", "value": "${filter.content_id.value}" },""")
     }
 
+    if (filter.tagPlus.isNotEmpty() or filter.tagMinus.isNotEmpty()) {
+        val tags = StringBuilder()
+        filter.tagPlus.forEach {
+            tags.append("+${it}")
+        }
+        filter.tagMinus.forEach {
+            tags.append("-${it}")
+        }
+        str.append("""{ "name": "tagged", "value": "$tags" },""")
+    }
+
     if (filter.genresPlus.isNotEmpty() or filter.genresMinus.isNotEmpty()) {
         val genres = StringBuilder()
         filter.genresPlus.forEach {

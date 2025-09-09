@@ -41,8 +41,6 @@ fun AlbumListFilterTags(
 
     val tagsCorrect = filterTerms?.minus(tagsPlus.map{it})?.minus(tagsMinus.map{it})?.toList()
 
-
-
     Column()
     {
 
@@ -134,13 +132,7 @@ fun AlbumListFilterTags(
 
 
 
-                                    Text(
-                                        item,
-                                        color = ThemeL.textColor,
-                                        fontFamily = ThemeL.fontFamilyKarla,
-                                        fontSize = 20.sp,
-                                        fontWeight = FontWeight.Bold
-                                    )
+                                    Text( item, color = ThemeL.textColor, fontFamily = ThemeL.fontFamilyKarla, fontSize = 20.sp, fontWeight = FontWeight.Bold )
 
                                     Icon(
                                         Icons.Default.Remove,
@@ -162,16 +154,8 @@ fun AlbumListFilterTags(
 
                                 }
 
-
-
-                                val count = filterTagStateCount.find { it1 -> it1.term == item }?.count
-                                Text(
-                                    count.toString(),
-                                    color = ThemeL.textColor,
-                                    fontFamily = ThemeL.fontFamilyKarla,
-                                    fontSize = 22.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
+                                val count = filterTagStateCount.find { it1 -> it1.term == item }?.count ?: -1
+                                Text( count.toString(), color = ThemeL.textColor, fontFamily = ThemeL.fontFamilyKarla,  fontSize = 22.sp, fontWeight = FontWeight.Bold )
 
                             }
 

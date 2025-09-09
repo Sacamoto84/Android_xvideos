@@ -72,6 +72,8 @@ class AlbumListImpl(
 
             val q = getAlbumListWithAggregations(id, filter)
 
+            Timber.i("!!! getAlbumListAggregations $q")
+
             val result = repository.openURI(Luscious.Companion.API, q)
             if (result.isFailure) {
                 Timber.i("!!! getAlbumListAggregations error ${result.exceptionOrNull()}")
@@ -128,7 +130,11 @@ class AlbumListImpl(
                 withContext(Dispatchers.Main) {
                     filterTaggedStateCount.clear()
                     filterTaggedStateCount.addAll(list)
-                    Timber.i("!!! getAlbumListAggregations list Tagged размер : ${list.size}")
+                    Timber.i("!!! getAlbumListAggregations list Tagged размер : ${list.size} ${
+                        list.joinToString(
+                            "\n"
+                        ) { it.term }
+                    }")
                 }
             } else {
                 withContext(Dispatchers.Main) {
@@ -186,6 +192,8 @@ class AlbumListImpl(
             filter = filterIn ?: AlbumListFilter()
 
             val q = getAlbumListGraphQL1(id, filter)
+
+            //Timber.i("!!! getAlbumList $q")
 
             val result = repository.openURI( Luscious.Companion.API, q, config = RepositoryUriConfig.CACHE_RAM )
             if (result.isFailure) {

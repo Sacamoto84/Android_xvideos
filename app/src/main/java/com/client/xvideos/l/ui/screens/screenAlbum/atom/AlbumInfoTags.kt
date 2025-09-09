@@ -23,7 +23,7 @@ import com.client.xvideos.l.model.Tag
 @Composable
 fun AlbumInfoTags(parsed: AlbumDetails, onClick: (String) -> Unit) {
     FlowRow(verticalArrangement = Arrangement.Center) {
-        parsed.tags.reversed().forEach {
+        parsed.tags.reversed().filter{it.count>0}.forEach {
             Text(
                 "${it.text.capitalizeEachWord()} (${it.count})",
                 modifier = Modifier
@@ -31,8 +31,7 @@ fun AlbumInfoTags(parsed: AlbumDetails, onClick: (String) -> Unit) {
                     .padding(vertical = 2.dp)
                     .border(1.dp, ThemeL.secondaryColor, RoundedCornerShape(4.dp))
                     .padding(4.dp)
-                    .clickable(onClick = {onClick(it.text) })
-                ,
+                    .clickable(onClick = {onClick(it.text) }),
                 color = ThemeL.textColor,
                 fontFamily = ThemeL.fontFamilyKarla
             )
