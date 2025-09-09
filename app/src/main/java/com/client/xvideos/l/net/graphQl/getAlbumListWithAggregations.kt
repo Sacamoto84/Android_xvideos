@@ -3,6 +3,7 @@ package com.client.xvideos.l.net.graphQl
 import com.client.xvideos.l.model.AlbumListFilter
 import com.client.xvideos.l.model.enum.AlbumType
 import com.client.xvideos.l.model.enum.ContentId
+import java.util.Locale.getDefault
 
 fun getAlbumListWithAggregations(
     page: Int = 1,
@@ -77,10 +78,10 @@ fun getAlbumListWithAggregations(
     if (filter.tagPlus.isNotEmpty() or filter.tagMinus.isNotEmpty()) {
         val tags = StringBuilder()
         filter.tagPlus.forEach {
-            tags.append("+${it}")
+            tags.append("+${it.replace(" ", "_").lowercase(getDefault())}")
         }
         filter.tagMinus.forEach {
-            tags.append("-${it}")
+            tags.append("-${it.replace(" ", "_").lowercase(getDefault())}")
         }
         str.append("""{ "name": "tagged", "value": "$tags" },""")
     }

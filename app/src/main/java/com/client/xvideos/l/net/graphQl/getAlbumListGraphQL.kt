@@ -4,6 +4,8 @@ import com.client.xvideos.l.model.AlbumListFilter
 import com.client.xvideos.l.model.enum.AlbumType
 import com.client.xvideos.l.model.enum.ContentId
 import com.client.xvideos.l.model.PictureCountRank
+import java.util.Locale
+import java.util.Locale.getDefault
 
 
 fun getAlbumListGraphQL1(
@@ -90,10 +92,10 @@ fun getAlbumListGraphQL1(
     if (filter.tagPlus.isNotEmpty() or filter.tagMinus.isNotEmpty()) {
         val tags = StringBuilder()
         filter.tagPlus.forEach {
-            tags.append("+${it}")
+            tags.append("+${it.replace(" ", "_").lowercase(getDefault())}")
         }
         filter.tagMinus.forEach {
-            tags.append("-${it}")
+            tags.append("-${it.replace(" ", "_").lowercase(getDefault())}")
         }
         str.append("""{ "name": "tagged", "value": "$tags" },""")
     }
