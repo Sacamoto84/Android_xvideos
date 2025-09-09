@@ -1,6 +1,7 @@
 package com.client.xvideos.l.ui.screens.screenAlbum.atom
 
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.padding
@@ -20,10 +21,21 @@ import com.client.xvideos.l.model.Genre
 import com.client.xvideos.l.model.Tag
 
 @Composable
-fun AlbumInfoTags(parsed: AlbumDetails) {
+fun AlbumInfoTags(parsed: AlbumDetails, onClick: (String) -> Unit) {
     FlowRow(verticalArrangement = Arrangement.Center) {
         parsed.tags.reversed().forEach {
-            Text("${it.text.capitalizeEachWord()} (${it.count})" , modifier = Modifier.padding(horizontal = 2.dp).padding(vertical = 2.dp).border(1.dp, ThemeL.secondaryColor, RoundedCornerShape(4.dp)).padding(4.dp), color = ThemeL.textColor, fontFamily = ThemeL.fontFamilyKarla)
+            Text(
+                "${it.text.capitalizeEachWord()} (${it.count})",
+                modifier = Modifier
+                    .padding(horizontal = 2.dp)
+                    .padding(vertical = 2.dp)
+                    .border(1.dp, ThemeL.secondaryColor, RoundedCornerShape(4.dp))
+                    .padding(4.dp)
+                    .clickable(onClick = {onClick(it.text) })
+                ,
+                color = ThemeL.textColor,
+                fontFamily = ThemeL.fontFamilyKarla
+            )
         }
     }
 }
@@ -36,8 +48,20 @@ fun AlbumInfoTagsPreview() {
         id = "album123",
         title = "Sample Album Title",
         tags = listOf(
-            Tag(id = "tag1", category = "general", text = "nature photography", url = "url1", count = 150),
-            Tag(id = "tag2", category = "location", text = "mountain view", url = "url2", count = 75)
+            Tag(
+                id = "tag1",
+                category = "general",
+                text = "nature photography",
+                url = "url1",
+                count = 150
+            ),
+            Tag(
+                id = "tag2",
+                category = "location",
+                text = "mountain view",
+                url = "url2",
+                count = 75
+            )
         ),
         is_manga = false,
         content = Content(id = "content1", title = "Album Content", url = "content_url"),
@@ -61,5 +85,5 @@ fun AlbumInfoTagsPreview() {
         url = "album_url",
         download_url = "download_album_url"
     )
-    AlbumInfoTags(parsed)
+    AlbumInfoTags(parsed, {})
 }

@@ -1,5 +1,6 @@
 package com.client.xvideos.l.net
 
+import com.client.xvideos.l.model.Landing_page_albumType
 import com.client.xvideos.l.net.graphQl.LandingPageAlbumTag
 import com.client.xvideos.l.net.graphQl.refreshMediaCategories
 import com.client.xvideos.l.repository.Repository
@@ -61,8 +62,8 @@ class Luscious(
         return AlbumTopHitsImpl(repository, scope)
     }
 
-    fun getLandingPageAlbumTag(tag : String =  "Blonde"): LandingPageAlbumTag {
-        return LandingPageAlbumTag(repository, scope, tag)
+    suspend fun getLandingPageAlbumTag(tag : String =  "Blonde"): Result<Landing_page_albumType> {
+        return LandingPageAlbumTag(tag, repository)
     }
 
 }

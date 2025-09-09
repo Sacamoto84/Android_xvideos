@@ -1,7 +1,6 @@
-package com.client.xvideos.l.ui.screens.explorer.tab.albumTopHits
+package com.client.xvideos.l.ui.screens.albumLandingTag
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,27 +11,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.screen.Screen
@@ -44,15 +35,10 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.l.ThemeL
-import com.client.xvideos.l.net.AlbumTopHitsImpl
+import com.client.xvideos.l.model.Landing_page_albumType
 import com.client.xvideos.l.net.Luscious
 import com.client.xvideos.l.ui.element.AlbumListItem
 import com.client.xvideos.l.ui.screens.screenAlbum.ScreenLAlbum
-import com.client.xvideos.l.ui.screens.explorer.tab.albumTopHits.atom.DrawerContentDefault
-import com.client.xvideos.l.ui.screens.explorer.tab.albumTopHits.atom.DrawerContentHentai
-import com.client.xvideos.l.ui.screens.explorer.tab.albumTopHits.atom.DrawerContentManga
-import com.client.xvideos.l.ui.screens.explorer.tab.albumTopHits.atom.DrawerContentPorn
-import com.client.xvideos.l.ui.screens.SelectIndex
 import dagger.Binds
 import dagger.Module
 import dagger.assisted.Assisted
@@ -66,11 +52,9 @@ import kotlinx.coroutines.launch
 import net.engawapg.lib.zoomable.ExperimentalZoomableApi
 import timber.log.Timber
 
-object ScreenLAlbumTopHits : Screen {
+class ScreenLAlbumLandingTag(val tag: String) : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
-
-    private fun readResolve(): Any = ScreenLAlbumTopHits
 
     @OptIn(ExperimentalZoomableApi::class)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -79,59 +63,35 @@ object ScreenLAlbumTopHits : Screen {
 
         val navigator = LocalNavigator.currentOrThrow
 
-        val vm = getScreenModel<ScreenLAlbumTopHitsSM, ScreenLAlbumTopHitsSM.Factory> { factory ->
-            factory.create(0)
-        }
+        val vm = getScreenModel<ScreenLAlbumLandingTagSM, ScreenLAlbumLandingTagSM.Factory> { factory ->  factory.create(tag) }
 
-        val items = vm.albumTopHits.collectAsState().value?.items
+        val items = vm.albumTopHits.collectAsState().value?.sections
+
+        val title = vm.albumTopHits.collectAsState().value?.title
 
         val haptic = LocalHapticFeedback.current
-
-        //val vm: ScreenLRootSM = getScreenModel()
-
-        var dialogExpanded by remember { mutableStateOf(false) }
-        val scope = rememberCoroutineScope()
-
-        var selectIndexDrawer by remember { mutableStateOf(SelectIndex.Unselect) }
-
 
 
         Scaffold(
             containerColor = ThemeL.greyBackground,
         ) {
 
-
-            if (dialogExpanded) {
-                Dialog(
-                    onDismissRequest = { dialogExpanded = false }
-                ) {
-
-                    Box(
-                        modifier = Modifier
-                            .padding(bottom = 96.dp, top = 16.dp)
-                            .fillMaxWidth(0.9f)
-                            .clip(RoundedCornerShape(16.dp))
-                            .border(1.dp, ThemeL.grey0, RoundedCornerShape(16.dp))
-                            .background(ThemeL.grey6)
-                            .padding(horizontal = 24.dp)
-                            .padding(vertical = 16.dp)
-                    ) {
-                        when (selectIndexDrawer) {
-                            SelectIndex.Default -> DrawerContentDefault()
-                            SelectIndex.Manga -> DrawerContentManga()
-                            SelectIndex.Hentai -> DrawerContentHentai()
-                            SelectIndex.Porn -> DrawerContentPorn()
-                            else -> {}
-                        }
-                    }
-
-                }
-            }
-
-
-
-
             LazyColumn(state = vm.state) {
+
+                item{
+                    if (title != null){
+
+                        Text(
+                            "Tag: $title",
+                            color = ThemeL.textColor,
+                            fontSize = 32.sp,
+                            fontFamily = ThemeL.fontFamilyKarla,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(start = 4.dp, top = 16.dp)
+                        )
+
+                    }
+                }
 
                 items(items?.size ?: 0) { index ->
                     val item = items?.get(index)
@@ -152,7 +112,8 @@ object ScreenLAlbumTopHits : Screen {
                         maxItemsInEachRow = 3,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 2.dp), horizontalArrangement = Arrangement.SpaceBetween
+                            .padding(horizontal = 2.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         val itemWidth = (screenWidth - 8.dp) / 3  // учитываем padding
                         item.items.dropLast(1).forEach { item ->
@@ -198,30 +159,30 @@ object ScreenLAlbumTopHits : Screen {
     }
 }
 
-class ScreenLAlbumTopHitsSM @AssistedInject constructor(
-    @Assisted val idAlbum: Long,
+class ScreenLAlbumLandingTagSM @AssistedInject constructor(
+    @Assisted val tag: String,
     val luscious: Luscious
 ) : ScreenModel {
 
     @AssistedFactory
     interface Factory : ScreenModelFactory {
-        fun create(idAlbum: Long): ScreenLAlbumTopHitsSM
+        fun create(tag: String): ScreenLAlbumLandingTagSM
     }
 
     val state = LazyListState()
 
-    var albumTopHits = MutableStateFlow<AlbumTopHitsImpl?>(null)
+    var albumTopHits = MutableStateFlow<Landing_page_albumType?>(null)
 
     init {
-        Timber.i("iii ScreenLAlbumTopHitsSM init")
+        Timber.i("iii ScreenLAlbumLandingTagSM init")
         screenModelScope.launch {
-            albumTopHits.value = luscious.getAlbumTopHits()
+            albumTopHits.value = luscious.getLandingPageAlbumTag(tag).getOrThrow()
         }
     }
 
     override fun onDispose() {
         super.onDispose()
-        Timber.i("iii ScreenLAlbumTopHitsSM onDispose")
+        Timber.i("iii ScreenLAlbumLandingTagSM onDispose")
     }
 
 }
@@ -229,13 +190,13 @@ class ScreenLAlbumTopHitsSM @AssistedInject constructor(
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class ScreenModuleLAlbumTopHits {
+abstract class ScreenModuleLAlbumLandingTag {
 
     @Binds
     @IntoMap
-    @ScreenModelFactoryKey(ScreenLAlbumTopHitsSM.Factory::class)
-    abstract fun bindHiltProfilesScreenModelFactory(
-        hiltDetailsScreenModelFactory: ScreenLAlbumTopHitsSM.Factory
+    @ScreenModelFactoryKey(ScreenLAlbumLandingTagSM.Factory::class)
+    abstract fun bindHiltLandingTagScreenModelFactory(
+        hiltDetailsScreenModelFactory: ScreenLAlbumLandingTagSM.Factory
     ): ScreenModelFactory
 
 }

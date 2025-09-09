@@ -30,6 +30,9 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.getScreenModel
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.common.urlVideImage.UrlImage
 import com.client.xvideos.l.ThemeL
 import com.client.xvideos.l.model.AlbumDetails
@@ -42,6 +45,7 @@ import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoFilterButton
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoGreeting
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoTags
 import com.client.xvideos.l.ui.element.expandMenu.AlbumItemExpandMenu
+import com.client.xvideos.l.ui.screens.albumLandingTag.ScreenLAlbumLandingTag
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.ScrollToTopButton
 import net.engawapg.lib.zoomable.ExperimentalZoomableApi
 import timber.log.Timber
@@ -54,6 +58,8 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
     override fun Content() {
+
+        val navigator = LocalNavigator.currentOrThrow
 
         val vm = getScreenModel<ScreenLAlbumSM, ScreenLAlbumSM.Factory> { factory ->
             factory.create(idAlbum)
@@ -148,7 +154,7 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
 
                             Row {
                                 UrlImage(
-                                    parsed?.cover?.url.toString(),
+                                    parsed.cover.url,
                                     modifier = Modifier.size(72.dp)
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
@@ -167,7 +173,7 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
 
                             AlbumInfoGreeting(parsed)
                             AlbumInfoAudiences(parsed)
-                            AlbumInfoTags(parsed)
+                            AlbumInfoTags(parsed) { navigator.push(ScreenLAlbumLandingTag(it)) }
                             AlbumInfoButtonSaveAlbum(saved, onClick = { if (!saved) { vm.saveAlbum() } else { itemPendingDelete = parsed } })
                             AlbumInfoDownloadButton( folderSize, album, fileCountDownloaded, fileCountError, vm, isDownloading, isDeletingFiles, deletionState, isDeletingChange = { isDeletingFiles = it })
                             AlbumInfoFilterButton( parsed, vm.showOnlyAnimated, { vm.showOnlyAnimated = it })
