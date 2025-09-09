@@ -96,7 +96,7 @@ class ScreenLExplorer() : Screen {
         }, containerColor = ThemeRed.colorCommonBackground2) { paddingValues ->
             Box(modifier = Modifier.padding(bottom = paddingValues.calculateBottomPadding())) {
                 when (screenType) {
-                    0 -> ScreenLAlbumList.Content()
+                    0 -> ScreenLAlbumList(null).Content()
                     1 -> ScreenLAlbumTopHits.Content()
                     2 -> SavedLTab.Content()
                     3 -> ScreenLConfigTab.Content()

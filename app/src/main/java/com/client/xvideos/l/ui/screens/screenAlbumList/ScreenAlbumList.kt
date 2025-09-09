@@ -44,6 +44,7 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.l.ThemeL
+import com.client.xvideos.l.model.AlbumListFilter
 import com.client.xvideos.l.net.AlbumListImpl
 import com.client.xvideos.l.net.Luscious
 import com.client.xvideos.l.ui.element.AlbumListItem
@@ -67,12 +68,9 @@ import timber.log.Timber
 
 //https://members.luscious.net/graphql/nobatch/?operationName=AlbumList
 
-object ScreenLAlbumList : Screen {
-
+class ScreenLAlbumList(val filter: AlbumListFilter?) : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
-
-    private fun readResolve(): Any = ScreenLAlbumList
 
     @OptIn(ExperimentalZoomableApi::class)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -80,11 +78,15 @@ object ScreenLAlbumList : Screen {
     override fun Content() {
 
         val navigator = LocalNavigator.currentOrThrow
-        val vm = getScreenModel<ScreenLAlbumListSM, ScreenLAlbumListSM.Factory> { factory ->  factory.create(0) }
+        val vm = getScreenModel<ScreenLAlbumListSM, ScreenLAlbumListSM.Factory> { factory ->  factory.create(filter) }
         val items = vm.albumList.collectAsStateWithLifecycle().value?.items
         val info = vm.albumList.collectAsStateWithLifecycle().value?.info
         val filter = vm.albumList.collectAsStateWithLifecycle().value?.filter
+
         val filterGCount = vm.albumList.collectAsStateWithLifecycle().value?.filterGenreStateCount
+
+        val filterTagsCount = vm.albumList.collectAsStateWithLifecycle().value?.filterTaggedStateCount
+
         var visibleFilter by remember { mutableStateOf(false) }
 
         val haptic = LocalHapticFeedback.current
@@ -150,10 +152,10 @@ object ScreenLAlbumList : Screen {
             }
 
             if (filter != null) {
-                if (visibleFilter) AlbumListFilter(filter, filterGCount, onClose = { visibleFilter = false }) {
-                    vm.albumList.value?.filter = it
+                if (visibleFilter) AlbumListFilter(filter, filterGCount, filterTagsCount, onClose = { visibleFilter = false }) {
+                    //vm.albumList.value?.filter = it
                     vm.screenModelScope.launch {
-                        vm.albumList.value?.getAlbumList(1)
+                        vm.albumList.value?.getAlbumList(1, it)
                         vm.albumList.value?.getAlbumListAggregations(1)
                     }
                 }
@@ -163,13 +165,13 @@ object ScreenLAlbumList : Screen {
 }
 
 class ScreenLAlbumListSM @AssistedInject constructor(
-    @Assisted val idAlbum: Long,
+    @Assisted val filter: AlbumListFilter?,
     val luscious: Luscious
 ) : ScreenModel {
 
     @AssistedFactory
     interface Factory : ScreenModelFactory {
-        fun create(idAlbum: Long): ScreenLAlbumListSM
+        fun create(filter: AlbumListFilter?): ScreenLAlbumListSM
     }
 
     var albumList = MutableStateFlow<AlbumListImpl?>(null)
@@ -178,7 +180,7 @@ class ScreenLAlbumListSM @AssistedInject constructor(
         Timber.i("iii ScreenLAlbumListSM init")
         screenModelScope.launch {
             albumList.value = luscious.getAlbumList()
-            albumList.value?.getAlbumList(1)
+            albumList.value?.getAlbumList(1, filter)
             albumList.value?.getAlbumListAggregations(1)
         }
     }
@@ -190,7 +192,7 @@ class ScreenLAlbumListSM @AssistedInject constructor(
 
     fun loadAlbumList(page: Int) {
         screenModelScope.launch {
-            albumList.value?.getAlbumList(page)
+            albumList.value?.getAlbumList(page, albumList.value!!.filter)
             //albumList.value?.getAlbumListAggregations(page)
         }
     }
@@ -198,7 +200,7 @@ class ScreenLAlbumListSM @AssistedInject constructor(
 
     fun loadNextList(){
           if (albumList.value != null){
-              val page = (albumList.value!!.info.page + 1)//.coerceAtMost(albumList.value!!.info.totalPages)
+              val page = (albumList.value!!.info.page + 1)
               loadAlbumList(page)
           }
     }

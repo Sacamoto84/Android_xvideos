@@ -86,9 +86,15 @@ fun getAlbumListGraphQL1(
         str.append("""{ "name": "content_id", "value": "${filter.content_id.value}" },""")
     }
 
+    if (filter.taggeded.isNotEmpty()) {
+        str.append("""{ "name": "tagged", "value": "${filter.taggeded}" },""")
+    }
+
     str.append("""{ "name": "audience_ids", "value": "${filter.audienceIds}" },""")
 
     str.append("""{ "name": "language_ids", "value": "${filter.languageIds}" }""")
+
+
 
     if (filter.genresPlus.isNotEmpty() or filter.genresMinus.isNotEmpty()) {
         val genres = StringBuilder()

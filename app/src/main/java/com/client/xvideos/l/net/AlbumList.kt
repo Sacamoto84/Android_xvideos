@@ -69,27 +69,27 @@ class AlbumListImpl(
 
         try {
             Timber.i("!!! getAlbumListAggregations $id")
+
             val q = getAlbumListWithAggregations(id, filter)
+
             val result = repository.openURI(Luscious.Companion.API, q)
             if (result.isFailure) {
                 Timber.i("!!! getAlbumListAggregations error ${result.exceptionOrNull()}")
                 return
             }
-            val res = result.getOrNull()
+            val res = result.getOrThrow()
             val json = JsonParser.parseString(res).asJsonObject
-            val get =
-                json["data"]?.asJsonObject?.get("album")?.asJsonObject?.get("list_with_aggregations")?.asJsonObject
+            val get = json["data"]?.asJsonObject?.get("album")?.asJsonObject?.get("list_with_aggregations")?.asJsonObject
             val activeFilters = get?.get("active_filters")?.asJsonArray
             val aggregations = get?.get("aggregations")?.asJsonArray
-            aggregations
+
 
             ////
             val indexGenre = aggregations?.mapIndexedNotNull { i, el ->
                 val obj = el.asJsonObject
                 val shortName = obj.getAsJsonObject("field")?.get("short_name")?.asString
                 if (shortName == "genre_ids") i else null
-            }
-                ?.firstOrNull()
+            } ?.firstOrNull()
 
             if (indexGenre != null) {
                 val genreValues =
@@ -115,12 +115,10 @@ class AlbumListImpl(
                 val obj = el.asJsonObject
                 val shortName = obj.getAsJsonObject("field")?.get("short_name")?.asString
                 if (shortName == "tagged") i else null
-            }
-                ?.firstOrNull()
+            } ?.firstOrNull()
 
             if (indexTagged != null) {
-                val taggedValues =
-                    aggregations.get(indexTagged)?.getAsJsonObject()?.get("values")?.asJsonArray
+                val taggedValues = aggregations.get(indexTagged)?.getAsJsonObject()?.get("values")?.asJsonArray
                 val gson = Gson()
                 val list = mutableListOf<AlbumListFilterGenreCountResponse>()
                 taggedValues?.forEach { element ->
@@ -176,7 +174,7 @@ class AlbumListImpl(
     /**
      * Получить список альбомов с учетом фильтра
      */
-    suspend fun getAlbumList(id: Int) {
+    suspend fun getAlbumList(id: Int, filterIn : AlbumListFilter?) {
 
         try {
 
@@ -184,6 +182,8 @@ class AlbumListImpl(
             withContext(Dispatchers.Main) {
                 items.clear()
             }
+
+            filter = filterIn ?: AlbumListFilter()
 
             val q = getAlbumListGraphQL1(id, filter)
 

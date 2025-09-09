@@ -40,6 +40,7 @@ import com.client.xvideos.l.ui.screens.screenAlbumList.molecule.filter.atom.Albu
 import com.client.xvideos.l.ui.screens.screenAlbumList.molecule.filter.atom.AlbumListFilterContentType
 import com.client.xvideos.l.ui.screens.screenAlbumList.molecule.filter.atom.AlbumListFilterGenres
 import com.client.xvideos.l.ui.screens.screenAlbumList.molecule.filter.atom.AlbumListFilterSize
+import com.client.xvideos.l.ui.screens.screenAlbumList.molecule.filter.atom.AlbumListFilterTags
 
 private val style = TextStyle(
     color = ThemeL.textColor,
@@ -50,7 +51,10 @@ private val style = TextStyle(
 
 
 @Composable
-fun AlbumListFilter(filter: AlbumListFilter, filterGCount: List<AlbumListFilterGenreCountResponse>?, onClose : () -> Unit, onFilterApply: (AlbumListFilter) -> Unit ) {
+fun AlbumListFilter(filter: AlbumListFilter,
+                    filterGCount: List<AlbumListFilterGenreCountResponse>?,
+                    filterTagsCount: List<AlbumListFilterGenreCountResponse>?,
+                    onClose : () -> Unit, onFilterApply: (AlbumListFilter) -> Unit ) {
     Column(modifier = Modifier.alpha(0.95f).background(ThemeL.grey4)) {
 
 
@@ -101,6 +105,12 @@ fun AlbumListFilter(filter: AlbumListFilter, filterGCount: List<AlbumListFilterG
         }
 
         AlbumListFilterGenres(filter, filterGCount) {
+            onFilterApply(it)
+        }
+
+        HorizontalDivider()
+
+        AlbumListFilterTags(filter, filterTagsCount) {
             onFilterApply(it)
         }
 

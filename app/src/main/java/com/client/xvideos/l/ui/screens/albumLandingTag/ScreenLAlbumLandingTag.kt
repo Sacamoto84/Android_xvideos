@@ -2,6 +2,7 @@ package com.client.xvideos.l.ui.screens.albumLandingTag
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.FlowRow
@@ -35,10 +36,16 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.l.ThemeL
+import com.client.xvideos.l.model.AlbumListFilter
+import com.client.xvideos.l.model.Landing_page_albumSection
 import com.client.xvideos.l.model.Landing_page_albumType
+import com.client.xvideos.l.model.enum.AlbumType
+import com.client.xvideos.l.model.enum.ContentId
 import com.client.xvideos.l.net.Luscious
 import com.client.xvideos.l.ui.element.AlbumListItem
 import com.client.xvideos.l.ui.screens.screenAlbum.ScreenLAlbum
+import com.client.xvideos.l.ui.screens.screenAlbumList.ScreenLAlbumList
+import com.client.xvideos.l.ui.screens.screenAlbumList.ScreenLAlbumListSM
 import dagger.Binds
 import dagger.Module
 import dagger.assisted.Assisted
@@ -139,8 +146,17 @@ class ScreenLAlbumLandingTag(val tag: String) : Screen {
                             .padding(top = 4.dp)
                             .padding(horizontal = 4.dp)
                             .fillMaxWidth()
-                            .height(32.dp)
-                            .border(1.dp, ThemeL.grey3, RoundedCornerShape(8.dp)),
+                            .height(40.dp)
+                            .border(2.dp, ThemeL.grey3, RoundedCornerShape(8.dp))
+                            .clickable(onClick = {
+
+                                val filter = vm.createFilter(item)
+
+                                navigator.push(ScreenLAlbumList(filter))
+
+
+                            })
+                        ,
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
@@ -148,7 +164,7 @@ class ScreenLAlbumLandingTag(val tag: String) : Screen {
                             color = ThemeL.textColor,
                             modifier = Modifier,
                             textAlign = TextAlign.Center,
-                            fontSize = 20.sp,
+                            fontSize = 22.sp,
                             fontFamily = ThemeL.fontFamilyKarla,
                             fontWeight = FontWeight.Medium,
                         )
@@ -183,6 +199,41 @@ class ScreenLAlbumLandingTagSM @AssistedInject constructor(
     override fun onDispose() {
         super.onDispose()
         Timber.i("iii ScreenLAlbumLandingTagSM onDispose")
+    }
+
+    //section title
+
+    //Hentai Manga
+    //Hentai Pictures
+    //Porn Pictures
+
+    fun createFilter (item: Landing_page_albumSection): AlbumListFilter {
+
+        val title = item.title
+
+        val albumType = when (title) {
+            "Hentai Manga" -> AlbumType.Manga
+            "Hentai Pictures" -> AlbumType.Pictures
+            "Porn Pictures" -> AlbumType.Pictures
+            else -> AlbumType.Pictures
+        }
+
+        val contentId = when (title) {
+            "Hentai Manga" -> ContentId.All
+            "Hentai Pictures" -> ContentId.Hentai
+            "Porn Pictures" -> ContentId.RealPeople
+            else -> ContentId.All
+        }
+
+        val f = AlbumListFilter(
+            display = "date_trending",
+            album_type = albumType,
+            content_id = contentId,
+            taggeded = "+$tag"
+        )
+
+        return f
+
     }
 
 }

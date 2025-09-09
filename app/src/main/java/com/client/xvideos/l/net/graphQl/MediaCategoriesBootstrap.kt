@@ -18,9 +18,10 @@ var mediaCategories by mutableStateOf<MediaCategories?>(null)
 
 suspend fun refreshMediaCategories(repository: Repository) {
     Timber.i("!!! refreshMediaCategories")
-    val q = mediaCategoriesBootstrap
 
+    val q = mediaCategoriesBootstrap
     val res = repository.openURI(Luscious.Companion.API, q, config = RepositoryUriConfig.CACHE_ROM)
+
     if (res.isFailure) return
 
     val gson = Gson()
