@@ -14,6 +14,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
@@ -25,6 +26,7 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import com.client.xvideos.common.sharedPref.Settings
+import com.client.xvideos.l.ui.screens.depth
 import com.client.xvideos.l.ui.screens.explorer.tab.albumTopHits.ScreenLAlbumTopHits
 import com.client.xvideos.l.ui.screens.explorer.tab.config.ScreenLConfigTab
 import com.client.xvideos.l.ui.screens.explorer.tab.saved.SavedLTab
@@ -57,6 +59,10 @@ class ScreenLExplorer() : Screen {
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
     override fun Content() {
+
+        LaunchedEffect(Unit) {
+            depth = 0
+        }
 
         val g0 = Settings.gallery_count[0].field.collectAsStateWithLifecycle().value
         val g1 = Settings.gallery_count[1].field.collectAsStateWithLifecycle().value

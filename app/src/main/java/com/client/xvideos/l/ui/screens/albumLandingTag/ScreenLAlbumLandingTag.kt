@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -43,6 +44,7 @@ import com.client.xvideos.l.model.enum.AlbumType
 import com.client.xvideos.l.model.enum.ContentId
 import com.client.xvideos.l.net.Luscious
 import com.client.xvideos.l.ui.element.AlbumListItem
+import com.client.xvideos.l.ui.screens.depth
 import com.client.xvideos.l.ui.screens.screenAlbum.ScreenLAlbum
 import com.client.xvideos.l.ui.screens.screenAlbumList.ScreenLAlbumList
 import com.client.xvideos.l.ui.screens.screenAlbumList.ScreenLAlbumListSM
@@ -170,6 +172,10 @@ class ScreenLAlbumLandingTag(val tag: String) : Screen {
                         )
                     }
                 }
+
+                item{
+                    Spacer(Modifier.height(64.dp))
+                }
             }
         }
     }
@@ -194,6 +200,7 @@ class ScreenLAlbumLandingTagSM @AssistedInject constructor(
         screenModelScope.launch {
             albumTopHits.value = luscious.getLandingPageAlbumTag(tag).getOrThrow()
         }
+        depth = 100
     }
 
     override fun onDispose() {

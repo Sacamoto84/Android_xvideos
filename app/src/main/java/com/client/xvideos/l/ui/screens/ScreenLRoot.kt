@@ -1,6 +1,7 @@
 package com.client.xvideos.l.ui.screens
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,9 +13,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ErrorOutline
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
@@ -26,8 +32,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,7 +50,9 @@ import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
+import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.common.fresco.DownloadQueueManager
 import com.client.xvideos.common.fresco.QueueStatisticsCardLite
 import com.client.xvideos.common.traficStatistic.AppNetworkSpeedMonitorLite
@@ -70,6 +80,10 @@ import javax.inject.Inject
 val LocalRootLScreenModel =
     staticCompositionLocalOf<ScreenLRootSM> { error("No ScreenLRootSM provided") }
 
+// Глобальная ссылка на основной навигатор для доступа из любого места
+val LocalMainNavigator =
+    staticCompositionLocalOf<Navigator?> { null }
+
 class ScreenLRoot() : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
@@ -86,6 +100,11 @@ class ScreenLRoot() : Screen {
         val snackbarHostState = remember { SnackbarHostState() }
 
         val snackBarEvent = vm.hostDI.snackBarEvent
+
+        val navigator = LocalNavigator.currentOrThrow
+
+        // Создаем отдельный навигатор для внутренней навигации
+        var mainNavigator: Navigator? = null
 
         LaunchedEffect(Unit) {
             vm.snackbarEvents.collect { message ->
@@ -106,6 +125,32 @@ class ScreenLRoot() : Screen {
 
         CompositionLocalProvider(LocalRootLScreenModel provides vm) {
             Scaffold(
+                floatingActionButtonPosition = FabPosition.Start,
+
+                floatingActionButton = {
+
+                    if (depth > 0) {
+                        SmallFloatingActionButton(
+                            onClick = {
+                                // Возврат к домашнему экрану через основной навигатор
+                                mainNavigator?.let { nav ->
+                                    // Проверяем, не находимся ли мы уже на домашнем экране
+                                    if (nav.lastItem !is ScreenLExplorer) {
+                                        // Очищаем весь стек и переходим к домашнему экрану
+                                        nav.replaceAll(ScreenLExplorer())
+                                    }
+                                }
+                            },
+                            content = {
+                                Icon(
+                                    imageVector = Icons.Default.Home,
+                                    contentDescription = "Scroll to top"
+                                )
+                            }
+
+                        )
+                    }
+                },
                 containerColor = ThemeL.greyBackground,
                 snackbarHost = {
                     Box(modifier = Modifier.zIndex(Float.MAX_VALUE)) {
@@ -152,8 +197,7 @@ class ScreenLRoot() : Screen {
                                     .zIndex(Float.MAX_VALUE)
                                     .wrapContentWidth()
                                     .padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
-                                    .zIndex(Float.MAX_VALUE)
-                                ,
+                                    .zIndex(Float.MAX_VALUE),
                                 color = bg,
                                 contentColor = fg,
                                 shape = RoundedCornerShape(12.dp),
@@ -161,7 +205,10 @@ class ScreenLRoot() : Screen {
                                 shadowElevation = 6.dp,
                             ) {
                                 Row(
-                                    Modifier .zIndex(Float.MAX_VALUE).padding(horizontal = 12.dp, vertical = 12.dp).zIndex(Float.MAX_VALUE),
+                                    Modifier
+                                        .zIndex(Float.MAX_VALUE)
+                                        .padding(horizontal = 12.dp, vertical = 12.dp)
+                                        .zIndex(Float.MAX_VALUE),
                                     verticalAlignment = Alignment.CenterVertically
                                 )
                                 {
@@ -181,7 +228,14 @@ class ScreenLRoot() : Screen {
                     }
                 }
             ) { paddingValues ->
-                Navigator(screen = ScreenLExplorer())
+
+                //Navigator(screen = ScreenLExplorer())
+
+                // Основной навигатор приложения
+                Navigator(screen = ScreenLExplorer()) { nav ->
+                    mainNavigator = nav // Сохраняем ссылку на навигатор
+                    nav.lastItem.Content()
+                }
 
                 QueueStatisticsCardLite(queueState = queueState)
 
@@ -191,7 +245,7 @@ class ScreenLRoot() : Screen {
                         modifier = Modifier
                             //.zIndex(10f)
                             .fillMaxSize()
-                        //.background(Color.Black.copy(alpha = 0.95f))
+                            .background(Color.Black.copy(alpha = 0.95f))
                     ) { content() }
                 }
 
@@ -206,6 +260,8 @@ class ScreenLRoot() : Screen {
 
 }
 
+//Глубина погружения навигации
+var depth by mutableIntStateOf(0)
 
 class ScreenLRootSM @Inject constructor(
     val hostDI: HostDI
@@ -230,6 +286,18 @@ class ScreenLRootSM @Inject constructor(
         _overlayContent.value = null
     }
 
+
+}
+
+// Расширение для удобного доступа к домашней навигации из любого экрана
+@Composable
+fun navigateToHome() {
+    val mainNavigator = LocalMainNavigator.current
+    mainNavigator?.let { nav ->
+        if (nav.lastItem !is ScreenLExplorer) {
+            nav.replaceAll(ScreenLExplorer())
+        }
+    }
 }
 
 @Module
