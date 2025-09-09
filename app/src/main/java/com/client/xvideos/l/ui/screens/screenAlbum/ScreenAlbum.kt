@@ -46,6 +46,7 @@ import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoGreeting
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoTags
 import com.client.xvideos.l.ui.element.expandMenu.AlbumItemExpandMenu
 import com.client.xvideos.l.ui.screens.albumLandingTag.ScreenLAlbumLandingTag
+import com.client.xvideos.l.ui.screens.depth
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.ScrollToTopButton
 import net.engawapg.lib.zoomable.ExperimentalZoomableApi
 import timber.log.Timber
@@ -58,6 +59,8 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
     override fun Content() {
+
+        depth = 100
 
         val navigator = LocalNavigator.currentOrThrow
 

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -16,6 +17,7 @@ import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.Badge
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -36,13 +38,16 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.screen.Screen
@@ -123,32 +128,70 @@ class ScreenLRoot() : Screen {
 
         val queueState by DownloadQueueManager.queueState.collectAsState()
 
-        CompositionLocalProvider(LocalRootLScreenModel provides vm) {
+        CompositionLocalProvider(
+            LocalRootLScreenModel provides vm,
+            LocalMainNavigator provides mainNavigator
+        ) {
             Scaffold(
                 floatingActionButtonPosition = FabPosition.Start,
 
                 floatingActionButton = {
+//
+
+                    // Отслеживаем изменения в навигаторе для обновления Badge
+                    var navigationDepth by remember { mutableIntStateOf(0) }
+
+                    LaunchedEffect(mainNavigator) {
+                        mainNavigator?.let { nav ->
+                            // Подписываемся на изменения в стеке навигации
+                            snapshotFlow { nav.items.size }
+                                .collect { stackSize ->
+                                    // Глубина = размер стека - 1 (так как ScreenLExplorer = 0)
+                                    navigationDepth = if (stackSize > 1) stackSize - 1 else 0
+                                }
+                        }
+                    }
+
+
 
                     if (depth > 0) {
-                        SmallFloatingActionButton(
-                            onClick = {
-                                // Возврат к домашнему экрану через основной навигатор
-                                mainNavigator?.let { nav ->
-                                    // Проверяем, не находимся ли мы уже на домашнем экране
-                                    if (nav.lastItem !is ScreenLExplorer) {
-                                        // Очищаем весь стек и переходим к домашнему экрану
-                                        nav.replaceAll(ScreenLExplorer())
+                        Box {
+                            SmallFloatingActionButton(
+                                onClick = {
+                                    // Возврат к домашнему экрану через основной навигатор
+                                    mainNavigator?.let { nav ->
+                                        // Проверяем, не находимся ли мы уже на домашнем экране
+                                        if (nav.lastItem !is ScreenLExplorer) {
+                                            // Очищаем весь стек и переходим к домашнему экрану
+                                            nav.replaceAll(ScreenLExplorer())
+                                        }
                                     }
+                                },
+                                content = {
+                                    Icon(
+                                        imageVector = Icons.Default.Home,
+                                        contentDescription = "Home"
+                                    )
                                 }
-                            },
-                            content = {
-                                Icon(
-                                    imageVector = Icons.Default.Home,
-                                    contentDescription = "Scroll to top"
-                                )
-                            }
+                            )
 
-                        )
+                            // Badge показываем только если есть глубина навигации
+                            if (navigationDepth > 0) {
+                                Badge(
+                                    modifier = Modifier
+                                        .align(Alignment.TopEnd)
+                                        .offset(x = 4.dp, y = (-4).dp),
+                                    containerColor = Color.Red,
+                                    contentColor = Color.White
+                                ) {
+                                    Text(
+                                        text = navigationDepth.toString(),
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                            }
+                        }
                     }
                 },
                 containerColor = ThemeL.greyBackground,
