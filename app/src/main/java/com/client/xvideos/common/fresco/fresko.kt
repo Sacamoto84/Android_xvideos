@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Animation
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
@@ -32,6 +33,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
@@ -225,21 +227,32 @@ fun UrlImageLusciousGifsGlide(
             }
 
             if (isAnimated) {
+
                 Box(
-                    modifier = Modifier .padding(2.dp)
+                    modifier = Modifier
+                        .padding(2.dp)
                         .align(Alignment.BottomStart)
                         .size(40.dp)
-                        //.border(0.5.dp, Color.Gray)
+                        .clip(CircleShape)
                         .background(Color.Gray.copy(alpha = 0.5f), CircleShape)
-                        .clickable(onClick = { isPlaying = !isPlaying }),
+                        .clickable(
+                            enabled = url.contains("https://").not(),
+                            onClick = { isPlaying = !isPlaying }
+                        ),
                     contentAlignment = Alignment.Center
                 ) {
-                    if (isPlaying)
-                        Icon(Icons.Default.Pause, contentDescription = null, tint = Color.White)
-                    else
-                        Icon(Icons.Default.PlayArrow, contentDescription = null, tint = Color.White)
+                    if (url.contains("https://")){
+                        Icon( Icons.Default.Animation, contentDescription = null, tint = Color.White )
+                    }
+                    else {
+                        Icon(
+                            if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow, contentDescription = null, tint = Color.White )
+                    }
                 }
+
             }
+
+
         } else
             Box(
                 modifier = Modifier

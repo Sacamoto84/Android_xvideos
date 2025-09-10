@@ -23,7 +23,7 @@ fun AlbumDialogDeleteAlbum(pending: AlbumDetails, onDismiss: () -> Unit, onClick
 
     AlertDialog(
         icon = { UrlImage(pending.cover.url, modifier = Modifier.size(96.dp)) },
-        onDismissRequest = { onDismiss },
+        onDismissRequest = { onDismiss() },
         title = {
             com.composeunstyled.Text(
                 "Удалить Альбом?",
@@ -49,7 +49,7 @@ fun AlbumDialogDeleteAlbum(pending: AlbumDetails, onDismiss: () -> Unit, onClick
             }
         },
         dismissButton = {
-            TextButton(onClick = { onDismiss }) {
+            TextButton(onClick = { onDismiss() }) {
                 com.composeunstyled.Text(
                     "Отмена",
                     fontSize = 16.sp,

@@ -1,5 +1,6 @@
 package com.client.xvideos.l.ui.screens.screenAlbum.atom
 
+import android.widget.Button
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.EaseOutCubic
@@ -13,11 +14,16 @@ import androidx.compose.foundation.gestures.calculatePan
 import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.forEachGesture
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Button
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -59,6 +65,7 @@ fun FullScreenImage(
     filteredPic: List<PicsDetails>,
     //onDownload: (PicsDetails) -> Unit = {},
     autoPlay : Boolean = false,
+    isAnimated : Boolean = false,
     expandMenu: @Composable (PicsDetails) -> Unit = {},
 ) {
     val density = LocalDensity.current
@@ -452,8 +459,31 @@ fun FullScreenImage(
                 //contentScale = ContentScale.FillBounds,
                 onSuccess = { success = true },
                 albumName = albumName,
-                autoPlay = autoPlay
+                autoPlay = autoPlay,
+                isAnimated = isAnimated
             )
         }
+
+        Row(modifier = Modifier.align(Alignment.BottomCenter).height(46.dp).fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween){
+
+            Button(onClick = {
+
+
+
+            }){
+
+            }
+
+            Button(onClick = {
+
+
+
+            }){
+
+            }
+
+        }
+
     }
 }
