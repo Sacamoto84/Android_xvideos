@@ -17,12 +17,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import cafe.adriel.voyager.core.registry.rememberScreen
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
+import cafe.adriel.voyager.navigator.CurrentScreen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import com.client.xvideos.common.sharedPref.Settings
@@ -60,9 +66,14 @@ class ScreenLExplorer() : Screen {
     @Composable
     override fun Content() {
 
+        val navigator = LocalNavigator.currentOrThrow
+
         LaunchedEffect(Unit) {
             depth = 0
         }
+
+
+
 
         val g0 = Settings.gallery_count[0].field.collectAsStateWithLifecycle().value
         val g1 = Settings.gallery_count[1].field.collectAsStateWithLifecycle().value
@@ -85,9 +96,9 @@ class ScreenLExplorer() : Screen {
                 onChangeState = {
                     if (it == screenType) {
                         when (it) {
-                           // 0 -> {
-                           //     SavedLTab.columnSelect.addColumn(g0, g1, g2, g3, g4)
-                           // }
+                            // 0 -> {
+                            //     SavedLTab.columnSelect.addColumn(g0, g1, g2, g3, g4)
+                            // }
                             1 -> {
 
                             }
@@ -101,13 +112,18 @@ class ScreenLExplorer() : Screen {
 
         }, containerColor = ThemeRed.colorCommonBackground2) { paddingValues ->
             Box(modifier = Modifier.padding(bottom = paddingValues.calculateBottomPadding())) {
+
+
+                //Navigator(
                 when (screenType) {
-                    0 -> ScreenLAlbumList(null).Content()
+                    0 -> ScreenLAlbumList.getFirst().Content()
                     1 -> ScreenLAlbumTopHits.Content()
                     2 -> SavedLTab.Content()
-                    3 -> ScreenLConfigTab.Content()
-                    else -> SavedLTab.Content()
+                    3 -> ScreenLConfigTab().Content()
+                    else -> SavedLTab
                 }
+                //)
+
             }
         }
 

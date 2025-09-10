@@ -64,9 +64,7 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
 
         val navigator = LocalNavigator.currentOrThrow
 
-        val vm = getScreenModel<ScreenLAlbumSM, ScreenLAlbumSM.Factory> { factory ->
-            factory.create(idAlbum)
-        }
+        val vm = getScreenModel<ScreenLAlbumSM, ScreenLAlbumSM.Factory> { factory -> factory.create(idAlbum) }
 
         val album = vm.albumInfo.collectAsStateWithLifecycle().value
 

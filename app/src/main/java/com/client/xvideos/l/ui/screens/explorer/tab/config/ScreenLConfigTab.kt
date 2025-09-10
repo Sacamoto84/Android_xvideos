@@ -68,9 +68,9 @@ import java.io.File
 import javax.inject.Inject
 
 
-object ScreenLConfigTab : Screen {
+class ScreenLConfigTab : Screen {
 
-    private fun readResolve(): Any = ScreenLConfigTab
+    //private fun readResolve(): Any = ScreenLConfigTab
 
     override val key: ScreenKey = uniqueScreenKey
 

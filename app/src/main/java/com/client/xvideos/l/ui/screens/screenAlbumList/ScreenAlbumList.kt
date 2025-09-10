@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -68,100 +69,155 @@ import timber.log.Timber
 
 //https://members.luscious.net/graphql/nobatch/?operationName=AlbumList
 
-class ScreenLAlbumList(val filter: AlbumListFilter?) : Screen {
+object ScreenLAlbumList {
 
-    override val key: ScreenKey = uniqueScreenKey
+    // Сохраняем первый экземпляр навсегда
+    private val firstInstance: Screen by lazy {
+        ScreenLAlbumListImpl(filter = null, isFirst = true)
+    }
 
-    @OptIn(ExperimentalZoomableApi::class)
-    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-    @Composable
-    override fun Content() {
+    private var instanceCounter = 0
 
-        val navigator = LocalNavigator.currentOrThrow
-        val vm = getScreenModel<ScreenLAlbumListSM, ScreenLAlbumListSM.Factory> { factory ->  factory.create(filter) }
-        val items = vm.albumList.collectAsStateWithLifecycle().value?.items
-        val info = vm.albumList.collectAsStateWithLifecycle().value?.info
-        val filter = vm.albumList.collectAsStateWithLifecycle().value?.filter
+    // Получить первый экземпляр (всегда живой)
+    fun getFirst(): Screen = firstInstance
 
-        val filterGCount = vm.albumList.collectAsStateWithLifecycle().value?.filterGenreStateCount
-
-        val filterTagsCount = vm.albumList.collectAsStateWithLifecycle().value?.filterTaggedStateCount
-
-        var visibleFilter by remember { mutableStateOf(false) }
-
-        val haptic = LocalHapticFeedback.current
-        val state = rememberLazyGridState()
-        val scope = rememberCoroutineScope()
-
-        Scaffold(
-            bottomBar = {
-                AlbumListBottomBar(onClickVisibleFilter = { visibleFilter = !visibleFilter }, onClickPrev = {vm.loadPrevList()}, onClickNext = {vm.loadNextList()})
-            }, containerColor = ThemeL.greyBackground
-        ) { padding ->
+    // Создать новый экземпляр
+    fun create(filter: AlbumListFilter? = null): Screen {
+        instanceCounter++
+        return ScreenLAlbumListImpl(filter = filter, isFirst = false, instanceId = instanceCounter)
+    }
+    // Создать экземпляр или вернуть первый
+    fun getInstance(filter: AlbumListFilter? = null, useFirst: Boolean = false): Screen {
+        return if (useFirst && filter == null) {
+            firstInstance
+        } else {
+            create(filter)
+        }
+    }
 
 
-            LazyVerticalGrid(
-                state = state,
-                columns = GridCells.Fixed(2),
-                modifier = Modifier.padding(bottom = padding.calculateBottomPadding())
-            ) {
-                item( key = "dummy", span = { GridItemSpan(maxLineSpan) }) { Spacer(Modifier.height(48.dp)) }
+    class ScreenLAlbumListImpl(
+        val filter: AlbumListFilter?,
+        private val isFirst: Boolean = false,
+        private val instanceId: Int = 0
+    ) : Screen {
 
-                item(
-                    key = "page_selector",
-                    span = { GridItemSpan(maxLineSpan) }) {
-                    if (info != null) {
-                        AlbumListPageSelector(info.page, info.totalPages, {
-                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                            vm.loadAlbumList(it)
-                        })
-                    }
-                }
+        //override val key: ScreenKey = uniqueScreenKey
 
-                items(items?.size ?: 0) { index ->
-                    val item = items?.get(index)
-                    if (item != null) {
-                        AlbumListItem(
-                            title = item.title,
-                            coverUrl = item.cover.url,
-                            numberOfAnimatedPictures = item.numberOfAnimatedPictures,
-                            numberOfPictures = item.numberOfPictures,
-                        ) {
-                            navigator.push(ScreenLAlbum(item.id.toLong()))
-                        }
-                    }
-                }
+        override val key: ScreenKey = if (isFirst) {
+            "ScreenLAlbumList_FIRST" // Уникальный ключ для первого экземпляра
+        } else {
+            "ScreenLAlbumList_$instanceId" // Уникальные ключи для остальных
+        }
 
-                item(
-                    key = "page_selector2",
-                    span = { GridItemSpan(maxLineSpan) }) {
+        @OptIn(ExperimentalZoomableApi::class)
+        @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+        @Composable
+        override fun Content() {
 
-                    if (items?.isNotEmpty() ?: false) {
-                        if (info != null) {
-                            AlbumListPageSelector( info.page, info.totalPages,
-                                {
-                                    scope.launch { state.scrollToItem(0) }
-                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                    vm.loadAlbumList(it)
-                                })
-                        }
-                    }
-
-                }
-
+            val navigator = LocalNavigator.currentOrThrow
+            val vm = getScreenModel<ScreenLAlbumListSM, ScreenLAlbumListSM.Factory> { factory ->
+                factory.create(filter)
             }
+            val items = vm.albumList.collectAsStateWithLifecycle().value?.items
+            val info = vm.albumList.collectAsStateWithLifecycle().value?.info
+            val filter = vm.albumList.collectAsStateWithLifecycle().value?.filter
 
-            if (filter != null) {
-                if (visibleFilter) AlbumListFilter(filter, filterGCount, filterTagsCount, onClose = { visibleFilter = false }) {
-                    //vm.albumList.value?.filter = it
-                    vm.screenModelScope.launch {
-                        vm.albumList.value?.getAlbumList(1, it)
-                        vm.albumList.value?.getAlbumListAggregations(1)
+            val filterGCount =
+                vm.albumList.collectAsStateWithLifecycle().value?.filterGenreStateCount
+
+            val filterTagsCount =
+                vm.albumList.collectAsStateWithLifecycle().value?.filterTaggedStateCount
+
+            var visibleFilter by remember { mutableStateOf(false) }
+
+            val haptic = LocalHapticFeedback.current
+
+            //val state = rememberLazyGridState()
+
+            val scope = rememberCoroutineScope()
+
+            Scaffold(
+                bottomBar = {
+                    AlbumListBottomBar(
+                        onClickVisibleFilter = { visibleFilter = !visibleFilter },
+                        onClickPrev = { vm.loadPrevList() },
+                        onClickNext = { vm.loadNextList() })
+                }, containerColor = ThemeL.greyBackground
+            ) { padding ->
+
+
+                LazyVerticalGrid(
+                    state = vm.state,
+                    columns = GridCells.Fixed(2),
+                    modifier = Modifier.padding(bottom = padding.calculateBottomPadding())
+                ) {
+                    item(
+                        key = "dummy",
+                        span = { GridItemSpan(maxLineSpan) }) { Spacer(Modifier.height(48.dp)) }
+
+                    item(
+                        key = "page_selector",
+                        span = { GridItemSpan(maxLineSpan) }) {
+                        if (info != null) {
+                            AlbumListPageSelector(info.page, info.totalPages, {
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                vm.loadAlbumList(it)
+                            })
+                        }
+                    }
+
+                    items(items?.size ?: 0) { index ->
+                        val item = items?.get(index)
+                        if (item != null) {
+                            AlbumListItem(
+                                title = item.title,
+                                coverUrl = item.cover.url,
+                                numberOfAnimatedPictures = item.numberOfAnimatedPictures,
+                                numberOfPictures = item.numberOfPictures,
+                            ) {
+                                navigator.push(ScreenLAlbum(item.id.toLong()))
+                            }
+                        }
+                    }
+
+                    item(
+                        key = "page_selector2",
+                        span = { GridItemSpan(maxLineSpan) }) {
+
+                        if (items?.isNotEmpty() ?: false) {
+                            if (info != null) {
+                                AlbumListPageSelector(
+                                    info.page, info.totalPages,
+                                    {
+                                        scope.launch { vm.state.scrollToItem(0) }
+                                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                        vm.loadAlbumList(it)
+                                    })
+                            }
+                        }
+
+                    }
+
+                }
+
+                if (filter != null) {
+                    if (visibleFilter) AlbumListFilter(
+                        filter,
+                        filterGCount,
+                        filterTagsCount,
+                        onClose = { visibleFilter = false }) {
+                        //vm.albumList.value?.filter = it
+                        vm.screenModelScope.launch {
+                            vm.albumList.value?.getAlbumList(1, it)
+                            vm.albumList.value?.getAlbumListAggregations(1)
+                        }
                     }
                 }
             }
         }
     }
+
 }
 
 class ScreenLAlbumListSM @AssistedInject constructor(
@@ -211,6 +267,8 @@ class ScreenLAlbumListSM @AssistedInject constructor(
             loadAlbumList(page)
         }
     }
+
+    val state = LazyGridState()
 
 }
 

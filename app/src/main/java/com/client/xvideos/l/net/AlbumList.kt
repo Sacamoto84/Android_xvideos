@@ -72,7 +72,7 @@ class AlbumListImpl(
 
             val q = getAlbumListWithAggregations(id, filter)
 
-            Timber.i("!!! getAlbumListAggregations $q")
+            //Timber.i("!!! getAlbumListAggregations $q")
 
             val result = repository.openURI(Luscious.Companion.API, q)
             if (result.isFailure) {
