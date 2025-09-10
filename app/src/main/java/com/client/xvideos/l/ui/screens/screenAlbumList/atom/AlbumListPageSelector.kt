@@ -65,8 +65,8 @@ private fun preview() {
 fun AlbumListPageSelector(
     page: Int,
     pageMax: Int,
-    onChange: (Int) -> Unit = {},
-    haptic: () -> Unit = {}
+    haptic: () -> Unit = {},
+    onChange: (Int) -> Unit = {}
 ) {
 
     var expanded by remember { mutableStateOf(false) }

@@ -31,7 +31,6 @@ import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.common.urlVideImage.UrlImage
 import com.client.xvideos.l.ThemeL
@@ -48,6 +47,7 @@ import com.client.xvideos.l.ui.element.expandMenu.AlbumItemExpandMenu
 import com.client.xvideos.l.ui.screens.albumLandingTag.ScreenLAlbumLandingTag
 import com.client.xvideos.l.ui.screens.depth
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.ScrollToTopButton
+import kotlinx.coroutines.delay
 import net.engawapg.lib.zoomable.ExperimentalZoomableApi
 import timber.log.Timber
 
@@ -78,28 +78,25 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
         val isDownloading = vm.downloader.isDownloading.collectAsStateWithLifecycle().value
 
         LaunchedEffect(vm.showOnlyAnimated, parsed, album?.albumPicsDetails?.pics?.size) {
-            Timber.d("!!! LaunchedEffect vm.showOnlyAnimated = ${vm.showOnlyAnimated} parsed = $parsed")
+
+            Timber.d("!!! iiii LaunchedEffect animated = ${vm.showOnlyAnimated} size:${album?.albumPicsDetails?.pics?.size}")
             if (parsed == null) return@LaunchedEffect
 
-            val allPics = album?.albumPicsDetails?.pics ?: emptyList()
-            val newFilteredPics = allPics.filter { it.is_animated == vm.showOnlyAnimated }
+            val allPics = album?.albumPicsDetails?.pics?.toList() ?: emptyList()
 
-            // Если изменился фильтр - полностью пересчитываем список
-            val currentFilteredUrls = vm.host.filteredPic.mapNotNull{ it.url_to_original }.toSet()
-            val shouldBeFilteredUrls = newFilteredPics.mapNotNull{ it.url_to_original }.toSet()
+            val newFilteredAnimatedPics = allPics.filter { it.is_animated } //Список анимированных елементов
+            val newFilteredNoAnimatedPics = allPics.filter { !it.is_animated } //Список анимированных елементов
 
-            // Проверяем, изменился ли набор URL после фильтрации
-            if (currentFilteredUrls != shouldBeFilteredUrls) {
-                // Удаляем элементы, которых не должно быть
-                val toRemove =
-                    vm.host.filteredPic.filter { it.url_to_original !in shouldBeFilteredUrls }
-                vm.host.filteredPic.removeAll(toRemove.toSet())
-
-                // Добавляем новые элементы
-                val existingUrls = vm.host.filteredPic.mapNotNull{ it.url_to_original }.toSet()
-                val toAdd = newFilteredPics.filter { it.url_to_original !in existingUrls }
-                vm.host.filteredPic.addAll(toAdd)
+            if (vm.showOnlyAnimated) {
+                //val a = vm.host.filteredPic.toMutableList()
+                //a.removeAll(newFilteredNoAnimatedPics)
+                vm.host.filteredPic.clear()
+                vm.host.filteredPic.addAll(newFilteredAnimatedPics)
+            } else {
+                vm.host.filteredPic.clear()
+                vm.host.filteredPic.addAll(allPics)
             }
+
         }
 
         val folderSize = vm.downloader.folderSize.collectAsStateWithLifecycle().value

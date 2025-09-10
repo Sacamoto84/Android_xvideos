@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -19,9 +20,14 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,6 +36,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
@@ -67,8 +74,6 @@ import kotlinx.coroutines.launch
 import net.engawapg.lib.zoomable.ExperimentalZoomableApi
 import timber.log.Timber
 
-//https://members.luscious.net/graphql/nobatch/?operationName=AlbumList
-
 object ScreenLAlbumList {
 
     // Сохраняем первый экземпляр навсегда
@@ -86,6 +91,7 @@ object ScreenLAlbumList {
         instanceCounter++
         return ScreenLAlbumListImpl(filter = filter, isFirst = false, instanceId = instanceCounter)
     }
+
     // Создать экземпляр или вернуть первый
     fun getInstance(filter: AlbumListFilter? = null, useFirst: Boolean = false): Screen {
         return if (useFirst && filter == null) {
@@ -95,14 +101,11 @@ object ScreenLAlbumList {
         }
     }
 
-
     class ScreenLAlbumListImpl(
         val filter: AlbumListFilter?,
         private val isFirst: Boolean = false,
         private val instanceId: Int = 0
     ) : Screen {
-
-        //override val key: ScreenKey = uniqueScreenKey
 
         override val key: ScreenKey = if (isFirst) {
             "ScreenLAlbumList_FIRST" // Уникальный ключ для первого экземпляра
@@ -119,97 +122,153 @@ object ScreenLAlbumList {
             val vm = getScreenModel<ScreenLAlbumListSM, ScreenLAlbumListSM.Factory> { factory ->
                 factory.create(filter)
             }
+
             val items = vm.albumList.collectAsStateWithLifecycle().value?.items
             val info = vm.albumList.collectAsStateWithLifecycle().value?.info
-            val filter = vm.albumList.collectAsStateWithLifecycle().value?.filter
+            val currentFilter = vm.albumList.collectAsStateWithLifecycle().value?.filter
+            val isRefreshing = vm.isRefreshing.collectAsStateWithLifecycle().value
 
-            val filterGCount =
-                vm.albumList.collectAsStateWithLifecycle().value?.filterGenreStateCount
-
-            val filterTagsCount =
-                vm.albumList.collectAsStateWithLifecycle().value?.filterTaggedStateCount
+            val filterGCount = vm.albumList.collectAsStateWithLifecycle().value?.filterGenreStateCount
+            val filterTagsCount = vm.albumList.collectAsStateWithLifecycle().value?.filterTaggedStateCount
 
             var visibleFilter by remember { mutableStateOf(false) }
 
             val haptic = LocalHapticFeedback.current
-
-            //val state = rememberLazyGridState()
-
             val scope = rememberCoroutineScope()
+
+            // Pull to refresh state
+            val pullToRefreshState = rememberPullToRefreshState()
 
             Scaffold(
                 bottomBar = {
                     AlbumListBottomBar(
                         onClickVisibleFilter = { visibleFilter = !visibleFilter },
                         onClickPrev = { vm.loadPrevList() },
-                        onClickNext = { vm.loadNextList() })
-                }, containerColor = ThemeL.greyBackground
+                        onClickNext = { vm.loadNextList() }
+                    )
+                },
+                containerColor = ThemeL.greyBackground
             ) { padding ->
 
+                // Wrap LazyVerticalGrid with PullToRefreshBox
+                PullToRefreshBox(
+                    isRefreshing = isRefreshing,
+                    onRefresh = {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        vm.refreshData()
+                    },
 
-                LazyVerticalGrid(
-                    state = vm.state,
-                    columns = GridCells.Fixed(2),
+                    indicator = {
+
+                        Indicator(
+                            modifier = Modifier.align(Alignment.TopCenter).size(48.dp),
+                            isRefreshing = isRefreshing,
+                            state = pullToRefreshState,
+                            containerColor = ThemeL.grey3,
+                            maxDistance = 96.dp
+                        )
+
+
+                        // Кастомный индикатор на светлом фоне и больше
+//
+//                        if (isRefreshing) {
+//
+//                            Box(
+//                                modifier = Modifier
+//                                    .size(56.dp) // Увеличенный размер
+//                                    .background(
+//                                        color = Color.White,
+//                                        shape = RoundedCornerShape(28.dp) // Круглый фон
+//                                    )
+//                                    .border(
+//                                        width = 1.dp,
+//                                        color = Color.Gray.copy(alpha = 0.2f),
+//                                        shape = RoundedCornerShape(28.dp)
+//                                    ),
+//                                contentAlignment = Alignment.Center
+//                            ) {
+//
+//                                CircularProgressIndicator(
+//                                    modifier = Modifier.size(32.dp), // Больше индикатор
+//                                    strokeWidth = 3.dp,
+//                                    color = ThemeL.primaryColor // Используем цвет темы
+//                                )
+//                            }
+//                        }
+
+                    },
+
+
+
+
+
+
+
+                    state = pullToRefreshState,
                     modifier = Modifier.padding(bottom = padding.calculateBottomPadding())
                 ) {
-                    item(
-                        key = "dummy",
-                        span = { GridItemSpan(maxLineSpan) }) { Spacer(Modifier.height(48.dp)) }
-
-                    item(
-                        key = "page_selector",
-                        span = { GridItemSpan(maxLineSpan) }) {
-                        if (info != null) {
-                            AlbumListPageSelector(info.page, info.totalPages, {
-                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                vm.loadAlbumList(it)
-                            })
+                    LazyVerticalGrid(
+                        state = vm.state,
+                        columns = GridCells.Fixed(2)
+                    ) {
+                        item(
+                            key = "dummy",
+                            span = { GridItemSpan(maxLineSpan) }
+                        ) {
+                            Spacer(Modifier.height(48.dp))
                         }
-                    }
 
-                    items(items?.size ?: 0) { index ->
-                        val item = items?.get(index)
-                        if (item != null) {
-                            AlbumListItem(
-                                title = item.title,
-                                coverUrl = item.cover.url,
-                                numberOfAnimatedPictures = item.numberOfAnimatedPictures,
-                                numberOfPictures = item.numberOfPictures,
-                            ) {
-                                navigator.push(ScreenLAlbum(item.id.toLong()))
-                            }
-                        }
-                    }
-
-                    item(
-                        key = "page_selector2",
-                        span = { GridItemSpan(maxLineSpan) }) {
-
-                        if (items?.isNotEmpty() ?: false) {
+                        item(
+                            key = "page_selector",
+                            span = { GridItemSpan(maxLineSpan) }
+                        ) {
                             if (info != null) {
-                                AlbumListPageSelector(
-                                    info.page, info.totalPages,
-                                    {
-                                        scope.launch { vm.state.scrollToItem(0) }
-                                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                        vm.loadAlbumList(it)
-                                    })
+                                AlbumListPageSelector(info.page, info.totalPages) {
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    vm.loadAlbumList(it)
+                                }
                             }
                         }
 
-                    }
+                        items(items?.size ?: 0) { index ->
+                            val item = items?.get(index)
+                            if (item != null) {
+                                AlbumListItem(
+                                    title = item.title,
+                                    coverUrl = item.cover.url,
+                                    numberOfAnimatedPictures = item.numberOfAnimatedPictures,
+                                    numberOfPictures = item.numberOfPictures,
+                                ) {
+                                    navigator.push(ScreenLAlbum(item.id.toLong()))
+                                }
+                            }
+                        }
 
+                        item(
+                            key = "page_selector2",
+                            span = { GridItemSpan(maxLineSpan) }
+                        ) {
+                            if (items?.isNotEmpty() == true && info != null) {
+                                AlbumListPageSelector(info.page, info.totalPages) {
+                                    scope.launch { vm.state.scrollToItem(0) }
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    vm.loadAlbumList(it)
+                                }
+                            }
+                        }
+                    }
                 }
 
-                if (filter != null) {
-                    if (visibleFilter) AlbumListFilter(
-                        filter,
+                // Filter overlay
+                if (currentFilter != null && visibleFilter) {
+                    AlbumListFilter(
+                        currentFilter,
                         filterGCount,
                         filterTagsCount,
-                        onClose = { visibleFilter = false }) {
-                        //vm.albumList.value?.filter = it
+                        onClose = { visibleFilter = false }
+                    ) { newFilter ->
                         vm.screenModelScope.launch {
-                            vm.albumList.value?.getAlbumList(1, it)
+                            vm.albumList.value?.getAlbumList(1, newFilter)
                             vm.albumList.value?.getAlbumListAggregations(1)
                         }
                     }
@@ -217,7 +276,6 @@ object ScreenLAlbumList {
             }
         }
     }
-
 }
 
 class ScreenLAlbumListSM @AssistedInject constructor(
@@ -232,12 +290,29 @@ class ScreenLAlbumListSM @AssistedInject constructor(
 
     var albumList = MutableStateFlow<AlbumListImpl?>(null)
 
+    // Pull to refresh state
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing = _isRefreshing
+
+    val state = LazyGridState()
+
     init {
         Timber.i("iii ScreenLAlbumListSM init")
+        loadInitialData()
+    }
+
+    private fun loadInitialData() {
         screenModelScope.launch {
-            albumList.value = luscious.getAlbumList()
-            albumList.value?.getAlbumList(1, filter)
-            albumList.value?.getAlbumListAggregations(1)
+            _isRefreshing.value = true
+            try {
+                albumList.value = luscious.getAlbumList()
+                albumList.value?.getAlbumList(1, filter)
+                albumList.value?.getAlbumListAggregations(1)
+            } catch (e: Exception) {
+                Timber.e(e, "Error loading initial data")
+            } finally {
+                _isRefreshing.value = false
+            }
         }
     }
 
@@ -248,30 +323,77 @@ class ScreenLAlbumListSM @AssistedInject constructor(
 
     fun loadAlbumList(page: Int) {
         screenModelScope.launch {
-            albumList.value?.getAlbumList(page, albumList.value!!.filter)
-            //albumList.value?.getAlbumListAggregations(page)
+            try {
+                albumList.value?.getAlbumList(page, albumList.value?.filter)
+            } catch (e: Exception) {
+                Timber.e(e, "Error loading page $page")
+            }
         }
     }
 
-
-    fun loadNextList(){
-          if (albumList.value != null){
-              val page = (albumList.value!!.info.page + 1)
-              loadAlbumList(page)
-          }
+    fun loadNextList() {
+        if (albumList.value != null) {
+            val page = (albumList.value!!.info.page + 1)
+            loadAlbumList(page)
+        }
     }
 
-    fun loadPrevList(){
-        if (albumList.value != null){
+    fun loadPrevList() {
+        if (albumList.value != null) {
             val page = (albumList.value!!.info.page - 1).coerceAtLeast(1)
             loadAlbumList(page)
         }
     }
 
-    val state = LazyGridState()
+    // Pull to refresh function
+    fun refreshData() {
+        screenModelScope.launch {
+            _isRefreshing.value = true
+            try {
+                val currentPage = albumList.value?.info?.page ?: 1
+                val currentFilter = albumList.value?.filter
 
+                Timber.d("Refreshing data for page $currentPage")
+
+                // Reload current page with current filter
+                albumList.value?.getAlbumList(currentPage, currentFilter)
+                albumList.value?.getAlbumListAggregations(currentPage)
+
+                // Optional: scroll to top after refresh
+                state.scrollToItem(0)
+
+            } catch (e: Exception) {
+                Timber.e(e, "Error refreshing data")
+            } finally {
+                _isRefreshing.value = false
+            }
+        }
+    }
+
+    // Alternative refresh method that always goes to first page
+    fun refreshToFirstPage() {
+        screenModelScope.launch {
+            _isRefreshing.value = true
+            try {
+                val currentFilter = albumList.value?.filter
+
+                Timber.d("Refreshing to first page")
+
+                // Always reload first page
+                albumList.value?.getAlbumList(1, currentFilter)
+                albumList.value?.getAlbumListAggregations(1)
+
+                // Scroll to top
+                state.scrollToItem(0)
+
+            } catch (e: Exception) {
+                Timber.e(e, "Error refreshing to first page")
+            } finally {
+                _isRefreshing.value = false
+            }
+        }
+    }
 }
-
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -283,5 +405,4 @@ abstract class ScreenModuleLAlbumList {
     abstract fun bindHiltProfilesScreenModelFactory(
         hiltDetailsScreenModelFactory: ScreenLAlbumListSM.Factory
     ): ScreenModelFactory
-
 }

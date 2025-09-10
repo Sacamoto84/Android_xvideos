@@ -38,7 +38,6 @@ import com.client.xvideos.l.ui.screens.screenAlbum.atom.FullScreenImage
 import com.client.xvideos.l.ui.screens.LocalRootLScreenModel
 import com.client.xvideos.common.fresco.UrlImageLusciousGifsGlide
 import com.client.xvideos.common.sharedPref.Settings
-import com.client.xvideos.l.model.ThumbnailsSize
 import com.client.xvideos.redgifs.ui.profile.atom.VerticalScrollbar
 import com.client.xvideos.redgifs.ui.profile.rememberVisibleRangePercentIgnoringFirstNForLazyStaggeredGrid
 
@@ -100,7 +99,8 @@ fun LazyRowPictureDetails(
                                             onClose = { rootVm.hideOverlay() },
                                             albumName = host.albumName,
                                             filteredPic = host.filteredPic,
-                                            expandMenu = expandMenuFullScreen
+                                            expandMenu = expandMenuFullScreen,
+                                            autoPlay = true
                                         )
                                     }
                                 },

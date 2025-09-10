@@ -38,7 +38,6 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.common.fresco.UrlImageLusciousGifsGlide
 import kotlinx.coroutines.coroutineScope
@@ -59,6 +58,7 @@ fun FullScreenImage(
     albumName: String,
     filteredPic: List<PicsDetails>,
     //onDownload: (PicsDetails) -> Unit = {},
+    autoPlay : Boolean = false,
     expandMenu: @Composable (PicsDetails) -> Unit = {},
 ) {
     val density = LocalDensity.current
@@ -451,7 +451,8 @@ fun FullScreenImage(
                 modifier = Modifier.aspectRatio(item.width.toFloat()/item.height),//.fillMaxSize(),
                 //contentScale = ContentScale.FillBounds,
                 onSuccess = { success = true },
-                albumName = albumName
+                albumName = albumName,
+                autoPlay = autoPlay
             )
         }
     }

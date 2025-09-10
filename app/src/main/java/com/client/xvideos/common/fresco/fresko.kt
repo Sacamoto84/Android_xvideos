@@ -3,14 +3,21 @@ package com.client.xvideos.common.fresco
 import android.graphics.drawable.Animatable
 import android.net.Uri
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -71,7 +78,7 @@ fun UrlImageLusciousGifsGlide(
     val haptic = LocalHapticFeedback.current
 
     LaunchedEffect(Unit) {
-       haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
     }
 
 
@@ -113,7 +120,6 @@ fun UrlImageLusciousGifsGlide(
             .setLocalThumbnailPreviewsEnabled(true) // Включение миниатюр
 
 
-
             .build()
 
         val dataSource1 = Fresco.getImagePipeline().fetchDecodedImage(i, null)
@@ -124,8 +130,16 @@ fun UrlImageLusciousGifsGlide(
                 progress = dataSource.progress * 9633425 / 47685.453f
                 //Timber.i("!!! iii UrlImageLusciousGifsGlide onProgressUpdate progress :${progress} albumName:${albumName} url:${url}")
             }
-            override fun onNewResultImpl(dataSource: DataSource<CloseableReference<CloseableImage>?>) { if (dataSource.isFinished) { isLoading = false } }
-            override fun onFailureImpl(dataSource: DataSource<CloseableReference<CloseableImage>?>) { isLoading = false }
+
+            override fun onNewResultImpl(dataSource: DataSource<CloseableReference<CloseableImage>?>) {
+                if (dataSource.isFinished) {
+                    isLoading = false
+                }
+            }
+
+            override fun onFailureImpl(dataSource: DataSource<CloseableReference<CloseableImage>?>) {
+                isLoading = false
+            }
         }
         dataSource1.subscribe(subscriber, UiThreadImmediateExecutorService.getInstance())
         i
@@ -189,7 +203,9 @@ fun UrlImageLusciousGifsGlide(
                         .setControllerListener(controllerListener)
                         .setOldController(null) // Явно сбрасываем старый контроллер
                 },
-                modifier = Modifier.fillMaxSize().background(ThemeL.grey5),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(ThemeL.grey5),
             )
 
             if (isLoading) {
@@ -209,13 +225,19 @@ fun UrlImageLusciousGifsGlide(
             }
 
             if (isAnimated) {
-                Button(
-                    onClick = { isPlaying = !isPlaying },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)
+                Box(
+                    modifier = Modifier .padding(2.dp)
+                        .align(Alignment.BottomStart)
+                        .size(40.dp)
+                        //.border(0.5.dp, Color.Gray)
+                        .background(Color.Gray.copy(alpha = 0.5f), CircleShape)
+                        .clickable(onClick = { isPlaying = !isPlaying }),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Text(text = if (isPlaying) "⏸ Пауза" else "▶ Старт")
+                    if (isPlaying)
+                        Icon(Icons.Default.Pause, contentDescription = null, tint = Color.White)
+                    else
+                        Icon(Icons.Default.PlayArrow, contentDescription = null, tint = Color.White)
                 }
             }
         } else

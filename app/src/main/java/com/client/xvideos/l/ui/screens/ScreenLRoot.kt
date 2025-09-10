@@ -136,7 +136,6 @@ class ScreenLRoot() : Screen {
                 floatingActionButtonPosition = FabPosition.Start,
 
                 floatingActionButton = {
-//
 
                     // Отслеживаем изменения в навигаторе для обновления Badge
                     var navigationDepth by remember { mutableIntStateOf(0) }
@@ -272,8 +271,6 @@ class ScreenLRoot() : Screen {
                 }
             ) { paddingValues ->
 
-                //Navigator(screen = ScreenLExplorer())
-
                 // Основной навигатор приложения
                 Navigator(screen = ScreenLExplorer()) { nav ->
                     mainNavigator = nav // Сохраняем ссылку на навигатор
@@ -294,8 +291,6 @@ class ScreenLRoot() : Screen {
 
 
             }
-
-
 
             AppNetworkSpeedMonitorLite()
         }

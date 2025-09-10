@@ -72,9 +72,6 @@ class ScreenLExplorer() : Screen {
             depth = 0
         }
 
-
-
-
         val g0 = Settings.gallery_count[0].field.collectAsStateWithLifecycle().value
         val g1 = Settings.gallery_count[1].field.collectAsStateWithLifecycle().value
         val g2 = Settings.gallery_count[2].field.collectAsStateWithLifecycle().value

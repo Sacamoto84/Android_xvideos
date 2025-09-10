@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectTreeColorHighlighter">
     <files>
+      <node color="6" path="$PROJECT_DIR$/app/src/main/java/com/client/xvideos/l/ui/screens/ScreenLRoot.kt" />
       <node color="4" path="$PROJECT_DIR$/app/src/main/java/com/client/xvideos/red/screens" />
     </files>
     <colors>
