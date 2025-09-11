@@ -33,6 +33,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.model.screenModelScope
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.common.fresco.DownloadQueueManager
 import com.client.xvideos.l.ThemeL
 import com.client.xvideos.l.model.PicsDetails
@@ -42,9 +44,13 @@ import com.client.xvideos.common.fresco.UrlImageLusciousGifsGlide
 import com.client.xvideos.common.sharedPref.Settings
 import com.client.xvideos.redgifs.ui.profile.atom.VerticalScrollbar
 import com.client.xvideos.redgifs.ui.profile.rememberVisibleRangePercentIgnoringFirstNForLazyStaggeredGrid
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
+@OptIn(DelicateCoroutinesApi::class)
 @Composable
 fun LazyRowPictureDetails(
     host: LazyRowPictureDetailsHost,
@@ -52,7 +58,11 @@ fun LazyRowPictureDetails(
     expandMenu: @Composable (PicsDetails) -> Unit = {},
     expandMenuFullScreen: @Composable (PicsDetails) -> Unit = {}
 ) {
+
+    val navigator = LocalNavigator.currentOrThrow
+
     val rootVm = LocalRootLScreenModel.current
+
     val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForLazyStaggeredGrid(
         host.state,
         0
@@ -62,7 +72,6 @@ fun LazyRowPictureDetails(
 
     val haptic = LocalHapticFeedback.current
 
-    val coroutineScope = rememberCoroutineScope()
 
     Box(modifier = Modifier.fillMaxSize()) {
 
@@ -77,7 +86,6 @@ fun LazyRowPictureDetails(
             }
 
             itemsIndexed(host.filteredPic) { index, item ->
-                var imageBounds by remember { mutableStateOf<Rect?>(null) }
 
                 if (item.url_to_original != null) {
                     Box(
@@ -94,26 +102,18 @@ fun LazyRowPictureDetails(
                         UrlImageLusciousGifsGlide(
                             url,
                             modifier = Modifier
-                                .padding(2.dp)
-                                .aspectRatio(aspect)
-                                .clipToBounds()
-                                .border(0.5.dp, Color.Gray)
-                                .onGloballyPositioned { coordinates ->
-                                    imageBounds = coordinates.boundsInRoot()
-                                }
+                                .padding(2.dp).aspectRatio(aspect).clipToBounds().border(0.5.dp, Color.Gray)
                                 .clickable {
-                                    rootVm.showOverlay {
+                                    navigator.push(
                                         FullScreenImage(
                                             item = item,
-                                            onClose = {
-                                                if (it != -1) {
-                                                    coroutineScope.launch {
-                                                        host.state.scrollToItem(it)
+                                            onClose = { it1 ->
+                                                Timber.i("scrollToItem 1 $it1")
+                                                if (it1 != -1) {
+                                                    rootVm.screenModelScope.launch {
+                                                        host.state.scrollToItem(it1)
                                                         delay(100)
-                                                        rootVm.hideOverlay()
                                                     }
-                                                }else {
-                                                    rootVm.hideOverlay()
                                                 }
                                             },
                                             albumName = host.albumName,
@@ -121,9 +121,8 @@ fun LazyRowPictureDetails(
                                             expandMenu = expandMenuFullScreen,
                                             autoPlay = true,
                                             isAnimated = item.is_animated,
-
-                                            )
-                                    }
+                                        )
+                                    )
                                 },
                             // contentScale = ContentScale.FillBounds,
                             albumName = host.albumName,

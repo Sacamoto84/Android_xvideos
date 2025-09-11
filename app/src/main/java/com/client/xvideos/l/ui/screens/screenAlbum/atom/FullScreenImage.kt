@@ -28,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -45,7 +46,13 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.core.screen.ScreenKey
+import cafe.adriel.voyager.core.screen.uniqueScreenKey
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.common.fresco.UrlImageLusciousGifsGlide
+import com.client.xvideos.l.ThemeL
 import com.client.xvideos.l.model.PicsDetails
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -53,205 +60,201 @@ import net.engawapg.lib.zoomable.ZoomState
 import net.engawapg.lib.zoomable.rememberZoomState
 import net.engawapg.lib.zoomable.zoomable
 
-@Composable
-fun FullScreenImage(
-    item: PicsDetails,
-    albumName: String,
-    filteredPic: List<PicsDetails>,
-    autoPlay: Boolean = false,
-    isAnimated: Boolean = false,
-    expandMenu: @Composable (PicsDetails) -> Unit = {},
-    onClose: (Int) -> Unit
-) {
-    val density = LocalDensity.current
-    val configuration = LocalConfiguration.current
-    val screenWidthPx = with(density) { configuration.screenWidthDp.dp.toPx() }
-    val screenHeightPx = with(density) { configuration.screenHeightDp.dp.toPx() }
+class FullScreenImage(
+    val item: PicsDetails,
+    val albumName: String,
+    val filteredPic: List<PicsDetails>,
+    val autoPlay: Boolean = false,
+    val isAnimated: Boolean = false,
+    val expandMenu: @Composable (PicsDetails) -> Unit = {},
+    val onClose: (Int) -> Unit
+) : Screen {
 
-    var isClosing by remember { mutableStateOf(false) }
-    var success by remember { mutableStateOf(false) }
-    val alphaAnim = remember { Animatable(0f) }
-    var dataItem by remember(Unit) { mutableStateOf(item) }
-    var corruptCancel by remember { mutableStateOf(false) }
-    val coroutineScope = rememberCoroutineScope()
+    override val key: ScreenKey = uniqueScreenKey
 
-    LaunchedEffect(success) {
-        if (success) {
-            alphaAnim.animateTo(1f, tween(200))
-        }
-    }
+    @Composable
+    override fun Content() {
 
-    LaunchedEffect(isClosing) {
-        if (isClosing) {
-            onClose(
-                if (corruptCancel) filteredPic.indexOf(dataItem)
-                    .coerceIn(0, filteredPic.size - 1) else -1
-            )
-        }
-    }
+        val navigator = LocalNavigator.currentOrThrow
 
-    BackHandler { isClosing = true }
+        val density = LocalDensity.current
+        val configuration = LocalConfiguration.current
+        val screenWidthPx = with(density) { configuration.screenWidthDp.dp.toPx() }
+        val screenHeightPx = with(density) { configuration.screenHeightDp.dp.toPx() }
 
-    val zoomState = rememberZoomState()
-    val pagerState = rememberPagerState(
-        filteredPic.indexOf(item).coerceIn(0, filteredPic.lastIndex),
-        pageCount = { filteredPic.size }
-    )
+        var isClosing by remember { mutableStateOf(false) }
 
-    // Состояние для LazyRow
-    val lazyRowState = rememberLazyListState()
+        var dataItem by remember(Unit) { mutableStateOf(item) }
+        var corruptCancel by remember { mutableStateOf(false) }
+        val coroutineScope = rememberCoroutineScope()
 
-    // Текущий индекс из pagerState
-    val currentIndex = pagerState.currentPage
-
-    // Автоматическая прокрутка LazyRow к текущему элементу
-    LaunchedEffect(currentIndex) {
-        // Обновляем dataItem при изменении страницы в pager
-        dataItem = filteredPic[currentIndex]
-
-        // Сбрасываем зум при смене страницы
-        //zoomState.reset()
-        if (zoomState.scale > 1.0f) {
-            zoomState.changeScale(1.0f, Offset.Zero)
-            delay(200)
-        }
-
-        // Прокручиваем LazyRow к текущему элементу
-        lazyRowState.animateScrollToItem((currentIndex-1).coerceIn(0, filteredPic.size - 1))
-
-    }
-
-    // Также сбрасываем зум при изменении dataItem через кнопки или миниатюры
-    LaunchedEffect(dataItem) {
-        val newIndex = filteredPic.indexOf(dataItem)
-        if (newIndex != currentIndex) {
-            coroutineScope.launch {
-                pagerState.animateScrollToPage(newIndex)
+        LaunchedEffect(isClosing) {
+            if (isClosing) {
+                onClose(
+                    if (corruptCancel) filteredPic.indexOf(dataItem)
+                        .coerceIn(0, filteredPic.size - 1) else -1
+                )
+                navigator.pop()
             }
         }
-    }
 
-    Box(
-        modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopStart
-    ) {
-        // Полупрозрачный фон
-        Box(
-            modifier = Modifier.matchParentSize()
-                .checkerboardBackground(
-                    squareSize = 12.dp,
-                    lightColor = Color(0xFF252525),//Color.White,
-                    darkColor = Color(0xFF181818)//Color.LightGray
-                )
+        BackHandler {
+            isClosing = true
+        }
+
+        val zoomState = rememberZoomState()
+        val pagerState = rememberPagerState(
+            filteredPic.indexOf(item).coerceIn(0, filteredPic.lastIndex),
+            pageCount = { filteredPic.size }
         )
 
-        HorizontalPager(
-            state = pagerState,
-            modifier = Modifier.align(Alignment.Center).fillMaxSize(),
-            pageSpacing = 8.dp,
-            key = { page -> filteredPic[page].url_to_original!! }
-        ) { page ->
-            val pageItem = filteredPic[page]
+        // Состояние для LazyRow
+        val lazyRowState = rememberLazyListState()
 
-            UrlImageLusciousGifsGlide(
-                url = pageItem.url_to_original!!,
-                modifier = Modifier
-                    .aspectRatio(pageItem.width.toFloat() / pageItem.height)
-                    .zoomable(
-                        zoomState = zoomState,
-                        enableOneFingerZoom = false,
-                        onDoubleTap = { position ->
-                            // Двойной тап для зума/раззума
-                            coroutineScope.launch {
-                                if (zoomState.scale > 1.0f) {
-                                    // Если уже увеличено - сбрасываем
-                                    //zoomState.reset()
-                                    zoomState.changeScale(1.0f, Offset.Zero)
-                                } else {
-                                    // Увеличиваем в 2-3 раза по центру тапа
-                                    zoomState.changeScale(2.5f, position)
-                                }
-                            }
-                        }
-                    )
-                ,
-                onSuccess = { success = true },
-                albumName = albumName,
-                autoPlay = autoPlay,
-                isAnimated = pageItem.is_animated
+        // Текущий индекс из pagerState
+        val currentIndex = pagerState.currentPage
+
+        val initialIndex by remember {
+            mutableIntStateOf(
+                filteredPic.indexOf(item).coerceIn(0, filteredPic.lastIndex)
             )
         }
 
-        Box(modifier = Modifier.align(Alignment.TopStart)) {
-            Text(
-                currentIndex.toString(),
-                color = Color.Gray,
-                modifier = Modifier.padding(start = 8.dp)
-            )
+        LaunchedEffect(currentIndex) {
+            if (currentIndex != initialIndex) {
+                corruptCancel = true
+            }
         }
 
-        Box(modifier = Modifier.align(Alignment.TopEnd)) {
-            expandMenu(item)
-        }
 
-        Column(modifier = Modifier.align(Alignment.BottomCenter)) {
-            LazyRow(
-                state = lazyRowState,
-                modifier = Modifier.height(96.dp)
-            ) {
-                itemsIndexed(filteredPic) { index, it1 ->
-                    Box(
-                        modifier = Modifier
-                            .padding(horizontal = 1.dp)
-                            .clip(RoundedCornerShape(4.dp))
-                            .aspectRatio(it1.width.toFloat() / it1.height)
-                            .clickable(onClick = {
-                                dataItem = it1
-                                corruptCancel = true
-                            })
-                            .border(
-                                2.dp,
-                                if (index == currentIndex) Color.Yellow else Color.Transparent,
-                                RoundedCornerShape(4.dp)
-                            )
-                            .padding(2.dp)
-                    ) {
-                        UrlImageLusciousGifsGlide(
-                            url = it1.url_to_original!!,
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(4.dp))
-                                .fillMaxSize(),
-                            contentScale = ContentScale.FillBounds,
-                            onSuccess = { },
-                            albumName = albumName,
-                            autoPlay = false,
-                            isAnimated = it1.is_animated
-                        )
-                    }
-                }
+        // Автоматическая прокрутка LazyRow к текущему элементу
+        LaunchedEffect(currentIndex) {
+            // Обновляем dataItem при изменении страницы в pager
+            dataItem = filteredPic[currentIndex]
+
+            // Сбрасываем зум при смене страницы
+            //zoomState.reset()
+            if (zoomState.scale > 1.0f) {
+                zoomState.changeScale(1.0f, Offset.Zero)
+                delay(200)
             }
 
-            Row(
+            // Прокручиваем LazyRow к текущему элементу
+            lazyRowState.animateScrollToItem((currentIndex - 1).coerceIn(0, filteredPic.size - 1))
+
+        }
+
+        // Также сбрасываем зум при изменении dataItem через кнопки или миниатюры
+        LaunchedEffect(dataItem) {
+            val newIndex = filteredPic.indexOf(dataItem)
+            if (newIndex != currentIndex) {
+                coroutineScope.launch {
+                    pagerState.animateScrollToPage(newIndex)
+                }
+            }
+        }
+
+        Box(
+            modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopStart
+        ) {
+            // Полупрозрачный фон
+            Box(
                 modifier = Modifier
-                    .height(46.dp)
-                    .padding(horizontal = 96.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Button(onClick = {
-                    val index = (currentIndex - 1).coerceIn(0, filteredPic.size - 1)
-                    dataItem = filteredPic[index]
-                    corruptCancel = true
-                }) {
-                    Text("←")
+                    .matchParentSize()
+                    .checkerboardBackground(
+                        squareSize = 12.dp,
+                        lightColor = Color(0xFF252525),//Color.White,
+                        darkColor = Color(0xFF181818)//Color.LightGray
+                    )
+            )
+
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .fillMaxSize(),
+                pageSpacing = 8.dp,
+                key = { page -> filteredPic[page].url_to_original!! }
+            ) { page ->
+                val pageItem = filteredPic[page]
+
+                UrlImageLusciousGifsGlide(
+                    url = pageItem.url_to_original!!,
+                    modifier = Modifier
+                        .aspectRatio(pageItem.width.toFloat() / pageItem.height)
+                        .zoomable(
+                            zoomState = zoomState,
+                            enableOneFingerZoom = false,
+                            onDoubleTap = { position ->
+                                // Двойной тап для зума/раззума
+                                coroutineScope.launch {
+                                    if (zoomState.scale > 1.0f) {
+                                        // Если уже увеличено - сбрасываем
+                                        //zoomState.reset()
+                                        zoomState.changeScale(1.0f, Offset.Zero)
+                                    } else {
+                                        // Увеличиваем в 2-3 раза по центру тапа
+                                        zoomState.changeScale(2.5f, position)
+                                    }
+                                }
+                            }
+                        ),
+                    onSuccess = { },
+                    albumName = albumName,
+                    autoPlay = autoPlay,
+                    isAnimated = pageItem.is_animated
+                )
+            }
+
+            Box(modifier = Modifier.align(Alignment.TopStart)) {
+                Text(
+                    currentIndex.toString(),
+                    color = Color.Gray,
+                    modifier = Modifier.padding(start = 8.dp), fontFamily = ThemeL.fontFamilyKarla
+                )
+            }
+
+            Box(modifier = Modifier.align(Alignment.TopEnd)) {
+                expandMenu(item)
+            }
+
+            Column(modifier = Modifier.align(Alignment.BottomCenter)) {
+                LazyRow(
+                    state = lazyRowState,
+                    modifier = Modifier.height(72.dp)
+                ) {
+                    itemsIndexed(filteredPic) { index, it1 ->
+                        Box(
+                            modifier = Modifier
+                                .padding(horizontal = 1.dp)
+                                .clip(RoundedCornerShape(4.dp))
+                                .aspectRatio(it1.width.toFloat() / it1.height)
+                                .clickable(onClick = {
+                                    dataItem = it1
+                                    corruptCancel = true
+                                })
+                                .border(
+                                    2.dp,
+                                    if (index == currentIndex) Color.Yellow else Color.Transparent,
+                                    RoundedCornerShape(4.dp)
+                                )
+                                .padding(2.dp)
+                        ) {
+                            UrlImageLusciousGifsGlide(
+                                url = it1.url_to_original!!,
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(4.dp))
+                                    .fillMaxSize(),
+                                contentScale = ContentScale.FillBounds,
+                                onSuccess = { },
+                                albumName = albumName,
+                                autoPlay = false,
+                                isAnimated = it1.is_animated
+                            )
+                        }
+                    }
                 }
 
-                Button(onClick = {
-                    val index = (currentIndex + 1).coerceIn(0, filteredPic.size - 1)
-                    dataItem = filteredPic[index]
-                    corruptCancel = true
-                }) {
-                    Text("→")
-                }
             }
         }
     }
