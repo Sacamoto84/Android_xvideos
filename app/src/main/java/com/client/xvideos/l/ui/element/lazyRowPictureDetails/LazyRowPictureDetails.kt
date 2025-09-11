@@ -105,7 +105,6 @@ fun LazyRowPictureDetails(
                                     rootVm.showOverlay {
                                         FullScreenImage(
                                             item = item,
-                                            startBounds = imageBounds,
                                             onClose = {
                                                 if (it != -1) {
                                                     coroutineScope.launch {
