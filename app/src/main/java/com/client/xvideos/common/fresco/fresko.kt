@@ -80,7 +80,7 @@ fun UrlImageLusciousGifsGlide(
     val haptic = LocalHapticFeedback.current
 
     LaunchedEffect(Unit) {
-        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+        //haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
     }
 
 
@@ -119,7 +119,7 @@ fun UrlImageLusciousGifsGlide(
             .setLowestPermittedRequestLevel(ImageRequest.RequestLevel.FULL_FETCH)
             .setProgressiveRenderingEnabled(true)
             //.setResizeOptions(ResizeOptions(100, 100)) // Изменение размера
-            .setLocalThumbnailPreviewsEnabled(true) // Включение миниатюр
+            //.setLocalThumbnailPreviewsEnabled(true) // Включение миниатюр
 
 
             .build()
@@ -205,9 +205,7 @@ fun UrlImageLusciousGifsGlide(
                         .setControllerListener(controllerListener)
                         .setOldController(null) // Явно сбрасываем старый контроллер
                 },
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(ThemeL.grey5),
+                modifier = Modifier.fillMaxSize().background(ThemeL.grey5),
             )
 
             if (isLoading) {

@@ -159,50 +159,14 @@ object ScreenLAlbumList {
                     },
 
                     indicator = {
-
                         Indicator(
                             modifier = Modifier.align(Alignment.TopCenter).size(48.dp),
                             isRefreshing = isRefreshing,
                             state = pullToRefreshState,
                             containerColor = ThemeL.grey3,
-                            maxDistance = 96.dp
+                            maxDistance = (96+50).dp
                         )
-
-
-                        // Кастомный индикатор на светлом фоне и больше
-//
-//                        if (isRefreshing) {
-//
-//                            Box(
-//                                modifier = Modifier
-//                                    .size(56.dp) // Увеличенный размер
-//                                    .background(
-//                                        color = Color.White,
-//                                        shape = RoundedCornerShape(28.dp) // Круглый фон
-//                                    )
-//                                    .border(
-//                                        width = 1.dp,
-//                                        color = Color.Gray.copy(alpha = 0.2f),
-//                                        shape = RoundedCornerShape(28.dp)
-//                                    ),
-//                                contentAlignment = Alignment.Center
-//                            ) {
-//
-//                                CircularProgressIndicator(
-//                                    modifier = Modifier.size(32.dp), // Больше индикатор
-//                                    strokeWidth = 3.dp,
-//                                    color = ThemeL.primaryColor // Используем цвет темы
-//                                )
-//                            }
-//                        }
-
                     },
-
-
-
-
-
-
 
                     state = pullToRefreshState,
                     modifier = Modifier.padding(bottom = padding.calculateBottomPadding())
