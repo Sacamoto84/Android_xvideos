@@ -44,6 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
@@ -59,6 +60,8 @@ import com.client.xvideos.common.fresco.UrlImageLusciousGifsGlide
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
+import net.engawapg.lib.zoomable.rememberZoomState
+import net.engawapg.lib.zoomable.zoomable
 import timber.log.Timber
 import kotlin.math.abs
 import kotlin.math.max
@@ -180,6 +183,8 @@ fun FullScreenImage(
             Pair(min(minOffsetY, maxOffsetY), max(minOffsetY, maxOffsetY))
         )
     }
+
+    val zoomState = rememberZoomState(contentSize = Size(screenWidthPx,screenHeightPx))
 
     Box(
         modifier = Modifier
@@ -461,18 +466,22 @@ fun FullScreenImage(
 
         Box(
             modifier = Modifier
-                .offset {
-                    IntOffset(
-                        offsetXAnim.value.roundToInt(),
-                        offsetYAnim.value.roundToInt()
-                    )
-                }
-                .graphicsLayer(
-                    scaleX = scaleAnim.value,
-                    scaleY = scaleAnim.value,
-                    transformOrigin = TransformOrigin(0f, 0f)
-                )
-                .size(baseWidthDp, baseHeightDp)
+
+                .zoomable(zoomState),
+
+
+//                .offset {
+//                    IntOffset(
+//                        offsetXAnim.value.roundToInt(),
+//                        offsetYAnim.value.roundToInt()
+//                    )
+//                }
+//                .graphicsLayer(
+//                    scaleX = scaleAnim.value,
+//                    scaleY = scaleAnim.value,
+//                    transformOrigin = TransformOrigin(0f, 0f)
+//                )
+//                .size(baseWidthDp, baseHeightDp)
         ) {
             //UrlImageLusciousGifsFull(
             UrlImageLusciousGifsGlide(
