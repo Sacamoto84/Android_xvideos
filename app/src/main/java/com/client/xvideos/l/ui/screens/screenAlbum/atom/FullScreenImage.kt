@@ -8,6 +8,8 @@ import androidx.compose.animation.core.calculateTargetValue
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.splineBasedDecay
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.calculateCentroid
 import androidx.compose.foundation.gestures.calculatePan
@@ -16,14 +18,20 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -33,6 +41,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
@@ -40,6 +49,7 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.util.VelocityTracker
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
@@ -49,24 +59,26 @@ import com.client.xvideos.common.fresco.UrlImageLusciousGifsGlide
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
 
 
-
 @Composable
 fun FullScreenImage(
     item: PicsDetails,
     startBounds: Rect?,
-    onClose: () -> Unit,
     albumName: String,
     filteredPic: List<PicsDetails>,
     //onDownload: (PicsDetails) -> Unit = {},
-    autoPlay : Boolean = false,
-    isAnimated : Boolean = false,
+    autoPlay: Boolean = false,
+    isAnimated: Boolean = false,
     expandMenu: @Composable (PicsDetails) -> Unit = {},
+
+    onClose: (Int) -> Unit
+
 ) {
     val density = LocalDensity.current
     val configuration = LocalConfiguration.current
@@ -104,6 +116,10 @@ fun FullScreenImage(
     var success by remember { mutableStateOf(false) }
     val alphaAnim = remember { Animatable(0f) }
 
+    var dataItem by remember(Unit) { mutableStateOf(item) }
+
+    var corruptCancel by remember { mutableStateOf(false) }
+
     LaunchedEffect(success) {
         if (success) {
             alphaAnim.animateTo(1f, tween(200))
@@ -122,13 +138,23 @@ fun FullScreenImage(
     // Анимация закрытия
     LaunchedEffect(isClosing) {
         if (isClosing) {
-            coroutineScope {
-                launch { scaleAnim.animateTo(1f, tween(300)) }
-                launch { offsetXAnim.animateTo(startX, tween(300)) }
-                launch { offsetYAnim.animateTo(startY, tween(300)) }
-                launch { alphaAnim.animateTo(0f, tween(200)) }
+
+            if (!corruptCancel) {
+                coroutineScope {
+                    launch { scaleAnim.animateTo(1f, tween(300)) }
+                    launch { offsetXAnim.animateTo(startX, tween(300)) }
+                    launch { offsetYAnim.animateTo(startY, tween(300)) }
+                    launch { alphaAnim.animateTo(0f, tween(200)) }
+                }
             }
-            onClose()
+
+
+            onClose(
+                if (corruptCancel) filteredPic.indexOf(dataItem)
+                    .coerceIn(0, filteredPic.size - 1) else -1
+            )
+
+
         }
     }
 
@@ -421,7 +447,7 @@ fun FullScreenImage(
                     }
                 )
             }
-            //.background(Color.Black.copy(alpha = alphaAnim.value))
+        //.background(Color.Black.copy(alpha = alphaAnim.value))
         ,
         contentAlignment = Alignment.TopStart
     ) {
@@ -432,10 +458,6 @@ fun FullScreenImage(
                 .matchParentSize()
                 .background(Color.Black.copy(alpha = alphaAnim.value))
         )
-
-        Box(modifier = Modifier.align(Alignment.TopEnd)) {
-            expandMenu(item)
-        }
 
         Box(
             modifier = Modifier
@@ -454,35 +476,86 @@ fun FullScreenImage(
         ) {
             //UrlImageLusciousGifsFull(
             UrlImageLusciousGifsGlide(
-                url = item.url_to_original!!,
-                modifier = Modifier.aspectRatio(item.width.toFloat()/item.height),//.fillMaxSize(),
+                url = dataItem.url_to_original!!,
+                modifier = Modifier.aspectRatio(dataItem.width.toFloat() / dataItem.height),//.fillMaxSize(),
                 //contentScale = ContentScale.FillBounds,
                 onSuccess = { success = true },
                 albumName = albumName,
                 autoPlay = autoPlay,
-                isAnimated = isAnimated
+                isAnimated = dataItem.is_animated
             )
         }
 
-        Row(modifier = Modifier.align(Alignment.BottomCenter).height(46.dp).fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween){
+        Box(modifier = Modifier.align(Alignment.TopStart)) {
+            Text(
+                filteredPic.indexOf(dataItem).coerceIn(0, filteredPic.size - 1).toString(),
+                color = Color.Gray, modifier = Modifier.padding(start = 8.dp)
+            )
+        }
 
-            Button(onClick = {
+        Box(modifier = Modifier.align(Alignment.TopEnd)) { expandMenu(item) }
 
 
+        Column(modifier = Modifier.align(Alignment.BottomCenter)) {
 
-            }){
+            LazyRow(modifier = Modifier.height(96.dp)) {
+                items(filteredPic) { it1 ->
+                    Box(
+                        modifier = Modifier
+                            .padding(horizontal = 1.dp)
+                            .clip(RoundedCornerShape(4.dp))
+                            .aspectRatio(it1.width.toFloat() / it1.height)
+                            .clickable(onClick = { dataItem = it1 })
+                            .border(2.dp, if (dataItem == it1) Color.Yellow else Color.Transparent ,RoundedCornerShape(4.dp))
+                            .padding(2.dp)
 
+                    ) {
+                        UrlImageLusciousGifsGlide(
+                            url = it1.url_to_original!!,
+                            modifier = Modifier.clip(RoundedCornerShape(4.dp)).fillMaxSize(),
+                            contentScale = ContentScale.FillBounds,
+                            onSuccess = { },
+                            albumName = albumName,
+                            autoPlay = false,
+                            isAnimated = dataItem.is_animated
+                        )
+                    }
+                }
             }
 
-            Button(onClick = {
 
 
+            Row(
+                modifier = Modifier
+                    .height(46.dp)
+                    .padding(horizontal = 96.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
 
-            }){
+
+                Button(onClick = {
+                    val index =
+                        filteredPic.indexOf(dataItem).minus(1).coerceIn(0, filteredPic.size - 1)
+                    dataItem = filteredPic[index]
+                    corruptCancel = true
+                    //Timber.e(" eee index $index")
+                }) {
+
+                }
+
+                Button(onClick = {
+                    val index =
+                        filteredPic.indexOf(dataItem).plus(1).coerceIn(0, filteredPic.size - 1)
+                    dataItem = filteredPic[index]
+
+                    corruptCancel = true
+                    //Timber.e(" eee index $index")
+                }) {
+
+                }
 
             }
-
         }
 
     }

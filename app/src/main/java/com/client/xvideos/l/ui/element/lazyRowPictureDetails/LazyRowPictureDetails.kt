@@ -19,6 +19,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,6 +32,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import cafe.adriel.voyager.core.model.screenModelScope
 import com.client.xvideos.common.fresco.DownloadQueueManager
 import com.client.xvideos.l.ThemeL
 import com.client.xvideos.l.model.PicsDetails
@@ -40,6 +42,8 @@ import com.client.xvideos.common.fresco.UrlImageLusciousGifsGlide
 import com.client.xvideos.common.sharedPref.Settings
 import com.client.xvideos.redgifs.ui.profile.atom.VerticalScrollbar
 import com.client.xvideos.redgifs.ui.profile.rememberVisibleRangePercentIgnoringFirstNForLazyStaggeredGrid
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun LazyRowPictureDetails(
@@ -49,11 +53,16 @@ fun LazyRowPictureDetails(
     expandMenuFullScreen: @Composable (PicsDetails) -> Unit = {}
 ) {
     val rootVm = LocalRootLScreenModel.current
-    val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForLazyStaggeredGrid(host.state, 0)
+    val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForLazyStaggeredGrid(
+        host.state,
+        0
+    )
 
     val thumbnailsSize = Settings.thumbalistSize.field.collectAsStateWithLifecycle().value
 
     val haptic = LocalHapticFeedback.current
+
+    val coroutineScope = rememberCoroutineScope()
 
     Box(modifier = Modifier.fillMaxSize()) {
 
@@ -77,8 +86,9 @@ fun LazyRowPictureDetails(
                     ) {
                         val aspect = item.width.toFloat() / item.height
 
-                        val url = if (item.thumbnails.isEmpty()) item.url_to_original else{
-                            item.thumbnails.firstOrNull{it.size == thumbnailsSize}?.url ?: item.url_to_original
+                        val url = if (item.thumbnails.isEmpty()) item.url_to_original else {
+                            item.thumbnails.firstOrNull { it.size == thumbnailsSize }?.url
+                                ?: item.url_to_original
                         } //"small" large_thumbnail
 
                         UrlImageLusciousGifsGlide(
@@ -96,16 +106,27 @@ fun LazyRowPictureDetails(
                                         FullScreenImage(
                                             item = item,
                                             startBounds = imageBounds,
-                                            onClose = { rootVm.hideOverlay() },
+                                            onClose = {
+                                                if (it != -1) {
+                                                    coroutineScope.launch {
+                                                        host.state.scrollToItem(it)
+                                                        delay(100)
+                                                        rootVm.hideOverlay()
+                                                    }
+                                                }else {
+                                                    rootVm.hideOverlay()
+                                                }
+                                            },
                                             albumName = host.albumName,
                                             filteredPic = host.filteredPic,
                                             expandMenu = expandMenuFullScreen,
                                             autoPlay = true,
-                                            isAnimated = item.is_animated
-                                        )
+                                            isAnimated = item.is_animated,
+
+                                            )
                                     }
                                 },
-                           // contentScale = ContentScale.FillBounds,
+                            // contentScale = ContentScale.FillBounds,
                             albumName = host.albumName,
                             isAnimated = item.is_animated
                         )
