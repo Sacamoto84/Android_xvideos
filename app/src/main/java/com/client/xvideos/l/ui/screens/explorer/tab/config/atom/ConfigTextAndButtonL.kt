@@ -22,7 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.client.xvideos.common.setting.styleTextConfig
-import com.client.xvideos.l.ThemeL
+import com.client.xvideos.l.theme.ThemeL
 
 
 @Composable

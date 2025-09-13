@@ -13,7 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.client.xvideos.l.ThemeL
+import com.client.xvideos.l.theme.ThemeL
 
 @Composable
 fun ConfigTextAndCheckBoxL(text: String, value: Boolean, onValueChange: (Boolean) -> Unit) {

@@ -1,34 +1,25 @@
 package com.client.xvideos.l.ui.screens.screenAlbumList
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,8 +27,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -45,13 +36,12 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
-import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.client.xvideos.l.ThemeL
+import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.model.AlbumListFilter
 import com.client.xvideos.l.net.AlbumListImpl
 import com.client.xvideos.l.net.Luscious
@@ -60,7 +50,6 @@ import com.client.xvideos.l.ui.screens.screenAlbum.ScreenLAlbum
 import com.client.xvideos.l.ui.screens.screenAlbumList.atom.AlbumListPageSelector
 import com.client.xvideos.l.ui.screens.screenAlbumList.bottomBar.AlbumListBottomBar
 import com.client.xvideos.l.ui.screens.screenAlbumList.molecule.filter.AlbumListFilter
-import com.client.xvideos.redgifs.common.ThemeRed
 import dagger.Binds
 import dagger.Module
 import dagger.assisted.Assisted
@@ -128,8 +117,10 @@ object ScreenLAlbumList {
             val currentFilter = vm.albumList.collectAsStateWithLifecycle().value?.filter
             val isRefreshing = vm.isRefreshing.collectAsStateWithLifecycle().value
 
-            val filterGCount = vm.albumList.collectAsStateWithLifecycle().value?.filterGenreStateCount
-            val filterTagsCount = vm.albumList.collectAsStateWithLifecycle().value?.filterTaggedStateCount
+            val filterGCount =
+                vm.albumList.collectAsStateWithLifecycle().value?.filterGenreStateCount
+            val filterTagsCount =
+                vm.albumList.collectAsStateWithLifecycle().value?.filterTaggedStateCount
 
             var visibleFilter by remember { mutableStateOf(false) }
 
@@ -138,6 +129,13 @@ object ScreenLAlbumList {
 
             // Pull to refresh state
             val pullToRefreshState = rememberPullToRefreshState()
+
+            val state  = rememberPagerState(initialPage = 1, pageCount = {199})
+
+            LaunchedEffect(state.currentPage) {
+                vm.loadAlbumList(state.currentPage)
+            }
+
 
             Scaffold(
                 bottomBar = {
@@ -150,97 +148,120 @@ object ScreenLAlbumList {
                 containerColor = ThemeL.greyBackground
             ) { padding ->
 
-                // Wrap LazyVerticalGrid with PullToRefreshBox
-                PullToRefreshBox(
-                    isRefreshing = isRefreshing,
-                    onRefresh = {
-                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                        vm.refreshData()
-                    },
+                HorizontalPager(state, Modifier.padding(bottom = padding.calculateBottomPadding()).fillMaxSize()) {
+                    page ->
 
-                    indicator = {
-                        Indicator(
-                            modifier = Modifier.align(Alignment.TopCenter).size(48.dp),
-                            isRefreshing = isRefreshing,
-                            state = pullToRefreshState,
-                            containerColor = ThemeL.grey3,
-                            maxDistance = (96+50).dp
-                        )
-                    },
 
-                    state = pullToRefreshState,
-                    modifier = Modifier.padding(bottom = padding.calculateBottomPadding())
-                ) {
-                    LazyVerticalGrid(
-                        state = vm.state,
-                        columns = GridCells.Fixed(2)
-                    ) {
-                        item(
-                            key = "dummy",
-                            span = { GridItemSpan(maxLineSpan) }
+                    // Wrap LazyVerticalGrid with PullToRefreshBox
+                    PullToRefreshBox(
+                        isRefreshing = isRefreshing,
+                        onRefresh = {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            vm.refreshData()
+                        },
+
+                        indicator = {
+                            Indicator(
+                                modifier = Modifier
+                                    .align(Alignment.TopCenter)
+                                    .size(48.dp),
+                                isRefreshing = isRefreshing,
+                                state = pullToRefreshState,
+                                containerColor = ThemeL.grey3,
+                                maxDistance = (96 + 50).dp
+                            )
+                        },
+
+                        state = pullToRefreshState,
+                        modifier = Modifier.fillMaxSize()//.padding(bottom = padding.calculateBottomPadding())
+                    )
+                    {
+                        LazyVerticalGrid(
+                            state = vm.state, modifier = Modifier.fillMaxSize(),
+                            columns = GridCells.Fixed(2)
                         ) {
-                            Spacer(Modifier.height(48.dp))
-                        }
+                            item(
+                                key = "dummy",
+                                span = { GridItemSpan(maxLineSpan) }
+                            ) {
+                                Spacer(Modifier.height(48.dp))
+                            }
 
-                        item(
-                            key = "page_selector",
-                            span = { GridItemSpan(maxLineSpan) }
-                        ) {
-                            if (info != null) {
-                                AlbumListPageSelector(info.page, info.totalPages) {
-                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                    vm.loadAlbumList(it)
+                            item(
+                                key = "page_selector",
+                                span = { GridItemSpan(maxLineSpan) }
+                            ) {
+                                if (info != null) {
+                                    AlbumListPageSelector(info.page, info.totalPages) {
+                                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                        vm.loadAlbumList(it)
+                                    }
                                 }
                             }
-                        }
 
-                        items(items?.size ?: 0) { index ->
-                            val item = items?.get(index)
-                            if (item != null) {
-                                AlbumListItem(
-                                    title = item.title,
-                                    coverUrl = item.cover.url,
-                                    numberOfAnimatedPictures = item.numberOfAnimatedPictures,
-                                    numberOfPictures = item.numberOfPictures,
-                                ) {
-                                    navigator.push(ScreenLAlbum(item.id.toLong()))
+                            items(items?.size ?: 0) { index ->
+                                val item = items?.get(index)
+                                if (item != null) {
+                                    AlbumListItem(
+                                        title = item.title,
+                                        coverUrl = item.cover.url,
+                                        numberOfAnimatedPictures = item.numberOfAnimatedPictures,
+                                        numberOfPictures = item.numberOfPictures,
+                                    ) {
+                                        navigator.push(ScreenLAlbum(item.id.toLong()))
+                                    }
                                 }
                             }
-                        }
 
-                        item(
-                            key = "page_selector2",
-                            span = { GridItemSpan(maxLineSpan) }
-                        ) {
-                            if (items?.isNotEmpty() == true && info != null) {
-                                AlbumListPageSelector(info.page, info.totalPages) {
-                                    scope.launch { vm.state.scrollToItem(0) }
-                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                    vm.loadAlbumList(it)
+                            item(
+                                key = "page_selector2",
+                                span = { GridItemSpan(maxLineSpan) }
+                            ) {
+                                if (items?.isNotEmpty() == true && info != null) {
+                                    AlbumListPageSelector(info.page, info.totalPages) {
+                                        scope.launch { vm.state.scrollToItem(0) }
+                                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                        vm.loadAlbumList(it)
+                                    }
                                 }
                             }
                         }
                     }
+
+
                 }
+
+
+
+
+
+
 
                 // Filter overlay
                 if (currentFilter != null && visibleFilter) {
-                    AlbumListFilter(
-                        currentFilter,
-                        filterGCount,
-                        filterTagsCount,
-                        onClose = { visibleFilter = false }
-                    ) { newFilter ->
-                        vm.screenModelScope.launch {
-                            vm.albumList.value?.getAlbumList(1, newFilter)
-                            vm.albumList.value?.getAlbumListAggregations(1)
+                    Box(modifier = Modifier.padding(bottom = padding.calculateBottomPadding())) {
+                        AlbumListFilter(
+                            currentFilter,
+                            filterGCount,
+                            filterTagsCount,
+                            onClose = { visibleFilter = false }
+                        ) { newFilter ->
+                            vm.screenModelScope.launch {
+                                vm.albumList.value?.getAlbumList(1, newFilter)
+                                vm.albumList.value?.getAlbumListAggregations(1)
+                            }
                         }
                     }
                 }
+
+
+
+
             }
         }
     }
 }
+
 
 class ScreenLAlbumListSM @AssistedInject constructor(
     @Assisted val filter: AlbumListFilter?,

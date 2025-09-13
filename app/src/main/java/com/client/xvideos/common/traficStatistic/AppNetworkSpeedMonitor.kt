@@ -3,12 +3,9 @@ package com.client.xvideos.common.traficStatistic
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -22,8 +19,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.client.xvideos.App
 import com.client.xvideos.common.util.formatBytes
-import com.client.xvideos.l.ThemeL
-import kotlin.math.roundToInt
+import com.client.xvideos.l.theme.ThemeL
 
 @Composable
 fun AppNetworkSpeedMonitor() {

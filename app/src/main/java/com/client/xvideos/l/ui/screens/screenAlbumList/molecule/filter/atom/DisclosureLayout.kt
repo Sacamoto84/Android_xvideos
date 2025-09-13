@@ -26,7 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.client.xvideos.l.ThemeL
+import com.client.xvideos.l.theme.ThemeL
 import com.composeunstyled.Disclosure
 import com.composeunstyled.DisclosureHeading
 import com.composeunstyled.DisclosurePanel
@@ -54,6 +54,7 @@ fun DisclosureLayout(contentDisclosureHeading: String, contentDisclosurePanel: @
                 Icon( imageVector = Icons.Default.ArrowDropDown, contentDescription = null, modifier = Modifier.rotate(degrees).size(32.dp), tint = ThemeL.textColor )
                 Text(contentDisclosureHeading, style = style)
             }
+
         }
         DisclosurePanel(
             enter = expandVertically( spring( stiffness = Spring.StiffnessMediumLow, visibilityThreshold = IntSize.VisibilityThreshold ) ),

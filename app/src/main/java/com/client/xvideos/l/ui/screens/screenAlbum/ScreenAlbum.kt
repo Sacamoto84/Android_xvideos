@@ -33,7 +33,7 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.common.urlVideImage.UrlImage
-import com.client.xvideos.l.ThemeL
+import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.model.AlbumDetails
 import com.client.xvideos.l.ui.element.lazyRowPictureDetails.LazyRowPictureDetails
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumDialogDeleteAlbum
@@ -47,7 +47,6 @@ import com.client.xvideos.l.ui.element.expandMenu.AlbumItemExpandMenu
 import com.client.xvideos.l.ui.screens.albumLandingTag.ScreenLAlbumLandingTag
 import com.client.xvideos.l.ui.screens.depth
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.ScrollToTopButton
-import kotlinx.coroutines.delay
 import net.engawapg.lib.zoomable.ExperimentalZoomableApi
 import timber.log.Timber
 

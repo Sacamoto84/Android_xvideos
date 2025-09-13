@@ -27,11 +27,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.client.xvideos.l.ThemeL
+import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.model.PictureCountRank
 import com.client.xvideos.redgifs.common.ThemeRed
 
@@ -70,17 +71,16 @@ fun AlbumListFilterSize(value: PictureCountRank, onChanged: (PictureCountRank) -
         ExposedDropdownMenuBox(
             expanded = expanded,
             onExpandedChange = { expanded = it },
-            modifier = Modifier
-                .height(43.dp)
+            modifier = Modifier.height(43.dp)
         )
         {
             Row(
                 modifier = Modifier
-                    .width(200.dp)
+                    .width(160.dp)
                     .fillMaxHeight()
                     .clip(RoundedCornerShape(4.dp))
                     .border(1.dp, ThemeL.grey5, RoundedCornerShape(4.dp))
-                    .background(ThemeL.grey3)
+                    .background(Color(0xFF585858))
                     .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween

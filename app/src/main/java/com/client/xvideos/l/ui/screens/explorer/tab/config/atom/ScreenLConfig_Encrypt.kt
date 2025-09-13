@@ -16,7 +16,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.client.xvideos.common.encrypting.Password
-import com.client.xvideos.l.ThemeL
+import com.client.xvideos.l.theme.ThemeL
 
 @Composable
 fun ScreenLConfig_Encrypt() {

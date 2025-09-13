@@ -11,27 +11,28 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.client.xvideos.l.ThemeL
+import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.model.AlbumListFilter
 import com.client.xvideos.l.model.enum.AlbumType
 import com.client.xvideos.l.net.AlbumListFilterGenreCountResponse
@@ -51,32 +52,69 @@ private val style = TextStyle(
 
 
 @Composable
-fun AlbumListFilter(filter: AlbumListFilter,
-                    filterGCount: List<AlbumListFilterGenreCountResponse>?,
-                    filterTagsCount: List<AlbumListFilterGenreCountResponse>?,
-                    onClose : () -> Unit, onFilterApply: (AlbumListFilter) -> Unit ) {
-    Column(modifier = Modifier.alpha(0.95f).background(ThemeL.grey4)) {
+fun AlbumListFilter(
+    filter: AlbumListFilter,
+    filterGCount: List<AlbumListFilterGenreCountResponse>?,
+    filterTagsCount: List<AlbumListFilterGenreCountResponse>?,
+    onClose: () -> Unit, onFilterApply: (AlbumListFilter) -> Unit
+) {
 
 
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
+    val maxHeight = screenHeight * 2 / 4
 
-        Box(Modifier.fillMaxWidth().height(48.dp)) {
+    Column( modifier = Modifier.alpha(0.95f).fillMaxHeight().background(Color(0xFF141414)).verticalScroll( rememberScrollState() ) )
+    {
 
-            Row( modifier = Modifier.padding(end = 0.dp).fillMaxWidth().height(46.dp).align(Alignment.CenterEnd).clickable(onClick = {onClose()}), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start ){
+        Box(
+            Modifier.fillMaxWidth().height(48.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .padding(end = 0.dp)
+                    .fillMaxWidth()
+                    .height(46.dp)
+                    .align(Alignment.CenterEnd)
+                    .clickable(onClick = { onClose() }),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start
+            )
+            {
                 //Icon(Icons.Filled.Close, contentDescription = null, tint = ThemeL.textColor)
-                Spacer(modifier = Modifier.fillMaxHeight().fillMaxWidth().weight(1f))
-                Spacer(modifier = Modifier.fillMaxHeight().width(4.dp))
-                Spacer(modifier = Modifier.fillMaxHeight().fillMaxWidth().weight(1f))
-                Spacer(modifier = Modifier.fillMaxHeight().width(4.dp))
-                Box(modifier = Modifier.fillMaxHeight().fillMaxWidth().weight(1f).border(0.5.dp, ThemeL.grey2, RoundedCornerShape(4.dp)), contentAlignment = Alignment.Center){
-                    Text("Close", textAlign = TextAlign.Center, color = ThemeL.textColor, fontFamily = ThemeL.fontFamilyKarla, fontSize = 20.sp, modifier = Modifier)
+                Spacer(
+                    modifier = Modifier.fillMaxHeight().fillMaxWidth().weight(1f)
+                )
+                Spacer( modifier = Modifier.fillMaxHeight().width(4.dp) )
+                Spacer(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .fillMaxWidth()
+                        .weight(1f)
+                )
+                Spacer(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .width(4.dp)
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .border(0.5.dp, ThemeL.grey2, RoundedCornerShape(4.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        "Close", textAlign = TextAlign.Center,
+                        color = ThemeL.textColor, fontFamily = ThemeL.fontFamilyKarla,
+                        fontSize = 20.sp, modifier = Modifier
+                    )
                 }
-
             }
         }
 
-        AlbumFilterDisplay(
-            filter.display,
-            onRequestApply = { onFilterApply(filter.copy(display = it)) })
+        AlbumFilterDisplay( filter.display, onRequestApply = { onFilterApply(filter.copy(display = it)) } )
 
         AlbumListFilterAlbumType(
             when (filter.album_type) {
@@ -94,25 +132,57 @@ fun AlbumListFilter(filter: AlbumListFilter,
             onFilterApply(filter.copy(album_type = type))
         }
 
-        AlbumListFilterContentType(filter.content_id) {
-            onFilterApply(filter.copy(content_id = it))
-        }
+        AlbumListFilterContentType(filter.content_id) { onFilterApply(filter.copy(content_id = it)) }
 
         HorizontalDivider()
 
-        AlbumListFilterSize(filter.picture_count_rank) {
-            onFilterApply(filter.copy(picture_count_rank = it))
+        Box(
+            modifier = Modifier
+                .padding(horizontal = 8.dp)
+                .padding(vertical = 2.dp)
+                .clip(RoundedCornerShape(4.dp))
+                .border(2.dp, Color(0xFF303030), RoundedCornerShape(4.dp))
+                .background(Color(0xFF3F3F3F))
+                .padding(vertical = 4.dp)
+                .padding(start = 4.dp, end = 4.dp)
+
+        ) {
+            AlbumListFilterSize(filter.picture_count_rank) {
+                onFilterApply(
+                    filter.copy(
+                        picture_count_rank = it
+                    )
+                )
+            }
         }
 
-        AlbumListFilterGenres(filter, filterGCount) {
-            onFilterApply(it)
+        Box(
+            modifier = Modifier.padding(horizontal = 8.dp).padding(vertical = 2.dp)
+                .clip(RoundedCornerShape(4.dp))
+                .border(2.dp, Color(0xFF434343), RoundedCornerShape(4.dp))
+                .background(Color(0xFF353535))
+                .padding(4.dp)
+                .sizeIn(maxHeight = maxHeight)
+        ) {
+            AlbumListFilterGenres(filter, filterGCount) { onFilterApply(it) }
         }
 
-        HorizontalDivider()
+        //HorizontalDivider()
 
-        AlbumListFilterTags(filter, filterTagsCount) {
-            onFilterApply(it)
+        Box(
+            modifier = Modifier
+                .padding(horizontal = 8.dp).padding(vertical = 2.dp)
+                .clip(RoundedCornerShape(4.dp))
+                .border(2.dp, Color(0xFF434343), RoundedCornerShape(4.dp))
+                .background(Color(0xFF353535))
+                .padding(4.dp)
+                .sizeIn(maxHeight = maxHeight)
+        ) {
+            AlbumListFilterTags(filter, filterTagsCount) {
+                onFilterApply(it)
+            }
         }
+
 
     }
 }

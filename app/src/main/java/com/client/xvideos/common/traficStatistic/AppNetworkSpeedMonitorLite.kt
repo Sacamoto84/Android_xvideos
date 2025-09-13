@@ -19,7 +19,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.client.xvideos.App
 import com.client.xvideos.common.util.formatBytes
 import com.client.xvideos.common.util.formatSpeed
-import com.client.xvideos.l.ThemeL
+import com.client.xvideos.l.theme.ThemeL
 
 @Composable
 fun AppNetworkSpeedMonitorLite() {

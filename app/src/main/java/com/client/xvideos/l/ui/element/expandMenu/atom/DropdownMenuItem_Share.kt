@@ -8,8 +8,8 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import com.client.xvideos.l.ThemeL.ExpandMenu.style
-import com.client.xvideos.l.ThemeL.ExpandMenu.tintColor
+import com.client.xvideos.l.theme.ThemeL.ExpandMenu.style
+import com.client.xvideos.l.theme.ThemeL.ExpandMenu.tintColor
 import com.client.xvideos.redgifs.model.GifsInfo
 
 @OptIn(ExperimentalMaterial3Api::class)

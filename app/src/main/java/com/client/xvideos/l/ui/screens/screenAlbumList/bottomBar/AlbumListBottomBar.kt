@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -26,7 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
-import com.client.xvideos.l.ThemeL
+import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.redgifs.common.ThemeRed
 
 @Composable
@@ -39,17 +38,18 @@ fun AlbumListBottomBar(
         HorizontalDivider()
         Row(modifier = Modifier.padding(start = 4.dp).fillMaxWidth().height(48.dp).background(ThemeRed.colorTabLevel1), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
 
-            Box(modifier = Modifier.width(64.dp).height(46.dp).border(2.dp, ThemeL.grey2, RoundedCornerShape(4.dp))
-                .background(ThemeL.lavender.copy(alpha = 0.2f)).clickable(onClick = { onClickVisibleFilter() }), contentAlignment = Alignment.Center){
-                Text("Filter", color = ThemeL.grey0 , fontFamily = ThemeL.fontFamilyKarla)
-            }
-
             Row {
                 ButtonRev(onClick = onClickPrev)
                 Spacer(Modifier.width(4.dp))
                 ButtonNext(onClick = onClickNext)
                 Spacer(Modifier.width(4.dp))
             }
+
+            Box(modifier = Modifier.width(64.dp).height(46.dp).border(2.dp, ThemeL.grey2, RoundedCornerShape(4.dp))
+                .background(ThemeL.lavender.copy(alpha = 0.2f)).clickable(onClick = { onClickVisibleFilter() }), contentAlignment = Alignment.Center){
+                Text("Filter", color = ThemeL.grey0 , fontFamily = ThemeL.fontFamilyKarla)
+            }
+
         }
 
 

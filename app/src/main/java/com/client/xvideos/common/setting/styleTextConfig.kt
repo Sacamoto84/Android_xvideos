@@ -1,12 +1,11 @@
 package com.client.xvideos.common.setting
 
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.sp
 import com.client.xvideos.R
-import com.client.xvideos.l.ThemeL
+import com.client.xvideos.l.theme.ThemeL
 
 val styleTextConfig = TextStyle(
     fontSize = 20.sp,

@@ -30,9 +30,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.client.xvideos.common.setting.styleTextConfig
-import com.client.xvideos.l.ThemeL
-import com.client.xvideos.l.ThemeL.ExpandMenu.backgroundColor
-import com.client.xvideos.l.ThemeL.ExpandMenu.style
+import com.client.xvideos.l.theme.ThemeL
+import com.client.xvideos.l.theme.ThemeL.ExpandMenu.backgroundColor
+import com.client.xvideos.l.theme.ThemeL.ExpandMenu.style
 
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -16,10 +16,8 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Badge
 import androidx.compose.material3.FabPosition
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SmallFloatingActionButton
@@ -61,7 +59,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.common.fresco.DownloadQueueManager
 import com.client.xvideos.common.fresco.QueueStatisticsCardLite
 import com.client.xvideos.common.traficStatistic.AppNetworkSpeedMonitorLite
-import com.client.xvideos.l.ThemeL
+import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.ui.screens.explorer.ScreenLExplorer
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.common.di.HostDI
