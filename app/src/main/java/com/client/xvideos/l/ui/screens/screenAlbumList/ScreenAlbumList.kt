@@ -116,21 +116,16 @@ object ScreenLAlbumList {
         override fun Content() {
 
             val navigator = LocalNavigator.currentOrThrow
-            val vm = getScreenModel<ScreenLAlbumListSM, ScreenLAlbumListSM.Factory> { factory ->
-                factory.create(filter)
-            }
+            val vm = getScreenModel<ScreenLAlbumListSM, ScreenLAlbumListSM.Factory> { factory -> factory.create(filter) }
 
             val items = vm.albumList.collectAsStateWithLifecycle().value?.items
+
             val info = vm.albumList.collectAsStateWithLifecycle().value?.info
             val currentFilter = vm.albumList.collectAsStateWithLifecycle().value?.filter
             val isRefreshing = vm.isRefreshing.collectAsStateWithLifecycle().value
 
-            val filterGCount =
-                vm.albumList.collectAsStateWithLifecycle().value?.filterGenreStateCount
-            val filterTagsCount =
-                vm.albumList.collectAsStateWithLifecycle().value?.filterTaggedStateCount
-
-            var visibleFilter by remember { mutableStateOf(false) }
+            val filterGCount = vm.albumList.collectAsStateWithLifecycle().value?.filterGenreStateCount
+            val filterTagsCount = vm.albumList.collectAsStateWithLifecycle().value?.filterTaggedStateCount
 
             val haptic = LocalHapticFeedback.current
             val scope = rememberCoroutineScope()
@@ -145,7 +140,6 @@ object ScreenLAlbumList {
             }
 
             val drawerState = rememberDrawerState(DrawerValue.Closed)
-
 
             ModalNavigationDrawer(
                 drawerState = drawerState,
@@ -173,10 +167,7 @@ object ScreenLAlbumList {
                 Scaffold(
                     bottomBar = {
                         AlbumListBottomBar(
-                            onClickVisibleFilter = {
-                                //visibleFilter = !visibleFilter
-                                scope.launch {drawerState.open()}
-                                                   },
+                            onClickVisibleFilter = { scope.launch {drawerState.open()} },
                             onClickPrev = { vm.loadPrevList() },
                             onClickNext = { vm.loadNextList() }
                         )
@@ -192,7 +183,6 @@ object ScreenLAlbumList {
                             .fillMaxSize(), beyondViewportPageCount = 1
                     ) { page ->
 
-
                         // Wrap LazyVerticalGrid with PullToRefreshBox
                         PullToRefreshBox(
                             isRefreshing = isRefreshing,
@@ -200,19 +190,7 @@ object ScreenLAlbumList {
                                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                 vm.refreshData()
                             },
-
-                            indicator = {
-                                Indicator(
-                                    modifier = Modifier
-                                        .align(Alignment.TopCenter)
-                                        .size(48.dp),
-                                    isRefreshing = isRefreshing,
-                                    state = pullToRefreshState,
-                                    containerColor = ThemeL.grey3,
-                                    maxDistance = (96 + 50).dp
-                                )
-                            },
-
+                            indicator = { Indicator( modifier = Modifier.align(Alignment.TopCenter).size(48.dp), isRefreshing = isRefreshing, state = pullToRefreshState, containerColor = ThemeL.grey3, maxDistance = (96 + 54).dp ) },
                             state = pullToRefreshState,
                             modifier = Modifier.fillMaxSize()//.padding(bottom = padding.calculateBottomPadding())
                         )
@@ -222,20 +200,13 @@ object ScreenLAlbumList {
                                 modifier = Modifier.fillMaxSize(),
                                 columns = GridCells.Fixed(2)
                             ) {
-                                item(key = "dummy", span = { GridItemSpan(maxLineSpan) }) {
-                                    Spacer(
-                                        Modifier.height(48.dp)
-                                    )
-                                }
+                                item(key = "dummy", span = { GridItemSpan(maxLineSpan) }) { Spacer( Modifier.height(48.dp) ) }
 
-                                item(
-                                    key = "page_selector",
-                                    span = { GridItemSpan(maxLineSpan) }
-                                ) {
+                                item( key = "page_selector", span = { GridItemSpan(maxLineSpan) } )
+                                {
                                     if (info != null) {
                                         Box(
-                                            Modifier.padding(vertical = 4.dp, horizontal = 4.dp),
-                                            contentAlignment = Alignment.Center
+                                            Modifier.padding(vertical = 4.dp, horizontal = 4.dp), contentAlignment = Alignment.Center
                                         ) {
                                             AlbumListPageSelector(info.page, info.totalPages) {
                                                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
@@ -278,145 +249,11 @@ object ScreenLAlbumList {
                                 }
                             }
                         }
-
-
                     }
-
-
                 }
             }
-
-        }
-
-    }
-}
-
-
-class ScreenLAlbumListSM @AssistedInject constructor(
-    @Assisted val filter: AlbumListFilter?,
-    val luscious: Luscious
-) : ScreenModel {
-
-    @AssistedFactory
-    interface Factory : ScreenModelFactory {
-        fun create(filter: AlbumListFilter?): ScreenLAlbumListSM
-    }
-
-    var albumList = MutableStateFlow<AlbumListImpl?>(null)
-
-    // Pull to refresh state
-    private val _isRefreshing = MutableStateFlow(false)
-    val isRefreshing = _isRefreshing
-
-    val state = LazyGridState()
-
-    init {
-        Timber.i("iii ScreenLAlbumListSM init")
-        loadInitialData()
-    }
-
-    private fun loadInitialData() {
-        screenModelScope.launch {
-            _isRefreshing.value = true
-            try {
-                albumList.value = luscious.getAlbumList()
-                albumList.value?.getAlbumList(1, filter)
-                albumList.value?.getAlbumListAggregations(1)
-            } catch (e: Exception) {
-                Timber.e(e, "Error loading initial data")
-            } finally {
-                _isRefreshing.value = false
-            }
-        }
-    }
-
-    override fun onDispose() {
-        super.onDispose()
-        Timber.i("iii ScreenLAlbumListSM onDispose")
-    }
-
-    fun loadAlbumList(page: Int) {
-        screenModelScope.launch {
-            try {
-                albumList.value?.getAlbumList(page, albumList.value?.filter)
-            } catch (e: Exception) {
-                Timber.e(e, "Error loading page $page")
-            }
-        }
-    }
-
-    fun loadNextList() {
-        if (albumList.value != null) {
-            val page = (albumList.value!!.info.page + 1)
-            loadAlbumList(page)
-        }
-    }
-
-    fun loadPrevList() {
-        if (albumList.value != null) {
-            val page = (albumList.value!!.info.page - 1).coerceAtLeast(1)
-            loadAlbumList(page)
-        }
-    }
-
-    // Pull to refresh function
-    fun refreshData() {
-        screenModelScope.launch {
-            _isRefreshing.value = true
-            try {
-                val currentPage = albumList.value?.info?.page ?: 1
-                val currentFilter = albumList.value?.filter
-
-                Timber.d("Refreshing data for page $currentPage")
-
-                // Reload current page with current filter
-                albumList.value?.getAlbumList(currentPage, currentFilter)
-                albumList.value?.getAlbumListAggregations(currentPage)
-
-                // Optional: scroll to top after refresh
-                state.scrollToItem(0)
-
-            } catch (e: Exception) {
-                Timber.e(e, "Error refreshing data")
-            } finally {
-                _isRefreshing.value = false
-            }
-        }
-    }
-
-    // Alternative refresh method that always goes to first page
-    fun refreshToFirstPage() {
-        screenModelScope.launch {
-            _isRefreshing.value = true
-            try {
-                val currentFilter = albumList.value?.filter
-
-                Timber.d("Refreshing to first page")
-
-                // Always reload first page
-                albumList.value?.getAlbumList(1, currentFilter)
-                albumList.value?.getAlbumListAggregations(1)
-
-                // Scroll to top
-                state.scrollToItem(0)
-
-            } catch (e: Exception) {
-                Timber.e(e, "Error refreshing to first page")
-            } finally {
-                _isRefreshing.value = false
-            }
         }
     }
 }
 
-@Module
-@InstallIn(SingletonComponent::class)
-abstract class ScreenModuleLAlbumList {
 
-    @Binds
-    @IntoMap
-    @ScreenModelFactoryKey(ScreenLAlbumListSM.Factory::class)
-    abstract fun bindHiltProfilesScreenModelFactory(
-        hiltDetailsScreenModelFactory: ScreenLAlbumListSM.Factory
-    ): ScreenModelFactory
-}
