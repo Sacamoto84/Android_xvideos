@@ -1,11 +1,15 @@
 package com.client.xvideos.l.ui.screens.screenAlbumList.molecule.filter.atom
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -18,7 +22,13 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.client.xvideos.l.theme.ThemeL
@@ -41,19 +51,18 @@ fun AlbumListFilterTags(
 
     val tagsCorrect = filterTerms?.minus(tagsPlus.map{it})?.minus(tagsMinus.map{it})?.toList()
 
-    Column()
+    Column(modifier = Modifier.fillMaxWidth().background(Color(0xFF3F3F3F)))
     {
 
-        HorizontalDivider()
+        //HorizontalDivider()
 
         LazyColumn {
             items(tagsPlus) {
                 Text(
                     it,
-                    color = ThemeL.lavender,
+                    color = StyleGenresTags.colorSelectTextItem,
                     modifier = Modifier
-                        .padding(start = 4.dp, top = 2.dp, bottom = 2.dp)
-                        .fillMaxWidth()
+                        .then(StyleGenresTags.modifierSelectTextItem)
                         .clickable(onClick = {
                             val plus = mutableListOf<String>()
                             plus.addAll(tagsPlus)
@@ -68,12 +77,17 @@ fun AlbumListFilterTags(
             }
 
             items(tagsMinus) {
+
+                val s = buildAnnotatedString {
+                    withStyle(SpanStyle( color = Color(0xb3ceeefc), textDecoration = TextDecoration.Underline)) { append("NOT") }
+                    append(" $it")
+                }
+
                 Text(
-                    "NOT $it",
-                    color = ThemeL.lavender,
+                    s,
+                    color = StyleGenresTags.colorSelectTextItem,
                     modifier = Modifier
-                        .padding(start = 4.dp, top = 2.dp, bottom = 2.dp)
-                        .fillMaxWidth()
+                        .then(StyleGenresTags.modifierSelectTextItem)
                         .clickable(onClick = {
                             val minus = mutableListOf<String>()
                             minus.addAll(tagsMinus)
@@ -89,21 +103,24 @@ fun AlbumListFilterTags(
         }
 
         DisclosureLayout("Tags") {
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+            Box(
+                modifier = Modifier.padding(4.dp)
             ) {
-
-                LazyColumn(modifier = Modifier.weight(1f)) {
-
+                LazyColumn(modifier = Modifier.fillMaxWidth()
+                    .border( 2.dp, Color(0xFF303030), RoundedCornerShape(4.dp))
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(Color(0xFF252525))
+                ) {
+                    item{ Spacer(Modifier.height(0.dp)) }
                     items(tagsCorrect?.size ?: 0) {
                         val item = tagsCorrect?.get(it)
 
                         if (item != null) {
 
                             Row(
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 2.dp, top = 4.dp,end = 6.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
@@ -120,7 +137,7 @@ fun AlbumListFilterTags(
                                             .padding(vertical = 2.dp)
                                             .padding(horizontal = 4.dp)
                                             .size(40.dp)
-                                            .border(1.dp, ThemeL.grey2, RoundedCornerShape(4.dp))
+                                            .border(1.dp, ThemeL.grey2, RoundedCornerShape(2.dp))
                                             .clickable(onClick = {
                                                 val plus = mutableListOf<String>()
                                                 plus.addAll(tagsPlus)
@@ -162,10 +179,9 @@ fun AlbumListFilterTags(
                         }
 
                     }
+                    item{ Spacer(Modifier.height(4.dp)) }
                 }
             }
-
-
         }
 
     }

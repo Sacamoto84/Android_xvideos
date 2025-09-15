@@ -1,6 +1,7 @@
 package com.client.xvideos.l.ui.screens.screenAlbumList.molecule.filter.atom
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
@@ -12,8 +13,19 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.client.xvideos.l.theme.ThemeL
+
+private val style = TextStyle(
+    color = ThemeL.textColor,
+    //fontWeight = FontWeight.Bold,
+    fontFamily = ThemeL.fontFamilyKarla,
+    fontSize = 16.sp
+)
 
 @Composable
 fun AlbumListFilterAlbumType(start : Int, onChange: (Int) -> Unit) {
@@ -22,13 +34,13 @@ fun AlbumListFilterAlbumType(start : Int, onChange: (Int) -> Unit) {
 
     val options = listOf("All", "Manga", "Pictures")
 
-    SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
+    SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth().height(48.dp)) {
         options.forEachIndexed { index, label ->
-            SegmentedButton(
+            SegmentedButton(modifier = Modifier.height(48.dp),
                 colors = SegmentedButtonDefaults.colors(
-                    activeContainerColor = ThemeL.grey4,
-                    activeBorderColor = ThemeL.grey3,
-                    inactiveBorderColor = ThemeL.grey3,
+                    activeContainerColor = Color(0xFF585858),
+                    activeBorderColor = Color(0xFF585858),
+                    inactiveBorderColor = Color(0xFF585858),
                 ),
 
                 shape = SegmentedButtonDefaults.itemShape(
@@ -41,9 +53,15 @@ fun AlbumListFilterAlbumType(start : Int, onChange: (Int) -> Unit) {
                     onChange(index)
                 },
                 selected = index == selectedIndex,
-                label = { Text(label, color = ThemeL.textColor, fontFamily = ThemeL.fontFamilyKarla) }
+                label = { Text(label, style = style) }
             )
         }
     }
 
+}
+
+@Preview
+@Composable
+fun AlbumListFilterAlbumTypePreview() {
+    AlbumListFilterAlbumType(start = 0, onChange = {})
 }

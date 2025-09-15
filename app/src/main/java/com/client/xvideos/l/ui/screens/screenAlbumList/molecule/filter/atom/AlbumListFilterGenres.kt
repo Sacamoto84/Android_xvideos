@@ -1,9 +1,11 @@
 package com.client.xvideos.l.ui.screens.screenAlbumList.molecule.filter.atom
 
+import android.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -29,7 +31,12 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.shadow.Shadow
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -58,26 +65,20 @@ fun AlbumListFilterGenres(
     val genresPlusCorrect = allGenres?.minus(genresPlus)?.minus(genresMinus)
         ?.filter { filterTerms?.contains(it.title) == true }
 
-    Column(modifier = Modifier.fillMaxWidth().background(Color(0xFF383838)))
+    Column(modifier = Modifier.fillMaxWidth().background(Color(0xFF3F3F3F)))
     {
 
         //HorizontalDivider()
 
         LazyColumn(
-            modifier = Modifier
+            modifier = Modifier.padding(top = 1.dp)
             //contentPadding= PaddingValues(4.dp)
         ) {
             items(genresPlus) {
                 Text(
                     it.title,
-                    color = ThemeL.lavender,
-                    modifier = Modifier
-                        .padding(start = 4.dp, top = 2.dp, bottom = 2.dp)
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(4.dp))
-                        .border(1.dp, Color(0xFF585858), RoundedCornerShape(4.dp))
-                        .background(Color(0xFF303030))
-                        .padding(horizontal = 4.dp)
+                    color = StyleGenresTags.colorSelectTextItem,
+                    modifier = Modifier.then(StyleGenresTags.modifierSelectTextItem)
                         .clickable(onClick = {
                             val plus = mutableListOf<Genre>()
                             plus.addAll(genresPlus)
@@ -92,12 +93,16 @@ fun AlbumListFilterGenres(
             }
 
             items(genresMinus) {
+
+                val s = buildAnnotatedString {
+                    withStyle(SpanStyle( color = Color(0xb3ceeefc), textDecoration = TextDecoration.Underline)) { append("NOT") }
+                    append(" "+it.title)
+                }
+
                 Text(
-                    "NOT ${it.title}",
-                    color = ThemeL.lavender,
-                    modifier = Modifier
-                        .padding(start = 4.dp, top = 2.dp, bottom = 2.dp)
-                        .fillMaxWidth()
+                    s,
+                    color = StyleGenresTags.colorSelectTextItem,
+                    modifier = Modifier.then(StyleGenresTags.modifierSelectTextItem)
                         .clickable(onClick = {
                             val minus = mutableListOf<Genre>()
                             minus.addAll(genresMinus)
@@ -114,32 +119,19 @@ fun AlbumListFilterGenres(
 
         DisclosureLayout("Genres") {
 
-            Column(
-                modifier = Modifier
-                    .background(Color(0xFF3B3B3B))
-                    //.padding(0.dp)
-                    //.clip(RoundedCornerShape(2.dp))
-                    .padding(4.dp)
-                    //.background(Color(0xFFFFFFFF))
+            Box(
+                modifier = Modifier.padding(4.dp)
             ) {
-
-//                HorizontalDivider(
-//                    modifier = Modifier.padding(bottom = 4.dp),
-//                    thickness = 2.dp,
-//                    color = Color(0xFF303030)
-//                )
 
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .offset(y = (0).dp)
-                        .border(
-                            2.dp, Color(0xFF303030), RoundedCornerShape(4.dp))
+                        .border(2.dp, Color(0xFF303030), RoundedCornerShape(4.dp))
                         .clip(RoundedCornerShape(4.dp))
                         .background(Color(0xFF252525))
                 ) {
 
-                    item{ Spacer(Modifier.height(1.dp)) }
+                    item{ Spacer(Modifier.height(0.dp)) }
 
                     items(genresPlusCorrect?.size ?: 0) {
                         val item = genresPlusCorrect?.get(it)

@@ -79,7 +79,7 @@ fun AlbumListFilterSize(value: PictureCountRank, onChanged: (PictureCountRank) -
                     .width(160.dp)
                     .fillMaxHeight()
                     .clip(RoundedCornerShape(4.dp))
-                    .border(1.dp, ThemeL.grey5, RoundedCornerShape(4.dp))
+                    .border(1.dp, Color(0xFF656565), RoundedCornerShape(4.dp))
                     .background(Color(0xFF585858))
                     .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
                 verticalAlignment = Alignment.CenterVertically,
@@ -93,7 +93,8 @@ fun AlbumListFilterSize(value: PictureCountRank, onChanged: (PictureCountRank) -
                     style = TextStyle(
                         color = ThemeL.textColor,
                         fontFamily = ThemeL.fontFamilyKarla,
-                        fontSize = 16.sp
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
                     )
                 )
                 Icon(

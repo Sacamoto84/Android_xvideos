@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
@@ -64,44 +65,25 @@ fun AlbumListFilter(
     val screenHeight = configuration.screenHeightDp.dp
     val maxHeight = screenHeight * 2 / 4
 
-    Column( modifier = Modifier.alpha(0.95f).fillMaxHeight().background(Color(0xFF141414)).verticalScroll( rememberScrollState() ) )
+    Column( modifier = Modifier.alpha(0.95f).fillMaxHeight().background(Color(0xFF242424))
+        .padding(horizontal = 4.dp).verticalScroll( rememberScrollState()) )
     {
 
-        Box(
-            Modifier.fillMaxWidth().height(48.dp)
-        ) {
+        Box( Modifier.fillMaxWidth().height(48.dp) )
+        {
             Row(
-                modifier = Modifier
-                    .padding(end = 0.dp)
-                    .fillMaxWidth()
-                    .height(46.dp)
-                    .align(Alignment.CenterEnd)
-                    .clickable(onClick = { onClose() }),
+                modifier = Modifier.padding(end = 0.dp).fillMaxWidth().height(46.dp)
+                    .align(Alignment.CenterEnd).clickable(onClick = { onClose() }),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start
             )
             {
-                //Icon(Icons.Filled.Close, contentDescription = null, tint = ThemeL.textColor)
-                Spacer(
-                    modifier = Modifier.fillMaxHeight().fillMaxWidth().weight(1f)
-                )
+                Spacer( modifier = Modifier.fillMaxHeight().fillMaxWidth().weight(1f) )
                 Spacer( modifier = Modifier.fillMaxHeight().width(4.dp) )
-                Spacer(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .fillMaxWidth()
-                        .weight(1f)
-                )
-                Spacer(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .width(4.dp)
-                )
+                Spacer( modifier = Modifier.fillMaxHeight().fillMaxWidth().weight(1f) )
+                Spacer( modifier = Modifier.fillMaxHeight().width(4.dp) )
                 Box(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .fillMaxWidth()
-                        .weight(1f)
+                    modifier = Modifier.fillMaxHeight().fillMaxWidth().weight(1f)
                         .border(0.5.dp, ThemeL.grey2, RoundedCornerShape(4.dp)),
                     contentAlignment = Alignment.Center
                 ) {
@@ -114,74 +96,39 @@ fun AlbumListFilter(
             }
         }
 
-        AlbumFilterDisplay( filter.display, onRequestApply = { onFilterApply(filter.copy(display = it)) } )
+        Box(modifier = Modifier) {
+            AlbumFilterDisplay( filter.display, onRequestApply = { onFilterApply(filter.copy(display = it)) })
+        }
 
-        AlbumListFilterAlbumType(
-            when (filter.album_type) {
-                AlbumType.All -> 0
-                AlbumType.Manga -> 1
-                AlbumType.Pictures -> 2
+        Box(modifier = Modifier.padding( vertical = 4.dp)) {
+            AlbumListFilterAlbumType(
+                when (filter.album_type) {
+                    AlbumType.All -> 0
+                    AlbumType.Manga -> 1
+                    AlbumType.Pictures -> 2
+                }
+            ) {
+                val type = when (it) {
+                    0 -> AlbumType.All
+                    1 -> AlbumType.Manga
+                    2 -> AlbumType.Pictures
+                    else -> AlbumType.All
+                }
+                onFilterApply(filter.copy(album_type = type))
             }
-        ) {
-            val type = when (it) {
-                0 -> AlbumType.All
-                1 -> AlbumType.Manga
-                2 -> AlbumType.Pictures
-                else -> AlbumType.All
-            }
-            onFilterApply(filter.copy(album_type = type))
         }
 
         AlbumListFilterContentType(filter.content_id) { onFilterApply(filter.copy(content_id = it)) }
 
-        HorizontalDivider()
+        Box( modifier = Modifier.padding(top = 4.dp).clip(RoundedCornerShape(4.dp)).background(Color(0xFF3F3F3F)).padding(vertical = 4.dp).padding(start = 4.dp, end = 4.dp)
+        ) { AlbumListFilterSize(filter.picture_count_rank) { onFilterApply( filter.copy( picture_count_rank = it ) ) } }
+
+        Box( modifier = Modifier.padding(top = 4.dp).clip(RoundedCornerShape(4.dp)).sizeIn(maxHeight = maxHeight)
+        ) { AlbumListFilterGenres(filter, filterGCount) { onFilterApply(it) } }
 
         Box(
-            modifier = Modifier
-                .padding(horizontal = 8.dp)
-                .padding(vertical = 2.dp)
-                .clip(RoundedCornerShape(4.dp))
-                .border(2.dp, Color(0xFF303030), RoundedCornerShape(4.dp))
-                .background(Color(0xFF3F3F3F))
-                .padding(vertical = 4.dp)
-                .padding(start = 4.dp, end = 4.dp)
-
-        ) {
-            AlbumListFilterSize(filter.picture_count_rank) {
-                onFilterApply(
-                    filter.copy(
-                        picture_count_rank = it
-                    )
-                )
-            }
-        }
-
-        Box(
-            modifier = Modifier.padding(horizontal = 8.dp).padding(vertical = 2.dp)
-                .clip(RoundedCornerShape(4.dp))
-                .border(2.dp, Color(0xFF434343), RoundedCornerShape(4.dp))
-                .background(Color(0xFF353535))
-                //.padding(4.dp)
-                .sizeIn(maxHeight = maxHeight)
-        ) {
-            AlbumListFilterGenres(filter, filterGCount) { onFilterApply(it) }
-        }
-
-        //HorizontalDivider()
-
-        Box(
-            modifier = Modifier
-                .padding(horizontal = 8.dp).padding(vertical = 2.dp)
-                .clip(RoundedCornerShape(4.dp))
-                .border(2.dp, Color(0xFF434343), RoundedCornerShape(4.dp))
-                .background(Color(0xFF353535))
-                .padding(4.dp)
-                .sizeIn(maxHeight = maxHeight)
-        ) {
-            AlbumListFilterTags(filter, filterTagsCount) {
-                onFilterApply(it)
-            }
-        }
+            modifier = Modifier.padding(top = 4.dp).clip(RoundedCornerShape(4.dp)).sizeIn(maxHeight = maxHeight)
+        ) { AlbumListFilterTags(filter, filterTagsCount) { onFilterApply(it) } }
 
 
     }
