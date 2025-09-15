@@ -65,35 +65,40 @@ fun AlbumListFilter(
     val screenHeight = configuration.screenHeightDp.dp
     val maxHeight = screenHeight * 2 / 4
 
-    Column( modifier = Modifier.alpha(0.95f).fillMaxHeight().background(Color(0xFF242424))
+    Column( modifier = Modifier.fillMaxHeight().alpha(0.95f).background(Color(0xFF242424))
         .padding(horizontal = 4.dp).verticalScroll( rememberScrollState()) )
     {
 
         Box( Modifier.fillMaxWidth().height(48.dp) )
         {
-            Row(
-                modifier = Modifier.padding(end = 0.dp).fillMaxWidth().height(46.dp)
-                    .align(Alignment.CenterEnd).clickable(onClick = { onClose() }),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start
+
+            Text("Filters", color = ThemeL.textColor, fontFamily = ThemeL.fontFamilyKarla, fontSize = 22.sp,
+                fontWeight = FontWeight.Bold, modifier = Modifier.align(Alignment.CenterStart).padding(start = 4.dp, top = 2.dp)
             )
-            {
-                Spacer( modifier = Modifier.fillMaxHeight().fillMaxWidth().weight(1f) )
-                Spacer( modifier = Modifier.fillMaxHeight().width(4.dp) )
-                Spacer( modifier = Modifier.fillMaxHeight().fillMaxWidth().weight(1f) )
-                Spacer( modifier = Modifier.fillMaxHeight().width(4.dp) )
-                Box(
-                    modifier = Modifier.fillMaxHeight().fillMaxWidth().weight(1f)
-                        .border(0.5.dp, ThemeL.grey2, RoundedCornerShape(4.dp)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        "Close", textAlign = TextAlign.Center,
-                        color = ThemeL.textColor, fontFamily = ThemeL.fontFamilyKarla,
-                        fontSize = 20.sp, modifier = Modifier
-                    )
-                }
-            }
+
+//            Row(
+//                modifier = Modifier.padding(end = 0.dp).fillMaxWidth().height(46.dp)
+//                    .align(Alignment.CenterEnd).clickable(onClick = { onClose() }),
+//                verticalAlignment = Alignment.CenterVertically,
+//                horizontalArrangement = Arrangement.Start
+//            )
+//            {
+//                Spacer( modifier = Modifier.fillMaxHeight().fillMaxWidth().weight(1f) )
+//                Spacer( modifier = Modifier.fillMaxHeight().width(4.dp) )
+//                Spacer( modifier = Modifier.fillMaxHeight().fillMaxWidth().weight(1f) )
+//                Spacer( modifier = Modifier.fillMaxHeight().width(4.dp) )
+//                Box(
+//                    modifier = Modifier.fillMaxHeight().fillMaxWidth().weight(1f)
+//                        .border(0.5.dp, ThemeL.grey2, RoundedCornerShape(4.dp)),
+//                    contentAlignment = Alignment.Center
+//                ) {
+//                    Text(
+//                        "Close", textAlign = TextAlign.Center,
+//                        color = ThemeL.textColor, fontFamily = ThemeL.fontFamilyKarla,
+//                        fontSize = 20.sp, modifier = Modifier
+//                    )
+//                }
+//            }
         }
 
         Box(modifier = Modifier) {

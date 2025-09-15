@@ -16,10 +16,14 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -29,10 +33,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
@@ -138,130 +144,150 @@ object ScreenLAlbumList {
                 vm.loadAlbumList(state.currentPage)
             }
 
-
-            Scaffold(
-                bottomBar = {
-                    AlbumListBottomBar(
-                        onClickVisibleFilter = { visibleFilter = !visibleFilter },
-                        onClickPrev = { vm.loadPrevList() },
-                        onClickNext = { vm.loadNextList() }
-                    )
-                },
-                containerColor = ThemeL.greyBackground
-            ) { padding ->
-
-                HorizontalPager(
-                    state,
-                    Modifier
-                        .padding(bottom = padding.calculateBottomPadding())
-                        .fillMaxSize(), beyondViewportPageCount = 1
-                ) { page ->
+            val drawerState = rememberDrawerState(DrawerValue.Closed)
 
 
-                    // Wrap LazyVerticalGrid with PullToRefreshBox
-                    PullToRefreshBox(
-                        isRefreshing = isRefreshing,
-                        onRefresh = {
-                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                            vm.refreshData()
-                        },
+            ModalNavigationDrawer(
+                drawerState = drawerState,
+                drawerContent = {
+                    // Filter overlay
+                    if (currentFilter != null) {
+                        Box(modifier = Modifier) {
+                            AlbumListFilter(
+                                currentFilter, filterGCount, filterTagsCount,
+                                onClose = {
 
-                        indicator = {
-                            Indicator(
-                                modifier = Modifier
-                                    .align(Alignment.TopCenter)
-                                    .size(48.dp),
-                                isRefreshing = isRefreshing,
-                                state = pullToRefreshState,
-                                containerColor = ThemeL.grey3,
-                                maxDistance = (96 + 50).dp
-                            )
-                        },
-
-                        state = pullToRefreshState,
-                        modifier = Modifier.fillMaxSize()//.padding(bottom = padding.calculateBottomPadding())
-                    )
-                    {
-                        LazyVerticalGrid(
-                            state = rememberLazyGridState(),
-                            modifier = Modifier.fillMaxSize(),
-                            columns = GridCells.Fixed(2)
-                        ) {
-                            item(key = "dummy", span = { GridItemSpan(maxLineSpan) }) {
-                                Spacer(
-                                    Modifier.height(48.dp)
-                                )
+                                }
+                            ) { newFilter ->
+                                vm.screenModelScope.launch {
+                                    vm.albumList.value?.getAlbumList(1, newFilter)
+                                    vm.albumList.value?.getAlbumListAggregations(1)
+                                }
                             }
+                        }
+                    }
+                },
+                scrimColor = Color.Transparent,
+            )
+            {
+                Scaffold(
+                    bottomBar = {
+                        AlbumListBottomBar(
+                            onClickVisibleFilter = {
+                                //visibleFilter = !visibleFilter
+                                scope.launch {drawerState.open()}
+                                                   },
+                            onClickPrev = { vm.loadPrevList() },
+                            onClickNext = { vm.loadNextList() }
+                        )
+                    },
+                    containerColor = ThemeL.greyBackground
+                )
+                { padding ->
 
-                            item(
-                                key = "page_selector",
-                                span = { GridItemSpan(maxLineSpan) }
+                    HorizontalPager(
+                        state,
+                        Modifier
+                            .padding(bottom = padding.calculateBottomPadding())
+                            .fillMaxSize(), beyondViewportPageCount = 1
+                    ) { page ->
+
+
+                        // Wrap LazyVerticalGrid with PullToRefreshBox
+                        PullToRefreshBox(
+                            isRefreshing = isRefreshing,
+                            onRefresh = {
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                vm.refreshData()
+                            },
+
+                            indicator = {
+                                Indicator(
+                                    modifier = Modifier
+                                        .align(Alignment.TopCenter)
+                                        .size(48.dp),
+                                    isRefreshing = isRefreshing,
+                                    state = pullToRefreshState,
+                                    containerColor = ThemeL.grey3,
+                                    maxDistance = (96 + 50).dp
+                                )
+                            },
+
+                            state = pullToRefreshState,
+                            modifier = Modifier.fillMaxSize()//.padding(bottom = padding.calculateBottomPadding())
+                        )
+                        {
+                            LazyVerticalGrid(
+                                state = rememberLazyGridState(),
+                                modifier = Modifier.fillMaxSize(),
+                                columns = GridCells.Fixed(2)
                             ) {
-                                if (info != null) {
-                                    Box(Modifier.padding(vertical = 4.dp, horizontal = 4.dp), contentAlignment = Alignment.Center) {
+                                item(key = "dummy", span = { GridItemSpan(maxLineSpan) }) {
+                                    Spacer(
+                                        Modifier.height(48.dp)
+                                    )
+                                }
+
+                                item(
+                                    key = "page_selector",
+                                    span = { GridItemSpan(maxLineSpan) }
+                                ) {
+                                    if (info != null) {
+                                        Box(
+                                            Modifier.padding(vertical = 4.dp, horizontal = 4.dp),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            AlbumListPageSelector(info.page, info.totalPages) {
+                                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                                vm.loadAlbumList(it)
+                                            }
+                                        }
+                                    }
+                                }
+
+                                items(items?.size ?: 0, key = { items?.get(it)?.id!! }) { index ->
+                                    val item = items?.get(index)
+                                    if (item != null) {
+                                        Box(
+                                            Modifier.padding(vertical = 4.dp, horizontal = 4.dp),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            AlbumListItem(
+                                                title = item.title,
+                                                coverUrl = item.cover.url,
+                                                numberOfAnimatedPictures = item.numberOfAnimatedPictures,
+                                                numberOfPictures = item.numberOfPictures,
+                                            ) {
+                                                navigator.push(ScreenLAlbum(item.id.toLong()))
+                                            }
+                                        }
+                                    }
+                                }
+
+                                item(
+                                    key = "page_selector2",
+                                    span = { GridItemSpan(maxLineSpan) }
+                                ) {
+                                    if (items?.isNotEmpty() == true && info != null) {
                                         AlbumListPageSelector(info.page, info.totalPages) {
+                                            scope.launch { vm.state.scrollToItem(0) }
                                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                             vm.loadAlbumList(it)
                                         }
                                     }
                                 }
                             }
-
-                            items(items?.size ?: 0, key = { items?.get(it)?.id!! }) { index ->
-                                val item = items?.get(index)
-                                if (item != null) {
-                                    Box(Modifier.padding(vertical = 4.dp, horizontal = 4.dp), contentAlignment = Alignment.Center) {
-                                        AlbumListItem(
-                                            title = item.title,
-                                            coverUrl = item.cover.url,
-                                            numberOfAnimatedPictures = item.numberOfAnimatedPictures,
-                                            numberOfPictures = item.numberOfPictures,
-                                        ) {
-                                            navigator.push(ScreenLAlbum(item.id.toLong()))
-                                        }
-                                    }
-                                }
-                            }
-
-                            item(
-                                key = "page_selector2",
-                                span = { GridItemSpan(maxLineSpan) }
-                            ) {
-                                if (items?.isNotEmpty() == true && info != null) {
-                                    AlbumListPageSelector(info.page, info.totalPages) {
-                                        scope.launch { vm.state.scrollToItem(0) }
-                                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                        vm.loadAlbumList(it)
-                                    }
-                                }
-                            }
                         }
+
+
                     }
 
 
                 }
-
-
-                // Filter overlay
-                if (currentFilter != null && visibleFilter) {
-                    Box(modifier = Modifier.padding(bottom = padding.calculateBottomPadding())) {
-                        AlbumListFilter(
-                            currentFilter,
-                            filterGCount,
-                            filterTagsCount,
-                            onClose = { visibleFilter = false }
-                        ) { newFilter ->
-                            vm.screenModelScope.launch {
-                                vm.albumList.value?.getAlbumList(1, newFilter)
-                                vm.albumList.value?.getAlbumListAggregations(1)
-                            }
-                        }
-                    }
-                }
-
-
             }
+
         }
+
     }
 }
 

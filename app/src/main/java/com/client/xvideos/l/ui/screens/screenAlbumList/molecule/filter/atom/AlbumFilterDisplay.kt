@@ -70,7 +70,7 @@ fun AlbumFilterDisplay(startString: String, onRequestApply: (String) -> Unit) {
             onExpandedChange = { expanded = it },
             modifier = Modifier
                 .weight(1f) // равная ширина
-                .height(43.dp)
+                .height(48.dp)
         ) {
             Row(
                 modifier = Modifier
@@ -131,7 +131,7 @@ fun AlbumFilterDisplay(startString: String, onRequestApply: (String) -> Unit) {
             onExpandedChange = { expanded2 = it },
             modifier = Modifier
                 .weight(1f) // равная ширина
-                .height(43.dp)
+                .height(48.dp)
         ) {
             Row(
                 modifier = Modifier
@@ -193,7 +193,7 @@ fun AlbumFilterDisplay(startString: String, onRequestApply: (String) -> Unit) {
         Box(
             modifier = Modifier
                 .weight(1f) // равная ширина
-                .height(43.dp)
+                .height(48.dp)
                 .clip(RoundedCornerShape(4.dp))
                 .border(1.dp, ThemeL.grey5, RoundedCornerShape(4.dp))
                 .background(ThemeL.red)

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.HorizontalDivider
@@ -36,7 +37,28 @@ fun AlbumListBottomBar(
 ) {
     Column {
         HorizontalDivider()
-        Row(modifier = Modifier.padding(start = 4.dp).fillMaxWidth().height(48.dp).background(ThemeRed.colorTabLevel1), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+        Row(
+            modifier = Modifier
+                .padding(start = 4.dp)
+                .fillMaxWidth()
+                .height(48.dp)
+                .background(ThemeRed.colorTabLevel1),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+
+            Box(
+                modifier = Modifier
+                    .padding(end = 4.dp)
+                    .width(46.dp)
+                    .height(46.dp)
+                    .border(2.dp, Color(0xFF434343), RoundedCornerShape(4.dp))
+                    .background(Color(0xFF414141))
+                    .clickable(onClick = { onClickVisibleFilter() }),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(Icons.Default.FilterList, contentDescription = null, tint = Color.White)
+            }
 
             Row {
                 ButtonRev(onClick = onClickPrev)
@@ -45,9 +67,17 @@ fun AlbumListBottomBar(
                 Spacer(Modifier.width(4.dp))
             }
 
-            Box(modifier = Modifier.width(64.dp).height(46.dp).border(2.dp, ThemeL.grey2, RoundedCornerShape(4.dp))
-                .background(ThemeL.lavender.copy(alpha = 0.2f)).clickable(onClick = { onClickVisibleFilter() }), contentAlignment = Alignment.Center){
-                Text("Filter", color = ThemeL.grey0 , fontFamily = ThemeL.fontFamilyKarla)
+            Box(
+                modifier = Modifier
+                    .padding(end = 4.dp)
+                    .width(46.dp)
+                    .height(46.dp)
+                    .border(2.dp, Color(0xFF434343), RoundedCornerShape(4.dp))
+                    .background(Color(0xFF414141))
+                    .clickable(onClick = { onClickVisibleFilter() }),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(Icons.Default.FilterList, contentDescription = null, tint = Color.White)
             }
 
         }
@@ -66,15 +96,27 @@ fun AlbumListBottomBarPreview() {
 
 
 @Composable
-private fun ButtonRev(onClick: () -> Unit){
-    Box( modifier = Modifier.height(46.dp).width(64.dp).background(ThemeL.red).clickable( onClick = onClick ), contentAlignment = Alignment.Center ) {
+private fun ButtonRev(onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .height(46.dp)
+            .width(64.dp)
+            .background(ThemeL.red)
+            .clickable(onClick = onClick), contentAlignment = Alignment.Center
+    ) {
         Icon(Icons.Default.KeyboardArrowLeft, tint = Color.White, contentDescription = null)
     }
 }
 
 @Composable
-private fun ButtonNext(onClick: () -> Unit){
-    Box( modifier = Modifier.height(46.dp).width(64.dp).background(ThemeL.red).clickable( onClick = onClick ), contentAlignment = Alignment.Center ) {
+private fun ButtonNext(onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .height(46.dp)
+            .width(64.dp)
+            .background(ThemeL.red)
+            .clickable(onClick = onClick), contentAlignment = Alignment.Center
+    ) {
         Icon(Icons.Default.KeyboardArrowRight, tint = Color.White, contentDescription = null)
     }
 }
