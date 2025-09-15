@@ -1,15 +1,12 @@
 package com.client.xvideos.l.ui.screens.screenAlbumList
 
 import androidx.compose.foundation.lazy.grid.LazyGridState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
 import com.client.xvideos.l.model.AlbumListFilter
-import com.client.xvideos.l.net.AlbumListImpl
+import com.client.xvideos.l.model.FacetCollectionInfo
 import com.client.xvideos.l.net.Luscious
 import dagger.Binds
 import dagger.Module
@@ -41,8 +38,7 @@ class ScreenLAlbumListSM @AssistedInject constructor(
     private val _filter = MutableStateFlow(inFilter)
     val filter: StateFlow<AlbumListFilter?> = _filter.asStateFlow()
 
-
-
+    val info = MutableStateFlow<FacetCollectionInfo?>(null)
 
 
 
@@ -69,12 +65,25 @@ class ScreenLAlbumListSM @AssistedInject constructor(
         screenModelScope.launch {
             _isRefreshing.value = true
             try {
-                val res = luscious.getAlbumList(1 ,filter.value )
-                if (res.isFailure){
+                val a = luscious.getAlbumList(1 ,filter.value )
+                if (a.isFailure){
                     return@launch
                 }
-                albumList.value?.getAlbumList(1, filter.value)
-                albumList.value?.getAlbumListAggregations(1)
+
+                val res = a.getOrThrow()
+
+                info.value = res.info
+
+                val items = res.items
+
+
+                val agr = luscious.getAlbumListAggregations(1, filter.value)
+                if (agr.isFailure){
+                    return@launch
+                }
+
+                //albumList.value?.getAlbumList(1, filter.value)
+                //albumList.value?.getAlbumListAggregations(1)
             } catch (e: Exception) {
                 Timber.e(e, "Error loading initial data")
             } finally {
@@ -99,15 +108,15 @@ class ScreenLAlbumListSM @AssistedInject constructor(
     }
 
     fun loadNextList() {
-        if (albumList.value != null) {
-            val page = (albumList.value!!.info.page + 1)
+        if (info.value != null) {
+            val page = (info.value!!.page + 1)
             loadAlbumList(page)
         }
     }
 
     fun loadPrevList() {
-        if (albumList.value != null) {
-            val page = (albumList.value!!.info.page - 1).coerceAtLeast(1)
+        if (info.value != null) {
+            val page = (info.value!!.page - 1).coerceAtLeast(1)
             loadAlbumList(page)
         }
     }
