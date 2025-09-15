@@ -161,7 +161,7 @@ fun AlbumListFilter(
                 .clip(RoundedCornerShape(4.dp))
                 .border(2.dp, Color(0xFF434343), RoundedCornerShape(4.dp))
                 .background(Color(0xFF353535))
-                .padding(4.dp)
+                //.padding(4.dp)
                 .sizeIn(maxHeight = maxHeight)
         ) {
             AlbumListFilterGenres(filter, filterGCount) { onFilterApply(it) }

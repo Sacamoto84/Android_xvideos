@@ -2,6 +2,7 @@ package com.client.xvideos.l.ui.screens.screenAlbumList
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,6 +13,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Scaffold
@@ -130,7 +132,7 @@ object ScreenLAlbumList {
             // Pull to refresh state
             val pullToRefreshState = rememberPullToRefreshState()
 
-            val state  = rememberPagerState(initialPage = 1, pageCount = {199})
+            val state = rememberPagerState(initialPage = 1, pageCount = { 199 })
 
             LaunchedEffect(state.currentPage) {
                 vm.loadAlbumList(state.currentPage)
@@ -148,8 +150,12 @@ object ScreenLAlbumList {
                 containerColor = ThemeL.greyBackground
             ) { padding ->
 
-                HorizontalPager(state, Modifier.padding(bottom = padding.calculateBottomPadding()).fillMaxSize()) {
-                    page ->
+                HorizontalPager(
+                    state,
+                    Modifier
+                        .padding(bottom = padding.calculateBottomPadding())
+                        .fillMaxSize(), beyondViewportPageCount = 1
+                ) { page ->
 
 
                     // Wrap LazyVerticalGrid with PullToRefreshBox
@@ -177,14 +183,14 @@ object ScreenLAlbumList {
                     )
                     {
                         LazyVerticalGrid(
-                            state = vm.state, modifier = Modifier.fillMaxSize(),
+                            state = rememberLazyGridState(),
+                            modifier = Modifier.fillMaxSize(),
                             columns = GridCells.Fixed(2)
                         ) {
-                            item(
-                                key = "dummy",
-                                span = { GridItemSpan(maxLineSpan) }
-                            ) {
-                                Spacer(Modifier.height(48.dp))
+                            item(key = "dummy", span = { GridItemSpan(maxLineSpan) }) {
+                                Spacer(
+                                    Modifier.height(48.dp)
+                                )
                             }
 
                             item(
@@ -192,23 +198,27 @@ object ScreenLAlbumList {
                                 span = { GridItemSpan(maxLineSpan) }
                             ) {
                                 if (info != null) {
-                                    AlbumListPageSelector(info.page, info.totalPages) {
-                                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                        vm.loadAlbumList(it)
+                                    Box(Modifier.padding(vertical = 4.dp, horizontal = 4.dp), contentAlignment = Alignment.Center) {
+                                        AlbumListPageSelector(info.page, info.totalPages) {
+                                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                            vm.loadAlbumList(it)
+                                        }
                                     }
                                 }
                             }
 
-                            items(items?.size ?: 0) { index ->
+                            items(items?.size ?: 0, key = { items?.get(it)?.id!! }) { index ->
                                 val item = items?.get(index)
                                 if (item != null) {
-                                    AlbumListItem(
-                                        title = item.title,
-                                        coverUrl = item.cover.url,
-                                        numberOfAnimatedPictures = item.numberOfAnimatedPictures,
-                                        numberOfPictures = item.numberOfPictures,
-                                    ) {
-                                        navigator.push(ScreenLAlbum(item.id.toLong()))
+                                    Box(Modifier.padding(vertical = 4.dp, horizontal = 4.dp), contentAlignment = Alignment.Center) {
+                                        AlbumListItem(
+                                            title = item.title,
+                                            coverUrl = item.cover.url,
+                                            numberOfAnimatedPictures = item.numberOfAnimatedPictures,
+                                            numberOfPictures = item.numberOfPictures,
+                                        ) {
+                                            navigator.push(ScreenLAlbum(item.id.toLong()))
+                                        }
                                     }
                                 }
                             }
@@ -232,11 +242,6 @@ object ScreenLAlbumList {
                 }
 
 
-
-
-
-
-
                 // Filter overlay
                 if (currentFilter != null && visibleFilter) {
                     Box(modifier = Modifier.padding(bottom = padding.calculateBottomPadding())) {
@@ -253,8 +258,6 @@ object ScreenLAlbumList {
                         }
                     }
                 }
-
-
 
 
             }

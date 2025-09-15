@@ -6,8 +6,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -22,10 +24,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.client.xvideos.l.theme.ThemeL
@@ -56,9 +61,10 @@ fun AlbumListFilterGenres(
     Column(modifier = Modifier.fillMaxWidth().background(Color(0xFF383838)))
     {
 
-        HorizontalDivider()
+        //HorizontalDivider()
 
-        LazyColumn(modifier = Modifier
+        LazyColumn(
+            modifier = Modifier
             //contentPadding= PaddingValues(4.dp)
         ) {
             items(genresPlus) {
@@ -107,19 +113,42 @@ fun AlbumListFilterGenres(
         }
 
         DisclosureLayout("Genres") {
-            Column(
-                modifier = Modifier.padding(4.dp).clip(RoundedCornerShape(4.dp)).background(Color(0xFF252525))
-            ) {
-                HorizontalDivider(modifier = Modifier.padding(bottom = 6.dp), thickness = 2.dp, color = Color(0xFF585858))
-                LazyColumn(modifier = Modifier.fillMaxWidth().offset(y = (-6).dp)) {
 
+            Column(
+                modifier = Modifier
+                    .background(Color(0xFF3B3B3B))
+                    //.padding(0.dp)
+                    //.clip(RoundedCornerShape(2.dp))
+                    .padding(4.dp)
+                    //.background(Color(0xFFFFFFFF))
+            ) {
+
+//                HorizontalDivider(
+//                    modifier = Modifier.padding(bottom = 4.dp),
+//                    thickness = 2.dp,
+//                    color = Color(0xFF303030)
+//                )
+
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .offset(y = (0).dp)
+                        .border(
+                            2.dp, Color(0xFF303030), RoundedCornerShape(4.dp))
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(Color(0xFF252525))
+                ) {
+
+                    item{ Spacer(Modifier.height(1.dp)) }
 
                     items(genresPlusCorrect?.size ?: 0) {
                         val item = genresPlusCorrect?.get(it)
                         if (item != null) {
 
                             Row(
-                                modifier = Modifier.fillMaxWidth().padding(end = 4.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 2.dp, top = 4.dp,end = 6.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
@@ -127,7 +156,8 @@ fun AlbumListFilterGenres(
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
                                     modifier = Modifier
-                                ) {
+                                )
+                                {
                                     Icon(
                                         Icons.Default.Add,
                                         contentDescription = null,
@@ -136,7 +166,7 @@ fun AlbumListFilterGenres(
                                             .padding(vertical = 2.dp)
                                             .padding(horizontal = 4.dp)
                                             .size(40.dp)
-                                            .border(1.dp, ThemeL.grey2, RoundedCornerShape(4.dp))
+                                            .border(1.dp, ThemeL.grey2, RoundedCornerShape(2.dp))
                                             .clickable(onClick = {
                                                 val plus = mutableListOf<Genre>()
                                                 plus.addAll(genresPlus)
@@ -145,8 +175,6 @@ fun AlbumListFilterGenres(
                                                 onChange(filter1)
                                             })
                                     )
-
-
 
                                     Text(
                                         item.title,
@@ -176,7 +204,6 @@ fun AlbumListFilterGenres(
 
                                 }
 
-
                                 val count =
                                     filterGenreStateCount?.find { it1 -> it1.term == item.title }?.count
                                 Text(
@@ -191,6 +218,8 @@ fun AlbumListFilterGenres(
                         }
 
                     }
+
+                    item{ Spacer(Modifier.height(4.dp)) }
                 }
             }
         }
