@@ -4,7 +4,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.client.xvideos.l.KtorRequestHandler
 import com.client.xvideos.l.model.Album
 import com.client.xvideos.l.model.AlbumListFilter
 import com.client.xvideos.l.model.AlbumResponse
@@ -37,51 +36,65 @@ data class AlbumListFilterGenreCountResponseList(
     val list: List<AlbumListFilterGenreCountResponse>
 )
 
-class AlbumListImpl(
-    val repository: Repository,
-    val scope: CoroutineScope,
-) {
 
-    var filter by mutableStateOf(AlbumListFilter())
-
-    val filterGenreStateCount = mutableStateListOf<AlbumListFilterGenreCountResponse>()
-
-    val filterTaggedStateCount = mutableStateListOf<AlbumListFilterGenreCountResponse>()
-
-    val filterPictureCountStateCount = mutableStateListOf<AlbumListFilterGenreCountResponse>()
+data class AlbumListImplInfoAndList(
+    val info: FacetCollectionInfo,
+    val items: List<Album>,
+    val filter: AlbumListFilter,
+    val page: Int
+)
 
 
-    var info by mutableStateOf(
-        FacetCollectionInfo(
-            page = 1,
-            hasNextPage = false,
-            hasPreviousPage = false,
-            totalItems = 0,
-            totalPages = 1,
-            itemsPerPage = 30,
-            urlComplete = ""
-        )
-    )
-    var items = mutableStateListOf<Album>()
+data class getAlbumListAggregationsResult(
+    val filterGenreStateCount: List<AlbumListFilterGenreCountResponse?>,
+    val filterTaggedStateCount: List<AlbumListFilterGenreCountResponse>,
+    val filterPictureCountStateCount: List<AlbumListFilterGenreCountResponse>,
+    val id: Int,
+    val filter: AlbumListFilter?
+)
 
 
-    suspend fun getAlbumListAggregations(id: Int) {
+
+
+
+//    var info by mutableStateOf(
+//        FacetCollectionInfo(
+//            page = 1,
+//            hasNextPage = false,
+//            hasPreviousPage = false,
+//            totalItems = 0,
+//            totalPages = 1,
+//            itemsPerPage = 30,
+//            urlComplete = ""
+//        )
+//    )
+
+
+    suspend fun getAlbumListAggregationsImpl(page: Int, filterIn: AlbumListFilter?, repository: Repository): Result<getAlbumListAggregationsResult> {
+
+        val filterGenreStateCount = mutableListOf<AlbumListFilterGenreCountResponse>()
+        val filterTaggedStateCount = mutableListOf<AlbumListFilterGenreCountResponse>()
+        val filterPictureCountStateCount = mutableListOf<AlbumListFilterGenreCountResponse>()
+
+        val filter = filterIn ?: AlbumListFilter()
 
         try {
-            Timber.i("!!! getAlbumListAggregations $id")
+            Timber.i("!!! getAlbumListAggregations $page")
 
-            val q = getAlbumListWithAggregations(id, filter)
+            val q = getAlbumListWithAggregations(page, filter)
 
             //Timber.i("!!! getAlbumListAggregations $q")
 
             val result = repository.openURI(Luscious.Companion.API, q)
             if (result.isFailure) {
                 Timber.i("!!! getAlbumListAggregations error ${result.exceptionOrNull()}")
-                return
+                return Result.failure(result.exceptionOrNull()!!)
             }
+
             val res = result.getOrThrow()
             val json = JsonParser.parseString(res).asJsonObject
-            val get = json["data"]?.asJsonObject?.get("album")?.asJsonObject?.get("list_with_aggregations")?.asJsonObject
+            val get =
+                json["data"]?.asJsonObject?.get("album")?.asJsonObject?.get("list_with_aggregations")?.asJsonObject
             val activeFilters = get?.get("active_filters")?.asJsonArray
             val aggregations = get?.get("aggregations")?.asJsonArray
 
@@ -91,7 +104,7 @@ class AlbumListImpl(
                 val obj = el.asJsonObject
                 val shortName = obj.getAsJsonObject("field")?.get("short_name")?.asString
                 if (shortName == "genre_ids") i else null
-            } ?.firstOrNull()
+            }?.firstOrNull()
 
             if (indexGenre != null) {
                 val genreValues =
@@ -102,25 +115,21 @@ class AlbumListImpl(
                     val pic = gson.fromJson(element, AlbumListFilterGenreCountResponse::class.java)
                     list.add(pic)
                 }
-                withContext(Dispatchers.Main) {
-                    filterGenreStateCount.clear()
-                    filterGenreStateCount.addAll(list)
-                    Timber.i("!!! getAlbumListAggregations list размер : ${list.size}")
-                }
-            } else {
-                withContext(Dispatchers.Main) {
-                    filterGenreStateCount.clear()
-                }
+
+                filterGenreStateCount.addAll(list)
+                Timber.i("!!! getAlbumListAggregations list размер : ${list.size}")
             }
+
             ////
             val indexTagged = aggregations?.mapIndexedNotNull { i, el ->
                 val obj = el.asJsonObject
                 val shortName = obj.getAsJsonObject("field")?.get("short_name")?.asString
                 if (shortName == "tagged") i else null
-            } ?.firstOrNull()
+            }?.firstOrNull()
 
             if (indexTagged != null) {
-                val taggedValues = aggregations.get(indexTagged)?.getAsJsonObject()?.get("values")?.asJsonArray
+                val taggedValues =
+                    aggregations.get(indexTagged)?.getAsJsonObject()?.get("values")?.asJsonArray
                 val gson = Gson()
                 val list = mutableListOf<AlbumListFilterGenreCountResponse>()
                 taggedValues?.forEach { element ->
@@ -128,17 +137,13 @@ class AlbumListImpl(
                     list.add(pic)
                 }
                 withContext(Dispatchers.Main) {
-                    filterTaggedStateCount.clear()
                     filterTaggedStateCount.addAll(list)
-                    Timber.i("!!! getAlbumListAggregations list Tagged размер : ${list.size} ${
-                        list.joinToString(
-                            "\n"
-                        ) { it.term }
-                    }")
-                }
-            } else {
-                withContext(Dispatchers.Main) {
-                    filterTaggedStateCount.clear()
+                    Timber.i(
+                        "!!! getAlbumListAggregations list Tagged размер : ${list.size} ${
+                            list.joinToString(
+                                "\n"
+                            ) { it.term }
+                        }")
                 }
             }
             ///
@@ -150,29 +155,36 @@ class AlbumListImpl(
                 ?.firstOrNull()
 
             if (indexPicture != null) {
-                val pictureValues =
-                    aggregations.get(indexPicture)?.getAsJsonObject()?.get("values")?.asJsonArray
+                val pictureValues = aggregations.get(indexPicture)?.getAsJsonObject()?.get("values")?.asJsonArray
                 val gson = Gson()
                 val list = mutableListOf<AlbumListFilterGenreCountResponse>()
                 pictureValues?.forEach { element ->
                     val pic = gson.fromJson(element, AlbumListFilterGenreCountResponse::class.java)
                     list.add(pic)
                 }
-                withContext(Dispatchers.Main) {
-                    filterPictureCountStateCount.clear()
-                    filterPictureCountStateCount.addAll(list)
-                    Timber.i("!!! getAlbumListAggregations list filterPictureCountStateCount размер : ${list.size}")
-                }
-            } else {
-                withContext(Dispatchers.Main) {
-                    filterPictureCountStateCount.clear()
-                }
+
+                filterPictureCountStateCount.addAll(list)
+                Timber.i("!!! getAlbumListAggregations list filterPictureCountStateCount размер : ${list.size}")
+
             }
 
             filterPictureCountStateCount
         } catch (e: Exception) {
             Timber.i("!!! getAlbumListAggregations Exception $e")
+            e.printStackTrace()
+            return Result.failure(e)
+
         }
+
+        return Result.success(
+            getAlbumListAggregationsResult(
+                filterGenreStateCount,
+                filterTaggedStateCount,
+                filterPictureCountStateCount,
+                page,
+                filter
+            )
+        )
 
     }
 
@@ -180,40 +192,44 @@ class AlbumListImpl(
     /**
      * Получить список альбомов с учетом фильтра
      */
-    suspend fun getAlbumList(id: Int, filterIn : AlbumListFilter?) {
-
+    suspend fun getAlbumListImpl(
+        page: Int,
+        filterIn: AlbumListFilter?,
+        repository: Repository,
+    ): Result<AlbumListImplInfoAndList>
+    {
+        val items = mutableListOf<Album>()
         try {
+            Timber.i("!!! getAlbumList $page")
+            val filter = filterIn ?: AlbumListFilter()
+            val q = getAlbumListGraphQL1(page, filter)
 
-            Timber.i("!!! getAlbumList $id")
-            withContext(Dispatchers.Main) {
-                items.clear()
-            }
-
-            filter = filterIn ?: AlbumListFilter()
-
-            val q = getAlbumListGraphQL1(id, filter)
-
-            //Timber.i("!!! getAlbumList $q")
-
-            val result = repository.openURI( Luscious.Companion.API, q, config = RepositoryUriConfig.CACHE_RAM )
+            val result = repository.openURI(
+                Luscious.Companion.API,
+                q,
+                config = RepositoryUriConfig.CACHE_RAM
+            )
             if (result.isFailure) {
                 Timber.e("!!! getAlbumList error ${result.exceptionOrNull()}")
-                return
+                return Result.failure(result.exceptionOrNull()!!)
             }
-            val res = result.getOrNull()
+            val res = result.getOrThrow()
             val gson = Gson()
-
             val a = gson.fromJson(res, AlbumResponse::class.java)
-
-            withContext(Dispatchers.Main) {
-                info = a.data.album.list.info
-                items.clear()
-                items.addAll(a.data.album.list.items)
-                Timber.i("!!! getAlbumList info ${info.page} ${items.toList()}")
-            }
+            val info = a.data.album.list.info
+            items.addAll(a.data.album.list.items)
+            Timber.i("!!! getAlbumList info ${info.page} ${items.toList()}")
+            return Result.success(
+                AlbumListImplInfoAndList(
+                    info = info,
+                    items = items,
+                    filter = filter,
+                    page = page
+                )
+            )
         } catch (e: Exception) {
             Timber.i("!!! getAlbumList Exception ${e.localizedMessage}")
             e.printStackTrace()
+            return Result.failure(e)
         }
     }
-}

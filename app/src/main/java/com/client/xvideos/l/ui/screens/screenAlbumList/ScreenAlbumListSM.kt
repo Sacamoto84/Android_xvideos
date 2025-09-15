@@ -1,6 +1,9 @@
 package com.client.xvideos.l.ui.screens.screenAlbumList
 
 import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelFactory
@@ -17,11 +20,13 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class ScreenLAlbumListSM @AssistedInject constructor(
-    @Assisted val filter: AlbumListFilter?,
+    @Assisted val inFilter: AlbumListFilter?,
     val luscious: Luscious
 ) : ScreenModel {
 
@@ -32,9 +37,22 @@ class ScreenLAlbumListSM @AssistedInject constructor(
 
 
 
+    //Глобальный фильтр
+    private val _filter = MutableStateFlow(inFilter)
+    val filter: StateFlow<AlbumListFilter?> = _filter.asStateFlow()
+
+
+
+
+
+
+
+
+
+
+
+
     var albumList = MutableStateFlow<AlbumListImpl?>(null)
-
-
 
     // Pull to refresh state
     private val _isRefreshing = MutableStateFlow(false)
@@ -51,8 +69,11 @@ class ScreenLAlbumListSM @AssistedInject constructor(
         screenModelScope.launch {
             _isRefreshing.value = true
             try {
-                albumList.value = luscious.getAlbumList()
-                albumList.value?.getAlbumList(1, filter)
+                val res = luscious.getAlbumList(1 ,filter.value )
+                if (res.isFailure){
+                    return@launch
+                }
+                albumList.value?.getAlbumList(1, filter.value)
                 albumList.value?.getAlbumListAggregations(1)
             } catch (e: Exception) {
                 Timber.e(e, "Error loading initial data")
@@ -70,7 +91,7 @@ class ScreenLAlbumListSM @AssistedInject constructor(
     fun loadAlbumList(page: Int) {
         screenModelScope.launch {
             try {
-                albumList.value?.getAlbumList(page, albumList.value?.filter)
+                albumList.value?.getAlbumList(page, filter.value)
             } catch (e: Exception) {
                 Timber.e(e, "Error loading page $page")
             }

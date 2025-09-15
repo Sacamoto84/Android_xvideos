@@ -1,5 +1,6 @@
 package com.client.xvideos.l.net
 
+import com.client.xvideos.l.model.AlbumListFilter
 import com.client.xvideos.l.model.Landing_page_albumType
 import com.client.xvideos.l.net.graphQl.LandingPageAlbumTag
 import com.client.xvideos.l.net.graphQl.refreshMediaCategories
@@ -54,8 +55,12 @@ class Luscious(
         return matchResult?.groupValues?.get(1)
     }
 
-    fun getAlbumList(): AlbumListImpl {
-        return AlbumListImpl(repository, scope)
+    suspend fun getAlbumListAggregations(page: Int, filter: AlbumListFilter?): Result<getAlbumListAggregationsResult> {
+        return getAlbumListAggregationsImpl(page, filter, repository)
+    }
+
+    suspend fun getAlbumList(page: Int, filter: AlbumListFilter?): Result<AlbumListImplInfoAndList> {
+        return getAlbumListImpl(page, filter, repository)
     }
 
     fun getAlbumTopHits(): AlbumTopHitsImpl {

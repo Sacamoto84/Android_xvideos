@@ -135,9 +135,7 @@ object ScreenLAlbumList {
 
             val state = rememberPagerState(initialPage = 1, pageCount = { 199 })
 
-            LaunchedEffect(state.currentPage) {
-                vm.loadAlbumList(state.currentPage)
-            }
+            LaunchedEffect(state.currentPage) { vm.loadAlbumList(state.currentPage) }
 
             val drawerState = rememberDrawerState(DrawerValue.Closed)
 
@@ -153,10 +151,12 @@ object ScreenLAlbumList {
 
                                 }
                             ) { newFilter ->
-                                vm.screenModelScope.launch {
-                                    vm.albumList.value?.getAlbumList(1, newFilter)
-                                    vm.albumList.value?.getAlbumListAggregations(1)
-                                }
+
+//                                vm.screenModelScope.launch {
+//                                    vm.albumList.value?.getAlbumList(1, newFilter)
+//                                    vm.albumList.value?.getAlbumListAggregations(1)
+//                                }
+
                             }
                         }
                     }
