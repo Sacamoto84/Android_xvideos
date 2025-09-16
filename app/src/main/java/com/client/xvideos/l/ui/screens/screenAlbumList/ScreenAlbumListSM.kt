@@ -25,6 +25,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -67,12 +68,35 @@ class ScreenLAlbumListSM @AssistedInject constructor(
 
     init {
         Timber.i("iii ScreenLAlbumListSM init")
-        loadInitialData()
 
+
+        screenModelScope.launch {
+            try {
+                _isRefreshing.value = true
+
+                val agr = luscious.getAlbumListAggregations(1, filter.value)
+                if (agr.isFailure) {
+                    return@launch
+                }
+
+                withContext(Dispatchers.Main) {
+                    val agrRes = agr.getOrThrow()
+                    filterGenreStateCount.value = agrRes.filterGenreStateCount
+                    filterTaggedStateCount.value = agrRes.filterTaggedStateCount
+                    filterPictureCountStateCount.value = agrRes.filterPictureCountStateCount
+                }
+            }
+            catch (e: Exception) {
+                Timber.e(e, "Error loading initial data")
+            } finally {
+                _isRefreshing.value = false
+            }
+        }
+        //loadInitialData()
         //val a = filter.value!!.toString().toMD5()
     }
 
-    private fun loadInitialData() {
+    fun loadInitialData() {
         screenModelScope.launch {
             _isRefreshing.value = true
             try {
@@ -82,7 +106,9 @@ class ScreenLAlbumListSM @AssistedInject constructor(
                 withContext(Dispatchers.Main) {
                     val res = a.getOrThrow()
                     info.value = res.info
-                    bigList.put(res.page, res)
+                    bigList.clear()
+                    delay(100)
+                    bigList.put(0, res)
                 }
 
                 val agr = luscious.getAlbumListAggregations(1, filter.value)
@@ -112,23 +138,22 @@ class ScreenLAlbumListSM @AssistedInject constructor(
 
     fun loadAlbumList(page: Int) {
 
-        if (page == 0) return
-
-        if (bigList.containsKey(page)){
-            info.value = bigList[page]?.info
-            return
-        }
+//        if (bigList.containsKey(page)){
+//            //info.value = bigList[page]?.info
+//            return
+//        }
 
         screenModelScope.launch {
             try {
                 Timber.i("!!! loadAlbumList page:$page")
-                val a = luscious.getAlbumList(page ,filter.value )
+                val a = luscious.getAlbumList(page+1,filter.value )
                 if (a.isFailure){ return@launch }
                 val res = a.getOrThrow()
                 info.value = res.info
-                bigList.put(res.page, res)
+                bigList.put(page, res)
+                Timber.i("!!! loadAlbumList page:$page bigList size:${bigList.size}")
             } catch (e: Exception) {
-                Timber.e(e, "Error loading page $page")
+                Timber.e(e, "!!! eee Error loading page $page")
             }
         }
     }

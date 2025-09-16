@@ -47,7 +47,7 @@ import timber.log.Timber
  */
 @Composable
 fun UrlImage(url: String, modifier: Modifier = Modifier,  contentScale : ContentScale = ContentScale.FillWidth, loadIndicator : Boolean = true, isGrayscale: Boolean = false) {
-    Timber.d("!!! UrlImage: $url")
+    //Timber.d("!!! UrlImage: $url")
     Column(modifier = modifier) {
         FrescoImage(
             imageUrl = url,

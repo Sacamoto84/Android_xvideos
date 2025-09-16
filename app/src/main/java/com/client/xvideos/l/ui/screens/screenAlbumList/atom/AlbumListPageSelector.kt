@@ -11,13 +11,20 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -31,6 +38,8 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -57,30 +66,17 @@ fun AlbumListPageSelector(
 
     var expanded by remember { mutableStateOf(false) }
 
-    LaunchedEffect(expanded) {
-        haptic.invoke()
-    }
+    LaunchedEffect(expanded) { haptic.invoke() }
 
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(48.dp),
+        modifier = Modifier.fillMaxWidth().height(48.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
 
-        Box(
-            modifier = Modifier
-                .fillMaxHeight()
-                .weight(1f)
-                .background(ThemeL.red)
-                .clickable(
-                    onClick = { onChange((page - 1).coerceAtLeast(1)) }
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(Icons.Default.KeyboardArrowLeft, tint = Color.White, contentDescription = null)
-        }
+        Box( modifier = Modifier.fillMaxHeight().weight(1f).background(ThemeL.red)
+                .clickable( onClick = { onChange((page - 1).coerceAtLeast(1)) } ),  contentAlignment = Alignment.Center
+        ) { Icon(Icons.Default.KeyboardArrowLeft, tint = Color.White, contentDescription = null) }
 
         Box(
             modifier = Modifier
@@ -109,7 +105,7 @@ fun AlbumListPageSelector(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                "Page $page of $pageMax",
+                "Page ${page + 1} of $pageMax",
                 color = ThemeL.textColor,
                 fontFamily = ThemeL.fontFamilyKarla,
                 textAlign = TextAlign.Center,
@@ -136,50 +132,87 @@ fun AlbumListPageSelector(
     }
 
 
+    var number by remember { mutableStateOf((page+1).toString()) }
+
     //-- Диалог --
     if (expanded) {
+
         Dialog(onDismissRequest = { expanded = false }) {
-            // Draw a rectangle shape with rounded corners inside the dialog
-            Box(Modifier
-                //.size(200.dp, 100.dp)
-                .background(ThemeL.grey4)) {
-                Column() {
 
+            Box( Modifier.background(ThemeL.grey4) )
+            {
 
-                    Row(Modifier.fillMaxWidth())  {
+                    Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
 
-                        
+                        TextField(
+                            number, onValueChange = { number = it },
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.NumberPassword
+                            ), singleLine = true, maxLines = 1, modifier = Modifier.padding(end = 8.dp).width(96.dp)
+                            , colors = TextFieldDefaults.colors(
+                                focusedContainerColor = Color(0xFF3B3B3B),
+                                unfocusedContainerColor = Color(0xFF3B3B3B),
+                                disabledContainerColor = Color(0xFF3B3B3B),
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent,
+                                disabledIndicatorColor = Color.Transparent,
+                                focusedTextColor = ThemeL.textColor,
+                                unfocusedTextColor = ThemeL.textColor,
+                                disabledTextColor = ThemeL.textColor,
+                            ), textStyle = TextStyle(
+                                color = ThemeL.textColor,
+                                fontFamily = ThemeL.fontFamilyKarla,
+                                fontSize = 20.sp
+                            ), keyboardActions = KeyboardActions(
+                                onDone = {
+                                    expanded = false
+                                    onChange(number.toInt() - 1)
+                                }
+                            )
+                        )
+                        Text("of ${pageMax}",
+                            color = ThemeL.textColor,
+                            fontFamily = ThemeL.fontFamilyKarla, fontSize = 20.sp)
                     }
 
 
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
-                        Spacer(Modifier.weight(0.25f))
-                        Box(
-                            modifier = Modifier
-                                . height(48.dp)
-                                .weight(1f)
-                                .clip(RoundedCornerShape(4.dp))
-                                .border(1.dp, ThemeL.grey3, RoundedCornerShape(4.dp))
-                            , contentAlignment = Alignment.Center
-                        ) {
-                            Text("Cancel", color = ThemeL.textColor)
-                        }
 
-                        Spacer(Modifier.weight(0.5f))
+//                    Row(Modifier.padding(bottom = 8.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround)
+//                    {
+//                        Spacer(Modifier.weight(0.25f))
+//                        Box(
+//                            modifier = Modifier
+//                                .height(48.dp)
+//                                .weight(1f)
+//                                .clip(RoundedCornerShape(4.dp))
+//                                .border(1.dp, ThemeL.grey2, RoundedCornerShape(4.dp)),
+//                            contentAlignment = Alignment.Center
+//                        ) {
+//                            Text("Cancel", color = ThemeL.textColor)
+//                        }
+//
+//                        Spacer(Modifier.weight(0.5f))
+//
+//                        Box(
+//                            modifier = Modifier
+//                                .height(48.dp)
+//                                .weight(1f)
+//                                .clip(RoundedCornerShape(4.dp))
+//                                .background(ThemeL.red)
+//                                .clickable( onClick = {
+//                                        expanded = false
+//                                        onChange(number.toInt() - 1)
+//                                    }
+//                                )
+//                            , contentAlignment = Alignment.Center
+//                        ) {
+//                            Text("Go", color = Color.White)
+//                        }
+//                        Spacer(Modifier.weight(0.25f))
+//
+//                    }
 
-                        Box(
-                            modifier = Modifier
-                                . height(48.dp)
-                                .weight(1f)
-                                .clip(RoundedCornerShape(4.dp))
-                                .background(ThemeL.red), contentAlignment = Alignment.Center
-                        ) {
-                            Text("Go", color = ThemeL.textColor)
-                        }
-                        Spacer(Modifier.weight(0.25f))
 
-                    }
-                }
             }
         }
     }

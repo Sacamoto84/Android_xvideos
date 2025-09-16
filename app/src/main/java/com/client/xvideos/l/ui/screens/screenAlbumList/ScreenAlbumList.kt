@@ -22,7 +22,11 @@ import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -91,7 +95,9 @@ object ScreenLAlbumList {
         override fun Content() {
 
             val navigator = LocalNavigator.currentOrThrow
-            val vm = getScreenModel<ScreenLAlbumListSM, ScreenLAlbumListSM.Factory> { factory -> factory.create(filter) }
+            val vm = getScreenModel<ScreenLAlbumListSM, ScreenLAlbumListSM.Factory> { factory ->
+                factory.create(filter)
+            }
 
             //val items = vm.albumList.collectAsStateWithLifecycle().value?.items
 
@@ -112,16 +118,22 @@ object ScreenLAlbumList {
             // Pull to refresh state
             val pullToRefreshState = rememberPullToRefreshState()
 
-            val state = rememberPagerState(initialPage = 1, pageCount = { 199 })
+            var totalPages by remember { mutableIntStateOf(1) }
 
-            LaunchedEffect(state.currentPage) {
+            val statePager = rememberPagerState(initialPage = 0, pageCount = { totalPages })
 
-                val currentPage = state.currentPage
+            LaunchedEffect(info) {
+                totalPages = info?.totalPages ?: 1
+            }
+
+            LaunchedEffect(statePager.currentPage) {
+
+                val currentPage = statePager.currentPage
 
                 val pagesToLoad = setOf(
-                    maxOf(1, currentPage - 1), // предыдущая
+                    maxOf(0, currentPage - 1), // предыдущая
                     currentPage,                // текущая
-                    minOf(state.pageCount - 1, currentPage + 1) // следующая
+                    minOf(statePager.pageCount - 1, currentPage + 1) // следующая
                 )
 
                 pagesToLoad.forEach { page ->
@@ -149,12 +161,9 @@ object ScreenLAlbumList {
                             ) { newFilter ->
 
                                 vm.screenModelScope.launch {
-                                    vm.bigList.clear()
+                                    statePager.scrollToPage(0)
                                     vm.filterUpdate(newFilter)
-                                    vm.loadAlbumList(1)
-
-//                                    vm.albumList.value?.getAlbumList(1, newFilter)
-//                                    vm.albumList.value?.getAlbumListAggregations(1)
+                                    vm.loadInitialData()
                                 }
 
                             }
@@ -167,7 +176,7 @@ object ScreenLAlbumList {
                 Scaffold(
                     bottomBar = {
                         AlbumListBottomBar(
-                            onClickVisibleFilter = { scope.launch {drawerState.open()} },
+                            onClickVisibleFilter = { scope.launch { drawerState.open() } },
                             onClickPrev = { vm.loadPrevList() },
                             onClickNext = { vm.loadNextList() }
                         )
@@ -177,23 +186,30 @@ object ScreenLAlbumList {
                 { padding ->
 
                     HorizontalPager(
-                        state,
-                        Modifier
-                            .padding(bottom = padding.calculateBottomPadding())
-                            .fillMaxSize(), beyondViewportPageCount = 1
+                        statePager,
+                        Modifier.padding(bottom = padding.calculateBottomPadding()).fillMaxSize(), beyondViewportPageCount = 1
                     ) { page ->
 
-                       val items = bigList[page]?.items
-
+                        val items = bigList[page]?.items
 
                         // Wrap LazyVerticalGrid with PullToRefreshBox
                         PullToRefreshBox(
                             isRefreshing = isRefreshing,
                             onRefresh = {
                                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                vm.refreshData()
+                                //vm.refreshData()
                             },
-                            indicator = { Indicator( modifier = Modifier.align(Alignment.TopCenter).size(48.dp), isRefreshing = isRefreshing, state = pullToRefreshState, containerColor = ThemeL.grey3, maxDistance = (96 + 54).dp ) },
+                            indicator = {
+                                Indicator(
+                                    modifier = Modifier
+                                        .align(Alignment.TopCenter)
+                                        .size(48.dp),
+                                    isRefreshing = isRefreshing,
+                                    state = pullToRefreshState,
+                                    containerColor = ThemeL.grey3,
+                                    maxDistance = (96 + 54).dp
+                                )
+                            },
                             state = pullToRefreshState,
                             modifier = Modifier.fillMaxSize()//.padding(bottom = padding.calculateBottomPadding())
                         )
@@ -203,15 +219,21 @@ object ScreenLAlbumList {
                                 modifier = Modifier.fillMaxSize(),
                                 columns = GridCells.Fixed(2)
                             ) {
-                                item(key = "dummy", span = { GridItemSpan(maxLineSpan) }) { Spacer( Modifier.height(48.dp) ) }
+                                item(key = "dummy", span = { GridItemSpan(maxLineSpan) }) {
+                                    Spacer( Modifier.height(48.dp) )
+                                }
 
-                                item( key = "page_selector", span = { GridItemSpan(maxLineSpan) } )
+                                item(key = "page_selector", span = { GridItemSpan(maxLineSpan) })
                                 {
                                     if (info != null) {
                                         Box(
-                                            Modifier.padding(vertical = 4.dp, horizontal = 4.dp), contentAlignment = Alignment.Center
+                                            Modifier.padding(vertical = 4.dp, horizontal = 4.dp),
+                                            contentAlignment = Alignment.Center
                                         ) {
-                                            AlbumListPageSelector(info.page, info.totalPages) {
+                                            AlbumListPageSelector(page, info.totalPages) {
+                                                scope.launch {
+                                                    statePager.scrollToPage(it)
+                                                }
                                                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                                 vm.loadAlbumList(it)
                                             }
@@ -243,8 +265,11 @@ object ScreenLAlbumList {
                                     span = { GridItemSpan(maxLineSpan) }
                                 ) {
                                     if (items?.isNotEmpty() == true && info != null) {
-                                        AlbumListPageSelector(info.page, info.totalPages) {
-                                            scope.launch { vm.state.scrollToItem(0) }
+                                        AlbumListPageSelector(page, info.totalPages) {
+                                            scope.launch {
+                                                vm.state.scrollToItem(0)
+                                                statePager.scrollToPage(it)
+                                            }
                                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                             vm.loadAlbumList(it)
                                         }
