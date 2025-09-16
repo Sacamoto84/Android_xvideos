@@ -2,16 +2,13 @@ package com.client.xvideos.l.ui.screens.screenAlbumList
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.pager.HorizontalPager
@@ -19,57 +16,35 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
-import cafe.adriel.voyager.hilt.ScreenModelFactory
-import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.model.AlbumListFilter
-import com.client.xvideos.l.net.AlbumListImpl
-import com.client.xvideos.l.net.Luscious
+import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.ui.element.AlbumListItem
 import com.client.xvideos.l.ui.screens.screenAlbum.ScreenLAlbum
 import com.client.xvideos.l.ui.screens.screenAlbumList.atom.AlbumListPageSelector
 import com.client.xvideos.l.ui.screens.screenAlbumList.bottomBar.AlbumListBottomBar
 import com.client.xvideos.l.ui.screens.screenAlbumList.molecule.filter.AlbumListFilter
-import dagger.Binds
-import dagger.Module
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
-import dagger.multibindings.IntoMap
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import net.engawapg.lib.zoomable.ExperimentalZoomableApi
-import timber.log.Timber
 
 object ScreenLAlbumList {
 
@@ -118,14 +93,18 @@ object ScreenLAlbumList {
             val navigator = LocalNavigator.currentOrThrow
             val vm = getScreenModel<ScreenLAlbumListSM, ScreenLAlbumListSM.Factory> { factory -> factory.create(filter) }
 
-            val items = vm.albumList.collectAsStateWithLifecycle().value?.items
+            //val items = vm.albumList.collectAsStateWithLifecycle().value?.items
 
-            val info = vm.albumList.collectAsStateWithLifecycle().value?.info
-            val currentFilter = vm.albumList.collectAsStateWithLifecycle().value?.filter
+            val bigList = vm.bigList
+
+            val info = vm.info.collectAsStateWithLifecycle().value
+
+            val currentFilter = vm.filter.collectAsStateWithLifecycle().value
+
             val isRefreshing = vm.isRefreshing.collectAsStateWithLifecycle().value
 
-            val filterGCount = vm.albumList.collectAsStateWithLifecycle().value?.filterGenreStateCount
-            val filterTagsCount = vm.albumList.collectAsStateWithLifecycle().value?.filterTaggedStateCount
+            val filterGCount = vm.filterGenreStateCount.collectAsStateWithLifecycle().value
+            val filterTagsCount = vm.filterTaggedStateCount.collectAsStateWithLifecycle().value
 
             val haptic = LocalHapticFeedback.current
             val scope = rememberCoroutineScope()
@@ -135,7 +114,22 @@ object ScreenLAlbumList {
 
             val state = rememberPagerState(initialPage = 1, pageCount = { 199 })
 
-            LaunchedEffect(state.currentPage) { vm.loadAlbumList(state.currentPage) }
+            LaunchedEffect(state.currentPage) {
+
+                val currentPage = state.currentPage
+
+                val pagesToLoad = setOf(
+                    maxOf(1, currentPage - 1), // предыдущая
+                    currentPage,                // текущая
+                    minOf(state.pageCount - 1, currentPage + 1) // следующая
+                )
+
+                pagesToLoad.forEach { page ->
+                    vm.loadAlbumList(page)
+                }
+
+
+            }
 
             val drawerState = rememberDrawerState(DrawerValue.Closed)
 
@@ -146,16 +140,22 @@ object ScreenLAlbumList {
                     if (currentFilter != null) {
                         Box(modifier = Modifier) {
                             AlbumListFilter(
-                                currentFilter, filterGCount, filterTagsCount,
+                                filter = currentFilter,
+                                filterGCount = filterGCount,
+                                filterTagsCount = filterTagsCount,
                                 onClose = {
 
                                 }
                             ) { newFilter ->
 
-//                                vm.screenModelScope.launch {
+                                vm.screenModelScope.launch {
+                                    vm.bigList.clear()
+                                    vm.filterUpdate(newFilter)
+                                    vm.loadAlbumList(1)
+
 //                                    vm.albumList.value?.getAlbumList(1, newFilter)
 //                                    vm.albumList.value?.getAlbumListAggregations(1)
-//                                }
+                                }
 
                             }
                         }
@@ -182,6 +182,9 @@ object ScreenLAlbumList {
                             .padding(bottom = padding.calculateBottomPadding())
                             .fillMaxSize(), beyondViewportPageCount = 1
                     ) { page ->
+
+                       val items = bigList[page]?.items
+
 
                         // Wrap LazyVerticalGrid with PullToRefreshBox
                         PullToRefreshBox(

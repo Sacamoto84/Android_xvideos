@@ -46,7 +46,7 @@ data class AlbumListImplInfoAndList(
 
 
 data class getAlbumListAggregationsResult(
-    val filterGenreStateCount: List<AlbumListFilterGenreCountResponse?>,
+    val filterGenreStateCount: List<AlbumListFilterGenreCountResponse>,
     val filterTaggedStateCount: List<AlbumListFilterGenreCountResponse>,
     val filterPictureCountStateCount: List<AlbumListFilterGenreCountResponse>,
     val id: Int,
@@ -204,11 +204,8 @@ data class getAlbumListAggregationsResult(
             val filter = filterIn ?: AlbumListFilter()
             val q = getAlbumListGraphQL1(page, filter)
 
-            val result = repository.openURI(
-                Luscious.Companion.API,
-                q,
-                config = RepositoryUriConfig.CACHE_RAM
-            )
+            val result = repository.openURI( Luscious.Companion.API,  q, config = RepositoryUriConfig.CACHE_RAM )
+
             if (result.isFailure) {
                 Timber.e("!!! getAlbumList error ${result.exceptionOrNull()}")
                 return Result.failure(result.exceptionOrNull()!!)
@@ -218,7 +215,7 @@ data class getAlbumListAggregationsResult(
             val a = gson.fromJson(res, AlbumResponse::class.java)
             val info = a.data.album.list.info
             items.addAll(a.data.album.list.items)
-            Timber.i("!!! getAlbumList info ${info.page} ${items.toList()}")
+            //Timber.i("!!! getAlbumList info ${info.page} ${items.toList()}")
             return Result.success(
                 AlbumListImplInfoAndList(
                     info = info,
