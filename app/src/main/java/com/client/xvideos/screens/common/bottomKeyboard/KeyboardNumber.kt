@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -68,7 +69,7 @@ fun KeyboardNumber(
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.padding(end = 3.dp).fillMaxWidth()
+            modifier = Modifier.width((300-8).dp)//.padding(end = 3.dp)//.fillMaxWidth()
         ) {
             //Циферблат
             Box(
@@ -95,10 +96,17 @@ fun KeyboardNumber(
 
             }
 
-            Text("($max)", color = theme.colorText, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Box( modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                Text(
+                    "($max)",
+                    color = theme.colorText,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
 
-        Row(modifier = Modifier.padding(bottom = 8.dp)) {
+        Row(modifier = Modifier.padding(bottom = 0.dp)) {
 
             //ButtonNumber("1", w =  48.dp, h = 48.dp * 4 + 1.dp + 1.dp, onClick =  { textFieldValue = TextFieldValue("1", TextRange(1)) })
 

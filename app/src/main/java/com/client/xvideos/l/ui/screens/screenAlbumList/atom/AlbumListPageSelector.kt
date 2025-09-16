@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.client.xvideos.l.theme.ThemeL
+import com.client.xvideos.screens.common.bottomKeyboard.KeyboardNumber
 
 @Preview
 @Composable
@@ -69,13 +70,20 @@ fun AlbumListPageSelector(
     LaunchedEffect(expanded) { haptic.invoke() }
 
     Row(
-        modifier = Modifier.fillMaxWidth().height(48.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(48.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
 
-        Box( modifier = Modifier.fillMaxHeight().weight(1f).background(ThemeL.red)
-                .clickable( onClick = { onChange((page - 1).coerceAtLeast(1)) } ),  contentAlignment = Alignment.Center
+        Box(
+            modifier = Modifier
+                .fillMaxHeight()
+                .weight(1f)
+                .background(ThemeL.red)
+                .clickable(onClick = { onChange((page - 1).coerceAtLeast(1)) }),
+            contentAlignment = Alignment.Center
         ) { Icon(Icons.Default.KeyboardArrowLeft, tint = Color.White, contentDescription = null) }
 
         Box(
@@ -131,88 +139,24 @@ fun AlbumListPageSelector(
         }
     }
 
-
-    var number by remember { mutableStateOf((page+1).toString()) }
-
     //-- Диалог --
     if (expanded) {
 
         Dialog(onDismissRequest = { expanded = false }) {
-
-            Box( Modifier.background(ThemeL.grey4) )
+            Box(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(ThemeL.lavender), contentAlignment = Alignment.Center
+            )
             {
-
-                    Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
-
-                        TextField(
-                            number, onValueChange = { number = it },
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.NumberPassword
-                            ), singleLine = true, maxLines = 1, modifier = Modifier.padding(end = 8.dp).width(96.dp)
-                            , colors = TextFieldDefaults.colors(
-                                focusedContainerColor = Color(0xFF3B3B3B),
-                                unfocusedContainerColor = Color(0xFF3B3B3B),
-                                disabledContainerColor = Color(0xFF3B3B3B),
-                                focusedIndicatorColor = Color.Transparent,
-                                unfocusedIndicatorColor = Color.Transparent,
-                                disabledIndicatorColor = Color.Transparent,
-                                focusedTextColor = ThemeL.textColor,
-                                unfocusedTextColor = ThemeL.textColor,
-                                disabledTextColor = ThemeL.textColor,
-                            ), textStyle = TextStyle(
-                                color = ThemeL.textColor,
-                                fontFamily = ThemeL.fontFamilyKarla,
-                                fontSize = 20.sp
-                            ), keyboardActions = KeyboardActions(
-                                onDone = {
-                                    expanded = false
-                                    onChange(number.toInt() - 1)
-                                }
-                            )
-                        )
-                        Text("of ${pageMax}",
-                            color = ThemeL.textColor,
-                            fontFamily = ThemeL.fontFamilyKarla, fontSize = 20.sp)
+                KeyboardNumber(
+                    value = page, max = pageMax,
+                    onClick = {
+                        onChange(it - 1)
+                        //expanded = false
                     }
-
-
-
-//                    Row(Modifier.padding(bottom = 8.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround)
-//                    {
-//                        Spacer(Modifier.weight(0.25f))
-//                        Box(
-//                            modifier = Modifier
-//                                .height(48.dp)
-//                                .weight(1f)
-//                                .clip(RoundedCornerShape(4.dp))
-//                                .border(1.dp, ThemeL.grey2, RoundedCornerShape(4.dp)),
-//                            contentAlignment = Alignment.Center
-//                        ) {
-//                            Text("Cancel", color = ThemeL.textColor)
-//                        }
-//
-//                        Spacer(Modifier.weight(0.5f))
-//
-//                        Box(
-//                            modifier = Modifier
-//                                .height(48.dp)
-//                                .weight(1f)
-//                                .clip(RoundedCornerShape(4.dp))
-//                                .background(ThemeL.red)
-//                                .clickable( onClick = {
-//                                        expanded = false
-//                                        onChange(number.toInt() - 1)
-//                                    }
-//                                )
-//                            , contentAlignment = Alignment.Center
-//                        ) {
-//                            Text("Go", color = Color.White)
-//                        }
-//                        Spacer(Modifier.weight(0.25f))
-//
-//                    }
-
-
+                )
             }
         }
     }
