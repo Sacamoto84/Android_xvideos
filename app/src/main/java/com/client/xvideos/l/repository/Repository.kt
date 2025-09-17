@@ -146,10 +146,7 @@ class Repository(
                         }
 
                         repositoryCacheTempDao.insert(
-                            RepositoryCacheTempEntity(
-                                url = cacheKey,
-                                content = response
-                            )
+                            RepositoryCacheTempEntity( url = cacheKey, content = response )
                         )
                         //Timber.i("!!! openURI() CACHE_RAM net response:$response")
 
@@ -162,6 +159,7 @@ class Repository(
                     }
                     catch (e: Exception){
                         Timber.e(e, "!!! openURI() CACHE_RAM error")
+                        snackBarEvent.error(e.message?: "openURI() CACHE_RAM error")
                         return Result.failure(e)
                     }
                 }

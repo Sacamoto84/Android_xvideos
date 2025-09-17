@@ -113,7 +113,7 @@ class ScreenLExplorer() : Screen {
 
                 //Navigator(
                 when (screenType) {
-                    0 -> ScreenLAlbumList.getFirst().Content()
+                    0 -> ScreenLAlbumList.Content()
                     1 -> ScreenLAlbumTopHits.Content()
                     2 -> SavedLTab.Content()
                     3 -> ScreenLConfigTab().Content()

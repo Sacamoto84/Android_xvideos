@@ -38,10 +38,18 @@ data class AlbumListFilterGenreCountResponseList(
 
 
 data class AlbumListImplInfoAndList(
-    val info: FacetCollectionInfo,
-    val items: List<Album>,
-    val filter: AlbumListFilter,
-    val page: Int
+    val info: FacetCollectionInfo = FacetCollectionInfo(
+        page = 1,
+        hasNextPage = true,
+        hasPreviousPage = true,
+        totalItems = 1,
+        totalPages = 1,
+        itemsPerPage = 1,
+        urlComplete = ""
+    ),
+    val items: List<Album> = emptyList(),
+    val filter: AlbumListFilter = AlbumListFilter(),
+    val page: Int = 0
 )
 
 

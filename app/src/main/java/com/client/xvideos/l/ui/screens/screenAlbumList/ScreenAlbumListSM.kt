@@ -4,6 +4,8 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
@@ -36,8 +38,21 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+
+enum class StatusAlbumList {
+    BUSY,
+    DOWNLOADING,
+    DOWNLOADED
+}
+
+data class AlbumListImplInfoAndListAndStatus(
+    val albumListImplInfoAndList: AlbumListImplInfoAndList? = null,
+    val status: StatusAlbumList = StatusAlbumList.BUSY
+)
 
 @OptIn(ExperimentalFoundationApi::class)
 class ScreenLAlbumListSM @AssistedInject constructor(
@@ -47,10 +62,12 @@ class ScreenLAlbumListSM @AssistedInject constructor(
 ) : ScreenModel {
 
     @AssistedFactory
-    interface Factory : ScreenModelFactory { fun create(filter: AlbumListFilter?): ScreenLAlbumListSM }
+    interface Factory : ScreenModelFactory {
+        fun create(filter: AlbumListFilter?): ScreenLAlbumListSM
+    }
 
     //Глобальный фильтр
-    private val _filter = MutableStateFlow( inFilter ?: AlbumListFilter() )
+    private val _filter = MutableStateFlow(inFilter ?: AlbumListFilter())
     val filter: StateFlow<AlbumListFilter> = _filter.asStateFlow()
 
     fun filterUpdate(filter: AlbumListFilter) {
@@ -61,22 +78,24 @@ class ScreenLAlbumListSM @AssistedInject constructor(
 
     var filterGenreStateCount = MutableStateFlow(emptyList<AlbumListFilterGenreCountResponse>())
     var filterTaggedStateCount = MutableStateFlow(emptyList<AlbumListFilterGenreCountResponse>())
-    var filterPictureCountStateCount = MutableStateFlow(emptyList<AlbumListFilterGenreCountResponse>())
+    var filterPictureCountStateCount =
+        MutableStateFlow(emptyList<AlbumListFilterGenreCountResponse>())
 
-    val bigList = mutableStateMapOf<Int, AlbumListImplInfoAndList>()
+    val bigList = mutableStateMapOf<Int, AlbumListImplInfoAndListAndStatus>()
 
-    var savedPagerPage by  mutableIntStateOf(0)
+    val drawerState = DrawerState(DrawerValue.Closed)
+
+    var savedPagerPage by mutableIntStateOf(0)
+
+    val statePager = DefaultPagerState1(0, 0f) { 10 }
 
     //var albumList = MutableStateFlow<AlbumListImpl?>(null)
 
-    // Pull to refresh state
-    private val _isRefreshing = MutableStateFlow(false)
-    val isRefreshing = _isRefreshing.asStateFlow()
 
     private val _isRequest = MutableStateFlow(false)
     val isRequest = _isRequest.asStateFlow()
 
-    val state = LazyGridState()
+    val stateGrid = mutableStateMapOf<Int, LazyGridState>()
 
     init {
         Timber.i("iii ScreenLAlbumListSM init")
@@ -84,7 +103,7 @@ class ScreenLAlbumListSM @AssistedInject constructor(
 
         screenModelScope.launch {
             try {
-                _isRefreshing.value = true
+                //_isRefreshing.value = true
 
                 val agr = luscious.getAlbumListAggregations(1, filter.value)
                 if (agr.isFailure) {
@@ -97,11 +116,10 @@ class ScreenLAlbumListSM @AssistedInject constructor(
                     filterTaggedStateCount.value = agrRes.filterTaggedStateCount
                     filterPictureCountStateCount.value = agrRes.filterPictureCountStateCount
                 }
-            }
-            catch (e: Exception) {
+            } catch (e: Exception) {
                 Timber.e(e, "Error loading initial data")
             } finally {
-                _isRefreshing.value = false
+                // _isRefreshing.value = false
             }
         }
         //loadInitialData()
@@ -110,21 +128,28 @@ class ScreenLAlbumListSM @AssistedInject constructor(
 
     fun loadInitialData() {
         screenModelScope.launch {
-            _isRefreshing.value = true
+            //_isRefreshing.value = true
             try {
-                val a = luscious.getAlbumList(1 ,filter.value )
-                if (a.isFailure){ return@launch }
+                val a = luscious.getAlbumList(1, filter.value)
+                if (a.isFailure) {
+                    return@launch
+                }
 
                 withContext(Dispatchers.Main) {
                     val res = a.getOrThrow()
                     info.value = res.info
                     bigList.clear()
                     delay(100)
-                    bigList.put(0, res)
+                    bigList.put(
+                        0,
+                        AlbumListImplInfoAndListAndStatus(res, StatusAlbumList.DOWNLOADED)
+                    )
                 }
 
                 val agr = luscious.getAlbumListAggregations(1, filter.value)
-                if (agr.isFailure){ return@launch }
+                if (agr.isFailure) {
+                    return@launch
+                }
 
                 withContext(Dispatchers.Main) {
                     val agrRes = agr.getOrThrow()
@@ -139,7 +164,7 @@ class ScreenLAlbumListSM @AssistedInject constructor(
                 Timber.e(e, "Error loading initial data")
                 snackBarEvent.error(e.message ?: "Error loading initial data")
             } finally {
-                _isRefreshing.value = false
+                //_isRefreshing.value = false
             }
         }
     }
@@ -151,89 +176,48 @@ class ScreenLAlbumListSM @AssistedInject constructor(
 
     fun loadAlbumList(page: Int) {
 
-        if (bigList.containsKey(page)) {  return  }
-
         screenModelScope.launch(Dispatchers.IO) {
+
+            when (bigList[page]?.status) {
+
+                StatusAlbumList.DOWNLOADED -> {
+                    Timber.i("!!! loadAlbumList DOWNLOADED page:$page")
+                    return@launch
+                }
+
+                StatusAlbumList.DOWNLOADING -> {
+                    Timber.i("!!! loadAlbumList DOWNLOADING page:$page")
+                    return@launch
+                }
+
+                else -> {}
+            }
+
             try {
                 _isRequest.value = true
+
                 Timber.i("!!! loadAlbumList page:$page")
-                val a = luscious.getAlbumList(page+1,filter.value )
-                if (a.isFailure){ return@launch }
+                bigList.put(  page, AlbumListImplInfoAndListAndStatus(null, StatusAlbumList.DOWNLOADING) )
+                val a = luscious.getAlbumList(page + 1, filter.value)
+                if (a.isFailure) {
+                    bigList.put(page, AlbumListImplInfoAndListAndStatus(null, StatusAlbumList.BUSY))
+                    return@launch
+                }
+
                 val res = a.getOrThrow()
                 info.value = res.info
-                bigList.put(page, res)
-                //Timber.i("!!! loadAlbumList page:$page bigList size:${bigList.size}")
+                bigList.put( page, AlbumListImplInfoAndListAndStatus(res, StatusAlbumList.DOWNLOADED) )
+
             } catch (e: Exception) {
                 Timber.e(e, "!!! eee Error loading page $page")
                 snackBarEvent.error(e.message ?: "Error loading page $page")
-            }finally {
+                bigList.put(page, AlbumListImplInfoAndListAndStatus(null, StatusAlbumList.BUSY))
+            } finally {
                 _isRequest.value = false
             }
         }
     }
 
-    fun loadNextList() {
-        if (info.value != null) {
-            val page = (info.value!!.page + 1)
-            loadAlbumList(page)
-        }
-    }
-
-    fun loadPrevList() {
-        if (info.value != null) {
-            val page = (info.value!!.page - 1).coerceAtLeast(1)
-            loadAlbumList(page)
-        }
-    }
-
-    // Pull to refresh function
-    fun refreshData() {
-//        screenModelScope.launch {
-//            _isRefreshing.value = true
-//            try {
-//                val currentPage = albumList.value?.info?.page ?: 1
-//                val currentFilter = albumList.value?.filter
-//
-//                Timber.d("Refreshing data for page $currentPage")
-//
-//                // Reload current page with current filter
-//                albumList.value?.getAlbumList(currentPage, currentFilter)
-//                albumList.value?.getAlbumListAggregations(currentPage)
-//
-//                // Optional: scroll to top after refresh
-//                state.scrollToItem(0)
-//
-//            } catch (e: Exception) {
-//                Timber.e(e, "Error refreshing data")
-//            } finally {
-//                _isRefreshing.value = false
-//            }
-//        }
-    }
-
-//    // Alternative refresh method that always goes to first page
-//    fun refreshToFirstPage() {
-//        screenModelScope.launch {
-//            _isRefreshing.value = true
-//            try {
-//                val currentFilter = albumList.value?.filter
-//
-//                Timber.d("Refreshing to first page")
-//
-//                // Always reload first page
-//                albumList.value?.getAlbumList(1, currentFilter)
-//                albumList.value?.getAlbumListAggregations(1)
-//
-//                // Scroll to top
-//                state.scrollToItem(0)
-//
-//            } catch (e: Exception) {
-//                Timber.e(e, "Error refreshing to first page")
-//            } finally {
-//                _isRefreshing.value = false
-//            }
-//        }
-//    }
 }
 
 @Module

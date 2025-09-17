@@ -29,7 +29,7 @@ import kotlinx.coroutines.delay
 import java.io.IOException
 
 class KtorRequestHandler(
-    private val timeoutMillis: Long = 5000,
+    private val timeoutMillis: Long = 15000,
     private val maxRetries: Int = 5,
     private val retryStatusCodes: Set<Int> = setOf(413, 429, 500, 502, 503, 504),
     private val backoffFactor: Long = 1000,

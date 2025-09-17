@@ -153,7 +153,7 @@ class ScreenLAlbumLandingTag(val tag: String) : Screen {
 
                                 val filter = vm.createFilter(item)
 
-                                navigator.push(ScreenLAlbumList.create(filter))
+                               // navigator.push(ScreenLAlbumList.create(filter))
 
 
                             })
