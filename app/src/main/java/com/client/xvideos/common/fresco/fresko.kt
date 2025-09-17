@@ -20,7 +20,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -33,7 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
@@ -70,19 +69,21 @@ fun UrlImageLusciousGifsGlide(
     isAnimated: Boolean = false,
     onSuccess: () -> Unit = {},
     onFailure: () -> Unit = {},
-    autoPlay: Boolean = false
+    autoPlay: Boolean = false,
+    sizeButton : Dp = 40.dp,
+    sizeButtonIcon : Dp = 24.dp,
+    rotate : Boolean = false
 ) {
 
-    val haptic = LocalHapticFeedback.current
+    //val haptic = LocalHapticFeedback.current
 
-    LaunchedEffect(Unit) {
+    //LaunchedEffect(Unit) {
         //haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-    }
+    //}
 
-
-    SideEffect {
-        Timber.i("!!! iii Recompose UrlImageLusciousGifsGlide albumName:${albumName} url:${url}")
-    }
+    //SideEffect {
+    //    Timber.i("!!! iii Recompose UrlImageLusciousGifsGlide albumName:${albumName} url:${url}")
+    //}
 
     var isPlaying by remember { mutableStateOf(autoPlay) }
     var isLoading by remember { mutableStateOf(true) }
@@ -116,8 +117,6 @@ fun UrlImageLusciousGifsGlide(
             .setProgressiveRenderingEnabled(true)
             //.setResizeOptions(ResizeOptions(100, 100)) // Изменение размера
             //.setLocalThumbnailPreviewsEnabled(true) // Включение миниатюр
-
-
             .build()
 
         val dataSource1 = Fresco.getImagePipeline().fetchDecodedImage(i, null)
@@ -145,11 +144,7 @@ fun UrlImageLusciousGifsGlide(
 
     var animation: Animatable? by remember { mutableStateOf(null) }
     LaunchedEffect(animation, isPlaying) {
-        if (isPlaying) {
-            animation?.start()
-        } else {
-            animation?.stop()
-        }
+        if (isPlaying) { animation?.start() } else { animation?.stop() }
     }
 
     val controllerListener = remember(url) {
@@ -201,6 +196,7 @@ fun UrlImageLusciousGifsGlide(
                         .setControllerListener(controllerListener)
                         .setOldController(null) // Явно сбрасываем старый контроллер
                 },
+                contentScale = contentScale,
                 modifier = Modifier.fillMaxSize().background(ThemeL.grey5),
             )
 
@@ -226,21 +222,31 @@ fun UrlImageLusciousGifsGlide(
                     modifier = Modifier
                         .padding(2.dp)
                         .align(Alignment.BottomStart)
-                        .size(40.dp)
+                        .size(sizeButton)
                         .clip(CircleShape)
                         .background(Color.Gray.copy(alpha = 0.5f), CircleShape)
-                        .clickable(
-                            enabled = url.contains("https://").not(),
-                            onClick = { isPlaying = !isPlaying }
-                        ),
+//                        .clickable(
+//                            enabled = url.contains("https://").not(),
+//                            onClick = { isPlaying = !isPlaying }
+//                        )
+
+                        .then(
+                            if (!url.contains("https://")) {
+                                Modifier.clickable { isPlaying = !isPlaying }
+                            } else {
+                                Modifier // без clickable → клики проходят к родителю
+                            }
+                        )
+
+
+                    ,
                     contentAlignment = Alignment.Center
                 ) {
                     if (url.contains("https://")){
-                        Icon( Icons.Default.Animation, contentDescription = null, tint = Color.White )
+                        Icon( Icons.Default.Animation, contentDescription = null, tint = Color.White, modifier = Modifier.size(sizeButtonIcon))
                     }
                     else {
-                        Icon(
-                            if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow, contentDescription = null, tint = Color.White )
+                        Icon( if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow, contentDescription = null, tint = Color.White, modifier = Modifier.size(sizeButtonIcon) )
                     }
                 }
 

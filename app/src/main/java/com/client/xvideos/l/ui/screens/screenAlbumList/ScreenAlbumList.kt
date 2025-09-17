@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -85,20 +86,9 @@ class DefaultPagerState1(
 }
 
 
-
-
-
-
-
-
-
-
-
-
 object ScreenLAlbumList : Screen {
 
     private fun readResolve(): Any = ScreenLAlbumList
-
 
 
     @OptIn(ExperimentalZoomableApi::class)
@@ -107,7 +97,9 @@ object ScreenLAlbumList : Screen {
     override fun Content() {
 
         val navigator = LocalNavigator.currentOrThrow
-        val vm = getScreenModel<ScreenLAlbumListSM, ScreenLAlbumListSM.Factory> { factory -> factory.create(null) }
+        val vm = getScreenModel<ScreenLAlbumListSM, ScreenLAlbumListSM.Factory> { factory ->
+            factory.create(null)
+        }
         val bigList = vm.bigList
         val info = vm.info.collectAsStateWithLifecycle().value
         val currentFilter = vm.filter.collectAsStateWithLifecycle().value
@@ -121,13 +113,18 @@ object ScreenLAlbumList : Screen {
 
         LaunchedEffect(info) { totalPages = info?.totalPages ?: 1 }
 
-       // val statePager = rememberPagerState(initialPage = 9999, pageCount = { totalPages })
+        // val statePager = rememberPagerState(initialPage = 9999, pageCount = { totalPages })
 
         LaunchedEffect(vm.statePager.currentPage) {
             vm.statePager.pageCountState.value = { totalPages }
             vm.savedPagerPage = vm.statePager.currentPage
             val currentPage = vm.statePager.currentPage
-            val pagesToLoad = setOf( maxOf(0, currentPage - 1), currentPage, minOf(vm.statePager.pageCount - 1, currentPage + 1), minOf(vm.statePager.pageCount - 1, currentPage + 2) )
+            val pagesToLoad = setOf(
+                maxOf(0, currentPage - 1),
+                currentPage,
+                minOf(vm.statePager.pageCount - 1, currentPage + 1),
+                minOf(vm.statePager.pageCount - 1, currentPage + 2)
+            )
             pagesToLoad.forEach { page -> vm.loadAlbumList(page) }
         }
 
@@ -135,26 +132,26 @@ object ScreenLAlbumList : Screen {
             drawerState = vm.drawerState,
             drawerContent = {
                 // Filter overlay
-                if (currentFilter != null) {
-                    Box(modifier = Modifier) {
-                        AlbumListFilter(
-                            filter = currentFilter,
-                            filterGCount = filterGCount,
-                            filterTagsCount = filterTagsCount,
-                            onClose = { })
-                        { newFilter ->
-                            vm.screenModelScope.launch {
-                                vm.stateGrid.clear()
-                                vm.statePager.scrollToPage(0)
-                                vm.filterUpdate(newFilter)
-                                vm.loadInitialData()
-                            }
+                Box(modifier = Modifier) {
+                    AlbumListFilter(
+                        filter = currentFilter,
+                        filterGCount = filterGCount,
+                        filterTagsCount = filterTagsCount,
+                        onClose = { })
+                    { newFilter ->
+                        vm.screenModelScope.launch {
+                            vm.stateGrid.clear()
+                            vm.statePager.scrollToPage(0)
+                            vm.filterUpdate(newFilter)
+                            vm.loadInitialData()
                         }
                     }
                 }
             },
             scrimColor = Color.Transparent,
-            modifier = Modifier.padding(top = 4.dp).fillMaxSize()
+            modifier = Modifier
+                .padding(top = 4.dp)
+                .fillMaxSize()
         )
         {
             Scaffold(
@@ -196,19 +193,19 @@ object ScreenLAlbumList : Screen {
 
                 HorizontalPager(
                     vm.statePager,
-                    Modifier.padding(bottom = padding.calculateBottomPadding()).fillMaxSize(),
+                    Modifier
+                        .padding(bottom = padding.calculateBottomPadding())
+                        .fillMaxSize(),
                     beyondViewportPageCount = 1,
-                    // Добавляем ключ для страниц пейджера
                     key = { page -> "${key}_page_$page" }
                 )
                 { page ->
 
                     val items = bigList[page]?.albumListImplInfoAndList?.items
 
-                    val stateGrid  = if (vm.stateGrid.containsKey(page)) {
+                    val stateGrid = if (vm.stateGrid.containsKey(page)) {
                         vm.stateGrid[page]!!
-                    } else
-                    {
+                    } else {
                         vm.stateGrid.put(page, LazyGridState())
                         vm.stateGrid[page]!!
                     }
@@ -224,7 +221,8 @@ object ScreenLAlbumList : Screen {
                             scrollbarPadding = 0.dp,
                             alwaysShowScrollbar = true
                         )
-                    ) {
+                    )
+                    {
 
                         LazyVerticalGrid(
                             state = stateGrid, modifier = Modifier.fillMaxSize(),
@@ -233,7 +231,9 @@ object ScreenLAlbumList : Screen {
                         {
 
                             item(key = "dummy", span = { GridItemSpan(maxLineSpan) }) {
-                                Spacer(Modifier.height(32.dp).background(ThemeL.red))
+                                Spacer(Modifier
+                                    .height(32.dp)
+                                    .background(ThemeL.red))
                             }
 
 //                                item(key = "page_selector", span = { GridItemSpan(maxLineSpan) })
@@ -279,6 +279,18 @@ object ScreenLAlbumList : Screen {
                             }
                         }
                     }
+
+                    val status = vm.bigList[page]?.status
+
+                    if (status == StatusAlbumList.DOWNLOADING) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
+                    }
+
                 }
 
             }

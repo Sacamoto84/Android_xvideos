@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
@@ -16,6 +17,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -24,14 +26,17 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
@@ -79,6 +84,8 @@ class FullScreenImage(
         var dataItem by remember(Unit) { mutableStateOf(item) }
         var corruptCancel by remember { mutableStateOf(false) }
         val coroutineScope = rememberCoroutineScope()
+
+        var rotate by remember { mutableStateOf(false) }
 
         LaunchedEffect(isClosing) {
             if (isClosing) {
@@ -160,6 +167,12 @@ class FullScreenImage(
                     )
             )
 
+
+
+
+
+
+
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier
@@ -170,32 +183,58 @@ class FullScreenImage(
             ) { page ->
                 val pageItem = filteredPic[page]
 
+                //val aspectRation = if (rotate) (pageItem.height.toFloat() / pageItem.width) else (pageItem.width.toFloat() / pageItem.height)
+
                 UrlImageLusciousGifsGlide(
+
+                    contentScale = ContentScale.Fit,
                     url = pageItem.url_to_original!!,
                     modifier = Modifier
-                        .aspectRatio(pageItem.width.toFloat() / pageItem.height)
-                        .zoomable(
-                            zoomState = zoomState,
-                            enableOneFingerZoom = false,
-                            onDoubleTap = { position ->
-                                // Двойной тап для зума/раззума
-                                coroutineScope.launch {
-                                    if (zoomState.scale > 1.0f) {
-                                        // Если уже увеличено - сбрасываем
-                                        //zoomState.reset()
-                                        zoomState.changeScale(1.0f, Offset.Zero)
-                                    } else {
-                                        // Увеличиваем в 2-3 раза по центру тапа
-                                        zoomState.changeScale(2.5f, position)
-                                    }
-                                }
-                            }
-                        ),
+                        //.fillMaxSize()
+                        .graphicsLayer {
+                            rotationZ = if (rotate) 90f else 0f
+                            transformOrigin =
+                                androidx.compose.ui.graphics.TransformOrigin(0.5f, 0.5f)
+                        }
+                        .aspectRatio(if (rotate) (pageItem.height.toFloat() / pageItem.width) else (pageItem.width.toFloat() / pageItem.height),  matchHeightConstraintsFirst = true)
+                        .align(Alignment.Center)
+
+
+
+//                        .zoomable(
+//                            zoomState = zoomState,
+//                            enableOneFingerZoom = false,
+//                            onDoubleTap = { position ->
+//                                // Двойной тап для зума/раззума
+//                                coroutineScope.launch {
+//                                    if (zoomState.scale > 1.0f) {
+//                                        // Если уже увеличено - сбрасываем
+//                                        //zoomState.reset()
+//                                        zoomState.changeScale(1.0f, Offset.Zero)
+//                                    } else {
+//                                        // Увеличиваем в 2-3 раза по центру тапа
+//                                        zoomState.changeScale(2.5f, position)
+//                                    }
+//                                }
+//                            }
+//                        )
+
+
+                    ,
+
                     onSuccess = { },
                     albumName = albumName,
                     autoPlay = autoPlay,
                     isAnimated = pageItem.is_animated
                 )
+            }
+
+
+
+            Button(onClick = {
+                rotate = rotate.not()
+            }, modifier = Modifier.padding(top = 48.dp)) {
+                Text(rotate.toString())
             }
 
             Box(modifier = Modifier.align(Alignment.TopStart)) {
@@ -241,7 +280,9 @@ class FullScreenImage(
                                 onSuccess = { },
                                 albumName = albumName,
                                 autoPlay = false,
-                                isAnimated = it1.is_animated
+                                isAnimated = it1.is_animated,
+                                sizeButton = 20.dp,
+                                sizeButtonIcon = 12.dp
                             )
                         }
                     }
