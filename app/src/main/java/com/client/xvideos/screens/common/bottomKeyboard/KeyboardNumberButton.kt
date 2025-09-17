@@ -1,6 +1,7 @@
 package com.client.xvideos.screens.common.bottomKeyboard
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
@@ -14,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Preview(showBackground = true)
@@ -30,6 +32,7 @@ fun KeyboardButtonNumber(text: String, theme :KeyboardNumberTheme = KeyboardNumb
             .height(theme.buttonHeight)
             .width(theme.buttonWidth)
             .clip(RoundedCornerShape(theme.buttonCornerRadius))
+            .border(2.dp, theme.colorButtonBorder, RoundedCornerShape(theme.buttonCornerRadius))
             .background(theme.buttonColor)
             .clickable { onClick.invoke() },
         contentAlignment = Alignment.Center

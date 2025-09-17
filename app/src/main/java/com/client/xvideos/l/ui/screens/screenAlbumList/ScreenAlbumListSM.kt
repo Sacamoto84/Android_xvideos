@@ -1,6 +1,9 @@
 package com.client.xvideos.l.ui.screens.screenAlbumList
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
@@ -16,6 +19,7 @@ import com.client.xvideos.l.model.FacetCollectionInfo
 import com.client.xvideos.l.net.AlbumListFilterGenreCountResponse
 import com.client.xvideos.l.net.AlbumListImplInfoAndList
 import com.client.xvideos.l.net.Luscious
+import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
 import dagger.Binds
 import dagger.Module
 import dagger.assisted.Assisted
@@ -33,9 +37,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
+@OptIn(ExperimentalFoundationApi::class)
 class ScreenLAlbumListSM @AssistedInject constructor(
     @Assisted val inFilter: AlbumListFilter?,
-    val luscious: Luscious
+    val luscious: Luscious,
+    val snackBarEvent: SnackBarEvent
 ) : ScreenModel {
 
     @AssistedFactory
@@ -51,7 +57,6 @@ class ScreenLAlbumListSM @AssistedInject constructor(
 
     val info = MutableStateFlow<FacetCollectionInfo?>(null)
 
-
     var filterGenreStateCount = MutableStateFlow(emptyList<AlbumListFilterGenreCountResponse>())
     var filterTaggedStateCount = MutableStateFlow(emptyList<AlbumListFilterGenreCountResponse>())
     var filterPictureCountStateCount = MutableStateFlow(emptyList<AlbumListFilterGenreCountResponse>())
@@ -62,7 +67,14 @@ class ScreenLAlbumListSM @AssistedInject constructor(
 
     // Pull to refresh state
     private val _isRefreshing = MutableStateFlow(false)
-    val isRefreshing = _isRefreshing
+    val isRefreshing = _isRefreshing.asStateFlow()
+
+
+
+
+    private val _isRequest = MutableStateFlow(false)
+    val isRequest = _isRequest.asStateFlow()
+
 
     val state = LazyGridState()
 
@@ -125,6 +137,7 @@ class ScreenLAlbumListSM @AssistedInject constructor(
                 //albumList.value?.getAlbumListAggregations(1)
             } catch (e: Exception) {
                 Timber.e(e, "Error loading initial data")
+                snackBarEvent.error(e.message ?: "Error loading initial data")
             } finally {
                 _isRefreshing.value = false
             }
@@ -138,22 +151,23 @@ class ScreenLAlbumListSM @AssistedInject constructor(
 
     fun loadAlbumList(page: Int) {
 
-//        if (bigList.containsKey(page)){
-//            //info.value = bigList[page]?.info
-//            return
-//        }
+        if (bigList.containsKey(page)) {  return  }
 
-        screenModelScope.launch {
+        screenModelScope.launch(Dispatchers.IO) {
             try {
+                _isRequest.value = true
                 Timber.i("!!! loadAlbumList page:$page")
                 val a = luscious.getAlbumList(page+1,filter.value )
                 if (a.isFailure){ return@launch }
                 val res = a.getOrThrow()
                 info.value = res.info
                 bigList.put(page, res)
-                Timber.i("!!! loadAlbumList page:$page bigList size:${bigList.size}")
+                //Timber.i("!!! loadAlbumList page:$page bigList size:${bigList.size}")
             } catch (e: Exception) {
                 Timber.e(e, "!!! eee Error loading page $page")
+                snackBarEvent.error(e.message ?: "Error loading page $page")
+            }finally {
+                _isRequest.value = false
             }
         }
     }

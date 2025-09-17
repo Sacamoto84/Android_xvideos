@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,9 +39,9 @@ fun AlbumListItem(
     Box(
         modifier = Modifier
             .then(modifier)
-            .clip(RoundedCornerShape(16.dp))
             .fillMaxWidth()
-            .border(1.dp, ThemeL.grey3)
+            .clip(RoundedCornerShape(16.dp))
+            .border(1.dp, ThemeL.grey3, RoundedCornerShape(16.dp))
             .clickable(onClick = onClick)
     ) {
 
@@ -62,7 +63,7 @@ fun AlbumListItem(
 
             Text(
                 title.removePrefix(" "),
-                modifier = Modifier,
+                modifier = Modifier.padding(horizontal = 4.dp),
                 color = Color.White,
                 fontFamily = ThemeL.fontFamilyKarla,
                 maxLines = 1,
@@ -71,7 +72,7 @@ fun AlbumListItem(
             )
 
             Row(
-                Modifier.fillMaxWidth()
+                Modifier.padding(start = 4.dp).fillMaxWidth()
             ) {
                 val str = StringBuilder()
                 if (numberOfAnimatedPictures > 0) {

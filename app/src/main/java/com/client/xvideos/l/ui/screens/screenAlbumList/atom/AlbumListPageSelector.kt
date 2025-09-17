@@ -52,9 +52,7 @@ import com.client.xvideos.screens.common.bottomKeyboard.KeyboardNumberTheme
 @Preview
 @Composable
 private fun preview() {
-
     AlbumListPageSelector(1, 199)
-
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -147,23 +145,25 @@ fun AlbumListPageSelector(
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(16.dp))
-                    .background(Color(0xFF1f1f1f))
+                    .border(2.dp, Color(0xFF3E3E3E), RoundedCornerShape(16.dp))
+                    .background(Color(0xFF373737))
                     .padding(16.dp), contentAlignment = Alignment.Center
             )
             {
                 KeyboardNumber(
 
                     theme = KeyboardNumberTheme(
-                        colorBackground = Color(0xFF414141)
-                        , colorText = Color(0xFFFFFFFF)
-                        , buttonColor = Color(0xFF606060)
-
+                        colorBackground = Color(0xFF2D2D2D),
+                        colorBorderBackground = Color(0xFF282828),
+                        colorText = Color(0xFFFFFFFF),
+                        buttonColor = Color(0xFF282828),
+                        colorButtonBorder = Color(0xFF232323),
                     ),
 
-                    value = page+1, max = pageMax,
+                    value = -1, max = pageMax,
                     onClick = {
                         onChange(it - 1)
-                        //expanded = false
+                        expanded = false
                     }
                 )
             }

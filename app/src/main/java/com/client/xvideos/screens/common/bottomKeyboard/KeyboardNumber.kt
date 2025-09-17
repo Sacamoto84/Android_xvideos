@@ -1,6 +1,7 @@
 package com.client.xvideos.screens.common.bottomKeyboard
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -42,6 +43,9 @@ import timber.log.Timber
 data class KeyboardNumberTheme(
     //Диалог
     val colorBackground: Color = Color(0xFF3D3F4A), //Цвет всего фона диалога
+    val colorBorderBackground: Color = Color.Transparent, //Цвет фона границы
+
+
     val colorText: Color = Color(0xFFDEE1EF),
 
     //Кнопки
@@ -50,6 +54,8 @@ data class KeyboardNumberTheme(
     val buttonHeight: Dp = 48.dp,
     val buttonCornerRadius: Int = 40,
     val buttonPadding: Dp = 4.dp,
+
+    val colorButtonBorder: Color = Color.Transparent,
 )
 
 @Composable
@@ -61,7 +67,7 @@ fun KeyboardNumber(
 ) {
 
     var textFieldValue by remember {
-        mutableStateOf(TextFieldValue(value.toString(), TextRange(value.toString().length)))
+        mutableStateOf(TextFieldValue(if (value == -1) "" else value.toString(), TextRange(value.toString().length)))
     }
 
     Column {
@@ -82,6 +88,7 @@ fun KeyboardNumber(
                     .height(theme.buttonHeight)
                     .width(theme.buttonWidth * 3 + theme.buttonPadding * 4)
                     .clip(RoundedCornerShape(theme.buttonCornerRadius))
+                    .border(2.dp, theme.colorBorderBackground, RoundedCornerShape(theme.buttonCornerRadius))
                     .background(theme.colorBackground),
                 contentAlignment = Alignment.Center
             ) {
@@ -182,7 +189,8 @@ fun KeyboardNumber(
                     .width(theme.buttonWidth)
                     .height(theme.buttonHeight * 4 + theme.buttonPadding * 6)
                     .clip(RoundedCornerShape(theme.buttonCornerRadius))
-                    .background(Color(0xFFFF5A1F))
+                    //.border(2.dp, Color(0xFF1F5AFF      ), RoundedCornerShape(theme.buttonCornerRadius))
+                    .background(Color(0xFFFF7043))
                     .clickable {
                         val a = textFieldValue.text.toIntOrNull()
                         if (a != null) {

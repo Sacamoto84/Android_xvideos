@@ -1,9 +1,18 @@
 package com.client.xvideos.l.ui.screens.screenAlbumList
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.animateColor
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.AnimationState
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -13,6 +22,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
@@ -47,6 +57,7 @@ import com.client.xvideos.l.ui.screens.screenAlbum.ScreenLAlbum
 import com.client.xvideos.l.ui.screens.screenAlbumList.atom.AlbumListPageSelector
 import com.client.xvideos.l.ui.screens.screenAlbumList.bottomBar.AlbumListBottomBar
 import com.client.xvideos.l.ui.screens.screenAlbumList.molecule.filter.AlbumListFilter
+
 import kotlinx.coroutines.launch
 import my.nanihadesuka.compose.LazyVerticalGridScrollbar
 import my.nanihadesuka.compose.ScrollbarSettings
@@ -111,6 +122,8 @@ object ScreenLAlbumList {
 
             val isRefreshing = vm.isRefreshing.collectAsStateWithLifecycle().value
 
+            val isRequest = vm.isRequest.collectAsStateWithLifecycle().value
+
             val filterGCount = vm.filterGenreStateCount.collectAsStateWithLifecycle().value
             val filterTagsCount = vm.filterTaggedStateCount.collectAsStateWithLifecycle().value
 
@@ -124,28 +137,21 @@ object ScreenLAlbumList {
 
             val statePager = rememberPagerState(initialPage = 0, pageCount = { totalPages })
 
-            LaunchedEffect(info) {
-                totalPages = info?.totalPages ?: 1
-            }
+            val drawerState = rememberDrawerState(DrawerValue.Closed)
+
+            LaunchedEffect(info) { totalPages = info?.totalPages ?: 1 }
 
             LaunchedEffect(statePager.currentPage) {
-
                 val currentPage = statePager.currentPage
-
                 val pagesToLoad = setOf(
-                    maxOf(0, currentPage - 1), // предыдущая
-                    currentPage,                // текущая
-                    minOf(statePager.pageCount - 1, currentPage + 1) // следующая
+                    maxOf(0, currentPage - 1),
+                    currentPage,
+                    minOf(statePager.pageCount - 1, currentPage + 1)
                 )
-
-                pagesToLoad.forEach { page ->
-                    vm.loadAlbumList(page)
-                }
-
-
+                pagesToLoad.forEach { page -> vm.loadAlbumList(page) }
             }
 
-            val drawerState = rememberDrawerState(DrawerValue.Closed)
+            val infiniteTransition = rememberInfiniteTransition(label = "infinite")
 
             ModalNavigationDrawer(
                 drawerState = drawerState,
@@ -157,25 +163,43 @@ object ScreenLAlbumList {
                                 filter = currentFilter,
                                 filterGCount = filterGCount,
                                 filterTagsCount = filterTagsCount,
-                                onClose = {
-
-                                }
-                            ) { newFilter ->
-
+                                onClose = { })
+                            { newFilter ->
                                 vm.screenModelScope.launch {
                                     statePager.scrollToPage(0)
                                     vm.filterUpdate(newFilter)
                                     vm.loadInitialData()
                                 }
-
                             }
                         }
                     }
                 },
                 scrimColor = Color.Transparent,
+                modifier = Modifier.padding(top = 4.dp).fillMaxSize()
             )
             {
                 Scaffold(
+                    topBar = {
+
+                        if (isRequest) {
+//                            val animColor by infiniteTransition.animateColor(
+//                                initialValue = Color.Transparent,
+//                                targetValue = Color(0xff0c94ff), // оранжевый
+//                                animationSpec = infiniteRepeatable(
+//                                    animation = tween(100),
+//                                    repeatMode = RepeatMode.Reverse
+//                                ),
+//                                label = "colorAnim"
+//                            )
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(2.dp)
+                                    .background(Color(0xff0c94ff)), contentAlignment = Alignment.Center
+                            ) {}
+                        }
+
+                    },
                     bottomBar = {
                         AlbumListBottomBar(
                             onClickVisibleFilter = { scope.launch { drawerState.open() } },
@@ -203,7 +227,8 @@ object ScreenLAlbumList {
                             .padding(bottom = padding.calculateBottomPadding())
                             .fillMaxSize(),
                         beyondViewportPageCount = 1
-                    ) { page ->
+                    )
+                    { page ->
 
                         val items = bigList[page]?.items
 
@@ -230,8 +255,7 @@ object ScreenLAlbumList {
                         )
                         {
 
-
-                           val  stateGrid = rememberLazyGridState()
+                            val stateGrid = rememberLazyGridState()
 
                             LazyVerticalGridScrollbar(
                                 state = stateGrid,
@@ -242,7 +266,7 @@ object ScreenLAlbumList {
                                     scrollbarPadding = 0.dp,
                                     alwaysShowScrollbar = true,
 
-                                )
+                                    )
                             ) {
 
                                 LazyVerticalGrid(
@@ -320,6 +344,14 @@ object ScreenLAlbumList {
 
                         }
                     }
+
+//                    if  (isRequest)
+//                    {
+//                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+//                            CircularProgressIndicator()
+//                        }
+//                    }
+
                 }
             }
         }
