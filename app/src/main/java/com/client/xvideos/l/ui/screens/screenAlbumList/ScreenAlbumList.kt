@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerValue
@@ -32,10 +33,13 @@ import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.savedinstancestate.Saver
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -62,6 +66,7 @@ import kotlinx.coroutines.launch
 import my.nanihadesuka.compose.LazyVerticalGridScrollbar
 import my.nanihadesuka.compose.ScrollbarSettings
 import net.engawapg.lib.zoomable.ExperimentalZoomableApi
+import timber.log.Timber
 
 object ScreenLAlbumList {
 
@@ -107,41 +112,44 @@ object ScreenLAlbumList {
         @Composable
         override fun Content() {
 
-            val navigator = LocalNavigator.currentOrThrow
-            val vm = getScreenModel<ScreenLAlbumListSM, ScreenLAlbumListSM.Factory> { factory ->
-                factory.create(filter)
+            SideEffect {
+                Timber.d("!!! ScreenLAlbumListSM: $key instanceId: $instanceId ")
             }
 
-            //val items = vm.albumList.collectAsStateWithLifecycle().value?.items
-
+            val navigator = LocalNavigator.currentOrThrow
+            val vm = getScreenModel<ScreenLAlbumListSM, ScreenLAlbumListSM.Factory> { factory ->  factory.create(filter) }
             val bigList = vm.bigList
-
             val info = vm.info.collectAsStateWithLifecycle().value
-
             val currentFilter = vm.filter.collectAsStateWithLifecycle().value
 
-            val isRefreshing = vm.isRefreshing.collectAsStateWithLifecycle().value
-
             val isRequest = vm.isRequest.collectAsStateWithLifecycle().value
-
             val filterGCount = vm.filterGenreStateCount.collectAsStateWithLifecycle().value
             val filterTagsCount = vm.filterTaggedStateCount.collectAsStateWithLifecycle().value
-
             val haptic = LocalHapticFeedback.current
             val scope = rememberCoroutineScope()
 
-            // Pull to refresh state
             val pullToRefreshState = rememberPullToRefreshState()
-
             var totalPages by remember { mutableIntStateOf(1) }
-
-            val statePager = rememberPagerState(initialPage = 0, pageCount = { totalPages })
 
             val drawerState = rememberDrawerState(DrawerValue.Closed)
 
             LaunchedEffect(info) { totalPages = info?.totalPages ?: 1 }
 
+            val statePager = rememberPagerState(initialPage = 9999, pageCount = { totalPages })
+
             LaunchedEffect(statePager.currentPage) {
+
+                Timber.i(
+                    "!!! LaunchedEffect ScreenLAlbumListSM statePager.currentPage: ${statePager.currentPage} savedPagerPage: ${vm.savedPagerPage} statePager ${statePager}\n" +
+                            "${vm}" +
+                            ""
+                )
+
+                if (statePager.currentPage == 9999){
+                    statePager.scrollToPage(vm.savedPagerPage)
+                }else
+                    vm.savedPagerPage = statePager.currentPage
+
                 val currentPage = statePager.currentPage
                 val pagesToLoad = setOf(
                     maxOf(0, currentPage - 1),
@@ -175,7 +183,9 @@ object ScreenLAlbumList {
                     }
                 },
                 scrimColor = Color.Transparent,
-                modifier = Modifier.padding(top = 4.dp).fillMaxSize()
+                modifier = Modifier
+                    .padding(top = 4.dp)
+                    .fillMaxSize()
             )
             {
                 Scaffold(
@@ -192,10 +202,7 @@ object ScreenLAlbumList {
 //                                label = "colorAnim"
 //                            )
                             Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(2.dp)
-                                    .background(Color(0xff0c94ff)), contentAlignment = Alignment.Center
+                                modifier = Modifier.fillMaxWidth().height(2.dp).background(Color(0xff0c94ff)), contentAlignment = Alignment.Center
                             ) {}
                         }
 
@@ -203,18 +210,12 @@ object ScreenLAlbumList {
                     bottomBar = {
                         AlbumListBottomBar(
                             onClickVisibleFilter = { scope.launch { drawerState.open() } },
-                            onClickPrev = { vm.loadPrevList() },
-                            onClickNext = { vm.loadNextList() },
-                            currentPage = statePager.currentPage,
-                            totalPages = info?.totalPages ?: 1,
+                            currentPage = statePager.currentPage, totalPages = info?.totalPages ?: 1,
                             onChange = {
-                                scope.launch {
-                                    statePager.scrollToPage(it)
-                                }
+                                scope.launch { statePager.scrollToPage(it) }
                                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                 vm.loadAlbumList(it)
                             }
-
                         )
                     },
                     containerColor = ThemeL.greyBackground
@@ -223,62 +224,33 @@ object ScreenLAlbumList {
 
                     HorizontalPager(
                         statePager,
-                        Modifier
-                            .padding(bottom = padding.calculateBottomPadding())
-                            .fillMaxSize(),
-                        beyondViewportPageCount = 1
+                        Modifier.padding(bottom = padding.calculateBottomPadding()).fillMaxSize(),
+                        beyondViewportPageCount = 1,
+                        // Добавляем ключ для страниц пейджера
+                        key = { page -> "${key}_page_$page" }
                     )
                     { page ->
 
                         val items = bigList[page]?.items
 
-                        // Wrap LazyVerticalGrid with PullToRefreshBox
-                        PullToRefreshBox(
-                            isRefreshing = isRefreshing,
-                            onRefresh = {
-                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                //vm.refreshData()
-                            },
-                            indicator = {
-                                Indicator(
-                                    modifier = Modifier
-                                        .align(Alignment.TopCenter)
-                                        .size(48.dp),
-                                    isRefreshing = isRefreshing,
-                                    state = pullToRefreshState,
-                                    containerColor = ThemeL.grey3,
-                                    maxDistance = (96 + 54).dp
-                                )
-                            },
-                            state = pullToRefreshState,
-                            modifier = Modifier.fillMaxSize()//.padding(bottom = padding.calculateBottomPadding())
-                        )
-                        {
 
-                            val stateGrid = rememberLazyGridState()
+                        val stateGrid = rememberLazyGridState()
 
-                            LazyVerticalGridScrollbar(
-                                state = stateGrid,
-                                settings = ScrollbarSettings.Default.copy(
-                                    thumbUnselectedColor = Color(0xFFA3A3A3),
-                                    thumbSelectedColor = Color(0xFFB3B3B3),
-                                    thumbThickness = 3.dp,
-                                    scrollbarPadding = 0.dp,
-                                    alwaysShowScrollbar = true,
+                        LazyVerticalGridScrollbar(
+                            state = stateGrid,
+                            settings = ScrollbarSettings.Default.copy( thumbUnselectedColor = Color(0xFFA3A3A3), thumbSelectedColor = Color(0xFFB3B3B3),
+                                thumbThickness = 3.dp, scrollbarPadding = 0.dp, alwaysShowScrollbar = true )
+                        ) {
 
-                                    )
-                            ) {
+                            LazyVerticalGrid(
+                                state = stateGrid, modifier = Modifier.fillMaxSize(),
+                                columns = GridCells.Fixed(2)
+                            )
+                            {
 
-                                LazyVerticalGrid(
-                                    state = stateGrid,
-                                    modifier = Modifier.fillMaxSize(),
-                                    columns = GridCells.Fixed(2)
-                                )
-                                {
-
-//                                item(key = "dummy", span = { GridItemSpan(maxLineSpan) }) {
-//                                    Spacer( Modifier.height(48.dp) )
-//                                }
+                                item(key = "dummy", span = { GridItemSpan(maxLineSpan) }) {
+                                    Spacer(Modifier.height(48.dp))
+                                }
 
 //                                item(key = "page_selector", span = { GridItemSpan(maxLineSpan) })
 //                                {
@@ -298,59 +270,32 @@ object ScreenLAlbumList {
 //                                    }
 //                                }
 
-                                    items(
-                                        items?.size ?: 0,
-                                        key = { items?.get(it)?.id!! }) { index ->
-                                        val item = items?.get(index)
-                                        if (item != null) {
-                                            Box(
-                                                Modifier.padding(
-                                                    vertical = 4.dp,
-                                                    horizontal = 4.dp
-                                                ),
-                                                contentAlignment = Alignment.Center
+                                items(
+                                    items?.size ?: 0,
+                                    key = { items?.get(it)?.id!! }) { index ->
+                                    val item = items?.get(index)
+                                    if (item != null) {
+                                        Box(
+                                            Modifier.padding(
+                                                vertical = 4.dp,
+                                                horizontal = 4.dp
+                                            ),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            AlbumListItem(
+                                                title = item.title,
+                                                coverUrl = item.cover.url,
+                                                numberOfAnimatedPictures = item.numberOfAnimatedPictures,
+                                                numberOfPictures = item.numberOfPictures,
                                             ) {
-                                                AlbumListItem(
-                                                    title = item.title,
-                                                    coverUrl = item.cover.url,
-                                                    numberOfAnimatedPictures = item.numberOfAnimatedPictures,
-                                                    numberOfPictures = item.numberOfPictures,
-                                                ) {
-                                                    navigator.push(ScreenLAlbum(item.id.toLong()))
-                                                }
+                                                navigator.push(ScreenLAlbum(item.id.toLong()))
                                             }
                                         }
                                     }
-
-//                                item(
-//                                    key = "page_selector2",
-//                                    span = { GridItemSpan(maxLineSpan) }
-//                                ) {
-//                                    if (items?.isNotEmpty() == true && info != null) {
-//                                        AlbumListPageSelector(page, info.totalPages) {
-//                                            scope.launch {
-//                                                vm.state.scrollToItem(0)
-//                                                statePager.scrollToPage(it)
-//                                            }
-//                                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-//                                            vm.loadAlbumList(it)
-//                                        }
-//                                    }
-//                                }
-
                                 }
-
                             }
-
                         }
                     }
-
-//                    if  (isRequest)
-//                    {
-//                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
-//                            CircularProgressIndicator()
-//                        }
-//                    }
 
                 }
             }

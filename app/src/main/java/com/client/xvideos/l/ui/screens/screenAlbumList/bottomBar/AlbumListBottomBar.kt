@@ -35,8 +35,6 @@ import kotlinx.coroutines.CoroutineScope
 @Composable
 fun AlbumListBottomBar(
     onClickVisibleFilter: () -> Unit,
-    onClickPrev: () -> Unit,
-    onClickNext: () -> Unit,
     currentPage: Int,
     totalPages: Int,
     onChange: (Int) -> Unit = {}
@@ -104,39 +102,8 @@ fun AlbumListBottomBar(
 fun AlbumListBottomBarPreview() {
     AlbumListBottomBar(
         onClickVisibleFilter = {},
-        onClickPrev = {},
-        onClickNext = {},
         currentPage = 1,
         totalPages = 10,
         onChange = {}
     )
-}
-
-
-
-
-@Composable
-private fun ButtonRev(onClick: () -> Unit) {
-    Box(
-        modifier = Modifier
-            .height(46.dp)
-            .width(64.dp)
-            .background(ThemeL.red)
-            .clickable(onClick = onClick), contentAlignment = Alignment.Center
-    ) {
-        Icon(Icons.Default.KeyboardArrowLeft, tint = Color.White, contentDescription = null)
-    }
-}
-
-@Composable
-private fun ButtonNext(onClick: () -> Unit) {
-    Box(
-        modifier = Modifier
-            .height(46.dp)
-            .width(64.dp)
-            .background(ThemeL.red)
-            .clickable(onClick = onClick), contentAlignment = Alignment.Center
-    ) {
-        Icon(Icons.Default.KeyboardArrowRight, tint = Color.White, contentDescription = null)
-    }
 }
