@@ -64,12 +64,12 @@ fun KeyboardNumber(
         mutableStateOf(TextFieldValue(value.toString(), TextRange(value.toString().length)))
     }
 
-    Column{
+    Column {
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.width((300-8).dp)//.padding(end = 3.dp)//.fillMaxWidth()
+            modifier = Modifier.width((300 - 8).dp)//.padding(end = 3.dp)//.fillMaxWidth()
         ) {
             //Циферблат
             Box(
@@ -96,7 +96,7 @@ fun KeyboardNumber(
 
             }
 
-            Box( modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 Text(
                     "($max)",
                     color = theme.colorText,
@@ -113,45 +113,66 @@ fun KeyboardNumber(
             FlowRow(maxItemsInEachRow = 3) {
                 KeyboardButtonNumber(
                     "7",
-                    onClick = { textFieldValue = addCharToTextField(textFieldValue, "7") })
+                    onClick = { textFieldValue = addCharToTextField(textFieldValue, "7") },
+                    theme = theme
+                )
                 KeyboardButtonNumber(
                     "8",
-                    onClick = { textFieldValue = addCharToTextField(textFieldValue, "8") })
+                    onClick = { textFieldValue = addCharToTextField(textFieldValue, "8") },
+                    theme = theme
+                )
                 KeyboardButtonNumber(
                     "9",
-                    onClick = { textFieldValue = addCharToTextField(textFieldValue, "9") })
+                    onClick = { textFieldValue = addCharToTextField(textFieldValue, "9") },
+                    theme = theme
+                )
 
                 KeyboardButtonNumber(
                     "4",
-                    onClick = { textFieldValue = addCharToTextField(textFieldValue, "4") })
+                    onClick = { textFieldValue = addCharToTextField(textFieldValue, "4") },
+                    theme = theme
+                )
                 KeyboardButtonNumber(
                     "5",
-                    onClick = { textFieldValue = addCharToTextField(textFieldValue, "5") })
+                    onClick = { textFieldValue = addCharToTextField(textFieldValue, "5") },
+                    theme = theme
+                )
                 KeyboardButtonNumber(
                     "6",
-                    onClick = { textFieldValue = addCharToTextField(textFieldValue, "6") })
+                    onClick = { textFieldValue = addCharToTextField(textFieldValue, "6") },
+                    theme = theme
+                )
 
                 KeyboardButtonNumber(
                     "1",
-                    onClick = { textFieldValue = addCharToTextField(textFieldValue, "1") })
+                    onClick = { textFieldValue = addCharToTextField(textFieldValue, "1") },
+                    theme = theme
+                )
                 KeyboardButtonNumber(
                     "2",
-                    onClick = { textFieldValue = addCharToTextField(textFieldValue, "2") })
+                    onClick = { textFieldValue = addCharToTextField(textFieldValue, "2") },
+                    theme = theme
+                )
                 KeyboardButtonNumber(
                     "3",
-                    onClick = { textFieldValue = addCharToTextField(textFieldValue, "3") })
+                    onClick = { textFieldValue = addCharToTextField(textFieldValue, "3") },
+                    theme = theme
+                )
 
                 KeyboardButtonNumber(
                     "C",
-                    onClick = { textFieldValue = TextFieldValue("", TextRange(0)) })
+                    onClick = { textFieldValue = TextFieldValue("", TextRange(0)) }, theme = theme
+                )
                 KeyboardButtonNumber(
                     "0",
-                    onClick = { textFieldValue = addCharToTextField(textFieldValue, "0") })
+                    onClick = { textFieldValue = addCharToTextField(textFieldValue, "0") },
+                    theme = theme
+                )
                 KeyboardButtonNumber("<-", onClick = {
                     val newText = textFieldValue.text.dropLast(1)
                     val newCursorPosition = newText.length
                     textFieldValue = TextFieldValue(newText, TextRange(newCursorPosition))
-                })
+                }, theme = theme)
             }
 
             //Энтер
@@ -200,6 +221,6 @@ private fun addCharToTextField(textFieldValue: TextFieldValue, char: String): Te
 
 @Preview
 @Composable
-private fun Prev(){
+private fun Prev() {
     KeyboardNumber(5, 10, onClick = {})
 }

@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.screens.common.bottomKeyboard.KeyboardNumber
+import com.client.xvideos.screens.common.bottomKeyboard.KeyboardNumberTheme
 
 @Preview
 @Composable
@@ -145,13 +146,21 @@ fun AlbumListPageSelector(
         Dialog(onDismissRequest = { expanded = false }) {
             Box(
                 modifier = Modifier
-                    .padding(16.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(ThemeL.lavender), contentAlignment = Alignment.Center
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(Color(0xFF1f1f1f))
+                    .padding(16.dp), contentAlignment = Alignment.Center
             )
             {
                 KeyboardNumber(
-                    value = page, max = pageMax,
+
+                    theme = KeyboardNumberTheme(
+                        colorBackground = Color(0xFF414141)
+                        , colorText = Color(0xFFFFFFFF)
+                        , buttonColor = Color(0xFF606060)
+
+                    ),
+
+                    value = page+1, max = pageMax,
                     onClick = {
                         onChange(it - 1)
                         //expanded = false

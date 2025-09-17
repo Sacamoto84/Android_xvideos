@@ -24,19 +24,26 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import com.client.xvideos.l.theme.ThemeL
+import com.client.xvideos.l.ui.screens.screenAlbumList.atom.AlbumListPageSelector
 import com.client.xvideos.redgifs.common.ThemeRed
+import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun AlbumListBottomBar(
     onClickVisibleFilter: () -> Unit,
     onClickPrev: () -> Unit,
-    onClickNext: () -> Unit
+    onClickNext: () -> Unit,
+    currentPage: Int,
+    totalPages: Int,
+    onChange: (Int) -> Unit = {}
 ) {
     Column {
         HorizontalDivider()
+
         Row(
             modifier = Modifier
                 .padding(start = 4.dp)
@@ -60,16 +67,20 @@ fun AlbumListBottomBar(
                 Icon(Icons.Default.FilterList, contentDescription = null, tint = Color.White)
             }
 
-            Row {
-                ButtonRev(onClick = onClickPrev)
-                Spacer(Modifier.width(4.dp))
-                ButtonNext(onClick = onClickNext)
-                Spacer(Modifier.width(4.dp))
+            Box(modifier = Modifier.weight(1f)) {
+                AlbumListPageSelector(currentPage, totalPages) { onChange(it) }
             }
+
+//            Row {
+//                ButtonRev(onClick = onClickPrev)
+//                Spacer(Modifier.width(4.dp))
+//                ButtonNext(onClick = onClickNext)
+//                Spacer(Modifier.width(4.dp))
+//            }
 
             Box(
                 modifier = Modifier
-                    .padding(end = 4.dp)
+                    .padding(start = 4.dp, end = 4.dp)
                     .width(46.dp)
                     .height(46.dp)
                     .border(2.dp, Color(0xFF434343), RoundedCornerShape(4.dp))
@@ -91,8 +102,17 @@ fun AlbumListBottomBar(
 @Preview
 @Composable
 fun AlbumListBottomBarPreview() {
-    AlbumListBottomBar(onClickVisibleFilter = {}, {}, {})
+    AlbumListBottomBar(
+        onClickVisibleFilter = {},
+        onClickPrev = {},
+        onClickNext = {},
+        currentPage = 1,
+        totalPages = 10,
+        onChange = {}
+    )
 }
+
+
 
 
 @Composable

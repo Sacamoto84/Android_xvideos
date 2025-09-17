@@ -48,6 +48,8 @@ import com.client.xvideos.l.ui.screens.screenAlbumList.atom.AlbumListPageSelecto
 import com.client.xvideos.l.ui.screens.screenAlbumList.bottomBar.AlbumListBottomBar
 import com.client.xvideos.l.ui.screens.screenAlbumList.molecule.filter.AlbumListFilter
 import kotlinx.coroutines.launch
+import my.nanihadesuka.compose.LazyVerticalGridScrollbar
+import my.nanihadesuka.compose.ScrollbarSettings
 import net.engawapg.lib.zoomable.ExperimentalZoomableApi
 
 object ScreenLAlbumList {
@@ -178,7 +180,17 @@ object ScreenLAlbumList {
                         AlbumListBottomBar(
                             onClickVisibleFilter = { scope.launch { drawerState.open() } },
                             onClickPrev = { vm.loadPrevList() },
-                            onClickNext = { vm.loadNextList() }
+                            onClickNext = { vm.loadNextList() },
+                            currentPage = statePager.currentPage,
+                            totalPages = info?.totalPages ?: 1,
+                            onChange = {
+                                scope.launch {
+                                    statePager.scrollToPage(it)
+                                }
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                vm.loadAlbumList(it)
+                            }
+
                         )
                     },
                     containerColor = ThemeL.greyBackground
@@ -187,7 +199,10 @@ object ScreenLAlbumList {
 
                     HorizontalPager(
                         statePager,
-                        Modifier.padding(bottom = padding.calculateBottomPadding()).fillMaxSize(), beyondViewportPageCount = 1
+                        Modifier
+                            .padding(bottom = padding.calculateBottomPadding())
+                            .fillMaxSize(),
+                        beyondViewportPageCount = 1
                     ) { page ->
 
                         val items = bigList[page]?.items
@@ -214,68 +229,95 @@ object ScreenLAlbumList {
                             modifier = Modifier.fillMaxSize()//.padding(bottom = padding.calculateBottomPadding())
                         )
                         {
-                            LazyVerticalGrid(
-                                state = rememberLazyGridState(),
-                                modifier = Modifier.fillMaxSize(),
-                                columns = GridCells.Fixed(2)
+
+
+                           val  stateGrid = rememberLazyGridState()
+
+                            LazyVerticalGridScrollbar(
+                                state = stateGrid,
+                                settings = ScrollbarSettings.Default.copy(
+                                    thumbUnselectedColor = Color(0xFFA3A3A3),
+                                    thumbSelectedColor = Color(0xFFB3B3B3),
+                                    thumbThickness = 3.dp,
+                                    scrollbarPadding = 0.dp,
+                                    alwaysShowScrollbar = true,
+
+                                )
                             ) {
-                                item(key = "dummy", span = { GridItemSpan(maxLineSpan) }) {
-                                    Spacer( Modifier.height(48.dp) )
-                                }
 
-                                item(key = "page_selector", span = { GridItemSpan(maxLineSpan) })
+                                LazyVerticalGrid(
+                                    state = stateGrid,
+                                    modifier = Modifier.fillMaxSize(),
+                                    columns = GridCells.Fixed(2)
+                                )
                                 {
-                                    if (info != null) {
-                                        Box(
-                                            Modifier.padding(vertical = 4.dp, horizontal = 4.dp),
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            AlbumListPageSelector(page, info.totalPages) {
-                                                scope.launch {
-                                                    statePager.scrollToPage(it)
-                                                }
-                                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                                vm.loadAlbumList(it)
-                                            }
-                                        }
-                                    }
-                                }
 
-                                items(items?.size ?: 0, key = { items?.get(it)?.id!! }) { index ->
-                                    val item = items?.get(index)
-                                    if (item != null) {
-                                        Box(
-                                            Modifier.padding(vertical = 4.dp, horizontal = 4.dp),
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            AlbumListItem(
-                                                title = item.title,
-                                                coverUrl = item.cover.url,
-                                                numberOfAnimatedPictures = item.numberOfAnimatedPictures,
-                                                numberOfPictures = item.numberOfPictures,
+//                                item(key = "dummy", span = { GridItemSpan(maxLineSpan) }) {
+//                                    Spacer( Modifier.height(48.dp) )
+//                                }
+
+//                                item(key = "page_selector", span = { GridItemSpan(maxLineSpan) })
+//                                {
+//                                    if (info != null) {
+//                                        Box(
+//                                            Modifier.padding(vertical = 4.dp, horizontal = 4.dp),
+//                                            contentAlignment = Alignment.Center
+//                                        ) {
+//                                            AlbumListPageSelector(page, info.totalPages) {
+//                                                scope.launch {
+//                                                    statePager.scrollToPage(it)
+//                                                }
+//                                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+//                                                vm.loadAlbumList(it)
+//                                            }
+//                                        }
+//                                    }
+//                                }
+
+                                    items(
+                                        items?.size ?: 0,
+                                        key = { items?.get(it)?.id!! }) { index ->
+                                        val item = items?.get(index)
+                                        if (item != null) {
+                                            Box(
+                                                Modifier.padding(
+                                                    vertical = 4.dp,
+                                                    horizontal = 4.dp
+                                                ),
+                                                contentAlignment = Alignment.Center
                                             ) {
-                                                navigator.push(ScreenLAlbum(item.id.toLong()))
+                                                AlbumListItem(
+                                                    title = item.title,
+                                                    coverUrl = item.cover.url,
+                                                    numberOfAnimatedPictures = item.numberOfAnimatedPictures,
+                                                    numberOfPictures = item.numberOfPictures,
+                                                ) {
+                                                    navigator.push(ScreenLAlbum(item.id.toLong()))
+                                                }
                                             }
                                         }
                                     }
+
+//                                item(
+//                                    key = "page_selector2",
+//                                    span = { GridItemSpan(maxLineSpan) }
+//                                ) {
+//                                    if (items?.isNotEmpty() == true && info != null) {
+//                                        AlbumListPageSelector(page, info.totalPages) {
+//                                            scope.launch {
+//                                                vm.state.scrollToItem(0)
+//                                                statePager.scrollToPage(it)
+//                                            }
+//                                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+//                                            vm.loadAlbumList(it)
+//                                        }
+//                                    }
+//                                }
+
                                 }
 
-                                item(
-                                    key = "page_selector2",
-                                    span = { GridItemSpan(maxLineSpan) }
-                                ) {
-                                    if (items?.isNotEmpty() == true && info != null) {
-                                        AlbumListPageSelector(page, info.totalPages) {
-                                            scope.launch {
-                                                vm.state.scrollToItem(0)
-                                                statePager.scrollToPage(it)
-                                            }
-                                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                            vm.loadAlbumList(it)
-                                        }
-                                    }
-                                }
                             }
+
                         }
                     }
                 }
