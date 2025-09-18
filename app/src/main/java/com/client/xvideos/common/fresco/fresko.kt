@@ -28,6 +28,7 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -36,10 +37,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
+import com.client.xvideos.R
 import com.client.xvideos.common.AppPath
 import com.client.xvideos.l.theme.ThemeL
 import com.facebook.common.executors.UiThreadImmediateExecutorService
@@ -91,7 +94,7 @@ fun UrlImageLusciousGifsGlide(
     val stableOnSuccess = rememberUpdatedState(onSuccess)
     val stableOnFailure = rememberUpdatedState(onFailure)
 
-    var progress by remember { mutableFloatStateOf(0f) }
+    var progress by rememberSaveable { mutableFloatStateOf(0f) }
 
     var displayProgress by remember { mutableLongStateOf(0L) }
 
@@ -305,13 +308,17 @@ fun UrlImageLusciousGifsGlide(
         }
 
 
+        //Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomEnd) {
+
+        Box(modifier = Modifier.align(Alignment.BottomEnd)) {
+            if (displayProgress > 1000) {
+                ProgressText(progress = displayProgress)
+            }
+        }
+
     }
 
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomEnd) {
-        if (displayProgress > 1000) {
-            ProgressText(progress = displayProgress)
-        }
-    }
+
 
     DisposableEffect(Unit) {
         onDispose {

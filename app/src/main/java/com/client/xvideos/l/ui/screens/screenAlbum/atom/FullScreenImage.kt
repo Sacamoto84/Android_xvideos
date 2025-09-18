@@ -1,6 +1,7 @@
 package com.client.xvideos.l.ui.screens.screenAlbum.atom
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.layout.LazyLayoutCacheWindow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -74,15 +76,11 @@ class FullScreenImage(
 
     override val key: ScreenKey = uniqueScreenKey
 
+    @OptIn(ExperimentalFoundationApi::class)
     @Composable
     override fun Content() {
 
         val navigator = LocalNavigator.currentOrThrow
-
-        val density = LocalDensity.current
-        val configuration = LocalConfiguration.current
-        val screenWidthPx = with(density) { configuration.screenWidthDp.dp.toPx() }
-        val screenHeightPx = with(density) { configuration.screenHeightDp.dp.toPx() }
 
         var isClosing by remember { mutableStateOf(false) }
 
@@ -91,6 +89,15 @@ class FullScreenImage(
         val coroutineScope = rememberCoroutineScope()
 
         var rotate by remember { mutableStateOf(false) }
+
+        val zoomState = rememberZoomState()
+        val pagerState = rememberPagerState(
+            filteredPic.indexOf(item).coerceIn(0, filteredPic.lastIndex),
+            pageCount = { filteredPic.size }
+        )
+
+        // Состояние для LazyRow
+        val lazyRowState = rememberLazyListState(cacheWindow = LazyLayoutCacheWindow(ahead = 200.dp, behind = 200.dp))
 
         LaunchedEffect(isClosing) {
             if (isClosing) {
@@ -105,15 +112,6 @@ class FullScreenImage(
         BackHandler {
             isClosing = true
         }
-
-        val zoomState = rememberZoomState()
-        val pagerState = rememberPagerState(
-            filteredPic.indexOf(item).coerceIn(0, filteredPic.lastIndex),
-            pageCount = { filteredPic.size }
-        )
-
-        // Состояние для LazyRow
-        val lazyRowState = rememberLazyListState()
 
         // Текущий индекс из pagerState
         val currentIndex = pagerState.currentPage
@@ -187,7 +185,7 @@ class FullScreenImage(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .border(2.dp, Color.Magenta)
+                        //.border(2.dp, Color.Magenta)
                         .aspectRatio(
                             if (rotate) (pageItem.height.toFloat() / pageItem.width) else (pageItem.width.toFloat() / pageItem.height),
                             matchHeightConstraintsFirst = false
