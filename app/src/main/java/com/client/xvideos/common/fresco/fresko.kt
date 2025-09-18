@@ -37,12 +37,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
-import com.client.xvideos.R
 import com.client.xvideos.common.AppPath
 import com.client.xvideos.l.theme.ThemeL
 import com.facebook.common.executors.UiThreadImmediateExecutorService
@@ -68,7 +66,7 @@ import kotlin.math.roundToInt
 
 @OptIn(InternalLandscapistApi::class, InternalAPI::class, FlowPreview::class)
 @Composable
-fun UrlImageLusciousGifsGlide(
+fun UrlImageGifsFresco(
     url: String,
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Crop,
@@ -318,8 +316,6 @@ fun UrlImageLusciousGifsGlide(
 
     }
 
-
-
     DisposableEffect(Unit) {
         onDispose {
             DownloadQueueManager.cancelDownload(url)
@@ -329,11 +325,6 @@ fun UrlImageLusciousGifsGlide(
 
 @Composable
 private fun ProgressText(progress: Long) {
-
-    SideEffect {
-        Timber.i("!!! UrlImageLusciousGifsGlide ProgressText progress:{$progress}")
-    }
-
     if (progress > 1000) {
         Text(
             formatBytes1(progress),

@@ -31,9 +31,9 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.common.fresco.DownloadQueueManager
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.model.PicsDetails
-import com.client.xvideos.l.ui.screens.screenAlbum.atom.FullScreenImage
+import com.client.xvideos.l.ui.screens.screenFullScreen.FullScreenImage
 import com.client.xvideos.l.ui.screens.LocalRootLScreenModel
-import com.client.xvideos.common.fresco.UrlImageLusciousGifsGlide
+import com.client.xvideos.common.fresco.UrlImageGifsFresco
 import com.client.xvideos.common.sharedPref.Settings
 import com.client.xvideos.redgifs.ui.profile.atom.VerticalScrollbar
 import com.client.xvideos.redgifs.ui.profile.rememberVisibleRangePercentIgnoringFirstNForLazyStaggeredGrid
@@ -91,7 +91,7 @@ fun LazyRowPictureDetails(
                                 ?: item.url_to_original
                         } //"small" large_thumbnail
 
-                        UrlImageLusciousGifsGlide(
+                        UrlImageGifsFresco(
                             url,
                             modifier = Modifier
                                 .padding(2.dp).aspectRatio(aspect).clipToBounds().border(0.5.dp, Color.Gray)

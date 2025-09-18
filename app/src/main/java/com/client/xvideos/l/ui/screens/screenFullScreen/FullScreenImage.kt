@@ -1,17 +1,14 @@
-package com.client.xvideos.l.ui.screens.screenAlbum.atom
+package com.client.xvideos.l.ui.screens.screenFullScreen
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
@@ -21,6 +18,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,34 +28,28 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.graphics.shapes.rectangle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.client.xvideos.common.fresco.UrlImageLusciousGifsGlide
-import com.client.xvideos.common.urlVideImage.UrlImageCoil
+import com.client.xvideos.common.fresco.UrlImageGifsFresco
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.model.PicsDetails
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.engawapg.lib.zoomable.ZoomState
@@ -76,7 +68,9 @@ class FullScreenImage(
 
     override val key: ScreenKey = uniqueScreenKey
 
-    @OptIn(ExperimentalFoundationApi::class)
+    @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class,
+        DelicateCoroutinesApi::class
+    )
     @Composable
     override fun Content() {
 
@@ -142,7 +136,7 @@ class FullScreenImage(
             }
 
             // Прокручиваем LazyRow к текущему элементу
-            lazyRowState.animateScrollToItem((currentIndex - 1).coerceIn(0, filteredPic.size - 1))
+            lazyRowState.animateScrollToItem((currentIndex - 2).coerceIn(0, filteredPic.size - 1))
 
         }
 
@@ -196,7 +190,7 @@ class FullScreenImage(
                 )
                 {
 
-                    UrlImageLusciousGifsGlide(
+                    UrlImageGifsFresco(
                         rotate = rotate,
                         contentScale = ContentScale.Fit ,
                         url = pageItem.url_to_original!!,
@@ -231,67 +225,82 @@ class FullScreenImage(
 
 
 
-            Button(onClick = {
-                rotate = rotate.not()
-            }, modifier = Modifier.padding(top = 48.dp)) {
-                Text(rotate.toString())
-            }
+            Button(onClick = { rotate = rotate.not() }, modifier = Modifier.padding(top = 48.dp)) { Text(rotate.toString()) }
 
             Box(modifier = Modifier.align(Alignment.TopStart)) {
                 Text(
-                    currentIndex.toString(),
-                    color = Color.Gray,
-                    modifier = Modifier.padding(start = 8.dp), fontFamily = ThemeL.fontFamilyKarla
+                    currentIndex.toString(), color = Color.Gray, modifier = Modifier.padding(start = 8.dp), fontFamily = ThemeL.fontFamilyKarla
                 )
             }
 
-            Box(modifier = Modifier.align(Alignment.TopEnd)) {
-                expandMenu(item)
-            }
+            Box(modifier = Modifier.align(Alignment.TopEnd)) { expandMenu(item) }
 
-            Column(modifier = Modifier.align(Alignment.BottomCenter)) {
-                LazyRow(
-                    state = lazyRowState,
-                    modifier = Modifier.height(72.dp),
-                ) {
+            val coroutineScope = rememberCoroutineScope()
 
-                    itemsIndexed(
-                        filteredPic,
-                        key = { _, item -> item.url_to_original!! }) { index, it1 ->
-                        Box(
-                            modifier = Modifier
-                                .padding(horizontal = 1.dp)
-                                .clip(RoundedCornerShape(4.dp))
-                                .aspectRatio(it1.width.toFloat() / it1.height)
-                                .clickable(onClick = {
-                                    dataItem = it1
-                                    corruptCancel = true
-                                })
-                                .border(
-                                    2.dp,
-                                    if (index == currentIndex) Color.Yellow else Color.Transparent,
-                                    RoundedCornerShape(4.dp)
+            SwipeableBottomPanel { swipeableState , hiddenOffset ->
+
+                Box(modifier = Modifier.align(Alignment.BottomCenter)) {
+                    LazyRow(
+                        state = lazyRowState,
+                        modifier = Modifier
+                            .height(72.dp)
+
+                            .pointerInput(Unit) {
+                                detectVerticalDragGestures(
+                                    onVerticalDrag = { change, dragAmount ->
+                                        swipeableState.performDrag(dragAmount)
+                                        change.consume()
+                                    },
+                                    onDragEnd = {
+                                        val targetState = if (swipeableState.offset.value < hiddenOffset / 2) 0 else 1
+                                        coroutineScope.launch {
+                                            swipeableState.animateTo(targetState)
+                                        }
+                                    }
                                 )
-                                .padding(2.dp)
-                        ) {
-                            UrlImageLusciousGifsGlide(
-                                url = it1.url_to_original!!,
+                            }
+
+
+                    ) {
+                        itemsIndexed(
+                            filteredPic,
+                            key = { _, item -> item.url_to_original!! }) { index, it1 ->
+                            Box(
                                 modifier = Modifier
+                                    .padding(horizontal = 1.dp)
                                     .clip(RoundedCornerShape(4.dp))
-                                    .fillMaxSize(),
-                                contentScale = ContentScale.FillBounds,
-                                onSuccess = { },
-                                albumName = albumName,
-                                autoPlay = false,
-                                isAnimated = it1.is_animated,
-                                sizeButton = 20.dp,
-                                sizeButtonIcon = 12.dp
-                            )
+                                    .aspectRatio(it1.width.toFloat() / it1.height)
+                                    .clickable(onClick = {
+                                        dataItem = it1
+                                        corruptCancel = true
+                                    })
+                                    .border(
+                                        2.dp,
+                                        if (index == currentIndex) Color.Yellow else Color.Transparent,
+                                        RoundedCornerShape(4.dp)
+                                    )
+                                    .padding(2.dp)
+                            ) {
+                                UrlImageGifsFresco(
+                                    url = it1.url_to_original!!,
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(4.dp))
+                                        .fillMaxSize(),
+                                    contentScale = ContentScale.FillBounds,
+                                    onSuccess = { },
+                                    albumName = albumName,
+                                    autoPlay = false,
+                                    isAnimated = it1.is_animated,
+                                    sizeButton = 20.dp,
+                                    sizeButtonIcon = 12.dp
+                                )
+                            }
                         }
                     }
                 }
 
             }
+
         }
     }
 }
