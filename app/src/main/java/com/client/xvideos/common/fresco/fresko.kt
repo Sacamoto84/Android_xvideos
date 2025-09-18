@@ -1,11 +1,6 @@
 package com.client.xvideos.common.fresco
 
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Matrix
 import android.graphics.drawable.Animatable
-import android.graphics.drawable.AnimationDrawable
-import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -26,17 +21,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
@@ -52,27 +48,22 @@ import com.facebook.datasource.BaseDataSubscriber
 import com.facebook.datasource.DataSource
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.controller.BaseControllerListener
-import com.facebook.drawee.view.SimpleDraweeView
-import com.facebook.fresco.animation.backend.AnimationBackend
-import com.facebook.fresco.animation.drawable.AnimatedDrawable2
-import com.facebook.imagepipeline.animated.base.AnimatedImageResult
-import com.facebook.imagepipeline.bitmaps.PlatformBitmapFactory
 import com.facebook.imagepipeline.common.RotationOptions
 import com.facebook.imagepipeline.image.CloseableImage
 import com.facebook.imagepipeline.image.ImageInfo
-import com.facebook.imagepipeline.request.BasePostprocessor
 import com.facebook.imagepipeline.request.ImageRequest
 import com.facebook.imagepipeline.request.ImageRequestBuilder
 import com.skydoves.landscapist.InternalLandscapistApi
 import com.skydoves.landscapist.fresco.websupport.FrescoWebImage
 import io.ktor.utils.io.InternalAPI
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.debounce
 import timber.log.Timber
 import java.io.File
-import java.lang.reflect.Proxy
 import kotlin.math.roundToInt
 
-@OptIn(InternalLandscapistApi::class, InternalAPI::class)
+@OptIn(InternalLandscapistApi::class, InternalAPI::class, FlowPreview::class)
 @Composable
 fun UrlImageLusciousGifsGlide(
     url: String,
@@ -88,15 +79,34 @@ fun UrlImageLusciousGifsGlide(
     sizeButtonIcon: Dp = 24.dp,
     rotate: Boolean = false
 ) {
+
+    SideEffect {
+        Timber.i("!!! UrlImageLusciousGifsGlide url:{$url}")
+    }
+
     var isPlaying by remember { mutableStateOf(autoPlay) }
     var isLoading by remember { mutableStateOf(true) }
     var isFailure by remember { mutableStateOf(false) }
 
     val stableOnSuccess = rememberUpdatedState(onSuccess)
     val stableOnFailure = rememberUpdatedState(onFailure)
-    var progress by rememberSaveable { mutableFloatStateOf(0f) }
 
-    val dataSource = remember(url) {
+    var progress by remember { mutableFloatStateOf(0f) }
+
+    var displayProgress by remember { mutableLongStateOf(0L) }
+
+    LaunchedEffect(Unit) {
+        snapshotFlow { progress.toLong() }
+            //.distinctUntilChanged()       // обновляем только при изменении числа
+            .debounce(100)                // не чаще раза в 200мс
+            .collect { newValue ->
+                displayProgress = newValue
+            }
+    }
+
+
+    val dataSource = remember(url)
+    {
         val fileName = url.substringAfterLast('/').substringBefore('?')
         val file = when (albumName) {
             "likes", "crypto" -> File(url)
@@ -106,7 +116,8 @@ fun UrlImageLusciousGifsGlide(
         else url.toUri()
     }
 
-    val imageRequest = remember(dataSource, rotate) {
+    val imageRequest = remember(dataSource, rotate)
+    {
 
         val builder = ImageRequestBuilder
             .newBuilderWithSource(dataSource)
@@ -115,47 +126,11 @@ fun UrlImageLusciousGifsGlide(
 
         // Применяем поворот на уровне запроса
         if (rotate) {
-            if (!isAnimated)
-                builder.setRotationOptions(RotationOptions.forceRotation(RotationOptions.ROTATE_90))
-           // else
-           // {
-//                val rotationPostprocessor = object : BasePostprocessor()
-//                {
-//
-//                    override fun process(
-//                        sourceBitmap: Bitmap,
-//                        bitmapFactory: PlatformBitmapFactory
-//                    ): CloseableReference<Bitmap> {
-//                        return try {
-//                            val matrix = Matrix().apply { postRotate(90f) }
-//
-//                            val rotated = Bitmap.createBitmap(
-//                                sourceBitmap,
-//                                0, 0,
-//                                sourceBitmap.width,
-//                                sourceBitmap.height,
-//                                matrix,
-//                                true
-//                            )
-//
-//                            // Теперь создаём "копию" внутри Fresco
-//                            val ref = bitmapFactory.createBitmap( rotated.width, rotated.height )
-//
-//                            val canvas = Canvas(ref.get())
-//                            canvas.drawBitmap(rotated, 0f, 0f, null)
-//
-//                            rotated.recycle() // освобождаем временный
-//
-//                            ref
-//                        } catch (e: Exception) {
-//                            Timber.e(e, "Error rotating bitmap")
-//                            super.process(sourceBitmap, bitmapFactory)
-//                        }
-//                    }
-//                }
-//                 builder.setPostprocessor(rotationPostprocessor)
-
-           // }
+            if (!isAnimated) builder.setRotationOptions(
+                RotationOptions.forceRotation(
+                    RotationOptions.ROTATE_90
+                )
+            )
         }
 
         val imageRequest = builder.build()
@@ -183,7 +158,8 @@ fun UrlImageLusciousGifsGlide(
     }
 
     var animation: Animatable? by remember { mutableStateOf(null) }
-    LaunchedEffect(animation, isPlaying) {
+    LaunchedEffect(animation, isPlaying)
+    {
         if (isPlaying) {
             animation?.start()
         } else {
@@ -191,7 +167,8 @@ fun UrlImageLusciousGifsGlide(
         }
     }
 
-    val controllerListener = remember(url) {
+    val controllerListener = remember(url)
+    {
         object : BaseControllerListener<ImageInfo>() {
             override fun onSubmit(id: String?, callerContext: Any?) {
                 isLoading = true; isFailure = false
@@ -223,42 +200,48 @@ fun UrlImageLusciousGifsGlide(
         isControllerReady = true
     }
 
-//        .graphicsLayer(
-//            rotationZ = if (rotate) 90f else 0f,
-//            scaleX = if (rotate) 0.2f else 1f,
-//            clip = false
-//        )
-
-
-    BoxWithConstraints( modifier = Modifier.fillMaxSize().then(modifier), contentAlignment = Alignment.Center ) {
+    BoxWithConstraints(
+        modifier = Modifier.fillMaxSize().then(modifier),
+        contentAlignment = Alignment.Center
+    ) {
 
         val w = maxWidth
         val h = maxHeight
 
-        if (isAnimated)
-            Timber.i("!!! UrlImageLusciousGifsGlide w:{$w} h:{$h}")
+        if (isAnimated) Timber.i("!!! UrlImageLusciousGifsGlide w:{$w} h:{$h}")
 
         if (isControllerReady) {
 
-                FrescoWebImage(
-                    controllerBuilder = {
-                        Fresco.newDraweeControllerBuilder()
-                            .setImageRequest(imageRequest)
-                            .setAutoPlayAnimations(true)
-                            .setControllerListener(controllerListener)
-                            .setOldController(null)
-                    },
-                    contentScale = contentScale,
-                    modifier = Modifier
-                        .background(ThemeL.grey5)
-                        .graphicsLayer(
-                            rotationZ = if (rotate) 90f else 0f,
-                            scaleX = if (rotate) { if (h>w) h/w else w/h }else {1f},
-                            scaleY = if (rotate) { if (h>w) h/w else w/h }else {1f},
-                        )
-                        .fillMaxSize()
-
-                )
+            FrescoWebImage(
+                controllerBuilder = {
+                    Fresco.newDraweeControllerBuilder()
+                        .setImageRequest(imageRequest)
+                        .setAutoPlayAnimations(true)
+                        .setControllerListener(controllerListener)
+                        .setOldController(null)
+                },
+                contentScale = contentScale,
+                modifier = Modifier
+                    .background(ThemeL.grey5)
+                    .then(
+                        if (isAnimated) {
+                            Modifier.graphicsLayer(
+                                rotationZ = if (rotate) 90f else 0f,
+                                scaleX = if (rotate) {
+                                    if (h > w) h / w else w / h
+                                } else {
+                                    1f
+                                },
+                                scaleY = if (rotate) {
+                                    if (h > w) h / w else w / h
+                                } else {
+                                    1f
+                                },
+                            )
+                        } else Modifier
+                    )
+                    .fillMaxSize()
+            )
 
             // Индикаторы загрузки и ошибки
             if (isLoading && loadIndicator) {
@@ -321,16 +304,12 @@ fun UrlImageLusciousGifsGlide(
             ) {}
         }
 
-        if (progress > 1000) {
-            Text(
-                formatBytes1(progress.toLong()),
-                color = Color.White,
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .offset((-1).dp, 7.dp),
-                fontFamily = ThemeL.fontFamilyKarla,
-                fontSize = 9.sp
-            )
+
+    }
+
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomEnd) {
+        if (displayProgress > 1000) {
+            ProgressText(progress = displayProgress)
         }
     }
 
@@ -338,6 +317,24 @@ fun UrlImageLusciousGifsGlide(
         onDispose {
             DownloadQueueManager.cancelDownload(url)
         }
+    }
+}
+
+@Composable
+private fun ProgressText(progress: Long) {
+
+    SideEffect {
+        Timber.i("!!! UrlImageLusciousGifsGlide ProgressText progress:{$progress}")
+    }
+
+    if (progress > 1000) {
+        Text(
+            formatBytes1(progress),
+            color = Color.White,
+            modifier = Modifier.offset((-1).dp, 7.dp),
+            fontFamily = ThemeL.fontFamilyKarla,
+            fontSize = 9.sp
+        )
     }
 }
 
