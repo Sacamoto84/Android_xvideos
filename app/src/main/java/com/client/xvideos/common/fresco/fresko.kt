@@ -10,6 +10,7 @@ import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -114,45 +115,45 @@ fun UrlImageLusciousGifsGlide(
 
         // Применяем поворот на уровне запроса
         if (rotate) {
-           // if (!isAnimated)
-           //     builder.setRotationOptions(RotationOptions.forceRotation(RotationOptions.ROTATE_90))
+            if (!isAnimated)
+                builder.setRotationOptions(RotationOptions.forceRotation(RotationOptions.ROTATE_90))
            // else
            // {
-                val rotationPostprocessor = object : BasePostprocessor()
-                {
-
-                    override fun process(
-                        sourceBitmap: Bitmap,
-                        bitmapFactory: PlatformBitmapFactory
-                    ): CloseableReference<Bitmap> {
-                        return try {
-                            val matrix = Matrix().apply { postRotate(90f) }
-
-                            val rotated = Bitmap.createBitmap(
-                                sourceBitmap,
-                                0, 0,
-                                sourceBitmap.width,
-                                sourceBitmap.height,
-                                matrix,
-                                true
-                            )
-
-                            // Теперь создаём "копию" внутри Fresco
-                            val ref = bitmapFactory.createBitmap( rotated.width, rotated.height )
-
-                            val canvas = Canvas(ref.get())
-                            canvas.drawBitmap(rotated, 0f, 0f, null)
-
-                            rotated.recycle() // освобождаем временный
-
-                            ref
-                        } catch (e: Exception) {
-                            Timber.e(e, "Error rotating bitmap")
-                            super.process(sourceBitmap, bitmapFactory)
-                        }
-                    }
-                }
-                 builder.setPostprocessor(rotationPostprocessor)
+//                val rotationPostprocessor = object : BasePostprocessor()
+//                {
+//
+//                    override fun process(
+//                        sourceBitmap: Bitmap,
+//                        bitmapFactory: PlatformBitmapFactory
+//                    ): CloseableReference<Bitmap> {
+//                        return try {
+//                            val matrix = Matrix().apply { postRotate(90f) }
+//
+//                            val rotated = Bitmap.createBitmap(
+//                                sourceBitmap,
+//                                0, 0,
+//                                sourceBitmap.width,
+//                                sourceBitmap.height,
+//                                matrix,
+//                                true
+//                            )
+//
+//                            // Теперь создаём "копию" внутри Fresco
+//                            val ref = bitmapFactory.createBitmap( rotated.width, rotated.height )
+//
+//                            val canvas = Canvas(ref.get())
+//                            canvas.drawBitmap(rotated, 0f, 0f, null)
+//
+//                            rotated.recycle() // освобождаем временный
+//
+//                            ref
+//                        } catch (e: Exception) {
+//                            Timber.e(e, "Error rotating bitmap")
+//                            super.process(sourceBitmap, bitmapFactory)
+//                        }
+//                    }
+//                }
+//                 builder.setPostprocessor(rotationPostprocessor)
 
            // }
         }
@@ -222,8 +223,20 @@ fun UrlImageLusciousGifsGlide(
         isControllerReady = true
     }
 
-    Box( modifier = Modifier.fillMaxSize().then(modifier), contentAlignment = Alignment.Center
-    ) {
+//        .graphicsLayer(
+//            rotationZ = if (rotate) 90f else 0f,
+//            scaleX = if (rotate) 0.2f else 1f,
+//            clip = false
+//        )
+
+
+    BoxWithConstraints( modifier = Modifier.fillMaxSize().then(modifier), contentAlignment = Alignment.Center ) {
+
+        val w = maxWidth
+        val h = maxHeight
+
+        if (isAnimated)
+            Timber.i("!!! UrlImageLusciousGifsGlide w:{$w} h:{$h}")
 
         if (isControllerReady) {
 
@@ -236,7 +249,15 @@ fun UrlImageLusciousGifsGlide(
                             .setOldController(null)
                     },
                     contentScale = contentScale,
-                    modifier = Modifier.fillMaxSize().background(ThemeL.grey5)
+                    modifier = Modifier
+                        .background(ThemeL.grey5)
+                        .graphicsLayer(
+                            rotationZ = if (rotate) 90f else 0f,
+                            scaleX = if (rotate) { if (h>w) h/w else w/h }else {1f},
+                            scaleY = if (rotate) { if (h>w) h/w else w/h }else {1f},
+                        )
+                        .fillMaxSize()
+
                 )
 
             // Индикаторы загрузки и ошибки

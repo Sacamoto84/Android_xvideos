@@ -231,9 +231,11 @@ object ScreenLAlbumList : Screen {
                         {
 
                             item(key = "dummy", span = { GridItemSpan(maxLineSpan) }) {
-                                Spacer(Modifier
-                                    .height(32.dp)
-                                    .background(ThemeL.red))
+                                Spacer(
+                                    Modifier
+                                        .height(32.dp)
+                                        .background(ThemeL.red)
+                                )
                             }
 
 //                                item(key = "page_selector", span = { GridItemSpan(maxLineSpan) })

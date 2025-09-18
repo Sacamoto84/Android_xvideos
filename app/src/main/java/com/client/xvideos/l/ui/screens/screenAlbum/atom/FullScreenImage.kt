@@ -53,6 +53,7 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.common.fresco.UrlImageLusciousGifsGlide
+import com.client.xvideos.common.urlVideImage.UrlImageCoil
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.model.PicsDetails
 import kotlinx.coroutines.delay
@@ -180,21 +181,26 @@ class FullScreenImage(
                 pageSpacing = 8.dp,
                 key = { page -> filteredPic[page].url_to_original!! }
             ) { page ->
+
                 val pageItem = filteredPic[page]
 
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxSize()
+                        .border(2.dp, Color.Magenta)
                         .aspectRatio(
                             if (rotate) (pageItem.height.toFloat() / pageItem.width) else (pageItem.width.toFloat() / pageItem.height),
-                            matchHeightConstraintsFirst = true
+                            matchHeightConstraintsFirst = false
+                        )
+                        .graphicsLayer(
+                           clip = false
                         )
                 )
                 {
 
                     UrlImageLusciousGifsGlide(
                         rotate = rotate,
-                        contentScale = ContentScale.Fit,
+                        contentScale = ContentScale.Fit ,
                         url = pageItem.url_to_original!!,
                         modifier = Modifier
                             .fillMaxSize()
@@ -214,12 +220,14 @@ class FullScreenImage(
                                         }
                                     }
                                 }
-                            ),
+                            )
+                                ,
                         onSuccess = { },
                         albumName = albumName,
                         autoPlay = autoPlay,
                         isAnimated = pageItem.is_animated
                     )
+
                 }
             }
 
@@ -246,9 +254,12 @@ class FullScreenImage(
             Column(modifier = Modifier.align(Alignment.BottomCenter)) {
                 LazyRow(
                     state = lazyRowState,
-                    modifier = Modifier.height(72.dp)
+                    modifier = Modifier.height(72.dp),
                 ) {
-                    itemsIndexed(filteredPic) { index, it1 ->
+
+                    itemsIndexed(
+                        filteredPic,
+                        key = { _, item -> item.url_to_original!! }) { index, it1 ->
                         Box(
                             modifier = Modifier
                                 .padding(horizontal = 1.dp)
