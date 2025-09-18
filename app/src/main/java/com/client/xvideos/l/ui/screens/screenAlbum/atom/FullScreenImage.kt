@@ -1,12 +1,14 @@
 package com.client.xvideos.l.ui.screens.screenAlbum.atom
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -41,8 +43,10 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.graphics.shapes.rectangle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
@@ -153,80 +157,70 @@ class FullScreenImage(
             }
         }
 
+        // Полупрозрачный фон
         Box(
-            modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopStart
+            modifier = Modifier
+                .fillMaxSize()
+                .checkerboardBackground(
+                    squareSize = 12.dp,
+                    lightColor = Color(0xFF252525),
+                    darkColor = Color(0xFF181818)
+                )
+        )
+
+        Box(
+            modifier = Modifier.fillMaxSize() //, contentAlignment = Alignment.TopStart
         ) {
-            // Полупрозрачный фон
-            Box(
-                modifier = Modifier
-                    .matchParentSize()
-                    .checkerboardBackground(
-                        squareSize = 12.dp,
-                        lightColor = Color(0xFF252525),//Color.White,
-                        darkColor = Color(0xFF181818)//Color.LightGray
-                    )
-            )
-
-
-
-
-
-
 
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier
-                    .align(Alignment.Center)
+                    //.align(Alignment.Center)
                     .fillMaxSize(),
                 pageSpacing = 8.dp,
                 key = { page -> filteredPic[page].url_to_original!! }
             ) { page ->
                 val pageItem = filteredPic[page]
 
-                //val aspectRation = if (rotate) (pageItem.height.toFloat() / pageItem.width) else (pageItem.width.toFloat() / pageItem.height)
-
-                UrlImageLusciousGifsGlide(
-
-                    contentScale = ContentScale.Fit,
-                    url = pageItem.url_to_original!!,
+                Box(
                     modifier = Modifier
-                        //.fillMaxSize()
-                        .graphicsLayer {
-                            rotationZ = if (rotate) 90f else 0f
-                            transformOrigin =
-                                androidx.compose.ui.graphics.TransformOrigin(0.5f, 0.5f)
-                        }
-                        .aspectRatio(if (rotate) (pageItem.height.toFloat() / pageItem.width) else (pageItem.width.toFloat() / pageItem.height),  matchHeightConstraintsFirst = true)
-                        .align(Alignment.Center)
-
-
-
-//                        .zoomable(
-//                            zoomState = zoomState,
-//                            enableOneFingerZoom = false,
-//                            onDoubleTap = { position ->
-//                                // Двойной тап для зума/раззума
-//                                coroutineScope.launch {
-//                                    if (zoomState.scale > 1.0f) {
-//                                        // Если уже увеличено - сбрасываем
-//                                        //zoomState.reset()
-//                                        zoomState.changeScale(1.0f, Offset.Zero)
-//                                    } else {
-//                                        // Увеличиваем в 2-3 раза по центру тапа
-//                                        zoomState.changeScale(2.5f, position)
-//                                    }
-//                                }
-//                            }
-//                        )
-
-
-                    ,
-
-                    onSuccess = { },
-                    albumName = albumName,
-                    autoPlay = autoPlay,
-                    isAnimated = pageItem.is_animated
+                        .fillMaxWidth()
+                        .aspectRatio(
+                            if (rotate) (pageItem.height.toFloat() / pageItem.width) else (pageItem.width.toFloat() / pageItem.height),
+                            matchHeightConstraintsFirst = true
+                        )
                 )
+                {
+
+                    UrlImageLusciousGifsGlide(
+                        rotate = rotate,
+                        contentScale = ContentScale.Fit,
+                        url = pageItem.url_to_original!!,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .zoomable(
+                                zoomState = zoomState,
+                                enableOneFingerZoom = false,
+                                onDoubleTap = { position ->
+                                    // Двойной тап для зума/раззума
+                                    coroutineScope.launch {
+                                        if (zoomState.scale > 1.0f) {
+                                            // Если уже увеличено - сбрасываем
+                                            //zoomState.reset()
+                                            zoomState.changeScale(1.0f, Offset.Zero)
+                                        } else {
+                                            // Увеличиваем в 2-3 раза по центру тапа
+                                            zoomState.changeScale(2.5f, position)
+                                        }
+                                    }
+                                }
+                            ),
+                        onSuccess = { },
+                        albumName = albumName,
+                        autoPlay = autoPlay,
+                        isAnimated = pageItem.is_animated
+                    )
+                }
             }
 
 
