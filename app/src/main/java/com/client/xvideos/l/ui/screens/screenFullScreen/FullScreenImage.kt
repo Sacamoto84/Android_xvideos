@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -19,7 +20,11 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ScreenRotation
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -49,6 +54,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.common.fresco.UrlImageGifsFresco
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.model.PicsDetails
+import com.client.xvideos.redgifs.ui.ui.atom.ButtonIcon
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -170,7 +176,7 @@ class FullScreenImage(
                 modifier = Modifier
                     //.align(Alignment.Center)
                     .fillMaxSize(),
-                pageSpacing = 8.dp,
+                pageSpacing = 8.dp, beyondViewportPageCount = 2,
                 key = { page -> filteredPic[page].url_to_original!! }
             ) { page ->
 
@@ -185,7 +191,7 @@ class FullScreenImage(
                             matchHeightConstraintsFirst = false
                         )
                         .graphicsLayer(
-                           clip = false
+                           clip = true
                         )
                 )
                 {
@@ -224,16 +230,21 @@ class FullScreenImage(
             }
 
 
-
-            Button(onClick = { rotate = rotate.not() }, modifier = Modifier.padding(top = 48.dp)) { Text(rotate.toString()) }
-
             Box(modifier = Modifier.align(Alignment.TopStart)) {
                 Text(
                     currentIndex.toString(), color = Color.Gray, modifier = Modifier.padding(start = 8.dp), fontFamily = ThemeL.fontFamilyKarla
                 )
             }
 
-            Box(modifier = Modifier.align(Alignment.TopEnd)) { expandMenu(item) }
+            Box(modifier = Modifier.align(Alignment.TopStart).offset(y = 8.dp)) {
+                IconButton(onClick = {
+                    rotate = rotate.not()
+                }){
+                   Icon(Icons.Default.ScreenRotation, contentDescription = null, tint = Color.White)
+                }
+            }
+
+            Box(modifier = Modifier.align(Alignment.TopEnd).offset(y = 8.dp)) { expandMenu(item) }
 
             val coroutineScope = rememberCoroutineScope()
 

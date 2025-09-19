@@ -31,8 +31,8 @@ import kotlin.math.roundToInt
 @Composable
 fun SwipeableBottomPanel(
     modifier: Modifier = Modifier,
-    contentHeight: Dp = 82.dp,
-    swipeAreaHeight: Dp = 180.dp,
+    contentHeight: Dp = 80.dp,
+    swipeAreaHeight: Dp = 160.dp,
     indicatorHeight: Dp = 4.dp,
     content: @Composable (swipeableState: SwipeableState<Int>, hiddenOffset: Float) -> Unit
 ) {
@@ -40,7 +40,7 @@ fun SwipeableBottomPanel(
     val indicatorHeightPx = with(LocalDensity.current) { indicatorHeight.toPx() }
     val swipeableState = rememberSwipeableState(initialValue = 0)
 
-    val hiddenOffset = contentHeightPx - indicatorHeightPx - with(LocalDensity.current) { 3.dp.toPx() }
+    val hiddenOffset = contentHeightPx - indicatorHeightPx - with(LocalDensity.current) { 4.dp.toPx() }
     val anchors = mapOf(0f to 0, hiddenOffset to 1)
 
     Box(modifier = modifier.fillMaxSize()) {
