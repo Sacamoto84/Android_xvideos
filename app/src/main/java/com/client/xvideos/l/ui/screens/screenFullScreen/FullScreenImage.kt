@@ -49,15 +49,16 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
+import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.common.fresco.UrlImageGifsFresco
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.model.PicsDetails
-import com.client.xvideos.redgifs.ui.ui.atom.ButtonIcon
+import com.client.xvideos.l.ui.screens.screenAlbum.ScreenLAlbumSM
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Transient
 import net.engawapg.lib.zoomable.ZoomState
 import net.engawapg.lib.zoomable.rememberZoomState
 import net.engawapg.lib.zoomable.zoomable
@@ -68,8 +69,8 @@ class FullScreenImage(
     val filteredPic: List<PicsDetails>,
     val autoPlay: Boolean = false,
     val isAnimated: Boolean = false,
-    val expandMenu: @Composable (PicsDetails) -> Unit = {},
-    val onClose: (Int) -> Unit
+    @Transient val expandMenu: @Composable (PicsDetails) -> Unit = {},
+    @Transient val onClose: (Int) -> Unit
 ) : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
@@ -82,6 +83,8 @@ class FullScreenImage(
 
         val navigator = LocalNavigator.currentOrThrow
 
+        val vm = getScreenModel<ScreenLAlbumSM, ScreenLAlbumSM.Factory> { factory -> factory.create(albumName.toLong()) }
+
         var isClosing by remember { mutableStateOf(false) }
 
         var dataItem by remember(Unit) { mutableStateOf(item) }
@@ -90,7 +93,8 @@ class FullScreenImage(
 
         var rotate by remember { mutableStateOf(false) }
 
-        val zoomState = rememberZoomState()
+        //val zoomState = rememberZoomState()
+
         val pagerState = rememberPagerState(
             filteredPic.indexOf(item).coerceIn(0, filteredPic.lastIndex),
             pageCount = { filteredPic.size }
@@ -136,10 +140,11 @@ class FullScreenImage(
 
             // Сбрасываем зум при смене страницы
             //zoomState.reset()
-            if (zoomState.scale > 1.0f) {
-                zoomState.changeScale(1.0f, Offset.Zero)
-                delay(200)
-            }
+
+//            if (zoomState.scale > 1.0f) {
+//                zoomState.changeScale(1.0f, Offset.Zero)
+//                delay(200)
+//            }
 
             // Прокручиваем LazyRow к текущему элементу
             lazyRowState.animateScrollToItem((currentIndex - 2).coerceIn(0, filteredPic.size - 1))
@@ -173,14 +178,14 @@ class FullScreenImage(
 
             HorizontalPager(
                 state = pagerState,
-                modifier = Modifier
-                    //.align(Alignment.Center)
-                    .fillMaxSize(),
+                modifier = Modifier.fillMaxSize(),
                 pageSpacing = 8.dp, beyondViewportPageCount = 2,
                 key = { page -> filteredPic[page].url_to_original!! }
             ) { page ->
 
                 val pageItem = filteredPic[page]
+
+                val zoomState = rememberZoomState()
 
                 Box(
                     modifier = Modifier
@@ -189,9 +194,6 @@ class FullScreenImage(
                         .aspectRatio(
                             if (rotate) (pageItem.height.toFloat() / pageItem.width) else (pageItem.width.toFloat() / pageItem.height),
                             matchHeightConstraintsFirst = false
-                        )
-                        .graphicsLayer(
-                           clip = true
                         )
                 )
                 {

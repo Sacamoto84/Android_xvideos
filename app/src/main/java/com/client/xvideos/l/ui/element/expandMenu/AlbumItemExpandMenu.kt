@@ -24,6 +24,7 @@ import com.client.xvideos.l.theme.ThemeL.ExpandMenu.backgroundColor
 import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.ui.element.expandMenu.atom.DropdownMenuItem_Download
 import com.client.xvideos.l.ui.element.expandMenu.atom.DropdownMenuItem_DownloadCrypto
+import com.client.xvideos.l.ui.element.expandMenu.atom.DropdownMenuItem_Share
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -33,6 +34,7 @@ fun AlbumItemExpandMenu(
     onClick: () -> Unit = {},
     onDownload : (PicsDetails) -> Unit = {},
     onDownloadCrypto : (PicsDetails) -> Unit = {},
+    onShare: (PicsDetails) -> Unit = {},
     haptic : ()->Unit = {}
 ) {
 
@@ -64,6 +66,9 @@ fun AlbumItemExpandMenu(
             ){ expanded = false }
 
             DropdownMenuItem_DownloadCrypto(item, onClick = {onDownloadCrypto(it)}
+            ){ expanded = false }
+
+            DropdownMenuItem_Share(item, onClick = {onShare(it)}
             ){ expanded = false }
 
         }

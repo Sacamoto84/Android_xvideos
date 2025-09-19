@@ -10,16 +10,15 @@ import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
 import com.client.xvideos.common.AppPath
 import com.client.xvideos.common.di.ApplicationScope
-import com.client.xvideos.common.encrypting.Crypto
-import com.client.xvideos.common.encrypting.Password
+import com.client.xvideos.common.kdownloader.KDownloader
+import com.client.xvideos.common.util.toMD5
 import com.client.xvideos.l.featured.downloader.DownloaderAlbum
 import com.client.xvideos.l.featured.downloader.DownloaderL
 import com.client.xvideos.l.featured.saved.SavedL
+import com.client.xvideos.l.featured.share.useCaseShareFile
+import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.net.AlbumInfo
 import com.client.xvideos.l.net.Luscious
-import com.client.xvideos.common.kdownloader.KDownloader
-import com.client.xvideos.common.util.toMD5
-import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.ui.element.lazyRowPictureDetails.LazyRowPictureDetailsHost
 import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
 import dagger.Binds
@@ -31,7 +30,12 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
+import io.ktor.client.HttpClient
+import io.ktor.client.request.get
+import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.readBytes
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -131,6 +135,43 @@ class ScreenLAlbumSM @AssistedInject constructor(
     override fun onDispose() {
         super.onDispose()
         Timber.e("!!! ScreenLAlbumSM onDispose")
+    }
+
+
+    fun share(item: PicsDetails) {
+        scope.launch(Dispatchers.Main) {
+            Timber.i("!!! share item = ${item.url_to_original} isAnimated: ${item.is_animated}")
+            val name = item.url_to_original?.substringAfterLast('/')?.substringBefore('?') //xxx.yyy
+
+            val ext = if (item.is_animated && name?.split(".")?.get(1) == "jpg") "gif" else name?.split(".")?.get(1)
+
+            val fileName =
+                item.width.toString() + "_" + item.height + "_" + item.is_animated + "_" + item.album + "_" + name?.toMD5()
+                    ?.dropLast(24) + "." + ext
+            val url = item.url_to_original!!
+            val client = HttpClient()
+            val downloadsDir = AppPath.cacheDownload_l
+            val file = File(downloadsDir, fileName)
+            try {
+                val response: HttpResponse = client.get(url)
+                val bytes: ByteArray = response.readBytes()
+                file.writeBytes(bytes)
+                println("!!! Файл сохранен: ${file.absolutePath}")
+
+                if (file.exists()) { useCaseShareFile(context, file) }
+                else
+                {
+                    snackBarEvent.error("Файл не найден: ${file.absolutePath}")
+                    Timber.w("shareGifs -> Файл не существует: ${file.absolutePath}")
+                }
+            } catch (e: Exception) {
+                snackBarEvent.error("shareGifs -> Ошибка при работе с файлом: ${file.absolutePath}")
+                Timber.e(e, "shareGifs -> Ошибка при работе с файлом: ${file.absolutePath}")
+            } finally {
+                client.close()
+            }
+
+        }
     }
 
 }

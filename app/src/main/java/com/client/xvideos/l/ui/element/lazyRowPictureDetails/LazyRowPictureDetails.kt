@@ -110,7 +110,7 @@ fun LazyRowPictureDetails(
                                             },
                                             albumName = host.albumName,
                                             filteredPic = host.filteredPic,
-                                            expandMenu = expandMenuFullScreen,
+                                            expandMenu = { expandMenuFullScreen.invoke(it) },
                                             autoPlay = true,
                                             isAnimated = item.is_animated,
                                         )

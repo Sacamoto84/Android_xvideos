@@ -19,7 +19,7 @@ import com.client.xvideos.redgifs.ui.ui.lazyrow123.LazyRow123Host
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.TypePager
 import com.client.xvideos.redgifs.common.di.HostDI
 import com.client.xvideos.redgifs.common.network.loadGifs
-import com.redgifs.common.share.useCaseShareGifs
+import com.client.xvideos.redgifs.common.share.useCaseShareGifs
 import com.redgifs.common.video.PlayerControls
 import dagger.Binds
 import dagger.Module

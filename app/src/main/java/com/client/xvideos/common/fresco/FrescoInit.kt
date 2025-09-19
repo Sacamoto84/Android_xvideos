@@ -17,7 +17,7 @@ fun FrescoInit(application: Application) {
     // 1. Создание параметров кэша в памяти
     // Укажите максимальное количество байт, которое может занимать кэш
     val bitmapCacheParams = MemoryCacheParams(
-        /* maxCacheSize */ Runtime.getRuntime().maxMemory().toInt() / 16, // 25% от доступной памяти
+        /* maxCacheSize */ Runtime.getRuntime().maxMemory().toInt() / 8, // 25% от доступной памяти
         /* maxCacheEntries */ 512,
         /* maxEvictionQueueSize */ Int.MAX_VALUE,
         /* maxEvictionQueueEntries */ Int.MAX_VALUE,

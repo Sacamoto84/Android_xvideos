@@ -35,6 +35,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.common.urlVideImage.UrlImage
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.model.AlbumDetails
+import com.client.xvideos.l.ui.element.expandMenu.AlbumItemExpandMenu
 import com.client.xvideos.l.ui.element.lazyRowPictureDetails.LazyRowPictureDetails
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumDialogDeleteAlbum
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoAudiences
@@ -43,7 +44,6 @@ import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoDownloadButton
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoFilterButton
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoGreeting
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoTags
-import com.client.xvideos.l.ui.element.expandMenu.AlbumItemExpandMenu
 import com.client.xvideos.l.ui.screens.albumLandingTag.ScreenLAlbumLandingTag
 import com.client.xvideos.l.ui.screens.depth
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.ScrollToTopButton
@@ -141,9 +141,19 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
 
             LazyRowPictureDetails(
                 host = vm.host,
+
                 expandMenu = { AlbumItemExpandMenu( item = it, onDownload = { it1 ->  vm.downloadLike(it1) } ,
-                    onDownloadCrypto = { it1 ->  vm.downloadLikeCrypto(it1) } ) },
-                expandMenuFullScreen = { AlbumItemExpandMenu( item = it, onDownload = { it1 ->  vm.downloadLike(it1) }) },
+                    onDownloadCrypto = { it1 -> vm.downloadLikeCrypto(it1) } ,
+                    onShare = { it1 ->
+                        vm.share(it1)
+                    }) },
+
+                expandMenuFullScreen = { AlbumItemExpandMenu( item = it, onDownload = { it1 ->  vm.downloadLike(it1) } ,
+                    onDownloadCrypto = { it1 -> vm.downloadLikeCrypto(it1) } ,
+                    onShare = { it1 ->
+                        vm.share(it1)
+                    }) },
+
                 itemBefore = {
                     Column(modifier = Modifier.padding(horizontal = 4.dp)) {
 

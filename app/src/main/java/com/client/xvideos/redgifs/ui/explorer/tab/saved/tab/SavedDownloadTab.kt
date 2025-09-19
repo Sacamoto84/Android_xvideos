@@ -67,9 +67,9 @@ import com.client.xvideos.redgifs.ui.profile.rememberVisibleRangePercentIgnoring
 import com.composeunstyled.Text
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.common.di.HostDI
+import com.client.xvideos.redgifs.common.share.useCaseShareGifs
 import com.client.xvideos.redgifs.model.GifsInfo
 import com.client.xvideos.redgifs.model.UserInfo
-import com.redgifs.common.share.useCaseShareGifs
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

@@ -1,4 +1,4 @@
-package com.redgifs.common.share
+package com.client.xvideos.redgifs.common.share
 
 import android.content.Context
 import android.content.Intent

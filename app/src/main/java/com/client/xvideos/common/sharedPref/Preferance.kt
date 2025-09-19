@@ -95,5 +95,17 @@ object Settings {
     val thumbalistSize by lazy { SettingElementString(pref, "thumbalistSize", ThumbnailsSize.SMALL.value) }
 
 
+    /**
+     * Обьем дискового кеша в МБ
+     */
+    val frescoDiskCacheCapacity by lazy { SettingElementInt(pref, "frescoDiskCacheCapacity", 2000) }
+
+    /**
+     * Функция автоочистки кеша при запуске приложения, очищает половину старых файлов
+     */
+    val frescoDiskCacheAutoClear by lazy { SettingElementBoolean(pref, "frescoDiskCacheAutoClear", false) }
+
+
+
 
 }
