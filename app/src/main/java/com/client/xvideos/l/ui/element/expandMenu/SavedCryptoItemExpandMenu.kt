@@ -19,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import com.client.xvideos.l.theme.ThemeL.ExpandMenu.backgroundColor
 import com.client.xvideos.l.model.PicsDetails
@@ -34,12 +35,16 @@ fun SavedCryptoItemExpandMenu(
     onDelete: (PicsDetails) -> Unit = {},
     onDownloadToLikes : (PicsDetails) -> Unit = {},
 
-    haptic : ()->Unit = {}
+    //haptic : ()->Unit = {}
 ) {
+
+    val haptic = LocalHapticFeedback.current
 
     var expanded by remember { mutableStateOf(false) }
 
-    LaunchedEffect(expanded) { haptic.invoke() }
+    LaunchedEffect(expanded) {
+        //haptic
+    }
 
     ExposedDropdownMenuBox(
         expanded = expanded,

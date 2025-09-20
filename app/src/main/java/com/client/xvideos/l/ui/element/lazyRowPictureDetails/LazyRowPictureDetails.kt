@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -35,6 +36,8 @@ import com.client.xvideos.l.ui.screens.screenFullScreen.FullScreenImage
 import com.client.xvideos.l.ui.screens.LocalRootLScreenModel
 import com.client.xvideos.common.fresco.UrlImageGifsFresco
 import com.client.xvideos.common.sharedPref.Settings
+import com.client.xvideos.l.ui.element.expandMenu.ExpandMenuType
+import com.client.xvideos.l.ui.element.expandMenu.ExpandMenuViewModel
 import com.client.xvideos.redgifs.ui.profile.atom.VerticalScrollbar
 import com.client.xvideos.redgifs.ui.profile.rememberVisibleRangePercentIgnoringFirstNForLazyStaggeredGrid
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -47,23 +50,20 @@ import timber.log.Timber
 fun LazyRowPictureDetails(
     host: LazyRowPictureDetailsHost,
     itemBefore: @Composable () -> Unit = {},
-    expandMenu: @Composable (PicsDetails) -> Unit = {},
-    expandMenuFullScreen: @Composable (PicsDetails) -> Unit = {}
+    expandMenu: ExpandMenuType
 ) {
+
+    val expandMenuViewModel: ExpandMenuViewModel = hiltViewModel()
 
     val navigator = LocalNavigator.currentOrThrow
 
     val rootVm = LocalRootLScreenModel.current
 
-    val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForLazyStaggeredGrid(
-        host.state,
-        0
-    )
+    val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForLazyStaggeredGrid( host.state,  0 )
 
     val thumbnailsSize = Settings.thumbalistSize.field.collectAsStateWithLifecycle().value
 
     val haptic = LocalHapticFeedback.current
-
 
     Box(modifier = Modifier.fillMaxSize()) {
 
@@ -99,18 +99,18 @@ fun LazyRowPictureDetails(
                                     navigator.push(
                                         FullScreenImage(
                                             item = item,
-                                            onClose = { it1 ->
-                                                Timber.i("scrollToItem 1 $it1")
-                                                if (it1 != -1) {
-                                                    rootVm.screenModelScope.launch {
-                                                        host.state.scrollToItem(it1)
-                                                        delay(100)
-                                                    }
-                                                }
-                                            },
+//                                            onClose = { it1 ->
+//                                                Timber.i("scrollToItem 1 $it1")
+//                                                if (it1 != -1) {
+//                                                    rootVm.screenModelScope.launch {
+//                                                        host.state.scrollToItem(it1)
+//                                                        delay(100)
+//                                                    }
+//                                                }
+//                                            },
                                             albumName = host.albumName,
-                                            filteredPic = host.filteredPic,
-                                            expandMenu = { expandMenuFullScreen.invoke(it) },
+                                            filteredPicArray = host.filteredPic.toTypedArray(),
+                                            expandMenu = expandMenu,
                                             autoPlay = true,
                                             isAnimated = item.is_animated,
                                         )
@@ -132,8 +132,9 @@ fun LazyRowPictureDetails(
                         )
 
                         Box(modifier = Modifier.align(Alignment.TopEnd)) {
-                            expandMenu(item)
+                            expandMenuViewModel.ExpandMenu(expandMenu, item, host.albumName)
                         }
+
                     }
                 }
             }

@@ -36,6 +36,7 @@ import com.client.xvideos.common.urlVideImage.UrlImage
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.model.AlbumDetails
 import com.client.xvideos.l.ui.element.expandMenu.AlbumItemExpandMenu
+import com.client.xvideos.l.ui.element.expandMenu.ExpandMenuType
 import com.client.xvideos.l.ui.element.lazyRowPictureDetails.LazyRowPictureDetails
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumDialogDeleteAlbum
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoAudiences
@@ -140,20 +141,9 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
         ) { padding ->
 
             LazyRowPictureDetails(
+
                 host = vm.host,
-
-                expandMenu = { AlbumItemExpandMenu( item = it, onDownload = { it1 ->  vm.downloadLike(it1) } ,
-                    onDownloadCrypto = { it1 -> vm.downloadLikeCrypto(it1) } ,
-                    onShare = { it1 ->
-                        vm.share(it1)
-                    }) },
-
-                expandMenuFullScreen = { AlbumItemExpandMenu( item = it, onDownload = { it1 ->  vm.downloadLike(it1) } ,
-                    onDownloadCrypto = { it1 -> vm.downloadLikeCrypto(it1) } ,
-                    onShare = { it1 ->
-                        vm.share(it1)
-                    }) },
-
+                expandMenu = ExpandMenuType.ALBUM,
                 itemBefore = {
                     Column(modifier = Modifier.padding(horizontal = 4.dp)) {
 

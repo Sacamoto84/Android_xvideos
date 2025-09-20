@@ -29,11 +29,8 @@ class LazyRowPictureDetailsHost(
     var columns by mutableIntStateOf(2)
 
     var selectedImage by  mutableStateOf<PicsDetails?>(null)
-    var selectedBounds by  mutableStateOf<Rect?>(null)
 
     var filteredPic =  mutableStateListOf<PicsDetails>()
-
-
 
 }
 

@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
@@ -19,9 +18,9 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.common.sharedPref.Settings
 import com.client.xvideos.l.featured.saved.SavedL
 import com.client.xvideos.l.model.PicsDetails
+import com.client.xvideos.l.ui.element.expandMenu.ExpandMenuType
 import com.client.xvideos.l.ui.element.lazyRowPictureDetails.LazyRowPictureDetails
 import com.client.xvideos.l.ui.element.lazyRowPictureDetails.LazyRowPictureDetailsHost
-import com.client.xvideos.l.ui.element.expandMenu.SavedCryptoItemExpandMenu
 import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
 import com.client.xvideos.redgifs.ui.explorer.tab.gifs.ColumnSelect
 import dagger.Binds
@@ -31,7 +30,6 @@ import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
 
 object ScreenLSavedLCryptoTab : Screen {
 
@@ -48,27 +46,11 @@ object ScreenLSavedLCryptoTab : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val vm: ScreenSavedLCryptoSM = getScreenModel()
 
-        val haptic = LocalHapticFeedback.current
-
         Scaffold(modifier = Modifier.fillMaxSize()) {
-            LazyRowPictureDetails(
-                vm.host,
-                expandMenu =
-                    { item ->
-                        SavedCryptoItemExpandMenu(
-                            item = item, onDelete = {
-                                vm.delete(item)
-                            },
-                            onDownloadToLikes = {
-
-                            },
-                            haptic = {haptic.performHapticFeedback(HapticFeedbackType.LongPress)})
-                    }
-            )
+            LazyRowPictureDetails( vm.host, expandMenu =  ExpandMenuType.CRYPTO )
         }
 
     }
-
 
 }
 

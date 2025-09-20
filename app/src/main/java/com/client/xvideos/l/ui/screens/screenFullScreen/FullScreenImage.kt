@@ -1,5 +1,6 @@
 package com.client.xvideos.l.ui.screens.screenFullScreen
 
+import android.os.Parcelable
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
@@ -22,7 +23,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ScreenRotation
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -41,49 +41,57 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
-import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.common.fresco.UrlImageGifsFresco
-import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.model.PicsDetails
-import com.client.xvideos.l.ui.screens.screenAlbum.ScreenLAlbumSM
+import com.client.xvideos.l.theme.ThemeL
+import com.client.xvideos.l.ui.element.expandMenu.ExpandMenuType
+import com.client.xvideos.l.ui.element.expandMenu.ExpandMenuViewModel
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.launch
-import kotlinx.serialization.Transient
+import kotlinx.parcelize.Parcelize
 import net.engawapg.lib.zoomable.ZoomState
 import net.engawapg.lib.zoomable.rememberZoomState
 import net.engawapg.lib.zoomable.zoomable
 
+@Parcelize
 class FullScreenImage(
     val item: PicsDetails,
     val albumName: String,
-    val filteredPic: List<PicsDetails>,
+    //val filteredPic: List<PicsDetails>,
+    val filteredPicArray: Array<PicsDetails>,
     val autoPlay: Boolean = false,
     val isAnimated: Boolean = false,
-    @Transient val expandMenu: @Composable (PicsDetails) -> Unit = {},
-    @Transient val onClose: (Int) -> Unit
-) : Screen {
+    val expandMenu: ExpandMenuType,
+    //val onClose: (Int) -> Unit
+) : Screen, Parcelable {
 
     override val key: ScreenKey = uniqueScreenKey
 
-    @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class,
-        DelicateCoroutinesApi::class
-    )
+    @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class,  DelicateCoroutinesApi::class)
     @Composable
     override fun Content() {
 
-        val navigator = LocalNavigator.currentOrThrow
+//        run {
+//
+//            Timber.d("!!! >>>> filteredPic type: ${filteredPic::class.java.simpleName}")
+//            //filteredPic.toList()
+//        }
 
-        val vm = getScreenModel<ScreenLAlbumSM, ScreenLAlbumSM.Factory> { factory -> factory.create(albumName.toLong()) }
+        val filteredPic = filteredPicArray.toList()
+
+        val expandMenuViewModel: ExpandMenuViewModel = hiltViewModel()
+
+        val navigator = LocalNavigator.currentOrThrow
 
         var isClosing by remember { mutableStateOf(false) }
 
@@ -105,10 +113,10 @@ class FullScreenImage(
 
         LaunchedEffect(isClosing) {
             if (isClosing) {
-                onClose(
-                    if (corruptCancel) filteredPic.indexOf(dataItem)
-                        .coerceIn(0, filteredPic.size - 1) else -1
-                )
+//                onClose(
+//                    if (corruptCancel) filteredPic.indexOf(dataItem)
+//                        .coerceIn(0, filteredPic.size - 1) else -1
+//                )
                 navigator.pop()
             }
         }
@@ -246,7 +254,9 @@ class FullScreenImage(
                 }
             }
 
-            Box(modifier = Modifier.align(Alignment.TopEnd).offset(y = 8.dp)) { expandMenu(item) }
+            Box(modifier = Modifier.align(Alignment.TopEnd).offset(y = 8.dp)) {
+                expandMenuViewModel.ExpandMenu(expandMenu, item, albumName)
+            }
 
             val coroutineScope = rememberCoroutineScope()
 

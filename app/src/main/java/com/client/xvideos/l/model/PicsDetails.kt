@@ -1,7 +1,10 @@
 package com.client.xvideos.l.model
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import com.google.gson.annotations.SerializedName
 
+@Parcelize
 data class PicsDetails(
     @SerializedName("height") val height: Int, //"846"
     @SerializedName("width") val width: Int, //"1280"
@@ -10,15 +13,15 @@ data class PicsDetails(
     @SerializedName("url_to_video") val url_to_video: String?,
     @SerializedName("album") val album: String = "null",
     @SerializedName("thumbnails") val thumbnails: List<Thumbnails> = emptyList()
-)
+) : Parcelable
 
+@Parcelize
 data class Thumbnails(
-
     @SerializedName("width") val width: Int,    //640,
     @SerializedName("height") val height: Int,  //3779,
     @SerializedName("size") val size: String,   //"small",
-    @SerializedName("url") val url: String      //"https://ah-img.luscious.net/Senred/554756/img_20250420_143600_01K3KQKZAWZVQB2X2RQXE7CWDC.640x0.jpg"
-)
+    @SerializedName("url") val url: String      //"https://..."
+) : Parcelable
 
 /**
  * Thumbnail size configuration enum with display value mapping
