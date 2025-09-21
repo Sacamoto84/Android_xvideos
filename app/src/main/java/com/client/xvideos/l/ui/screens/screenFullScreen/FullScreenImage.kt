@@ -58,6 +58,7 @@ import com.client.xvideos.l.ui.element.expandMenu.ExpandMenuType
 import com.client.xvideos.l.ui.element.expandMenu.ExpandMenuViewModel
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.launch
+import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import net.engawapg.lib.zoomable.ZoomState
 import net.engawapg.lib.zoomable.rememberZoomState
@@ -68,13 +69,14 @@ class FullScreenImage(
     val item: PicsDetails,
     val albumName: String,
     //val filteredPic: List<PicsDetails>,
-    val filteredPicArray: Array<PicsDetails>,
+    val filteredPicArray: List<PicsDetails>,
     val autoPlay: Boolean = false,
     val isAnimated: Boolean = false,
     val expandMenu: ExpandMenuType,
-    //val onClose: (Int) -> Unit
+    @IgnoredOnParcel val onClose: (Int) -> Unit = {}
 ) : Screen, Parcelable {
 
+    @IgnoredOnParcel
     override val key: ScreenKey = uniqueScreenKey
 
     @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class,  DelicateCoroutinesApi::class)
@@ -113,10 +115,10 @@ class FullScreenImage(
 
         LaunchedEffect(isClosing) {
             if (isClosing) {
-//                onClose(
-//                    if (corruptCancel) filteredPic.indexOf(dataItem)
-//                        .coerceIn(0, filteredPic.size - 1) else -1
-//                )
+                onClose(
+                    if (corruptCancel) filteredPic.indexOf(dataItem)
+                        .coerceIn(0, filteredPic.size - 1) else -1
+                )
                 navigator.pop()
             }
         }
@@ -241,22 +243,14 @@ class FullScreenImage(
 
 
             Box(modifier = Modifier.align(Alignment.TopStart)) {
-                Text(
-                    currentIndex.toString(), color = Color.Gray, modifier = Modifier.padding(start = 8.dp), fontFamily = ThemeL.fontFamilyKarla
-                )
+                Text( currentIndex.toString(), color = Color.Gray, modifier = Modifier.padding(start = 8.dp), fontFamily = ThemeL.fontFamilyKarla )
             }
 
             Box(modifier = Modifier.align(Alignment.TopStart).offset(y = 8.dp)) {
-                IconButton(onClick = {
-                    rotate = rotate.not()
-                }){
-                   Icon(Icons.Default.ScreenRotation, contentDescription = null, tint = Color.White)
-                }
+                IconButton(onClick = { rotate = rotate.not() }){ Icon(Icons.Default.ScreenRotation, contentDescription = null, tint = Color.White) }
             }
 
-            Box(modifier = Modifier.align(Alignment.TopEnd).offset(y = 8.dp)) {
-                expandMenuViewModel.ExpandMenu(expandMenu, item, albumName)
-            }
+            Box(modifier = Modifier.align(Alignment.TopEnd).offset(y = 8.dp)) { expandMenuViewModel.ExpandMenu(expandMenu, filteredPic[pagerState.currentPage], albumName) }
 
             val coroutineScope = rememberCoroutineScope()
 

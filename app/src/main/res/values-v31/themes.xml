@@ -11,20 +11,19 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowTranslucentStatus">true</item>
 
-
-
-
         <!-- Чёрный фон -->
-<!--        <item name="android:background">#000000</item>-->
-<!--        <item name="android:windowBackground">#000000</item>-->
+        <!--        <item name="android:background">#000000</item>-->
+        <!--        <item name="android:windowBackground">#000000</item>-->
+
     </style>
 
     <style name="Theme.MyApp.Splash" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Фон сплэша -->
         <item name="android:windowBackground">@color/white</item>
         <!-- Лого/иконка -->
-
+        <item name="android:windowSplashScreenBackground">#242424</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/news_avd_v02</item>
+        <item name="android:windowSplashScreenAnimationDuration">1000</item>
     </style>
-
 
 </resources>

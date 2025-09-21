@@ -99,17 +99,17 @@ fun LazyRowPictureDetails(
                                     navigator.push(
                                         FullScreenImage(
                                             item = item,
-//                                            onClose = { it1 ->
-//                                                Timber.i("scrollToItem 1 $it1")
-//                                                if (it1 != -1) {
-//                                                    rootVm.screenModelScope.launch {
-//                                                        host.state.scrollToItem(it1)
-//                                                        delay(100)
-//                                                    }
-//                                                }
-//                                            },
+                                            onClose = { it1 ->
+                                                Timber.i("scrollToItem 1 $it1")
+                                                if (it1 != -1) {
+                                                    rootVm.screenModelScope.launch {
+                                                        host.state.scrollToItem(it1)
+                                                        delay(100)
+                                                    }
+                                                }
+                                            },
                                             albumName = host.albumName,
-                                            filteredPicArray = host.filteredPic.toTypedArray(),
+                                            filteredPicArray = host.filteredPic.toList(),
                                             expandMenu = expandMenu,
                                             autoPlay = true,
                                             isAnimated = item.is_animated,

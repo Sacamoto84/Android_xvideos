@@ -54,6 +54,19 @@
             android:screenOrientation="portrait"
             />
 
+
+        <activity
+            android:name=".SplashActivity"
+            android:exported="true"
+            android:theme="@style/Theme.MyApp.Splash"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+
         <activity
             android:windowSoftInputMode="adjustResize"
             android:name=".MainActivity"
@@ -63,11 +76,6 @@
             android:windowIsTranslucent="false"
             android:windowBackground="@color/black"
             >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-                <category android:name="android.intent.category.HOME" />
-            </intent-filter>
         </activity>
 
 
