@@ -22,7 +22,7 @@ class Luscious(
     }
 
     init {
-        scope.launch(Dispatchers.Main) {
+        scope.launch(Dispatchers.IO) {
             refreshMediaCategories(repository)
         }
     }

@@ -5,23 +5,21 @@
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowNoTitle">true</item>
 
-        <item name="android:windowIsTranslucent">true</item>
+        <!--        <item name="android:windowIsTranslucent">true</item>-->
 
         <!-- Установка прозрачности для статус-бара -->
         <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:windowTranslucentStatus">true</item>
-
-
-
+        <!--        <item name="android:windowTranslucentStatus">true</item>-->
 
         <!-- Чёрный фон -->
-<!--        <item name="android:background">#000000</item>-->
-<!--        <item name="android:windowBackground">#000000</item>-->
+        <!--        <item name="android:background">#000000</item>-->
+        <item name="android:windowBackground">#000000</item>
+
     </style>
 
     <style name="Theme.MyApp.Splash" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Фон сплэша -->
-        <item name="android:windowBackground">@color/white</item>
+        <item name="android:windowBackground">@color/black</item>
         <!-- Лого/иконка -->
 
     </style>

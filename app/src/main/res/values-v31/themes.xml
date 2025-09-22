@@ -5,25 +5,25 @@
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowNoTitle">true</item>
 
-        <item name="android:windowIsTranslucent">true</item>
+        <!--        <item name="android:windowIsTranslucent">true</item>-->
 
         <!-- Установка прозрачности для статус-бара -->
         <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:windowTranslucentStatus">true</item>
+        <!--        <item name="android:windowTranslucentStatus">true</item>-->
 
         <!-- Чёрный фон -->
         <!--        <item name="android:background">#000000</item>-->
-        <!--        <item name="android:windowBackground">#000000</item>-->
+        <item name="android:windowBackground">#00FF00</item>
 
     </style>
 
     <style name="Theme.MyApp.Splash" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Фон сплэша -->
-        <item name="android:windowBackground">@color/white</item>
+        <item name="android:windowBackground">@color/black</item>
         <!-- Лого/иконка -->
-        <item name="android:windowSplashScreenBackground">#242424</item>
-        <item name="android:windowSplashScreenAnimatedIcon">@drawable/news_avd_v02</item>
-        <item name="android:windowSplashScreenAnimationDuration">1000</item>
+        <item name="android:windowSplashScreenBackground">#252525</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/anim_data5</item>
+        <item name="android:windowSplashScreenAnimationDuration">0</item>
     </style>
 
 </resources>

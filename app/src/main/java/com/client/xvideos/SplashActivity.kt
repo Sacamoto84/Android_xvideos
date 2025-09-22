@@ -61,6 +61,7 @@ class SplashActivity : ComponentActivity() {
             isReady = true
             // когда закончили — запускаем MainActivity
             startActivity(Intent(this@SplashActivity, MainActivity::class.java))
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
             finish()
         }
     }

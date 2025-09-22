@@ -1,7 +1,6 @@
 package com.client.xvideos.l.ui.screens.explorer.tab.albumTopHits
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,14 +23,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.screen.Screen
@@ -42,16 +39,12 @@ import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.net.AlbumTopHitsImpl
 import com.client.xvideos.l.net.Luscious
+import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.ui.element.AlbumListItem
-import com.client.xvideos.l.ui.screens.screenAlbum.ScreenLAlbum
-import com.client.xvideos.l.ui.screens.explorer.tab.albumTopHits.atom.DrawerContentDefault
-import com.client.xvideos.l.ui.screens.explorer.tab.albumTopHits.atom.DrawerContentHentai
-import com.client.xvideos.l.ui.screens.explorer.tab.albumTopHits.atom.DrawerContentManga
-import com.client.xvideos.l.ui.screens.explorer.tab.albumTopHits.atom.DrawerContentPorn
 import com.client.xvideos.l.ui.screens.SelectIndex
+import com.client.xvideos.l.ui.screens.screenAlbum.ScreenLAlbum
 import dagger.Binds
 import dagger.Module
 import dagger.assisted.Assisted
@@ -93,42 +86,9 @@ object ScreenLAlbumTopHits : Screen {
 
         var selectIndexDrawer by remember { mutableStateOf(SelectIndex.Unselect) }
 
-
-
         Scaffold(
             containerColor = ThemeL.greyBackground,
         ) {
-
-
-            if (dialogExpanded) {
-                Dialog(
-                    onDismissRequest = { dialogExpanded = false }
-                ) {
-
-                    Box(
-                        modifier = Modifier
-                            .padding(bottom = 96.dp, top = 16.dp)
-                            .fillMaxWidth(0.9f)
-                            .clip(RoundedCornerShape(16.dp))
-                            .border(1.dp, ThemeL.grey0, RoundedCornerShape(16.dp))
-                            .background(ThemeL.grey6)
-                            .padding(horizontal = 24.dp)
-                            .padding(vertical = 16.dp)
-                    ) {
-                        when (selectIndexDrawer) {
-                            SelectIndex.Default -> DrawerContentDefault()
-                            SelectIndex.Manga -> DrawerContentManga()
-                            SelectIndex.Hentai -> DrawerContentHentai()
-                            SelectIndex.Porn -> DrawerContentPorn()
-                            else -> {}
-                        }
-                    }
-
-                }
-            }
-
-
-
 
             LazyColumn(state = vm.state) {
 

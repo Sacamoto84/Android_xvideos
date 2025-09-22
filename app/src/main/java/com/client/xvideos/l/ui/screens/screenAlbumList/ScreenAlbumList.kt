@@ -90,16 +90,13 @@ object ScreenLAlbumList : Screen {
 
     private fun readResolve(): Any = ScreenLAlbumList
 
-
     @OptIn(ExperimentalZoomableApi::class)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
     override fun Content() {
 
         val navigator = LocalNavigator.currentOrThrow
-        val vm = getScreenModel<ScreenLAlbumListSM, ScreenLAlbumListSM.Factory> { factory ->
-            factory.create(null)
-        }
+        val vm = getScreenModel<ScreenLAlbumListSM, ScreenLAlbumListSM.Factory> { factory -> factory.create(null) }
         val bigList = vm.bigList
         val info = vm.info.collectAsStateWithLifecycle().value
         val currentFilter = vm.filter.collectAsStateWithLifecycle().value
@@ -112,8 +109,6 @@ object ScreenLAlbumList : Screen {
         var totalPages by remember { mutableIntStateOf(1) }
 
         LaunchedEffect(info) { totalPages = info?.totalPages ?: 1 }
-
-        // val statePager = rememberPagerState(initialPage = 9999, pageCount = { totalPages })
 
         LaunchedEffect(vm.statePager.currentPage) {
             vm.statePager.pageCountState.value = { totalPages }
@@ -223,7 +218,6 @@ object ScreenLAlbumList : Screen {
                         )
                     )
                     {
-
                         LazyVerticalGrid(
                             state = stateGrid, modifier = Modifier.fillMaxSize(),
                             columns = GridCells.Fixed(2)
@@ -286,7 +280,7 @@ object ScreenLAlbumList : Screen {
 
                     if (status == StatusAlbumList.DOWNLOADING) {
                         Box(
-                            modifier = Modifier.fillMaxSize(),
+                            modifier = Modifier.fillMaxSize().background(Color.Magenta),
                             contentAlignment = Alignment.Center
                         ) {
                             CircularProgressIndicator()
