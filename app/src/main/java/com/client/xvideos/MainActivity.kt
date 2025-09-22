@@ -8,23 +8,49 @@ import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import cafe.adriel.voyager.core.annotation.ExperimentalVoyagerApi
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.CurrentScreen
+import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.PermissionScreenActivity.PermissionStorage
 import com.client.xvideos.common.util.KeepScreenOn
 import com.client.xvideos.l.ui.screens.ScreenLRoot
+import com.client.xvideos.redgifs.ui.ScreenRedRoot
+import com.client.xvideos.screens.dashboards.ScreenDashBoards
 import com.client.xvideos.screens.videoplayer.video.cache.VideoPlayerCacheManager
 import com.client.xvideos.ui.theme.XvideosTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -93,22 +119,29 @@ class MainActivity : ComponentActivity()//, ImageLoaderFactory
         VideoPlayerCacheManager.initialize(this, 1024 * 1024 * 1024)    // 1GB
 
 
-
         setContent {
             KeepScreenOn()
             XvideosTheme(darkTheme = true) {
                 //EdgeToEdgeFix()
                 //Navigator(ScreenTags("blonde"))
+
                 Surface(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(Color.Black)
-                        //.windowInsetsPadding(WindowInsets.ime)
-                        //.consumeWindowInsets(WindowInsets.ime)
+                    //.windowInsetsPadding(WindowInsets.ime)
+                    //.consumeWindowInsets(WindowInsets.ime)
                     //.displayCutoutPadding()
                     //.systemBarsPadding())
                 )
                 {
+
+
+                    Navigator(MenuScreen, key = "root_navigator") { navigator ->
+                        CurrentScreen()
+                    }
+
+
                     //Navigator(ScreenDashBoards())
                     //Navigator(ScreenFavorites())
                     //ScreenRedProfile
@@ -119,16 +152,74 @@ class MainActivity : ComponentActivity()//, ImageLoaderFactory
                     //Navigator( screen = ScreenLAlbumList(556543))
                     //Navigator( screen = ScreenLAlbumTopHits())
 
-                    Navigator( screen = ScreenLRoot())
-
-
                     //Navigator( screen = ScreenLRoot())
+
+
                 }
 
             }
         }
     }
 
+}
+
+
+
+private object MenuScreen : Screen {
+
+    private fun readResolve(): Any = MenuScreen
+
+    @Composable
+    override fun Content() {
+        val navigator = LocalNavigator.currentOrThrow
+
+        Column(
+            modifier = Modifier.fillMaxSize().background(Color(0xFF353535)),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Bottom
+        ) {
+            ButtonSelect(R.drawable.icon_xvideos_white) {
+                navigator.push(ScreenDashBoards())
+            }
+            ButtonSelect(R.drawable.icon_luscious) {
+                navigator.push(ScreenLRoot()) // или ScreenLusciousRoot()
+            }
+            ButtonSelect(R.drawable.icon_red) {
+                navigator.push(ScreenRedRoot()) // или ScreenRedRoot()
+            }
+        }
+    }
+}
+
+
+@Composable
+private fun ButtonSelect(iconId: Int, onClick: () -> Unit) {
+
+    Box(
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .border(2.dp, Color(0xFF565656), RoundedCornerShape(16.dp))
+            .background(Color(0xFF212121))
+            .clickable { onClick() }
+            .padding(vertical = 16.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Image(
+            painterResource(iconId),
+            contentDescription = null,
+            modifier = Modifier.height(80.dp),
+            contentScale = ContentScale.FillHeight
+        )
+    }
+
+}
+
+@Preview(device = "id:pixel_9_pro")
+@Composable
+private fun MenuPreview() {
+    MenuScreen.Content()
 }
 
 @Composable
