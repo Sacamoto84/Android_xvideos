@@ -203,7 +203,6 @@ open class BaseEnhancedZoomState constructor(
         onAnimationEnd()
     }
 
-    // TODO Add resetting back to bounds for rotated state as well
     /**
      * Resets to bounds with animation and resets tracking for fling animation
      */

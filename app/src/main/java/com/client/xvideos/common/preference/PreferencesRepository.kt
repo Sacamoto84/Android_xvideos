@@ -8,6 +8,20 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
+
+/**
+ *
+ * # Переходим на  Setting TODO
+ *
+ *
+ *
+ */
+
+
+
+
+
+
 class PreferencesRepository(private val dataStore: DataStore<Preferences>) {
     ////////////////////////////////////////////////////////
     private val ROW2_KEY = booleanPreferencesKey("row2")

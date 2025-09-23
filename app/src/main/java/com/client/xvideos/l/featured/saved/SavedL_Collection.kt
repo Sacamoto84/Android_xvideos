@@ -1,6 +1,6 @@
 package com.client.xvideos.l.featured.saved
 
-import com.client.xvideos.common.collection.model.ISavedLCollection
+import com.client.xvideos.common.collectionDB.model.ISavedLCollection
 import com.client.xvideos.common.util.toMD5
 import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent

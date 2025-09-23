@@ -26,7 +26,7 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
 import cafe.adriel.voyager.hilt.getScreenModel
-import com.client.xvideos.common.collection.ui.DaialogNewCollection
+import com.client.xvideos.common.collectionDB.ui.DaialogNewCollection
 import com.client.xvideos.common.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.SavedCollectionTab
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.LazyRow123

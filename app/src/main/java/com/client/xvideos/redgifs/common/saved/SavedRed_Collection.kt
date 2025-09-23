@@ -1,6 +1,6 @@
 package com.redgifs.common.saved
 
-import com.client.xvideos.common.collection.model.ISavedLCollection
+import com.client.xvideos.common.collectionDB.model.ISavedLCollection
 import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
 import com.client.xvideos.redgifs.model.GifsInfo
 import kotlinx.coroutines.DelicateCoroutinesApi
