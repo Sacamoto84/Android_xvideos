@@ -19,11 +19,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.client.xvideos.feature.country.ComposeCountry
 import com.client.xvideos.common.noRippleClickable
 import com.client.xvideos.screens.config.ScreenConfig
-import com.client.xvideos.screens.favorites.ScreenFavorites
+import com.client.xvideos.xvideos.screens.favorites.ScreenFavorites
 import com.client.xvideos.ui.theme.grayColor
+import com.client.xvideos.xvideos.feature.country.ComposeCountry
 
 @Composable
 fun TopBarDashboard(){

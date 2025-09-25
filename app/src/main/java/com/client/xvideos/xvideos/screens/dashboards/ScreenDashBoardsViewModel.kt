@@ -1,4 +1,4 @@
-package com.client.xvideos.screens.dashboards
+package com.client.xvideos.xvideos.screens.dashboards
 
 import androidx.compose.foundation.pager.PagerState
 import cafe.adriel.voyager.core.model.ScreenModel
@@ -6,12 +6,12 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.navigator.Navigator
 import com.client.xvideos.common.preference.PreferencesRepository
-import com.client.xvideos.feature.room.AppDatabase
-import com.client.xvideos.feature.room.entity.FavoriteWithItem
-import com.client.xvideos.feature.room.entity.Favorites
-import com.client.xvideos.feature.room.entity.Items
 import com.client.xvideos.xvideos.model.GalleryItem
 import com.client.xvideos.screens.videoplayer.ScreenVideoPlayer
+import com.client.xvideos.xvideos.feature.room.AppDatabase
+import com.client.xvideos.xvideos.feature.room.entity.FavoriteWithItem
+import com.client.xvideos.xvideos.feature.room.entity.Favorites
+import com.client.xvideos.xvideos.feature.room.entity.Items
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

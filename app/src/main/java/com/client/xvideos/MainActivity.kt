@@ -159,8 +159,6 @@ class MainActivity : ComponentActivity()//, ImageLoaderFactory
 
 }
 
-
-
 private object MenuScreen : Screen {
 
     private fun readResolve(): Any = MenuScreen

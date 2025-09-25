@@ -21,13 +21,13 @@ import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
 import cafe.adriel.voyager.navigator.Navigator
 import com.client.xvideos.xvideos.model.HTML5PlayerConfig
-import com.client.xvideos.feature.net.readHtmlFromURLDirect
 import com.client.xvideos.xvideos.parcer.parseHTML5Player
 import com.client.xvideos.xvideos.parcer.parserItemVideo
 import com.client.xvideos.xvideos.parcer.parserItemVideoTags
 import com.client.xvideos.screens.videoplayer.model.TagsModel
 import com.client.xvideos.screens.itemFullScreen.ScreenVideoPlayerFullScreen
 import com.client.xvideos.screens.tags.ScreenTags
+import com.client.xvideos.xvideos.feature.net.readHtmlFromURLDirect
 import dagger.Binds
 import dagger.Module
 import dagger.assisted.Assisted

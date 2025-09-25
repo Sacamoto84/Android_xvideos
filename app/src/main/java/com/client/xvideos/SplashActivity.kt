@@ -46,7 +46,6 @@ class SplashActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         // включаем API
         val splashScreen = installSplashScreen()
-
         super.onCreate(savedInstanceState)
 
         // держим сплэш пока инициализация не завершена

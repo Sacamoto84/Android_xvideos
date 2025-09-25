@@ -1,12 +1,12 @@
-package com.client.xvideos.screens.tags
+package com.client.xvideos.xvideos.screens.tags
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
-import com.client.xvideos.feature.net.readHtmlFromURLDirect
 import com.client.xvideos.screens.tags.model.ModelScreenTag
 import com.client.xvideos.xvideos.parcer.parserScreenTags
 import com.client.xvideos.urlStart
+import com.client.xvideos.xvideos.feature.net.readHtmlFromURLDirect
 import dagger.Binds
 import dagger.Module
 import dagger.assisted.Assisted

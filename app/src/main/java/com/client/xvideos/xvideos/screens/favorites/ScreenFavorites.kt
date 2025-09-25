@@ -1,4 +1,4 @@
-package com.client.xvideos.screens.favorites
+package com.client.xvideos.xvideos.screens.favorites
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -40,7 +40,6 @@ import com.client.xvideos.xvideos.model.GalleryItem
 import com.client.xvideos.screens.dashboards.UrlVideoImageAndLongClick
 import com.client.xvideos.screens.profile.ScreenProfile
 import com.composables.core.HorizontalSeparator
-
 
 class ScreenFavorites() : Screen {
 

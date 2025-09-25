@@ -25,7 +25,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.xvideos.model.GalleryItem
 import com.client.xvideos.screens.dashboards.UrlVideoImageAndLongClick
-import com.client.xvideos.screens.tags.ScreenTagsViewModel
+import com.client.xvideos.xvideos.screens.tags.ScreenTagsViewModel
 
 @Composable
 fun TagsPaginatedListScreen(pageIndex: Int, vm: ScreenTagsViewModel) {

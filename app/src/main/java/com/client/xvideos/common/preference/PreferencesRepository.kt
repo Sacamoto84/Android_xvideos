@@ -17,11 +17,6 @@ import kotlinx.coroutines.flow.map
  *
  */
 
-
-
-
-
-
 class PreferencesRepository(private val dataStore: DataStore<Preferences>) {
     ////////////////////////////////////////////////////////
     private val ROW2_KEY = booleanPreferencesKey("row2")

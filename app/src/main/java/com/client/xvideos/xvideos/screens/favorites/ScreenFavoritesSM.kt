@@ -1,10 +1,10 @@
-package com.client.xvideos.screens.favorites
+package com.client.xvideos.xvideos.screens.favorites
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelKey
-import com.client.xvideos.feature.room.AppDatabase
-import com.client.xvideos.feature.room.entity.FavoriteWithItem
+import com.client.xvideos.xvideos.feature.room.AppDatabase
+import com.client.xvideos.xvideos.feature.room.entity.FavoriteWithItem
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
