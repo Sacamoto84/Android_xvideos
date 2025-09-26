@@ -8,7 +8,7 @@ import com.client.xvideos.redgifs.model.GifsInfo
 import com.client.xvideos.redgifs.model.MediaType
 import com.client.xvideos.redgifs.model.Order
 import com.client.xvideos.redgifs.common.block.BlockRed
-import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
+import com.client.xvideos.common.snackBar.SnackBarEvent
 import timber.log.Timber
 
 class ItemProfilePagingSource (val profileName : String, val sort : Order, val block: BlockRed, val redApi: RedApi, val tags : List<String> = emptyList(), val snackBarEvent: SnackBarEvent): PagingSource<Int, GifsInfo>() {

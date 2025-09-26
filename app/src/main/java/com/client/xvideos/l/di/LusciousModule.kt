@@ -8,7 +8,7 @@ import com.client.xvideos.common.kdownloader.KDownloader
 import com.client.xvideos.common.room.AppDatabase
 import com.client.xvideos.l.net.Luscious
 import com.client.xvideos.l.repository.Repository
-import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
+import com.client.xvideos.common.snackBar.SnackBarEvent
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

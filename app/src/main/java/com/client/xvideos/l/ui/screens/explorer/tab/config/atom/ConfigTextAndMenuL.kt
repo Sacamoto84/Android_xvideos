@@ -29,7 +29,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.client.xvideos.common.setting.styleTextConfig
+import com.client.xvideos.common.settings.ui.styleTextConfig
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.theme.ThemeL.ExpandMenu.backgroundColor
 import com.client.xvideos.l.theme.ThemeL.ExpandMenu.style

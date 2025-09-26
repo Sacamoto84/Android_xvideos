@@ -11,7 +11,7 @@ import com.client.xvideos.common.room.dao.r.R_GifsInfoDao
 import com.client.xvideos.common.room.entity.r.R_BlockEntity
 import com.client.xvideos.common.room.entity.r.toDomain
 import com.client.xvideos.common.room.entity.r.toEntity
-import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
+import com.client.xvideos.common.snackBar.SnackBarEvent
 import com.client.xvideos.redgifs.model.GifsInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow

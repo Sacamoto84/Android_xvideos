@@ -1,7 +1,7 @@
 package com.client.xvideos.xvideos.feature.saved
 
 import com.client.xvideos.common.di.ApplicationScope
-import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
+import com.client.xvideos.common.snackBar.SnackBarEvent
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 import javax.inject.Singleton

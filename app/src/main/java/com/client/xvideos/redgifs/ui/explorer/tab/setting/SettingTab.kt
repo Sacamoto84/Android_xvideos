@@ -47,10 +47,10 @@ import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import com.client.xvideos.common.AppPath
 import com.client.xvideos.common.util.getFolderSize
-import com.client.xvideos.common.sharedPref.Settings
-import com.client.xvideos.common.setting.ConfigText
-import com.client.xvideos.common.setting.ConfigTextAndButtonWithDialog
-import com.client.xvideos.common.setting.ConfigTextAndCheckBox
+import com.client.xvideos.common.settings.Settings
+import com.client.xvideos.common.settings.ui.ConfigText
+import com.client.xvideos.common.settings.ui.ConfigTextAndButtonWithDialog
+import com.client.xvideos.common.settings.ui.ConfigTextAndCheckBox
 import com.client.xvideos.common.util.toPrettyCount3
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.common.di.HostDI

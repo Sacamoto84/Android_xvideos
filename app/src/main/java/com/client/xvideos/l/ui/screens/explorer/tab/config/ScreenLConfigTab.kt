@@ -37,7 +37,7 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import com.client.xvideos.common.fresco.FrescoUtils
-import com.client.xvideos.common.sharedPref.Settings
+import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.common.traficStatistic.AppNetworkSpeedMonitor
 import com.client.xvideos.common.util.formatBytes
 import com.client.xvideos.common.util.getFolderSize
@@ -49,7 +49,7 @@ import com.client.xvideos.l.ui.screens.explorer.tab.config.atom.ConfigTextAndChe
 import com.client.xvideos.l.ui.screens.explorer.tab.config.atom.ConfigTextAndMenuL
 import com.client.xvideos.l.ui.screens.explorer.tab.config.atom.ConfigTextL
 import com.client.xvideos.l.ui.screens.explorer.tab.config.atom.ScreenLConfig_Encrypt
-import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
+import com.client.xvideos.common.snackBar.SnackBarEvent
 import com.facebook.drawee.backends.pipeline.Fresco
 import dagger.Binds
 import dagger.Module

@@ -6,12 +6,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.EnhancedEncryption
-import androidx.compose.material.icons.outlined.AdminPanelSettings
 import androidx.compose.material.icons.outlined.Apps
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.Lock
-import androidx.compose.material.icons.outlined.LockOpen
 import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
@@ -24,7 +21,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
-import com.client.xvideos.common.sharedPref.Settings
+import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.l.ui.screens.explorer.tab.saved.albums.ScreenLSavedAlbumsTab
 import com.client.xvideos.l.ui.screens.explorer.tab.saved.crypto.ScreenLSavedLCryptoTab
 import com.client.xvideos.l.ui.screens.explorer.tab.saved.likes.ScreenLSavedLikesTab

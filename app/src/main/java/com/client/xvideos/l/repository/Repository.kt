@@ -7,7 +7,7 @@ import com.client.xvideos.common.room.entity.CacheUrlStringRamEntity
 import com.client.xvideos.common.room.entity.CacheUrlStringRomEntity
 import com.client.xvideos.common.util.toMD5
 import com.client.xvideos.l.KtorRequestHandler
-import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
+import com.client.xvideos.common.snackBar.SnackBarEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay

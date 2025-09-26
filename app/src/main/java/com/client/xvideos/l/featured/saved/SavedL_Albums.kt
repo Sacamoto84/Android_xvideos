@@ -6,7 +6,7 @@ import com.client.xvideos.common.room.AppDatabase
 import com.client.xvideos.common.room.entity.l.L_AlbumPictureCacheEntity
 import com.client.xvideos.l.model.AlbumDetails
 import com.client.xvideos.l.model.PicsDetails
-import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
+import com.client.xvideos.common.snackBar.SnackBarEvent
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi

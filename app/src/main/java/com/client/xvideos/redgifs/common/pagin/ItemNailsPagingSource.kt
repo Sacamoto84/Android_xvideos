@@ -7,7 +7,7 @@ import com.client.xvideos.redgifs.network.api.RedApi
 import com.client.xvideos.redgifs.model.GifsInfo
 import com.client.xvideos.redgifs.model.Order
 import com.client.xvideos.redgifs.common.block.BlockRed
-import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
+import com.client.xvideos.common.snackBar.SnackBarEvent
 import timber.log.Timber
 
 class ItemNailsPagingSource (val order : Order, val nichesName : String, val block: BlockRed, val redApi: RedApi, val snackBarEvent: SnackBarEvent): PagingSource<Int, GifsInfo>() {

@@ -1,4 +1,4 @@
-package com.client.xvideos.redgifs.common.snackBar
+package com.client.xvideos.common.snackBar
 
 import com.redgifs.common.snackBar.UiMessage
 import kotlinx.coroutines.channels.Channel

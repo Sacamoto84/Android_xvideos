@@ -29,13 +29,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.client.xvideos.LocalRootScreenModel
 import com.client.xvideos.common.fresco.DownloadQueueManager
 import com.client.xvideos.l.theme.ThemeL
-import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.ui.screens.screenFullScreen.FullScreenImage
-import com.client.xvideos.l.ui.screens.LocalRootLScreenModel
 import com.client.xvideos.common.fresco.UrlImageGifsFresco
-import com.client.xvideos.common.sharedPref.Settings
+import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.l.ui.element.expandMenu.ExpandMenuType
 import com.client.xvideos.l.ui.element.expandMenu.ExpandMenuViewModel
 import com.client.xvideos.redgifs.ui.profile.atom.VerticalScrollbar
@@ -57,7 +56,7 @@ fun LazyRowPictureDetails(
 
     val navigator = LocalNavigator.currentOrThrow
 
-    val rootVm = LocalRootLScreenModel.current
+    val rootVm = LocalRootScreenModel.current
 
     val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForLazyStaggeredGrid( host.state,  0 )
 

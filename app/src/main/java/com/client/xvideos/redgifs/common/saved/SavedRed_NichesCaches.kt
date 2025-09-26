@@ -9,7 +9,7 @@ import androidx.compose.runtime.setValue
 import com.client.xvideos.common.AppPath
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
-import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
+import com.client.xvideos.common.snackBar.SnackBarEvent
 import com.client.xvideos.redgifs.model.Niche
 import com.client.xvideos.redgifs.network.api.RedApi
 import kotlinx.coroutines.CoroutineScope

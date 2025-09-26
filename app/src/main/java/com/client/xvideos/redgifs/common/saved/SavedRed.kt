@@ -1,7 +1,7 @@
 package com.client.xvideos.redgifs.common.saved
 
 import com.client.xvideos.common.di.ApplicationScope
-import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
+import com.client.xvideos.common.snackBar.SnackBarEvent
 import com.client.xvideos.redgifs.model.tag.TagInfo
 import com.client.xvideos.redgifs.network.api.RedApi
 import com.redgifs.common.saved.SavedRed_Collection

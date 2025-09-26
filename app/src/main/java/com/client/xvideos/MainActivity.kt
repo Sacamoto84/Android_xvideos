@@ -38,13 +38,11 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import cafe.adriel.voyager.core.annotation.ExperimentalVoyagerApi
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.PermissionScreenActivity.PermissionStorage
 import com.client.xvideos.common.util.KeepScreenOn
-import com.client.xvideos.l.ui.screens.ScreenLRoot
+import com.client.xvideos.l.ui.screens.explorer.ScreenLExplorer
 import com.client.xvideos.redgifs.ui.ScreenRedRoot
 import com.client.xvideos.screens.dashboards.ScreenXDashBoards
 import com.client.xvideos.screens.videoplayer.video.cache.VideoPlayerCacheManager
@@ -56,30 +54,6 @@ const val urlStart = "https://www.xv-ru.com"
 @AndroidEntryPoint
 class MainActivity : ComponentActivity()//, ImageLoaderFactory
 {
-
-//    override fun newImageLoader(): ImageLoader {
-//        return ImageLoader.Builder(this)
-//            .diskCache {
-//                DiskCache.Builder()
-//                    .directory(cacheDir.resolve("image_cache"))
-//                    .maxSizePercent(0.5)
-//                    .build()
-//            }
-//            .memoryCache {
-//                MemoryCache.Builder(this)
-//                    .maxSizePercent(0.5)
-//                    .build()
-//            }
-//            .respectCacheHeaders(false)
-//            .allowHardware(true)
-//            .allowRgb565(true)
-//            .interceptorDispatcher(Dispatchers.IO)
-//            .memoryCachePolicy(CachePolicy.ENABLED)
-//            .diskCachePolicy(CachePolicy.ENABLED)
-//            .dispatcher(Dispatchers.Default)
-//            .bitmapFactoryMaxParallelism(8)
-//            .build()
-//    }
 
     @OptIn(ExperimentalVoyagerApi::class, ExperimentalLayoutApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -114,12 +88,10 @@ class MainActivity : ComponentActivity()//, ImageLoaderFactory
 
         VideoPlayerCacheManager.initialize(this, 1024 * 1024 * 1024)    // 1GB
 
-
         setContent {
             KeepScreenOn()
             XvideosTheme(darkTheme = true) {
                 //EdgeToEdgeFix()
-                //Navigator(ScreenTags("blonde"))
 
                 Surface(
                     modifier = Modifier
@@ -132,34 +104,18 @@ class MainActivity : ComponentActivity()//, ImageLoaderFactory
                 )
                 {
 
-
-                    Navigator(MenuScreen, key = "root_navigator") { navigator ->
-                        CurrentScreen()
-                    }
-
-
-                    //Navigator(ScreenDashBoards())
-                    //Navigator(ScreenFavorites())
-                    //ScreenRedProfile
-                    //Navigator(ScreenRedProfile("lilijunex")
-                    //Navigator(startScreen, key = "1")
-                    //Navigator(ScreenRedRoot())
-                    //Navigator( screen = ScreenLAlbum(556543))
-                    //Navigator( screen = ScreenLAlbumList(556543))
-                    //Navigator( screen = ScreenLAlbumTopHits())
-
-                    //Navigator( screen = ScreenLRoot())
-
+//                    Navigator(MenuScreen, key = "root_navigator") { navigator ->
+//                        CurrentScreen()
+//                    }
+                    ScreenRoot.Content()
 
                 }
-
             }
         }
     }
-
 }
 
-private object MenuScreen : Screen {
+object MenuScreen : Screen {
 
     private fun readResolve(): Any = MenuScreen
 
@@ -176,7 +132,7 @@ private object MenuScreen : Screen {
                 navigator.push(ScreenXDashBoards())
             }
             ButtonSelect(R.drawable.icon_luscious) {
-                navigator.push(ScreenLRoot()) // или ScreenLusciousRoot()
+                navigator.push(ScreenLExplorer()) // или ScreenLusciousRoot()
             }
             ButtonSelect(R.drawable.icon_red) {
                 navigator.push(ScreenRedRoot()) // или ScreenRedRoot()

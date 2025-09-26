@@ -3,11 +3,9 @@ package com.client.xvideos.l.ui.element.expandMenu
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.tooling.ComposeToolingApi
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.lifecycle.ViewModel
-import cafe.adriel.voyager.core.model.screenModelScope
 import com.client.xvideos.common.AppPath
 import com.client.xvideos.common.di.ApplicationScope
 import com.client.xvideos.common.kdownloader.KDownloader
@@ -17,8 +15,7 @@ import com.client.xvideos.l.featured.saved.SavedL
 import com.client.xvideos.l.featured.share.useCaseShareFile
 import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.net.Luscious
-import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
-import dagger.assisted.Assisted
+import com.client.xvideos.common.snackBar.SnackBarEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.ktor.client.HttpClient

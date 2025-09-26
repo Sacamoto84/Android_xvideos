@@ -17,30 +17,26 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import cafe.adriel.voyager.core.registry.rememberScreen
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
-import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
-import com.client.xvideos.common.sharedPref.Settings
-import com.client.xvideos.l.ui.screens.depth
+import com.client.xvideos.common.settings.Settings
+import com.client.xvideos.depth
 import com.client.xvideos.l.ui.screens.explorer.tab.albumTopHits.ScreenLAlbumTopHits
 import com.client.xvideos.l.ui.screens.explorer.tab.config.ScreenLConfigTab
 import com.client.xvideos.l.ui.screens.explorer.tab.saved.SavedLTab
 import com.client.xvideos.l.ui.screens.screenAlbumList.ScreenLAlbumList
+import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.ui.explorer.tab.gifs.GifsTab
 import com.client.xvideos.redgifs.ui.explorer.top.TabRow
 import com.client.xvideos.redgifs.ui.ui.atom.TabBarPoints
-import com.client.xvideos.redgifs.common.ThemeRed
 
 @Composable
 private fun RowScope.TabNavigationItem(tab: Tab) {

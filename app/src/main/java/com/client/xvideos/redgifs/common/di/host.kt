@@ -6,7 +6,7 @@ import com.redgifs.common.downloader.DownloadRed
 import com.client.xvideos.redgifs.common.saved.SavedRed
 import com.client.xvideos.redgifs.common.search.SearchNichesRed
 import com.redgifs.common.search.SearchRed
-import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
+import com.client.xvideos.common.snackBar.SnackBarEvent
 import com.client.xvideos.redgifs.network.api.RedApi
 import javax.inject.Inject
 import javax.inject.Singleton

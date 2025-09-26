@@ -1,4 +1,4 @@
-package com.client.xvideos.common.sharedPref
+package com.client.xvideos.common.settings.element
 
 import android.content.SharedPreferences
 import androidx.core.content.edit

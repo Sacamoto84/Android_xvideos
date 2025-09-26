@@ -1,4 +1,4 @@
-package com.client.xvideos.common.setting
+package com.client.xvideos.common.settings.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

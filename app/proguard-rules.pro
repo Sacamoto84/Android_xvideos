@@ -112,7 +112,7 @@
 -dontwarn com.redgifs.common.saved.SavedRed_Niches
 -dontwarn com.client.xvideos.redgifs.common.search.SearchNichesRed
 -dontwarn com.redgifs.common.search.SearchRed
--dontwarn com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
+-dontwarn com.client.xvideos.common.snackBar.SnackBarEvent
 -dontwarn com.client.xvideos.redgifs.network.api.RedApi
 
 -keep class com.client.common.videoplayer.util.PlaybackPreference { *; }

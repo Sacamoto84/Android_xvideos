@@ -5,7 +5,7 @@ import android.app.Application
 import android.preference.PreferenceManager
 import androidx.compose.runtime.ExperimentalComposeRuntimeApi
 import com.client.xvideos.common.fresco.FrescoInit
-import com.client.xvideos.common.sharedPref.Settings
+import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.common.traficStatistic.NetworkTrafficMonitor
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.DelicateCoroutinesApi

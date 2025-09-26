@@ -4,7 +4,7 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.client.xvideos.redgifs.model.GifsInfo
 import com.client.xvideos.redgifs.common.saved.SavedRed
-import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
+import com.client.xvideos.common.snackBar.SnackBarEvent
 import timber.log.Timber
 
 class ItemCollectionPagingSource(val collection: String?, val savedRed: SavedRed, val snackBarEvent: SnackBarEvent) : PagingSource<Int, GifsInfo>() {

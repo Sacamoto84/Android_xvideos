@@ -2,7 +2,7 @@ package com.client.xvideos.xvideos.feature.saved
 
 import com.client.xvideos.common.AppPath
 import com.client.xvideos.common.fileDB.FileDB
-import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
+import com.client.xvideos.common.snackBar.SnackBarEvent
 import com.client.xvideos.xvideos.model.ItemsX
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi

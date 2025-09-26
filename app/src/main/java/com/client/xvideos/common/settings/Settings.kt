@@ -1,6 +1,9 @@
-package com.client.xvideos.common.sharedPref
+package com.client.xvideos.common.settings
 
 import android.content.SharedPreferences
+import com.client.xvideos.common.settings.element.SettingElementBoolean
+import com.client.xvideos.common.settings.element.SettingElementInt
+import com.client.xvideos.common.settings.element.SettingElementString
 import com.client.xvideos.l.model.ThumbnailsSize
 
 object Settings {
@@ -26,7 +29,13 @@ object Settings {
     val current_count_gifTab by lazy { SettingElementInt(pref, "current_count_gifTab", 2) }
 
     val current_count_likesTab by lazy { SettingElementInt(pref, "current_count_likesTab", 2) }
-    val current_count_collectionTab by lazy { SettingElementInt(pref, "current_count_collectionTab", 2) }
+    val current_count_collectionTab by lazy {
+        SettingElementInt(
+            pref,
+            "current_count_collectionTab",
+            2
+        )
+    }
 
 
 
@@ -36,7 +45,13 @@ object Settings {
     /**
      * Размер миниатюры в галерее
      */
-    val thumbalistSize by lazy { SettingElementString(pref, "thumbalistSize", ThumbnailsSize.SMALL.value) }
+    val thumbalistSize by lazy {
+        SettingElementString(
+            pref,
+            "thumbalistSize",
+            ThumbnailsSize.SMALL.value
+        )
+    }
 
 
     /**
@@ -47,7 +62,13 @@ object Settings {
     /**
      * Функция автоочистки кеша при запуске приложения, очищает половину старых файлов
      */
-    val frescoDiskCacheAutoClear by lazy { SettingElementBoolean(pref, "frescoDiskCacheAutoClear", false) }
+    val frescoDiskCacheAutoClear by lazy {
+        SettingElementBoolean(
+            pref,
+            "frescoDiskCacheAutoClear",
+            false
+        )
+    }
 
 
 
