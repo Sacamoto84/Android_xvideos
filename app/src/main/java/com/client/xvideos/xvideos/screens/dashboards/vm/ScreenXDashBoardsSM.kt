@@ -6,7 +6,7 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.navigator.Navigator
 import com.client.xvideos.common.sharedPref.Settings
-import com.client.xvideos.xvideos.feature.room.entity.ItemsX
+import com.client.xvideos.xvideos.model.ItemsX
 import com.client.xvideos.xvideos.feature.saved.SavedX
 import com.client.xvideos.xvideos.screens.videoplayer.ScreenVideoPlayer
 import dagger.Binds

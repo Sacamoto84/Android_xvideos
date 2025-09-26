@@ -1,6 +1,6 @@
 package com.client.xvideos.xvideos.parcer
 
-import com.client.xvideos.xvideos.feature.room.entity.ItemsX
+import com.client.xvideos.xvideos.model.ItemsX
 import com.client.xvideos.xvideos.screens.tags.model.ModelScreenTag
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document

@@ -1,4 +1,4 @@
-package com.client.xvideos.xvideos.feature.room.entity
+package com.client.xvideos.xvideos.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

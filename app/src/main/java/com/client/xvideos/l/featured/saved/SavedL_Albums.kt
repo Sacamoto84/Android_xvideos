@@ -2,20 +2,20 @@ package com.client.xvideos.l.featured.saved
 
 import com.client.xvideos.common.AppPath
 import com.client.xvideos.common.fileDB.FileDB
-import com.client.xvideos.l.db.AlbumPictureCacheEntity
-import com.client.xvideos.l.db.AppLDatabase
+import com.client.xvideos.common.room.AppDatabase
+import com.client.xvideos.common.room.L_AlbumPictureCacheEntity
 import com.client.xvideos.l.model.AlbumDetails
 import com.client.xvideos.l.model.PicsDetails
-import com.google.gson.Gson
 import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
+import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class SavedL_Albums(val snackBarEvent: SnackBarEvent, val db: AppLDatabase, val scope: CoroutineScope) {
+class SavedL_Albums(val snackBarEvent: SnackBarEvent, val db: AppDatabase, val scope: CoroutineScope) {
 
-    val albumDb = FileDB<AlbumDetails>(AppPath.albums_l, "album", AlbumDetails::class.java)
+    val albumDb = FileDB(AppPath.albums_l, "album", AlbumDetails::class.java)
     val list = albumDb.list
 
     fun add(item: AlbumDetails) {
@@ -39,7 +39,12 @@ class SavedL_Albums(val snackBarEvent: SnackBarEvent, val db: AppLDatabase, val 
 
                 scope.launch(Dispatchers.IO) {
                     val gson = Gson()
-                    db.albumPictureCacheDao().insert( AlbumPictureCacheEntity( item.id.toLong(), gson.toJson(picsDetails)) )
+                    db.albumPictureCacheDao().insert(
+                        L_AlbumPictureCacheEntity(
+                            item.id.toLong(),
+                            gson.toJson(picsDetails)
+                        )
+                    )
                 }
 
             }

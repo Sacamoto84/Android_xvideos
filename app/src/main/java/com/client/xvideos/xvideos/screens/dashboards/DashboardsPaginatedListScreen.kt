@@ -51,7 +51,7 @@ import com.client.xvideos.xvideos.parcer.parserListVideo
 import com.client.xvideos.urlStart
 import com.client.xvideos.xvideos.feature.country.currentCountriesUpdate
 import com.client.xvideos.xvideos.feature.net.readHtmlFromURLWebView
-import com.client.xvideos.xvideos.feature.room.entity.ItemsX
+import com.client.xvideos.xvideos.model.ItemsX
 import com.client.xvideos.xvideos.screens.dashboards.vm.ScreenXDashBoardsScreenModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay

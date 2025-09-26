@@ -35,7 +35,7 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.client.xvideos.xvideos.feature.room.entity.ItemsX
+import com.client.xvideos.xvideos.model.ItemsX
 import com.client.xvideos.xvideos.screens.dashboards.UrlVideoImageAndLongClick
 import com.client.xvideos.xvideos.screens.profile.ScreenProfile
 import com.composables.core.HorizontalSeparator

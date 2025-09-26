@@ -17,7 +17,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import com.client.xvideos.common.vibrate.vibrateWithPatternAndAmplitude
 import com.client.xvideos.common.urlVideImage.UrlImage
 import com.client.xvideos.common.urlVideImage.UrlVideoLite
-import com.client.xvideos.xvideos.feature.room.entity.ItemsX
+import com.client.xvideos.xvideos.model.ItemsX
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

@@ -3,7 +3,7 @@ package com.client.xvideos.xvideos.screens.favorites
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelKey
-import com.client.xvideos.xvideos.feature.room.entity.ItemsX
+import com.client.xvideos.xvideos.model.ItemsX
 import com.client.xvideos.xvideos.feature.saved.SavedX
 import dagger.Binds
 import dagger.Module

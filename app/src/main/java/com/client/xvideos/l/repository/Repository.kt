@@ -1,44 +1,22 @@
 package com.client.xvideos.l.repository
 
 import android.content.Context
-import com.client.xvideos.common.encrypting.Crypto
 import com.client.xvideos.common.encrypting.Password
+import com.client.xvideos.common.room.AppDatabase
+import com.client.xvideos.common.room.CacheUrlStringRamEntity
+import com.client.xvideos.common.room.CacheUrlStringRomEntity
 import com.client.xvideos.common.util.toMD5
 import com.client.xvideos.l.KtorRequestHandler
-import com.client.xvideos.l.db.AppLDatabase
-import com.client.xvideos.l.db.RepositoryCacheFullEntity
-import com.client.xvideos.l.db.RepositoryCacheTempEntity
 import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
-import com.github.javafaker.Faker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import io.ktor.client.*
-import io.ktor.client.engine.cio.*   // или OkHttp, если хочешь
-import io.ktor.client.engine.okhttp.OkHttp
-import io.ktor.client.plugins.HttpRequestRetry
-import io.ktor.client.plugins.HttpTimeout
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.cookies.AcceptAllCookiesStorage
-import io.ktor.client.plugins.cookies.HttpCookies
-import io.ktor.client.plugins.defaultRequest
-import io.ktor.client.plugins.logging.LogLevel
-import io.ktor.client.plugins.logging.Logging
-import io.ktor.client.plugins.timeout
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.isSuccess
-import io.ktor.serialization.gson.gson
-import io.ktor.utils.io.jvm.javaio.*
-import java.io.File
-import javax.crypto.SecretKey
-import javax.crypto.spec.SecretKeySpec
 
 class Repository(
-    db: AppLDatabase,
+    dbCache: AppDatabase,
     //private val luscious: Luscious,
     private val snackBarEvent: SnackBarEvent,
     private val scope: CoroutineScope,
@@ -62,8 +40,8 @@ class Repository(
         password
     )
 
-    private val repositoryCacheFullDao = db.repositoryCacheFullDao()
-    private val repositoryCacheTempDao = db.repositoryCacheTempDao()
+    private val cacheUrlStringRomDao = dbCache.cacheUrlStringRomDao()
+    private val cacheUrlStringRamDao = dbCache.cacheUrlStringRamDao()
 
     suspend fun openURI(
         url: String,
@@ -103,7 +81,7 @@ class Repository(
                 RepositoryUriConfig.CACHE_ROM -> {
                     try {
                         val cacheKey = data.toMD5()
-                        val res = repositoryCacheFullDao.get(cacheKey)
+                        val res = cacheUrlStringRomDao.get(cacheKey)
                         if (res != null) {
                             //Timber.i("!!! openURI() CACHE_ROM res != null response:${res.content}")
                             return Result.success(res.content)
@@ -115,12 +93,8 @@ class Repository(
                             return Result.failure(Exception(response))
                         }
 
-                        repositoryCacheFullDao.insert(
-                            RepositoryCacheFullEntity(
-                                url = cacheKey,
-                                content = response
-                            )
-                        )
+                        cacheUrlStringRomDao.insert( CacheUrlStringRomEntity( url = cacheKey, content = response ) )
+
                         //Timber.i("!!! openURI() CACHE_ROM net response:$response")
                         return Result.success(response)
                     }
@@ -133,7 +107,7 @@ class Repository(
                 RepositoryUriConfig.CACHE_RAM -> {
                     try {
                         val cacheKey = data.toMD5()
-                        val res = repositoryCacheTempDao.get(cacheKey)
+                        val res = cacheUrlStringRamDao.get(cacheKey)
                         if (res != null) {
                             //Timber.i("!!! openURI() CACHE_RAM res != null response:${res.content}")
                             return Result.success(res.content)
@@ -145,9 +119,8 @@ class Repository(
                             return Result.failure(Exception(response))
                         }
 
-                        repositoryCacheTempDao.insert(
-                            RepositoryCacheTempEntity( url = cacheKey, content = response )
-                        )
+                        cacheUrlStringRamDao.insert( CacheUrlStringRamEntity(url = cacheKey, content = response) )
+
                         //Timber.i("!!! openURI() CACHE_RAM net response:$response")
 
                         if (response.contains("{\"errors\":"))
@@ -174,7 +147,7 @@ class Repository(
     fun clearTemp(){
         scope.launch {
             withContext(Dispatchers.Main) {
-                repositoryCacheTempDao.deleteAll()
+                cacheUrlStringRamDao.deleteAll()
             }
         }
     }

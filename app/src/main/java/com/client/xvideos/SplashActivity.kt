@@ -3,22 +3,15 @@ package com.client.xvideos
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
-import com.airbnb.lottie.compose.rememberLottieComposition
 import com.client.xvideos.PermissionScreenActivity.PermissionStorage
-import com.client.xvideos.l.db.AppLDatabase
+import com.client.xvideos.common.room.AppDatabase
 import com.client.xvideos.redgifs.common.block.BlockRed
 import com.client.xvideos.redgifs.common.saved.SavedRed
 import com.client.xvideos.redgifs.db.AppRedGifsDatabase
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -30,7 +23,7 @@ import javax.inject.Inject
 class SplashActivity : ComponentActivity() {
 
     @Inject
-    lateinit var dbL: javax.inject.Provider<AppLDatabase>
+    lateinit var dbCache: javax.inject.Provider<AppDatabase>
 
     @Inject
     lateinit var redGifsDb: javax.inject.Provider<AppRedGifsDatabase>
@@ -70,7 +63,7 @@ class SplashActivity : ComponentActivity() {
 
             val savedRedInstance = savedRed.get()
             val blockRedInstance = blockRed.get()
-            val dbInstance = dbL.get()
+            val dbInstance = dbCache.get()
 
             val jobs = listOf(
                 async { savedRedInstance.refreshTagList() },
@@ -79,7 +72,7 @@ class SplashActivity : ComponentActivity() {
                 async { savedRedInstance.niches.refresh() },
                 async { savedRedInstance.creators.refresh() },
                 async { savedRedInstance.collections.refreshCollectionList() },
-                async { dbInstance.postJsonRamDao().deleteAll() }
+                async { dbInstance.cacheUrlStringRamDao().deleteAll() }
             )
 
             // ждём все задачи
