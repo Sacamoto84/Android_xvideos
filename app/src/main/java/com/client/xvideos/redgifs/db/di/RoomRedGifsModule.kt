@@ -1,19 +1,14 @@
 package com.client.xvideos.redgifs.db.di
 
-import android.content.Context
-import androidx.room.Room
-import com.client.xvideos.common.AppPath
-import com.client.xvideos.redgifs.db.AppRedGifsDatabase
-import com.client.xvideos.redgifs.db.dao.BlockDao
-import com.client.xvideos.redgifs.db.dao.CacheMediaResponseDao
-import com.client.xvideos.redgifs.db.dao.GifsInfoDao
-import com.client.xvideos.redgifs.db.dao.SearchRedHistoryDao
+import com.client.xvideos.common.room.AppDatabase
+import com.client.xvideos.common.room.dao.r.R_BlockDao
+import com.client.xvideos.common.room.dao.r.R_CacheMediaResponseDao
+import com.client.xvideos.common.room.dao.r.R_GifsInfoDao
+import com.client.xvideos.common.room.dao.r.R_SearchHistoryDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import java.io.File
 import javax.inject.Singleton
 
 @Module
@@ -22,39 +17,39 @@ object RoomRedGifsModule {
 
     @Singleton
     @Provides
-    fun provideMediaDao(appDatabase: AppRedGifsDatabase): CacheMediaResponseDao {
+    fun provideMediaDao(appDatabase: AppDatabase): R_CacheMediaResponseDao {
         return appDatabase.cacheMediaResponseDao()
     }
 
     @Singleton
     @Provides
-    fun provideSearchDao(appDatabase: AppRedGifsDatabase): SearchRedHistoryDao {
+    fun provideSearchDao(appDatabase: AppDatabase): R_SearchHistoryDao {
         return appDatabase.searchHistoryDao()
     }
 
     @Singleton
     @Provides
-    fun provideBlockDao(appDatabase: AppRedGifsDatabase): BlockDao {
+    fun provideBlockDao(appDatabase: AppDatabase): R_BlockDao {
         return appDatabase.blockDao()
     }
 
     @Singleton
     @Provides
-    fun provideGifInfoDao(appDatabase: AppRedGifsDatabase): GifsInfoDao {
+    fun provideGifInfoDao(appDatabase: AppDatabase): R_GifsInfoDao {
         return appDatabase.gifInfoDao()
     }
 
-    @Provides
-    @Singleton
-    fun provideRedGifsStockDatabase(@ApplicationContext context: Context): AppRedGifsDatabase {
-        println("!!! DI RedGifs ROOM")
-        val dbPath = File(AppPath.db_red, "red_database.db").apply {
-            parentFile?.mkdirs()      // гарантируем, что директория есть
-        }.absolutePath
-        return Room.databaseBuilder(context, AppRedGifsDatabase::class.java, dbPath)
-            .fallbackToDestructiveMigration()
-            //.allowMainThreadQueries()
-            .build()
-    }
+//    @Provides
+//    @Singleton
+//    fun provideRedGifsStockDatabase(@ApplicationContext context: Context): AppRedGifsDatabase {
+//        println("!!! DI RedGifs ROOM")
+//        val dbPath = File(AppPath.db_red, "red_database.db").apply {
+//            parentFile?.mkdirs()      // гарантируем, что директория есть
+//        }.absolutePath
+//        return Room.databaseBuilder(context, AppRedGifsDatabase::class.java, dbPath)
+//            .fallbackToDestructiveMigration()
+//            //.allowMainThreadQueries()
+//            .build()
+//    }
 
 }

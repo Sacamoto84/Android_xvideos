@@ -1,4 +1,4 @@
-package com.client.xvideos.redgifs.db.entity
+package com.client.xvideos.common.room.entity.r
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -12,7 +12,7 @@ import java.util.TimeZone
  * Таблица с кешем строк ответов от сервера
  */
 @Entity(tableName = "cache_media_response")
-data class CacheMediaResponseEntity(
+data class R_CacheMediaResponseEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val url: String,
     val content: String,

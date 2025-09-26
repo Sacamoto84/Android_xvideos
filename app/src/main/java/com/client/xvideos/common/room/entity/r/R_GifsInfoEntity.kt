@@ -1,4 +1,4 @@
-package com.client.xvideos.redgifs.db.entity
+package com.client.xvideos.common.room.entity.r
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -6,7 +6,7 @@ import com.client.xvideos.redgifs.model.GifsInfo
 import com.client.xvideos.redgifs.model.URL1
 
 @Entity(tableName = "gifs_info")
-data class GifsInfoEntity(
+data class R_GifsInfoEntity(
     @PrimaryKey
     val id: String,
     val createDate: Long,
@@ -25,8 +25,8 @@ data class GifsInfoEntity(
 )
 
 /* ------ маппинг сети -> база ------ */
-fun GifsInfo.toEntity(): GifsInfoEntity =
-    GifsInfoEntity(
+fun GifsInfo.toEntity(): R_GifsInfoEntity =
+    R_GifsInfoEntity(
         id          = id,
         createDate  = createDate,
         likes       = likes,
@@ -44,7 +44,7 @@ fun GifsInfo.toEntity(): GifsInfoEntity =
     )
 
 /* ------ маппинг базы -> доменная модель (если пригодится) ------ */
-fun GifsInfoEntity.toDomain(): GifsInfo =
+fun R_GifsInfoEntity.toDomain(): GifsInfo =
     GifsInfo(
         id          = id,
         createDate  = createDate,
@@ -63,5 +63,5 @@ fun GifsInfoEntity.toDomain(): GifsInfo =
     )
 
 /* ------ вспомогательный bulk‑маппинг ------ */
-fun List<GifsInfo>.toEntityList(): List<GifsInfoEntity> = map { it.toEntity() }
+fun List<GifsInfo>.toEntityList(): List<R_GifsInfoEntity> = map { it.toEntity() }
 

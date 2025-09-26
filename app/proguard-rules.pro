@@ -110,7 +110,7 @@
 -dontwarn com.redgifs.common.saved.SavedRed_Creator
 -dontwarn com.redgifs.common.saved.SavedRed_Likes
 -dontwarn com.redgifs.common.saved.SavedRed_Niches
--dontwarn com.redgifs.common.search.SearchNichesRed
+-dontwarn com.client.xvideos.redgifs.common.search.SearchNichesRed
 -dontwarn com.redgifs.common.search.SearchRed
 -dontwarn com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
 -dontwarn com.client.xvideos.redgifs.network.api.RedApi

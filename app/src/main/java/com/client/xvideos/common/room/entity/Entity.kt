@@ -1,8 +1,8 @@
-package com.client.xvideos.common.room
+package com.client.xvideos.common.room.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.client.xvideos.redgifs.db.entity.getCurrentTimeText
+import com.client.xvideos.common.room.entity.r.getCurrentTimeText
 
 /**
  * ## Сохранение данных только пока работает программа, удаление при следующем запуске
@@ -25,19 +25,3 @@ data class CacheUrlStringRomEntity(
     val timeCreate: Long = System.currentTimeMillis(),
     val timeCreateText: String = getCurrentTimeText()// добавляем поле для времени в текстовом формате = getCurrentTimeText()
 )
-
-
-
-//--- L ---
-
-@Entity(tableName = "l_album_picture_cache")
-data class L_AlbumPictureCacheEntity(
-    @PrimaryKey(autoGenerate = true)
-    val id: Long = 0, //Номер альбома
-    val content: String, //Json список PicsDetails
-    val timeCreate: Long = System.currentTimeMillis(),
-    val timeCreateText: String = getCurrentTimeText()// добавляем поле для времени в текстовом формате = getCurrentTimeText()
-)
-
-
-

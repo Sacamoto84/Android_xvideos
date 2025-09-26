@@ -4,7 +4,7 @@ import com.client.xvideos.common.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.redgifs.common.block.BlockRed
 import com.redgifs.common.downloader.DownloadRed
 import com.client.xvideos.redgifs.common.saved.SavedRed
-import com.redgifs.common.search.SearchNichesRed
+import com.client.xvideos.redgifs.common.search.SearchNichesRed
 import com.redgifs.common.search.SearchRed
 import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent
 import com.client.xvideos.redgifs.network.api.RedApi

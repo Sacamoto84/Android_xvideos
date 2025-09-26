@@ -54,7 +54,7 @@ import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.common.di.HostDI
 import com.client.xvideos.redgifs.model.Niche
 import com.client.xvideos.redgifs.model.Order
-import com.redgifs.common.search.SearchNichesRed
+import com.client.xvideos.redgifs.common.search.SearchNichesRed
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

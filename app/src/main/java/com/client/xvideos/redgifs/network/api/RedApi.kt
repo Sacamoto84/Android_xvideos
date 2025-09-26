@@ -1,8 +1,8 @@
 package com.client.xvideos.redgifs.network.api
 
-import com.client.xvideos.redgifs.db.dao.CacheMediaResponseDao
-import com.client.xvideos.redgifs.db.entity.CacheMediaResponseEntity
-import com.client.xvideos.redgifs.db.entity.getCurrentTimeText
+import com.client.xvideos.common.room.dao.r.R_CacheMediaResponseDao
+import com.client.xvideos.common.room.entity.r.R_CacheMediaResponseEntity
+import com.client.xvideos.common.room.entity.r.getCurrentTimeText
 import com.client.xvideos.redgifs.model.CreatorResponse
 import com.client.xvideos.redgifs.model.CreatorsResponse
 import com.client.xvideos.redgifs.model.MediaResponse
@@ -27,7 +27,7 @@ import javax.inject.Singleton
 
 @Singleton
 class RedApi @Inject constructor(
-   val dao: CacheMediaResponseDao
+   val dao: R_CacheMediaResponseDao
 ) {
 
     val api = ApiClient
@@ -398,7 +398,7 @@ class RedApi @Inject constructor(
 private suspend fun cacheMediaResponse(
     route: Route,
     redApi: RedApi,
-    dao: CacheMediaResponseDao
+    dao: R_CacheMediaResponseDao
 ): MediaResponse {
 
     val cachedEntity = dao.get(route.url)
@@ -421,7 +421,7 @@ private suspend fun cacheMediaResponse(
         val res = redApi.api.request<MediaResponse>(route)
         // Сохраняем в кеш (с текущим временем)
         val jsonContent = gson.toJson(res.getOrNull())
-        val entity = CacheMediaResponseEntity(
+        val entity = R_CacheMediaResponseEntity(
             url = route.url,
             content = jsonContent,
             timeCreate = System.currentTimeMillis(),

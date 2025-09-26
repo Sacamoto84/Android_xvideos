@@ -3,8 +3,8 @@ package com.client.xvideos.l.repository
 import android.content.Context
 import com.client.xvideos.common.encrypting.Password
 import com.client.xvideos.common.room.AppDatabase
-import com.client.xvideos.common.room.CacheUrlStringRamEntity
-import com.client.xvideos.common.room.CacheUrlStringRomEntity
+import com.client.xvideos.common.room.entity.CacheUrlStringRamEntity
+import com.client.xvideos.common.room.entity.CacheUrlStringRomEntity
 import com.client.xvideos.common.util.toMD5
 import com.client.xvideos.l.KtorRequestHandler
 import com.client.xvideos.redgifs.common.snackBar.SnackBarEvent

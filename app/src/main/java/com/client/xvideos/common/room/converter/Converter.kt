@@ -1,4 +1,4 @@
-package com.client.xvideos.redgifs.db.converter
+package com.client.xvideos.common.room.converter
 
 import androidx.room.TypeConverter
 import com.client.xvideos.redgifs.model.URL1

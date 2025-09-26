@@ -1,4 +1,4 @@
-package com.redgifs.common.search
+package com.client.xvideos.redgifs.common.search
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
@@ -70,11 +70,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.client.xvideos.common.di.ApplicationScope
+import com.client.xvideos.common.room.dao.r.R_SearchHistoryDao
+import com.client.xvideos.common.room.entity.r.R_SearchHistoryEntity
 import com.client.xvideos.common.util.toPrettyCount2
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.common.saved.SavedRed
-import com.client.xvideos.redgifs.db.dao.SearchRedHistoryDao
-import com.client.xvideos.redgifs.db.entity.SearchRedHistoryEntity
 import com.client.xvideos.redgifs.model.search.SearchItemNichesResponse
 import com.client.xvideos.redgifs.network.api.RedApi
 import kotlinx.coroutines.CoroutineScope
@@ -91,7 +91,7 @@ import javax.inject.Singleton
 
 @Singleton
 class SearchNichesRed @Inject constructor(
-    val dao: SearchRedHistoryDao,
+    val dao: R_SearchHistoryDao,
     val savedRed: SavedRed,
     val redApi: RedApi,
     @ApplicationScope val scope: CoroutineScope
@@ -483,7 +483,7 @@ class SearchNichesRed @Inject constructor(
 
     @OptIn(DelicateCoroutinesApi::class)
     fun add(text: String) = GlobalScope.launch {
-        dao.insertAndTrim(SearchRedHistoryEntity(text = text))
+        dao.insertAndTrim(R_SearchHistoryEntity(text = text))
     }
 
     @OptIn(DelicateCoroutinesApi::class)

@@ -1,18 +1,18 @@
-package com.client.xvideos.redgifs.db.dao
+package com.client.xvideos.common.room.dao.r
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.client.xvideos.redgifs.db.entity.SearchRedHistoryEntity
+import com.client.xvideos.common.room.entity.r.R_SearchHistoryEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface SearchRedHistoryDao {
+interface R_SearchHistoryDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(item: SearchRedHistoryEntity)
+    suspend fun insert(item: R_SearchHistoryEntity)
 
     @Query("SELECT text FROM search_red_history ORDER BY timeCreate DESC")
     fun observeAllTexts(): Flow<List<String>>   // <‑‑ поток изменений
@@ -22,7 +22,7 @@ interface SearchRedHistoryDao {
 
 
     @Transaction
-    suspend fun insertAndTrim(item: SearchRedHistoryEntity, limit: Int = 10) {
+    suspend fun insertAndTrim(item: R_SearchHistoryEntity, limit: Int = 10) {
         insert(item)
         deleteOlderThanLimit(limit)
     }

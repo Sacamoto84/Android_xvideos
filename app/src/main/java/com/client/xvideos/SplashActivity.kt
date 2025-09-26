@@ -9,7 +9,6 @@ import com.client.xvideos.PermissionScreenActivity.PermissionStorage
 import com.client.xvideos.common.room.AppDatabase
 import com.client.xvideos.redgifs.common.block.BlockRed
 import com.client.xvideos.redgifs.common.saved.SavedRed
-import com.client.xvideos.redgifs.db.AppRedGifsDatabase
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -23,10 +22,7 @@ import javax.inject.Inject
 class SplashActivity : ComponentActivity() {
 
     @Inject
-    lateinit var dbCache: javax.inject.Provider<AppDatabase>
-
-    @Inject
-    lateinit var redGifsDb: javax.inject.Provider<AppRedGifsDatabase>
+    lateinit var db: javax.inject.Provider<AppDatabase>
 
     @Inject
     lateinit var blockRed: javax.inject.Provider<BlockRed>
@@ -63,7 +59,7 @@ class SplashActivity : ComponentActivity() {
 
             val savedRedInstance = savedRed.get()
             val blockRedInstance = blockRed.get()
-            val dbInstance = dbCache.get()
+            val dbInstance = db.get()
 
             val jobs = listOf(
                 async { savedRedInstance.refreshTagList() },

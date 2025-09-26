@@ -1,16 +1,16 @@
-package com.client.xvideos.redgifs.db.dao
+package com.client.xvideos.common.room.dao.r
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.client.xvideos.redgifs.db.entity.BlockEntity
-import com.client.xvideos.redgifs.db.entity.BlockWithGif
+import com.client.xvideos.common.room.entity.r.BlockWithGif
+import com.client.xvideos.common.room.entity.r.R_BlockEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface BlockDao {
+interface R_BlockDao {
 
     /* Cписок всех блоков с их GIF‑ами (gif может быть null) */
     @Transaction
@@ -32,9 +32,6 @@ interface BlockDao {
 
     /* Вставка / обновление */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertBlock(block: BlockEntity)
-
-
-
+    suspend fun insertBlock(block: R_BlockEntity)
 
 }

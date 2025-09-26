@@ -1,19 +1,19 @@
-package com.client.xvideos.redgifs.db.dao
+package com.client.xvideos.common.room.dao.r
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.client.xvideos.redgifs.db.entity.CacheMediaResponseEntity
-import com.client.xvideos.redgifs.db.entity.getStartOfTodayMillis
+import com.client.xvideos.common.room.entity.r.R_CacheMediaResponseEntity
+import com.client.xvideos.common.room.entity.r.getStartOfTodayMillis
 
 @Dao
-interface CacheMediaResponseDao {
+interface R_CacheMediaResponseDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(doc: CacheMediaResponseEntity)
+    suspend fun insert(doc: R_CacheMediaResponseEntity)
 
     @Query("SELECT * FROM cache_media_response WHERE url = :url")
-    suspend fun get(url: String): CacheMediaResponseEntity?
+    suspend fun get(url: String): R_CacheMediaResponseEntity?
 
     @Query("DELETE FROM cache_media_response WHERE timeCreate < :time")
     suspend fun deleteOld(time: Long)
@@ -25,7 +25,7 @@ interface CacheMediaResponseDao {
 }
 
 /** Удалить все записи созданные в прошлых сутках */
-suspend fun clearOldCache(cacheDao: CacheMediaResponseDao) {
+suspend fun clearOldCache(cacheDao: R_CacheMediaResponseDao) {
     val todayStartMillis = getStartOfTodayMillis()
     cacheDao.deleteOld(todayStartMillis)
 }
