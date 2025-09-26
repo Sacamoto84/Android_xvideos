@@ -1,5 +1,5 @@
-package com.client.xvideos.screens.tags.model
+package com.client.xvideos.xvideos.screens.tags.model
 
-import com.client.xvideos.xvideos.model.GalleryItem
+import com.client.xvideos.xvideos.feature.room.entity.ItemsX
 
-data class ModelScreenTag(val title0: String, val title1: String, val items: List<GalleryItem>)
+data class ModelScreenTag(val title0: String, val title1: String, val items: List<ItemsX>)

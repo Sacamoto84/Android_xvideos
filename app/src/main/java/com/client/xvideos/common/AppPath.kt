@@ -8,6 +8,7 @@ private enum class Folder(val value: String) {
     CACHE_DOWNLOAD_RED("Download"),
     RED("Red"),
     L("L"),
+    X("X")
 }
 
 /**
@@ -23,6 +24,13 @@ object AppPath {
     val sdcard: String = Environment.getExternalStorageDirectory().toString()
 
     val main : String = "$sdcard/$appMain"
+
+    //--- xvideos ---
+
+    val favorites_x : String = "${main}/${Folder.X.value}/Saved/Favorites"
+
+
+
 
     /**
      * Пусть к папке с кешем загруженных файлов для предросмотра
@@ -100,6 +108,8 @@ object AppPath {
 
         File(cacheDownload_l).mkdirs()
 
+
+        File(favorites_x).mkdirs()
 
     }
 

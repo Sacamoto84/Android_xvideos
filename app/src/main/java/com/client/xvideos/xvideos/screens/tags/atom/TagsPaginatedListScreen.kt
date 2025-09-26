@@ -1,4 +1,4 @@
-package com.client.xvideos.screens.tags.atom
+package com.client.xvideos.xvideos.screens.tags.atom
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
@@ -19,20 +19,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.client.xvideos.xvideos.model.GalleryItem
-import com.client.xvideos.screens.dashboards.UrlVideoImageAndLongClick
-import com.client.xvideos.xvideos.screens.tags.ScreenTagsViewModel
+import com.client.xvideos.xvideos.feature.room.entity.ItemsX
+import com.client.xvideos.xvideos.screens.dashboards.UrlVideoImageAndLongClick
 
 @Composable
-fun TagsPaginatedListScreen(pageIndex: Int, vm: ScreenTagsViewModel) {
+fun TagsPaginatedListScreen(pageIndex: Int) {
 
-    val context = LocalContext.current
-
-    val l = remember { mutableStateListOf<GalleryItem>() }
+    val l = remember { mutableStateListOf<ItemsX>() }
 
     LaunchedEffect(pageIndex) {
 //        withContext(Dispatchers.IO) {
@@ -43,19 +39,15 @@ fun TagsPaginatedListScreen(pageIndex: Int, vm: ScreenTagsViewModel) {
 
     val navigator = LocalNavigator.currentOrThrow
 
-    val itemsPerRow =
-        if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE) 4 else 2
+    val itemsPerRow = if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE) 4 else 2
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
         items(l.chunked(itemsPerRow))
         { row ->
-
             Row(modifier = Modifier.fillMaxWidth()) {
-
                 row.forEachIndexed { index, cell ->
                     Box(
                         modifier = Modifier
@@ -78,11 +70,6 @@ fun TagsPaginatedListScreen(pageIndex: Int, vm: ScreenTagsViewModel) {
                     }
                 }
             }
-
-
         }
-
-
     }
-
 }

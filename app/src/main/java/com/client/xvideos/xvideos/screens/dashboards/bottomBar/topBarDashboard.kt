@@ -16,11 +16,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.common.noRippleClickable
-import com.client.xvideos.screens.config.ScreenConfig
+import com.client.xvideos.xvideos.screens.config.ScreenConfig
 import com.client.xvideos.xvideos.screens.favorites.ScreenFavorites
 import com.client.xvideos.ui.theme.grayColor
 import com.client.xvideos.xvideos.feature.country.ComposeCountry
@@ -31,20 +32,12 @@ fun TopBarDashboard(){
     val navigator = LocalNavigator.currentOrThrow
 
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(grayColor(0x0E)),
+        modifier = Modifier.fillMaxWidth().background(grayColor(0x0E)),
         horizontalArrangement = Arrangement.Absolute.SpaceBetween
     ) {
         ComposeCountry(modifier = Modifier)
 
-
-
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .weight(1f))
-
-
+        Box(modifier = Modifier.fillMaxWidth().weight(1f))
 
         IconButton(onClick = {
             navigator.push(ScreenFavorites())
@@ -53,34 +46,16 @@ fun TopBarDashboard(){
                 imageVector = Icons.Filled.FavoriteBorder,
                 contentDescription = null,
                 tint = Color.Gray,
-                modifier = Modifier
-                    .size(32.dp)
-
+                modifier = Modifier.size(32.dp)
             )
         }
 
-
         //////////// Настройка ////////////
         Box(
-            modifier = Modifier
-                .padding(start = 8.dp, end = 8.dp)
-                .size(48.dp)
-                //.border(1.dp,Color.Gray)
-                .noRippleClickable(onClick = {
-                    navigator.push(ScreenConfig())
-                }),
+            modifier = Modifier.padding(start = 8.dp, end = 8.dp).size(48.dp)
+                .noRippleClickable(onClick = { navigator.push(ScreenConfig()) }),
             contentAlignment = Alignment.Center
         ) {
-
-//                        BasicText(
-//                            "?",
-//                            style = TextStyle(
-//                                fontWeight = FontWeight.Medium,
-//                                color = Color(0xFFCCCCCC),
-//                                fontSize = 24.sp
-//                            )
-//                        )
-
             Icon(
                 imageVector = Icons.Filled.Settings,
                 contentDescription = "Настройки",
@@ -92,4 +67,10 @@ fun TopBarDashboard(){
 
 
     }
+}
+
+@Preview
+@Composable
+fun TopBarDashboardPreview() {
+    TopBarDashboard()
 }

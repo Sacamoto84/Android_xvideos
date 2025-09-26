@@ -1,4 +1,4 @@
-package com.client.xvideos.screens.dashboards
+package com.client.xvideos.xvideos.screens.dashboards
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
@@ -15,14 +15,14 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import com.client.xvideos.common.vibrate.vibrateWithPatternAndAmplitude
-import com.client.xvideos.xvideos.model.GalleryItem
 import com.client.xvideos.common.urlVideImage.UrlImage
 import com.client.xvideos.common.urlVideImage.UrlVideoLite
+import com.client.xvideos.xvideos.feature.room.entity.ItemsX
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun UrlVideoImageAndLongClick(
-    item: GalleryItem,
+    item: ItemsX,
     modifier: Modifier = Modifier,
     onLongClick: () -> Unit,
     onDoubleClick: () -> Unit,

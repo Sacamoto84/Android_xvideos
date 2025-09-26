@@ -1,6 +1,5 @@
 package com.client.xvideos.xvideos.feature.net
 
-import android.util.LruCache
 import android.webkit.CookieManager
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
@@ -14,9 +13,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import timber.log.Timber
 import kotlin.coroutines.resume
 
-private val lruCacheHTML: LruCache<String, String> = LruCache<String, String>(1000)
-
-suspend fun readHtmlFromURL(url: String = "https://www.xvideos.com"): String =
+suspend fun readHtmlFromURLWebView(url: String = "https://www.xvideos.com"): String =
 
     suspendCancellableCoroutine { continuation ->
 
@@ -68,9 +65,7 @@ suspend fun readHtmlFromURL(url: String = "https://www.xvideos.com"): String =
                 }
             }
             webView.loadUrl(url)
-            continuation.invokeOnCancellation { cause ->
-                webView.destroy()
-            }
+            continuation.invokeOnCancellation { cause ->  webView.destroy() }
         }
     }
 

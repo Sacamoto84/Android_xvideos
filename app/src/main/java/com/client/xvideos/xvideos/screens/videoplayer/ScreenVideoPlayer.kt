@@ -1,4 +1,4 @@
-package com.client.xvideos.screens.videoplayer
+package com.client.xvideos.xvideos.screens.videoplayer
 
 import androidx.annotation.OptIn
 import androidx.compose.foundation.layout.Arrangement
@@ -13,6 +13,7 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.client.xvideos.screens.videoplayer.ScreenVideoPlayerSM
 import com.client.xvideos.screens.videoplayer.atom.ComposeTags
 import com.client.xvideos.screens.videoplayer.atom.ZoomableVideoPlayer
 

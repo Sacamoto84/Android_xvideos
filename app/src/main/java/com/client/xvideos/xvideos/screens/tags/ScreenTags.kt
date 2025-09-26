@@ -1,4 +1,4 @@
-package com.client.xvideos.screens.tags
+package com.client.xvideos.xvideos.screens.tags
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column
@@ -15,8 +15,7 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.client.xvideos.screens.tags.atom.TagsPaginatedListScreen
-import com.client.xvideos.xvideos.screens.tags.ScreenTagsViewModel
+import com.client.xvideos.xvideos.screens.tags.atom.TagsPaginatedListScreen
 
 class ScreenTags(private val tag: String) : Screen {
 
@@ -27,9 +26,7 @@ class ScreenTags(private val tag: String) : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
 
-        val vm = getScreenModel<ScreenTagsViewModel, ScreenTagsViewModel.Factory> { factory ->
-            factory.create(tag)
-        }
+        val vm = getScreenModel<ScreenTagsViewModel, ScreenTagsViewModel.Factory> { factory -> factory.create(tag) }
 
         Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
             Column {
@@ -41,9 +38,8 @@ class ScreenTags(private val tag: String) : Screen {
             }
 
         }) {
-            TagsPaginatedListScreen(0, vm)
+            TagsPaginatedListScreen(0)
         }
-
 
     }
 

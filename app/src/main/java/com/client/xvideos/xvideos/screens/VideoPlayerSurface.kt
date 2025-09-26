@@ -38,8 +38,9 @@ import com.client.xvideos.screens.videoplayer.video.ResizeMode
 import com.client.xvideos.screens.videoplayer.video.toPlayerViewResizeMode
 
 import kotlinx.coroutines.DelicateCoroutinesApi
+import androidx.core.graphics.toColorInt
 
-private val orange = Color.parseColor("#FFA800")
+private val orange = "#FFA800".toColorInt()
 
 @OptIn(DelicateCoroutinesApi::class)
 @SuppressLint("UnsafeOptInUsageError")

@@ -47,7 +47,7 @@ fun parseHTML5Player(script: String): HTML5PlayerConfig {
     )
 }
 
-fun extractValue(script: String, pattern: String): String? {
+private fun extractValue(script: String, pattern: String): String? {
     val regex = Pattern.compile(pattern)
     val matcher = regex.matcher(script)
     return if (matcher.find()) matcher.group(1) else null

@@ -13,14 +13,14 @@ import javax.inject.Singleton
 // Глобальный модуль SharedPreferences
 // v1.0.0 17.04.2024
 
-@Module
-@InstallIn(SingletonComponent::class)
-object AppModuleSharedPreferences {
-
-    @Provides
-    @Singleton
-    fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences {
-        return context.getSharedPreferences("prefs", MODE_PRIVATE)
-    }
-
-}
+//@Module
+//@InstallIn(SingletonComponent::class)
+//object AppModuleSharedPreferences {
+//
+//    @Provides
+//    @Singleton
+//    fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences {
+//        return context.getSharedPreferences("prefs", MODE_PRIVATE)
+//    }
+//
+//}

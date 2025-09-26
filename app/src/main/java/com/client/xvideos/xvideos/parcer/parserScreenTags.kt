@@ -1,13 +1,13 @@
 package com.client.xvideos.xvideos.parcer
 
-import com.client.xvideos.xvideos.model.GalleryItem
-import com.client.xvideos.screens.tags.model.ModelScreenTag
+import com.client.xvideos.xvideos.feature.room.entity.ItemsX
+import com.client.xvideos.xvideos.screens.tags.model.ModelScreenTag
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
 fun parserScreenTags(html: String): ModelScreenTag {
 
-    val listItems = mutableListOf<GalleryItem>()
+    val listItems = mutableListOf<ItemsX>()
 
     // Парсим HTML-документ
     val document: Document = Jsoup.parse(html)
@@ -34,7 +34,7 @@ fun parserScreenTags(html: String): ModelScreenTag {
             val profileLink = video.selectFirst("p.metadata a")?.attr("href") ?: ""
 
             listItems.add(
-                GalleryItem(
+                ItemsX(
                     title = title,
                     href = href,
                     duration = duration,

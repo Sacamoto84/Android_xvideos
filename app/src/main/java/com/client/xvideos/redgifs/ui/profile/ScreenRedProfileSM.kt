@@ -101,8 +101,7 @@ class ScreenRedProfileSM @AssistedInject constructor(
     var isLoading = MutableStateFlow(false) //║ Запрос к серверу п процессе
 
     ///////////////////////////////////////////////
-    val selector =
-        pref.flowRedSelector.stateIn(screenModelScope, SharingStarted.WhileSubscribed(5000), 0)
+    val selector = pref.flowRedSelector.stateIn(screenModelScope, SharingStarted.WhileSubscribed(5000), 0)
 
     fun setSelector(value: Int) {
         screenModelScope.launch { pref.setRedSelector(value) }

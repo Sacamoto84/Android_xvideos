@@ -34,7 +34,7 @@ import com.client.xvideos.R
 import com.client.xvideos.ui.theme.PornHubOrange
 import com.client.xvideos.ui.theme.grayColor
 import com.client.xvideos.urlStart
-import com.client.xvideos.xvideos.feature.net.readHtmlFromURL
+import com.client.xvideos.xvideos.feature.net.readHtmlFromURLWebView
 import com.composables.core.Menu
 import com.composables.core.MenuButton
 import com.composables.core.MenuContent
@@ -46,10 +46,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import timber.log.Timber
 
 // Data class для представления страны
 // Страна: Австралия, Ссылка: /change-country/au, Класс флага: flag-au
-data class Country(val name: String, val url: String, val flagClass: String)
+private data class Country(val name: String, val url: String, val flagClass: String)
 
 @Preview
 @Composable
@@ -128,14 +129,13 @@ fun ComposeCountry(modifier: Modifier = Modifier) {
                                 //.border(1.dp, Color.Magenta)
                                 .clickable {
                                     GlobalScope.launch {
-                                        readHtmlFromURL(urlStart + it.url)
+                                        readHtmlFromURLWebView(urlStart + it.url)
                                         withContext(Dispatchers.Main) {
                                             currentCountriesUpdate++
                                             Toast.makeText(
                                                 App.Companion.instance.applicationContext,
                                                 "${getFlagEmoji(it.flagClass)} ${it.name}", Toast.LENGTH_SHORT).show()
                                         }
-
                                     }
                                 }
                         ) {
@@ -229,7 +229,7 @@ private fun parserCountry(): List<Country> {
 
     // Выводим список стран
     countryList.forEach { country ->
-        println("Страна: ${country.name}, Ссылка: ${country.url}, Класс флага: ${country.flagClass}")
+        Timber.i("Страна: ${country.name}, Ссылка: ${country.url}, Класс флага: ${country.flagClass}")
     }
     return countryList
 }

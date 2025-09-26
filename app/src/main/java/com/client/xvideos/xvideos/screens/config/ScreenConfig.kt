@@ -1,4 +1,4 @@
-package com.client.xvideos.screens.config
+package com.client.xvideos.xvideos.screens.config
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -14,7 +14,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
@@ -27,10 +26,6 @@ import com.client.xvideos.screens.config.atom.CheckboxPreference
 import com.composables.core.HorizontalSeparator
 import com.composeunstyled.Text
 
-
-
-
-
 class ScreenConfig() : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
@@ -40,24 +35,20 @@ class ScreenConfig() : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val vm: ScreenConfigSM = getScreenModel()
 
-        val countRow = vm.countRow.collectAsState().value
-        val shemale = vm.shemale.collectAsState().value
+        val countRow = vm.countRow.field.collectAsState().value
+        val shemale = vm.shemale.field.collectAsState().value
 
         Scaffold(
 
             topBar = {
                 Box(
-                    modifier = Modifier
-                        .height(48.dp)
-                        .fillMaxWidth()
-                        .background(Color(0xFF4D62F7)),
+                    modifier = Modifier.height(48.dp).fillMaxWidth().background(Color(0xFF4D62F7)),
                     contentAlignment = Alignment.Center
                 ) {
 
                     Text(
                         "Настройки",
-                        modifier = Modifier
-                            .padding(bottom = 0.dp),
+                        modifier = Modifier.padding(bottom = 0.dp),
                         textAlign = TextAlign.Center,
                         fontSize = 32.sp, color = Color.White
                     )
@@ -66,16 +57,13 @@ class ScreenConfig() : Screen {
 
             },
 
-            modifier = Modifier
-                .fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
             //containerColor = Color(0xFFE4E7EC)
             containerColor = Color.White
         ) {
 
             Column(
-                modifier = Modifier
-                    .padding(it)
-                    .padding(16.dp)
+                modifier = Modifier.padding(it).padding(16.dp)
             ) {
 
                 HorizontalSeparator(color = Color(0xFF9E9E9E))

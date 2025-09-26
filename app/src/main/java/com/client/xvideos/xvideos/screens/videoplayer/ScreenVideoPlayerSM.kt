@@ -26,7 +26,7 @@ import com.client.xvideos.xvideos.parcer.parserItemVideo
 import com.client.xvideos.xvideos.parcer.parserItemVideoTags
 import com.client.xvideos.screens.videoplayer.model.TagsModel
 import com.client.xvideos.screens.itemFullScreen.ScreenVideoPlayerFullScreen
-import com.client.xvideos.screens.tags.ScreenTags
+import com.client.xvideos.xvideos.screens.tags.ScreenTags
 import com.client.xvideos.xvideos.feature.net.readHtmlFromURLDirect
 import dagger.Binds
 import dagger.Module

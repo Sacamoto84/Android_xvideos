@@ -29,16 +29,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.client.xvideos.xvideos.model.GalleryItem
-import com.client.xvideos.screens.dashboards.UrlVideoImageAndLongClick
-import com.client.xvideos.screens.profile.ScreenProfile
+import com.client.xvideos.xvideos.feature.room.entity.ItemsX
+import com.client.xvideos.xvideos.screens.dashboards.UrlVideoImageAndLongClick
+import com.client.xvideos.xvideos.screens.profile.ScreenProfile
 import com.composables.core.HorizontalSeparator
 
 class ScreenFavorites() : Screen {
@@ -51,7 +50,7 @@ class ScreenFavorites() : Screen {
 
         val vm: ScreenFavoritesSM = getScreenModel()
 
-        val favorites = vm.favorites.collectAsStateWithLifecycle(emptyList()).value
+        val favorites = vm.favorites
 
         Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
 
@@ -109,17 +108,17 @@ class ScreenFavorites() : Screen {
                                 .background(Color.DarkGray)
                         ) {
 
-                            val cell = GalleryItem(
-                                id = it.item.id,
-                                title = it.item.title,
-                                duration = it.item.duration,
-                                views = it.item.views,
-                                channel = it.item.channel,
-                                previewImage = it.item.previewImage,
-                                previewVideo = it.item.previewVideo,
-                                href = it.item.href,
-                                nameProfile = it.item.nameProfile,
-                                linkProfile = it.item.linkProfile
+                            val cell = ItemsX(
+                                id = it.id,
+                                title = it.title,
+                                duration = it.duration,
+                                views = it.views,
+                                channel = it.channel,
+                                previewImage = it.previewImage,
+                                previewVideo = it.previewVideo,
+                                href = it.href,
+                                nameProfile = it.nameProfile,
+                                linkProfile = it.linkProfile
                             )
 
                             UrlVideoImageAndLongClick(cell, onLongClick = {
@@ -131,7 +130,7 @@ class ScreenFavorites() : Screen {
 
                                     //Продолжительность видео
                                     Text(
-                                        text = it.item.duration.dropLast(1),
+                                        text = it.duration.dropLast(1),
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .offset(1.dp, offsetY + 1.dp),
@@ -141,7 +140,7 @@ class ScreenFavorites() : Screen {
                                     )
 
                                     Text(
-                                        text = it.item.duration.dropLast(1),
+                                        text = it.duration.dropLast(1),
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .offset(0.dp, offsetY),

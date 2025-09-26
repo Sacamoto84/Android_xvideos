@@ -6,8 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
-import com.client.xvideos.xvideos.feature.room.entity.Favorites
-import com.client.xvideos.xvideos.feature.room.entity.Items
+import com.client.xvideos.xvideos.feature.room.entity.ItemsX
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,14 +16,14 @@ import java.util.Date
 import javax.inject.Singleton
 
 @Database(
-    entities = [Items::class, Favorites::class],
-    version = 5,
+    entities = [ItemsX::class],
+    version = 6,
     exportSchema = true
 )
 @TypeConverters(DateConverter::class)
-abstract class AppDatabase : RoomDatabase() {
-    abstract fun favoriteDao(): FavoriteGalleryDao
-    abstract fun itemsDao(): ItemsDao
+abstract class AppDatabaseX : RoomDatabase() {
+    //abstract fun favoriteDao(): FavoriteGalleryDao
+    //abstract fun itemsDao(): ItemsDao
 }
 
 class DateConverter {
@@ -45,9 +44,9 @@ object RoomPrefs {
 
     @Provides
     @Singleton
-    fun provideStockDatabase(@ApplicationContext context: Context): AppDatabase {
+    fun provideStockDatabase(@ApplicationContext context: Context): AppDatabaseX {
         println("!!! DI ROOM")
-        return Room.databaseBuilder(context, AppDatabase::class.java, "database")
+        return Room.databaseBuilder(context, AppDatabaseX::class.java, "database")
             .fallbackToDestructiveMigration()
             .allowMainThreadQueries()
             .build()

@@ -46,7 +46,7 @@ import com.client.xvideos.PermissionScreenActivity.PermissionStorage
 import com.client.xvideos.common.util.KeepScreenOn
 import com.client.xvideos.l.ui.screens.ScreenLRoot
 import com.client.xvideos.redgifs.ui.ScreenRedRoot
-import com.client.xvideos.screens.dashboards.ScreenDashBoards
+import com.client.xvideos.screens.dashboards.ScreenXDashBoards
 import com.client.xvideos.screens.videoplayer.video.cache.VideoPlayerCacheManager
 import com.client.xvideos.ui.theme.XvideosTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -173,7 +173,7 @@ private object MenuScreen : Screen {
             verticalArrangement = Arrangement.Bottom
         ) {
             ButtonSelect(R.drawable.icon_xvideos_white) {
-                navigator.push(ScreenDashBoards())
+                navigator.push(ScreenXDashBoards())
             }
             ButtonSelect(R.drawable.icon_luscious) {
                 navigator.push(ScreenLRoot()) // или ScreenLusciousRoot()

@@ -2,14 +2,14 @@ package com.client.xvideos.xvideos.parcer
 
 import com.client.xvideos.xvideos.feature.country.currentCountries
 import com.client.xvideos.xvideos.feature.country.getFlagEmoji
-import com.client.xvideos.xvideos.model.GalleryItem
+import com.client.xvideos.xvideos.feature.room.entity.ItemsX
 import org.jsoup.nodes.Document
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 
-fun parserListVideo(html: String): List<GalleryItem> {
+fun parserListVideo(html: String): List<ItemsX> {
 
-    val list = mutableListOf<GalleryItem>()
+    val list = mutableListOf<ItemsX>()
 
     // Парсим HTML-документ
     val document: Document = Jsoup.parse(html)
@@ -42,7 +42,7 @@ fun parserListVideo(html: String): List<GalleryItem> {
         val channelLink = block.selectFirst("p.metadata a")?.attr("href") ?: "No channel link"
 
         list.add(
-            GalleryItem(
+            ItemsX(
                 id = videoId.toLong(),
                 title = videoTitle,
                 href = href,
