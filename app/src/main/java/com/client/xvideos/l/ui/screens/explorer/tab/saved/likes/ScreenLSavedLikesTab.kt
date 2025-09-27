@@ -19,7 +19,6 @@ import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.ui.element.expandMenu.ExpandMenuType
 import com.client.xvideos.l.ui.element.lazyRowPictureDetails.LazyRowPictureDetails
 import com.client.xvideos.l.ui.element.lazyRowPictureDetails.LazyRowPictureDetailsHost
-import com.client.xvideos.common.snackBar.SnackBarEvent
 import com.client.xvideos.redgifs.ui.explorer.tab.gifs.ColumnSelect
 import dagger.Binds
 import dagger.Module
@@ -54,7 +53,6 @@ object ScreenLSavedLikesTab : Screen {
 }
 
 class ScreenSavedLLikesSM @Inject constructor(
-val snackBarEvent: SnackBarEvent,
 val savedL: SavedL
 ) : ScreenModel {
 

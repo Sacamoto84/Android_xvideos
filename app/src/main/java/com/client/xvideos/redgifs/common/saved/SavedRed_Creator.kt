@@ -1,13 +1,15 @@
-package com.redgifs.common.saved
+package com.client.xvideos.redgifs.common.saved
 
 import com.client.xvideos.common.fileDB.FileDB
 import com.client.xvideos.common.AppPath
+import com.client.xvideos.common.eventBus.snackBarError
+import com.client.xvideos.common.eventBus.snackBarInfo
+import com.client.xvideos.common.eventBus.snackBarSuccess
 import com.client.xvideos.redgifs.model.UserInfo
-import com.client.xvideos.common.snackBar.SnackBarEvent
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlin.onSuccess
 
-class SavedRed_Creator(val snackBarEvent : SnackBarEvent) {
+class SavedRed_Creator() {
 
     val creatorDb = FileDB(AppPath.creators_red, "creator", UserInfo::class.java)
 
@@ -17,11 +19,11 @@ class SavedRed_Creator(val snackBarEvent : SnackBarEvent) {
         println("!!! addCreator() id:${item.username}")
         creatorDb.insert(item.username, item)
             .onSuccess {
-                snackBarEvent.success("Автор добавлен")
+                snackBarSuccess("Автор добавлен")
                 list.add(item)
             }
             .onFailure { e ->
-                snackBarEvent.error("Ошибка добавления Автора ${e.message}")
+                snackBarError("Ошибка добавления Автора ${e.message}")
             }
     }
 
@@ -29,13 +31,11 @@ class SavedRed_Creator(val snackBarEvent : SnackBarEvent) {
         println("!!! removeCreator() id:${username} ")
         creatorDb.delete(username)
             .onSuccess {
-                snackBarEvent.info("Автор удален")
+                snackBarInfo("Автор удален")
                 //creatorsList.remove(item)
                 refresh()
             }
-            .onFailure { e ->
-                snackBarEvent.error("Ошибка удаления Автора ${e.message}")
-            }
+            .onFailure { e -> snackBarError("Ошибка удаления Автора ${e.message}") }
     }
 
     @OptIn(DelicateCoroutinesApi::class)

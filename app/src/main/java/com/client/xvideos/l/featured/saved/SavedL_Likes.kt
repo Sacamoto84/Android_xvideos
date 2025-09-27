@@ -2,13 +2,15 @@ package com.client.xvideos.l.featured.saved
 
 import androidx.compose.runtime.mutableStateListOf
 import com.client.xvideos.common.AppPath
+import com.client.xvideos.common.eventBus.snackBarError
+import com.client.xvideos.common.eventBus.snackBarInfo
+import com.client.xvideos.common.eventBus.snackBarSuccess
 import com.client.xvideos.common.kdownloader.KDownloader
 import com.client.xvideos.l.model.PicsDetails
-import com.client.xvideos.common.snackBar.SnackBarEvent
 import timber.log.Timber
 import java.io.File
 
-class SavedL_Likes( val snackBarEvent: SnackBarEvent, val kDownloader: KDownloader) {
+class SavedL_Likes(val kDownloader: KDownloader) {
 
     val listUrl = mutableStateListOf<PicsDetails>()
 
@@ -20,10 +22,10 @@ class SavedL_Likes( val snackBarEvent: SnackBarEvent, val kDownloader: KDownload
         println("!!! SavedL_Likes addLikes() item:${item.url_to_original}")
 
         downloadLikes(item, kDownloader, onComplete = {
-            snackBarEvent.success("Like")
+            snackBarSuccess("Like")
             refresh()
         }, onError = {
-            snackBarEvent.error("Ошибка добавления лайка")
+            snackBarError("Ошибка добавления лайка")
         })
     }
 
@@ -33,11 +35,11 @@ class SavedL_Likes( val snackBarEvent: SnackBarEvent, val kDownloader: KDownload
         val file = File(AppPath.likes_l, fileName)
         if (file.exists()) {
             if (!file.delete()) {
-                snackBarEvent.error("Не удалось удалить файл: ${file.absolutePath}")
+                snackBarError("Не удалось удалить файл: ${file.absolutePath}")
             }else
-                snackBarEvent.info("Unlike")
+                snackBarInfo("Unlike")
         }else{
-            snackBarEvent.error("Файл не найден: ${file.absolutePath}")
+            snackBarError("Файл не найден: ${file.absolutePath}")
         }
         refresh()
     }
@@ -53,7 +55,7 @@ class SavedL_Likes( val snackBarEvent: SnackBarEvent, val kDownloader: KDownload
            }
         } catch (e: Exception) {
             Timber.e("!!! eee SavedL_Likes refresh() Ошибка получения списка likes ${e.localizedMessage}")
-            snackBarEvent.error("Ошибка получения списка likes")
+            snackBarError("Ошибка получения списка likes")
         }
 
     }

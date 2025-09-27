@@ -4,14 +4,16 @@ import androidx.compose.runtime.mutableStateListOf
 import com.client.xvideos.common.AppPath
 import com.client.xvideos.common.encrypting.Crypto
 import com.client.xvideos.common.encrypting.Password
+import com.client.xvideos.common.eventBus.snackBarError
+import com.client.xvideos.common.eventBus.snackBarInfo
+import com.client.xvideos.common.eventBus.snackBarSuccess
 import com.client.xvideos.common.kdownloader.KDownloader
 import com.client.xvideos.common.util.toMD5
 import com.client.xvideos.l.model.PicsDetails
-import com.client.xvideos.common.snackBar.SnackBarEvent
 import timber.log.Timber
 import java.io.File
 
-class SavedL_Crypto(val snackBarEvent: SnackBarEvent, val kDownloader: KDownloader) {
+class SavedL_Crypto(val kDownloader: KDownloader) {
 
     val listUrl = mutableStateListOf<PicsDetails>()
 
@@ -25,7 +27,7 @@ class SavedL_Crypto(val snackBarEvent: SnackBarEvent, val kDownloader: KDownload
         val key = Password.key
         if (key == null) {
             Timber.i("!!! SavedL_Crypto add key == null Ключ отсутствует, не могу сохранять")
-            snackBarEvent.error("Ключ шифрования отсутствует")
+            snackBarError("Ключ шифрования отсутствует")
             return
         }
 
@@ -42,13 +44,13 @@ class SavedL_Crypto(val snackBarEvent: SnackBarEvent, val kDownloader: KDownload
             Password.key!!
         )
             .onSuccess {
-                snackBarEvent.success("Сохранен в сейф")
+                snackBarSuccess("Сохранен в сейф")
                 Timber.i("!!! ScreenLAlbumSM downloadLikeCrypto success")
                 refresh()
             }
             .onFailure {
                 it.printStackTrace()
-                snackBarEvent.error("Ошибка сохранения в сейф")
+                snackBarError("Ошибка сохранения в сейф")
                 Timber.e(it, "!!! ScreenLAlbumSM downloadLikeCrypto error")
             }
 
@@ -60,7 +62,7 @@ class SavedL_Crypto(val snackBarEvent: SnackBarEvent, val kDownloader: KDownload
         val key = Password.key
         if (key == null) {
             Timber.i("!!! SavedL_Crypto add key == null Ключ отсутствует, не могу сохранять")
-            snackBarEvent.error("Ключ шифрования отсутствует")
+            snackBarError("Ключ шифрования отсутствует")
             return
         }
 
@@ -73,13 +75,13 @@ class SavedL_Crypto(val snackBarEvent: SnackBarEvent, val kDownloader: KDownload
 
         Crypto.encryptFile(File(item.url_to_original!!), File(AppPath.likesCrypto_l, fileName), key)
             .onSuccess {
-                snackBarEvent.success("Сохранен в сейф")
+                snackBarSuccess("Сохранен в сейф")
                 Timber.i("!!! ScreenLAlbumSM downloadLikeCrypto success")
                 refresh()
             }
             .onFailure {
                 it.printStackTrace()
-                snackBarEvent.error("Ошибка сохранения в сейф")
+                snackBarError("Ошибка сохранения в сейф")
                 Timber.e(it, "!!! ScreenLAlbumSM downloadLikeCrypto error")
             }
 
@@ -90,11 +92,11 @@ class SavedL_Crypto(val snackBarEvent: SnackBarEvent, val kDownloader: KDownload
         val file = File(fileName)
         if (file.exists()) {
             if (!file.delete()) {
-                snackBarEvent.error("Не удалось удалить файл: ${file.absolutePath}")
+                snackBarError("Не удалось удалить файл: ${file.absolutePath}")
             } else
-                snackBarEvent.info("Удален из сейфа")
+                snackBarInfo("Удален из сейфа")
         } else {
-            snackBarEvent.error("Файл не найден: ${file.absolutePath}")
+            snackBarError("Файл не найден: ${file.absolutePath}")
         }
         refresh()
     }
@@ -113,7 +115,7 @@ class SavedL_Crypto(val snackBarEvent: SnackBarEvent, val kDownloader: KDownload
             }
         } catch (e: Exception) {
             Timber.e("eee Ошибка получения списка crypto ${e.localizedMessage}")
-            snackBarEvent.error("Ошибка получения списка crypto")
+            snackBarError("Ошибка получения списка crypto")
         }
 
     }

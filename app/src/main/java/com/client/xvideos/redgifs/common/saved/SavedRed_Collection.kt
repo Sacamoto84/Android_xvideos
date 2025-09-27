@@ -1,11 +1,12 @@
-package com.redgifs.common.saved
+package com.client.xvideos.redgifs.common.saved
 
 import com.client.xvideos.common.collectionDB.model.ISavedLCollection
-import com.client.xvideos.common.snackBar.SnackBarEvent
+import com.client.xvideos.common.eventBus.snackBarError
+import com.client.xvideos.common.eventBus.snackBarSuccess
 import com.client.xvideos.redgifs.model.GifsInfo
 import kotlinx.coroutines.DelicateCoroutinesApi
 
-class SavedRed_Collection(val snackBarEvent : SnackBarEvent) : ISavedLCollection<GifsInfo>(GifsInfo::class.java){
+class SavedRed_Collection() : ISavedLCollection<GifsInfo>(GifsInfo::class.java){
 
     override fun addCollection(item: GifsInfo, collectionName: String) {
         println("!!! addCollection() item:${item.id} collectionName:$collectionName")
@@ -17,30 +18,30 @@ class SavedRed_Collection(val snackBarEvent : SnackBarEvent) : ISavedLCollection
         println("!!! deleteItemFromCollection() item:${itemId} collectionName:$collectionName")
         collectionDb.deleteItem(itemId, collectionName)
             .onSuccess {
-                snackBarEvent.success("GIF удален из коллекции $collectionName")
+                snackBarSuccess("GIF удален из коллекции $collectionName")
                 refreshCollectionList()
             }
-            .onFailure { e -> snackBarEvent.error("Ошибка удаления GIF из коллекции $collectionName ${e.message}") }
+            .onFailure { e -> snackBarError("Ошибка удаления GIF из коллекции $collectionName ${e.message}") }
     }
 
     override fun deleteCollection(collectionName: String) {
             collectionDb.deleteCollection(collectionName)
             .onSuccess {
-                snackBarEvent.success("Коллекция $collectionName удалена")
+                snackBarSuccess("Коллекция $collectionName удалена")
                 refreshCollectionList()
             }
-            .onFailure { e -> snackBarEvent.error("Ошибка удаления коллекции $collectionName ${e.message}") }
+            .onFailure { e -> snackBarError("Ошибка удаления коллекции $collectionName ${e.message}") }
     }
 
     override fun createCollection(collectionName: String) {
         println("!!! createCollection() collectionName:$collectionName")
             collectionDb.create(collectionName)
             .onSuccess {
-                snackBarEvent.success("Коллекция $collectionName создана")
+                snackBarSuccess("Коллекция $collectionName создана")
                 refreshCollectionList()
             }
             .onFailure { e ->
-                snackBarEvent.error("Ошибка создания коллекции $collectionName ${e.message}")
+                snackBarError("Ошибка создания коллекции $collectionName ${e.message}")
             }
     }
 
@@ -51,7 +52,7 @@ class SavedRed_Collection(val snackBarEvent : SnackBarEvent) : ISavedLCollection
             collectionList.clear()
             collectionList.addAll(a.getOrThrow())
         } else {
-            snackBarEvent.error("Ошибка чтения коллекций ${a.exceptionOrNull()?.message}")
+            snackBarError("Ошибка чтения коллекций ${a.exceptionOrNull()?.message}")
         }
     }
 

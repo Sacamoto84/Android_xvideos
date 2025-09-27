@@ -1,13 +1,14 @@
-package com.redgifs.common.saved
+package com.client.xvideos.redgifs.common.saved
 
 import com.client.xvideos.common.fileDB.FileDB
 import com.client.xvideos.common.AppPath
+import com.client.xvideos.common.eventBus.snackBarError
+import com.client.xvideos.common.eventBus.snackBarInfo
 import com.client.xvideos.redgifs.model.NichesInfo
-import com.client.xvideos.common.snackBar.SnackBarEvent
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlin.onSuccess
 
-class SavedRed_Niches(val snackBarEvent : SnackBarEvent) {
+class SavedRed_Niches() {
 
     val nichesDb = FileDB(AppPath.niches_red, "niches", NichesInfo::class.java)
     val list = nichesDb.list
@@ -16,11 +17,11 @@ class SavedRed_Niches(val snackBarEvent : SnackBarEvent) {
         println("!!! addNiches() id:${item.id} name:${item.name}")
         nichesDb.insert(item.id, item)
             .onSuccess {
-                snackBarEvent.info("Группа добавлена")
+                snackBarInfo("Группа добавлена")
                 list.add(item)
             }
             .onFailure { e ->
-                snackBarEvent.error("Ошибка добавления группы ${e.message}")
+                snackBarError("Ошибка добавления группы ${e.message}")
             }
     }
 
@@ -28,12 +29,10 @@ class SavedRed_Niches(val snackBarEvent : SnackBarEvent) {
         println("!!! removeNiches() id:${item.id} name:${item.name}")
         nichesDb.delete(item.id)
             .onSuccess {
-                snackBarEvent.info("Группа удалена")
+                snackBarInfo("Группа удалена")
                 list.remove(item)
             }
-            .onFailure { e ->
-                snackBarEvent.error("Ошибка удаления группы ${e.message}")
-            }
+            .onFailure { e -> snackBarError("Ошибка удаления группы ${e.message}") }
     }
 
     @OptIn(DelicateCoroutinesApi::class)

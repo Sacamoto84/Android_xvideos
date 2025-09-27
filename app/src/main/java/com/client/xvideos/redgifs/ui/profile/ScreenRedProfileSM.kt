@@ -11,6 +11,7 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
 import com.client.xvideos.common.connectivityObserver.ConnectivityObserver
+import com.client.xvideos.common.eventBus.snackBarError
 import com.client.xvideos.common.preference.PreferencesRepository
 import com.client.xvideos.redgifs.model.GifsInfo
 import com.client.xvideos.redgifs.model.MediaType
@@ -130,7 +131,7 @@ class ScreenRedProfileSM @AssistedInject constructor(
             } catch (e: Exception) {
                 creator = null
                 Timber.e(e)
-                hostDI.snackBarEvent.error(e.message.toString())
+                snackBarError(e.message.toString())
             }
 
             //Фильтруем список тегов убрав из списка блокируемые gif

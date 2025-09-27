@@ -28,6 +28,7 @@ import com.client.xvideos.redgifs.ui.explorer.ScreenRedExplorer
 import com.redgifs.common.downloader.ui.DownloadIndicator
 import com.redgifs.common.saved.DialogCollection
 import com.client.xvideos.common.eventBus.UiMessage
+import com.client.xvideos.common.eventBus.snackBarSuccess
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -75,8 +76,6 @@ class ScreenRedRoot() : Screen {
         val savedRed = vm.hostDI.savedRed
 
         val percentDownload = vm.hostDI.downloadRed.downloader.percent.collectAsStateWithLifecycle().value
-        val snackBarEvent = vm.hostDI.snackBarEvent
-
 
         BackHandler { Timber.i("iii BackHandler Root") }
 
@@ -95,7 +94,7 @@ class ScreenRedRoot() : Screen {
                                 collection
                             )
                             savedRed.collections.collectionItemGifInfo = null
-                            snackBarEvent.success("Элемент добавлен в коллекцию")
+                            snackBarSuccess("Элемент добавлен в коллекцию")
                             delay(800)
                             savedRed.collections.collectionVisibleDialog = false
                         }

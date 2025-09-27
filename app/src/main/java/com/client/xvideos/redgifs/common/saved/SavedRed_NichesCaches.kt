@@ -1,4 +1,4 @@
-package com.redgifs.common.saved
+package com.client.xvideos.redgifs.common.saved
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -7,9 +7,10 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.client.xvideos.common.AppPath
+import com.client.xvideos.common.eventBus.snackBarError
+import com.client.xvideos.common.eventBus.snackBarSuccess
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
-import com.client.xvideos.common.snackBar.SnackBarEvent
 import com.client.xvideos.redgifs.model.Niche
 import com.client.xvideos.redgifs.network.api.RedApi
 import kotlinx.coroutines.CoroutineScope
@@ -20,7 +21,6 @@ import java.io.File
 class SavedRed_NichesCaches(
     val scope: CoroutineScope,
     val redApi: RedApi,
-    val snackBarEvent: SnackBarEvent
 ) {
 
     val list = mutableListOf<Niche>()
@@ -60,10 +60,10 @@ class SavedRed_NichesCaches(
                 file.writeText(json)
                 size = list.size
                 timeRefresh()
-                snackBarEvent.success("Обновление завершено")
+                snackBarSuccess("Обновление завершено")
                 isDownloading = false
             } catch (e: Exception) {
-                snackBarEvent.error("Ошибка обновления ${e.toString()}")
+                snackBarError("Ошибка обновления ${e.toString()}")
                 isDownloading = false
             }
         }

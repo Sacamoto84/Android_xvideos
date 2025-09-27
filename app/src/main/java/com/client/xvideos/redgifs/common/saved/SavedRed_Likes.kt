@@ -1,13 +1,15 @@
-package com.redgifs.common.saved
+package com.client.xvideos.redgifs.common.saved
 
 import com.client.xvideos.common.fileDB.FileDB
 import com.client.xvideos.common.AppPath
+import com.client.xvideos.common.eventBus.snackBarError
+import com.client.xvideos.common.eventBus.snackBarInfo
+import com.client.xvideos.common.eventBus.snackBarSuccess
 import com.client.xvideos.redgifs.model.GifsInfo
-import com.client.xvideos.common.snackBar.SnackBarEvent
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlin.onSuccess
 
-class SavedRed_Likes(val snackBarEvent : SnackBarEvent) {
+class SavedRed_Likes() {
 
     val likesDb = FileDB(AppPath.likes_red, "likes", GifsInfo::class.java)
 
@@ -17,19 +19,19 @@ class SavedRed_Likes(val snackBarEvent : SnackBarEvent) {
         println("!!! addLikes() id:${item.id} userName:${item.userName} url:${item.urls.hd}")
         likesDb.insert(item.id, item)
             .onSuccess {
-                snackBarEvent.success("Like")
+                snackBarSuccess("Like")
                 list.add(item)
             }
             .onFailure { e ->
-                snackBarEvent.error("Ошибка добавления лайка ${e.message}")
+                snackBarError("Ошибка добавления лайка ${e.message}")
             }
     }
 
     fun remove(item: GifsInfo) {
         println("!!! removeLikes() id:${item.id} userName:${item.userName} url:${item.urls.hd}")
         likesDb.delete(item.id)
-            .onSuccess { snackBarEvent.info("Unlike") }
-            .onFailure { e ->  snackBarEvent.error("Ошибка удаления лайка ${e.message}") }
+            .onSuccess { snackBarInfo("Unlike") }
+            .onFailure { e -> snackBarError("Ошибка удаления лайка ${e.message}") }
         refresh()
     }
 

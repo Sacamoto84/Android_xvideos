@@ -1,17 +1,17 @@
-package com.redgifs.common.pagin
+package com.client.xvideos.redgifs.common.pagin
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import com.client.xvideos.common.eventBus.snackBarError
 import com.client.xvideos.redgifs.common.UsersRed
 import com.client.xvideos.redgifs.network.api.RedApi
 import com.client.xvideos.redgifs.model.GifsInfo
 import com.client.xvideos.redgifs.model.MediaType
 import com.client.xvideos.redgifs.model.Order
 import com.client.xvideos.redgifs.common.block.BlockRed
-import com.client.xvideos.common.snackBar.SnackBarEvent
 import timber.log.Timber
 
-class ItemProfilePagingSource (val profileName : String, val sort : Order, val block: BlockRed, val redApi: RedApi, val tags : List<String> = emptyList(), val snackBarEvent: SnackBarEvent): PagingSource<Int, GifsInfo>() {
+class ItemProfilePagingSource (val profileName : String, val sort : Order, val block: BlockRed, val redApi: RedApi, val tags : List<String> = emptyList()): PagingSource<Int, GifsInfo>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int,  GifsInfo> {
 
@@ -57,7 +57,7 @@ class ItemProfilePagingSource (val profileName : String, val sort : Order, val b
 
         } catch (e: Exception) {
             Timber.e("!!! ItemProfilePagingSource load() profileName:${profileName} page = $page Ошибка = ${e.message}")
-            snackBarEvent.error("ItemProfilePagingSource load() profileName:${profileName} page = $page Ошибка = ${e.message}")
+            snackBarError("ItemProfilePagingSource load() profileName:${profileName} page = $page Ошибка = ${e.message}")
             LoadResult.Error(e)
         }
     }

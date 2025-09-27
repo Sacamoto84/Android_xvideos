@@ -1,10 +1,12 @@
-package com.redgifs.common.downloader
+package com.client.xvideos.redgifs.common.downloader
 
 import com.client.xvideos.common.AppPath
 import com.google.gson.GsonBuilder
 import com.client.xvideos.common.kdownloader.KDownloader
-import com.client.xvideos.common.snackBar.SnackBarEvent
 import com.client.xvideos.common.eventBus.UiMessage
+import com.client.xvideos.common.eventBus.snackBarError
+import com.client.xvideos.common.eventBus.snackBarInfo
+import com.client.xvideos.common.eventBus.snackBarSuccess
 import com.client.xvideos.redgifs.model.GifsInfo
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,16 +21,12 @@ data class ItemsRedDownload(
     val url: String = "",      //Создается на этапе закачки, и после успешной закачки не используется url mp4  //https://media.redgifs.com/VictoriousGlamorousStud.m4s
 )
 
-
 /**
  * Проверка что данное имя креатор уже есть в кеше
  */
-
-
 @Singleton
 class Downloader @Inject constructor(
     val kDownloader: KDownloader,
-    val snackBarEvent: SnackBarEvent,
 ) {
 
     //Процент скачивания 0..1 - начало скачивания, -2 busy, -3 error
@@ -70,16 +68,15 @@ class Downloader @Inject constructor(
 
                 onError = {
                     println("!!! onError закачки: $it"); percent.value = -3f
-                    snackBarEvent.messages.trySend(UiMessage.Error("Ошибка закачки: $it"))
+                    snackBarError("Ошибка закачки: $it")
                 },
 
                 onProgress = { it1 -> percent.value = it1 / 100f },
                 onCompleted = {
                     println("!!! onCompleted закачки")
                     percent.value = -2f
-                    //Toast("Скачивание завершено")
-                    snackBarEvent.messages.trySend(UiMessage.Success("Скачивание завершено"))
 
+                    snackBarSuccess("Скачивание завершено")
                     val gson = GsonBuilder().create()
                     val text = gson.toJson(item)
                     File(p, "${item.id}.info").writeText(text.toString())
@@ -90,7 +87,7 @@ class Downloader @Inject constructor(
             )
         } else {
             //Toast("Файл есть к кеше")
-            snackBarEvent.messages.trySend(UiMessage.Info("Файл есть к кеше"))
+            snackBarInfo("Файл есть к кеше")
         }
 
     }

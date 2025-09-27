@@ -16,11 +16,11 @@ import androidx.paging.cachedIn
 import com.client.xvideos.common.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.redgifs.model.Order
 import com.client.xvideos.redgifs.common.di.HostDI
-import com.redgifs.common.pagin.ItemCollectionPagingSource
+import com.client.xvideos.redgifs.common.pagin.ItemCollectionPagingSource
 import com.redgifs.common.pagin.ItemEmptyPagingSource
-import com.redgifs.common.pagin.ItemExplorerNailsPagingSource
-import com.redgifs.common.pagin.ItemNailsPagingSource
-import com.redgifs.common.pagin.ItemProfilePagingSource
+import com.client.xvideos.redgifs.common.pagin.ItemExplorerNailsPagingSource
+import com.client.xvideos.redgifs.common.pagin.ItemNailsPagingSource
+import com.client.xvideos.redgifs.common.pagin.ItemProfilePagingSource
 import com.redgifs.common.pagin.ItemSavedLikesPagingSource
 import com.client.xvideos.redgifs.common.pagin.ItemTopPagingSource
 import kotlinx.coroutines.CoroutineScope
@@ -155,7 +155,6 @@ fun createPager(
                 nichesName = extraString,
                 block = hostDI.block,
                 redApi = hostDI.redApi,
-                hostDI.snackBarEvent
             )
         }
 
@@ -165,7 +164,6 @@ fun createPager(
                 searchText = searchText,
                 block = hostDI.block,
                 redApi = hostDI.redApi,
-                hostDI.snackBarEvent
             )
         }
 
@@ -178,7 +176,6 @@ fun createPager(
                 order = sort,
                 textNiches = textNiches,
                 redApi = hostDI.redApi,
-                hostDI.snackBarEvent,
                 hostDI.savedRed.nichesCache
             )
         }
@@ -190,7 +187,6 @@ fun createPager(
                 block = hostDI.block,
                 redApi = hostDI.redApi,
                 tags = tags,
-                hostDI.snackBarEvent
             )
         }
 
@@ -202,7 +198,6 @@ fun createPager(
             ItemCollectionPagingSource(
                 collection = extraString,
                 savedRed = hostDI.savedRed,
-                snackBarEvent = hostDI.snackBarEvent
             )
         }
 

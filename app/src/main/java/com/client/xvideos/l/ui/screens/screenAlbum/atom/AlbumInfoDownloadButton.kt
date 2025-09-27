@@ -26,13 +26,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.client.xvideos.common.eventBus.snackBarInfo
+import com.client.xvideos.common.eventBus.snackBarSuccess
 import com.client.xvideos.common.util.toPrettyCount2
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.featured.downloader.DownloaderAlbum
 import com.client.xvideos.l.net.AlbumInfo
 import com.client.xvideos.l.ui.screens.screenAlbum.ScreenLAlbumSM
 import com.client.xvideos.ui.theme.PurpleGrey80
-
 
 @Composable
 fun AlbumInfoDownloadButton(
@@ -121,12 +122,12 @@ fun AlbumInfoDownloadButton(
                             onStart = {
                                 isDeletingChange(true)
                                 //isDeletingFiles = true
-                                vm.snackBarEvent.info("Удаление файлов альбома")
+                                snackBarInfo("Удаление файлов альбома")
                             },
                             onComplete = {
                                 isDeletingChange(false)
                                 //isDeletingFiles = false
-                                vm.snackBarEvent.success("Удаление файлов альбома завершено")
+                                snackBarSuccess("Удаление файлов альбома завершено")
                             },
                         )
                     }, enabled = !isDeletingFiles, // Блокируем кнопку

@@ -1,7 +1,6 @@
 package com.client.xvideos.xvideos.feature.saved
 
 import com.client.xvideos.common.di.ApplicationScope
-import com.client.xvideos.common.snackBar.SnackBarEvent
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -9,12 +8,11 @@ import javax.inject.Singleton
 @Singleton
 class SavedX @Inject constructor(
     //val db: AppLDatabase,
-    snackBarEvent: SnackBarEvent,
     @ApplicationScope val scope: CoroutineScope,
     //kDownloader: KDownloader,
 ) {
 
-    val favorites = SavedX_Favorites(snackBarEvent, scope)
+    val favorites = SavedX_Favorites(scope)
 
     //val collection = SavedL_Collection(snackBarEvent)
 

@@ -36,6 +36,7 @@ import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
+import com.client.xvideos.common.eventBus.snackBarSuccess
 import com.client.xvideos.common.fresco.FrescoUtils
 import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.common.traficStatistic.AppNetworkSpeedMonitor
@@ -49,7 +50,6 @@ import com.client.xvideos.l.ui.screens.explorer.tab.config.atom.ConfigTextAndChe
 import com.client.xvideos.l.ui.screens.explorer.tab.config.atom.ConfigTextAndMenuL
 import com.client.xvideos.l.ui.screens.explorer.tab.config.atom.ConfigTextL
 import com.client.xvideos.l.ui.screens.explorer.tab.config.atom.ScreenLConfig_Encrypt
-import com.client.xvideos.common.snackBar.SnackBarEvent
 import com.facebook.drawee.backends.pipeline.Fresco
 import dagger.Binds
 import dagger.Module
@@ -59,7 +59,6 @@ import dagger.multibindings.IntoMap
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
-
 
 class ScreenLConfigTab : Screen {
 
@@ -132,7 +131,7 @@ class ScreenLConfigTab : Screen {
             ConfigTextAndMenuL("Размер миниатюры", currentDisplayName, ThumbnailsSize.displayNames) { selectedDisplayName ->
                 ThumbnailsSize.fromDisplayName(selectedDisplayName)?.apply {
                     Settings.thumbalistSize.setValue(value)
-                    vm.snackBarEvent.success("Размер миниатюры: $displayName")
+                    snackBarSuccess("Размер миниатюры: $displayName")
                 }
             }
             Spacer(Modifier.height(4.dp))
@@ -165,7 +164,6 @@ class ScreenLConfigTab : Screen {
 
 
 class ScreenLExplorerSettingSM @Inject constructor(
-    val snackBarEvent: SnackBarEvent
 ) : ScreenModel {
 
     var sizeXvideos by mutableLongStateOf(0L)

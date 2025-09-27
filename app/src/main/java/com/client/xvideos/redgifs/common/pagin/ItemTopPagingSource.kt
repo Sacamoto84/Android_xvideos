@@ -2,12 +2,12 @@ package com.client.xvideos.redgifs.common.pagin
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import com.client.xvideos.common.eventBus.snackBarError
 import com.client.xvideos.redgifs.common.UsersRed
 import com.client.xvideos.redgifs.network.api.RedApi
 import com.client.xvideos.redgifs.model.GifsInfo
 import com.client.xvideos.redgifs.model.Order
 import com.client.xvideos.redgifs.common.block.BlockRed
-import com.client.xvideos.common.snackBar.SnackBarEvent
 import timber.log.Timber
 
 class ItemTopPagingSource(
@@ -15,7 +15,6 @@ class ItemTopPagingSource(
     val searchText: String,
     val block: BlockRed,
     val redApi: RedApi,
-    val snackBarEvent: SnackBarEvent
 ) : PagingSource<Int, GifsInfo>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, GifsInfo> {
@@ -57,7 +56,7 @@ class ItemTopPagingSource(
             )
         } catch (e: Exception) {
             Timber.e("!!! ItemPagingSource load() page = $page Ошибка = ${e.message}")
-            snackBarEvent.error("ItemPagingSource load() page = $page Ошибка = ${e.message}")
+            snackBarError("ItemPagingSource load() page = $page Ошибка = ${e.message}")
             LoadResult.Error(e)
         }
     }

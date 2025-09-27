@@ -2,6 +2,7 @@ package com.redgifs.common.downloader
 
 import com.client.xvideos.common.AppPath
 import com.client.xvideos.common.di.ApplicationScope
+import com.client.xvideos.redgifs.common.downloader.Downloader
 import com.google.gson.GsonBuilder
 import com.client.xvideos.redgifs.model.GifsInfo
 import kotlinx.coroutines.CoroutineScope
