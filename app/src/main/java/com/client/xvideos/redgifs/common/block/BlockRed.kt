@@ -5,13 +5,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.room.withTransaction
 import com.client.xvideos.common.di.ApplicationScope
+import com.client.xvideos.common.eventBus.snackBarError
+import com.client.xvideos.common.eventBus.snackBarSuccess
 import com.client.xvideos.common.room.AppDatabase
 import com.client.xvideos.common.room.dao.r.R_BlockDao
 import com.client.xvideos.common.room.dao.r.R_GifsInfoDao
 import com.client.xvideos.common.room.entity.r.R_BlockEntity
 import com.client.xvideos.common.room.entity.r.toDomain
 import com.client.xvideos.common.room.entity.r.toEntity
-import com.client.xvideos.common.snackBar.SnackBarEvent
 import com.client.xvideos.redgifs.model.GifsInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,7 +28,6 @@ class BlockRed @Inject constructor(
     private val blockDao: R_BlockDao,
     private val infoDao: R_GifsInfoDao,
     private val db: AppDatabase,
-    val snackBarEvent: SnackBarEvent,
     @ApplicationScope private val scope: CoroutineScope
 ) {
 
@@ -73,11 +73,11 @@ class BlockRed @Inject constructor(
                 }
                 refresh()
             }.onSuccess {
-                snackBarEvent.success("GIFs заблокирован\"")
+                snackBarSuccess("GIFs заблокирован")
             }
                 .onFailure { errorMsg ->
                     Timber.e(errorMsg, "!!! Не удалось заблокировать GIF")
-                    snackBarEvent.error("Ошибка блокировки: $errorMsg")
+                    snackBarError("Ошибка блокировки: $errorMsg")
                 }
         }
     }

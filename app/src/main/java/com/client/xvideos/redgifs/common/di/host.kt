@@ -20,5 +20,4 @@ class HostDI @Inject constructor (
     val downloadRed: DownloadRed,
     val search : SearchRed,
     val searchNiches : SearchNichesRed,
-    val snackBarEvent: SnackBarEvent
 )

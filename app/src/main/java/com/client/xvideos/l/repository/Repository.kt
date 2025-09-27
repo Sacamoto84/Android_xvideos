@@ -2,12 +2,12 @@ package com.client.xvideos.l.repository
 
 import android.content.Context
 import com.client.xvideos.common.encrypting.Password
+import com.client.xvideos.common.eventBus.snackBarError
 import com.client.xvideos.common.room.AppDatabase
 import com.client.xvideos.common.room.entity.CacheUrlStringRamEntity
 import com.client.xvideos.common.room.entity.CacheUrlStringRomEntity
 import com.client.xvideos.common.util.toMD5
 import com.client.xvideos.l.KtorRequestHandler
-import com.client.xvideos.common.snackBar.SnackBarEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -18,7 +18,6 @@ import timber.log.Timber
 class Repository(
     dbCache: AppDatabase,
     //private val luscious: Luscious,
-    private val snackBarEvent: SnackBarEvent,
     private val scope: CoroutineScope,
     //private val saved: SavedL
     username: String? = null,
@@ -89,7 +88,7 @@ class Repository(
                         val response = handler.postJson(url, data)
 
                         if (response.contains("{\"errors\":")){
-                            snackBarEvent.error(response)
+                            snackBarError(response)
                             return Result.failure(Exception(response))
                         }
 
@@ -115,7 +114,7 @@ class Repository(
                         val response = handler.postJson(url, data)
 
                         if (response.contains("{\"errors\":")){
-                            snackBarEvent.error(response)
+                            snackBarError(response)
                             return Result.failure(Exception(response))
                         }
 
@@ -125,14 +124,14 @@ class Repository(
 
                         if (response.contains("{\"errors\":"))
                         {
-                            snackBarEvent.error(response)
+                            snackBarError(response)
                         }
 
                         return Result.success(response)
                     }
                     catch (e: Exception){
                         Timber.e(e, "!!! openURI() CACHE_RAM error")
-                        snackBarEvent.error(e.message?: "openURI() CACHE_RAM error")
+                        snackBarError(e.message?: "openURI() CACHE_RAM error")
                         return Result.failure(e)
                     }
                 }

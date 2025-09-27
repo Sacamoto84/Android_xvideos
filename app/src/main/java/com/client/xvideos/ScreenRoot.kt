@@ -1,6 +1,5 @@
 package com.client.xvideos
 
-import com.client.xvideos.common.snackBar.SnackBarEvent
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -53,9 +52,10 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
-import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
-import cafe.adriel.voyager.navigator.currentOrThrow
+import com.client.xvideos.common.eventBus.Event
+import com.client.xvideos.common.eventBus.EventBus
+import com.client.xvideos.common.eventBus.UiMessage
 import com.client.xvideos.common.fresco.DownloadQueueManager
 import com.client.xvideos.common.fresco.QueueStatisticsCardLite
 import com.client.xvideos.common.traficStatistic.AppNetworkSpeedMonitorLite
@@ -64,7 +64,6 @@ import com.client.xvideos.l.ui.screens.explorer.ScreenLExplorer
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.ui.UiSnackbarVisuals
 import com.client.xvideos.redgifs.ui.show
-import com.redgifs.common.snackBar.UiMessage
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -79,12 +78,13 @@ import kotlinx.coroutines.launch
 import net.engawapg.lib.zoomable.ExperimentalZoomableApi
 import javax.inject.Inject
 
-val LocalRootScreenModel = staticCompositionLocalOf<ScreenRootSM> { error("No ScreenRootSM provided") }
+val LocalRootScreenModel =
+    staticCompositionLocalOf<ScreenRootSM> { error("No ScreenRootSM provided") }
 
 // Глобальная ссылка на основной навигатор для доступа из любого места
 val LocalMainNavigator = staticCompositionLocalOf<Navigator?> { null }
 
-object ScreenRoot: Screen {
+object ScreenRoot : Screen {
 
     private fun readResolve(): Any = ScreenRoot
 
@@ -97,18 +97,35 @@ object ScreenRoot: Screen {
         val haptic = LocalHapticFeedback.current
         val vm: ScreenRootSM = getScreenModel()
         val snackBarHostState = remember { SnackbarHostState() }
-        val snackBarEvent = vm.snackBarEvent
+
 
         // Создаем отдельный навигатор для внутренней навигации
         var mainNavigator: Navigator? = null
 
-        LaunchedEffect(Unit) { vm.snackbarEvents.collect { message -> snackBarHostState.showSnackbar( message ) } }
+        LaunchedEffect(Unit) {
+            vm.snackbarEvents.collect { message ->
+                snackBarHostState.showSnackbar(
+                    message
+                )
+            }
+        }
 
         LaunchedEffect(Unit) {
-            snackBarEvent.messages.receiveAsFlow().collect { message ->
-                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                snackBarHostState.show(message)
+//            snackBarEvent.messages.receiveAsFlow().collect { message ->
+//                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+//                snackBarHostState.show(message)
+//            }
+            EventBus.events.collect { event ->
+                when (event) {
+                    is Event.SnackBarRaw -> {
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                        snackBarHostState.show(event.message)
+                    }
+                    else -> {}
+                }
             }
+
+
         }
 
         val queueState by DownloadQueueManager.queueState.collectAsState()
@@ -285,7 +302,7 @@ object ScreenRoot: Screen {
 var depth by mutableIntStateOf(0)
 
 class ScreenRootSM @Inject constructor(
-   val snackBarEvent: SnackBarEvent
+
 ) : ScreenModel {
     private val _snackbarEvents = Channel<String>(64)
     val snackbarEvents = _snackbarEvents.receiveAsFlow()

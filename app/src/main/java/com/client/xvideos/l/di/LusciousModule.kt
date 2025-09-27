@@ -8,7 +8,6 @@ import com.client.xvideos.common.kdownloader.KDownloader
 import com.client.xvideos.common.room.AppDatabase
 import com.client.xvideos.l.net.Luscious
 import com.client.xvideos.l.repository.Repository
-import com.client.xvideos.common.snackBar.SnackBarEvent
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -37,12 +36,10 @@ object LusciousModule {
     fun provideRepository(
         db: AppDatabase,
         @ApplicationScope scope: CoroutineScope,
-        snackBarEvent: SnackBarEvent,
         @ApplicationContext context: Context
     ): Repository {
         return Repository(
             db,
-            snackBarEvent,
             scope,
             BuildConfig.luscious_email,
             BuildConfig.luscious_password,

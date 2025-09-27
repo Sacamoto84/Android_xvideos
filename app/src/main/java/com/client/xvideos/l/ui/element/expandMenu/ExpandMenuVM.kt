@@ -8,6 +8,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.lifecycle.ViewModel
 import com.client.xvideos.common.AppPath
 import com.client.xvideos.common.di.ApplicationScope
+import com.client.xvideos.common.eventBus.snackBarError
 import com.client.xvideos.common.kdownloader.KDownloader
 import com.client.xvideos.common.util.toMD5
 import com.client.xvideos.l.featured.downloader.DownloaderL
@@ -15,7 +16,6 @@ import com.client.xvideos.l.featured.saved.SavedL
 import com.client.xvideos.l.featured.share.useCaseShareFile
 import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.net.Luscious
-import com.client.xvideos.common.snackBar.SnackBarEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.ktor.client.HttpClient
@@ -49,7 +49,6 @@ class ExpandMenuViewModel @Inject constructor(
     //val repository: Repository
     val kDownloader: KDownloader,
     val dowloaderL: DownloaderL,
-    val snackBarEvent: SnackBarEvent,
     @ApplicationContext val context: Context
 ) : ViewModel() {
 
@@ -144,11 +143,11 @@ class ExpandMenuViewModel @Inject constructor(
                 if (file.exists()) {
                     useCaseShareFile(context, file)
                 } else {
-                    snackBarEvent.error("Файл не найден: ${file.absolutePath}")
+                    snackBarError("Файл не найден: ${file.absolutePath}")
                     Timber.w("shareGifs -> Файл не существует: ${file.absolutePath}")
                 }
             } catch (e: Exception) {
-                snackBarEvent.error("shareGifs -> Ошибка при работе с файлом: ${file.absolutePath}")
+                snackBarError("shareGifs -> Ошибка при работе с файлом: ${file.absolutePath}")
                 Timber.e(e, "shareGifs -> Ошибка при работе с файлом: ${file.absolutePath}")
             } finally {
                 client.close()

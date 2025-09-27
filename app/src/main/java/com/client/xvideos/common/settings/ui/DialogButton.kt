@@ -134,21 +134,6 @@ fun DialogButtonPreview() {
     )
 }
 
-@Preview
-@Composable
-fun DialogButtonPreview1() {
-    DialogButton(
-        visible = true,
-        title = "Dialog Title",
-        body = "This is the body of the dialog.",
-        buttonText = "Confirm",
-        onDismiss = {},
-        onBlockConfirmed = {},
-        composable = {
-            Text("This is a composable inside the dialog.")
-        }
-    )
-}
 
 
 

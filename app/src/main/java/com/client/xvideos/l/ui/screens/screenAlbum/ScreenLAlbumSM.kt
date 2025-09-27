@@ -10,6 +10,7 @@ import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
 import com.client.xvideos.common.AppPath
 import com.client.xvideos.common.di.ApplicationScope
+import com.client.xvideos.common.eventBus.snackBarError
 import com.client.xvideos.common.kdownloader.KDownloader
 import com.client.xvideos.common.util.toMD5
 import com.client.xvideos.l.featured.downloader.DownloaderAlbum
@@ -20,7 +21,6 @@ import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.net.AlbumInfo
 import com.client.xvideos.l.net.Luscious
 import com.client.xvideos.l.ui.element.lazyRowPictureDetails.LazyRowPictureDetailsHost
-import com.client.xvideos.common.snackBar.SnackBarEvent
 import dagger.Binds
 import dagger.Module
 import dagger.assisted.Assisted
@@ -49,7 +49,6 @@ class ScreenLAlbumSM @AssistedInject constructor(
     //val repository: Repository
     val kDownloader: KDownloader,
     val dowloaderL: DownloaderL,
-    val snackBarEvent: SnackBarEvent,
     @ApplicationContext val context: Context
 ) : ScreenModel {
 
@@ -161,11 +160,11 @@ class ScreenLAlbumSM @AssistedInject constructor(
                 if (file.exists()) { useCaseShareFile(context, file) }
                 else
                 {
-                    snackBarEvent.error("Файл не найден: ${file.absolutePath}")
+                    snackBarError("Файл не найден: ${file.absolutePath}")
                     Timber.w("shareGifs -> Файл не существует: ${file.absolutePath}")
                 }
             } catch (e: Exception) {
-                snackBarEvent.error("shareGifs -> Ошибка при работе с файлом: ${file.absolutePath}")
+                snackBarError("shareGifs -> Ошибка при работе с файлом: ${file.absolutePath}")
                 Timber.e(e, "shareGifs -> Ошибка при работе с файлом: ${file.absolutePath}")
             } finally {
                 client.close()
