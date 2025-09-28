@@ -102,7 +102,7 @@ class ScreenX_VideoPlayerFullScreenSM @AssistedInject constructor(
 
     var playbackState by mutableIntStateOf(0)
 
-    val trackSelector = DefaultTrackSelector(context)
+    //val trackSelector = DefaultTrackSelector(context)
 
     val listFormat = mutableStateListOf<FORMAT>()
 

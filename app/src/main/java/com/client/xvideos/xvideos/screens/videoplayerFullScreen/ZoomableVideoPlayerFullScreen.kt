@@ -8,17 +8,24 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.MimeTypes
 import androidx.media3.common.Player
 import androidx.media3.common.Tracks
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.analytics.AnalyticsListener
+import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
+import com.client.xvideos.common.eventBus.Event
+import com.client.xvideos.common.eventBus.EventBus
 import com.client.xvideos.screens.videoplayer.video.RepeatMode
 import com.client.xvideos.screens.videoplayer.video.uri.VideoPlayerMediaItem
 import com.client.xvideos.xvideos.screens.videoplayer.FORMAT
 import com.client.xvideos.xvideos.screens.videoplayer.atom.formatMinSec
 import com.client.xvideos.xvideos.screens.videoplayer.video.controller.VideoPlayerControllerConfig
+import io.ktor.http.content.EntityTagVersion
 import timber.log.Timber
 
 @OptIn(UnstableApi::class)
@@ -27,6 +34,10 @@ fun ZoomableVideoPlayerFullScreen(
     vm: ScreenX_VideoPlayerFullScreenSM,
     videoUri: String,
 ) {
+    val context = LocalContext.current
+
+    val navigator = LocalNavigator.currentOrThrow
+
 
     Timber.i("!!! ZoomableVideoPlayer url:$videoUri")
     //val activity = LocalContext.current as Activity
@@ -37,8 +48,8 @@ fun ZoomableVideoPlayerFullScreen(
         vm = vm,
         onFullScreenExit = { position ->
             Timber.i("!!! onFullScreenExit position:${position.formatMinSec()} ")
-            //vm.isFullScreen = false
-            //vm.playerE?.seekTo(position)
+            EventBus.postEvent(Event.X_FullScreenExitPosition(position))
+            navigator.pop()
         },
         onFullScreenEnter = {
             Timber.i("!!! onFullScreenEnter")
@@ -47,7 +58,7 @@ fun ZoomableVideoPlayerFullScreen(
 
         defaultFullScreeen = true,
 
-        trackSelector = vm.trackSelector,
+        trackSelector = DefaultTrackSelector(context),
         mediaItems = listOf(
             VideoPlayerMediaItem.NetworkMediaItem(
                 url = videoUri,
@@ -136,8 +147,8 @@ fun ZoomableVideoPlayerFullScreen(
                 }
             )
         },
-        modifier = Modifier.fillMaxSize()
-    )
 
+        modifier = Modifier.fillMaxSize(),
+    )
 
 }

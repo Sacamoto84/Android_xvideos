@@ -9,19 +9,27 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.MimeTypes
 import androidx.media3.common.Player
 import androidx.media3.common.Tracks
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.analytics.AnalyticsListener
+import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
+import cafe.adriel.voyager.core.model.screenModelScope
+import com.client.xvideos.common.eventBus.Event
+import com.client.xvideos.common.eventBus.EventBus
 import com.client.xvideos.common.noRippleClickable
 import com.client.xvideos.screens.videoplayer.atom.ItemPlayerBottomControl
 import com.client.xvideos.screens.videoplayer.video.RepeatMode
@@ -30,6 +38,12 @@ import com.client.xvideos.screens.videoplayer.video.uri.VideoPlayerMediaItem
 import com.client.xvideos.xvideos.screens.videoplayer.FORMAT
 import com.client.xvideos.xvideos.screens.videoplayer.ScreenX_VideoPlayerSM
 import com.client.xvideos.xvideos.screens.videoplayer.video.controller.VideoPlayerControllerConfig
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
@@ -43,6 +57,8 @@ fun ZoomableVideoPlayer(
 
     Timber.i("!!! ZoomableVideoPlayer url:$videoUri")
 
+    val context = LocalContext.current
+
     //val activity = LocalContext.current as Activity
     //activity.requestedOrientation = SCREEN_ORIENTATION_PORTRAIT
 
@@ -51,32 +67,24 @@ fun ZoomableVideoPlayer(
     var isDragging by remember { mutableStateOf(false) }
     var dragAmount by remember { mutableFloatStateOf(0f) } // Текущее смещение во время жеста
 
-    Column( modifier = Modifier.fillMaxSize().then(modifier), verticalArrangement = Arrangement.Bottom)
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .then(modifier),
+        verticalArrangement = Arrangement.Bottom
+    )
     {
 
         VideoPlayer(
             vm = vm,
-//            onFullScreenExit = {
-//                position ->
-//                Timber.i("!!! onFullScreenExit position:${position.formatMinSec()} ")
-//                vm.isFullScreen = false
-//                vm.playerE?.seekTo(position)
-//            },
-//            onFullScreenEnter = {
-//                Timber.i("!!! onFullScreenEnter")
-//                vm.isFullScreen = true
-//            },
-
-//            defaultFullScreeen = vm.isFullScreen,
-
-            trackSelector = vm.trackSelector,
-            mediaItems = listOf(
+            trackSelector = remember(videoUri) { DefaultTrackSelector(context) },
+            mediaItems = remember(videoUri) {listOf(
                 VideoPlayerMediaItem.NetworkMediaItem(
                     url = videoUri,
                     mediaMetadata = MediaMetadata.Builder().setTitle("Widevine HLS: Example").build(),
                     mimeType = MimeTypes.APPLICATION_M3U8,
                 )
-            ),
+            ) },
             handleLifecycle = true,
             autoPlay = true,
             usePlayerController = false,
@@ -111,6 +119,20 @@ fun ZoomableVideoPlayer(
 
                     object : Player.Listener {
 
+                        override fun onPlaybackStateChanged(playbackState: Int) {
+                            Timber.i("!!! onPlaybackStateChanged ${Player.STATE_READY} positionFromFullscreen:${vm.positionFromFullscreen}")
+                            if (playbackState == Player.STATE_READY && vm.positionFromFullscreen != -1L) {
+                                Timber.i("!!! >>> positionFromFullscreen ${vm.positionFromFullscreen.formatMinSec()}")
+                                vm.playerE?.seekTo(vm.positionFromFullscreen)
+                                val temp = vm.positionFromFullscreen
+                                vm.positionFromFullscreen = -1
+                                vm.screenModelScope.launch {
+                                    delay(16)
+                                    vm.playerE?.seekTo(temp)
+                                }
+                            }
+                        }
+
                         override fun onTracksChanged(tracks: Tracks) {
                             // Update UI using current tracks.
                             if (tracks.groups.size == 0) return
@@ -142,12 +164,7 @@ fun ZoomableVideoPlayer(
                             }
 
                         }
-
-
                     }
-
-
-
                 )
 
                 addAnalyticsListener(
@@ -173,7 +190,6 @@ fun ZoomableVideoPlayer(
                                 // Hide shutter, hide image view.
                             }
                         }
-
 
 
                     }
@@ -248,8 +264,9 @@ fun ZoomableVideoPlayer(
 
 @SuppressLint("DefaultLocale")
 fun Long.formatMinSec(): String {
-    return if (this == 0L) { "..." }
-    else {
+    return if (this == 0L) {
+        "..."
+    } else {
         String.format(
             "%02d:%02d",
             TimeUnit.MILLISECONDS.toMinutes(this),

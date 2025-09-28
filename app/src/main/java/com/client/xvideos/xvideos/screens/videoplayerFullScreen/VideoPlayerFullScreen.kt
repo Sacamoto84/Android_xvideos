@@ -105,7 +105,7 @@ import java.util.*
 @SuppressLint("SourceLockedOrientationActivity", "UnsafeOptInUsageError")
 @Composable
 fun VideoPlayerFullScreen(
-    vm : ScreenX_VideoPlayerFullScreenSM,
+    vm: ScreenX_VideoPlayerFullScreenSM,
     modifier: Modifier = Modifier,
     mediaItems: List<VideoPlayerMediaItem>,
     handleLifecycle: Boolean = true,
@@ -121,7 +121,7 @@ fun VideoPlayerFullScreen(
     fullScreenSecurePolicy: SecureFlagPolicy = SecureFlagPolicy.Inherit,
     onFullScreenEnter: () -> Unit = {},
     onFullScreenExit: (Long) -> Unit = {},
-    defaultFullScreeen: Boolean = false,
+    defaultFullScreeen: Boolean = true,
     handleAudioFocus: Boolean = true,
     playerBuilder: ExoPlayer.Builder.() -> ExoPlayer.Builder = { this },
     playerInstance: ExoPlayer.() -> Unit = {},
@@ -168,8 +168,11 @@ fun VideoPlayerFullScreen(
     val defaultPlayerView = remember {
         PlayerView(context).apply {
 
-            val basic_progressbar= this.findViewById<ProgressBar>(R.id.exo_buffering)
-            basic_progressbar?.indeterminateDrawable?.setColorFilter(Color.parseColor("#FFA500"), PorterDuff.Mode.SRC_IN)
+            val basic_progressbar = this.findViewById<ProgressBar>(R.id.exo_buffering)
+            basic_progressbar?.indeterminateDrawable?.setColorFilter(
+                Color.parseColor("#FFA500"),
+                PorterDuff.Mode.SRC_IN
+            )
 
 
             val exoPrev = this.findViewById<ImageButton>(R.id.exo_play_pause)
@@ -236,11 +239,9 @@ fun VideoPlayerFullScreen(
         }
     }
 
-    var isFullScreenModeEntered by remember(defaultFullScreeen) { mutableStateOf(defaultFullScreeen) }
-
     LaunchedEffect(controllerConfig) {
         controllerConfig.applyToExoPlayerView(defaultPlayerView) {
-            isFullScreenModeEntered = it
+            //isFullScreenModeEntered = it
             if (it) {
                 onFullScreenEnter()
             }
@@ -262,45 +263,35 @@ fun VideoPlayerFullScreen(
 
     LaunchedEffect(volume) { player.volume = volume }
 
-//    VideoPlayerSurface(
-//        vm = vm,
-//        modifier = modifier,
-//        defaultPlayerView = defaultPlayerView,
-//        player = player,
-//        usePlayerController = usePlayerController,
-//        handleLifecycle = handleLifecycle,
-//        surfaceResizeMode = resizeMode
-//    )
 
-    if (isFullScreenModeEntered) {
-        var fullScreenPlayerView by remember { mutableStateOf<PlayerView?>(null) }
+    var fullScreenPlayerView by remember { mutableStateOf<PlayerView?>(null) }
 
-        VideoPlayerFullScreenDialog(
-            vm = vm,
-            player = player,
-            currentPlayerView = defaultPlayerView,
-            controllerConfig = controllerConfig,
-            repeatMode = repeatMode,
-            resizeMode = resizeMode,
-            onDismissRequest = {
-                Timber.e("!!! onDismissRequest Нажата кнопка выхода из полноэкранного режимати из фулскрин")
-                fullScreenPlayerView?.let {
-                    PlayerView.switchTargetView(player, it, defaultPlayerView)
-                    defaultPlayerView.findViewById<ImageButton>(R.id.exo_fullscreen).performClick()
-                    val currentActivity = context.findActivity()
-                    currentActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                    currentActivity.setFullScreen(false)
-                    onFullScreenExit(player.currentPosition)
-                }
+    VideoPlayerFullScreenDialog(
+        vm = vm,
+        player = player,
+        currentPlayerView = defaultPlayerView,
+        controllerConfig = controllerConfig,
+        repeatMode = repeatMode,
+        resizeMode = resizeMode,
+        onDismissRequest = {
+            Timber.e("!!! onDismissRequest Нажата кнопка выхода из полноэкранного режимати из фулскрин")
+            fullScreenPlayerView?.let {
+                PlayerView.switchTargetView(player, it, defaultPlayerView)
+                defaultPlayerView.findViewById<ImageButton>(R.id.exo_fullscreen).performClick()
+                val currentActivity = context.findActivity()
+                currentActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                currentActivity.setFullScreen(false)
+                onFullScreenExit(player.currentPosition)
+            }
 
-                isFullScreenModeEntered = false
+            //isFullScreenModeEntered = false
 
-            },
-            fullScreenPlayerView = {
-                fullScreenPlayerView = this
-            },
-        )
-    }
+        },
+        fullScreenPlayerView = {
+            fullScreenPlayerView = this
+        },
+    )
+
 
 }
 

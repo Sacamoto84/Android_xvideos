@@ -2,6 +2,7 @@ package com.client.xvideos.xvideos.screens.videoplayer
 
 import android.content.Context
 import androidx.annotation.OptIn
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -9,6 +10,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
@@ -17,9 +19,12 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.ui.AspectRatioFrameLayout
 import cafe.adriel.voyager.core.model.ScreenModel
+import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
 import cafe.adriel.voyager.navigator.Navigator
+import com.client.xvideos.common.eventBus.Event
+import com.client.xvideos.common.eventBus.EventBus
 import com.client.xvideos.common.room.AppDatabase
 import com.client.xvideos.common.room.entity.CacheUrlStringRamEntity
 import com.client.xvideos.xvideos.model.HTML5PlayerConfig
@@ -39,6 +44,9 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 
@@ -54,7 +62,7 @@ data class FORMAT(
 class ScreenX_VideoPlayerSM @AssistedInject constructor(
     @Assisted val url: String,
     @ApplicationContext context: Context,
-    val db : AppDatabase
+    val db: AppDatabase
 ) : ScreenModel {
 
     @AssistedFactory
@@ -77,6 +85,9 @@ class ScreenX_VideoPlayerSM @AssistedInject constructor(
 
     var tags by mutableStateOf(TagsModel(emptyList(), emptyList(), emptyList()))
 
+    var positionFromFullscreen by mutableLongStateOf(-1L)
+
+
     init {
         runBlocking {
 
@@ -86,13 +97,14 @@ class ScreenX_VideoPlayerSM @AssistedInject constructor(
 
             val s = if (res == null) {
                 val content = readHtmlFromURLDirect(url)
-                db.cacheUrlStringRamDao().insert(CacheUrlStringRamEntity(
-                    url = url,
-                    content = content
-                ))
+                db.cacheUrlStringRamDao().insert(
+                    CacheUrlStringRamEntity(
+                        url = url,
+                        content = content
+                    )
+                )
                 content
-            }
-            else
+            } else
                 res.content
 
             val script = parserItemVideo(s)
@@ -107,10 +119,18 @@ class ScreenX_VideoPlayerSM @AssistedInject constructor(
 
             playerE = null
 
+            Timber.i("!!! ~~~ ??? LaunchedEffect started — start collecting")
+            screenModelScope.launch {
+                EventBus.events
+                    .onEach { Timber.i("!!! ~~~ EventBus emitted: $it") }
+                    .filterIsInstance<Event.X_FullScreenExitPosition>()
+                    .collect { event ->
+                        Timber.i("!!! ~~~ collect Event.X_FullScreenExitPosition ${event.position}")
+                        positionFromFullscreen = event.position
+                    }
+            }
         }
     }
-
-
 
 
     /////////////////////////////////////////////////////////
@@ -143,12 +163,9 @@ class ScreenX_VideoPlayerSM @AssistedInject constructor(
     val trackSelector = DefaultTrackSelector(context)
 
 
-
     val listFormat = mutableStateListOf<FORMAT>()
 
     var quality by mutableIntStateOf(0)
-
-
 
 
     /**
@@ -175,7 +192,7 @@ class ScreenX_VideoPlayerSM @AssistedInject constructor(
         player.trackSelectionParameters =
             player.trackSelectionParameters
                 .buildUpon()
-                .setOverrideForType( override ).build()
+                .setOverrideForType(override).build()
 
         player.prepare()
         player.play()
@@ -206,20 +223,17 @@ class ScreenX_VideoPlayerSM @AssistedInject constructor(
     }
 
 
-
-
-
     // Блок соотношения сторон
     private var currentAspectRatios = 0
     private val aspectRatios = listOf(
-                            AspectRatioFrameLayout.RESIZE_MODE_FIT,
-                            AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH,
-                            AspectRatioFrameLayout.RESIZE_MODE_FIXED_HEIGHT,
-                            AspectRatioFrameLayout.RESIZE_MODE_FILL,
-                            AspectRatioFrameLayout.RESIZE_MODE_ZOOM
-                        )
+        AspectRatioFrameLayout.RESIZE_MODE_FIT,
+        AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH,
+        AspectRatioFrameLayout.RESIZE_MODE_FIXED_HEIGHT,
+        AspectRatioFrameLayout.RESIZE_MODE_FILL,
+        AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+    )
 
-    fun aspectRatiosClick():Int{
+    fun aspectRatiosClick(): Int {
         currentAspectRatios = (currentAspectRatios + 1) % aspectRatios.size
         return aspectRatios[currentAspectRatios]
     }

@@ -32,6 +32,8 @@ import androidx.compose.ui.window.DialogWindowProvider
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import androidx.media3.ui.R
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.xvideos.screens.videoplayer.video.controller.VideoPlayerControllerConfig
 import com.client.xvideos.xvideos.screens.videoplayer.video.controller.applyToExoPlayerView
 import com.client.xvideos.screens.videoplayer.video.util.findActivity
@@ -60,7 +62,7 @@ import timber.log.Timber
 @SuppressLint("UnsafeOptInUsageError")
 @Composable
 internal fun VideoPlayerFullScreenDialog(
-    vm : ScreenX_VideoPlayerFullScreenSM,
+    vm: ScreenX_VideoPlayerFullScreenSM,
     player: ExoPlayer,
     currentPlayerView: PlayerView,
     fullScreenPlayerView: PlayerView.() -> Unit,
@@ -71,17 +73,16 @@ internal fun VideoPlayerFullScreenDialog(
 ) {
     val context = LocalContext.current
 
-    val internalFullScreenPlayerView = remember {
-        PlayerView(context)
-            .also(fullScreenPlayerView)
-    }
+    val navigator = LocalNavigator.currentOrThrow
+
+    val internalFullScreenPlayerView = remember { PlayerView(context).also(fullScreenPlayerView) }
 
     BackHandler(enabled = true) {
-
         Timber.i("iii BackHandler VideoPlayerFullScreenDialog")
-
-        internalFullScreenPlayerView.findViewById<ImageButton>(R.id.exo_fullscreen)
-            .performClick()
+//        internalFullScreenPlayerView.findViewById<ImageButton>(R.id.exo_fullscreen)
+//            .performClick()
+//        navigator.pop()
+        onDismissRequest()
     }
 
     LaunchedEffect(Unit) {
@@ -107,14 +108,16 @@ internal fun VideoPlayerFullScreenDialog(
         usePlayerController = true,
         autoDispose = false,
         surfaceResizeMode = resizeMode,
-        modifier = Modifier.fillMaxSize().systemBarsPadding(),
+        modifier = Modifier
+            .fillMaxSize()
+            .systemBarsPadding(),
         handleLifecycle = true,
         qualityChange = { vm.quality = it },
         quality = vm.quality,
         listFormat = vm.listFormat, // Убирает статус и навигационные панели
         speed = vm.speed,
-        changePlaybackSpeed = { vm.changePlaybackSpeed(it)},
-        switchTrack = {vm.switchTrack(it)}
+        changePlaybackSpeed = { vm.changePlaybackSpeed(it) },
+        switchTrack = { vm.switchTrack(it) }
     )
 }
 

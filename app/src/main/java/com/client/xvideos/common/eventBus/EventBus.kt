@@ -10,12 +10,19 @@ import timber.log.Timber
 
 sealed class Event {
     data class Log(val message: String) : Event()
-    data class ServerDate(val date: String) : Event()
-    data class RequestCount(val count: Int) : Event()
+
     object ArchiveCountIncrement : Event()
 
-    data class SnackBarText(val message: String) : Event()
+
+
+    //Показ снекбара с текстом из UiMessage
     data class SnackBarRaw(val message: UiMessage) : Event()
+
+
+
+    data class X_FullScreenExitPosition(val position: Long) : Event()
+
+
 }
 
 object EventBus {
@@ -28,7 +35,7 @@ object EventBus {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     fun postEvent(event: Event) {
-        Timber.i("~~~ EventBus.postEvent $event")
+        Timber.i("!!! ~~~ EventBus.postEvent $event")
         scope.launch { _events.emit(event) }
     }
 
