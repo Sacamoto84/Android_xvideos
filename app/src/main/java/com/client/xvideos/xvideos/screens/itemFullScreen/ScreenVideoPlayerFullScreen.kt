@@ -13,7 +13,7 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.getNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.client.xvideos.xvideos.screens.videoplayer.ScreenVideoPlayerSM
+import com.client.xvideos.xvideos.screens.videoplayer.ScreenX_VideoPlayerSM
 
 class ScreenVideoPlayerFullScreen(val url: String) : Screen {
 
@@ -31,7 +31,7 @@ class ScreenVideoPlayerFullScreen(val url: String) : Screen {
         //val vm = navigator.rememberNavigatorScreenModel { a }
         //val vm = rememberScreenModel { a }
 
-        val vm = navigator.getNavigatorScreenModel<ScreenVideoPlayerSM, ScreenVideoPlayerSM.Factory> { factory ->
+        val vm = navigator.getNavigatorScreenModel<ScreenX_VideoPlayerSM, ScreenX_VideoPlayerSM.Factory> { factory ->
             factory.create(url)
         }
 

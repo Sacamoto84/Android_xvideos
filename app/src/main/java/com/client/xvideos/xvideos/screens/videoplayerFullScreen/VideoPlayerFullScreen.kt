@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.client.xvideos.screens.videoplayer.video
+package com.client.xvideos.xvideos.screens.videoplayerFullScreen
 
 import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
@@ -49,8 +49,12 @@ import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.session.MediaSession
 import androidx.media3.ui.PlayerView
 import androidx.media3.ui.R
-import com.client.xvideos.xvideos.screens.videoplayer.ScreenX_VideoPlayerSM
+import com.client.xvideos.screens.videoplayer.video.RepeatMode
+import com.client.xvideos.screens.videoplayer.video.ResizeMode
+import com.client.xvideos.screens.videoplayer.video.VideoPlayerFullScreenDialog
+import com.client.xvideos.screens.videoplayer.video.VideoPlayerSurface
 import com.client.xvideos.screens.videoplayer.video.cache.VideoPlayerCacheManager
+import com.client.xvideos.screens.videoplayer.video.toExoPlayerRepeatMode
 import com.client.xvideos.xvideos.screens.videoplayer.video.controller.VideoPlayerControllerConfig
 import com.client.xvideos.xvideos.screens.videoplayer.video.controller.applyToExoPlayerView
 import com.client.xvideos.screens.videoplayer.video.uri.VideoPlayerMediaItem
@@ -101,8 +105,8 @@ import java.util.*
  */
 @SuppressLint("SourceLockedOrientationActivity", "UnsafeOptInUsageError")
 @Composable
-fun VideoPlayer(
-    vm : ScreenX_VideoPlayerSM,
+fun VideoPlayerFullScreen(
+    vm : ScreenX_VideoPlayerFullScreenSM,
     modifier: Modifier = Modifier,
     mediaItems: List<VideoPlayerMediaItem>,
     handleLifecycle: Boolean = true,

@@ -32,7 +32,7 @@ import androidx.compose.ui.window.DialogWindowProvider
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import androidx.media3.ui.R
-import com.client.xvideos.xvideos.screens.videoplayer.ScreenVideoPlayerSM
+import com.client.xvideos.xvideos.screens.videoplayer.ScreenX_VideoPlayerSM
 import com.client.xvideos.xvideos.screens.videoplayer.video.controller.VideoPlayerControllerConfig
 import com.client.xvideos.xvideos.screens.videoplayer.video.controller.applyToExoPlayerView
 import com.client.xvideos.screens.videoplayer.video.util.findActivity
@@ -59,7 +59,7 @@ import timber.log.Timber
 @SuppressLint("UnsafeOptInUsageError")
 @Composable
 internal fun VideoPlayerFullScreenDialog(
-    vm : ScreenVideoPlayerSM,
+    vm : ScreenX_VideoPlayerSM,
     player: ExoPlayer,
     currentPlayerView: PlayerView,
     fullScreenPlayerView: PlayerView.() -> Unit,

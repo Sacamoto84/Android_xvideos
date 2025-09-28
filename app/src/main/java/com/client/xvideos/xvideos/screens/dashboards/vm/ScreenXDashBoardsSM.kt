@@ -8,7 +8,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.xvideos.model.ItemsX
 import com.client.xvideos.xvideos.feature.saved.SavedX
-import com.client.xvideos.xvideos.screens.videoplayer.ScreenVideoPlayer
+import com.client.xvideos.xvideos.screens.videoplayer.ScreenX_VideoPlayer
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -23,7 +23,7 @@ class ScreenXDashBoardsScreenModel @Inject constructor(
     /** Количество колонок true-2 false-1 */
     val countRow = Settings.xvideos_row2
     val pagerState: PagerState = PagerState(0) { 20000 }
-    fun openVideoPlayer(url: String, navigator: Navigator) { navigator.push(ScreenVideoPlayer(url)) }
+    fun openVideoPlayer(url: String, navigator: Navigator) { navigator.push(ScreenX_VideoPlayer(url)) }
 
     fun addFavorite(item: ItemsX) = screenModelScope.launch { saved.favorites.add(item) }
     fun removeFavorite(item: ItemsX) = screenModelScope.launch { saved.favorites.remove(item) }

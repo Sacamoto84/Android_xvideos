@@ -1,4 +1,4 @@
-package com.client.xvideos.xvideos.screens.videoplayer
+package com.client.xvideos.xvideos.screens.videoplayerFullScreen
 
 import android.content.Context
 import androidx.annotation.OptIn
@@ -20,14 +20,13 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
 import cafe.adriel.voyager.navigator.Navigator
+import com.client.xvideos.common.room.AppDatabase
+import com.client.xvideos.common.room.entity.CacheUrlStringRamEntity
+import com.client.xvideos.screens.itemFullScreen.ScreenVideoPlayerFullScreen
+import com.client.xvideos.xvideos.feature.net.readHtmlFromURLDirect
 import com.client.xvideos.xvideos.model.HTML5PlayerConfig
 import com.client.xvideos.xvideos.parcer.parseHTML5Player
 import com.client.xvideos.xvideos.parcer.parserItemVideo
-import com.client.xvideos.xvideos.parcer.parserItemVideoTags
-import com.client.xvideos.xvideos.screens.videoplayer.model.TagsModel
-import com.client.xvideos.screens.itemFullScreen.ScreenVideoPlayerFullScreen
-import com.client.xvideos.xvideos.screens.tags.ScreenTags
-import com.client.xvideos.xvideos.feature.net.readHtmlFromURLDirect
 import dagger.Binds
 import dagger.Module
 import dagger.assisted.Assisted
@@ -40,21 +39,19 @@ import dagger.multibindings.IntoMap
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 
-
 @UnstableApi
-class ScreenVideoPlayerSM @AssistedInject constructor(
+class ScreenX_VideoPlayerFullScreenSM @AssistedInject constructor(
     @Assisted val url: String,
     @ApplicationContext context: Context,
+    val db : AppDatabase
 ) : ScreenModel {
 
     @AssistedFactory
-    interface Factory : ScreenModelFactory {
-        fun create(url: String): ScreenVideoPlayerSM
-    }
+    interface Factory : ScreenModelFactory { fun create(url: String): ScreenX_VideoPlayerFullScreenSM }
 
     override fun onDispose() {
         super.onDispose()
-        Timber.e("!!! ScreenVideoPlayerSM onDispose")
+        Timber.e("!!! ScreenX_VideoPlayerFullScreenSM onDispose")
     }
 
     var playerE by mutableStateOf<Player?>(null)
@@ -63,42 +60,29 @@ class ScreenVideoPlayerSM @AssistedInject constructor(
 
     val a: MutableState<HTML5PlayerConfig?> = mutableStateOf(HTML5PlayerConfig())
 
-    //val mediaItem: MediaItem?
-
-    var tags by mutableStateOf(TagsModel(emptyList(), emptyList(), emptyList()))
-
     init {
         runBlocking {
-
             Timber.e("!!! ScreenVideoPlayerSM init()")
 
-            val s = readHtmlFromURLDirect(url)
+            val res = db.cacheUrlStringRamDao().get(url)
+
+            val s = if (res == null) {
+                val content = readHtmlFromURLDirect(url)
+                db.cacheUrlStringRamDao().insert(CacheUrlStringRamEntity(
+                    url = url,
+                    content = content
+                ))
+                content
+            }
+            else
+                res.content
+
             val script = parserItemVideo(s)
             a.value = script?.let { parseHTML5Player(it) }
-            a
-
-            //Получить список тегов
-            tags = parserItemVideoTags(s)
-            tags
-
             passedString = a.value?.videoHLS.toString()
-
             playerE = null
-
         }
     }
-
-    var isFullScreen by mutableStateOf(false)
-
-
-    /////////////////////////////////////////////////////////
-    /**
-     * ## Открыть экран с нужным тегом
-     */
-    fun openTag(tag: String, navigator: Navigator) {
-        navigator.push(ScreenTags(tag))
-    }
-    /////////////////////////////////////////////////////////
 
 
     /**
@@ -131,9 +115,6 @@ class ScreenVideoPlayerSM @AssistedInject constructor(
     val listFormat = mutableStateListOf<FORMAT>()
 
     var quality by mutableIntStateOf(0)
-
-
-
 
     /**
      * Скорость воспроизведения
@@ -191,10 +172,6 @@ class ScreenVideoPlayerSM @AssistedInject constructor(
         navigator.push(ScreenVideoPlayerFullScreen(url))
     }
 
-
-
-
-
     // Блок соотношения сторон
     private var currentAspectRatios = 0
     private val aspectRatios = listOf(
@@ -220,9 +197,9 @@ abstract class ScreenModuleItem {
     @OptIn(UnstableApi::class)
     @Binds
     @IntoMap
-    @ScreenModelFactoryKey(ScreenVideoPlayerSM.Factory::class)
+    @ScreenModelFactoryKey(ScreenX_VideoPlayerFullScreenSM.Factory::class)
     abstract fun bindHiltDetailsScreenModelFactory(
-        hiltDetailsScreenModelFactory: ScreenVideoPlayerSM.Factory,
+        hiltDetailsScreenModelFactory: ScreenX_VideoPlayerFullScreenSM.Factory,
     ): ScreenModelFactory
 
 }

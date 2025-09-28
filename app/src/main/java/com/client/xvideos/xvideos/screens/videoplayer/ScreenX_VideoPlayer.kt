@@ -14,9 +14,10 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.screens.videoplayer.atom.ComposeTags
+import com.client.xvideos.xvideos.screens.videoplayerFullScreen.atom.ComposeTags
 import com.client.xvideos.xvideos.screens.videoplayer.atom.ZoomableVideoPlayer
 
-class ScreenVideoPlayer(val url: String) : Screen {
+class ScreenX_VideoPlayer(val url: String) : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
 
@@ -25,7 +26,7 @@ class ScreenVideoPlayer(val url: String) : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
 
-        val vm = getScreenModel<ScreenVideoPlayerSM, ScreenVideoPlayerSM.Factory> { factory ->  factory.create(url) }
+        val vm = getScreenModel<ScreenX_VideoPlayerSM, ScreenX_VideoPlayerSM.Factory> { factory ->  factory.create(url) }
 
         Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
             //Отобразить теги

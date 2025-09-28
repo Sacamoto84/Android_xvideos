@@ -38,7 +38,7 @@ import androidx.media3.common.util.UnstableApi
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.R
-import com.client.xvideos.xvideos.screens.videoplayer.ScreenVideoPlayerSM
+import com.client.xvideos.xvideos.screens.videoplayer.ScreenX_VideoPlayerSM
 import com.client.xvideos.xvideos.screens.videoplayer.atom.formatMinSec
 
 
@@ -48,7 +48,7 @@ import com.client.xvideos.xvideos.screens.videoplayer.atom.formatMinSec
 @OptIn(UnstableApi::class)
 @Composable
 fun ItemPlayerBottomControl(
-    vm: ScreenVideoPlayerSM,
+    vm: ScreenX_VideoPlayerSM,
     modifier: Modifier = Modifier,
     currentTime: () -> Long,
     bufferedPercentage: () -> Int,

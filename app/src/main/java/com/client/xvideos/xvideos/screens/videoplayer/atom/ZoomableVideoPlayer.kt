@@ -25,9 +25,9 @@ import androidx.media3.exoplayer.analytics.AnalyticsListener
 import com.client.xvideos.common.noRippleClickable
 import com.client.xvideos.screens.videoplayer.atom.ItemPlayerBottomControl
 
-import com.client.xvideos.xvideos.screens.videoplayer.ScreenVideoPlayerSM
+import com.client.xvideos.xvideos.screens.videoplayer.ScreenX_VideoPlayerSM
 import com.client.xvideos.screens.videoplayer.video.RepeatMode
-import com.client.xvideos.screens.videoplayer.video.VideoPlayer
+import com.client.xvideos.xvideos.screens.videoplayerFullScreen.VideoPlayer
 import com.client.xvideos.xvideos.screens.videoplayer.video.controller.VideoPlayerControllerConfig
 import com.client.xvideos.screens.videoplayer.video.uri.VideoPlayerMediaItem
 import timber.log.Timber
@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit
 @OptIn(UnstableApi::class)
 @Composable
 fun ZoomableVideoPlayer(
-    vm: ScreenVideoPlayerSM,
+    vm: ScreenX_VideoPlayerSM,
     videoUri: String,
     modifier: Modifier = Modifier,
 ) {
@@ -126,7 +126,7 @@ fun ZoomableVideoPlayer(
                                 val format = group.getTrackFormat(j)
 
                                 vm.listFormat.add(
-                                    ScreenVideoPlayerSM.FORMAT(
+                                    ScreenX_VideoPlayerSM.FORMAT(
                                         id = j,
                                         width = format.width,
                                         height = format.height,
