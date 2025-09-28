@@ -2,7 +2,6 @@ package com.client.xvideos.xvideos.screens.videoplayer
 
 import android.content.Context
 import androidx.annotation.OptIn
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -10,7 +9,6 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
@@ -26,7 +24,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import com.client.xvideos.common.eventBus.Event
 import com.client.xvideos.common.eventBus.EventBus
 import com.client.xvideos.common.room.AppDatabase
-import com.client.xvideos.common.room.entity.CacheUrlStringRamEntity
+import com.client.xvideos.common.room.entity.CacheUrlStringRomEntity
 import com.client.xvideos.xvideos.model.HTML5PlayerConfig
 import com.client.xvideos.xvideos.parcer.parseHTML5Player
 import com.client.xvideos.xvideos.parcer.parserItemVideo
@@ -77,7 +75,7 @@ class ScreenX_VideoPlayerSM @AssistedInject constructor(
 
     var playerE by mutableStateOf<Player?>(null)
 
-    var passedString: String = ""
+    var passedHLS: String by mutableStateOf("")
 
     val a: MutableState<HTML5PlayerConfig?> = mutableStateOf(HTML5PlayerConfig())
 
@@ -87,18 +85,16 @@ class ScreenX_VideoPlayerSM @AssistedInject constructor(
 
     var positionFromFullscreen by mutableLongStateOf(-1L)
 
-
     init {
-        runBlocking {
+        screenModelScope.launch {
 
             Timber.e("!!! ScreenVideoPlayerSM init()")
 
-            val res = db.cacheUrlStringRamDao().get(url)
-
+            val res = db.cacheUrlStringRomDao().get(url)
             val s = if (res == null) {
                 val content = readHtmlFromURLDirect(url)
-                db.cacheUrlStringRamDao().insert(
-                    CacheUrlStringRamEntity(
+                db.cacheUrlStringRomDao().insert(
+                    CacheUrlStringRomEntity(
                         url = url,
                         content = content
                     )
@@ -115,7 +111,7 @@ class ScreenX_VideoPlayerSM @AssistedInject constructor(
             tags = parserItemVideoTags(s)
             tags
 
-            passedString = a.value?.videoHLS.toString()
+            passedHLS = a.value?.videoHLS.toString()
 
             playerE = null
 

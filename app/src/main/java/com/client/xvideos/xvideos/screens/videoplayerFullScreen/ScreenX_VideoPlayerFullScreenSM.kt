@@ -22,6 +22,7 @@ import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
 import cafe.adriel.voyager.navigator.Navigator
 import com.client.xvideos.common.room.AppDatabase
 import com.client.xvideos.common.room.entity.CacheUrlStringRamEntity
+import com.client.xvideos.common.room.entity.CacheUrlStringRomEntity
 import com.client.xvideos.xvideos.feature.net.readHtmlFromURLDirect
 import com.client.xvideos.xvideos.model.HTML5PlayerConfig
 import com.client.xvideos.xvideos.parcer.parseHTML5Player
@@ -64,14 +65,15 @@ class ScreenX_VideoPlayerFullScreenSM @AssistedInject constructor(
         runBlocking {
             Timber.e("!!! ScreenVideoPlayerSM init()")
 
-            val res = db.cacheUrlStringRamDao().get(url)
-
+            val res = db.cacheUrlStringRomDao().get(url)
             val s = if (res == null) {
                 val content = readHtmlFromURLDirect(url)
-                db.cacheUrlStringRamDao().insert(CacheUrlStringRamEntity(
-                    url = url,
-                    content = content
-                ))
+                db.cacheUrlStringRomDao().insert(
+                    CacheUrlStringRomEntity(
+                        url = url,
+                        content = content
+                    )
+                )
                 content
             }
             else

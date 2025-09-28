@@ -1,11 +1,16 @@
 package com.client.xvideos.xvideos.screens.videoplayer
 
 import androidx.annotation.OptIn
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.media3.common.util.UnstableApi
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
@@ -25,13 +30,21 @@ class ScreenX_VideoPlayer(val url: String) : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
 
-        val vm = getScreenModel<ScreenX_VideoPlayerSM, ScreenX_VideoPlayerSM.Factory> { factory ->  factory.create(url) }
+        val vm = getScreenModel<ScreenX_VideoPlayerSM, ScreenX_VideoPlayerSM.Factory> { factory ->
+            factory.create(url)
+        }
 
-        Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
-            //Отобразить теги
-            ComposeTags(vm.tags, onClick = { vm.openTag(it, navigator) })
-            //Отображение плеера и его кнопок
-            ZoomableVideoPlayer(vm, videoUri = vm.passedString, Modifier.weight(1f))
+        if (vm.passedHLS == "") {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
+        } else {
+            Box(
+                modifier = Modifier.fillMaxSize().background(Color(0xFF040404)),
+            ) {
+                //Отображение плеера и его кнопок
+                ZoomableVideoPlayer(vm, videoUri = vm.passedHLS, Modifier)
+            }
         }
 
     }
