@@ -32,7 +32,7 @@ import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 import com.client.xvideos.R
 import com.client.xvideos.xvideos.screens.videoplayer.ScreenX_VideoPlayerSM
-import com.client.xvideos.screens.videoplayer.atom.VideoQualitySelector
+import com.client.xvideos.xvideos.screens.videoplayer.atom.VideoQualitySelector
 import com.client.xvideos.screens.videoplayer.atom.VideoSpeedSelector
 import com.client.xvideos.screens.videoplayer.video.ResizeMode
 import com.client.xvideos.screens.videoplayer.video.toPlayerViewResizeMode

@@ -1,39 +1,31 @@
 package com.client.xvideos.xvideos.screens.videoplayerFullScreen
 
-import android.annotation.SuppressLint
 import androidx.annotation.OptIn
-import androidx.compose.foundation.gestures.detectHorizontalDragGestures
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.MimeTypes
 import androidx.media3.common.Player
 import androidx.media3.common.Tracks
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.analytics.AnalyticsListener
-import com.client.xvideos.common.noRippleClickable
 import com.client.xvideos.screens.videoplayer.video.RepeatMode
-import com.client.xvideos.xvideos.screens.videoplayer.video.controller.VideoPlayerControllerConfig
 import com.client.xvideos.screens.videoplayer.video.uri.VideoPlayerMediaItem
+import com.client.xvideos.xvideos.screens.videoplayer.FORMAT
+import com.client.xvideos.xvideos.screens.videoplayer.atom.formatMinSec
+import com.client.xvideos.xvideos.screens.videoplayer.video.controller.VideoPlayerControllerConfig
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
 
 @OptIn(UnstableApi::class)
 @Composable
 fun ZoomableVideoPlayerFullScreen(
     vm: ScreenX_VideoPlayerFullScreenSM,
     videoUri: String,
-    modifier: Modifier = Modifier,
 ) {
 
     Timber.i("!!! ZoomableVideoPlayer url:$videoUri")
@@ -110,7 +102,7 @@ fun ZoomableVideoPlayerFullScreen(
                             val format = group.getTrackFormat(j)
 
                             vm.listFormat.add(
-                                ScreenX_VideoPlayerFullScreenSM.FORMAT(
+                                FORMAT(
                                     id = j,
                                     width = format.width,
                                     height = format.height,

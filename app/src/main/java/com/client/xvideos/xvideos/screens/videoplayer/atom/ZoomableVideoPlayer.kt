@@ -24,12 +24,12 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.analytics.AnalyticsListener
 import com.client.xvideos.common.noRippleClickable
 import com.client.xvideos.screens.videoplayer.atom.ItemPlayerBottomControl
-
-import com.client.xvideos.xvideos.screens.videoplayer.ScreenX_VideoPlayerSM
 import com.client.xvideos.screens.videoplayer.video.RepeatMode
-import com.client.xvideos.xvideos.screens.videoplayerFullScreen.VideoPlayer
-import com.client.xvideos.xvideos.screens.videoplayer.video.controller.VideoPlayerControllerConfig
+import com.client.xvideos.screens.videoplayer.video.VideoPlayer
 import com.client.xvideos.screens.videoplayer.video.uri.VideoPlayerMediaItem
+import com.client.xvideos.xvideos.screens.videoplayer.FORMAT
+import com.client.xvideos.xvideos.screens.videoplayer.ScreenX_VideoPlayerSM
+import com.client.xvideos.xvideos.screens.videoplayer.video.controller.VideoPlayerControllerConfig
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
@@ -56,20 +56,18 @@ fun ZoomableVideoPlayer(
 
         VideoPlayer(
             vm = vm,
-            onFullScreenExit = {
-                position ->
-                Timber.i("!!! onFullScreenExit position:${position.formatMinSec()} ")
-                vm.isFullScreen = false
+//            onFullScreenExit = {
+//                position ->
+//                Timber.i("!!! onFullScreenExit position:${position.formatMinSec()} ")
+//                vm.isFullScreen = false
+//                vm.playerE?.seekTo(position)
+//            },
+//            onFullScreenEnter = {
+//                Timber.i("!!! onFullScreenEnter")
+//                vm.isFullScreen = true
+//            },
 
-                vm.playerE?.seekTo(position)
-
-            },
-            onFullScreenEnter = {
-                Timber.i("!!! onFullScreenEnter")
-                vm.isFullScreen = true
-            },
-
-            defaultFullScreeen = vm.isFullScreen,
+//            defaultFullScreeen = vm.isFullScreen,
 
             trackSelector = vm.trackSelector,
             mediaItems = listOf(
@@ -126,7 +124,7 @@ fun ZoomableVideoPlayer(
                                 val format = group.getTrackFormat(j)
 
                                 vm.listFormat.add(
-                                    ScreenX_VideoPlayerSM.FORMAT(
+                                    FORMAT(
                                         id = j,
                                         width = format.width,
                                         height = format.height,
@@ -184,12 +182,6 @@ fun ZoomableVideoPlayer(
             },
             modifier = Modifier
                 .weight(1f)
-//                    .graphicsLayer(
-//                        scaleX = scale,
-//                        scaleY = scale,
-//                        translationX = offset.x,
-//                        translationY = offset.y
-//                    )
                 .fillMaxWidth()
                 .pointerInput(Unit) {
                     detectHorizontalDragGestures(
@@ -227,9 +219,6 @@ fun ZoomableVideoPlayer(
                 .noRippleClickable { if (vm.isPlaying) vm.playerE?.pause() else vm.playerE?.play() }
         )
 
-
-
-        if(!vm.isFullScreen)
         Box(modifier = Modifier) {
             //Блок кнопок
             ItemPlayerBottomControl(

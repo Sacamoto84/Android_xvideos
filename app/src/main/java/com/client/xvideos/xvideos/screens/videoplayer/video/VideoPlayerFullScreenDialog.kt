@@ -32,10 +32,11 @@ import androidx.compose.ui.window.DialogWindowProvider
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import androidx.media3.ui.R
-import com.client.xvideos.xvideos.screens.videoplayer.ScreenX_VideoPlayerSM
 import com.client.xvideos.xvideos.screens.videoplayer.video.controller.VideoPlayerControllerConfig
 import com.client.xvideos.xvideos.screens.videoplayer.video.controller.applyToExoPlayerView
 import com.client.xvideos.screens.videoplayer.video.util.findActivity
+import com.client.xvideos.xvideos.screens.videoplayer.video.VideoPlayerSurface
+import com.client.xvideos.xvideos.screens.videoplayerFullScreen.ScreenX_VideoPlayerFullScreenSM
 import timber.log.Timber
 
 /**
@@ -48,7 +49,7 @@ import timber.log.Timber
  * for synchronization with the video controller on the full screen and the video controller on the previous screen.
  *
  * @param player Exoplayer instance.
- * @param currentPlayerView [androidx.media3.ui.PlayerView] instance currently in use for playback.
+ * @param currentPlayerView [PlayerView] instance currently in use for playback.
  * @param fullScreenPlayerView Callback to return all features to existing video player controller.
  * @param controllerConfig Player controller config. You can customize the Video Player Controller UI.
  * @param repeatMode Sets the content repeat mode.
@@ -59,7 +60,7 @@ import timber.log.Timber
 @SuppressLint("UnsafeOptInUsageError")
 @Composable
 internal fun VideoPlayerFullScreenDialog(
-    vm : ScreenX_VideoPlayerSM,
+    vm : ScreenX_VideoPlayerFullScreenSM,
     player: ExoPlayer,
     currentPlayerView: PlayerView,
     fullScreenPlayerView: PlayerView.() -> Unit,
@@ -83,76 +84,6 @@ internal fun VideoPlayerFullScreenDialog(
             .performClick()
     }
 
-//    Dialog(
-//        onDismissRequest = onDismissRequest,
-//
-//        properties = DialogProperties(
-//            dismissOnClickOutside = false,
-//            usePlatformDefaultWidth = false,
-//            securePolicy = securePolicy,
-//            decorFitsSystemWindows = false,
-//        ),
-//
-//    ) {
-//
-//        LaunchedEffect(Unit) {
-//            PlayerView.switchTargetView(player, currentPlayerView, internalFullScreenPlayerView)
-//            val currentActivity = context.findActivity()
-//            currentActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-//        }
-//
-//        val activityWindow = getActivityWindow()
-//        val dialogWindow = getDialogWindow()
-//
-//        SideEffect {
-//            if (activityWindow != null && dialogWindow != null && !isFullScreenModeEntered) {
-//
-//                //activityWindow.setFullScreen(true)
-//                //dialogWindow.setFullScreen(true)
-//
-//                // dialogWindow has extra padding but activityWindow doesn't;
-//                // copy the attributes from activity to dialog
-//
-//                WindowManager.LayoutParams().apply {
-//                    copyFrom(activityWindow.attributes)
-//                    type = dialogWindow.attributes.type
-//                    dialogWindow.attributes = this
-//                }
-//
-//                isFullScreenModeEntered = true
-//
-//            }
-//        }
-//
-//        LaunchedEffect(controllerConfig) {
-//
-//            controllerConfig.applyToExoPlayerView(internalFullScreenPlayerView) {
-//                if (!it) {
-//                    onDismissRequest()
-//                }
-//            }
-//
-//            internalFullScreenPlayerView.findViewById<ImageButton>(androidx.media3.ui.R.id.exo_fullscreen)
-//                .performClick()
-//
-//        }
-//
-//        LaunchedEffect(controllerConfig, repeatMode) {
-//            internalFullScreenPlayerView.setRepeatToggleModes(
-//                if (controllerConfig.showRepeatModeButton) {
-//                    RepeatModeUtil.REPEAT_TOGGLE_MODE_ALL or RepeatModeUtil.REPEAT_TOGGLE_MODE_ONE
-//                } else {
-//                    RepeatModeUtil.REPEAT_TOGGLE_MODE_NONE
-//                },
-//            )
-//        }
-//
-//
-//
-//       // }
-//    }
-
-
     LaunchedEffect(Unit) {
         PlayerView.switchTargetView(player, currentPlayerView, internalFullScreenPlayerView)
         val currentActivity = context.findActivity()
@@ -171,17 +102,19 @@ internal fun VideoPlayerFullScreenDialog(
     }
 
     VideoPlayerSurface(
-        vm = vm,
         defaultPlayerView = internalFullScreenPlayerView,
         player = player,
         usePlayerController = true,
         autoDispose = false,
         surfaceResizeMode = resizeMode,
-        modifier = Modifier
-            // .align(Alignment.Center)
-            .fillMaxSize()
-            .systemBarsPadding(),
-        handleLifecycle = true // Убирает статус и навигационные панели,
+        modifier = Modifier.fillMaxSize().systemBarsPadding(),
+        handleLifecycle = true,
+        qualityChange = { vm.quality = it },
+        quality = vm.quality,
+        listFormat = vm.listFormat, // Убирает статус и навигационные панели
+        speed = vm.speed,
+        changePlaybackSpeed = { vm.changePlaybackSpeed(it)},
+        switchTrack = {vm.switchTrack(it)}
     )
 }
 

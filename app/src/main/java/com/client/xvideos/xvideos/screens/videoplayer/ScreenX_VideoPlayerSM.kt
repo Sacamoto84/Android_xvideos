@@ -27,9 +27,9 @@ import com.client.xvideos.xvideos.parcer.parseHTML5Player
 import com.client.xvideos.xvideos.parcer.parserItemVideo
 import com.client.xvideos.xvideos.parcer.parserItemVideoTags
 import com.client.xvideos.xvideos.screens.videoplayer.model.TagsModel
-import com.client.xvideos.screens.itemFullScreen.ScreenVideoPlayerFullScreen
 import com.client.xvideos.xvideos.screens.tags.ScreenTags
 import com.client.xvideos.xvideos.feature.net.readHtmlFromURLDirect
+import com.client.xvideos.xvideos.screens.videoplayerFullScreen.ScreenX_VideoPlayerFullScreen
 import dagger.Binds
 import dagger.Module
 import dagger.assisted.Assisted
@@ -110,7 +110,7 @@ class ScreenX_VideoPlayerSM @AssistedInject constructor(
         }
     }
 
-    var isFullScreen by mutableStateOf(false)
+
 
 
     /////////////////////////////////////////////////////////
@@ -163,7 +163,6 @@ class ScreenX_VideoPlayerSM @AssistedInject constructor(
     @OptIn(UnstableApi::class)
     fun switchTrack(trackIndex: Int) {
         if (playerE == null) return
-
         val player = playerE!!
 
         player.stop()
@@ -176,10 +175,7 @@ class ScreenX_VideoPlayerSM @AssistedInject constructor(
         player.trackSelectionParameters =
             player.trackSelectionParameters
                 .buildUpon()
-                .setOverrideForType(
-                    override
-                )
-                .build()
+                .setOverrideForType( override ).build()
 
         player.prepare()
         player.play()
@@ -203,8 +199,10 @@ class ScreenX_VideoPlayerSM @AssistedInject constructor(
     ///////////////////////////////////////////////
     //Открыть плее в полном окне
     fun openFullScreen(navigator: Navigator) {
-        if (playerE == null) return
-        navigator.push(ScreenVideoPlayerFullScreen(url))
+        //if (playerE == null) return
+        navigator.push(
+            ScreenX_VideoPlayerFullScreen(url)
+        )
     }
 
 

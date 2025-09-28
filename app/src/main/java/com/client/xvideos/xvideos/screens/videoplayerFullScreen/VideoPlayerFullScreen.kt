@@ -52,7 +52,6 @@ import androidx.media3.ui.R
 import com.client.xvideos.screens.videoplayer.video.RepeatMode
 import com.client.xvideos.screens.videoplayer.video.ResizeMode
 import com.client.xvideos.screens.videoplayer.video.VideoPlayerFullScreenDialog
-import com.client.xvideos.screens.videoplayer.video.VideoPlayerSurface
 import com.client.xvideos.screens.videoplayer.video.cache.VideoPlayerCacheManager
 import com.client.xvideos.screens.videoplayer.video.toExoPlayerRepeatMode
 import com.client.xvideos.xvideos.screens.videoplayer.video.controller.VideoPlayerControllerConfig
@@ -263,15 +262,15 @@ fun VideoPlayerFullScreen(
 
     LaunchedEffect(volume) { player.volume = volume }
 
-    VideoPlayerSurface(
-        vm = vm,
-        modifier = modifier,
-        defaultPlayerView = defaultPlayerView,
-        player = player,
-        usePlayerController = usePlayerController,
-        handleLifecycle = handleLifecycle,
-        surfaceResizeMode = resizeMode
-    )
+//    VideoPlayerSurface(
+//        vm = vm,
+//        modifier = modifier,
+//        defaultPlayerView = defaultPlayerView,
+//        player = player,
+//        usePlayerController = usePlayerController,
+//        handleLifecycle = handleLifecycle,
+//        surfaceResizeMode = resizeMode
+//    )
 
     if (isFullScreenModeEntered) {
         var fullScreenPlayerView by remember { mutableStateOf<PlayerView?>(null) }

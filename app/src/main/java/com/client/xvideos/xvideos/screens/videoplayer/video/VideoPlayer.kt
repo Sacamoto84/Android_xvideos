@@ -16,7 +16,6 @@
 package com.client.xvideos.screens.videoplayer.video
 
 import android.annotation.SuppressLint
-import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.widget.ImageButton
@@ -26,7 +25,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -55,12 +53,10 @@ import com.client.xvideos.xvideos.screens.videoplayer.video.controller.VideoPlay
 import com.client.xvideos.xvideos.screens.videoplayer.video.controller.applyToExoPlayerView
 import com.client.xvideos.screens.videoplayer.video.uri.VideoPlayerMediaItem
 import com.client.xvideos.screens.videoplayer.video.uri.toUri
-import com.client.xvideos.screens.videoplayer.video.util.findActivity
-import com.client.xvideos.screens.videoplayer.video.util.setFullScreen
+import com.client.xvideos.xvideos.screens.videoplayer.video.VideoPlayerSurface
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.util.*
 
 /**
@@ -116,9 +112,9 @@ fun VideoPlayer(
     @FloatRange(from = 0.0, to = 1.0) volume: Float = 1f,
     onCurrentTimeChanged: (Long) -> Unit = {},
     fullScreenSecurePolicy: SecureFlagPolicy = SecureFlagPolicy.Inherit,
-    onFullScreenEnter: () -> Unit = {},
-    onFullScreenExit: (Long) -> Unit = {},
-    defaultFullScreeen: Boolean = false,
+    //onFullScreenEnter: () -> Unit = {},
+    //onFullScreenExit: (Long) -> Unit = {},
+    //defaultFullScreeen: Boolean = false,
     handleAudioFocus: Boolean = true,
     playerBuilder: ExoPlayer.Builder.() -> ExoPlayer.Builder = { this },
     playerInstance: ExoPlayer.() -> Unit = {},
@@ -233,14 +229,14 @@ fun VideoPlayer(
         }
     }
 
-    var isFullScreenModeEntered by remember(defaultFullScreeen) { mutableStateOf(defaultFullScreeen) }
+    var isFullScreenModeEntered = false//by remember(defaultFullScreeen) { mutableStateOf(defaultFullScreeen) }
 
     LaunchedEffect(controllerConfig) {
         controllerConfig.applyToExoPlayerView(defaultPlayerView) {
-            isFullScreenModeEntered = it
-            if (it) {
-                onFullScreenEnter()
-            }
+//            isFullScreenModeEntered = it
+//            if (it) {
+//                onFullScreenEnter()
+//            }
         }
     }
 
@@ -260,44 +256,19 @@ fun VideoPlayer(
     LaunchedEffect(volume) { player.volume = volume }
 
     VideoPlayerSurface(
-        vm = vm,
         modifier = modifier,
         defaultPlayerView = defaultPlayerView,
         player = player,
         usePlayerController = usePlayerController,
         handleLifecycle = handleLifecycle,
-        surfaceResizeMode = resizeMode
+        surfaceResizeMode = resizeMode,
+        qualityChange = { vm.quality = it },
+        quality = vm.quality,
+        listFormat = vm.listFormat,
+        speed = vm.speed,
+        changePlaybackSpeed = { vm.changePlaybackSpeed(it)},
+        switchTrack = {vm.switchTrack(it)}
     )
-
-    if (isFullScreenModeEntered) {
-        var fullScreenPlayerView by remember { mutableStateOf<PlayerView?>(null) }
-
-        VideoPlayerFullScreenDialog(
-            vm = vm,
-            player = player,
-            currentPlayerView = defaultPlayerView,
-            controllerConfig = controllerConfig,
-            repeatMode = repeatMode,
-            resizeMode = resizeMode,
-            onDismissRequest = {
-                Timber.e("!!! onDismissRequest Нажата кнопка выхода из полноэкранного режимати из фулскрин")
-                fullScreenPlayerView?.let {
-                    PlayerView.switchTargetView(player, it, defaultPlayerView)
-                    defaultPlayerView.findViewById<ImageButton>(R.id.exo_fullscreen).performClick()
-                    val currentActivity = context.findActivity()
-                    currentActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                    currentActivity.setFullScreen(false)
-                    onFullScreenExit(player.currentPosition)
-                }
-
-                isFullScreenModeEntered = false
-
-            },
-            fullScreenPlayerView = {
-                fullScreenPlayerView = this
-            },
-        )
-    }
 
 }
 

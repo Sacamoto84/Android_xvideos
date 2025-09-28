@@ -22,11 +22,11 @@ import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
 import cafe.adriel.voyager.navigator.Navigator
 import com.client.xvideos.common.room.AppDatabase
 import com.client.xvideos.common.room.entity.CacheUrlStringRamEntity
-import com.client.xvideos.screens.itemFullScreen.ScreenVideoPlayerFullScreen
 import com.client.xvideos.xvideos.feature.net.readHtmlFromURLDirect
 import com.client.xvideos.xvideos.model.HTML5PlayerConfig
 import com.client.xvideos.xvideos.parcer.parseHTML5Player
 import com.client.xvideos.xvideos.parcer.parserItemVideo
+import com.client.xvideos.xvideos.screens.videoplayer.FORMAT
 import dagger.Binds
 import dagger.Module
 import dagger.assisted.Assisted
@@ -104,14 +104,6 @@ class ScreenX_VideoPlayerFullScreenSM @AssistedInject constructor(
 
     val trackSelector = DefaultTrackSelector(context)
 
-    data class FORMAT(
-        val id: Int,
-        val width: Int,
-        val height: Int,
-        val bitrate: Int,
-        val isSelect: Boolean,
-    )
-
     val listFormat = mutableStateListOf<FORMAT>()
 
     var quality by mutableIntStateOf(0)
@@ -163,13 +155,6 @@ class ScreenX_VideoPlayerFullScreenSM @AssistedInject constructor(
         player.playbackParameters = params
         Timber.d("Playback speed changed to $speed")
         this.speed = speed
-    }
-
-    ///////////////////////////////////////////////
-    //Открыть плее в полном окне
-    fun openFullScreen(navigator: Navigator) {
-        if (playerE == null) return
-        navigator.push(ScreenVideoPlayerFullScreen(url))
     }
 
     // Блок соотношения сторон

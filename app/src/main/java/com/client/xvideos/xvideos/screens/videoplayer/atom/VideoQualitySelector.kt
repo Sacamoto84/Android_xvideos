@@ -1,4 +1,4 @@
-package com.client.xvideos.screens.videoplayer.atom
+package com.client.xvideos.xvideos.screens.videoplayer.atom
 
 import androidx.annotation.OptIn
 import androidx.compose.animation.fadeOut
@@ -29,6 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.media3.common.util.UnstableApi
+import com.client.xvideos.xvideos.screens.videoplayer.FORMAT
 import com.client.xvideos.xvideos.screens.videoplayer.ScreenX_VideoPlayerSM
 import com.composables.core.Menu
 import com.composables.core.MenuButton
@@ -44,13 +45,13 @@ fun VideoQualitySelectorPreview() {
     var q by remember { mutableIntStateOf(250) }
 
     val list = remember {
-        mutableStateListOf<ScreenX_VideoPlayerSM.FORMAT>().apply {
-            add(ScreenX_VideoPlayerSM.FORMAT(0, 250, 250, bitrate = 0, isSelect = true))
-            add(ScreenX_VideoPlayerSM.FORMAT(1, 360, 360, bitrate = 0, isSelect = true))
-            add(ScreenX_VideoPlayerSM.FORMAT(2, 480, 480, bitrate = 0, isSelect = true))
-            add(ScreenX_VideoPlayerSM.FORMAT(3, 720, 720, bitrate = 0, isSelect = true))
-            add(ScreenX_VideoPlayerSM.FORMAT(4, 1080, 1080, bitrate = 0, isSelect = true))
-            add(ScreenX_VideoPlayerSM.FORMAT(5, 1440, 1440, bitrate = 0, isSelect = true))
+        mutableStateListOf<FORMAT>().apply {
+            add(FORMAT(0, 250, 250, bitrate = 0, isSelect = true))
+            add(FORMAT(1, 360, 360, bitrate = 0, isSelect = true))
+            add(FORMAT(2, 480, 480, bitrate = 0, isSelect = true))
+            add(FORMAT(3, 720, 720, bitrate = 0, isSelect = true))
+            add(FORMAT(4, 1080, 1080, bitrate = 0, isSelect = true))
+            add(FORMAT(5, 1440, 1440, bitrate = 0, isSelect = true))
         }
     }
 
@@ -65,7 +66,7 @@ fun VideoQualitySelectorPreview() {
 @Composable
 fun VideoQualitySelector(
     h: Int,
-    list: SnapshotStateList<ScreenX_VideoPlayerSM.FORMAT>,
+    list: SnapshotStateList<FORMAT>,
     onClick: (Int) -> Unit,
 ) {
 

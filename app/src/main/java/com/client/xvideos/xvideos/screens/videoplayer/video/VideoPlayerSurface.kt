@@ -1,4 +1,4 @@
-package com.client.xvideos.screens.videoplayer.video
+package com.client.xvideos.xvideos.screens.videoplayer.video
 
 import android.annotation.SuppressLint
 import android.graphics.Color
@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
@@ -30,9 +31,11 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 import com.client.xvideos.R
-import com.client.xvideos.xvideos.screens.videoplayer.ScreenX_VideoPlayerSM
-import com.client.xvideos.screens.videoplayer.atom.VideoQualitySelector
+import com.client.xvideos.xvideos.screens.videoplayer.atom.VideoQualitySelector
 import com.client.xvideos.screens.videoplayer.atom.VideoSpeedSelector
+import com.client.xvideos.screens.videoplayer.video.ResizeMode
+import com.client.xvideos.screens.videoplayer.video.toPlayerViewResizeMode
+import com.client.xvideos.xvideos.screens.videoplayer.FORMAT
 import kotlinx.coroutines.DelicateCoroutinesApi
 
 private val orange = Color.parseColor("#FFA800")
@@ -41,7 +44,7 @@ private val orange = Color.parseColor("#FFA800")
 @SuppressLint("UnsafeOptInUsageError")
 @Composable
 internal fun VideoPlayerSurface(
-    vm: ScreenX_VideoPlayerSM,
+    //vm: ScreenX_VideoPlayerSM,
     modifier: Modifier = Modifier,
     defaultPlayerView: PlayerView,
     player: ExoPlayer,
@@ -49,6 +52,14 @@ internal fun VideoPlayerSurface(
     handleLifecycle: Boolean,
     surfaceResizeMode: ResizeMode,
     autoDispose: Boolean = true,
+
+    qualityChange: (Int) -> Unit,
+    quality: Int, //vm.quality
+    listFormat: SnapshotStateList<FORMAT>,
+
+    speed : Float,
+    changePlaybackSpeed : (Float) -> Unit,
+    switchTrack : (Int) -> Unit
 ) {
     val lifecycleOwner =
         rememberUpdatedState(LocalLifecycleOwner.current)
@@ -61,44 +72,10 @@ internal fun VideoPlayerSurface(
                 useController = usePlayerController
                 resizeMode = surfaceResizeMode.toPlayerViewResizeMode()
                 setBackgroundColor(Color.BLACK)
-
-
-//                setControllerShowTimeoutMs(0)
-//                controllerAutoShow = false // Автоматическое отображение при взаимодействии
-//                controllerHideOnTouch = false // Автоматическое скрытие при касании экрана
-                // Установить время в миллисекундах (10 секунд)
-
-//                // Подключение кастомной разметки
-//                val customControls = LayoutInflater.from(context).inflate(
-//                    RR.layout.custom_player_controls,
-//                    this,
-//                    false
-//                )
-//                this.addView(customControls)
-
-//                val text: TextView = customControls.findViewById(RR.id.speed)
-//                text.text = "2X"
-
-//                // Логика для кнопки изменения соотношения сторон
-//                val aspectRatioButton: ImageButton = customControls.findViewById(RR.id.exo_aspect_ratio)
-//
-//                val aspectRatios = listOf(
-//                    AspectRatioFrameLayout.RESIZE_MODE_FIT,
-//                    AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH,
-//                    AspectRatioFrameLayout.RESIZE_MODE_FIXED_HEIGHT,
-//                    AspectRatioFrameLayout.RESIZE_MODE_FILL,
-//                    AspectRatioFrameLayout.RESIZE_MODE_ZOOM
-//                )
-//
                 var currentMode = 0
-//
-//                text.setOnClickListener {
-//                    currentMode = (currentMode + 1) % aspectRatios.size
-//                    this.resizeMode = aspectRatios[currentMode]
-//                }
 
-//                ///////////////////////////////////////////////////////////////////////////////
-//                //Кнопка изменения отношения сторон
+//              ///////////////////////////////////////////////////////////////////////////////
+//              //Кнопка изменения отношения сторон
                 val customButtonResize = ImageButton(context).apply {
                     setImageResource(R.drawable.resize1) // Ваш значок кнопки
                     contentDescription = "Change Aspect Ratio"
@@ -124,20 +101,21 @@ internal fun VideoPlayerSurface(
 
                     Row(
                         modifier = Modifier.height(50.dp)
-                            //.background(androidx.compose.ui.graphics.Color.Magenta)
+                        //.background(androidx.compose.ui.graphics.Color.Magenta)
                         ,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         //Изменение качества
-                        VideoQualitySelector(vm.quality, list = vm.listFormat) {
-                            vm.quality = it
-                            val targetId = vm.listFormat.find { el -> el.height == it }?.id
+                        VideoQualitySelector(quality, list = listFormat) {
+                            //vm.quality = it
+                            qualityChange(it)
+                            val targetId = listFormat.find { el -> el.height == it }?.id
                             if (targetId != null) {
-                                vm.switchTrack(targetId)
+                                switchTrack(targetId)
                             }
                         }
                         Spacer(Modifier.width(8.dp))
-                        VideoSpeedSelector(vm.speed, onClick = { vm.changePlaybackSpeed(it) })
+                        VideoSpeedSelector(speed, onClick = { changePlaybackSpeed(it) })
 
 //                        IconButtonLocal(R.drawable.resize1, sizeIB = 50.dp, sizeI = 40.dp, onClick = {
 //                            val a = vm.aspectRatiosClick()
@@ -147,7 +125,6 @@ internal fun VideoPlayerSurface(
 //                        })
 
                     }
-
 
 
                 }

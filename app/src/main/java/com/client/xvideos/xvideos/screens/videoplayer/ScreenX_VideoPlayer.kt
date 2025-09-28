@@ -14,7 +14,6 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.screens.videoplayer.atom.ComposeTags
-import com.client.xvideos.xvideos.screens.videoplayerFullScreen.atom.ComposeTags
 import com.client.xvideos.xvideos.screens.videoplayer.atom.ZoomableVideoPlayer
 
 class ScreenX_VideoPlayer(val url: String) : Screen {
@@ -30,9 +29,7 @@ class ScreenX_VideoPlayer(val url: String) : Screen {
 
         Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
             //Отобразить теги
-            if (!vm.isFullScreen) {
-                ComposeTags(vm.tags, onClick = { vm.openTag(it, navigator) })
-            }
+            ComposeTags(vm.tags, onClick = { vm.openTag(it, navigator) })
             //Отображение плеера и его кнопок
             ZoomableVideoPlayer(vm, videoUri = vm.passedString, Modifier.weight(1f))
         }

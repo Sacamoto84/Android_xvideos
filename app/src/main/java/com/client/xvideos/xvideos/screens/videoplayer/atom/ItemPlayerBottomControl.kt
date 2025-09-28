@@ -39,6 +39,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.R
 import com.client.xvideos.xvideos.screens.videoplayer.ScreenX_VideoPlayerSM
+import com.client.xvideos.xvideos.screens.videoplayer.atom.VideoQualitySelector
 import com.client.xvideos.xvideos.screens.videoplayer.atom.formatMinSec
 
 
@@ -191,7 +192,9 @@ fun ItemPlayerBottomControl(
                 Spacer(Modifier.width(8.dp))
                 VideoSpeedSelector(vm.speed, onClick = { vm.changePlaybackSpeed(it) })
                 Spacer(Modifier.width(8.dp))
-                IconButtonLocal(R.drawable.exo_ic_fullscreen_enter){vm.isFullScreen = true}
+                IconButtonLocal(R.drawable.exo_ic_fullscreen_enter){
+                    vm.openFullScreen(navigator)
+                }
             }
 
         }
