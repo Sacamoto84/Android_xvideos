@@ -49,13 +49,14 @@ import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.session.MediaSession
 import androidx.media3.ui.PlayerView
 import androidx.media3.ui.R
-import com.client.xvideos.screens.videoplayer.ScreenVideoPlayerSM
+import com.client.xvideos.xvideos.screens.videoplayer.ScreenVideoPlayerSM
 import com.client.xvideos.screens.videoplayer.video.cache.VideoPlayerCacheManager
-import com.client.xvideos.screens.videoplayer.video.controller.VideoPlayerControllerConfig
-import com.client.xvideos.screens.videoplayer.video.controller.applyToExoPlayerView
+import com.client.xvideos.xvideos.screens.videoplayer.video.controller.VideoPlayerControllerConfig
+import com.client.xvideos.xvideos.screens.videoplayer.video.controller.applyToExoPlayerView
 import com.client.xvideos.screens.videoplayer.video.uri.VideoPlayerMediaItem
 import com.client.xvideos.screens.videoplayer.video.uri.toUri
 import com.client.xvideos.screens.videoplayer.video.util.findActivity
+import com.client.xvideos.screens.videoplayer.video.util.setFullScreen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -116,7 +117,7 @@ fun VideoPlayer(
     onCurrentTimeChanged: (Long) -> Unit = {},
     fullScreenSecurePolicy: SecureFlagPolicy = SecureFlagPolicy.Inherit,
     onFullScreenEnter: () -> Unit = {},
-    onFullScreenExit: () -> Unit = {},
+    onFullScreenExit: (Long) -> Unit = {},
     defaultFullScreeen: Boolean = false,
     handleAudioFocus: Boolean = true,
     playerBuilder: ExoPlayer.Builder.() -> ExoPlayer.Builder = { this },
@@ -237,7 +238,6 @@ fun VideoPlayer(
     LaunchedEffect(controllerConfig) {
         controllerConfig.applyToExoPlayerView(defaultPlayerView) {
             isFullScreenModeEntered = it
-
             if (it) {
                 onFullScreenEnter()
             }
@@ -257,9 +257,7 @@ fun VideoPlayer(
 
     }
 
-    LaunchedEffect(volume) {
-        player.volume = volume
-    }
+    LaunchedEffect(volume) { player.volume = volume }
 
     VideoPlayerSurface(
         vm = vm,
@@ -285,14 +283,11 @@ fun VideoPlayer(
                 Timber.e("!!! onDismissRequest Нажата кнопка выхода из полноэкранного режимати из фулскрин")
                 fullScreenPlayerView?.let {
                     PlayerView.switchTargetView(player, it, defaultPlayerView)
-
-                    defaultPlayerView.findViewById<ImageButton>(R.id.exo_fullscreen)
-                        .performClick()
-
+                    defaultPlayerView.findViewById<ImageButton>(R.id.exo_fullscreen).performClick()
                     val currentActivity = context.findActivity()
                     currentActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                    //currentActivity.setFullScreen(false)
-                    onFullScreenExit()
+                    currentActivity.setFullScreen(false)
+                    onFullScreenExit(player.currentPosition)
                 }
 
                 isFullScreenModeEntered = false

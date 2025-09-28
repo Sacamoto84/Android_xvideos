@@ -67,9 +67,7 @@ class ScreenXDashBoards : Screen {
                     )
                 )
             ) { pageIndex ->
-
                 DashboardsPaginatedListScreen(pageIndex, vm)
-
             }
 
         }

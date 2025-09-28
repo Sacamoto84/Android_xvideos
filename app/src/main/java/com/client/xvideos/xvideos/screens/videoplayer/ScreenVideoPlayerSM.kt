@@ -1,4 +1,4 @@
-package com.client.xvideos.screens.videoplayer
+package com.client.xvideos.xvideos.screens.videoplayer
 
 import android.content.Context
 import androidx.annotation.OptIn
@@ -24,7 +24,7 @@ import com.client.xvideos.xvideos.model.HTML5PlayerConfig
 import com.client.xvideos.xvideos.parcer.parseHTML5Player
 import com.client.xvideos.xvideos.parcer.parserItemVideo
 import com.client.xvideos.xvideos.parcer.parserItemVideoTags
-import com.client.xvideos.screens.videoplayer.model.TagsModel
+import com.client.xvideos.xvideos.screens.videoplayer.model.TagsModel
 import com.client.xvideos.screens.itemFullScreen.ScreenVideoPlayerFullScreen
 import com.client.xvideos.xvideos.screens.tags.ScreenTags
 import com.client.xvideos.xvideos.feature.net.readHtmlFromURLDirect

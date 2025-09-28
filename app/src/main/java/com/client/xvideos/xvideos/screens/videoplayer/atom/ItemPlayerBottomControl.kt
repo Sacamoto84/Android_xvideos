@@ -38,7 +38,8 @@ import androidx.media3.common.util.UnstableApi
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.R
-import com.client.xvideos.screens.videoplayer.ScreenVideoPlayerSM
+import com.client.xvideos.xvideos.screens.videoplayer.ScreenVideoPlayerSM
+import com.client.xvideos.xvideos.screens.videoplayer.atom.formatMinSec
 
 
 /**

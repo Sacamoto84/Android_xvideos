@@ -29,7 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.media3.common.util.UnstableApi
-import com.client.xvideos.screens.videoplayer.ScreenVideoPlayerSM
+import com.client.xvideos.xvideos.screens.videoplayer.ScreenVideoPlayerSM
 import com.composables.core.Menu
 import com.composables.core.MenuButton
 import com.composables.core.MenuContent

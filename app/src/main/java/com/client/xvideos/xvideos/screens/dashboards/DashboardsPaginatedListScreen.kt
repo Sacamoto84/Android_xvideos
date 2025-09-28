@@ -2,17 +2,18 @@ package com.client.xvideos.xvideos.screens.dashboards
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -41,12 +42,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.client.xvideos.common.icons.IconFavorite18
 import com.client.xvideos.xvideos.parcer.parserListVideo
 import com.client.xvideos.urlStart
 import com.client.xvideos.xvideos.feature.country.currentCountriesUpdate
@@ -95,149 +96,89 @@ fun DashboardsPaginatedListScreen(pageIndex: Int, vm: ScreenXDashBoardsScreenMod
         if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE) 4 else if (vm.countRow.field.collectAsState().value) 2 else 1
 
 
-    val favorites = vm.saved.favorites.list//vm.getAll.collectAsStateWithLifecycle(emptyList()).value
+    val favorites =
+        vm.saved.favorites.list//vm.getAll.collectAsStateWithLifecycle(emptyList()).value
 
     val count = vm.countRow.field.collectAsStateWithLifecycle().value
 
-    LazyColumn(
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(itemsPerRow),
         modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        items(l.chunked(itemsPerRow))
-        { row ->
+        items(l, key = {it.id})
+        { cell ->
 
-            Row(modifier = Modifier.fillMaxWidth()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(352f / 198f)
+                    .padding(1.dp)
+                    .background(Color.DarkGray)
+            ) {
+                //Отобразить карточку картинка видео
+                UrlVideoImageAndLongClickX(
+                    cell,
+                    onLongClick = {
+                        //Открыть экран плеера
+                        vm.openVideoPlayer(urlStart + cell.href, navigator)
+                    },
+                    onDoubleClick = {
+                        vm.openVideoPlayer(urlStart + cell.href, navigator)
+                    }
+                )
+                {
 
-                row.forEachIndexed { _, cell ->
-                    Box(
-                        modifier = Modifier.weight(1f).aspectRatio(352f / 198f).padding(1.dp)
-                            .background(Color.DarkGray)
-                    ) {
-                        //Отобразить карточку картинка видео
-                        UrlVideoImageAndLongClickX(
-                            cell, onLongClick = {
-                                //Открыть экран плеера
-                                vm.openVideoPlayer(urlStart + cell.href, navigator)
-                            },
-                            onDoubleClick = { }
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        val offsetY = (-3).dp
+
+                        //Продолжительность видео
+                        Text(
+                            text = cell.duration.dropLast(1),
+                            modifier = Modifier.fillMaxWidth().offset(0.5.dp, offsetY + 0.5.dp),
+                            textAlign = TextAlign.Right,
+                            fontSize = 14.sp,
+                            color = Color.Black
                         )
-                        {
 
-                            Box(modifier = Modifier.fillMaxSize()) {
-                                val offsetY = (-3).dp
+                        Text(
+                            text = cell.duration.dropLast(1),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .offset(0.dp, offsetY),
+                            textAlign = TextAlign.Right,
+                            fontSize = 14.sp,
+                            color = Color.White
+                        )
 
-                                //Продолжительность видео
-                                Text(
-                                    text = cell.duration.dropLast(1),
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .offset(1.dp, offsetY + 1.dp),
-                                    textAlign = TextAlign.Right,
-                                    fontSize = 14.sp,
-                                    color = Color.Black
-                                )
-
-                                Text(
-                                    text = cell.duration.dropLast(1),
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .offset(0.dp, offsetY),
-                                    textAlign = TextAlign.Right,
-                                    fontSize = 14.sp,
-                                    color = Color.White
-                                )
+                    }
 
 
-                            }
+                    //Название канала
+                    Box(
+                        modifier = Modifier.align(Alignment.TopStart).background(Color(0x60000000)), contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = cell.channel,
+                            modifier = Modifier.align(Alignment.Center), fontSize = 14.sp,
+                            color = Color.White
+                        )
+                    }
 
-                            //Название канала
-                            Box(
-                                modifier = Modifier
-                                    .align(Alignment.TopStart)
-                                    .background(Color(0x60000000)),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = cell.channel,
-                                    modifier = Modifier.align(Alignment.Center), fontSize = 14.sp,
-                                    color = Color.White
-                                )
-                            }
-
-                            if (favorites.any { it.id == cell.id }) {
-                                //Индикатор что видео в фаворитах
-                                Box(modifier = Modifier.align(Alignment.BottomStart)) {
-                                    IconFavorite(
-                                        count
-                                    )
-                                }
-                            }
-
-                            Box(modifier = Modifier.align(Alignment.BottomEnd)) {
-                                DropMenu(
-                                    cell,
-                                    vm
-                                )
-                            }
-
+                    Row(modifier = Modifier.align(Alignment.BottomEnd), horizontalArrangement = Arrangement.End) {
+                        if (favorites.any { it.id == cell.id }) {
+                            //Индикатор что видео в фаворитах
+                            Box(modifier = Modifier) { IconFavorite18(Modifier.padding(bottom = 6.dp, end = 6.dp)) }
                         }
                     }
-                }
-                // Если элементов в строке меньше, чем itemsPerRow, добавляем пустые ячейки
-                if (row.size < itemsPerRow) {
-                    repeat(itemsPerRow - row.size) {
-                        Spacer(modifier = Modifier.weight(1f))
-                    }
+
+                    Box(modifier = Modifier.align(Alignment.TopEnd)) { DropMenu( cell, vm ) }
+
                 }
             }
         }
+
     }
 }
-
-
-@Composable
-private fun IconFavorite(count: Boolean) {
-
-    val size = if (count) 26.dp else 32.dp
-
-    //Индикатор что видео в фаворитах
-    Box(
-        modifier = Modifier,
-        contentAlignment = Alignment.Center
-    ) {
-
-        IconButton(onClick = { }, enabled = false) {
-
-            Icon(
-                imageVector = Icons.Filled.Favorite,
-                contentDescription = "Like",
-                tint = Color.Black,//grayColor(0xC6),
-                modifier = Modifier
-                    .size(size)
-                    .offset(1.dp, 1.dp)
-            )
-
-            Icon(
-                imageVector = Icons.Filled.Favorite,
-                contentDescription = "Like",
-                tint = Color.White,//grayColor(0xC6),
-                modifier = Modifier
-                    .padding(0.dp)
-                    .size(size)
-            )
-
-
-        }
-    }
-
-}
-
-@Preview
-@Composable
-private fun IconFavoritePreview() {
-    IconFavorite(count = true)
-}
-
 
 @Composable
 private fun DropMenu(cell: ItemsX, vm: ScreenXDashBoardsScreenModel) {
@@ -261,7 +202,7 @@ private fun DropMenu(cell: ItemsX, vm: ScreenXDashBoardsScreenModel) {
                 contentDescription = "Localized description",
                 tint = Color.Black, modifier = Modifier
                     .size(size)
-                    .offset(1.dp, 1.dp)
+                    .offset(0.5.dp, 0.5.dp)
             )
 
             Icon(
@@ -279,7 +220,6 @@ private fun DropMenu(cell: ItemsX, vm: ScreenXDashBoardsScreenModel) {
             onDismissRequest = { expanded = false },
             containerColor = Color(0xFFF2EDF7),
             shadowElevation = 2.dp, tonalElevation = 16.dp
-
         )
         {
 
@@ -293,7 +233,9 @@ private fun DropMenu(cell: ItemsX, vm: ScreenXDashBoardsScreenModel) {
                         delay(50)
                         when (isFavorite) {
                             true -> vm.removeFavorite(cell)
-                            false -> { vm.addFavorite(cell) }
+                            false -> {
+                                vm.addFavorite(cell)
+                            }
                         }
                     }
                 },
@@ -304,16 +246,6 @@ private fun DropMenu(cell: ItemsX, vm: ScreenXDashBoardsScreenModel) {
                     )
                 }
             )
-            DropdownMenuItem(
-                text = { Text("TODO") },
-                onClick = { /* Handle settings! */ },
-                leadingIcon = {
-                    Icon(
-                        Icons.Outlined.Save,
-                        contentDescription = null
-                    )
-                }
-            )
 
             DropdownMenuItem(
                 text = { Text("TODO") },
@@ -326,18 +258,6 @@ private fun DropMenu(cell: ItemsX, vm: ScreenXDashBoardsScreenModel) {
                 }
             )
 
-            HorizontalDivider()
-            DropdownMenuItem(
-                text = { Text("TODO") },
-                onClick = { /* Handle send feedback! */ },
-                leadingIcon = {
-                    Icon(
-                        Icons.Outlined.Email,
-                        contentDescription = null
-                    )
-                },
-                trailingIcon = { Text(">", textAlign = TextAlign.Center) }
-            )
         }
 
     }

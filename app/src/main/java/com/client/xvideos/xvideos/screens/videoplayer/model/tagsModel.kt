@@ -1,4 +1,4 @@
-package com.client.xvideos.screens.videoplayer.model
+package com.client.xvideos.xvideos.screens.videoplayer.model
 
 //<li class="main-uploader">
 //<a class="btn btn-default label main uploader-tag hover-name" href="/milfed">

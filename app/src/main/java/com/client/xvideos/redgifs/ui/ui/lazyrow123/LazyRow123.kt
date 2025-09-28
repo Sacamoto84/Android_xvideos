@@ -272,7 +272,7 @@ fun LazyRow123(
 
                                         LazyRow123Icons(
                                             modifier = Modifier.align(Alignment.BottomEnd)
-                                                .offset(2.dp, 2.dp), host.hostDI, item, downloadList
+                                                .offset(2.dp, 2.dp), host.hostDI.savedRed, item, downloadList
                                         )
                                     }
                                 }
@@ -354,7 +354,7 @@ fun LazyRow123(
                                     cornerRadius = 8.dp
                                 )
                             }
-                            LazyRow123Icons( modifier = Modifier.align(Alignment.BottomCenter), host.hostDI, item, downloadList )
+                            LazyRow123Icons( modifier = Modifier.align(Alignment.BottomCenter), host.hostDI.savedRed, item, downloadList )
                         }
                     }
                 }

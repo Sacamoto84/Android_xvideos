@@ -1,4 +1,4 @@
-package com.client.xvideos.screens.videoplayer.atom
+package com.client.xvideos.xvideos.screens.videoplayer.atom
 
 import android.annotation.SuppressLint
 import androidx.annotation.OptIn
@@ -23,11 +23,12 @@ import androidx.media3.common.Tracks
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.analytics.AnalyticsListener
 import com.client.xvideos.common.noRippleClickable
+import com.client.xvideos.screens.videoplayer.atom.ItemPlayerBottomControl
 
-import com.client.xvideos.screens.videoplayer.ScreenVideoPlayerSM
+import com.client.xvideos.xvideos.screens.videoplayer.ScreenVideoPlayerSM
 import com.client.xvideos.screens.videoplayer.video.RepeatMode
 import com.client.xvideos.screens.videoplayer.video.VideoPlayer
-import com.client.xvideos.screens.videoplayer.video.controller.VideoPlayerControllerConfig
+import com.client.xvideos.xvideos.screens.videoplayer.video.controller.VideoPlayerControllerConfig
 import com.client.xvideos.screens.videoplayer.video.uri.VideoPlayerMediaItem
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -50,30 +51,31 @@ fun ZoomableVideoPlayer(
     var isDragging by remember { mutableStateOf(false) }
     var dragAmount by remember { mutableFloatStateOf(0f) } // Текущее смещение во время жеста
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .then(modifier),
-        verticalArrangement = Arrangement.Bottom
-    ) {
+    Column( modifier = Modifier.fillMaxSize().then(modifier), verticalArrangement = Arrangement.Bottom)
+    {
 
         VideoPlayer(
             vm = vm,
             onFullScreenExit = {
-                Timber.i("!!! onFullScreenExit")
+                position ->
+                Timber.i("!!! onFullScreenExit position:${position.formatMinSec()} ")
                 vm.isFullScreen = false
+
+                vm.playerE?.seekTo(position)
+
             },
             onFullScreenEnter = {
                 Timber.i("!!! onFullScreenEnter")
                 vm.isFullScreen = true
             },
+
             defaultFullScreeen = vm.isFullScreen,
+
             trackSelector = vm.trackSelector,
             mediaItems = listOf(
                 VideoPlayerMediaItem.NetworkMediaItem(
                     url = videoUri,
-                    mediaMetadata = MediaMetadata.Builder().setTitle("Widevine HLS: Example")
-                        .build(),
+                    mediaMetadata = MediaMetadata.Builder().setTitle("Widevine HLS: Example").build(),
                     mimeType = MimeTypes.APPLICATION_M3U8,
                 )
             ),
@@ -152,10 +154,6 @@ fun ZoomableVideoPlayer(
 
                 addAnalyticsListener(
                     object : AnalyticsListener {
-
-
-
-
 
                         @OptIn(UnstableApi::class)
                         override fun onEvents(player: Player, events: AnalyticsListener.Events) {
@@ -255,20 +253,14 @@ fun ZoomableVideoPlayer(
             )
         }
 
-
-
-
-
     }
-
 
 }
 
 @SuppressLint("DefaultLocale")
 fun Long.formatMinSec(): String {
-    return if (this == 0L) {
-        "..."
-    } else {
+    return if (this == 0L) { "..." }
+    else {
         String.format(
             "%02d:%02d",
             TimeUnit.MILLISECONDS.toMinutes(this),
