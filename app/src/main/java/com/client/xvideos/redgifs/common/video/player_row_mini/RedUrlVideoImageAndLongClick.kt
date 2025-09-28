@@ -31,7 +31,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.sp
 import com.client.xvideos.BuildConfig
 import com.client.xvideos.common.AppPath
-import com.client.xvideos.common.urlVideImage.UrlImage
+import com.client.xvideos.common.urlVideoImage.UrlImage
 import com.client.xvideos.common.vibrate.vibrateWithPatternAndAmplitude
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.redgifs.common.downloader.DownloadRed

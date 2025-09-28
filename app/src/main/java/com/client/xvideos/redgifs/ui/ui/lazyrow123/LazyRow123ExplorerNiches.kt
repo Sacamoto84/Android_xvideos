@@ -35,7 +35,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.client.xvideos.common.urlVideImage.UrlImage
+import com.client.xvideos.common.urlVideoImage.UrlImage
 import com.client.xvideos.common.util.toPrettyCountInt
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.model.Niche

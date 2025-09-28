@@ -36,7 +36,7 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.xvideos.model.ItemsX
-import com.client.xvideos.xvideos.screens.dashboards.UrlVideoImageAndLongClick
+import com.client.xvideos.common.urlVideoImage.UrlVideoImageAndLongClickX
 import com.client.xvideos.xvideos.screens.profile.ScreenProfile
 import com.composables.core.HorizontalSeparator
 
@@ -121,7 +121,7 @@ class ScreenFavorites() : Screen {
                                 linkProfile = it.linkProfile
                             )
 
-                            UrlVideoImageAndLongClick(cell, onLongClick = {
+                            UrlVideoImageAndLongClickX(cell, onLongClick = {
                                 //vm.openItem(urlStart + cell.link, navigator)
                             }, onDoubleClick = {}){
 

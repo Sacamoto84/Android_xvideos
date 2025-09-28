@@ -4,11 +4,17 @@ import android.annotation.SuppressLint
 import android.app.Application
 import android.preference.PreferenceManager
 import androidx.compose.runtime.ExperimentalComposeRuntimeApi
+import com.client.xvideos.common.eventBus.Event
+import com.client.xvideos.common.eventBus.EventBus
 import com.client.xvideos.common.fresco.FrescoInit
 import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.common.traficStatistic.NetworkTrafficMonitor
 import dagger.hilt.android.HiltAndroidApp
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import timber.log.Timber.DebugTree
 import java.security.SecureRandom
@@ -62,6 +68,7 @@ class App : Application() {
     lateinit var networkTrafficMonitor: NetworkTrafficMonitor
         private set
 
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     @OptIn(DelicateCoroutinesApi::class, ExperimentalComposeRuntimeApi::class)
     override fun onCreate() {
@@ -204,6 +211,14 @@ class App : Application() {
 //
 //        }
 
+
+        scope.launch {
+            EventBus.events.collect { event ->
+                if (event is Event.Log) {
+                    //saveLogToFile(event.message)
+                }
+            }
+        }
 
     }
 

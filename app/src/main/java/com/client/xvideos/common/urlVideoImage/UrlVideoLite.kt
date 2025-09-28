@@ -1,4 +1,4 @@
-package com.client.xvideos.common.urlVideImage
+package com.client.xvideos.common.urlVideoImage
 
 import androidx.annotation.OptIn
 import androidx.compose.foundation.background
@@ -34,9 +34,7 @@ fun UrlVideoLite(url: String) {
 
     val context = LocalContext.current
 
-    var player: Player? by remember {
-        mutableStateOf(null)
-    }
+    var player: Player? by remember { mutableStateOf(null) }
 
     val playerView = remember {
         PlayerView(context).apply {

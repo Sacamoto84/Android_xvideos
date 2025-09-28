@@ -1,4 +1,4 @@
-package com.client.xvideos.common.urlVideImage
+package com.client.xvideos.common.urlVideoImage
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

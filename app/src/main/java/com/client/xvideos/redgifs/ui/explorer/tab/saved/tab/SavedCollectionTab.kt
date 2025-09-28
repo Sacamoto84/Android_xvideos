@@ -49,7 +49,7 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.Navigator
 import com.client.xvideos.common.collectionDB.ui.DaialogNewCollection
 import com.client.xvideos.common.settings.Settings
-import com.client.xvideos.common.urlVideImage.UrlImage
+import com.client.xvideos.common.urlVideoImage.UrlImage
 import com.client.xvideos.redgifs.model.GifsInfo
 import com.client.xvideos.redgifs.ui.explorer.tab.gifs.ColumnSelect
 import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.collection.ScreenCollectionName

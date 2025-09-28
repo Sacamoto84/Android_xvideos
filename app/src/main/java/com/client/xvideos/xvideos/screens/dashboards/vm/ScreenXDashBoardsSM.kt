@@ -20,56 +20,14 @@ import javax.inject.Inject
 class ScreenXDashBoardsScreenModel @Inject constructor(
     val saved : SavedX
 ) : ScreenModel {
-
     /** Количество колонок true-2 false-1 */
     val countRow = Settings.xvideos_row2
-
     val pagerState: PagerState = PagerState(0) { 20000 }
+    fun openVideoPlayer(url: String, navigator: Navigator) { navigator.push(ScreenVideoPlayer(url)) }
 
-    fun openVideoPlayer(url: String, navigator: Navigator) {
-        navigator.push(ScreenVideoPlayer(url))
-    }
-
-    fun addFavorite(cell: ItemsX) = screenModelScope.launch {
-
-        val item = ItemsX(
-            id = cell.id,
-            title = cell.title,
-            duration = cell.duration,
-            views = cell.views,
-            channel = cell.channel,
-            previewImage = cell.previewImage,
-            previewVideo = cell.previewVideo,
-            href = cell.href,
-            nameProfile = cell.nameProfile,
-            linkProfile = cell.linkProfile,
-        )
-
-        saved.favorites.add(item)
-
-    }
-
-    fun removeFavorite(cell: ItemsX) = screenModelScope.launch {
-
-        val item = ItemsX(
-            id = cell.id,
-            title = cell.title,
-            duration = cell.duration,
-            views = cell.views,
-            channel = cell.channel,
-            previewImage = cell.previewImage,
-            previewVideo = cell.previewVideo,
-            href = cell.href,
-            nameProfile = cell.nameProfile,
-            linkProfile = cell.linkProfile,
-        )
-        saved.favorites.remove(item)
-
-    }
-
-    fun isFavorite(id : Long): Boolean{
-        return saved.favorites.list.find { it.id == id } != null
-    }
+    fun addFavorite(item: ItemsX) = screenModelScope.launch { saved.favorites.add(item) }
+    fun removeFavorite(item: ItemsX) = screenModelScope.launch { saved.favorites.remove(item) }
+    fun isFavorite(id : Long): Boolean{ return saved.favorites.list.find { it.id == id } != null }
 
 }
 

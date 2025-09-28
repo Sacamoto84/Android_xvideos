@@ -52,7 +52,7 @@ import cafe.adriel.voyager.transitions.ScreenTransition
 import com.client.xvideos.R
 import com.client.xvideos.common.AppPath
 import com.client.xvideos.common.connectivityObserver.ConnectivityObserver
-import com.client.xvideos.common.urlVideImage.UrlImage
+import com.client.xvideos.common.urlVideoImage.UrlImage
 import com.client.xvideos.redgifs.ui.explorer.ScreenRedExplorer
 import com.client.xvideos.redgifs.ui.fullscreen.bottom_bar.FeedControls_Container_Line0
 import com.client.xvideos.redgifs.ui.profile.ScreenRedProfile

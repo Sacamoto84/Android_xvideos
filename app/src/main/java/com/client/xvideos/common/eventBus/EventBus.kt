@@ -1,7 +1,12 @@
 package com.client.xvideos.common.eventBus
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.launch
+import timber.log.Timber
 
 sealed class Event {
     data class Log(val message: String) : Event()
@@ -14,15 +19,17 @@ sealed class Event {
 }
 
 object EventBus {
-    private val _events = MutableSharedFlow<Event>()
+    private val _events = MutableSharedFlow<Event>(
+        replay = 0,
+        extraBufferCapacity = 1024
+    )
     val events = _events.asSharedFlow()
 
-//    suspend fun postEvent(event: UpdateEvent) {
-//        _events.emit(event)
-//    }
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     fun postEvent(event: Event) {
-        _events.tryEmit(event)
+        Timber.i("~~~ EventBus.postEvent $event")
+        scope.launch { _events.emit(event) }
     }
 
 }

@@ -39,13 +39,10 @@ class ScreenXDashBoards : Screen {
             bottomBar = {
                 val job = rememberCoroutineScope()
                 Column {
-
                     BottomListDashBoardNavigationButtons2(
                         vm.pagerState.currentPage,
                         onChange = {
-                            job.launch(Dispatchers.Main) {
-                                vm.pagerState.scrollToPage((it).coerceAtLeast(0))
-                            }
+                            job.launch(Dispatchers.Main) { vm.pagerState.scrollToPage((it).coerceAtLeast(0)) }
                         },
                         max = vm.pagerState.pageCount,
                     )
@@ -59,8 +56,7 @@ class ScreenXDashBoards : Screen {
             HorizontalPager(
                 state = vm.pagerState,
                 modifier = Modifier
-                    .padding(innerPadding)
-                    .fillMaxSize(),
+                    .padding(innerPadding).fillMaxSize(),
                 beyondViewportPageCount = 1,
                 flingBehavior = PagerDefaults.flingBehavior(
                     state = vm.pagerState,
@@ -71,7 +67,9 @@ class ScreenXDashBoards : Screen {
                     )
                 )
             ) { pageIndex ->
+
                 DashboardsPaginatedListScreen(pageIndex, vm)
+
             }
 
         }

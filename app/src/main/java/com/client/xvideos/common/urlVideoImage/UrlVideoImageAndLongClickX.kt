@@ -1,4 +1,4 @@
-package com.client.xvideos.xvideos.screens.dashboards
+package com.client.xvideos.common.urlVideoImage
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
@@ -15,13 +15,11 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import com.client.xvideos.common.vibrate.vibrateWithPatternAndAmplitude
-import com.client.xvideos.common.urlVideImage.UrlImage
-import com.client.xvideos.common.urlVideImage.UrlVideoLite
 import com.client.xvideos.xvideos.model.ItemsX
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun UrlVideoImageAndLongClick(
+fun UrlVideoImageAndLongClickX(
     item: ItemsX,
     modifier: Modifier = Modifier,
     onLongClick: () -> Unit,
@@ -29,9 +27,7 @@ fun UrlVideoImageAndLongClick(
     overlay: @Composable () -> Unit= {}) {
 
     val haptic = LocalHapticFeedback.current
-
     val context = LocalContext.current
-
     var isVideo by remember { mutableStateOf(false) }
 
     Box(
@@ -61,12 +57,9 @@ fun UrlVideoImageAndLongClick(
             //Показ видео
             UrlVideoLite(item.previewVideo)
         } else {
-
             //Показ картинки
             UrlImage(item.previewImage, Modifier.fillMaxWidth())
-
             overlay.invoke()
-
         }
 
     }

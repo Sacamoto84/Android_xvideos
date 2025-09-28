@@ -48,7 +48,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.common.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.common.saved.SavedRed
-import com.client.xvideos.common.urlVideImage.UrlImage
+import com.client.xvideos.common.urlVideoImage.UrlImage
 import com.client.xvideos.redgifs.model.NichesInfo
 import com.client.xvideos.redgifs.ui.niche.ScreenRedNiche
 import com.client.xvideos.redgifs.ui.profile.atom.VerticalScrollbar

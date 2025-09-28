@@ -69,17 +69,12 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.filterIsInstance
 import net.engawapg.lib.zoomable.ExperimentalZoomableApi
 import javax.inject.Inject
 
-val LocalRootScreenModel =
-    staticCompositionLocalOf<ScreenRootSM> { error("No ScreenRootSM provided") }
+val LocalRootScreenModel = staticCompositionLocalOf<ScreenRootSM> { error("No ScreenRootSM provided") }
 
 // Глобальная ссылка на основной навигатор для доступа из любого места
 val LocalMainNavigator = staticCompositionLocalOf<Navigator?> { null }
@@ -94,38 +89,24 @@ object ScreenRoot : Screen {
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
     override fun Content() {
+
         val haptic = LocalHapticFeedback.current
         val vm: ScreenRootSM = getScreenModel()
         val snackBarHostState = remember { SnackbarHostState() }
-
 
         // Создаем отдельный навигатор для внутренней навигации
         var mainNavigator: Navigator? = null
 
         LaunchedEffect(Unit) {
-            vm.snackbarEvents.collect { message ->
-                snackBarHostState.showSnackbar(
-                    message
-                )
-            }
-        }
-
-        LaunchedEffect(Unit) {
-//            snackBarEvent.messages.receiveAsFlow().collect { message ->
-//                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-//                snackBarHostState.show(message)
-//            }
-            EventBus.events.collect { event ->
-                when (event) {
-                    is Event.SnackBarRaw -> {
-                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                        snackBarHostState.show(event.message)
-                    }
-                    else -> {}
+            //Timber.i("~~~ LaunchedEffect started — start collecting")
+            EventBus.events
+                //.onEach { Timber.i("~~~ EventBus emitted: $it") }
+                .filterIsInstance<Event.SnackBarRaw>()
+                .collect { event ->
+                    //Timber.i("~~~ Event.SnackBarRaw collected: ${event.message}")
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    snackBarHostState.show(event.message)
                 }
-            }
-
-
         }
 
         val queueState by DownloadQueueManager.queueState.collectAsState()
@@ -197,41 +178,17 @@ object ScreenRoot : Screen {
                 snackbarHost = {
                     Box(modifier = Modifier.zIndex(Float.MAX_VALUE)) {
                         SnackbarHost(snackBarHostState) { data ->
-                            val uiMsg = (data.visuals as? UiSnackbarVisuals)?.ui ?: UiMessage.Info(
-                                data.visuals.message
-                            )
+                            val uiMsg = (data.visuals as? UiSnackbarVisuals)?.ui ?: UiMessage.Info( data.visuals.message )
                             val (bg, fg, icon) = when (uiMsg) {
-                                is UiMessage.Success -> Triple(
-                                    Color(0xFF0F9960),
-                                    Color.White,
-                                    Icons.Default.Check
-                                )
-
-                                is UiMessage.Error -> Triple(
-                                    Color(0xFFD13913),
-                                    Color.White,
-                                    Icons.Default.ErrorOutline
-                                )
-
-                                is UiMessage.Info -> Triple(
-                                    Color(0xFF137CBD),
-                                    Color.White,
-                                    Icons.Default.Info
-                                )
+                                is UiMessage.Success -> Triple(Color(0xFF0F9960), Color.White, Icons.Default.Check)
+                                is UiMessage.Error -> Triple(Color(0xFFD13913), Color.White, Icons.Default.ErrorOutline)
+                                is UiMessage.Info -> Triple(Color(0xFF137CBD), Color.White, Icons.Default.Info)
                             }
                             LaunchedEffect(data) {
                                 when (uiMsg) {
-                                    is UiMessage.Success -> {
-                                        delay(2000); data.dismiss()
-                                    }
-
-                                    is UiMessage.Error -> {
-                                        delay(5000); data.dismiss()
-                                    }
-
-                                    is UiMessage.Info -> {
-                                        delay(2000); data.dismiss()
-                                    }
+                                    is UiMessage.Success -> { delay(2000); data.dismiss() }
+                                    is UiMessage.Error   -> { delay(5000); data.dismiss() }
+                                    is UiMessage.Info    -> { delay(2000); data.dismiss() }
                                 }
                             }
                             Surface(
@@ -256,11 +213,7 @@ object ScreenRoot : Screen {
                                 {
                                     Icon(icon, contentDescription = null)
                                     Spacer(Modifier.width(8.dp))
-                                    Text(
-                                        data.visuals.message,
-                                        Modifier,
-                                        fontFamily = ThemeRed.fontFamilyDMsanss
-                                    )
+                                    Text( data.visuals.message, Modifier, fontFamily = ThemeRed.fontFamilyDMsanss )
                                     data.visuals.actionLabel?.let { label ->
                                         TextButton(onClick = { data.performAction() }) { Text(label) }
                                     }
@@ -273,7 +226,7 @@ object ScreenRoot : Screen {
 
                 // Основной навигатор приложения
                 Navigator(screen = MenuScreen) { nav ->
-                    mainNavigator = nav // Сохраняем ссылку на навигатор
+                    mainNavigator = nav
                     nav.lastItem.Content()
                 }
 
@@ -282,10 +235,7 @@ object ScreenRoot : Screen {
                 // Оверлей рисуется поверх Scaffold
                 vm.overlayContent.value?.let { content ->
                     Box(
-                        modifier = Modifier
-                            //.zIndex(10f)
-                            .fillMaxSize()
-                            .background(Color.Black.copy(alpha = 0.95f))
+                        modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.95f))
                     ) { content() }
                 }
 
@@ -304,14 +254,6 @@ var depth by mutableIntStateOf(0)
 class ScreenRootSM @Inject constructor(
 
 ) : ScreenModel {
-    private val _snackbarEvents = Channel<String>(64)
-    val snackbarEvents = _snackbarEvents.receiveAsFlow()
-
-    @OptIn(DelicateCoroutinesApi::class)
-    fun showSnackbar(message: String) {
-        GlobalScope.launch { _snackbarEvents.send(message) }
-    }
-
 
     // состояние для фуллскрин-оверлея
     private val _overlayContent = mutableStateOf<(@Composable () -> Unit)?>(null)

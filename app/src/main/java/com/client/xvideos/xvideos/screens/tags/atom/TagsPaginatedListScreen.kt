@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.xvideos.model.ItemsX
-import com.client.xvideos.xvideos.screens.dashboards.UrlVideoImageAndLongClick
+import com.client.xvideos.common.urlVideoImage.UrlVideoImageAndLongClickX
 
 @Composable
 fun TagsPaginatedListScreen(pageIndex: Int) {
@@ -57,7 +57,7 @@ fun TagsPaginatedListScreen(pageIndex: Int) {
                             .background(Color.DarkGray)
                     ) {
 
-                        UrlVideoImageAndLongClick(cell, onLongClick = {
+                        UrlVideoImageAndLongClickX(cell, onLongClick = {
                             //vm.openItem(urlStart + cell.link, navigator)
                         }, onDoubleClick = {})
 

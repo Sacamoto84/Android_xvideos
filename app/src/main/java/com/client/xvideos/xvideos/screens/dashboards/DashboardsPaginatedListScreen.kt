@@ -52,6 +52,7 @@ import com.client.xvideos.urlStart
 import com.client.xvideos.xvideos.feature.country.currentCountriesUpdate
 import com.client.xvideos.xvideos.feature.net.readHtmlFromURLWebView
 import com.client.xvideos.xvideos.model.ItemsX
+import com.client.xvideos.common.urlVideoImage.UrlVideoImageAndLongClickX
 import com.client.xvideos.xvideos.screens.dashboards.vm.ScreenXDashBoardsScreenModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -77,7 +78,6 @@ private suspend fun openNew(numberScreen: Int = 0): SnapshotStateList<ItemsX> {
 fun DashboardsPaginatedListScreen(pageIndex: Int, vm: ScreenXDashBoardsScreenModel) {
 
     println("!!! DashboardsPaginatedListScreen pageIndex:$pageIndex")
-
 
     val l = remember { mutableStateListOf<ItemsX>() }
 
@@ -110,21 +110,16 @@ fun DashboardsPaginatedListScreen(pageIndex: Int, vm: ScreenXDashBoardsScreenMod
 
                 row.forEachIndexed { _, cell ->
                     Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .aspectRatio(352f / 198f)
-                            .padding(1.dp)
+                        modifier = Modifier.weight(1f).aspectRatio(352f / 198f).padding(1.dp)
                             .background(Color.DarkGray)
                     ) {
                         //Отобразить карточку картинка видео
-                        UrlVideoImageAndLongClick(
+                        UrlVideoImageAndLongClickX(
                             cell, onLongClick = {
-                                //Открыть экран прлеера
+                                //Открыть экран плеера
                                 vm.openVideoPlayer(urlStart + cell.href, navigator)
                             },
-                            onDoubleClick = {
-
-                            }
+                            onDoubleClick = { }
                         )
                         {
 
@@ -164,15 +159,18 @@ fun DashboardsPaginatedListScreen(pageIndex: Int, vm: ScreenXDashBoardsScreenMod
                             ) {
                                 Text(
                                     text = cell.channel,
-                                    modifier = Modifier
-                                        .align(Alignment.Center), fontSize = 14.sp,
+                                    modifier = Modifier.align(Alignment.Center), fontSize = 14.sp,
                                     color = Color.White
                                 )
                             }
 
                             if (favorites.any { it.id == cell.id }) {
                                 //Индикатор что видео в фаворитах
-                                Box(modifier = Modifier.align(Alignment.BottomStart)) { IconFavorite( count ) }
+                                Box(modifier = Modifier.align(Alignment.BottomStart)) {
+                                    IconFavorite(
+                                        count
+                                    )
+                                }
                             }
 
                             Box(modifier = Modifier.align(Alignment.BottomEnd)) {
