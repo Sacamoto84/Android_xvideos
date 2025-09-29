@@ -77,13 +77,7 @@ internal fun VideoPlayerFullScreenDialog(
 
     val internalFullScreenPlayerView = remember { PlayerView(context).also(fullScreenPlayerView) }
 
-    BackHandler(enabled = true) {
-        Timber.i("iii BackHandler VideoPlayerFullScreenDialog")
-//        internalFullScreenPlayerView.findViewById<ImageButton>(R.id.exo_fullscreen)
-//            .performClick()
-//        navigator.pop()
-        onDismissRequest()
-    }
+    BackHandler(enabled = true) { onDismissRequest() }
 
     LaunchedEffect(Unit) {
         PlayerView.switchTargetView(player, currentPlayerView, internalFullScreenPlayerView)
@@ -108,9 +102,7 @@ internal fun VideoPlayerFullScreenDialog(
         usePlayerController = true,
         autoDispose = false,
         surfaceResizeMode = resizeMode,
-        modifier = Modifier
-            .fillMaxSize()
-            .systemBarsPadding(),
+        modifier = Modifier.fillMaxSize().systemBarsPadding(),
         handleLifecycle = true,
         qualityChange = { vm.quality = it },
         quality = vm.quality,

@@ -10,7 +10,7 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 
-class ScreenX_VideoPlayerFullScreen(val url: String) : Screen {
+class ScreenX_VideoPlayerFullScreen(val url: String, val position : Long = -1L) : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
 
@@ -18,7 +18,7 @@ class ScreenX_VideoPlayerFullScreen(val url: String) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val vm = getScreenModel<ScreenX_VideoPlayerFullScreenSM, ScreenX_VideoPlayerFullScreenSM.Factory> { factory ->  factory.create(url) }
+        val vm = getScreenModel<ScreenX_VideoPlayerFullScreenSM, ScreenX_VideoPlayerFullScreenSM.Factory> { factory ->  factory.create(url, position) }
         ZoomableVideoPlayerFullScreen(vm, videoUri = vm.passedString)
     }
 

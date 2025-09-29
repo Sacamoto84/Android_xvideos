@@ -183,17 +183,17 @@ fun VideoPlayerFullScreen(
         }
     }
 
-    LaunchedEffect(Unit) {
-        while (true) {
-            delay(1000)
-
-            if (currentTime != player.currentPosition) {
-                onCurrentTimeChanged(currentTime)
-            }
-
-            currentTime = player.currentPosition
-        }
-    }
+//    LaunchedEffect(Unit) {
+//        while (true) {
+//            delay(1000)
+//
+//            if (currentTime != player.currentPosition) {
+//                onCurrentTimeChanged(currentTime)
+//            }
+//
+//            currentTime = player.currentPosition
+//        }
+//    }
 
     LaunchedEffect(usePlayerController) {
         defaultPlayerView.useController = usePlayerController
@@ -262,7 +262,6 @@ fun VideoPlayerFullScreen(
     }
 
     LaunchedEffect(volume) { player.volume = volume }
-
 
     var fullScreenPlayerView by remember { mutableStateOf<PlayerView?>(null) }
 

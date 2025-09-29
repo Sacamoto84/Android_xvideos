@@ -54,7 +54,9 @@ internal fun VideoPlayerSurface(
     autoDispose: Boolean = true,
 
     qualityChange: (Int) -> Unit,
+
     quality: Int, //vm.quality
+
     listFormat: SnapshotStateList<FORMAT>,
 
     speed : Float,
@@ -93,8 +95,6 @@ internal fun VideoPlayerSurface(
                     }
                 }
                 ///////////////////////////////////////////////////////////////////////////////
-
-                val t = this
                 //Выбор качество видео
                 val compose = ComposeView(context)
                 compose.setContent {

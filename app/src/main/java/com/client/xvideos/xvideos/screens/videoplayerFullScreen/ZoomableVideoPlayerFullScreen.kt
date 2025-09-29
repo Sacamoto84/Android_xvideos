@@ -16,6 +16,7 @@ import androidx.media3.common.Tracks
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.analytics.AnalyticsListener
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
+import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.common.eventBus.Event
@@ -26,6 +27,8 @@ import com.client.xvideos.xvideos.screens.videoplayer.FORMAT
 import com.client.xvideos.xvideos.screens.videoplayer.atom.formatMinSec
 import com.client.xvideos.xvideos.screens.videoplayer.video.controller.VideoPlayerControllerConfig
 import io.ktor.http.content.EntityTagVersion
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @OptIn(UnstableApi::class)
@@ -38,11 +41,9 @@ fun ZoomableVideoPlayerFullScreen(
 
     val navigator = LocalNavigator.currentOrThrow
 
-
     Timber.i("!!! ZoomableVideoPlayer url:$videoUri")
     //val activity = LocalContext.current as Activity
     //activity.requestedOrientation = SCREEN_ORIENTATION_PORTRAIT
-    var once by remember { mutableStateOf(false) }
 
     VideoPlayerFullScreen(
         vm = vm,
@@ -100,11 +101,25 @@ fun ZoomableVideoPlayerFullScreen(
 
                 object : Player.Listener {
 
+                    override fun onPlaybackStateChanged(playbackState: Int) {
+                        Timber.i("!!! onPlaybackStateChanged ${Player.STATE_READY} positionFromFullscreen:${vm.positionForFullscreen}")
+                        if (playbackState == Player.STATE_READY && vm.positionForFullscreen != -1L) {
+                            Timber.i("!!! >>> positionFromFullscreen ${vm.positionForFullscreen.formatMinSec()}")
+                            vm.playerE?.seekTo(vm.positionForFullscreen)
+                            val temp = vm.positionForFullscreen
+                            vm.positionForFullscreen = -1
+                            vm.screenModelScope.launch {
+                                delay(16)
+                                vm.playerE?.seekTo(temp)
+                            }
+                        }
+                    }
+
                     override fun onTracksChanged(tracks: Tracks) {
                         // Update UI using current tracks.
                         if (tracks.groups.size == 0) return
 
-                        Timber.i("!!! onTracksChanged " + tracks.groups[0])
+                        Timber.i("!!! onTracksChanged " + tracks.groups[0].toString())
 
                         vm.listFormat.clear()
 
@@ -124,9 +139,10 @@ fun ZoomableVideoPlayerFullScreen(
                             Timber.d("!!! Group: 0, Format: $j, Resolution: ${format.width}x${format.height}, Bitrate: ${format.bitrate}")
                         }
                         vm.listFormat.sortBy { it.height }
-                        if (!once) {
+                        if (!vm.once) {
+                            vm.once = true
                             vm.quality = vm.listFormat.last().height
-                            once = true
+                            Timber.d("!!! vm.quality: ${vm.quality}")
                         }
                     }
                 }

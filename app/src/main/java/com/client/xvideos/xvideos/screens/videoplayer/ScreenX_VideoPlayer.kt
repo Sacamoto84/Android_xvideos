@@ -2,9 +2,7 @@ package com.client.xvideos.xvideos.screens.videoplayer
 
 import androidx.annotation.OptIn
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
@@ -18,7 +16,6 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.client.xvideos.screens.videoplayer.atom.ComposeTags
 import com.client.xvideos.xvideos.screens.videoplayer.atom.ZoomableVideoPlayer
 
 class ScreenX_VideoPlayer(val url: String) : Screen {

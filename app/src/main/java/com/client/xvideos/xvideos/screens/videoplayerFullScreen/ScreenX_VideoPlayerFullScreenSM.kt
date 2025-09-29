@@ -9,6 +9,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
@@ -43,23 +44,28 @@ import timber.log.Timber
 @UnstableApi
 class ScreenX_VideoPlayerFullScreenSM @AssistedInject constructor(
     @Assisted val url: String,
+    @Assisted val position : Long,
     @ApplicationContext context: Context,
     val db : AppDatabase
 ) : ScreenModel {
 
     @AssistedFactory
-    interface Factory : ScreenModelFactory { fun create(url: String): ScreenX_VideoPlayerFullScreenSM }
+    interface Factory : ScreenModelFactory { fun create(url: String, position : Long): ScreenX_VideoPlayerFullScreenSM }
 
     override fun onDispose() {
         super.onDispose()
         Timber.e("!!! ScreenX_VideoPlayerFullScreenSM onDispose")
     }
 
+    var once by  mutableStateOf(false)
+
     var playerE by mutableStateOf<Player?>(null)
 
     var passedString: String = ""
 
     val a: MutableState<HTML5PlayerConfig?> = mutableStateOf(HTML5PlayerConfig())
+
+    var positionForFullscreen by mutableLongStateOf(position)
 
     init {
         runBlocking {
@@ -108,7 +114,7 @@ class ScreenX_VideoPlayerFullScreenSM @AssistedInject constructor(
 
     val listFormat = mutableStateListOf<FORMAT>()
 
-    var quality by mutableIntStateOf(0)
+    var quality by mutableIntStateOf(8)
 
     /**
      * Скорость воспроизведения

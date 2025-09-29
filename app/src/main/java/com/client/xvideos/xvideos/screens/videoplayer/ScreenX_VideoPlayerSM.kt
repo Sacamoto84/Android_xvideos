@@ -214,7 +214,7 @@ class ScreenX_VideoPlayerSM @AssistedInject constructor(
     fun openFullScreen(navigator: Navigator) {
         //if (playerE == null) return
         navigator.push(
-            ScreenX_VideoPlayerFullScreen(url)
+            ScreenX_VideoPlayerFullScreen(url, playerE?.currentPosition ?: -1L)
         )
     }
 
