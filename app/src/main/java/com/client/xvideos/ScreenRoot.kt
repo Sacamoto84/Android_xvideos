@@ -178,25 +178,30 @@ object ScreenRoot : Screen {
                 snackbarHost = {
                     Box(modifier = Modifier.zIndex(Float.MAX_VALUE)) {
                         SnackbarHost(snackBarHostState) { data ->
+
                             val uiMsg = (data.visuals as? UiSnackbarVisuals)?.ui ?: UiMessage.Info( data.visuals.message )
+
                             val (bg, fg, icon) = when (uiMsg) {
                                 is UiMessage.Success -> Triple(Color(0xFF0F9960), Color.White, Icons.Default.Check)
                                 is UiMessage.Error -> Triple(Color(0xFFD13913), Color.White, Icons.Default.ErrorOutline)
                                 is UiMessage.Info -> Triple(Color(0xFF137CBD), Color.White, Icons.Default.Info)
+                                is UiMessage.Warning -> Triple(Color(0xFFFF8E0C), Color.White, Icons.Default.Info)
                             }
                             LaunchedEffect(data) {
                                 when (uiMsg) {
                                     is UiMessage.Success -> { delay(2000); data.dismiss() }
                                     is UiMessage.Error   -> { delay(5000); data.dismiss() }
                                     is UiMessage.Info    -> { delay(2000); data.dismiss() }
+                                    is UiMessage.Warning -> { delay(2000); data.dismiss() }
                                 }
                             }
+
+
                             Surface(
                                 modifier = Modifier
                                     .zIndex(Float.MAX_VALUE)
                                     .wrapContentWidth()
-                                    .padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
-                                    .zIndex(Float.MAX_VALUE),
+                                    .padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
                                 color = bg,
                                 contentColor = fg,
                                 shape = RoundedCornerShape(12.dp),
@@ -219,6 +224,8 @@ object ScreenRoot : Screen {
                                     }
                                 }
                             }
+
+
                         }
                     }
                 }
