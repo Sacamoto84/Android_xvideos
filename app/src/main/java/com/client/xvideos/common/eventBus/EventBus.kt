@@ -14,14 +14,12 @@ sealed class Event {
     object ArchiveCountIncrement : Event()
 
 
-
-    //Показ снекбара с текстом из UiMessage
+    /**
+     * Показ снекбара с текстом из UiMessage
+     */
     data class SnackBarRaw(val message: UiMessage) : Event()
 
-
-
     data class X_FullScreenExitPosition(val position: Long) : Event()
-
 
 }
 

@@ -12,6 +12,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.contextmenu.builder.item
+import androidx.compose.foundation.text.contextmenu.modifier.appendTextContextMenuComponents
+import androidx.compose.foundation.text.input.clearText
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.material3.HorizontalDivider
@@ -59,6 +64,12 @@ import dagger.multibindings.IntoMap
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.contextmenu.builder.item
+import androidx.compose.foundation.text.contextmenu.modifier.appendTextContextMenuComponents
+import androidx.compose.foundation.text.input.clearText
+import androidx.compose.foundation.text.input.rememberTextFieldState
+
 
 class ScreenLConfigTab : Screen {
 
@@ -152,7 +163,7 @@ class ScreenLConfigTab : Screen {
                     style = ThemeL.styleTextConfigL.copy(fontSize = 14.sp, color = ThemeL.grey2)
                 )
             }
-
+            
         }
 
 

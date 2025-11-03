@@ -42,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.layout.onFirstVisible
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -242,7 +243,8 @@ object ScreenRoot : Screen {
                 // Оверлей рисуется поверх Scaffold
                 vm.overlayContent.value?.let { content ->
                     Box(
-                        modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.95f))
+                        modifier = Modifier
+                            .fillMaxSize().background(Color.Black.copy(alpha = 0.95f))
                     ) { content() }
                 }
 

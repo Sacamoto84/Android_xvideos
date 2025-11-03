@@ -63,17 +63,13 @@ class MainActivity : ComponentActivity()//, ImageLoaderFactory
 
         val window = this.window
 
-        val windowInsetsController =
-            window?.let { WindowCompat.getInsetsController(it, it.decorView) }
-//
-        windowInsetsController?.systemBarsBehavior =
-            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-//
+        val windowInsetsController = window?.let { WindowCompat.getInsetsController(it, it.decorView) }
+        windowInsetsController?.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+
         window?.let { WindowCompat.setDecorFitsSystemWindows(window, false) }
         window?.attributes = window.attributes?.apply {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                layoutInDisplayCutoutMode =
-                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+                layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
             }
         }
         windowInsetsController?.hide(WindowInsetsCompat.Type.systemBars())
@@ -94,9 +90,7 @@ class MainActivity : ComponentActivity()//, ImageLoaderFactory
                 //EdgeToEdgeFix()
 
                 Surface(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.Black)
+                    modifier = Modifier.fillMaxSize().background(Color.Black)
                     //.windowInsetsPadding(WindowInsets.ime)
                     //.consumeWindowInsets(WindowInsets.ime)
                     //.displayCutoutPadding()
