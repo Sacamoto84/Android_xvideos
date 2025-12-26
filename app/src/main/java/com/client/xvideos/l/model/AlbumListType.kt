@@ -88,8 +88,8 @@ data class Album(
     @SerializedName("id")                  val id: String,                 // "551361"
     @SerializedName("title")               val title: String,              // "Nimbletail art -- Comic strips"
     @SerializedName("description")         val description: String,        // "An album of Nimbletail's short comic strips.\n\nCheck out this album for hentai images https://members.luscious.net/albums/nimble-tail-art-images_512240/\n\nPS: This is not all that the artist has to offer, but a selection of what I like."
-    @SerializedName("created")             val created: Long,              // 1730508154
-    @SerializedName("modified")            val modified: Long,             // 1756516075
+    //@SerializedName("created")             val created: Double,              // 1730508154
+    //@SerializedName("modified")            val modified: Long,             // 1756516075
     @SerializedName("like_status")         val likeStatus: String,         // "none"
     @SerializedName("moderation_status")   val moderationStatus: String,   // "NOT_MODERATED"
     @SerializedName("number_of_favorites") val numberOfFavorites: Int,     // 290

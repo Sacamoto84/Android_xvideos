@@ -9,7 +9,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import cafe.adriel.voyager.core.screen.Screen
 
 data class WebScreen(val url: String) : Screen {
-
     @Composable
     override fun Content() {
         WebViewPage(url)

@@ -1,9 +1,5 @@
 package com.client.xvideos.l.net
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import com.client.xvideos.l.model.Album
 import com.client.xvideos.l.model.AlbumListFilter
 import com.client.xvideos.l.model.AlbumResponse
@@ -15,7 +11,6 @@ import com.client.xvideos.l.repository.RepositoryUriConfig
 import com.google.gson.Gson
 import com.google.gson.JsonParser
 import com.google.gson.annotations.SerializedName
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber

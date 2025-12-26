@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -28,12 +29,22 @@ fun AppNetworkSpeedMonitorLite() {
     val application = context.applicationContext as App
     val trafficData by application.networkTrafficMonitor.trafficFlow.collectAsStateWithLifecycle()
 
+    val formattedSpeed = remember (trafficData.downloadSpeed) {
+        formatSpeed(trafficData.downloadSpeed)
+    }
+
+    val formattedBytes = remember(trafficData.sessionDownloaded) {
+        formatBytes(trafficData.sessionDownloaded)
+    }
+
+
+
     Row(
         modifier = Modifier.padding(end = 16.dp).fillMaxWidth(), horizontalArrangement = Arrangement.End
     ) {
         Box {
             Text(
-                formatSpeed(trafficData.downloadSpeed),
+                formattedSpeed,
                 color = Color.Black,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Medium,
@@ -42,7 +53,7 @@ fun AppNetworkSpeedMonitorLite() {
             )
 
             Text(
-                formatSpeed(trafficData.downloadSpeed),
+                formattedSpeed,
                 color = ThemeL.textColor,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Medium,
@@ -53,7 +64,7 @@ fun AppNetworkSpeedMonitorLite() {
         Box {
 
             Text(
-                " / ${formatBytes(trafficData.sessionDownloaded)}",
+                " / $formattedBytes",
                 color = Color.Black,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Medium,
@@ -62,7 +73,7 @@ fun AppNetworkSpeedMonitorLite() {
             )
 
             Text(
-                " / ${formatBytes(trafficData.sessionDownloaded)}",
+                " / $formattedBytes",
                 color = ThemeL.textColor,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Medium,
