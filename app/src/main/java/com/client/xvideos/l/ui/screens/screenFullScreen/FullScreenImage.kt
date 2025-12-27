@@ -51,6 +51,7 @@ import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.client.xvideos.common.coil.UrlImageGifsCoil
 import com.client.xvideos.common.fresco.UrlImageGifsFresco
 import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.theme.ThemeL
@@ -214,7 +215,39 @@ class FullScreenImage(
                 )
                 {
 
-                    UrlImageGifsFresco(
+
+//                    UrlImageGifsFresco(
+//                        rotate = rotate,
+//                        contentScale = ContentScale.Fit,
+//                        url = pageItem.url_to_original!!,
+//                        modifier = Modifier
+//                            .fillMaxSize()
+//                            .zoomable(
+//                                zoomState = zoomState,
+//                                enableOneFingerZoom = false,
+//                                onDoubleTap = { position ->
+//                                    // Двойной тап для зума/раззума
+//                                    coroutineScope.launch {
+//                                        if (zoomState.scale > 1.0f) {
+//                                            // Если уже увеличено - сбрасываем
+//                                            //zoomState.reset()
+//                                            zoomState.changeScale(1.0f, Offset.Zero)
+//                                        } else {
+//                                            // Увеличиваем в 2-3 раза по центру тапа
+//                                            zoomState.changeScale(2.5f, position)
+//                                        }
+//                                    }
+//                                }
+//                            ),
+//                        onSuccess = { },
+//                        albumName = albumName,
+//                        autoPlay = autoPlay,
+//                        isAnimated = pageItem.is_animated,
+//                        isVisible = currentIndex == page
+//                    )
+
+
+                    UrlImageGifsCoil(
                         rotate = rotate,
                         contentScale = ContentScale.Fit,
                         url = pageItem.url_to_original!!,
@@ -244,6 +277,7 @@ class FullScreenImage(
                         isVisible = currentIndex == page
                     )
 
+
                 }
             }
 
@@ -257,9 +291,11 @@ class FullScreenImage(
                 )
             }
 
-            Box(modifier = Modifier
-                .align(Alignment.TopStart)
-                .offset(y = 8.dp)) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .offset(y = 8.dp)
+            ) {
                 IconButton(onClick = { rotate = rotate.not() }) {
                     Icon(
                         Icons.Default.ScreenRotation,
@@ -270,7 +306,9 @@ class FullScreenImage(
             }
 
             Box(
-                modifier = Modifier.align(Alignment.TopEnd).offset(y = 8.dp)
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .offset(y = 8.dp)
             ) {
                 expandMenuViewModel.ExpandMenu(
                     expandMenu,
@@ -326,7 +364,7 @@ class FullScreenImage(
                                     )
                                     .padding(2.dp)
                             ) {
-                                UrlImageGifsFresco(
+                                UrlImageGifsCoil(
                                     url = it1.url_to_original!!,
                                     modifier = Modifier
                                         .clip(RoundedCornerShape(4.dp))

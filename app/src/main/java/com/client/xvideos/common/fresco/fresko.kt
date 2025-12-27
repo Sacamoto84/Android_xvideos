@@ -86,15 +86,11 @@ fun UrlImageGifsFresco(
         Timber.i("!!! UrlImageLusciousGifsGlide url:{$url}")
     }
 
-
-
     var isPlaying by remember { mutableStateOf(autoPlay) }
     var isLoading by remember { mutableStateOf(true) }
     var isFailure by remember { mutableStateOf(false) }
 
     var wasVisible by remember { mutableStateOf(false) }
-
-
 
     val stableOnSuccess = rememberUpdatedState(onSuccess)
     val stableOnFailure = rememberUpdatedState(onFailure)

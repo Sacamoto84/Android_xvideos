@@ -2,8 +2,12 @@ package com.client.xvideos
 
 import android.annotation.SuppressLint
 import android.app.Application
+import android.content.Context
 import android.preference.PreferenceManager
 import androidx.compose.runtime.ExperimentalComposeRuntimeApi
+import coil3.ImageLoader
+import coil3.SingletonImageLoader
+import coil3.request.crossfade
 import com.client.xvideos.common.eventBus.Event
 import com.client.xvideos.common.eventBus.EventBus
 import com.client.xvideos.common.fresco.FrescoInit
@@ -58,9 +62,14 @@ fun allowAllSSL() {
 }
 
 @HiltAndroidApp
-class App : Application() {
+class App : Application(), SingletonImageLoader.Factory {
 
 
+    override fun newImageLoader(context: Context): ImageLoader {
+        return ImageLoader.Builder(context)
+            .crossfade(true)
+            .build()
+    }
 
     // Сохраняем оригинальный обработчик
     private var originalHandler: Thread.UncaughtExceptionHandler? = null

@@ -30,6 +30,7 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.LocalRootScreenModel
+import com.client.xvideos.common.coil.UrlImageGifsCoil
 import com.client.xvideos.common.fresco.DownloadQueueManager
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.ui.screens.screenFullScreen.FullScreenImage
@@ -90,7 +91,7 @@ fun LazyRowPictureDetails(
                                 ?: item.url_to_original
                         } //"small" large_thumbnail
 
-                        UrlImageGifsFresco(
+                        UrlImageGifsCoil(
                             url,
                             modifier = Modifier
                                 .padding(2.dp).aspectRatio(aspect).clipToBounds().border(0.5.dp, Color.Gray)
