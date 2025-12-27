@@ -8,6 +8,7 @@ import androidx.compose.runtime.ExperimentalComposeRuntimeApi
 import coil3.ImageLoader
 import coil3.SingletonImageLoader
 import coil3.request.crossfade
+import com.client.xvideos.common.coil.CoilImageLoaderFactory
 import com.client.xvideos.common.eventBus.Event
 import com.client.xvideos.common.eventBus.EventBus
 import com.client.xvideos.common.fresco.FrescoInit
@@ -66,9 +67,7 @@ class App : Application(), SingletonImageLoader.Factory {
 
 
     override fun newImageLoader(context: Context): ImageLoader {
-        return ImageLoader.Builder(context)
-            .crossfade(true)
-            .build()
+        return CoilImageLoaderFactory.getImageLoader(this)
     }
 
     // Сохраняем оригинальный обработчик

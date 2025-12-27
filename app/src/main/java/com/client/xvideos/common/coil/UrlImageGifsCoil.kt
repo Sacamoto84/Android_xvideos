@@ -1,6 +1,7 @@
 package com.client.xvideos.common.coil
 
 import android.net.Uri
+import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,16 +20,13 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -44,23 +42,82 @@ import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import coil3.ImageLoader
 import coil3.compose.AsyncImage
-import coil3.compose.SubcomposeAsyncImage
-import coil3.compose.SubcomposeAsyncImageContent
 import coil3.gif.AnimatedImageDecoder
 import coil3.gif.GifDecoder
+import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import coil3.size.Scale
 import com.client.xvideos.common.AppPath
-import com.client.xvideos.common.fresco.DownloadQueueManager
 import com.client.xvideos.l.theme.ThemeL
 import com.skydoves.landscapist.InternalLandscapistApi
 import io.ktor.utils.io.InternalAPI
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
+import okhttp3.Interceptor
+import okhttp3.OkHttpClient
+import okhttp3.Response
+import okhttp3.ResponseBody
+import okio.Buffer
+import okio.BufferedSource
+import okio.ForwardingSource
+import okio.Source
+import okio.buffer
 import timber.log.Timber
 import java.io.File
 import kotlin.math.roundToInt
+
+// Класс для отслеживания прогресса загрузки
+class ProgressResponseBody(
+    private val responseBody: ResponseBody,
+    private val progressListener: (bytesRead: Long, contentLength: Long, done: Boolean) -> Unit
+) : ResponseBody() {
+
+    private val bufferedSource: BufferedSource by lazy {
+        source(responseBody.source()).buffer()
+    }
+
+    override fun contentType() = responseBody.contentType()
+
+    override fun contentLength() = responseBody.contentLength()
+
+    override fun source(): BufferedSource = bufferedSource
+
+    private fun source(source: Source): Source {
+        return object : ForwardingSource(source) {
+            var totalBytesRead = 0L
+
+            override fun read(sink: Buffer, byteCount: Long): Long {
+                val bytesRead = super.read(sink, byteCount)
+                totalBytesRead += if (bytesRead != -1L) bytesRead else 0L
+                progressListener(
+                    totalBytesRead,
+                    responseBody.contentLength(),
+                    bytesRead == -1L
+                )
+                return bytesRead
+            }
+        }
+    }
+}
+
+// Interceptor для отслеживания прогресса
+class ProgressInterceptor(
+    private val progressListener: (url: String, bytesRead: Long, contentLength: Long, done: Boolean) -> Unit
+) : Interceptor {
+    override fun intercept(chain: Interceptor.Chain): Response {
+        val originalResponse = chain.proceed(chain.request())
+        val url = chain.request().url.toString()
+
+        return originalResponse.newBuilder()
+            .body(
+                ProgressResponseBody(originalResponse.body) { bytesRead, contentLength, done ->
+                    progressListener(url, bytesRead, contentLength, done)
+                } as ResponseBody
+            )
+            .build()
+    }
+}
 
 @OptIn(InternalLandscapistApi::class, InternalAPI::class, FlowPreview::class)
 @Composable
@@ -94,11 +151,12 @@ fun UrlImageGifsCoil(
     val stableOnSuccess = rememberUpdatedState(onSuccess)
     val stableOnFailure = rememberUpdatedState(onFailure)
 
-    var progress by rememberSaveable { mutableFloatStateOf(0f) }
+    var bytesRead by remember { mutableLongStateOf(0L) }
+    var contentLength by remember { mutableLongStateOf(0L) }
     var displayProgress by remember { mutableLongStateOf(0L) }
 
     LaunchedEffect(Unit) {
-        snapshotFlow { progress.toLong() }
+        snapshotFlow { bytesRead }
             .debounce(100)
             .collect { newValue ->
                 displayProgress = newValue
@@ -118,7 +176,25 @@ fun UrlImageGifsCoil(
         }
     }
 
-    val imageLoader = remember {
+    val imageLoader = remember(url) {
+        val okHttpClient = OkHttpClient.Builder()
+            .addNetworkInterceptor(
+                ProgressInterceptor { requestUrl, bytes, total, done ->
+                    if (requestUrl.contains(url)) {
+                        bytesRead = bytes
+                        contentLength = total
+                    }
+                }
+            )
+            .cache(
+                okhttp3.Cache(
+                    directory = File(context.cacheDir, "http_cache"),
+                    maxSize = 50L * 1024L * 1024L
+                )
+            )
+            .build()
+
+        // Клонируем глобальные настройки, но добавляем свой OkHttp
         ImageLoader.Builder(context)
             .components {
                 if (SDK_INT >= 28) {
@@ -126,7 +202,11 @@ fun UrlImageGifsCoil(
                 } else {
                     add(GifDecoder.Factory())
                 }
+                add(OkHttpNetworkFetcherFactory(callFactory = { okHttpClient }))
             }
+            // Используем те же настройки кеша из глобального
+            .diskCache(CoilImageLoaderFactory.getImageLoader(context).diskCache)
+            .memoryCache(CoilImageLoaderFactory.getImageLoader(context).memoryCache)
             .build()
     }
 
@@ -139,6 +219,8 @@ fun UrlImageGifsCoil(
                 onStart = {
                     isLoading = true
                     isFailure = false
+                    bytesRead = 0L
+                    contentLength = 0L
                 },
                 onSuccess = { _, result ->
                     isLoading = false
@@ -166,7 +248,9 @@ fun UrlImageGifsCoil(
     }
 
     BoxWithConstraints(
-        modifier = Modifier.fillMaxSize().then(modifier),
+        modifier = Modifier
+            .fillMaxSize()
+            .then(modifier),
         contentAlignment = Alignment.Center
     ) {
         val w = maxWidth
@@ -201,14 +285,22 @@ fun UrlImageGifsCoil(
                 .fillMaxSize()
         )
 
-
         // Индикаторы загрузки и ошибки
         if (isLoading && loadIndicator) {
             Box(
                 modifier = Modifier.matchParentSize(),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(modifier = Modifier.size(32.dp))
+                // Показываем прогресс в процентах если известен общий размер
+                if (contentLength > 0 && bytesRead > 0) {
+                    val progress = (bytesRead.toFloat() / contentLength.toFloat())
+                    CircularProgressIndicator(
+                        progress = { progress },
+                        modifier = Modifier.size(32.dp)
+                    )
+                } else {
+                    CircularProgressIndicator(modifier = Modifier.size(32.dp), color = Color.Gray)
+                }
             }
         }
 
@@ -258,25 +350,30 @@ fun UrlImageGifsCoil(
         // Прогресс загрузки
         Box(modifier = Modifier.align(Alignment.BottomEnd)) {
             if (displayProgress > 1000) {
-                ProgressText(progress = displayProgress)
+                ProgressText(
+                    bytesRead = displayProgress,
+                    totalBytes = contentLength
+                )
             }
         }
     }
-
-
-
-//    DisposableEffect(Unit) {
-//        onDispose {
-//            DownloadQueueManager.cancelDownload(url)
-//        }
-//    }
 }
 
 @Composable
-private fun ProgressText(progress: Long) {
-    if (progress > 1000) {
+private fun ProgressText(
+    bytesRead: Long,
+    totalBytes: Long,
+    visibleByte : Boolean = true
+) {
+    if (bytesRead > 1000) {
+        val text = if (totalBytes > 0) {
+            if (visibleByte) "${formatBytes1(bytesRead)} / ${formatBytes1(totalBytes)}" else formatBytes1(totalBytes)
+        } else {
+            formatBytes1(bytesRead)
+        }
+
         Text(
-            formatBytes1(progress),
+            text,
             color = Color.White,
             modifier = Modifier.offset((-1).dp, 7.dp),
             fontFamily = ThemeL.fontFamilyKarla,
@@ -294,48 +391,3 @@ fun formatBytes1(bytes: Long): String {
         else -> "${(bytes / (1024.0 * 1024.0 * 1024.0) * 100).roundToInt() / 100.0} G"
     }
 }
-
-
-
-
-
-
-//@OptIn(InternalLandscapistApi::class, InternalAPI::class, FlowPreview::class)
-//@Composable
-//fun UrlImageGifsCoil(
-//    url: String,
-//    modifier: Modifier = Modifier,
-//    contentScale: ContentScale = ContentScale.Crop,
-//    loadIndicator: Boolean = true,
-//    albumName: String,
-//    isAnimated: Boolean = false,
-//    onSuccess: () -> Unit = {},
-//    onFailure: () -> Unit = {},
-//    autoPlay: Boolean = false,
-//    sizeButton: Dp = 40.dp,
-//    sizeButtonIcon: Dp = 24.dp,
-//    rotate: Boolean = false,
-//    isVisible: Boolean = true  // новый параметр
-//) {
-//
-//    val context = LocalContext.current
-//
-//    val imageLoader = ImageLoader.Builder(context)
-//        .components {
-//            if (SDK_INT >= 28) {
-//                add(AnimatedImageDecoder.Factory())
-//            } else {
-//                add(GifDecoder.Factory())
-//            }
-//        }
-//        .build()
-//
-//    AsyncImage(
-//        model = url,
-//        contentDescription = null,
-//        imageLoader = imageLoader,
-//        modifier = modifier.fillMaxSize(),
-//        contentScale = ContentScale.Fit
-//    )
-//
-//}
