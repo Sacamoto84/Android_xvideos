@@ -1,5 +1,7 @@
 package com.client.xvideos.common.coil
 
+import android.graphics.Bitmap
+import android.graphics.Matrix
 import android.net.Uri
 import android.os.Build
 import android.os.Build.VERSION.SDK_INT
@@ -47,7 +49,9 @@ import coil3.gif.GifDecoder
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import coil3.request.transformations
 import coil3.size.Scale
+import coil3.transform.Transformation
 import com.client.xvideos.common.AppPath
 import com.client.xvideos.l.theme.ThemeL
 import com.skydoves.landscapist.InternalLandscapistApi
@@ -189,7 +193,7 @@ fun UrlImageGifsCoil(
             .cache(
                 okhttp3.Cache(
                     directory = File(context.cacheDir, "http_cache"),
-                    maxSize = 50L * 1024L * 1024L
+                    maxSize = 500L * 1024L * 1024L
                 )
             )
             .build()
@@ -265,23 +269,20 @@ fun UrlImageGifsCoil(
             contentScale = contentScale,
             modifier = Modifier
                 .background(ThemeL.grey5)
-                .then(
-                    if (isAnimated) {
-                        Modifier.graphicsLayer(
-                            rotationZ = if (rotate) 90f else 0f,
-                            scaleX = if (rotate) {
-                                if (h > w) h / w else w / h
-                            } else {
-                                1f
-                            },
-                            scaleY = if (rotate) {
-                                if (h > w) h / w else w / h
-                            } else {
-                                1f
-                            },
-                        )
-                    } else Modifier
+                .graphicsLayer(
+                    rotationZ = if (rotate) 90f else 0f,
+                    scaleX = if (rotate) {
+                        if (h > w) h / w else w / h
+                    } else {
+                        1f
+                    },
+                    scaleY = if (rotate) {
+                        if (h > w) h / w else w / h
+                    } else {
+                        1f
+                    },
                 )
+
                 .fillMaxSize()
         )
 
@@ -363,11 +364,13 @@ fun UrlImageGifsCoil(
 private fun ProgressText(
     bytesRead: Long,
     totalBytes: Long,
-    visibleByte : Boolean = true
+    visibleByte: Boolean = true
 ) {
     if (bytesRead > 1000) {
         val text = if (totalBytes > 0) {
-            if (visibleByte) "${formatBytes1(bytesRead)} / ${formatBytes1(totalBytes)}" else formatBytes1(totalBytes)
+            if (visibleByte) "${formatBytes1(bytesRead)} / ${formatBytes1(totalBytes)}" else formatBytes1(
+                totalBytes
+            )
         } else {
             formatBytes1(bytesRead)
         }
