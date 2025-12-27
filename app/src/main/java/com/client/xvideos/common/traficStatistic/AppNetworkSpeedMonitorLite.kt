@@ -25,6 +25,8 @@ import com.client.xvideos.l.theme.ThemeL
 @Composable
 fun AppNetworkSpeedMonitorLite() {
 
+    return
+
     val context = LocalContext.current
     val application = context.applicationContext as App
     val trafficData by application.networkTrafficMonitor.trafficFlow.collectAsStateWithLifecycle()

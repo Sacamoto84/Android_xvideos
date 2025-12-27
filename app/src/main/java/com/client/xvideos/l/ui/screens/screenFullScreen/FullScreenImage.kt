@@ -79,7 +79,11 @@ class FullScreenImage(
     @IgnoredOnParcel
     override val key: ScreenKey = uniqueScreenKey
 
-    @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class,  DelicateCoroutinesApi::class)
+    @OptIn(
+        ExperimentalFoundationApi::class,
+        ExperimentalMaterialApi::class,
+        DelicateCoroutinesApi::class
+    )
     @Composable
     override fun Content() {
 
@@ -111,7 +115,12 @@ class FullScreenImage(
         )
 
         // Состояние для LazyRow
-        val lazyRowState = rememberLazyListState(cacheWindow = LazyLayoutCacheWindow(ahead = 200.dp, behind = 200.dp))
+        val lazyRowState = rememberLazyListState(
+            cacheWindow = LazyLayoutCacheWindow(
+                ahead = 200.dp,
+                behind = 200.dp
+            )
+        )
 
         LaunchedEffect(isClosing) {
             if (isClosing) {
@@ -171,25 +180,22 @@ class FullScreenImage(
             }
         }
 
-        // Полупрозрачный фон
         Box(
             modifier = Modifier
                 .fillMaxSize()
+
+                //Шахматкая доска
                 .checkerboardBackground(
                     squareSize = 12.dp,
                     lightColor = Color(0xFF252525),
                     darkColor = Color(0xFF181818)
                 )
-        )
-
-        Box(
-            modifier = Modifier.fillMaxSize() //, contentAlignment = Alignment.TopStart
         ) {
 
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier.fillMaxSize(),
-                pageSpacing = 8.dp, beyondViewportPageCount = 2,
+                pageSpacing = 8.dp, beyondViewportPageCount = 1,
                 key = { page -> filteredPic[page].url_to_original!! }
             ) { page ->
 
@@ -210,7 +216,7 @@ class FullScreenImage(
 
                     UrlImageGifsFresco(
                         rotate = rotate,
-                        contentScale = ContentScale.Fit ,
+                        contentScale = ContentScale.Fit,
                         url = pageItem.url_to_original!!,
                         modifier = Modifier
                             .fillMaxSize()
@@ -230,12 +236,12 @@ class FullScreenImage(
                                         }
                                     }
                                 }
-                            )
-                                ,
+                            ),
                         onSuccess = { },
                         albumName = albumName,
                         autoPlay = autoPlay,
-                        isAnimated = pageItem.is_animated
+                        isAnimated = pageItem.is_animated,
+                        isVisible = currentIndex == page
                     )
 
                 }
@@ -243,18 +249,39 @@ class FullScreenImage(
 
 
             Box(modifier = Modifier.align(Alignment.TopStart)) {
-                Text( currentIndex.toString(), color = Color.Gray, modifier = Modifier.padding(start = 8.dp), fontFamily = ThemeL.fontFamilyKarla )
+                Text(
+                    currentIndex.toString(),
+                    color = Color.Gray,
+                    modifier = Modifier.padding(start = 8.dp),
+                    fontFamily = ThemeL.fontFamilyKarla
+                )
             }
 
-            Box(modifier = Modifier.align(Alignment.TopStart).offset(y = 8.dp)) {
-                IconButton(onClick = { rotate = rotate.not() }){ Icon(Icons.Default.ScreenRotation, contentDescription = null, tint = Color.White) }
+            Box(modifier = Modifier
+                .align(Alignment.TopStart)
+                .offset(y = 8.dp)) {
+                IconButton(onClick = { rotate = rotate.not() }) {
+                    Icon(
+                        Icons.Default.ScreenRotation,
+                        contentDescription = null,
+                        tint = Color.White
+                    )
+                }
             }
 
-            Box(modifier = Modifier.align(Alignment.TopEnd).offset(y = 8.dp)) { expandMenuViewModel.ExpandMenu(expandMenu, filteredPic[pagerState.currentPage], albumName) }
+            Box(
+                modifier = Modifier.align(Alignment.TopEnd).offset(y = 8.dp)
+            ) {
+                expandMenuViewModel.ExpandMenu(
+                    expandMenu,
+                    filteredPic[pagerState.currentPage],
+                    albumName
+                )
+            }
 
             val coroutineScope = rememberCoroutineScope()
 
-            SwipeableBottomPanel { swipeableState , hiddenOffset ->
+            SwipeableBottomPanel { swipeableState, hiddenOffset ->
 
                 Box(modifier = Modifier.align(Alignment.BottomCenter)) {
                     LazyRow(
@@ -269,7 +296,8 @@ class FullScreenImage(
                                         change.consume()
                                     },
                                     onDragEnd = {
-                                        val targetState = if (swipeableState.offset.value < hiddenOffset / 2) 0 else 1
+                                        val targetState =
+                                            if (swipeableState.offset.value < hiddenOffset / 2) 0 else 1
                                         coroutineScope.launch {
                                             swipeableState.animateTo(targetState)
                                         }

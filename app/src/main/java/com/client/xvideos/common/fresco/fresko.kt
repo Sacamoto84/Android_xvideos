@@ -78,16 +78,23 @@ fun UrlImageGifsFresco(
     autoPlay: Boolean = false,
     sizeButton: Dp = 40.dp,
     sizeButtonIcon: Dp = 24.dp,
-    rotate: Boolean = false
+    rotate: Boolean = false,
+    isVisible: Boolean = true  // новый параметр
 ) {
 
     SideEffect {
         Timber.i("!!! UrlImageLusciousGifsGlide url:{$url}")
     }
 
+
+
     var isPlaying by remember { mutableStateOf(autoPlay) }
     var isLoading by remember { mutableStateOf(true) }
     var isFailure by remember { mutableStateOf(false) }
+
+    var wasVisible by remember { mutableStateOf(false) }
+
+
 
     val stableOnSuccess = rememberUpdatedState(onSuccess)
     val stableOnFailure = rememberUpdatedState(onFailure)
@@ -99,7 +106,7 @@ fun UrlImageGifsFresco(
     LaunchedEffect(Unit) {
         snapshotFlow { progress.toLong() }
             //.distinctUntilChanged()       // обновляем только при изменении числа
-            .debounce(100)                // не чаще раза в 200мс
+            .debounce(100)                  // не чаще раза в 200мс
             .collect { newValue ->
                 displayProgress = newValue
             }
@@ -159,6 +166,7 @@ fun UrlImageGifsFresco(
     }
 
     var animation: Animatable? by remember { mutableStateOf(null) }
+
     LaunchedEffect(animation, isPlaying)
     {
         if (isPlaying) {
@@ -166,6 +174,18 @@ fun UrlImageGifsFresco(
         } else {
             animation?.stop()
         }
+    }
+
+    LaunchedEffect(isVisible) {
+        if (isVisible && !wasVisible && isAnimated) {
+            // Принудительно перезапустить анимацию
+            //restartAnimation()
+            animation?.start()
+        }else{
+            animation?.stop()
+        }
+
+        wasVisible = isVisible
     }
 
     val controllerListener = remember(url)
