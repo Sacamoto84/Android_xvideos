@@ -243,19 +243,19 @@ dependencies {
     implementation libs.kotlinx.serialization.json
 
     //implementation "com.github.skydoves:landscapist-glide:2.4.1"
-    implementation libs.landscapist.placeholder
-    implementation libs.landscapist.coil
-    implementation(libs.landscapist.fresco)
-    implementation(libs.landscapist.fresco.websupport)
+    //implementation libs.landscapist.placeholder
+    //implementation libs.landscapist.coil
+    //implementation(libs.landscapist.fresco)
+    //implementation(libs.landscapist.fresco.websupport)
     //implementation(libs.landscapist.glide)
 
     //implementation 'com.github.bumptech.glide:glide:5.0.4'
 
-    implementation libs.animated.base
-    implementation libs.fresco
-    implementation libs.animated.gif
-    implementation libs.animated.webp
-    implementation libs.webpsupport
+    //implementation libs.animated.base
+    //implementation libs.fresco
+    //implementation libs.animated.gif
+    //implementation libs.animated.webp
+    //implementation libs.webpsupport
 
     implementation("io.coil-kt.coil3:coil-compose:3.3.0")
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.3.0")

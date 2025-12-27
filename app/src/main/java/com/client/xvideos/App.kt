@@ -7,11 +7,9 @@ import android.preference.PreferenceManager
 import androidx.compose.runtime.ExperimentalComposeRuntimeApi
 import coil3.ImageLoader
 import coil3.SingletonImageLoader
-import coil3.request.crossfade
 import com.client.xvideos.common.coil.CoilImageLoaderFactory
 import com.client.xvideos.common.eventBus.Event
 import com.client.xvideos.common.eventBus.EventBus
-import com.client.xvideos.common.fresco.FrescoInit
 import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.common.traficStatistic.NetworkTrafficMonitor
 import dagger.hilt.android.HiltAndroidApp
@@ -28,7 +26,6 @@ import javax.net.ssl.HttpsURLConnection
 import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
-
 
 fun allowAllSSL() {
     try {
@@ -192,8 +189,6 @@ class App : Application(), SingletonImageLoader.Factory {
 //                throw e
 //            }
 //        }
-
-        FrescoInit(this)
 
         // Enable only for debug flavor to avoid perf regressions in release
         //Composer.setDiagnosticStackTraceEnabled(BuildConfig.DEBUG)

@@ -31,10 +31,8 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.LocalRootScreenModel
 import com.client.xvideos.common.coil.UrlImageGifsCoil
-import com.client.xvideos.common.fresco.DownloadQueueManager
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.ui.screens.screenFullScreen.FullScreenImage
-import com.client.xvideos.common.fresco.UrlImageGifsFresco
 import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.l.ui.element.expandMenu.ExpandMenuType
 import com.client.xvideos.l.ui.element.expandMenu.ExpandMenuViewModel
@@ -148,12 +146,6 @@ fun LazyRowPictureDetails(
                 .width(2.dp)
         ) {
             VerticalScrollbar(scrollPercent)
-        }
-    }
-
-    DisposableEffect(Unit) {
-        onDispose {
-            DownloadQueueManager.cancelAll()
         }
     }
 

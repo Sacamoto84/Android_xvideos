@@ -57,8 +57,6 @@ import cafe.adriel.voyager.navigator.Navigator
 import com.client.xvideos.common.eventBus.Event
 import com.client.xvideos.common.eventBus.EventBus
 import com.client.xvideos.common.eventBus.UiMessage
-import com.client.xvideos.common.fresco.DownloadQueueManager
-import com.client.xvideos.common.fresco.QueueStatisticsCardLite
 import com.client.xvideos.common.traficStatistic.AppNetworkSpeedMonitorLite
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.ui.screens.explorer.ScreenLExplorer
@@ -109,8 +107,6 @@ object ScreenRoot : Screen {
                     snackBarHostState.show(event.message)
                 }
         }
-
-        val queueState by DownloadQueueManager.queueState.collectAsState()
 
         CompositionLocalProvider(
             LocalRootScreenModel provides vm,
@@ -238,8 +234,6 @@ object ScreenRoot : Screen {
                     nav.lastItem.Content()
                 }
 
-                QueueStatisticsCardLite(queueState = queueState)
-
                 // Оверлей рисуется поверх Scaffold
                 vm.overlayContent.value?.let { content ->
                     Box(
@@ -247,7 +241,6 @@ object ScreenRoot : Screen {
                             .fillMaxSize().background(Color.Black.copy(alpha = 0.95f))
                     ) { content() }
                 }
-
 
             }
 

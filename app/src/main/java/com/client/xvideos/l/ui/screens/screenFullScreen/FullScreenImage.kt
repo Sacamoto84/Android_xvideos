@@ -52,7 +52,6 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.common.coil.UrlImageGifsCoil
-import com.client.xvideos.common.fresco.UrlImageGifsFresco
 import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.ui.element.expandMenu.ExpandMenuType

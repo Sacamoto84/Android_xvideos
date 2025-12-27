@@ -49,12 +49,9 @@ import coil3.gif.GifDecoder
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import coil3.request.transformations
 import coil3.size.Scale
-import coil3.transform.Transformation
 import com.client.xvideos.common.AppPath
 import com.client.xvideos.l.theme.ThemeL
-import com.skydoves.landscapist.InternalLandscapistApi
 import io.ktor.utils.io.InternalAPI
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
@@ -123,7 +120,7 @@ class ProgressInterceptor(
     }
 }
 
-@OptIn(InternalLandscapistApi::class, InternalAPI::class, FlowPreview::class)
+@OptIn(InternalAPI::class, FlowPreview::class)
 @Composable
 fun UrlImageGifsCoil(
     url: String,

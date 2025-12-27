@@ -42,7 +42,6 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import com.client.xvideos.common.eventBus.snackBarSuccess
-import com.client.xvideos.common.fresco.FrescoUtils
 import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.common.traficStatistic.AppNetworkSpeedMonitor
 import com.client.xvideos.common.util.formatBytes
@@ -55,7 +54,6 @@ import com.client.xvideos.l.ui.screens.explorer.tab.config.atom.ConfigTextAndChe
 import com.client.xvideos.l.ui.screens.explorer.tab.config.atom.ConfigTextAndMenuL
 import com.client.xvideos.l.ui.screens.explorer.tab.config.atom.ConfigTextL
 import com.client.xvideos.l.ui.screens.explorer.tab.config.atom.ScreenLConfig_Encrypt
-import com.facebook.drawee.backends.pipeline.Fresco
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -86,8 +84,6 @@ class ScreenLConfigTab : Screen {
         val vm: ScreenLExplorerSettingSM = getScreenModel()
 
         val context = LocalContext.current
-
-        val bitmapCache = Fresco.getImagePipeline().bitmapMemoryCache.sizeInBytes
 
         val versionText = try {
             val pInfo = context.packageManager.getPackageInfo(context.packageName, 0)
@@ -129,12 +125,12 @@ class ScreenLConfigTab : Screen {
             AppNetworkSpeedMonitor()
             HorizontalDivider(color = Color.DarkGray)
             Spacer(Modifier.height(4.dp))
-            ConfigTextL("BitmapCache: ${formatBytes(bitmapCache.toLong())}")
+            //ConfigTextL("BitmapCache: ${formatBytes(bitmapCache.toLong())}")
 
             val size = getFolderSize(File(context.cacheDir, "fresco_main_cache").absoluteFile)
             ConfigTextAndButtonL("Дисковый кеш: " + formatBytes(size), "Задать", {}, { })
 
-            ConfigTextAndButtonL( "Очистить кеш картинок", "Очистить", {}, { FrescoUtils.clearCache() })
+            //ConfigTextAndButtonL( "Очистить кеш картинок", "Очистить", {}, { FrescoUtils.clearCache() })
 
             // --- Миниатюра ---
             val thumbnailSize = Settings.thumbalistSize.field.collectAsStateWithLifecycle().value
