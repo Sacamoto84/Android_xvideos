@@ -132,7 +132,7 @@ fun UrlImageGifsCoil(
     onSuccess: () -> Unit = {},
     onFailure: () -> Unit = {},
     autoPlay: Boolean = false,
-    sizeButton: Dp = 40.dp,
+    sizeButton: Dp = 32.dp,
     sizeButtonIcon: Dp = 20.dp,
     rotate: Boolean = false,
     isVisible: Boolean = true

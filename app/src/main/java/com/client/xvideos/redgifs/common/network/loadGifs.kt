@@ -9,7 +9,7 @@ suspend fun loadGifs(
     userName: String = "lilijunex",
     items: Int = 100,
     page: Int = 1,
-    ord: Order = Order.NEW,
+    ord: Order = Order.LATEST,
     type: MediaType = MediaType.GIF,
     redApi: RedApi
 ): Result<CreatorResponse> {

@@ -8,7 +8,8 @@ enum class Order(val value: String) {
     RECENT("recent"),
     BEST("best"),
     TOP28("top28"),
-    NEW("new"),
+    
+    //NEW("new"),
 
     FORCE_TEMP(""),
 

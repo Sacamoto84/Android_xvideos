@@ -91,7 +91,7 @@ class ScreenRedProfileSM @AssistedInject constructor(
     //═════════════════════════════════════════════════════════════════════════════════════════════════════╣
     val orderList =
         listOf(Order.TOP, Order.LATEST, Order.OLDEST, Order.TOP28, Order.TRENDING)           //║
-    var order by mutableStateOf(Order.NEW)                         //║ Текущий вид сортировки              ║
+    var order by mutableStateOf(Order.LATEST)                         //║ Текущий вид сортировки              ║
     //═══════════════════════════════════════════════════════════════╩═════════════════════════════════════╝
 
     val typeGifsList = listOf(TypeGifs.GIFS, TypeGifs.IMAGES)

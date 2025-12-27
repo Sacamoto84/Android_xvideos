@@ -103,7 +103,7 @@ class RedApi @Inject constructor(
     ): Result<MediaResponse> {
         val route = Route(
             method = "GET",
-            path = "/v2/gifs/search?order=new&count={count}&page={page}&type={type}",
+            path = "/v2/gifs/search?order=latest&count={count}&page={page}&type={type}",
             "count" to count,
             "page" to page,
             "type" to type.value
@@ -151,7 +151,7 @@ class RedApi @Inject constructor(
         userName: String = "lilijunex",
         page: Int = 1,
         count: Int = 100,
-        order: Order = Order.NEW,
+        order: Order = Order.LATEST,
         type: MediaType = MediaType.GIF,
     ): Result<CreatorResponse> {
         val route = Route(
@@ -173,7 +173,7 @@ class RedApi @Inject constructor(
         userName: String = "lilijunex",
         page: Int = 1,
         count: Int = 100,
-        order: Order = Order.NEW,
+        order: Order = Order.LATEST,
         type: MediaType = MediaType.GIF,
         tags: List<String>
     ): Result <CreatorResponse> {
@@ -208,7 +208,7 @@ class RedApi @Inject constructor(
 
     suspend fun searchImage(
         searchText: String,
-        order: Order = Order.NEW,
+        order: Order = Order.LATEST,
         count: Int = 100,
         page: Int = 1
     ): MediaResponse {
@@ -250,7 +250,7 @@ class RedApi @Inject constructor(
         niches: String = "pumped-pussy",
         page: Int = 1,
         count: Int = 100,
-        order: Order = Order.NEW
+        order: Order = Order.LATEST
     ): MediaResponse {
         val route = Route(
             method = "GET",
