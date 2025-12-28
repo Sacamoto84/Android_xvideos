@@ -75,7 +75,7 @@ import java.io.File
 import kotlin.math.roundToInt
 
 
-@OptIn(InternalAPI::class, FlowPreview::class)
+
 @Composable
 fun UrlImageGifsCoil(
     url: String,
@@ -92,10 +92,8 @@ fun UrlImageGifsCoil(
     rotate: Boolean = false,                 //Поворот изображения
     isVisible: Boolean = true,
 
-
     //new
     isVisibleProgressIndictor: Boolean = true //Показ индикатора прогресса после индикатора загрузки
-
 
 ) {
 
@@ -106,12 +104,6 @@ fun UrlImageGifsCoil(
     val context = LocalContext.current
 
     var isPlaying by remember { mutableStateOf(autoPlay) }
-    var isLoading by remember { mutableStateOf(true) }
-    var isFailure by remember { mutableStateOf(false) }
-    var wasVisible by remember { mutableStateOf(false) }
-
-    val stableOnSuccess = rememberUpdatedState(onSuccess)
-    val stableOnFailure = rememberUpdatedState(onFailure)
 
     var bytesRead by remember { mutableLongStateOf(0L) }
     var contentLength by remember { mutableLongStateOf(0L) }
@@ -179,21 +171,13 @@ fun UrlImageGifsCoil(
             .scale(Scale.FILL)
             .listener(
                 onStart = {
-                    isLoading = true
-                    isFailure = false
                     bytesRead = 0L
                     contentLength = 0L
                 },
                 onSuccess = { _, result ->
-                    isLoading = false
-                    isFailure = false
-                    stableOnSuccess.value()
                 },
                 onError = { _, result ->
-                    isLoading = false
-                    isFailure = true
                     Timber.e("!!! eee UrlImageGifsCoil throwable:${result.throwable}")
-                    stableOnFailure.value()
                 }
             )
             .build()
@@ -207,29 +191,6 @@ fun UrlImageGifsCoil(
 
     val state = painter.state.collectAsState().value
 
-
-    when (state) {
-        is AsyncImagePainter.State.Empty, is AsyncImagePainter.State.Loading -> {
-            // CircularProgressIndicator()
-
-        }
-
-        is AsyncImagePainter.State.Success -> {
-//            Image(
-//                painter = painter,
-//                contentDescription = stringResource(R.string.description)
-//            )
-
-            val result = (painter.state as? AsyncImagePainter.State.Success)?.result
-            val drawable = result?.image?.asDrawable(context.resources)
-
-
-        }
-
-        is AsyncImagePainter.State.Error -> {
-            // Show some error UI.
-        }
-    }
 
 
 //// Управление воспроизведением анимации
@@ -264,12 +225,8 @@ fun UrlImageGifsCoil(
         }
     }
 
-    BoxWithConstraints(
-        modifier = Modifier
-            .fillMaxSize()
-            .then(modifier),
-        contentAlignment = Alignment.Center
-    ) {
+    BoxWithConstraints( modifier = Modifier.fillMaxSize().then(modifier), contentAlignment = Alignment.Center )
+    {
         val w = maxWidth
         val h = maxHeight
 
@@ -296,60 +253,12 @@ fun UrlImageGifsCoil(
                 )
 
                 .fillMaxSize()
+                .then(
+                    if (isAnimated) {
+                        Modifier.clickable { isPlaying = !isPlaying }
+                    } else Modifier
+                )
         )
-
-//        AsyncImage(
-//            model = imageRequest,
-//            contentDescription = null,
-//            imageLoader = imageLoader,
-//            contentScale = contentScale,
-//            modifier = Modifier
-//                .background(ThemeL.grey5)
-//                .graphicsLayer(
-//                    rotationZ = if (rotate) 90f else 0f,
-//                    scaleX = if (rotate) {
-//                        if (h > w) h / w else w / h
-//                    } else {
-//                        1f
-//                    },
-//                    scaleY = if (rotate) {
-//                        if (h > w) h / w else w / h
-//                    } else {
-//                        1f
-//                    },
-//                )
-//
-//                .fillMaxSize()
-//        )
-
-        // Индикаторы загрузки и ошибки
-        if (isLoading && loadIndicator) {
-            Box(
-                modifier = Modifier.matchParentSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                // Показываем прогресс в процентах если известен общий размер
-                if (contentLength > 0 && bytesRead > 0) {
-                    val progress = (bytesRead.toFloat() / contentLength.toFloat())
-                    CircularProgressIndicator(
-                        progress = { progress },
-                        modifier = Modifier.size(32.dp)
-                    )
-                } else {
-                    CircularProgressIndicator(modifier = Modifier.size(32.dp), color = Color.Gray)
-                }
-            }
-        }
-
-        if (isFailure) {
-            Box(
-                modifier = Modifier.matchParentSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("Ошибка загрузки", color = Color.Gray)
-            }
-        }
-
 
         // Кнопка управления анимацией
         if (isAnimated) {
@@ -359,7 +268,7 @@ fun UrlImageGifsCoil(
                     .align(Alignment.BottomStart)
                     .size(sizeButton)
                     .clip(CircleShape)
-                    .background(Color.Gray.copy(alpha = 0.5f), CircleShape)
+                    //.background(Color.Gray.copy(alpha = 0.5f), CircleShape)
                     .then(
                         if (!url.contains("https://")) {
                             Modifier.clickable { isPlaying = !isPlaying }
@@ -384,6 +293,49 @@ fun UrlImageGifsCoil(
                 }
             }
         }
+
+        when (state) {
+            is AsyncImagePainter.State.Empty -> {
+
+            }
+
+            is AsyncImagePainter.State.Loading -> {
+                if (loadIndicator) {
+                    Box(
+                        modifier = Modifier.matchParentSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        // Показываем прогресс в процентах если известен общий размер
+                        if (contentLength > 0 && bytesRead > 0) {
+                            val progress = (bytesRead.toFloat() / contentLength.toFloat())
+                            CircularProgressIndicator(
+                                progress = { progress },
+                                modifier = Modifier.size(32.dp)
+                            )
+                        } else {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(32.dp),
+                                color = Color.Gray
+                            )
+                        }
+                    }
+                }
+            }
+
+            is AsyncImagePainter.State.Success -> {
+
+            }
+
+            is AsyncImagePainter.State.Error -> {
+                Box(
+                    modifier = Modifier.matchParentSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("Ошибка загрузки", color = Color.Gray)
+                }
+            }
+        }
+
 
         // Прогресс загрузки
         Box(modifier = Modifier.align(Alignment.BottomEnd)) {
