@@ -2,9 +2,11 @@ package com.client.xvideos.common.coil
 
 import android.graphics.Bitmap
 import android.graphics.Matrix
+import android.graphics.drawable.AnimatedImageDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Build.VERSION.SDK_INT
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -24,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -43,7 +46,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import coil3.ImageLoader
+import coil3.asDrawable
 import coil3.compose.AsyncImage
+import coil3.compose.AsyncImagePainter
+import coil3.compose.rememberAsyncImagePainter
 import coil3.gif.AnimatedImageDecoder
 import coil3.gif.GifDecoder
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
@@ -68,57 +74,6 @@ import timber.log.Timber
 import java.io.File
 import kotlin.math.roundToInt
 
-// Класс для отслеживания прогресса загрузки
-class ProgressResponseBody(
-    private val responseBody: ResponseBody,
-    private val progressListener: (bytesRead: Long, contentLength: Long, done: Boolean) -> Unit
-) : ResponseBody() {
-
-    private val bufferedSource: BufferedSource by lazy {
-        source(responseBody.source()).buffer()
-    }
-
-    override fun contentType() = responseBody.contentType()
-
-    override fun contentLength() = responseBody.contentLength()
-
-    override fun source(): BufferedSource = bufferedSource
-
-    private fun source(source: Source): Source {
-        return object : ForwardingSource(source) {
-            var totalBytesRead = 0L
-
-            override fun read(sink: Buffer, byteCount: Long): Long {
-                val bytesRead = super.read(sink, byteCount)
-                totalBytesRead += if (bytesRead != -1L) bytesRead else 0L
-                progressListener(
-                    totalBytesRead,
-                    responseBody.contentLength(),
-                    bytesRead == -1L
-                )
-                return bytesRead
-            }
-        }
-    }
-}
-
-// Interceptor для отслеживания прогресса
-class ProgressInterceptor(
-    private val progressListener: (url: String, bytesRead: Long, contentLength: Long, done: Boolean) -> Unit
-) : Interceptor {
-    override fun intercept(chain: Interceptor.Chain): Response {
-        val originalResponse = chain.proceed(chain.request())
-        val url = chain.request().url.toString()
-
-        return originalResponse.newBuilder()
-            .body(
-                ProgressResponseBody(originalResponse.body) { bytesRead, contentLength, done ->
-                    progressListener(url, bytesRead, contentLength, done)
-                } as ResponseBody
-            )
-            .build()
-    }
-}
 
 @OptIn(InternalAPI::class, FlowPreview::class)
 @Composable
@@ -244,14 +199,69 @@ fun UrlImageGifsCoil(
             .build()
     }
 
-    // Управление видимостью анимации
-    LaunchedEffect(isVisible) {
-        if (isVisible && !wasVisible && isAnimated) {
-            isPlaying = true
-        } else if (!isVisible && isAnimated) {
-            isPlaying = false
+    // Painter для контроля анимации
+    val painter = rememberAsyncImagePainter(
+        model = imageRequest,
+        imageLoader = imageLoader
+    )
+
+    val state = painter.state.collectAsState().value
+
+
+    when (state) {
+        is AsyncImagePainter.State.Empty, is AsyncImagePainter.State.Loading -> {
+            // CircularProgressIndicator()
+
         }
-        wasVisible = isVisible
+
+        is AsyncImagePainter.State.Success -> {
+//            Image(
+//                painter = painter,
+//                contentDescription = stringResource(R.string.description)
+//            )
+
+            val result = (painter.state as? AsyncImagePainter.State.Success)?.result
+            val drawable = result?.image?.asDrawable(context.resources)
+
+
+        }
+
+        is AsyncImagePainter.State.Error -> {
+            // Show some error UI.
+        }
+    }
+
+
+//// Управление воспроизведением анимации
+    LaunchedEffect(state, isPlaying, isAnimated) {
+
+        if (isAnimated && state is AsyncImagePainter.State.Success) {
+
+            val drawable = state.result.image.asDrawable(context.resources)
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && drawable is AnimatedImageDrawable) {
+                if (isPlaying) {
+                    drawable.start()
+                    Timber.d("!!! AnimatedImageDrawable started")
+                } else {
+                    drawable.stop()
+                    Timber.d("!!! AnimatedImageDrawable stopped")
+                }
+            } else if (drawable is android.graphics.drawable.AnimatedVectorDrawable) {
+                if (isPlaying) {
+                    drawable.start()
+                } else {
+                    drawable.stop()
+                }
+            } else if (drawable is android.graphics.drawable.Animatable) {
+                if (isPlaying) {
+                    drawable.start()
+                } else {
+                    drawable.stop()
+                }
+            }
+
+        }
     }
 
     BoxWithConstraints(
@@ -265,10 +275,9 @@ fun UrlImageGifsCoil(
 
         if (isAnimated) Timber.i("!!! UrlImageGifsCoil w:{$w} h:{$h}")
 
-        AsyncImage(
-            model = imageRequest,
+        Image(
+            painter = painter,
             contentDescription = null,
-            imageLoader = imageLoader,
             contentScale = contentScale,
             modifier = Modifier
                 .background(ThemeL.grey5)
@@ -288,6 +297,30 @@ fun UrlImageGifsCoil(
 
                 .fillMaxSize()
         )
+
+//        AsyncImage(
+//            model = imageRequest,
+//            contentDescription = null,
+//            imageLoader = imageLoader,
+//            contentScale = contentScale,
+//            modifier = Modifier
+//                .background(ThemeL.grey5)
+//                .graphicsLayer(
+//                    rotationZ = if (rotate) 90f else 0f,
+//                    scaleX = if (rotate) {
+//                        if (h > w) h / w else w / h
+//                    } else {
+//                        1f
+//                    },
+//                    scaleY = if (rotate) {
+//                        if (h > w) h / w else w / h
+//                    } else {
+//                        1f
+//                    },
+//                )
+//
+//                .fillMaxSize()
+//        )
 
         // Индикаторы загрузки и ошибки
         if (isLoading && loadIndicator) {
