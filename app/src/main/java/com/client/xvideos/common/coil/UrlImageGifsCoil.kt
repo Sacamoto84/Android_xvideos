@@ -134,8 +134,14 @@ fun UrlImageGifsCoil(
     autoPlay: Boolean = false,
     sizeButton: Dp = 32.dp,
     sizeButtonIcon: Dp = 20.dp,
-    rotate: Boolean = false,
-    isVisible: Boolean = true
+    rotate: Boolean = false,                 //Поворот изображения
+    isVisible: Boolean = true,
+
+
+    //new
+    isVisibleProgressIndictor: Boolean = true //Показ индикатора прогресса после индикатора загрузки
+
+
 ) {
 
     SideEffect {
@@ -311,6 +317,7 @@ fun UrlImageGifsCoil(
             }
         }
 
+
         // Кнопка управления анимацией
         if (isAnimated) {
             Box(
@@ -354,7 +361,10 @@ fun UrlImageGifsCoil(
                 )
             }
         }
+
     }
+
+
 }
 
 @Composable

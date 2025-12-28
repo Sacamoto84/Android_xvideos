@@ -2,16 +2,14 @@
 accompanistSystemuicontroller = "0.36.0"
 activityKtx = "1.12.2"
 agp = "8.13.2"
-animatedBase = "3.6.0"
-animatedGif = "3.6.0"
-animatedWebp = "3.6.0"
+
 apolloRuntime = "4.3.3"
 componentsResources = "1.9.3"
 composeThemeAdapter = "1.2.1"
 core = "1.49.3"
 coreSplashscreen = "1.2.0"
 diskLruCache = "1.7"
-fresco = "3.6.0"
+
 gson = "2.13.2"
 hiltAndroid = "2.57.2"
 hiltAndroidCompiler = "2.57.2"
@@ -68,19 +66,12 @@ androidx-paging-compose = { module = "androidx.paging:paging-compose", version.r
 androidx-paging-runtime = { module = "androidx.paging:paging-runtime", version.ref = "pagingRuntime" }
 androidx-security-crypto = { module = "androidx.security:security-crypto", version.ref = "securityCrypto" }
 
-animated-base = { module = "com.facebook.fresco:animated-base", version.ref = "animatedBase" }
-animated-gif = { module = "com.facebook.fresco:animated-gif", version.ref = "animatedGif" }
-animated-webp = { module = "com.facebook.fresco:animated-webp", version.ref = "animatedWebp" }
-
 apollo-runtime = { module = "com.apollographql.apollo:apollo-runtime", version.ref = "apolloRuntime" }
 components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "componentsResources" }
-fresco = { module = "com.facebook.fresco:fresco", version.ref = "fresco" }
 image-loader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "imageLoader" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 
 landscapist-coil = { module = "com.github.skydoves:landscapist-coil", version.ref = "landscapist" }
-landscapist-fresco-websupport = { module = "com.github.skydoves:landscapist-fresco-websupport", version.ref = "landscapist" }
-landscapist-fresco = { module = "com.github.skydoves:landscapist-fresco", version.ref = "landscapist" }
 landscapist-placeholder = { module = "com.github.skydoves:landscapist-placeholder", version.ref = "landscapist" }
 
 material = { module = "com.google.android.material:material", version.ref = "material" }
@@ -128,11 +119,7 @@ gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroidCompiler" }
 
-
-
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
-
-
 
 #Test
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -183,7 +170,6 @@ voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", vers
 
 warden = { module = "com.alexstyl:warden", version.ref = "warden" }
 
-webpsupport = { module = "com.facebook.fresco:webpsupport", version.ref = "webpsupport" }
 zoomable = { module = "net.engawapg.lib:zoomable", version.ref = "zoomable" }
 
 ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics", version.ref = "ui" }
