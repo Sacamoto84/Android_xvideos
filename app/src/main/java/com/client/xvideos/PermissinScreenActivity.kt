@@ -30,6 +30,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -56,9 +59,7 @@ class PermissionScreenActivity : ComponentActivity() {
 
             XvideosTheme {
 
-                var granded by remember {
-                    mutableStateOf(false)
-                }
+                var granded by remember { mutableStateOf(false) }
 
                 if (!PermissionStorage.hasPermissions(this)) {
 
@@ -75,21 +76,21 @@ class PermissionScreenActivity : ComponentActivity() {
                     })
 
                     Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(Color.Black),
-                        Arrangement.Center
+                        modifier = Modifier.fillMaxSize().background(Color.Black).semantics { testTagsAsResourceId = true }, Arrangement.Center
                     )
                     {
                         Text(
-                            text = "Отсуствуют Файловые разрешения",
+                            text = "Отсутствуют Файловые разрешения",
                             modifier = Modifier.fillMaxWidth(),
                             textAlign = TextAlign.Center,
                             fontSize = 24.sp,
                             color = Color(0xFFFFE800)
                         )
                         Spacer(modifier = Modifier.height(16.dp))
-                        Button(onClick = { PermissionStorage.requestPermissions(applicationContext) }) {
+
+                        Button( modifier = Modifier.testTag("bPermission"),
+                            onClick = { PermissionStorage.requestPermissions(applicationContext) }
+                        ) {
                             Text(
                                 text = "Запрос",
                                 modifier = Modifier.fillMaxWidth(),

@@ -30,7 +30,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
@@ -90,7 +93,7 @@ class MainActivity : ComponentActivity()//, ImageLoaderFactory
                 //EdgeToEdgeFix()
 
                 Surface(
-                    modifier = Modifier.fillMaxSize().background(Color.Black)
+                    modifier = Modifier.fillMaxSize().background(Color.Black).semantics { testTagsAsResourceId = true }
                     //.windowInsetsPadding(WindowInsets.ime)
                     //.consumeWindowInsets(WindowInsets.ime)
                     //.displayCutoutPadding()
@@ -125,7 +128,7 @@ object MenuScreen : Screen {
             ButtonSelect(R.drawable.icon_xvideos_white) {
                 navigator.push(ScreenXDashBoards())
             }
-            ButtonSelect(R.drawable.icon_luscious) {
+            ButtonSelect(R.drawable.icon_luscious, "buttonL") {
                 navigator.push(ScreenLExplorer()) // или ScreenLusciousRoot()
             }
             ButtonSelect(R.drawable.icon_red) {
@@ -137,7 +140,7 @@ object MenuScreen : Screen {
 
 
 @Composable
-private fun ButtonSelect(iconId: Int, onClick: () -> Unit) {
+private fun ButtonSelect(iconId: Int, tag : String= "", onClick: () -> Unit) {
 
     Box(
         modifier = Modifier
@@ -147,7 +150,14 @@ private fun ButtonSelect(iconId: Int, onClick: () -> Unit) {
             .border(2.dp, Color(0xFF565656), RoundedCornerShape(16.dp))
             .background(Color(0xFF212121))
             .clickable { onClick() }
-            .padding(vertical = 16.dp),
+            .padding(vertical = 16.dp)
+            .then (
+                if (tag.isNotEmpty()){
+                    Modifier.testTag(tag)
+                } else Modifier
+            )
+
+        ,
         contentAlignment = Alignment.Center
     ) {
         Image(

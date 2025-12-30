@@ -11,7 +11,7 @@ plugins {
     id("org.jetbrains.kotlin.plugin.serialization") version '2.3.0' apply false
     alias(libs.plugins.google.gms.google.services) apply false
     alias(libs.plugins.android.library) apply false
-
+    alias(libs.plugins.android.test) apply false
 
 
 }
