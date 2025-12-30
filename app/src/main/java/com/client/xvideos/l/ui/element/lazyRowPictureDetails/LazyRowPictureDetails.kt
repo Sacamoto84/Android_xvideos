@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -48,7 +49,8 @@ import timber.log.Timber
 fun LazyRowPictureDetails(
     host: LazyRowPictureDetailsHost,
     itemBefore: @Composable () -> Unit = {},
-    expandMenu: ExpandMenuType
+    expandMenu: ExpandMenuType,
+    tag: String=""
 ) {
 
     val expandMenuViewModel: ExpandMenuViewModel = hiltViewModel()
@@ -57,7 +59,10 @@ fun LazyRowPictureDetails(
 
     val rootVm = LocalRootScreenModel.current
 
-    val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForLazyStaggeredGrid( host.state,  0 )
+    val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForLazyStaggeredGrid(
+        host.state,
+        0
+    )
 
     val thumbnailsSize = Settings.thumbalistSize.field.collectAsStateWithLifecycle().value
 
@@ -68,7 +73,9 @@ fun LazyRowPictureDetails(
         LazyVerticalStaggeredGrid(
             state = host.state,
             columns = StaggeredGridCells.Fixed(host.columns),
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .then(if (tag.isNotEmpty()) Modifier.testTag(tag) else Modifier)
         ) {
 
             item(span = StaggeredGridItemSpan.FullLine) {
@@ -92,7 +99,10 @@ fun LazyRowPictureDetails(
                         UrlImageGifsCoil(
                             url,
                             modifier = Modifier
-                                .padding(2.dp).aspectRatio(aspect).clipToBounds().border(0.5.dp, Color.Gray)
+                                .padding(2.dp)
+                                .aspectRatio(aspect)
+                                .clipToBounds()
+                                .border(0.5.dp, Color.Gray)
                                 .clickable {
                                     navigator.push(
                                         FullScreenImage(

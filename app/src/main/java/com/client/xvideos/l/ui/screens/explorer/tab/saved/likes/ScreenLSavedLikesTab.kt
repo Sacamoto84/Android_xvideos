@@ -44,7 +44,8 @@ object ScreenLSavedLikesTab : Screen {
         Scaffold(modifier = Modifier.fillMaxSize()) {
             LazyRowPictureDetails(
                 vm.host,
-                expandMenu =  ExpandMenuType.LIKES ,
+                expandMenu =  ExpandMenuType.LIKES,
+                tag = "lLikes"
             )
         }
 

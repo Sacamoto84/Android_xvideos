@@ -7,6 +7,7 @@ import androidx.benchmark.macro.FrameTimingMetric
 import androidx.benchmark.macro.MacrobenchmarkScope
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
 import androidx.test.uiautomator.By
+import androidx.test.uiautomator.Direction
 import androidx.test.uiautomator.Until
 import org.junit.Rule
 import org.junit.Test
@@ -87,6 +88,16 @@ class ListScrollBenchmark {
 
         val bookmarkTab = device.findObject(By.res("bBookMark"))
         bookmarkTab.click()
+
+        val grid = device.findObject(By.res("lLikes"))
+
+        repeat(6) {
+            grid.fling(Direction.DOWN)
+            Thread.sleep(1000)  // Достаточно времени для завершения инерции и отрисовки кадров
+
+            grid.fling(Direction.UP)
+            Thread.sleep(1000)
+        }
 
 //        // Ждем появления следующего экрана
 //        device.wait(Until.hasObject(By.res(packageName, "categories_screen_tag")), 10000)
