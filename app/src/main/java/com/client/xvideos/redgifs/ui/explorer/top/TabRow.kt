@@ -25,13 +25,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.client.xvideos.l.ui.screens.TabRow
 import com.client.xvideos.redgifs.common.ThemeRed
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toPersistentList
 
 @Composable
 fun TabRow(
-    titlesIcon: List<ImageVector>, onChangeState: (Int) -> Unit,
+    titlesIcon: ImmutableList<ImageVector>,
+    onChangeState: (Int) -> Unit,
     value: Int,
     containerColor: Color = ThemeRed.colorCommonBackground2,
     overlay0: @Composable () -> Unit = {},
@@ -40,11 +46,13 @@ fun TabRow(
     overlay3: @Composable () -> Unit = {},
     overlay4: @Composable () -> Unit = {},
     overlay5: @Composable () -> Unit = {},
+    //tags: List<String> = remember { emptyList() }
+    tags: ImmutableList<String>// = persistentListOf()
 ) {
 
     val haptic = LocalHapticFeedback.current
 
-    var state by remember(value){ mutableIntStateOf(value) }
+    var state by remember(value) { mutableIntStateOf(value) }
 
     SecondaryTabRow(
         modifier = Modifier.height(48.dp),
@@ -62,6 +70,12 @@ fun TabRow(
         titlesIcon.forEachIndexed { index, item ->
             Box(modifier = Modifier.background(if (index == state) Color.Transparent else Color.Transparent)) {
                 Tab(
+                    modifier = Modifier.then(
+                        if (tags.isNotEmpty()) {
+                            Modifier.testTag(tags[index])
+                        } else
+                            Modifier
+                    ),
                     selected = index == state,
                     onClick = {
                         haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
@@ -103,6 +117,6 @@ fun TabRowPreview() {
         Icons.Outlined.Group,
         Icons.Outlined.BookmarkBorder
     )
-    TabRow(l, onChangeState = {}, 2)
+    TabRow(l.toPersistentList(), onChangeState = {}, 2)
 }
 

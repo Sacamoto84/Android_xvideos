@@ -2,6 +2,7 @@ package com.example.benchmark
 
 import android.content.Intent
 import androidx.benchmark.macro.CompilationMode
+import androidx.benchmark.macro.ExperimentalMacrobenchmarkApi
 import androidx.benchmark.macro.FrameTimingMetric
 import androidx.benchmark.macro.MacrobenchmarkScope
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
@@ -15,12 +16,13 @@ class ListScrollBenchmark {
     @get:Rule
     val benchmarkRule = MacrobenchmarkRule()
 
+    @OptIn(ExperimentalMacrobenchmarkApi::class)
     @Test
     fun scrollLazyColumnAfterNavigation() = benchmarkRule.measureRepeated(
         packageName = "com.client.xvideos",  // Ваш пакет
         metrics = listOf(FrameTimingMetric()),  // Можно добавить PowerMetric и др.
         iterations = 10,
-        compilationMode = CompilationMode.Partial()  // Или Partial для реальных условий
+        compilationMode = CompilationMode.Ignore()  // Или Partial для реальных условий
     ) {
         // setupBlock: Навигация до экрана с LazyColumn (не измеряется)
         navigateToListScreen()
@@ -79,11 +81,12 @@ class ListScrollBenchmark {
             device.wait(Until.hasObject(By.pkg(packageName)), 10000)
         }
 
-
         // Шаг 1: Клик по кнопке/элементу на первом экране
-        val buttonToCategories =
-            device.findObject(By.res("buttonL"))//(By.text("Категории"))  // Или By.res("id_categories") buttonL
+        val buttonToCategories = device.findObject(By.res("buttonL"))//(By.text("Категории"))  // Или By.res("id_categories") buttonL
         buttonToCategories.click()
+
+        val bookmarkTab = device.findObject(By.res("bBookMark"))
+        bookmarkTab.click()
 
 //        // Ждем появления следующего экрана
 //        device.wait(Until.hasObject(By.res(packageName, "categories_screen_tag")), 10000)

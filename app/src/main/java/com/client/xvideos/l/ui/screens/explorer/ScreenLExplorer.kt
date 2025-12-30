@@ -37,6 +37,7 @@ import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.ui.explorer.tab.gifs.GifsTab
 import com.client.xvideos.redgifs.ui.explorer.top.TabRow
 import com.client.xvideos.redgifs.ui.ui.atom.TabBarPoints
+import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 private fun RowScope.TabNavigationItem(tab: Tab) {
@@ -57,6 +58,20 @@ class ScreenLExplorer() : Screen {
         var screenType by mutableIntStateOf(0)
     }
 
+    val l = persistentListOf(
+        Icons.Outlined.FormatListBulleted,
+        Icons.Outlined.Topic,
+        Icons.Outlined.BookmarkBorder,
+        Icons.Outlined.Settings
+    )
+
+    val tags = persistentListOf(
+        "",
+        "",
+        "bBookMark",
+        ""
+    )
+
     @OptIn(ExperimentalMaterial3Api::class)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
@@ -74,12 +89,7 @@ class ScreenLExplorer() : Screen {
         val g3 = Settings.gallery_count[3].field.collectAsStateWithLifecycle().value
         val g4 = Settings.gallery_count[4].field.collectAsStateWithLifecycle().value
 
-        val l = listOf(
-            Icons.Outlined.FormatListBulleted,
-            Icons.Outlined.Topic,
-            Icons.Outlined.BookmarkBorder,
-            Icons.Outlined.Settings
-        )
+
         Scaffold(bottomBar = {
 
             TabRow(
@@ -100,6 +110,7 @@ class ScreenLExplorer() : Screen {
                     screenType = it
                 },
                 overlay0 = { TabBarPoints(GifsTab.columnSelect.column, screenType == 0) },
+                tags = tags
             )
 
 

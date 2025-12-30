@@ -22,12 +22,14 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import com.client.xvideos.common.settings.Settings
+import com.client.xvideos.l.ui.screens.TabRow
 import com.client.xvideos.l.ui.screens.explorer.tab.saved.albums.ScreenLSavedAlbumsTab
 import com.client.xvideos.l.ui.screens.explorer.tab.saved.crypto.ScreenLSavedLCryptoTab
 import com.client.xvideos.l.ui.screens.explorer.tab.saved.likes.ScreenLSavedLikesTab
 import com.client.xvideos.redgifs.ui.explorer.top.TabRow
 import com.client.xvideos.redgifs.ui.ui.atom.TabBarPoints
 import com.client.xvideos.redgifs.common.ThemeRed
+import kotlinx.collections.immutable.persistentListOf
 
 object SavedLTab : Screen {
 
@@ -36,6 +38,15 @@ object SavedLTab : Screen {
     override val key: ScreenKey = uniqueScreenKey
 
     var screenType by mutableIntStateOf(0)
+
+    val l = persistentListOf(
+        //Icons.Outlined.FavoriteBorder,
+        Icons.Outlined.Save,
+        Icons.Outlined.Folder,
+        Icons.Outlined.Apps,
+        Icons.Outlined.Lock,
+        //Icons.Outlined.LockOpen,
+    )
 
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
@@ -47,14 +58,7 @@ object SavedLTab : Screen {
         val g3 = Settings.gallery_count[3].field.collectAsStateWithLifecycle().value
         val g4 = Settings.gallery_count[4].field.collectAsStateWithLifecycle().value
 
-        val l = listOf(
-            //Icons.Outlined.FavoriteBorder,
-            Icons.Outlined.Save,
-            Icons.Outlined.Folder,
-            Icons.Outlined.Apps,
-            Icons.Outlined.Lock,
-            //Icons.Outlined.LockOpen,
-        )
+
 
         Scaffold(
             bottomBar = {

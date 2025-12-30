@@ -26,6 +26,7 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import com.client.xvideos.common.settings.Settings
+import com.client.xvideos.l.ui.screens.TabRow
 import com.client.xvideos.redgifs.ui.explorer.tab.FavoritesTab
 import com.client.xvideos.redgifs.ui.explorer.tab.gifs.GifsTab
 import com.client.xvideos.redgifs.ui.explorer.tab.niches.NichesTab
@@ -35,6 +36,7 @@ import com.client.xvideos.redgifs.ui.explorer.tab.setting.SettingTab
 import com.client.xvideos.redgifs.ui.explorer.top.TabRow
 import com.client.xvideos.redgifs.ui.ui.atom.TabBarPoints
 import com.client.xvideos.redgifs.common.ThemeRed
+import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 private fun RowScope.TabNavigationItem(tab: Tab) {
@@ -55,6 +57,14 @@ class ScreenRedExplorer() : Screen {
         var screenType by mutableIntStateOf(0)
     }
 
+    val l = persistentListOf(
+        Icons.Outlined.Movie,
+        Icons.Outlined.Group,
+        Icons.Outlined.BookmarkBorder,
+        Icons.Outlined.Search,
+        Icons.Outlined.Settings
+    )
+
     @OptIn(ExperimentalMaterial3Api::class)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
@@ -66,13 +76,7 @@ class ScreenRedExplorer() : Screen {
         val g3 = Settings.gallery_count[3].field.collectAsStateWithLifecycle().value
         val g4 = Settings.gallery_count[4].field.collectAsStateWithLifecycle().value
 
-        val l = listOf(
-            Icons.Outlined.Movie,
-            Icons.Outlined.Group,
-            Icons.Outlined.BookmarkBorder,
-            Icons.Outlined.Search,
-            Icons.Outlined.Settings
-        )
+
         Scaffold(bottomBar = {
 
             TabRow(
