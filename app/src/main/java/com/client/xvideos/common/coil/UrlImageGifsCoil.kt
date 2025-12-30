@@ -1,7 +1,5 @@
 package com.client.xvideos.common.coil
 
-import android.graphics.Bitmap
-import android.graphics.Matrix
 import android.graphics.drawable.AnimatedImageDrawable
 import android.net.Uri
 import android.os.Build
@@ -31,7 +29,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -40,14 +37,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import coil3.ImageLoader
 import coil3.asDrawable
-import coil3.compose.AsyncImage
 import coil3.compose.AsyncImagePainter
 import coil3.compose.rememberAsyncImagePainter
 import coil3.gif.AnimatedImageDecoder
@@ -58,24 +56,15 @@ import coil3.request.crossfade
 import coil3.size.Scale
 import com.client.xvideos.common.AppPath
 import com.client.xvideos.l.theme.ThemeL
-import io.ktor.utils.io.InternalAPI
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
-import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import okhttp3.Response
-import okhttp3.ResponseBody
-import okio.Buffer
-import okio.BufferedSource
-import okio.ForwardingSource
-import okio.Source
-import okio.buffer
 import timber.log.Timber
 import java.io.File
 import kotlin.math.roundToInt
 
-
-
+@Suppress("UiComposable")
+@OptIn(FlowPreview::class)
 @Composable
 fun UrlImageGifsCoil(
     url: String,
@@ -102,6 +91,8 @@ fun UrlImageGifsCoil(
     }
 
     val context = LocalContext.current
+
+    var containerSize by remember { mutableStateOf(IntSize.Zero) }
 
     var isPlaying by remember { mutableStateOf(autoPlay) }
 
@@ -225,13 +216,9 @@ fun UrlImageGifsCoil(
         }
     }
 
-    BoxWithConstraints( modifier = Modifier.fillMaxSize().then(modifier), contentAlignment = Alignment.Center )
+    @Suppress("UiComposable")
+    Box( modifier = Modifier.fillMaxSize().then(modifier).onSizeChanged { containerSize = it }, contentAlignment = Alignment.Center )
     {
-        val w = maxWidth
-        val h = maxHeight
-
-        if (isAnimated) Timber.i("!!! UrlImageGifsCoil w:{$w} h:{$h}")
-
         Image(
             painter = painter,
             contentDescription = null,
@@ -240,18 +227,20 @@ fun UrlImageGifsCoil(
                 .background(ThemeL.grey5)
                 .graphicsLayer(
                     rotationZ = if (rotate) 90f else 0f,
-                    scaleX = if (rotate) {
-                        if (h > w) h / w else w / h
-                    } else {
-                        1f
-                    },
-                    scaleY = if (rotate) {
-                        if (h > w) h / w else w / h
-                    } else {
-                        1f
-                    },
-                )
+                    scaleX = if (rotate && containerSize != IntSize.Zero) {
+                        if (containerSize.height > containerSize.width)
+                            containerSize.height.toFloat() / containerSize.width
+                        else
+                            containerSize.width.toFloat() / containerSize.height
+                    } else 1f,
 
+                    scaleY = if (rotate && containerSize != IntSize.Zero) {
+                        if (containerSize.height > containerSize.width)
+                            containerSize.height.toFloat() / containerSize.width
+                        else
+                            containerSize.width.toFloat() / containerSize.height
+                    } else 1f
+                )
                 .fillMaxSize()
                 .then(
                     if (isAnimated) {
