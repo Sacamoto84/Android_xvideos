@@ -21,6 +21,7 @@ coreKtx = "1.17.0"
 junit = "4.13.2"
 junitVersion = "1.3.0"
 espressoCore = "3.7.0"
+kotlinxCollectionsImmutable = "0.4.0"
 kotlinxSerializationJson = "1.9.0"
 ktor= "3.3.3"
 landscapist = "2.7.0"
@@ -49,8 +50,8 @@ ui = "1.10.0"
 foundationLayout = "1.10.0"
 junitKtx = "1.3.0"
 runtimeSavedInstanceState = "1.0.0-alpha11"
-uiautomator = "2.2.0"
-benchmarkMacroJunit4 = "1.2.0-beta01"
+uiautomator = "2.3.0"
+benchmarkMacroJunit4 = "1.4.1"
 
 [libraries]
 accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanistSystemuicontroller" }
@@ -70,6 +71,7 @@ androidx-security-crypto = { module = "androidx.security:security-crypto", versi
 apollo-runtime = { module = "com.apollographql.apollo:apollo-runtime", version.ref = "apolloRuntime" }
 components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "componentsResources" }
 image-loader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "imageLoader" }
+kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutable" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 
 landscapist-coil = { module = "com.github.skydoves:landscapist-coil", version.ref = "landscapist" }
@@ -128,7 +130,7 @@ junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
-androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version = "1.12.0-alpha09" }
+androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version = "1.12.2" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
 
 androidx-ui = { group = "androidx.compose.ui", name = "ui" }

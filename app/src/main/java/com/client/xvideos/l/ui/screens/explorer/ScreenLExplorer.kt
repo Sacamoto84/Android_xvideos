@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -58,20 +59,6 @@ class ScreenLExplorer() : Screen {
         var screenType by mutableIntStateOf(0)
     }
 
-    val l = persistentListOf(
-        Icons.Outlined.FormatListBulleted,
-        Icons.Outlined.Topic,
-        Icons.Outlined.BookmarkBorder,
-        Icons.Outlined.Settings
-    )
-
-    val tags = persistentListOf(
-        "",
-        "",
-        "bBookMark",
-        ""
-    )
-
     @OptIn(ExperimentalMaterial3Api::class)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
@@ -89,6 +76,24 @@ class ScreenLExplorer() : Screen {
         val g3 = Settings.gallery_count[3].field.collectAsStateWithLifecycle().value
         val g4 = Settings.gallery_count[4].field.collectAsStateWithLifecycle().value
 
+        // ПЕРЕНЕСЕНО СЮДА: Теперь эти списки создаются внутри Composable
+        val l = remember {
+            persistentListOf(
+                Icons.Outlined.FormatListBulleted,
+                Icons.Outlined.Topic,
+                Icons.Outlined.BookmarkBorder,
+                Icons.Outlined.Settings
+            )
+        }
+
+        val tags = remember {
+            persistentListOf(
+                "",
+                "",
+                "bBookMark",
+                ""
+            )
+        }
 
         Scaffold(bottomBar = {
 

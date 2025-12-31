@@ -341,8 +341,11 @@ dependencies {
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.androidx.navigation3.runtime)
 
-    implementation "org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.7"
+    implementation libs.kotlinx.collections.immutable
 
+    implementation(libs.androidx.benchmark.macro.junit4)
+    implementation(libs.androidx.junit)
+    implementation(libs.androidx.uiautomator)
 }
 
 ksp {

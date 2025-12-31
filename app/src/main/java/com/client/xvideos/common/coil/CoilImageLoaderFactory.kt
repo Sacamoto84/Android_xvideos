@@ -9,9 +9,21 @@ import coil3.gif.AnimatedImageDecoder
 import coil3.gif.GifDecoder
 import coil3.memory.MemoryCache
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
+import coil3.request.allowHardware
 import coil3.request.crossfade
 import okhttp3.OkHttpClient
+import okhttp3.ResponseBody
+import timber.log.Timber
 import java.io.File
+
+
+data class CoilProgressItem(
+    val url : String,
+    val bytes: Long,
+    val total : Long,
+    val done : Boolean
+)
+
 
 object CoilImageLoaderFactory {
 
@@ -25,6 +37,7 @@ object CoilImageLoaderFactory {
     }
 
     private fun createImageLoader(context: Context): ImageLoader {
+
         val okHttpClient = OkHttpClient.Builder()
             // Настройка HTTP кеша
             .cache(
@@ -33,7 +46,20 @@ object CoilImageLoaderFactory {
                     maxSize = 500L * 1024L * 1024L // 500 MB
                 )
             )
+            .addNetworkInterceptor(
+                ProgressInterceptor { requestUrl, bytes, total, done ->
+                    //Timber.i("$requestUrl, $bytes, $total, $done Thread: ${Thread.currentThread().name}")
+                    // По завершении
+                    CoilProgressManager.updateProgress(
+                        url = requestUrl,
+                        bytes = bytes,
+                        total = total.coerceAtLeast(0L),
+                        done = done
+                    )
+                }
+            )
             .build()
+
 
         return ImageLoader.Builder(context)
             .components {
@@ -53,6 +79,8 @@ object CoilImageLoaderFactory {
                     .maxSizeBytes(2500L * 1024L * 1024L) // 2500 MB
                     .build()
             }
+
+
             // Настройка кеша в памяти
             .memoryCache {
                 MemoryCache.Builder()
@@ -61,9 +89,9 @@ object CoilImageLoaderFactory {
                     .build()
             }
             // Включить кросс-фейд по умолчанию
-            .crossfade(true)
+            //.crossfade(true)
             // Разрешить использование hardware bitmaps (быстрее, но нельзя редактировать)
-            //    .allowHardware(true)
+            .allowHardware(true)
             // Включить логирование (для отладки)
             // .logger(DebugLogger())
             .build()
