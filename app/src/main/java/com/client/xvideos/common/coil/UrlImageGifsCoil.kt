@@ -100,7 +100,14 @@ fun UrlImageGifsCoil(
     var isPlaying by remember { mutableStateOf(autoPlay) }
 
     val rawProgress by remember(url) {
-        derivedStateOf { CoilProgressManager.progressMap[url] ?: CoilProgressItem(url, 0L, 0L, false) }
+        derivedStateOf {
+            CoilProgressManager.progressMap[url] ?: CoilProgressItem(
+                url,
+                0L,
+                0L,
+                false
+            )
+        }
     }
 
     // Debounce: обновляем UI не чаще 100–200 мс
@@ -128,8 +135,7 @@ fun UrlImageGifsCoil(
 
         if (url.contains("https://"))
             url.toUri()
-        else
-        {
+        else {
             val fileName = url.substringAfterLast('/').substringBefore('?')
             val file = when (albumName) {
                 "likes", "crypto" -> File(url)
@@ -142,41 +148,6 @@ fun UrlImageGifsCoil(
 
     // Один глобальный ImageLoader на всё приложение
     val imageLoader = CoilImageLoaderFactory.getImageLoader(context)
-
-//    val imageLoader = remember(url) {
-//
-//        val okHttpClient = OkHttpClient.Builder()
-//            .addNetworkInterceptor(
-//                ProgressInterceptor { requestUrl, bytes, total, done ->
-//                    if (requestUrl.contains(url)) {
-//                        bytesRead = bytes
-//                        contentLength = total
-//                    }
-//                }
-//            )
-//            .cache(
-//                okhttp3.Cache(
-//                    directory = File(context.cacheDir, "http_cache"),
-//                    maxSize = 500L * 1024L * 1024L
-//                )
-//            )
-//            .build()
-//
-//        // Клонируем глобальные настройки, но добавляем свой OkHttp
-//        ImageLoader.Builder(context)
-//            .components {
-//                if (SDK_INT >= 28) {
-//                    add(AnimatedImageDecoder.Factory())
-//                } else {
-//                    add(GifDecoder.Factory())
-//                }
-//                add(OkHttpNetworkFetcherFactory(callFactory = { okHttpClient }))
-//            }
-//            // Используем те же настройки кеша из глобального
-//            .diskCache(CoilImageLoaderFactory.getImageLoader(context).diskCache)
-//            .memoryCache(CoilImageLoaderFactory.getImageLoader(context).memoryCache)
-//            .build()
-//    }
 
     val imageRequest = remember(dataSource, rotate) {
         ImageRequest.Builder(context)
@@ -203,7 +174,7 @@ fun UrlImageGifsCoil(
         imageLoader = imageLoader
     )
 
-    //val state = painter.state.collectAsState().value
+    val state = painter.state.collectAsState().value
 
 
 //// Управление воспроизведением анимации
@@ -239,12 +210,8 @@ fun UrlImageGifsCoil(
 //    }
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .then(modifier)
-            .onSizeChanged { containerSize = it },
-        contentAlignment = Alignment.Center
-    )
+        modifier = Modifier.fillMaxSize().then(modifier).onSizeChanged { containerSize = it },
+        contentAlignment = Alignment.Center )
     {
         Image(
             painter = painter,
@@ -372,6 +339,10 @@ fun UrlImageGifsCoil(
 
 
 }
+
+
+
+
 
 @Composable
 private fun ProgressText(
