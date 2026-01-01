@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.screen.Screen
@@ -60,7 +61,8 @@ val savedL: SavedL
     val host =  LazyRowPictureDetailsHost("likes")
 
     init {
-        host.filteredPic = savedL.likes.listUrl
+        val a = savedL.likes.listUrl
+        host.filteredPic = a
     }
 
     fun delete(item: PicsDetails){

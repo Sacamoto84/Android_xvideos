@@ -92,6 +92,7 @@
                   <entry key="Duration" value="90" />
                   <entry key="Tests" value="360" />
                   <entry key="Xiaomi 2311DRK48G" value="120" />
+                  <entry key="samsung SM-G965N" value="120" />
                 </map>
               </option>
             </AndroidTestResultsTableState>

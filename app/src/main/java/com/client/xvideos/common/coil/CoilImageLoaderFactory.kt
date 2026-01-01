@@ -76,7 +76,7 @@ object CoilImageLoaderFactory {
             .diskCache {
                 DiskCache.Builder()
                     .directory(File(context.cacheDir, "image_cache"))
-                    .maxSizeBytes(2500L * 1024L * 1024L) // 2500 MB
+                    .maxSizeBytes(500L * 1024L * 1024L) // 500 MB
                     .build()
             }
 
@@ -84,7 +84,7 @@ object CoilImageLoaderFactory {
             // Настройка кеша в памяти
             .memoryCache {
                 MemoryCache.Builder()
-                    .maxSizePercent(context, 0.25) // 25% доступной памяти
+                    .maxSizePercent(context, 0.5) // 25% доступной памяти
                     .strongReferencesEnabled(true)
                     .build()
             }

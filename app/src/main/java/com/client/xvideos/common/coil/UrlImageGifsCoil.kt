@@ -37,10 +37,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -48,6 +50,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import coil3.ImageLoader
 import coil3.asDrawable
+import coil3.compose.AsyncImage
 import coil3.compose.AsyncImagePainter
 import coil3.compose.rememberAsyncImagePainter
 import coil3.gif.AnimatedImageDecoder
@@ -89,9 +92,11 @@ fun UrlImageGifsCoil(
 
 ) {
 
-    SideEffect {
-        Timber.i("!!! UrlImageGifsCoil url:{$url}")
-    }
+    if (isAnimated) return
+
+//    SideEffect {
+//        Timber.i("!!! UrlImageGifsCoil url:{$url}")
+//    }
 
     val context = LocalContext.current
 
@@ -99,28 +104,28 @@ fun UrlImageGifsCoil(
 
     var isPlaying by remember { mutableStateOf(autoPlay) }
 
-    val rawProgress by remember(url) {
-        derivedStateOf {
-            CoilProgressManager.progressMap[url] ?: CoilProgressItem(
-                url,
-                0L,
-                0L,
-                false
-            )
-        }
-    }
-
-    // Debounce: обновляем UI не чаще 100–200 мс
-    val progress by produceState(rawProgress) {
-        while (true) {
-            value = rawProgress
-            delay(150)
-        }
-    }
-
-    val bytes = progress.bytes
-    val total = progress.total
-    val done = progress.done
+//    val rawProgress by remember(url) {
+//        derivedStateOf {
+//            CoilProgressManager.progressMap[url] ?: CoilProgressItem(
+//                url,
+//                0L,
+//                0L,
+//                false
+//            )
+//        }
+//    }
+//
+//    // Debounce: обновляем UI не чаще 100–200 мс
+//    val progress by produceState(rawProgress) {
+//        while (!rawProgress.done) {
+//            value = rawProgress
+//            delay(150)
+//        }
+//    }
+//
+//    val bytes = progress.bytes
+//    val total = progress.total
+//    val done = progress.done
 
 
 //    LaunchedEffect(Unit) {
@@ -168,13 +173,13 @@ fun UrlImageGifsCoil(
             .build()
     }
 
-    // Painter для контроля анимации
-    val painter = rememberAsyncImagePainter(
-        model = imageRequest,
-        imageLoader = imageLoader
-    )
+//    // Painter для контроля анимации
+//    val painter = rememberAsyncImagePainter(
+//        model = imageRequest,
+//        imageLoader = imageLoader
+//    )
 
-    val state = painter.state.collectAsState().value
+    //val state = painter.state.collectAsState().value
 
 
 //// Управление воспроизведением анимации
@@ -210,13 +215,24 @@ fun UrlImageGifsCoil(
 //    }
 
     Box(
-        modifier = Modifier.fillMaxSize().then(modifier).onSizeChanged { containerSize = it },
-        contentAlignment = Alignment.Center )
+        modifier = Modifier
+            .fillMaxSize()
+            .then(modifier)
+            .onSizeChanged { containerSize = it },
+        contentAlignment = Alignment.Center
+    )
     {
-        Image(
-            painter = painter,
+
+        AsyncImage(
+            model = imageRequest,
+            imageLoader = imageLoader,
             contentDescription = null,
             contentScale = contentScale,
+//            placeholder = forwardingPainter(
+//                painter = painterResource(R.drawable.placeholder),
+//                colorFilter = ColorFilter(Color.Red),
+//                alpha = 0.5f,
+//            ),
             modifier = Modifier
                 .background(ThemeL.grey5)
                 .then(
@@ -247,6 +263,41 @@ fun UrlImageGifsCoil(
                     } else Modifier
                 )
         )
+
+//        Image(
+//            painter = painter,
+//            contentDescription = null,
+//            contentScale = contentScale,
+//            modifier = Modifier
+//                .background(ThemeL.grey5)
+//                .then(
+//                    if (rotate) {
+//                        Modifier.graphicsLayer(
+//                            rotationZ = 90f,
+//                            scaleX = if (containerSize != IntSize.Zero) {
+//                                if (containerSize.height > containerSize.width)
+//                                    containerSize.height.toFloat() / containerSize.width
+//                                else
+//                                    containerSize.width.toFloat() / containerSize.height
+//                            } else 1f,
+//
+//                            scaleY = if (containerSize != IntSize.Zero) {
+//                                if (containerSize.height > containerSize.width)
+//                                    containerSize.height.toFloat() / containerSize.width
+//                                else
+//                                    containerSize.width.toFloat() / containerSize.height
+//                            } else 1f
+//                        )
+//                    } else
+//                        Modifier
+//                )
+//                .fillMaxSize()
+//                .then(
+//                    if (isAnimated) {
+//                        Modifier.clickable { isPlaying = !isPlaying }
+//                    } else Modifier
+//                )
+//        )
 
 //        // Кнопка управления анимацией
 //        if (isAnimated) {
@@ -339,9 +390,6 @@ fun UrlImageGifsCoil(
 
 
 }
-
-
-
 
 
 @Composable
