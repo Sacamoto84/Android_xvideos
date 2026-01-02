@@ -46,6 +46,7 @@ android {
         buildConfigField "String", "luscious_email", "\"${secrets['luscious_email']}\""
         buildConfigField "String", "luscious_password", "\"${secrets['luscious_password']}\""
 
+        multiDexEnabled = true
     }
 
     signingConfigs {
@@ -78,6 +79,10 @@ android {
         }
     }
     compileOptions {
+
+        // For AGP 4.1+
+        //isCoreLibraryDesugaringEnabled true
+
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
@@ -95,6 +100,9 @@ android {
 }
 
 dependencies {
+
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.3'
+
     // Lottie для Compose
     implementation "com.airbnb.android:lottie-compose:6.7.1"
     // Коррутины
@@ -265,6 +273,7 @@ dependencies {
     implementation("io.coil-kt.coil3:coil-compose:3.3.0")
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.3.0")
     implementation("io.coil-kt.coil3:coil-gif:3.3.0")
+    implementation("io.coil-kt.coil3:coil-network-cache-control:3.3.0")
 
     //implementation("com.github.bumptech.glide:glide:4.16.0")
     //ksp "com.github.bumptech.glide:compiler:4.16.0"

@@ -1,9 +1,14 @@
 package com.example.benchmark
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.benchmark.macro.CompilationMode
 import androidx.benchmark.macro.ExperimentalMacrobenchmarkApi
+import androidx.benchmark.macro.ExperimentalMetricApi
 import androidx.benchmark.macro.FrameTimingMetric
 import androidx.benchmark.macro.MacrobenchmarkScope
+import androidx.benchmark.macro.MemoryUsageMetric
+import androidx.benchmark.macro.PowerMetric
 import androidx.benchmark.macro.StartupMode
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
 import androidx.test.uiautomator.By
@@ -20,7 +25,8 @@ class ListScrollBenchmark {
     @get:Rule
     val benchmarkRule = MacrobenchmarkRule()
 
-    @OptIn(ExperimentalMacrobenchmarkApi::class)
+    @RequiresApi(Build.VERSION_CODES.Q)
+    @OptIn(ExperimentalMacrobenchmarkApi::class, ExperimentalMetricApi::class)
     @Test
     fun scrollLikesGridAfterNavigation() = benchmarkRule.measureRepeated(
         packageName = "com.client.xvideos",
@@ -47,16 +53,18 @@ class ListScrollBenchmark {
             // Скролл вниз с небольшой паузой
             grid.setGestureMargin(device.displayWidth / 5)
             repeat(4) {
-                grid.fling(Direction.DOWN)
-                Thread.sleep(100)
-                //device.waitForIdle() // Даём отрисоваться кадрам
-                device.waitForIdle(1000)  // Дольше подождать idle
+                grid.fling(Direction.DOWN, 20000)
+                //grid.scroll(Direction.DOWN,10f, 20000 )
+                //Thread.sleep(100)
+                device.waitForIdle() // Даём отрисоваться кадрам
+                //device.waitForIdle(500)  // Дольше подождать idle
             }
             repeat(4) {
-                grid.fling(Direction.UP)
-                Thread.sleep(100)
-                device.waitForIdle(1000)  // Дольше подождать idle
-                //device.waitForIdle()
+                grid.fling(Direction.UP,20000)
+                //grid.scroll(Direction.UP,10f, 20000)
+                //Thread.sleep(100)
+                //device.waitForIdle(500)  // Дольше подождать idle
+                device.waitForIdle()
             }
         }
         device.waitForIdle(2000)  // Дольше подождать idle

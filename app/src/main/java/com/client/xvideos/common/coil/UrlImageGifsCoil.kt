@@ -171,8 +171,6 @@ fun UrlImageGifsCoil(
                 }
             }
 
-
-
 //            .listener(
 //                onStart = {
 //                    bytesRead = 0L
@@ -242,15 +240,11 @@ fun UrlImageGifsCoil(
     )
     {
 
-        SubcomposeAsyncImage(
+        AsyncImage(
             model = imageRequest,
             imageLoader = imageLoader,
             contentDescription = null,
             contentScale = contentScale,
-
-            onLoading = {
-
-            },
 
 //            placeholder = forwardingPainter(
 //                painter = painterResource(R.drawable.placeholder),

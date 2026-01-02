@@ -3,11 +3,13 @@ package com.client.xvideos.common.coil
 import android.content.Context
 import android.os.Build
 import coil3.ImageLoader
+import coil3.annotation.ExperimentalCoilApi
 import coil3.disk.DiskCache
 import coil3.disk.directory
 import coil3.gif.AnimatedImageDecoder
 import coil3.gif.GifDecoder
 import coil3.memory.MemoryCache
+import coil3.network.cachecontrol.CacheControlCacheStrategy
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.request.allowHardware
 import coil3.request.crossfade
@@ -36,6 +38,7 @@ object CoilImageLoaderFactory {
         }
     }
 
+    @OptIn(ExperimentalCoilApi::class)
     private fun createImageLoader(context: Context): ImageLoader {
 
         val okHttpClient = OkHttpClient.Builder()
@@ -70,7 +73,7 @@ object CoilImageLoaderFactory {
                     add(GifDecoder.Factory())
                 }
                 // OkHttp для сетевых запросов
-                add(OkHttpNetworkFetcherFactory(callFactory = { okHttpClient }))
+                add(OkHttpNetworkFetcherFactory(callFactory = { okHttpClient },  cacheStrategy = { CacheControlCacheStrategy() }))
             }
             // Настройка дискового кеша
             .diskCache {
@@ -90,7 +93,6 @@ object CoilImageLoaderFactory {
             }
             // Включить кросс-фейд по умолчанию
             //.crossfade(true)
-            // Разрешить использование hardware bitmaps (быстрее, но нельзя редактировать)
             .allowHardware(true)
             // Включить логирование (для отладки)
             // .logger(DebugLogger())
