@@ -52,12 +52,14 @@ import coil3.ImageLoader
 import coil3.asDrawable
 import coil3.compose.AsyncImage
 import coil3.compose.AsyncImagePainter
+import coil3.compose.SubcomposeAsyncImage
 import coil3.compose.rememberAsyncImagePainter
 import coil3.gif.AnimatedImageDecoder
 import coil3.gif.GifDecoder
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import coil3.size.Precision
 import coil3.size.Scale
 import com.client.xvideos.common.AppPath
 import com.client.xvideos.l.theme.ThemeL
@@ -88,8 +90,10 @@ fun UrlImageGifsCoil(
     isVisible: Boolean = true,
 
     //new
-    isVisibleProgressIndictor: Boolean = true //Показ индикатора прогресса после индикатора загрузки
+    isVisibleProgressIndictor: Boolean = true, //Показ индикатора прогресса после индикатора загрузки
 
+
+    isFullScreen: Boolean = false //Режим полного экрана с поддержкой поворота
 ) {
 
     if (isAnimated) return
@@ -152,13 +156,23 @@ fun UrlImageGifsCoil(
     }
 
     // Один глобальный ImageLoader на всё приложение
-    val imageLoader = CoilImageLoaderFactory.getImageLoader(context)
+    val imageLoader = remember { CoilImageLoaderFactory.getImageLoader(context) }
 
     val imageRequest = remember(dataSource, rotate) {
         ImageRequest.Builder(context)
             .data(dataSource)
             //.crossfade(true)
-            .scale(Scale.FILL)
+            .scale(Scale.FIT)
+
+            .apply {
+                if (!isFullScreen) {
+                    //size(512, 64)
+                    precision(Precision.INEXACT)
+                }
+            }
+
+
+
 //            .listener(
 //                onStart = {
 //                    bytesRead = 0L
@@ -218,26 +232,38 @@ fun UrlImageGifsCoil(
         modifier = Modifier
             .fillMaxSize()
             .then(modifier)
-            .onSizeChanged { containerSize = it },
+            .then(
+                if (isFullScreen) {
+                    Modifier.onSizeChanged { containerSize = it }
+                } else
+                    Modifier
+            ),
         contentAlignment = Alignment.Center
     )
     {
 
-        AsyncImage(
+        SubcomposeAsyncImage(
             model = imageRequest,
             imageLoader = imageLoader,
             contentDescription = null,
             contentScale = contentScale,
+
+            onLoading = {
+
+            },
+
 //            placeholder = forwardingPainter(
 //                painter = painterResource(R.drawable.placeholder),
 //                colorFilter = ColorFilter(Color.Red),
 //                alpha = 0.5f,
 //            ),
             modifier = Modifier
+
                 .background(ThemeL.grey5)
                 .then(
-                    if (rotate) {
+                    if (isFullScreen && rotate) {
                         Modifier.graphicsLayer(
+
                             rotationZ = 90f,
                             scaleX = if (containerSize != IntSize.Zero) {
                                 if (containerSize.height > containerSize.width)
@@ -253,6 +279,7 @@ fun UrlImageGifsCoil(
                                     containerSize.width.toFloat() / containerSize.height
                             } else 1f
                         )
+
                     } else
                         Modifier
                 )

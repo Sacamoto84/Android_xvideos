@@ -273,7 +273,8 @@ class FullScreenImage(
                         albumName = albumName,
                         autoPlay = autoPlay,
                         isAnimated = pageItem.is_animated,
-                        isVisible = currentIndex == page
+                        isVisible = currentIndex == page,
+                        isFullScreen = true
                     )
 
 
