@@ -37,6 +37,7 @@ import com.client.xvideos.l.ui.screens.screenFullScreen.FullScreenImage
 import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.l.ui.element.expandMenu.ExpandMenuType
 import com.client.xvideos.l.ui.element.expandMenu.ExpandMenuViewModel
+import com.client.xvideos.l.ui.screens.screenFullScreen.fullScreenImageFilteredPicArray
 import com.client.xvideos.redgifs.ui.profile.atom.VerticalScrollbar
 import com.client.xvideos.redgifs.ui.profile.rememberVisibleRangePercentIgnoringFirstNForLazyStaggeredGrid
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -50,7 +51,7 @@ fun LazyRowPictureDetails(
     host: LazyRowPictureDetailsHost,
     itemBefore: @Composable () -> Unit = {},
     expandMenu: ExpandMenuType,
-    tag: String=""
+    tag: String = ""
 ) {
 
     val expandMenuViewModel: ExpandMenuViewModel = hiltViewModel()
@@ -82,7 +83,12 @@ fun LazyRowPictureDetails(
                 itemBefore()
             }
 
-            itemsIndexed(host.filteredPic) { index, item ->
+            itemsIndexed(host.filteredPic, key = { index, item ->
+                item.url_to_original!!
+            }
+
+
+            ) { index, item ->
 
                 if (item.url_to_original != null) {
                     Box(
@@ -91,19 +97,25 @@ fun LazyRowPictureDetails(
                     ) {
                         val aspect = item.width.toFloat() / item.height
 
-                        val url = if (item.thumbnails.isEmpty()) item.url_to_original else {
-                            item.thumbnails.firstOrNull { it.size == thumbnailsSize }?.url
-                                ?: item.url_to_original
-                        } //"small" large_thumbnail
+                        val url =
+                            if (item.thumbnails.isEmpty()) item.url_to_original else {
+                                item.thumbnails.firstOrNull { it.size == thumbnailsSize }?.url
+                                    ?: item.url_to_original
+                            } //"small" large_thumbnail
+
 
                         UrlImageGifsCoil(
                             url,
+                            urlGif = item.url_to_original,
                             modifier = Modifier
                                 .padding(2.dp)
                                 .aspectRatio(aspect)
                                 .clipToBounds()
                                 .border(0.5.dp, Color.Gray)
                                 .clickable {
+
+                                    fullScreenImageFilteredPicArray = host.filteredPic.toList()
+
                                     navigator.push(
                                         FullScreenImage(
                                             item = item,
@@ -117,7 +129,7 @@ fun LazyRowPictureDetails(
                                                 }
                                             },
                                             albumName = host.albumName,
-                                            filteredPicArray = host.filteredPic.toList(),
+                                            //filteredPicArray = host.filteredPic.toList(),
                                             expandMenu = expandMenu,
                                             autoPlay = true,
                                             isAnimated = item.is_animated,

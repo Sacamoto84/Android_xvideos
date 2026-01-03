@@ -39,7 +39,7 @@ object CoilImageLoaderFactory {
     }
 
     @OptIn(ExperimentalCoilApi::class)
-    private fun createImageLoader(context: Context): ImageLoader {
+    fun createImageLoader(context: Context): ImageLoader {
 
         val okHttpClient = OkHttpClient.Builder()
             // Настройка HTTP кеша

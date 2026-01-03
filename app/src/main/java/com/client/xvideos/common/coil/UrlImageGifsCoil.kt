@@ -59,7 +59,10 @@ enum class LoadingIndicator()
 @OptIn(FlowPreview::class)
 @Composable
 fun UrlImageGifsCoil(
+
     url: String,
+    urlGif : String?= null, //url для gif файла
+
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Crop,
     loadIndicator: Boolean = true,
@@ -131,7 +134,7 @@ fun UrlImageGifsCoil(
 //            }
 //    }
 
-    val dataSource = remember(url) {
+    val dataSource = remember(url, urlGif) {
 
         if (url.contains("https://"))
             url.toUri()
@@ -146,8 +149,13 @@ fun UrlImageGifsCoil(
 
     }
 
+
+
     // Один глобальный ImageLoader на всё приложение
-    val imageLoader = remember { CoilImageLoaderFactory.getImageLoader(context) }
+    val imageLoader = remember {
+        CoilImageLoaderFactory.getImageLoader(context)
+        //CoilImageLoaderFactory.createImageLoader(context)
+    }
 
     val imageRequest = remember(dataSource, rotate) {
         ImageRequest.Builder(context)

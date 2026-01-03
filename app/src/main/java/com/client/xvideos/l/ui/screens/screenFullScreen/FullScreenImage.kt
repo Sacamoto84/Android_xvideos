@@ -64,12 +64,13 @@ import net.engawapg.lib.zoomable.ZoomState
 import net.engawapg.lib.zoomable.rememberZoomState
 import net.engawapg.lib.zoomable.zoomable
 
+var fullScreenImageFilteredPicArray : List<PicsDetails> = emptyList()
+
 @Parcelize
 class FullScreenImage(
     val item: PicsDetails,
     val albumName: String,
-    //val filteredPic: List<PicsDetails>,
-    val filteredPicArray: List<PicsDetails>,
+    //val filteredPicArray: List<PicsDetails>,
     val autoPlay: Boolean = false,
     val isAnimated: Boolean = false,
     val expandMenu: ExpandMenuType,
@@ -93,7 +94,8 @@ class FullScreenImage(
 //            //filteredPic.toList()
 //        }
 
-        val filteredPic = filteredPicArray.toList()
+        //val filteredPic = filteredPicArray.toList()
+        val filteredPic = fullScreenImageFilteredPicArray.toList()
 
         val expandMenuViewModel: ExpandMenuViewModel = hiltViewModel()
 
