@@ -214,38 +214,6 @@ class FullScreenImage(
                 )
                 {
 
-
-//                    UrlImageGifsFresco(
-//                        rotate = rotate,
-//                        contentScale = ContentScale.Fit,
-//                        url = pageItem.url_to_original!!,
-//                        modifier = Modifier
-//                            .fillMaxSize()
-//                            .zoomable(
-//                                zoomState = zoomState,
-//                                enableOneFingerZoom = false,
-//                                onDoubleTap = { position ->
-//                                    // Двойной тап для зума/раззума
-//                                    coroutineScope.launch {
-//                                        if (zoomState.scale > 1.0f) {
-//                                            // Если уже увеличено - сбрасываем
-//                                            //zoomState.reset()
-//                                            zoomState.changeScale(1.0f, Offset.Zero)
-//                                        } else {
-//                                            // Увеличиваем в 2-3 раза по центру тапа
-//                                            zoomState.changeScale(2.5f, position)
-//                                        }
-//                                    }
-//                                }
-//                            ),
-//                        onSuccess = { },
-//                        albumName = albumName,
-//                        autoPlay = autoPlay,
-//                        isAnimated = pageItem.is_animated,
-//                        isVisible = currentIndex == page
-//                    )
-
-
                     UrlImageGifsCoil(
                         rotate = rotate,
                         contentScale = ContentScale.Fit,

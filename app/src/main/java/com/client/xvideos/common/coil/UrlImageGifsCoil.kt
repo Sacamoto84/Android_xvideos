@@ -1,14 +1,11 @@
 package com.client.xvideos.common.coil
 
 import android.graphics.drawable.AnimatedImageDrawable
-import android.net.Uri
 import android.os.Build
-import android.os.Build.VERSION.SDK_INT
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -23,53 +20,40 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
-import coil3.ImageLoader
 import coil3.asDrawable
 import coil3.compose.AsyncImage
 import coil3.compose.AsyncImagePainter
-import coil3.compose.SubcomposeAsyncImage
-import coil3.compose.rememberAsyncImagePainter
-import coil3.gif.AnimatedImageDecoder
-import coil3.gif.GifDecoder
-import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.request.ImageRequest
-import coil3.request.crossfade
 import coil3.size.Precision
 import coil3.size.Scale
 import com.client.xvideos.common.AppPath
 import com.client.xvideos.l.theme.ThemeL
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.debounce
-import okhttp3.OkHttpClient
 import timber.log.Timber
 import java.io.File
 import kotlin.math.roundToInt
+
+enum class LoadingIndicator()
 
 @Suppress("UiComposable")
 @OptIn(FlowPreview::class)
@@ -87,16 +71,23 @@ fun UrlImageGifsCoil(
     sizeButton: Dp = 32.dp,
     sizeButtonIcon: Dp = 20.dp,
     rotate: Boolean = false,                 //Поворот изображения
+
     isVisible: Boolean = true,
 
     //new
-    isVisibleProgressIndictor: Boolean = true, //Показ индикатора прогресса после индикатора загрузки
 
+    isVisibleLoadingIndicator: Boolean = true, //Показ индикатора прогресса после индикатора загрузки
+    sizeLoadingIndicator: Dp = 32.dp, //Показ индикатора прогресса после индикатора загрузки
+
+
+    isVisibleProgressText: Boolean = true,   //Показ текста скачанных данных
 
     isFullScreen: Boolean = false //Режим полного экрана с поддержкой поворота
 ) {
 
-    if (isAnimated) return
+    if (!isVisible) return
+
+    //if (isAnimated) return
 
 //    SideEffect {
 //        Timber.i("!!! UrlImageGifsCoil url:{$url}")
@@ -108,28 +99,28 @@ fun UrlImageGifsCoil(
 
     var isPlaying by remember { mutableStateOf(autoPlay) }
 
-//    val rawProgress by remember(url) {
-//        derivedStateOf {
-//            CoilProgressManager.progressMap[url] ?: CoilProgressItem(
-//                url,
-//                0L,
-//                0L,
-//                false
-//            )
-//        }
-//    }
-//
+    val rawProgress by remember(url) {
+        derivedStateOf {
+            CoilProgressManager.progressMap[url] ?: CoilProgressItem(
+                url,
+                0L,
+                0L,
+                false
+            )
+        }
+    }
+
 //    // Debounce: обновляем UI не чаще 100–200 мс
-//    val progress by produceState(rawProgress) {
-//        while (!rawProgress.done) {
-//            value = rawProgress
-//            delay(150)
-//        }
-//    }
+    val progress by produceState(rawProgress) {
+        while (!rawProgress.done) {
+            value = rawProgress
+            delay(200)
+        }
+    }
 //
-//    val bytes = progress.bytes
-//    val total = progress.total
-//    val done = progress.done
+    val bytes = progress.bytes
+    val total = progress.total
+    //val done = progress.done
 
 
 //    LaunchedEffect(Unit) {
@@ -193,38 +184,39 @@ fun UrlImageGifsCoil(
 
     //val state = painter.state.collectAsState().value
 
+    var state by remember { mutableStateOf<AsyncImagePainter.State>(AsyncImagePainter.State.Empty) }
 
 //// Управление воспроизведением анимации
-//    LaunchedEffect(state, isPlaying, isAnimated) {
-//
-//        if (isAnimated && state is AsyncImagePainter.State.Success) {
-//
-//            val drawable = state.result.image.asDrawable(context.resources)
-//
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && drawable is AnimatedImageDrawable) {
-//                if (isPlaying) {
-//                    drawable.start()
-//                    Timber.d("!!! AnimatedImageDrawable started")
-//                } else {
-//                    drawable.stop()
-//                    Timber.d("!!! AnimatedImageDrawable stopped")
-//                }
-//            } else if (drawable is android.graphics.drawable.AnimatedVectorDrawable) {
-//                if (isPlaying) {
-//                    drawable.start()
-//                } else {
-//                    drawable.stop()
-//                }
-//            } else if (drawable is android.graphics.drawable.Animatable) {
-//                if (isPlaying) {
-//                    drawable.start()
-//                } else {
-//                    drawable.stop()
-//                }
-//            }
-//
-//        }
-//    }
+    LaunchedEffect(state, isPlaying, isAnimated) {
+
+        if (isAnimated && state is AsyncImagePainter.State.Success) {
+
+            val drawable =
+                (state as AsyncImagePainter.State.Success).result.image.asDrawable(context.resources)
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && drawable is AnimatedImageDrawable) {
+                if (isPlaying) {
+                    drawable.start()
+                    Timber.d("!!! AnimatedImageDrawable started")
+                } else {
+                    drawable.stop()
+                    Timber.d("!!! AnimatedImageDrawable stopped")
+                }
+            } else if (drawable is android.graphics.drawable.AnimatedVectorDrawable) {
+                if (isPlaying) {
+                    drawable.start()
+                } else {
+                    drawable.stop()
+                }
+            } else if (drawable is android.graphics.drawable.Animatable) {
+                if (isPlaying) {
+                    drawable.start()
+                } else {
+                    drawable.stop()
+                }
+            }
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -241,6 +233,9 @@ fun UrlImageGifsCoil(
     {
 
         AsyncImage(
+            onState = { st ->
+                state = st
+            },
             model = imageRequest,
             imageLoader = imageLoader,
             contentDescription = null,
@@ -320,92 +315,142 @@ fun UrlImageGifsCoil(
 //                )
 //        )
 
-//        // Кнопка управления анимацией
-//        if (isAnimated) {
-//            Box(
-//                modifier = Modifier
-//                    .padding(2.dp)
-//                    .align(Alignment.BottomStart)
-//                    .size(sizeButton)
-//                    .clip(CircleShape)
-//                    //.background(Color.Gray.copy(alpha = 0.5f), CircleShape)
+
+        when (state) {
+            is AsyncImagePainter.State.Empty -> {
+
+            }
+
+            is AsyncImagePainter.State.Loading -> {
+
+                if (isVisibleLoadingIndicator) {
+
+                    Box(
+                        modifier = Modifier.matchParentSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (isAnimated) {
+                            // Показываем прогресс в процентах если известен общий размер
+                            if (total > 0 && bytes > 0) {
+                                val progress = (bytes.toFloat() / total.toFloat())
+                                CircularProgressIndicator(
+                                    progress = { progress },
+                                    modifier = Modifier.size(sizeLoadingIndicator)
+                                )
+
+                            } else {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(sizeLoadingIndicator),
+                                    color = Color.Gray
+                                )
+                            }
+                        } else {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(sizeLoadingIndicator),
+                                color = Color.Gray
+                            )
+                        }
+                    }
+
+
+                }
+
+            }
+
+            is AsyncImagePainter.State.Success -> {
+
+            }
+
+            is AsyncImagePainter.State.Error -> {
+                Box(
+                    modifier = Modifier.matchParentSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("Ошибка загрузки", color = Color.Gray)
+                }
+            }
+        }
+
+
+        //        // Кнопка управления анимацией
+        if (isAnimated) {
+            Box(
+                modifier = Modifier
+                    .padding(2.dp)
+                    .align(Alignment.BottomStart)
+                    .size(sizeButton)
+                    .clip(CircleShape)
+                    //.background(Color.Gray.copy(alpha = 0.5f), CircleShape)
+
+                    .combinedClickable(
+                        onClick = { isPlaying = !isPlaying },
+                        onLongClick = {
+
+
+                        }
+                    )
+
 //                    .then(
 //                        if (!url.contains("https://")) {
-//                            Modifier.clickable { isPlaying = !isPlaying }
+//                            Modifier
+//
+//                                .combinedClickable(
+//                                    onClick = {isPlaying = !isPlaying},
+//                                    onLongClick = {
+//
+//
+//                                    }
+//                                )
+//
+//
+//
 //                        } else Modifier
-//                    ),
-//                contentAlignment = Alignment.Center
-//            ) {
-//                if (url.contains("https://")) {
-//                    Icon(
-//                        Icons.Default.Animation,
-//                        contentDescription = null,
-//                        tint = Color.White,
-//                        modifier = Modifier.size(sizeButtonIcon)
 //                    )
-//                } else {
-//                    Icon(
-//                        if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
-//                        contentDescription = null,
-//                        tint = Color.White,
-//                        modifier = Modifier.size(sizeButtonIcon)
-//                    )
-//                }
-//            }
-//        }
+                ,
+                contentAlignment = Alignment.Center
+            ) {
+                if (url.contains("https://")) {
 
-//        when (state) {
-//            is AsyncImagePainter.State.Empty -> {
-//
-//            }
-//
-//            is AsyncImagePainter.State.Loading -> {
-//                if (loadIndicator) {
-//                    Box(
-//                        modifier = Modifier.matchParentSize(),
-//                        contentAlignment = Alignment.Center
-//                    ) {
-//                        // Показываем прогресс в процентах если известен общий размер
-//                        if (contentLength > 0 && bytesRead > 0) {
-//                            val progress = (bytesRead.toFloat() / contentLength.toFloat())
-//                            CircularProgressIndicator(
-//                                progress = { progress },
-//                                modifier = Modifier.size(32.dp)
-//                            )
-//                        } else {
-//                            CircularProgressIndicator(
-//                                modifier = Modifier.size(32.dp),
-//                                color = Color.Gray
-//                            )
-//                        }
-//                    }
-//                }
-//            }
-//
-//            is AsyncImagePainter.State.Success -> {
-//
-//            }
-//
-//            is AsyncImagePainter.State.Error -> {
-//                Box(
-//                    modifier = Modifier.matchParentSize(),
-//                    contentAlignment = Alignment.Center
-//                ) {
-//                    Text("Ошибка загрузки", color = Color.Gray)
-//                }
-//            }
-//        }
+                    Icon(
+                        Icons.Default.Animation,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(sizeButtonIcon)
+                    )
 
+                } else {
+
+                    Icon(
+                        if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
+                        contentDescription = null,
+                        tint = Color.Black,
+                        modifier = Modifier.size(sizeButtonIcon)
+                    )
+
+                    Icon(
+                        if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier
+                            .size(sizeButtonIcon)
+                            .offset((-0.5).dp, (-0.5).dp)
+                    )
+
+                }
+            }
+        }
 
 //        // Прогресс загрузки
-//        Box(modifier = Modifier.align(Alignment.BottomEnd)) {
-//            if (displayProgress > 1000) {
-//                ProgressText(
-//                    bytesRead = displayProgress,
-//                    totalBytes = contentLength
-//                )
-//            }
-//        }
+        if (isVisibleProgressText) {
+            Box(modifier = Modifier.align(Alignment.BottomEnd)) {
+                if (bytes > 1000) {
+                    ProgressText(
+                        bytesRead = bytes,
+                        totalBytes = total
+                    )
+                }
+            }
+        }
 
     }
 
