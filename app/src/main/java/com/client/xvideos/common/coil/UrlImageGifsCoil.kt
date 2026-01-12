@@ -88,7 +88,10 @@ fun UrlImageGifsCoil(
     isFullScreen: Boolean = false //Режим полного экрана с поддержкой поворота
 ) {
 
-    if (!isVisible) return
+//    if (!isVisible) {
+//        Box(modifier = Modifier.fillMaxSize().background(Color.Transparent))
+//        return
+//    }
 
     //if (isAnimated) return
 
@@ -104,12 +107,7 @@ fun UrlImageGifsCoil(
 
     val rawProgress by remember(url) {
         derivedStateOf {
-            CoilProgressManager.progressMap[url] ?: CoilProgressItem(
-                url,
-                0L,
-                0L,
-                false
-            )
+            CoilProgressManager.progressMap[url] ?: CoilProgressItem( url, 0L, 0L, false )
         }
     }
 
@@ -119,20 +117,11 @@ fun UrlImageGifsCoil(
             value = rawProgress
             delay(200)
         }
+        value = rawProgress
     }
 //
     val bytes = progress.bytes
     val total = progress.total
-    //val done = progress.done
-
-
-//    LaunchedEffect(Unit) {
-//        snapshotFlow { bytesRead }
-//            .debounce(100)
-//            .collect { newValue ->
-//                displayProgress = newValue
-//            }
-//    }
 
     val dataSource = remember(url, urlGif) {
 
@@ -149,38 +138,19 @@ fun UrlImageGifsCoil(
 
     }
 
-
-
     // Один глобальный ImageLoader на всё приложение
-    val imageLoader = remember {
-        CoilImageLoaderFactory.getImageLoader(context)
-        //CoilImageLoaderFactory.createImageLoader(context)
-    }
+    val imageLoader = remember {CoilImageLoaderFactory.getImageLoader(context) }
 
     val imageRequest = remember(dataSource, rotate) {
         ImageRequest.Builder(context)
             .data(dataSource)
-            //.crossfade(true)
             .scale(Scale.FIT)
-
             .apply {
                 if (!isFullScreen) {
                     //size(512, 64)
                     precision(Precision.INEXACT)
                 }
             }
-
-//            .listener(
-//                onStart = {
-//                    bytesRead = 0L
-//                    contentLength = 0L
-//                },
-//                onSuccess = { _, result ->
-//                },
-//                onError = { _, result ->
-//                    //Timber.e("!!! eee UrlImageGifsCoil throwable:${result.throwable}")
-//                }
-//            )
             .build()
     }
 
@@ -194,7 +164,7 @@ fun UrlImageGifsCoil(
 
     var state by remember { mutableStateOf<AsyncImagePainter.State>(AsyncImagePainter.State.Empty) }
 
-//// Управление воспроизведением анимации
+    //// Управление воспроизведением анимации
     LaunchedEffect(state, isPlaying, isAnimated) {
 
         if (isAnimated && state is AsyncImagePainter.State.Success) {

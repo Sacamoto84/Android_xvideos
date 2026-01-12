@@ -1,8 +1,11 @@
 package com.client.xvideos.l.ui.screens.screenFullScreen
 
+import android.os.Build
 import android.os.Parcelable
 import androidx.activity.compose.BackHandler
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -18,6 +21,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.layout.LazyLayoutCacheWindow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
@@ -41,10 +45,14 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ColorMatrix
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
@@ -63,8 +71,26 @@ import kotlinx.parcelize.Parcelize
 import net.engawapg.lib.zoomable.ZoomState
 import net.engawapg.lib.zoomable.rememberZoomState
 import net.engawapg.lib.zoomable.zoomable
+import kotlin.math.absoluteValue
 
-var fullScreenImageFilteredPicArray : List<PicsDetails> = emptyList()
+var fullScreenImageFilteredPicArray: List<PicsDetails> = emptyList()
+
+fun lerp(start: Float, stop: Float, fraction: Float): Float {
+    return start + (stop - start) * fraction
+}
+
+// ACTUAL OFFSET
+fun PagerState.offsetForPage(page: Int) = (currentPage - page) + currentPageOffsetFraction
+
+// OFFSET ONLY FROM THE LEFT
+fun PagerState.startOffsetForPage(page: Int): Float {
+    return offsetForPage(page).coerceAtLeast(0f)
+}
+
+// OFFSET ONLY FROM THE RIGHT
+fun PagerState.endOffsetForPage(page: Int): Float {
+    return offsetForPage(page).coerceAtMost(0f)
+}
 
 @Parcelize
 class FullScreenImage(
@@ -80,6 +106,7 @@ class FullScreenImage(
     @IgnoredOnParcel
     override val key: ScreenKey = uniqueScreenKey
 
+    @RequiresApi(Build.VERSION_CODES.S)
     @OptIn(
         ExperimentalFoundationApi::class,
         ExperimentalMaterialApi::class,
@@ -194,62 +221,414 @@ class FullScreenImage(
                 )
         ) {
 
+
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier.fillMaxSize(),
-                pageSpacing = 8.dp, beyondViewportPageCount = 1,
+                pageSpacing = 0.dp,
+                beyondViewportPageCount = 0,
+                reverseLayout = false,
                 key = { page -> filteredPic[page].url_to_original!! }
             ) { page ->
-
                 val pageItem = filteredPic[page]
-
                 val zoomState = rememberZoomState()
 
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        //.border(2.dp, Color.Magenta)
                         .aspectRatio(
-                            if (rotate) (pageItem.height.toFloat() / pageItem.width) else (pageItem.width.toFloat() / pageItem.height),
+                            if (rotate) (pageItem.height.toFloat() / pageItem.width)
+                            else (pageItem.width.toFloat() / pageItem.height),
                             matchHeightConstraintsFirst = false
                         )
-                )
-                {
-
-                    UrlImageGifsCoil(
-                        rotate = rotate,
-                        contentScale = ContentScale.Fit,
-                        url = pageItem.url_to_original!!,
+                        .zIndex(
+                            if (pagerState.offsetForPage(page) <= 0)
+                                0f
+                            else
+                                100f
+                        )
+                ) {
+                    // Картинка с масштабированием и позиционированием
+                    Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .zoomable(
-                                zoomState = zoomState,
-                                enableOneFingerZoom = false,
-                                onDoubleTap = { position ->
-                                    // Двойной тап для зума/раззума
-                                    coroutineScope.launch {
-                                        if (zoomState.scale > 1.0f) {
-                                            // Если уже увеличено - сбрасываем
-                                            //zoomState.reset()
-                                            zoomState.changeScale(1.0f, Offset.Zero)
-                                        } else {
-                                            // Увеличиваем в 2-3 раза по центру тапа
-                                            zoomState.changeScale(2.5f, position)
+                            .graphicsLayer {
+                                val pageOffset = pagerState.offsetForPage(page)
+
+                                // Если это текущая или прошлая страница (уходящая)
+                                if (pageOffset <= 0f) {
+                                    val progress = pageOffset.absoluteValue.coerceIn(0f, 1f)
+
+                                    // Уменьшаем от 1.0 до 0.5
+                                    val scale = lerp(1f, 0.7f, progress)
+                                    scaleX = scale
+                                    scaleY = scale
+
+                                    // Сдвигаем
+                                    translationX = size.width * pageOffset
+
+                                } else {
+                                    // Новая страница (входящая) - всегда в полном масштабе
+                                    scaleX = 1f
+                                    scaleY = 1f
+
+                                    translationX = 0f
+                                }
+                            }
+                    ) {
+                        UrlImageGifsCoil(
+                            rotate = rotate,
+                            contentScale = ContentScale.Fit,
+                            url = pageItem.url_to_original!!,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .zoomable(
+                                    zoomState = zoomState,
+                                    enableOneFingerZoom = false,
+                                    onDoubleTap = { position ->
+                                        coroutineScope.launch {
+                                            if (zoomState.scale > 1.0f) {
+                                                zoomState.changeScale(1.0f, Offset.Zero)
+                                            } else {
+                                                zoomState.changeScale(2.5f, position)
+                                            }
                                         }
                                     }
-                                }
-                            ),
-                        onSuccess = { },
-                        albumName = albumName,
-                        autoPlay = autoPlay,
-                        isAnimated = pageItem.is_animated,
-                        isVisible = currentIndex == page,
-                        isFullScreen = true
-                    )
+                                ),
+                            onSuccess = { },
+                            albumName = albumName,
+                            autoPlay = autoPlay,
+                            isAnimated = pageItem.is_animated,
+                            isVisible = currentIndex == page,
+                            isFullScreen = true
+                        )
 
+                        // Чёрный оверлей для уходящей страницы
+                        val pageOffset = pagerState.offsetForPage(page)
+                        if (pageOffset <= 0f) {
+                            val progress = pageOffset.absoluteValue.coerceIn(0f, 1f)
+                            val blackAlpha = lerp(0f, 0.7f, progress)
 
+                            Box(
+                                modifier = Modifier
+                                    .matchParentSize()
+                                    .background(Color.Black.copy(alpha = blackAlpha))
+                            )
+                        }
+                    }
                 }
             }
+
+
+
+//                    HorizontalPager(
+//                        state = pagerState,
+//                        modifier = Modifier.fillMaxSize(),
+//                        pageSpacing = 0.dp,
+//                        beyondViewportPageCount = 0,
+//                        reverseLayout = false,
+//                        key = { page -> filteredPic[page].url_to_original!! }
+//                    ) { page ->
+//                        val pageItem = filteredPic[page]
+//                        val zoomState = rememberZoomState()
+//
+//                        Box(
+//                            modifier = Modifier
+//                                .fillMaxSize()
+//                                .aspectRatio(
+//                                    if (rotate) (pageItem.height.toFloat() / pageItem.width)
+//                                    else (pageItem.width.toFloat() / pageItem.height),
+//                                    matchHeightConstraintsFirst = false
+//                                )
+//                                .zIndex(
+//                                    if (pagerState.offsetForPage(page) <= 0)
+//                                        0f
+//                                    else
+//                                        100f
+//                                )
+//                                .graphicsLayer {
+//                                    val pageOffset = pagerState.offsetForPage(page)
+//
+//                                    // Если это текущая или прошлая страница (уходящая)
+//                                    if (pageOffset <= 0f) {
+//                                        val progress = pageOffset.absoluteValue.coerceIn(0f, 1f)
+//
+//                                        // Уменьшаем от 1.0 до 0.5
+//                                        val scale = lerp(1f, 0.5f, progress)
+//                                        scaleX = scale
+//                                        scaleY = scale
+//
+//                                        // Затемняем через яркость (brightness)
+//                                        val brightness = lerp(0f, -0.7f, progress) // От 0 (норма) до -0.7 (темнее)
+//
+//                                        val matrix = ColorMatrix().apply {
+//                                            // Уменьшаем яркость (затемняем)
+//                                            set(0, 4, brightness * 255) // R
+//                                            set(1, 4, brightness * 255) // G
+//                                            set(2, 4, brightness * 255) // B
+//                                        }
+//
+//                                        colorFilter = ColorFilter.colorMatrix(matrix)
+//
+//                                        // Сдвигаем
+//                                        translationX = size.width * pageOffset
+//
+//                                    } else {
+//                                        // Новая страница (входящая) - всегда в полном масштабе
+//                                        scaleX = 1f
+//                                        scaleY = 1f
+//                                        colorFilter = null // Без фильтра
+//
+//                                        // Не двигаем
+//                                        translationX = 0f
+//                                    }
+//                                }
+//                        ) {
+//                            UrlImageGifsCoil(
+//                                rotate = rotate,
+//                                contentScale = ContentScale.Fit,
+//                                url = pageItem.url_to_original!!,
+//                                modifier = Modifier
+//                                    .fillMaxSize()
+//                                    .zoomable(
+//                                        zoomState = zoomState,
+//                                        enableOneFingerZoom = false,
+//                                        onDoubleTap = { position ->
+//                                            coroutineScope.launch {
+//                                                if (zoomState.scale > 1.0f) {
+//                                                    zoomState.changeScale(1.0f, Offset.Zero)
+//                                                } else {
+//                                                    zoomState.changeScale(2.5f, position)
+//                                                }
+//                                            }
+//                                        }
+//                                    ),
+//                                onSuccess = { },
+//                                albumName = albumName,
+//                                autoPlay = autoPlay,
+//                                isAnimated = pageItem.is_animated,
+//                                isVisible = currentIndex == page,
+//                                isFullScreen = true
+//                            )
+//                        }
+//                    }
+
+
+//            HorizontalPager(
+//                state = pagerState,
+//                modifier = Modifier.fillMaxSize(),
+//                pageSpacing = 0.dp,
+//                beyondViewportPageCount = 0,
+//                reverseLayout = false,
+//                key = { page -> filteredPic[page].url_to_original!! }
+//            )
+//            { page ->
+//                val pageItem = filteredPic[page]
+//                val zoomState = rememberZoomState()
+//
+//                Box(
+//                    modifier = Modifier
+//                        .fillMaxSize()
+//                        .aspectRatio(
+//                            if (rotate) (pageItem.height.toFloat() / pageItem.width)
+//                            else (pageItem.width.toFloat() / pageItem.height),
+//                            matchHeightConstraintsFirst = false
+//                        )
+//                        .zIndex(
+//                            if (pagerState.offsetForPage(page) <= 0)
+//                                0f
+//                            else
+//                                100f
+//                        )
+//                        .graphicsLayer {
+//                            val pageOffset = pagerState.offsetForPage(page)
+//
+//                            // Если это текущая или прошлая страница (уходящая)
+//                            if (pageOffset <= 0f) {
+//                                val progress = pageOffset.absoluteValue.coerceIn(0f, 1f)
+//
+//                                // Уменьшаем от 1.0 до 0.85
+//                                val scale = lerp(1f, 0.5f, progress)
+//                                scaleX = scale
+//                                scaleY = scale
+//
+//                                // Затемняем
+//                                alpha = lerp(1f, 0.0f, progress) // Нужно заменить на затемнение черным цветом  а не альфа
+//
+//                                // Сдвигаем
+//                                translationX = size.width * pageOffset
+//
+//               //                ??? val blur = (pagerState.startOffsetForPage(page)   * 20f).coerceAtLeast(0.1f)
+//               //                ??? renderEffect = RenderEffect
+//               //               ???      .createColorFilterEffect()
+////                                    .createBlurEffect(
+////                                        blur, blur, Shader.TileMode.DECAL
+////                                    ).asComposeRenderEffect()
+//
+//                            } else {
+//                                // Новая страница (входящая) - всегда в полном масштабе
+//                                scaleX = 1f
+//                                scaleY = 1f
+//                                alpha = 1f
+//
+//                                // Просто сдвигаем справа
+//                                translationX = 0f //size.width * pageOffset
+//                            }
+//                        }
+//
+//                ) {
+//                    UrlImageGifsCoil(
+//                        rotate = rotate,
+//                        contentScale = ContentScale.Fit,
+//                        url = pageItem.url_to_original!!,
+//                        modifier = Modifier
+//                            .fillMaxSize()
+//                            .zoomable(
+//                                zoomState = zoomState,
+//                                enableOneFingerZoom = false,
+//                                onDoubleTap = { position ->
+//                                    coroutineScope.launch {
+//                                        if (zoomState.scale > 1.0f) {
+//                                            zoomState.changeScale(1.0f, Offset.Zero)
+//                                        } else {
+//                                            zoomState.changeScale(2.5f, position)
+//                                        }
+//                                    }
+//                                }
+//                            ),
+//                        onSuccess = { },
+//                        albumName = albumName,
+//                        autoPlay = autoPlay,
+//                        isAnimated = pageItem.is_animated,
+//                        isVisible = currentIndex == page,
+//                        isFullScreen = true
+//                    )
+//                }
+//            }
+
+//            HorizontalPager(
+//                state = pagerState,
+//                modifier = Modifier.fillMaxSize(),
+//                pageSpacing = 8.dp, beyondViewportPageCount = 1,
+//                key = { page -> filteredPic[page].url_to_original!! }
+//            )
+//            { page ->
+//
+//                val pageItem = filteredPic[page]
+//
+//                val zoomState = rememberZoomState()
+//
+//                Box(
+//                    modifier = Modifier
+//                        .fillMaxSize()
+//                        //.border(2.dp, Color.Magenta)
+//                        .aspectRatio(
+//                            if (rotate) (pageItem.height.toFloat() / pageItem.width) else (pageItem.width.toFloat() / pageItem.height),
+//                            matchHeightConstraintsFirst = false
+//                        )
+//                        .graphicsLayer {
+//                            val pageOffset = pagerState.offsetForPage(page)//((pagerState.currentPage - page) + pagerState.currentPageOffsetFraction).absoluteValue
+//                            Timber.i(pageOffset.toString())
+//
+//                            val clampedOffset = pageOffset.coerceIn(0f, 1f)
+//
+//                            translationX =  size.width * clampedOffset
+////
+////                                if (page != pagerState.currentPage) {
+////                                0f
+////                            } else {
+////                               // 0f
+////                                size.width * clampedOffset //* if (page < pagerState.currentPage) -1 else 1
+//////                                size.width * clampedOffset * 0.15f *
+//////                                        if (page < pagerState.currentPage) -1 else 1
+////                            }
+//                        }
+////                            val pageOffset = pageOffset
+////                            val offScreenRight = pageOffset < 0f
+////                            val deg = 105f
+////                            val interpolated = FastOutLinearInEasing.transform(pageOffset.absoluteValue)
+////                            rotationY = min(interpolated * if (offScreenRight) deg else -deg, 90f)
+////
+////                            transformOrigin = TransformOrigin(
+////                                pivotFractionX = if (offScreenRight) 0f else 1f,
+////                                pivotFractionY = .5f
+////                            )
+////                        }
+//
+//
+////                        .graphicsLayer {
+////
+////                            val clampedOffset = pageOffset.coerceIn(0f, 1f)
+////
+////                            // 📏 scale: текущая уменьшается, соседняя увеличивается
+////                            val scale = lerp(
+////                                start = 0.85f,
+////                                stop = 1f,
+////                                fraction = FastOutSlowInEasing.transform(1f - clampedOffset)
+////                            )
+////                            scaleX = scale
+////                            scaleY = scale
+////
+////                            // 🌑 dim (затемнение)
+////                            alpha = lerp(
+////                                start = 0.5f,
+////                                stop = 1f,
+////                                fraction = 1f - clampedOffset
+////                            )
+////
+////                            // 🚫 НЕ двигаем текущую страницу
+////                            translationX = if (page == pagerState.currentPage) {
+////                                0f
+////                            } else {
+////                                // 👉 соседняя слегка «тянется»
+////                                size.width * clampedOffset * 0.15f *
+////                                        if (page < pagerState.currentPage) -1 else 1
+////                            }
+////                        }
+//                )
+//                {
+//
+//                    UrlImageGifsCoil(
+//                        rotate = rotate,
+//                        contentScale = ContentScale.Fit,
+//                        url = pageItem.url_to_original!!,
+//                        modifier = Modifier
+//                            .fillMaxSize()
+//                            .zoomable(
+//                                zoomState = zoomState,
+//                                enableOneFingerZoom = false,
+//                                onDoubleTap = { position ->
+//                                    // Двойной тап для зума/раззума
+//                                    coroutineScope.launch {
+//                                        if (zoomState.scale > 1.0f) {
+//                                            // Если уже увеличено - сбрасываем
+//                                            //zoomState.reset()
+//                                            zoomState.changeScale(1.0f, Offset.Zero)
+//                                        } else {
+//                                            // Увеличиваем в 2-3 раза по центру тапа
+//                                            zoomState.changeScale(2.5f, position)
+//                                        }
+//                                    }
+//                                }
+//                            ),
+//                        onSuccess = { },
+//                        albumName = albumName,
+//                        autoPlay = autoPlay,
+//                        isAnimated = pageItem.is_animated,
+//                        isVisible = currentIndex == page,
+//                        isFullScreen = true
+//                    )
+//
+////                    Box(
+////                        Modifier
+////                            .matchParentSize()
+////                            .background(
+////                                Color.Black.copy(alpha = pageOffset.coerceIn(0f, 0.5f))
+////                            )
+////                    )
+//
+//                }
+//            }
 
 
             Box(modifier = Modifier.align(Alignment.TopStart)) {
