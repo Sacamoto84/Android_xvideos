@@ -11,6 +11,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -26,7 +27,10 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Analytics
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.ScreenRotation
+import androidx.compose.material.icons.filled.Web
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -104,7 +108,7 @@ class FullScreenImage(
     val expandMenu: ExpandMenuType,
     @IgnoredOnParcel val onClose: (Int) -> Unit = {},
 
-) : Screen, Parcelable {
+    ) : Screen, Parcelable {
 
     @IgnoredOnParcel
     override val key: ScreenKey = uniqueScreenKey
@@ -123,8 +127,6 @@ class FullScreenImage(
 //            //filteredPic.toList()
 //        }
 
-        /** ## ➡️ Стиль отображения типа телеграмм ⬅️ */
-        val isStyleTelegram  = Settings.lusciousFullScreenStyleTelegram.field.collectAsStateWithLifecycle().value
 
         //val filteredPic = filteredPicArray.toList() 🔴 📚 🗂️ 💾 𝑹𝒖𝒍𝒆𝒔 ⚡️⭐⭐⭐⭐⭐
         val filteredPic = fullScreenImageFilteredPicArray.toList()
@@ -230,7 +232,7 @@ class FullScreenImage(
                 state = pagerState,
                 modifier = Modifier.fillMaxSize(),
                 pageSpacing = 0.dp,
-                beyondViewportPageCount = 0,
+                beyondViewportPageCount = 1,
                 reverseLayout = false,
                 key = { page -> filteredPic[page].url_to_original!! }
             ) { page ->
@@ -246,36 +248,14 @@ class FullScreenImage(
                             matchHeightConstraintsFirst = false
                         )
                         .zIndex(
-                            if (pagerState.offsetForPage(page) <= 0)  0f  else 100f
+                            if (pagerState.offsetForPage(page) <= 0) 0f else 100f
                         )
+
                 ) {
                     // Картинка с масштабированием и позиционированием
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .graphicsLayer {
-                                val pageOffset = pagerState.offsetForPage(page)
-
-                                // Если это текущая или прошлая страница (уходящая)
-                                if (pageOffset <= 0f) {
-                                    val progress = pageOffset.absoluteValue.coerceIn(0f, 1f)
-
-                                    // Уменьшаем от 1.0 до 0.5
-                                    val scale = lerp(1f, 0.7f, progress)
-                                    scaleX = scale
-                                    scaleY = scale
-
-                                    // Сдвигаем
-                                    translationX = size.width * pageOffset
-
-                                } else {
-                                    // Новая страница (входящая) - всегда в полном масштабе
-                                    scaleX = 1f
-                                    scaleY = 1f
-
-                                    translationX = 0f
-                                }
-                            }
                     ) {
                         UrlImageGifsCoil(
                             rotate = rotate,
@@ -304,333 +284,9 @@ class FullScreenImage(
                             isFullScreen = true
                         )
 
-                        // Чёрный оверлей для уходящей страницы
-                        val pageOffset = pagerState.offsetForPage(page)
-                        if (pageOffset <= 0f) {
-                            val progress = pageOffset.absoluteValue.coerceIn(0f, 1f)
-                            val blackAlpha = lerp(0f, 0.7f, progress)
-
-                            Box(
-                                modifier = Modifier
-                                    .matchParentSize()
-                                    .background(Color.Black.copy(alpha = blackAlpha))
-                            )
-                        }
                     }
                 }
             }
-
-
-
-//                    HorizontalPager(
-//                        state = pagerState,
-//                        modifier = Modifier.fillMaxSize(),
-//                        pageSpacing = 0.dp,
-//                        beyondViewportPageCount = 0,
-//                        reverseLayout = false,
-//                        key = { page -> filteredPic[page].url_to_original!! }
-//                    ) { page ->
-//                        val pageItem = filteredPic[page]
-//                        val zoomState = rememberZoomState()
-//
-//                        Box(
-//                            modifier = Modifier
-//                                .fillMaxSize()
-//                                .aspectRatio(
-//                                    if (rotate) (pageItem.height.toFloat() / pageItem.width)
-//                                    else (pageItem.width.toFloat() / pageItem.height),
-//                                    matchHeightConstraintsFirst = false
-//                                )
-//                                .zIndex(
-//                                    if (pagerState.offsetForPage(page) <= 0)
-//                                        0f
-//                                    else
-//                                        100f
-//                                )
-//                                .graphicsLayer {
-//                                    val pageOffset = pagerState.offsetForPage(page)
-//
-//                                    // Если это текущая или прошлая страница (уходящая)
-//                                    if (pageOffset <= 0f) {
-//                                        val progress = pageOffset.absoluteValue.coerceIn(0f, 1f)
-//
-//                                        // Уменьшаем от 1.0 до 0.5
-//                                        val scale = lerp(1f, 0.5f, progress)
-//                                        scaleX = scale
-//                                        scaleY = scale
-//
-//                                        // Затемняем через яркость (brightness)
-//                                        val brightness = lerp(0f, -0.7f, progress) // От 0 (норма) до -0.7 (темнее)
-//
-//                                        val matrix = ColorMatrix().apply {
-//                                            // Уменьшаем яркость (затемняем)
-//                                            set(0, 4, brightness * 255) // R
-//                                            set(1, 4, brightness * 255) // G
-//                                            set(2, 4, brightness * 255) // B
-//                                        }
-//
-//                                        colorFilter = ColorFilter.colorMatrix(matrix)
-//
-//                                        // Сдвигаем
-//                                        translationX = size.width * pageOffset
-//
-//                                    } else {
-//                                        // Новая страница (входящая) - всегда в полном масштабе
-//                                        scaleX = 1f
-//                                        scaleY = 1f
-//                                        colorFilter = null // Без фильтра
-//
-//                                        // Не двигаем
-//                                        translationX = 0f
-//                                    }
-//                                }
-//                        ) {
-//                            UrlImageGifsCoil(
-//                                rotate = rotate,
-//                                contentScale = ContentScale.Fit,
-//                                url = pageItem.url_to_original!!,
-//                                modifier = Modifier
-//                                    .fillMaxSize()
-//                                    .zoomable(
-//                                        zoomState = zoomState,
-//                                        enableOneFingerZoom = false,
-//                                        onDoubleTap = { position ->
-//                                            coroutineScope.launch {
-//                                                if (zoomState.scale > 1.0f) {
-//                                                    zoomState.changeScale(1.0f, Offset.Zero)
-//                                                } else {
-//                                                    zoomState.changeScale(2.5f, position)
-//                                                }
-//                                            }
-//                                        }
-//                                    ),
-//                                onSuccess = { },
-//                                albumName = albumName,
-//                                autoPlay = autoPlay,
-//                                isAnimated = pageItem.is_animated,
-//                                isVisible = currentIndex == page,
-//                                isFullScreen = true
-//                            )
-//                        }
-//                    }
-
-
-//            HorizontalPager(
-//                state = pagerState,
-//                modifier = Modifier.fillMaxSize(),
-//                pageSpacing = 0.dp,
-//                beyondViewportPageCount = 0,
-//                reverseLayout = false,
-//                key = { page -> filteredPic[page].url_to_original!! }
-//            )
-//            { page ->
-//                val pageItem = filteredPic[page]
-//                val zoomState = rememberZoomState()
-//
-//                Box(
-//                    modifier = Modifier
-//                        .fillMaxSize()
-//                        .aspectRatio(
-//                            if (rotate) (pageItem.height.toFloat() / pageItem.width)
-//                            else (pageItem.width.toFloat() / pageItem.height),
-//                            matchHeightConstraintsFirst = false
-//                        )
-//                        .zIndex(
-//                            if (pagerState.offsetForPage(page) <= 0)
-//                                0f
-//                            else
-//                                100f
-//                        )
-//                        .graphicsLayer {
-//                            val pageOffset = pagerState.offsetForPage(page)
-//
-//                            // Если это текущая или прошлая страница (уходящая)
-//                            if (pageOffset <= 0f) {
-//                                val progress = pageOffset.absoluteValue.coerceIn(0f, 1f)
-//
-//                                // Уменьшаем от 1.0 до 0.85
-//                                val scale = lerp(1f, 0.5f, progress)
-//                                scaleX = scale
-//                                scaleY = scale
-//
-//                                // Затемняем
-//                                alpha = lerp(1f, 0.0f, progress) // Нужно заменить на затемнение черным цветом  а не альфа
-//
-//                                // Сдвигаем
-//                                translationX = size.width * pageOffset
-//
-//               //                ??? val blur = (pagerState.startOffsetForPage(page)   * 20f).coerceAtLeast(0.1f)
-//               //                ??? renderEffect = RenderEffect
-//               //               ???      .createColorFilterEffect()
-////                                    .createBlurEffect(
-////                                        blur, blur, Shader.TileMode.DECAL
-////                                    ).asComposeRenderEffect()
-//
-//                            } else {
-//                                // Новая страница (входящая) - всегда в полном масштабе
-//                                scaleX = 1f
-//                                scaleY = 1f
-//                                alpha = 1f
-//
-//                                // Просто сдвигаем справа
-//                                translationX = 0f //size.width * pageOffset
-//                            }
-//                        }
-//
-//                ) {
-//                    UrlImageGifsCoil(
-//                        rotate = rotate,
-//                        contentScale = ContentScale.Fit,
-//                        url = pageItem.url_to_original!!,
-//                        modifier = Modifier
-//                            .fillMaxSize()
-//                            .zoomable(
-//                                zoomState = zoomState,
-//                                enableOneFingerZoom = false,
-//                                onDoubleTap = { position ->
-//                                    coroutineScope.launch {
-//                                        if (zoomState.scale > 1.0f) {
-//                                            zoomState.changeScale(1.0f, Offset.Zero)
-//                                        } else {
-//                                            zoomState.changeScale(2.5f, position)
-//                                        }
-//                                    }
-//                                }
-//                            ),
-//                        onSuccess = { },
-//                        albumName = albumName,
-//                        autoPlay = autoPlay,
-//                        isAnimated = pageItem.is_animated,
-//                        isVisible = currentIndex == page,
-//                        isFullScreen = true
-//                    )
-//                }
-//            }
-
-//            HorizontalPager(
-//                state = pagerState,
-//                modifier = Modifier.fillMaxSize(),
-//                pageSpacing = 8.dp, beyondViewportPageCount = 1,
-//                key = { page -> filteredPic[page].url_to_original!! }
-//            )
-//            { page ->
-//
-//                val pageItem = filteredPic[page]
-//
-//                val zoomState = rememberZoomState()
-//
-//                Box(
-//                    modifier = Modifier
-//                        .fillMaxSize()
-//                        //.border(2.dp, Color.Magenta)
-//                        .aspectRatio(
-//                            if (rotate) (pageItem.height.toFloat() / pageItem.width) else (pageItem.width.toFloat() / pageItem.height),
-//                            matchHeightConstraintsFirst = false
-//                        )
-//                        .graphicsLayer {
-//                            val pageOffset = pagerState.offsetForPage(page)//((pagerState.currentPage - page) + pagerState.currentPageOffsetFraction).absoluteValue
-//                            Timber.i(pageOffset.toString())
-//
-//                            val clampedOffset = pageOffset.coerceIn(0f, 1f)
-//
-//                            translationX =  size.width * clampedOffset
-////
-////                                if (page != pagerState.currentPage) {
-////                                0f
-////                            } else {
-////                               // 0f
-////                                size.width * clampedOffset //* if (page < pagerState.currentPage) -1 else 1
-//////                                size.width * clampedOffset * 0.15f *
-//////                                        if (page < pagerState.currentPage) -1 else 1
-////                            }
-//                        }
-////                            val pageOffset = pageOffset
-////                            val offScreenRight = pageOffset < 0f
-////                            val deg = 105f
-////                            val interpolated = FastOutLinearInEasing.transform(pageOffset.absoluteValue)
-////                            rotationY = min(interpolated * if (offScreenRight) deg else -deg, 90f)
-////
-////                            transformOrigin = TransformOrigin(
-////                                pivotFractionX = if (offScreenRight) 0f else 1f,
-////                                pivotFractionY = .5f
-////                            )
-////                        }
-//
-//
-////                        .graphicsLayer {
-////
-////                            val clampedOffset = pageOffset.coerceIn(0f, 1f)
-////
-////                            // 📏 scale: текущая уменьшается, соседняя увеличивается
-////                            val scale = lerp(
-////                                start = 0.85f,
-////                                stop = 1f,
-////                                fraction = FastOutSlowInEasing.transform(1f - clampedOffset)
-////                            )
-////                            scaleX = scale
-////                            scaleY = scale
-////
-////                            // 🌑 dim (затемнение)
-////                            alpha = lerp(
-////                                start = 0.5f,
-////                                stop = 1f,
-////                                fraction = 1f - clampedOffset
-////                            )
-////
-////                            // 🚫 НЕ двигаем текущую страницу
-////                            translationX = if (page == pagerState.currentPage) {
-////                                0f
-////                            } else {
-////                                // 👉 соседняя слегка «тянется»
-////                                size.width * clampedOffset * 0.15f *
-////                                        if (page < pagerState.currentPage) -1 else 1
-////                            }
-////                        }
-//                )
-//                {
-//
-//                    UrlImageGifsCoil(
-//                        rotate = rotate,
-//                        contentScale = ContentScale.Fit,
-//                        url = pageItem.url_to_original!!,
-//                        modifier = Modifier
-//                            .fillMaxSize()
-//                            .zoomable(
-//                                zoomState = zoomState,
-//                                enableOneFingerZoom = false,
-//                                onDoubleTap = { position ->
-//                                    // Двойной тап для зума/раззума
-//                                    coroutineScope.launch {
-//                                        if (zoomState.scale > 1.0f) {
-//                                            // Если уже увеличено - сбрасываем
-//                                            //zoomState.reset()
-//                                            zoomState.changeScale(1.0f, Offset.Zero)
-//                                        } else {
-//                                            // Увеличиваем в 2-3 раза по центру тапа
-//                                            zoomState.changeScale(2.5f, position)
-//                                        }
-//                                    }
-//                                }
-//                            ),
-//                        onSuccess = { },
-//                        albumName = albumName,
-//                        autoPlay = autoPlay,
-//                        isAnimated = pageItem.is_animated,
-//                        isVisible = currentIndex == page,
-//                        isFullScreen = true
-//                    )
-//
-////                    Box(
-////                        Modifier
-////                            .matchParentSize()
-////                            .background(
-////                                Color.Black.copy(alpha = pageOffset.coerceIn(0f, 0.5f))
-////                            )
-////                    )
-//
-//                }
-//            }
-
 
             Box(modifier = Modifier.align(Alignment.TopStart)) {
                 Text(
@@ -641,11 +297,13 @@ class FullScreenImage(
                 )
             }
 
-            Box(
+
+            Row(
                 modifier = Modifier
                     .align(Alignment.TopStart)
                     .offset(y = 8.dp)
             ) {
+
                 IconButton(onClick = { rotate = rotate.not() }) {
                     Icon(
                         Icons.Default.ScreenRotation,
@@ -653,7 +311,20 @@ class FullScreenImage(
                         tint = Color.White
                     )
                 }
+
+                IconButton(onClick = {  }) {
+                    Icon(
+                        Icons.Default.Info,
+                        contentDescription = null,
+                        tint = Color.White
+                    )
+                }
+
+
             }
+
+
+
 
             Box(
                 modifier = Modifier
