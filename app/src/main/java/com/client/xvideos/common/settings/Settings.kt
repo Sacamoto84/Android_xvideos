@@ -10,9 +10,7 @@ object Settings {
 
     private lateinit var pref: SharedPreferences
 
-    fun init(prefs: SharedPreferences) {
-        pref = prefs
-    }
+    fun init(prefs: SharedPreferences) { pref = prefs }
 
     val gallery_count: List<SettingElementBoolean> by lazy {
         listOf(
@@ -45,33 +43,17 @@ object Settings {
     /**
      * Размер миниатюры в галерее
      */
-    val thumbalistSize by lazy {
-        SettingElementString(
-            pref,
-            "thumbalistSize",
-            ThumbnailsSize.SMALL.value
-        )
-    }
+    val thumbalistSize by lazy { SettingElementString( pref, "thumbalistSize", ThumbnailsSize.SMALL.value ) }
 
+    /**
+     * Стиль отображения на экране фуллскрин в стиле телеграмм
+     */
+    val lusciousFullScreenStyleTelegram by lazy { SettingElementBoolean( pref, "lusciousFullscreenStyleTelegram", false ) }
 
     /**
      * Обьем дискового кеша в МБ
      */
     val frescoDiskCacheCapacity by lazy { SettingElementInt(pref, "frescoDiskCacheCapacity", 2000) }
-
-    /**
-     * Функция автоочистки кеша при запуске приложения, очищает половину старых файлов
-     */
-    val frescoDiskCacheAutoClear by lazy {
-        SettingElementBoolean(
-            pref,
-            "frescoDiskCacheAutoClear",
-            false
-        )
-    }
-
-
-
 
 
     //-- xvideos ---

@@ -54,12 +54,14 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.common.coil.UrlImageGifsCoil
+import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.ui.element.expandMenu.ExpandMenuType
@@ -100,7 +102,8 @@ class FullScreenImage(
     val autoPlay: Boolean = false,
     val isAnimated: Boolean = false,
     val expandMenu: ExpandMenuType,
-    @IgnoredOnParcel val onClose: (Int) -> Unit = {}
+    @IgnoredOnParcel val onClose: (Int) -> Unit = {},
+
 ) : Screen, Parcelable {
 
     @IgnoredOnParcel
@@ -116,12 +119,14 @@ class FullScreenImage(
     override fun Content() {
 
 //        run {
-//
 //            Timber.d("!!! >>>> filteredPic type: ${filteredPic::class.java.simpleName}")
 //            //filteredPic.toList()
 //        }
 
-        //val filteredPic = filteredPicArray.toList()
+        /** ## ➡️ Стиль отображения типа телеграмм ⬅️ */
+        val isStyleTelegram  = Settings.lusciousFullScreenStyleTelegram.field.collectAsStateWithLifecycle().value
+
+        //val filteredPic = filteredPicArray.toList() 🔴 📚 🗂️ 💾 𝑹𝒖𝒍𝒆𝒔 ⚡️⭐⭐⭐⭐⭐
         val filteredPic = fullScreenImageFilteredPicArray.toList()
 
         val expandMenuViewModel: ExpandMenuViewModel = hiltViewModel()
@@ -221,7 +226,6 @@ class FullScreenImage(
                 )
         ) {
 
-
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier.fillMaxSize(),
@@ -242,10 +246,7 @@ class FullScreenImage(
                             matchHeightConstraintsFirst = false
                         )
                         .zIndex(
-                            if (pagerState.offsetForPage(page) <= 0)
-                                0f
-                            else
-                                100f
+                            if (pagerState.offsetForPage(page) <= 0)  0f  else 100f
                         )
                 ) {
                     // Картинка с масштабированием и позиционированием
