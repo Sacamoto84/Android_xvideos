@@ -13,7 +13,7 @@ fun blockItem(item: GifsInfo): Result<Boolean> {
         Timber.i("!!! Блокировка GIFS -> useCaseBlockItem() id:${item.id} userName:${item.userName} url:${item.urls.hd}")
 
         // Создаем директорию <userName>/block, если её нет
-        val blockDir = File(AppPath.block_red, item.userName)
+        val blockDir = File(AppPath.r_block, item.userName)
 
         if (!blockDir.exists()) {
             val created = blockDir.mkdirs()

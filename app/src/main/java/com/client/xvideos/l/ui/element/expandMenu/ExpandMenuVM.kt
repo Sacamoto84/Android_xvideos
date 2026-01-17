@@ -8,8 +8,8 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.lifecycle.ViewModel
 import com.client.xvideos.common.AppPath
 import com.client.xvideos.common.di.ApplicationScope
-import com.client.xvideos.common.eventBus.snackBarError
 import com.client.xvideos.common.kdownloader.KDownloader
+import com.client.xvideos.common.snackbar.SnackBar
 import com.client.xvideos.common.util.toMD5
 import com.client.xvideos.l.featured.downloader.DownloaderL
 import com.client.xvideos.l.featured.saved.SavedL
@@ -132,7 +132,7 @@ class ExpandMenuViewModel @Inject constructor(
                     ?.dropLast(24) + "." + ext
             val url = item.url_to_original!!
             val client = HttpClient()
-            val downloadsDir = AppPath.cacheDownload_l
+            val downloadsDir = AppPath.l_cacheDownload
             val file = File(downloadsDir, fileName)
             try {
                 val response: HttpResponse = client.get(url)
@@ -143,11 +143,11 @@ class ExpandMenuViewModel @Inject constructor(
                 if (file.exists()) {
                     useCaseShareFile(context, file)
                 } else {
-                    snackBarError("Файл не найден: ${file.absolutePath}")
+                    SnackBar.error("Файл не найден: ${file.absolutePath}")
                     Timber.w("shareGifs -> Файл не существует: ${file.absolutePath}")
                 }
             } catch (e: Exception) {
-                snackBarError("shareGifs -> Ошибка при работе с файлом: ${file.absolutePath}")
+                SnackBar.error("shareGifs -> Ошибка при работе с файлом: ${file.absolutePath}")
                 Timber.e(e, "shareGifs -> Ошибка при работе с файлом: ${file.absolutePath}")
             } finally {
                 client.close()

@@ -30,7 +30,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -42,7 +41,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.layout.onFirstVisible
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -56,7 +54,7 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.Navigator
 import com.client.xvideos.common.eventBus.Event
 import com.client.xvideos.common.eventBus.EventBus
-import com.client.xvideos.common.eventBus.UiMessage
+import com.client.xvideos.common.snackbar.UiMessage
 import com.client.xvideos.common.traficStatistic.AppNetworkSpeedMonitorLite
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.ui.screens.explorer.ScreenLExplorer
@@ -100,7 +98,7 @@ object ScreenRoot : Screen {
             //Timber.i("~~~ LaunchedEffect started — start collecting")
             EventBus.events
                 //.onEach { Timber.i("~~~ EventBus emitted: $it") }
-                .filterIsInstance<Event.SnackBarRaw>()
+                .filterIsInstance<Event.ShowSnackBar>()
                 .collect { event ->
                     //Timber.i("~~~ Event.SnackBarRaw collected: ${event.message}")
                     haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)

@@ -2,7 +2,7 @@ package com.client.xvideos.redgifs.common.pagin
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.client.xvideos.common.eventBus.snackBarError
+import com.client.xvideos.common.snackbar.SnackBar
 import com.client.xvideos.redgifs.common.UsersRed
 import com.client.xvideos.redgifs.network.api.RedApi
 import com.client.xvideos.redgifs.model.GifsInfo
@@ -56,7 +56,7 @@ class ItemTopPagingSource(
             )
         } catch (e: Exception) {
             Timber.e("!!! ItemPagingSource load() page = $page Ошибка = ${e.message}")
-            snackBarError("ItemPagingSource load() page = $page Ошибка = ${e.message}")
+            SnackBar.error("ItemPagingSource load() page = $page Ошибка = ${e.message}")
             LoadResult.Error(e)
         }
     }

@@ -85,7 +85,7 @@ object SettingTab : Screen {
 
         LaunchedEffect(Unit) {
             vm.sizeXvideos = getFolderSize(File(AppPath.main))
-            vm.sizeRedDownload = getFolderSize(File(AppPath.cache_download_red))
+            vm.sizeRedDownload = getFolderSize(File(AppPath.r_cache_download))
         }
 
         Column(
@@ -122,7 +122,7 @@ object SettingTab : Screen {
                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                 vm.hostDI.downloadRed.deleteAll {
                     vm.sizeXvideos = getFolderSize(File(AppPath.main))
-                    vm.sizeRedDownload = getFolderSize(File(AppPath.cache_download_red))
+                    vm.sizeRedDownload = getFolderSize(File(AppPath.r_cache_download))
                 }
             }
             HorizontalDivider(color = Color.DarkGray)

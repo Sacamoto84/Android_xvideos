@@ -183,8 +183,8 @@ object SavedDownloadTab : Screen {
                                 .clickable(onClick = {navigator.push(ScreenRedFullScreen(it1))})
                         ) {
 
-                            val imagePath = AppPath.cache_download_red + "/" + it1.userName + "/" + it1.id + ".jpg"
-                            val mp4Path = AppPath.cache_download_red + "/" + it1.userName + "/" + it1.id + ".mp4"
+                            val imagePath = AppPath.r_cache_download + "/" + it1.userName + "/" + it1.id + ".jpg"
+                            val mp4Path = AppPath.r_cache_download + "/" + it1.userName + "/" + it1.id + ".mp4"
 
                             val size = File(mp4Path).length().toPrettyCount3()
 

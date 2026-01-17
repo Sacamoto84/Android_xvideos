@@ -4,14 +4,13 @@ import android.content.Context
 import android.widget.Toast
 import com.client.xvideos.common.AppPath
 import com.client.xvideos.l.model.PicsDetails
-import com.client.xvideos.redgifs.model.GifsInfo
 import timber.log.Timber
 import java.io.File
 
 //--- Поделиться ---
 fun useCaseShareL(context : Context, item: PicsDetails){
 
-    val path = "${AppPath.cacheDownload_l}/${item.url_to_original}"
+    val path = "${AppPath.l_cacheDownload}/${item.url_to_original}"
     val file = File(path)
 
     try {

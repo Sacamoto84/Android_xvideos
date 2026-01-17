@@ -53,12 +53,8 @@ fun AlbumListItem(
             contentScale = ContentScale.Crop
         )
 
-        Column(
-            Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .background(Color(0x80000000))
-        ) {
+        Column( Modifier.align(Alignment.BottomCenter).fillMaxWidth().background(Color(0x80000000)) )
+        {
 
             Text(
                 title.removePrefix(" "),
@@ -70,9 +66,8 @@ fun AlbumListItem(
                 fontSize = 16.sp
             )
 
-            Row(
-                Modifier.padding(start = 4.dp).fillMaxWidth()
-            ) {
+            Row( Modifier.padding(start = 4.dp).fillMaxWidth() )
+            {
                 val str = StringBuilder()
                 if (numberOfAnimatedPictures > 0) {
                     str.append("$numberOfAnimatedPictures gifs")

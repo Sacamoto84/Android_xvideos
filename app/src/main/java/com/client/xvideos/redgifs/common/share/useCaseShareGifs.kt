@@ -11,7 +11,7 @@ import java.io.File
 //--- Поделиться ---
 fun useCaseShareGifs(context : Context, item: GifsInfo){
 
-    val path = "${AppPath.cache_download_red}/${item.userName}/${item.id}.mp4"
+    val path = "${AppPath.r_cache_download}/${item.userName}/${item.id}.mp4"
     val file = File(path)
 
     try {

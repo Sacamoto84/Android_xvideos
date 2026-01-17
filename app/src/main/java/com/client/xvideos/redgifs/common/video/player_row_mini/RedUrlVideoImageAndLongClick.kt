@@ -93,7 +93,7 @@ fun RedUrlVideoImageAndLongClick(
         Timber.tag("???").i("Перерачсет videoItem.id = ${item.id}")
         //Определяем адрес откуда брать видео, из кеша или из сети
         if (downloadRed.downloader.findVideoInDownload(item.id, item.userName))
-            "${AppPath.cache_download_red}/${item.userName}/${item.id}.mp4"
+            "${AppPath.r_cache_download}/${item.userName}/${item.id}.mp4"
         else {
             if (isNetConnected)
                 "https://api.redgifs.com/v2/gifs/${item.id.lowercase()}/hd.m3u8"
@@ -107,7 +107,7 @@ fun RedUrlVideoImageAndLongClick(
     val imageUrl by remember {
         mutableStateOf(
             run {
-                val imagePath = "${AppPath.cache_download_red}/${item.userName}/${item.id}.jpg"
+                val imagePath = "${AppPath.r_cache_download}/${item.userName}/${item.id}.jpg"
                 if (File(imagePath).exists()) {
                     imagePath
                 } else {

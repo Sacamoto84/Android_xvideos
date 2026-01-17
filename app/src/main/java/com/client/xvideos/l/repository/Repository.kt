@@ -2,10 +2,10 @@ package com.client.xvideos.l.repository
 
 import android.content.Context
 import com.client.xvideos.common.encrypting.Password
-import com.client.xvideos.common.eventBus.snackBarError
 import com.client.xvideos.common.room.AppDatabase
 import com.client.xvideos.common.room.entity.CacheUrlStringRamEntity
 import com.client.xvideos.common.room.entity.CacheUrlStringRomEntity
+import com.client.xvideos.common.snackbar.SnackBar
 import com.client.xvideos.common.util.toMD5
 import com.client.xvideos.l.KtorRequestHandler
 import kotlinx.coroutines.CoroutineScope
@@ -88,7 +88,7 @@ class Repository(
                         val response = handler.postJson(url, data)
 
                         if (response.contains("{\"errors\":")){
-                            snackBarError(response)
+                            SnackBar.error(response)
                             return Result.failure(Exception(response))
                         }
 
@@ -114,7 +114,7 @@ class Repository(
                         val response = handler.postJson(url, data)
 
                         if (response.contains("{\"errors\":")){
-                            snackBarError(response)
+                            SnackBar.error(response)
                             return Result.failure(Exception(response))
                         }
 
@@ -124,14 +124,14 @@ class Repository(
 
                         if (response.contains("{\"errors\":"))
                         {
-                            snackBarError(response)
+                            SnackBar.error(response)
                         }
 
                         return Result.success(response)
                     }
                     catch (e: Exception){
                         Timber.e(e, "!!! openURI() CACHE_RAM error")
-                        snackBarError(e.message?: "openURI() CACHE_RAM error")
+                        SnackBar.error(e.message?: "openURI() CACHE_RAM error")
                         return Result.failure(e)
                     }
                 }

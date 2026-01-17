@@ -2,7 +2,7 @@ package com.client.xvideos.redgifs.common.pagin
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.client.xvideos.common.eventBus.snackBarError
+import com.client.xvideos.common.snackbar.SnackBar
 import com.client.xvideos.redgifs.model.GifsInfo
 import com.client.xvideos.redgifs.common.saved.SavedRed
 import timber.log.Timber
@@ -23,7 +23,7 @@ class ItemCollectionPagingSource(val collection: String?, val savedRed: SavedRed
 
         } catch (e: Exception) {
             Timber.e("!!! ItemCollectionPagingSource::load() collection:${collection} Ошибка = ${e.message}")
-            snackBarError("ItemCollectionPagingSource::load() collection:${collection} Ошибка = ${e.message}")
+            SnackBar.error("ItemCollectionPagingSource::load() collection:${collection} Ошибка = ${e.message}")
             LoadResult.Error(e)
         }
     }

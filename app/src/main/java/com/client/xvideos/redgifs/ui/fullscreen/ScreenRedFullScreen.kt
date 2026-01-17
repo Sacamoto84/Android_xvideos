@@ -100,7 +100,7 @@ class ScreenRedFullScreen(val item: GifsInfo) : Screen, ScreenTransition {
             Timber.tag("???").i("Перерасчет videoItem.id = ${item.id}")
             //Определяем адрес откуда брать видео, из кеша или из сети
             if (vm.downloadRed.downloader.findVideoInDownload(item.id, item.userName))
-                "${AppPath.cache_download_red}/${item.userName}/${item.id}.mp4"
+                "${AppPath.r_cache_download}/${item.userName}/${item.id}.mp4"
             else
                 "https://api.redgifs.com/v2/gifs/${item.id.lowercase()}/hd.m3u8"
         }

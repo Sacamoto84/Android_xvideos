@@ -7,8 +7,7 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.client.xvideos.common.AppPath
-import com.client.xvideos.common.eventBus.snackBarError
-import com.client.xvideos.common.eventBus.snackBarSuccess
+import com.client.xvideos.common.snackbar.SnackBar
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import com.client.xvideos.redgifs.model.Niche
@@ -56,21 +55,21 @@ class SavedRed_NichesCaches(
                 list.addAll(niches)
                 val gson = GsonBuilder().setPrettyPrinting().create()
                 val json = gson.toJson(niches)
-                val file = File(AppPath.nichesCache_red, "niches.json")
+                val file = File(AppPath.r_nichesCache, "niches.json")
                 file.writeText(json)
                 size = list.size
                 timeRefresh()
-                snackBarSuccess("Обновление завершено")
+                SnackBar.success("Обновление завершено")
                 isDownloading = false
             } catch (e: Exception) {
-                snackBarError("Ошибка обновления ${e.toString()}")
+                SnackBar.error("Ошибка обновления ${e.toString()}")
                 isDownloading = false
             }
         }
     }
 
     fun readFromDisk() {
-        val file = File(AppPath.nichesCache_red, "niches.json")
+        val file = File(AppPath.r_nichesCache, "niches.json")
         if (!file.exists()) {
             return
         }
@@ -84,7 +83,7 @@ class SavedRed_NichesCaches(
     }
 
     private fun timeRefresh() {
-        val file = File(AppPath.nichesCache_red, "niches.json")
+        val file = File(AppPath.r_nichesCache, "niches.json")
         if (!file.exists()) {
             return
         }

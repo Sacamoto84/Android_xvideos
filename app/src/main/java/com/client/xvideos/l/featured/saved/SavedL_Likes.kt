@@ -2,10 +2,8 @@ package com.client.xvideos.l.featured.saved
 
 import androidx.compose.runtime.mutableStateListOf
 import com.client.xvideos.common.AppPath
-import com.client.xvideos.common.eventBus.snackBarError
-import com.client.xvideos.common.eventBus.snackBarInfo
-import com.client.xvideos.common.eventBus.snackBarSuccess
 import com.client.xvideos.common.kdownloader.KDownloader
+import com.client.xvideos.common.snackbar.SnackBar
 import com.client.xvideos.l.model.PicsDetails
 import timber.log.Timber
 import java.io.File
@@ -22,24 +20,24 @@ class SavedL_Likes(val kDownloader: KDownloader) {
         println("!!! SavedL_Likes addLikes() item:${item.url_to_original}")
 
         downloadLikes(item, kDownloader, onComplete = {
-            snackBarSuccess("Like")
+            SnackBar.success("Like")
             refresh()
         }, onError = {
-            snackBarError("Ошибка добавления лайка")
+            SnackBar.error("Ошибка добавления лайка")
         })
     }
 
     fun remove(url: String) {
         println("!!! SavedL_Likes removeLikes() url:${url}")
         val fileName = url.substringAfterLast('/').substringBefore('?')
-        val file = File(AppPath.likes_l, fileName)
+        val file = File(AppPath.l_likes, fileName)
         if (file.exists()) {
             if (!file.delete()) {
-                snackBarError("Не удалось удалить файл: ${file.absolutePath}")
+                SnackBar.error("Не удалось удалить файл: ${file.absolutePath}")
             }else
-                snackBarInfo("Unlike")
+                SnackBar.info("Unlike")
         }else{
-            snackBarError("Файл не найден: ${file.absolutePath}")
+            SnackBar.error("Файл не найден: ${file.absolutePath}")
         }
         refresh()
     }
@@ -47,7 +45,7 @@ class SavedL_Likes(val kDownloader: KDownloader) {
     fun refresh() {
         try {
             println("!!! SavedL_Likes refresh()")
-            val files = File(AppPath.likes_l).list()?.mapNotNull{ fileNameToPicsDetails(File(it), AppPath.likes_l) }
+            val files = File(AppPath.l_likes).list()?.mapNotNull{ fileNameToPicsDetails(File(it), AppPath.l_likes) }
            if (files != null) {
                listUrl.clear()
                listUrl.addAll(files)
@@ -55,7 +53,7 @@ class SavedL_Likes(val kDownloader: KDownloader) {
            }
         } catch (e: Exception) {
             Timber.e("!!! eee SavedL_Likes refresh() Ошибка получения списка likes ${e.localizedMessage}")
-            snackBarError("Ошибка получения списка likes")
+            SnackBar.error("Ошибка получения списка likes")
         }
 
     }
@@ -74,7 +72,7 @@ private fun downloadLikes(
 
     val fileName = item.width.toString()+"_"+item.height+"_"+item.is_animated+"_"+item.album+"_"+item.url_to_original?.substringAfterLast('/')?.substringBefore('?')
 
-    val dir = File(AppPath.likes_l)
+    val dir = File(AppPath.l_likes)
     dir.mkdirs()
 
     val request = kDownloader

@@ -23,12 +23,12 @@ import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.Navigator
 import com.client.xvideos.common.collectionDB.ui.DaialogNewCollection
+import com.client.xvideos.common.snackbar.SnackBar
+import com.client.xvideos.common.snackbar.UiMessage
 import com.client.xvideos.redgifs.common.di.HostDI
 import com.client.xvideos.redgifs.ui.explorer.ScreenRedExplorer
 import com.redgifs.common.downloader.ui.DownloadIndicator
 import com.redgifs.common.saved.DialogCollection
-import com.client.xvideos.common.eventBus.UiMessage
-import com.client.xvideos.common.eventBus.snackBarSuccess
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -94,7 +94,7 @@ class ScreenRedRoot() : Screen {
                                 collection
                             )
                             savedRed.collections.collectionItemGifInfo = null
-                            snackBarSuccess("Элемент добавлен в коллекцию")
+                            SnackBar.success("Элемент добавлен в коллекцию")
                             delay(800)
                             savedRed.collections.collectionVisibleDialog = false
                         }

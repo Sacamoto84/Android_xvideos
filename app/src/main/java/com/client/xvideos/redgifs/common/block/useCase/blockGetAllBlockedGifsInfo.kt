@@ -12,7 +12,7 @@ import java.io.File
  * @return Список всех GifsInfo, считанных из .block файлов во всех пользовательских директориях.
  */
 fun blockGetAllBlockedGifsInfo(): List<GifsInfo> {
-    val rootDir = File(AppPath.block_red)
+    val rootDir = File(AppPath.r_block)
 
     if (!rootDir.exists() || !rootDir.isDirectory) {
         Timber.w("Директория кэша не найдена: ${rootDir.absolutePath}")

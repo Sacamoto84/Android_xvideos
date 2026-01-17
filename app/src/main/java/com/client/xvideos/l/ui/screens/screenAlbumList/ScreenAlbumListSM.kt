@@ -12,15 +12,12 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
-import com.client.xvideos.common.eventBus.EventBus
-import com.client.xvideos.common.eventBus.Event
+import com.client.xvideos.common.snackbar.SnackBar
 import com.client.xvideos.l.model.AlbumListFilter
 import com.client.xvideos.l.model.FacetCollectionInfo
 import com.client.xvideos.l.net.AlbumListFilterGenreCountResponse
 import com.client.xvideos.l.net.AlbumListImplInfoAndList
 import com.client.xvideos.l.net.Luscious
-import com.client.xvideos.common.eventBus.UiMessage
-import com.client.xvideos.common.eventBus.snackBarError
 import dagger.Binds
 import dagger.Module
 import dagger.assisted.Assisted
@@ -156,7 +153,7 @@ class ScreenLAlbumListSM @AssistedInject constructor(
                 //albumList.value?.getAlbumListAggregations(1)
             } catch (e: Exception) {
                 Timber.e(e, "Error loading initial data")
-                snackBarError(e.message ?: "Error loading initial data")
+                SnackBar.error(e.message ?: "Error loading initial data")
             } finally {
                 //_isRefreshing.value = false
             }
@@ -204,7 +201,7 @@ class ScreenLAlbumListSM @AssistedInject constructor(
 
             } catch (e: Exception) {
                 Timber.e(e, "!!! eee Error loading page $page")
-                snackBarError(e.message ?: "Error loading page $page")
+                SnackBar.error(e.message ?: "Error loading page $page")
                 bigList.put(page, AlbumListImplInfoAndListAndStatus(null, StatusAlbumList.BUSY))
             } finally {
                 _isRequest.value = false

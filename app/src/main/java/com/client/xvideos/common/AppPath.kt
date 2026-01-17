@@ -25,46 +25,35 @@ object AppPath {
 
     val main : String = "$sdcard/$appMain"
 
-    //--- xvideos ---
+    //--- X ---
+    val x_favorites : String = "${main}/${Folder.X.value}/Saved/Favorites"
 
-    val favorites_x : String = "${main}/${Folder.X.value}/Saved/Favorites"
-
-
-
-
+    //--- R ---
     /**
      * Пусть к папке с кешем загруженных файлов для предросмотра
      */
-    val cache_download_red : String = "${main}/${Folder.RED.value}/${Folder.CACHE_DOWNLOAD_RED.value}"
-    val offline_red : String = "${main}/${Folder.RED.value}/Offline"
-    val block_red : String = "${main}/${Folder.RED.value}/Block"
-    val favorite_red : String = "${main}/${Folder.RED.value}/Favorite"
+    val r_cache_download : String = "${main}/${Folder.RED.value}/${Folder.CACHE_DOWNLOAD_RED.value}"
+    val r_offline : String = "${main}/${Folder.RED.value}/Offline"
+    val r_block : String = "${main}/${Folder.RED.value}/Block"
+    val r_favorite : String = "${main}/${Folder.RED.value}/Favorite"
 
-    val users_red : String = "${main}/${Folder.RED.value}/Users"
+    val r_users : String = "${main}/${Folder.RED.value}/Users"
+    val r_db : String = "${main}/${Folder.RED.value}/db"
+    val r_likes : String = "${main}/${Folder.RED.value}/Saved/Likes"
+    val r_collection : String = "${main}/${Folder.RED.value}/Saved/Collection"
+    val r_niches : String = "${main}/${Folder.RED.value}/Saved/Niches"
+    val r_nichesCache : String = "${main}/${Folder.RED.value}/Saved/NichesCache"
+    val r_creators : String = "${main}/${Folder.RED.value}/Saved/Creators"
 
-    val db_red : String = "${main}/${Folder.RED.value}/db"
+    //--- L ---
+    val l_likes: String = "${main}/${Folder.L.value}/Saved/Downloaded/Likes"
+    val l_cacheDownload: String = "${main}/${Folder.L.value}/Saved/Downloaded/Cache"
+    val l_likesCrypto: String = "${main}/${Folder.L.value}/Saved/Downloaded/LikesCrypto"
+    val l_albums: String = "${main}/${Folder.L.value}/Saved/Album"
+    val l_downloaded_albums: String = "${main}/${Folder.L.value}/Saved/Downloaded/Album"
+    val l_collection: String = "${main}/${Folder.L.value}/Saved/Collection"
+    val l_db: String = "${main}/${Folder.L.value}/db"
 
-    val likes_red : String = "${main}/${Folder.RED.value}/Saved/Likes"
-    val collection_red : String = "${main}/${Folder.RED.value}/Saved/Collection"
-    val niches_red : String = "${main}/${Folder.RED.value}/Saved/Niches"
-
-    val nichesCache_red : String = "${main}/${Folder.RED.value}/Saved/NichesCache"
-    val creators_red : String = "${main}/${Folder.RED.value}/Saved/Creators"
-
-    //L
-    val likes_l: String = "${main}/${Folder.L.value}/Saved/Downloaded/Likes"
-
-    val cacheDownload_l: String = "${main}/${Folder.L.value}/Saved/Downloaded/Cache"
-
-    val likesCrypto_l: String = "${main}/${Folder.L.value}/Saved/Downloaded/LikesCrypto"
-
-    val albums_l: String = "${main}/${Folder.L.value}/Saved/Album"
-
-    val downloaded_albums_l: String = "${main}/${Folder.L.value}/Saved/Downloaded/Album"
-
-    val collection_l: String = "${main}/${Folder.L.value}/Saved/Collection"
-
-    val db_l: String = "${main}/${Folder.L.value}/db"
 
     init {
 
@@ -83,33 +72,33 @@ object AppPath {
             }
         }
 
-        File(cache_download_red).mkdirs()
-        File(offline_red).mkdirs()
-        File(block_red).mkdirs()
-        File(favorite_red).mkdirs()
-        File(users_red).mkdirs()
-        File(db_red).mkdirs()
+        File(r_cache_download).mkdirs()
+        File(r_offline).mkdirs()
+        File(r_block).mkdirs()
+        File(r_favorite).mkdirs()
+        File(r_users).mkdirs()
+        File(r_db).mkdirs()
 
-        File(likes_red).mkdirs()
-        File(collection_red).mkdirs()
-        File(niches_red).mkdirs()
-        File(creators_red).mkdirs()
+        File(r_likes).mkdirs()
+        File(r_collection).mkdirs()
+        File(r_niches).mkdirs()
+        File(r_creators).mkdirs()
 
-        File(nichesCache_red).mkdirs()
+        File(r_nichesCache).mkdirs()
 
-        File(likes_l).mkdirs()
-        File(db_l).mkdirs()
+        File(l_likes).mkdirs()
+        File(l_db).mkdirs()
 
-        File(albums_l).mkdirs()
-        File(collection_l).mkdirs()
+        File(l_albums).mkdirs()
+        File(l_collection).mkdirs()
 
-        File(downloaded_albums_l).mkdirs()
-        File(likesCrypto_l).mkdirs()
+        File(l_downloaded_albums).mkdirs()
+        File(l_likesCrypto).mkdirs()
 
-        File(cacheDownload_l).mkdirs()
+        File(l_cacheDownload).mkdirs()
 
 
-        File(favorites_x).mkdirs()
+        File(x_favorites).mkdirs()
 
     }
 

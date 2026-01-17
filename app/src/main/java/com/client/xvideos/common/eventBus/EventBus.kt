@@ -8,21 +8,23 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-sealed class Event {
-    data class Log(val message: String) : Event()
-
-    object ArchiveCountIncrement : Event()
-
-
-    /**
-     * Показ снекбара с текстом из UiMessage
-     */
-    data class SnackBarRaw(val message: UiMessage) : Event()
-
-    data class X_FullScreenExitPosition(val position: Long) : Event()
-
-}
-
+/**
+ * Отправка сообщения
+ * ```kotlin
+ * EventBus.postEvent(Event.ShowSnackBar(UiMessage.Info(message)))
+ * ```
+ *
+ * Подписывание на шину
+ * ```kotlin
+ * scope.launch {
+ *   EventBus.events.collect { event ->
+ *     if (event is Event.Log) {
+ *       saveLogToFile(event.message)
+ *     }
+ *   }
+ * }
+ * ```
+ */
 object EventBus {
     private val _events = MutableSharedFlow<Event>(
         replay = 0,

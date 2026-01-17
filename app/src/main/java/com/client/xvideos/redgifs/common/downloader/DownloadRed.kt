@@ -49,7 +49,7 @@ class DownloadRed @Inject constructor(
 
     fun refreshDownloadList() {
         scope.launch(Dispatchers.IO) {
-            val rootDir = File(AppPath.cache_download_red)
+            val rootDir = File(AppPath.r_cache_download)
 
             val infoFiles = if (rootDir.exists() && rootDir.isDirectory) {
                 rootDir.walkTopDown()
@@ -82,7 +82,7 @@ class DownloadRed @Inject constructor(
 
     fun deleteAll(onComplete: () -> Unit = {}) {
         scope.launch(Dispatchers.IO) {
-            File(AppPath.cache_download_red).deleteRecursively()
+            File(AppPath.r_cache_download).deleteRecursively()
             refreshDownloadList()
             onComplete()
         }
@@ -90,9 +90,9 @@ class DownloadRed @Inject constructor(
 
     fun delete(item: GifsInfo) {
         scope.launch(Dispatchers.IO) {
-            val path0 = AppPath.cache_download_red+ SystemPathSeparator + item.userName + SystemPathSeparator + item.id+".mp4"
-            val path1 = AppPath.cache_download_red+ SystemPathSeparator + item.userName + SystemPathSeparator + item.id+".info"
-            val path2 = AppPath.cache_download_red+ SystemPathSeparator + item.userName + SystemPathSeparator + item.id+".jpg"
+            val path0 = AppPath.r_cache_download+ SystemPathSeparator + item.userName + SystemPathSeparator + item.id+".mp4"
+            val path1 = AppPath.r_cache_download+ SystemPathSeparator + item.userName + SystemPathSeparator + item.id+".info"
+            val path2 = AppPath.r_cache_download+ SystemPathSeparator + item.userName + SystemPathSeparator + item.id+".jpg"
             File(path0).delete()
             File(path1).delete()
             File(path2).delete()

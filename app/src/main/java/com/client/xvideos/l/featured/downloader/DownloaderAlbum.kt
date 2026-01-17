@@ -1,15 +1,13 @@
 package com.client.xvideos.l.featured.downloader
 
 import com.client.xvideos.common.AppPath
-import com.client.xvideos.common.util.getFolderSize
 import com.client.xvideos.common.kdownloader.KDownloader
-import com.client.xvideos.common.util.toPrettyCount3
 import com.client.xvideos.common.kdownloader.Status
+import com.client.xvideos.common.util.getFolderSize
+import com.client.xvideos.common.util.toPrettyCount3
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -21,39 +19,13 @@ import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
-import java.util.concurrent.Executors
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlin.random.Random
-
-
-@Singleton
-class DownloaderL @Inject constructor() {
-
-    private val downloadDispatcher = Executors.newFixedThreadPool(1).asCoroutineDispatcher()
-    val scope = CoroutineScope(SupervisorJob() + downloadDispatcher)
-
-    val listDownloaderAlbum = mutableSetOf<DownloaderAlbum>()
-
-    fun clear() {
-        downloadDispatcher.close()
-    }
-
-
-
-}
-
-
-
-
-
 
 @OptIn(FlowPreview::class)
 class DownloaderAlbum(
     val albumName: String,
     private val kDownloader: KDownloader,
     private val scope: CoroutineScope,
-
     ) {
 
     /**
@@ -96,7 +68,7 @@ class DownloaderAlbum(
             while (true) {
                 try {
                     updatingGetSizeChannel.receive()
-                    val size = getFolderSize(File(AppPath.downloaded_albums_l, albumName))
+                    val size = getFolderSize(File(AppPath.l_downloaded_albums, albumName))
                     folderSize.value = size
                     Timber.i("---- DownloaderAlbum updating size albumName: $albumName size :${folderSize.value.toPrettyCount3()}")
                     delay(1000)
@@ -111,7 +83,7 @@ class DownloaderAlbum(
         //val size = getFolderSize(File(AppPath.downloaded_albums_l, albumName))
         //folderSize.value = size
 
-        val dir = File(AppPath.downloaded_albums_l + "/" + albumName)
+        val dir = File(AppPath.l_downloaded_albums + "/" + albumName)
         dir.mkdirs()
         // Список имён файлов, которые уже есть
         val existingFiles = dir.listFiles()?.map { it.name }?.toSet() ?: emptySet()
@@ -140,7 +112,7 @@ class DownloaderAlbum(
         scope.launch(Dispatchers.IO.limitedParallelism(1)) {
             withContext(Dispatchers.Main) { onStart() }
 
-            val dir = File(AppPath.downloaded_albums_l + "/" + albumName)
+            val dir = File(AppPath.l_downloaded_albums + "/" + albumName)
 
             if (dir.exists()) {
                 val files = dir.listFiles() ?: emptyArray()
@@ -194,7 +166,7 @@ class DownloaderAlbum(
 
                 requestAlbumSizeUpdate()
 
-                val dir = File(AppPath.downloaded_albums_l + "/" + albumName)
+                val dir = File(AppPath.l_downloaded_albums + "/" + albumName)
                 dir.mkdirs()
 
                 fileCountRaw.value = listUrl.size

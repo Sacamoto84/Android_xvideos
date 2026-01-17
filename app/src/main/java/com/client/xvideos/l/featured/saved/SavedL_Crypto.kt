@@ -4,10 +4,8 @@ import androidx.compose.runtime.mutableStateListOf
 import com.client.xvideos.common.AppPath
 import com.client.xvideos.common.encrypting.Crypto
 import com.client.xvideos.common.encrypting.Password
-import com.client.xvideos.common.eventBus.snackBarError
-import com.client.xvideos.common.eventBus.snackBarInfo
-import com.client.xvideos.common.eventBus.snackBarSuccess
 import com.client.xvideos.common.kdownloader.KDownloader
+import com.client.xvideos.common.snackbar.SnackBar
 import com.client.xvideos.common.util.toMD5
 import com.client.xvideos.l.model.PicsDetails
 import timber.log.Timber
@@ -27,7 +25,7 @@ class SavedL_Crypto(val kDownloader: KDownloader) {
         val key = Password.key
         if (key == null) {
             Timber.i("!!! SavedL_Crypto add key == null Ключ отсутствует, не могу сохранять")
-            snackBarError("Ключ шифрования отсутствует")
+            SnackBar.error("Ключ шифрования отсутствует")
             return
         }
 
@@ -40,17 +38,17 @@ class SavedL_Crypto(val kDownloader: KDownloader) {
 
         Crypto.downloadAndEncryptFile(
             item.url_to_original!!,
-            File(AppPath.likesCrypto_l, fileName),
+            File(AppPath.l_likesCrypto, fileName),
             Password.key!!
         )
             .onSuccess {
-                snackBarSuccess("Сохранен в сейф")
+                SnackBar.success("Сохранен в сейф")
                 Timber.i("!!! ScreenLAlbumSM downloadLikeCrypto success")
                 refresh()
             }
             .onFailure {
                 it.printStackTrace()
-                snackBarError("Ошибка сохранения в сейф")
+                SnackBar.error("Ошибка сохранения в сейф")
                 Timber.e(it, "!!! ScreenLAlbumSM downloadLikeCrypto error")
             }
 
@@ -62,7 +60,7 @@ class SavedL_Crypto(val kDownloader: KDownloader) {
         val key = Password.key
         if (key == null) {
             Timber.i("!!! SavedL_Crypto add key == null Ключ отсутствует, не могу сохранять")
-            snackBarError("Ключ шифрования отсутствует")
+            SnackBar.error("Ключ шифрования отсутствует")
             return
         }
 
@@ -73,15 +71,15 @@ class SavedL_Crypto(val kDownloader: KDownloader) {
             item.width.toString() + "_" + item.height + "_" + item.is_animated + "_" + item.album + "_" +
                     name?.toMD5()?.dropLast(24) + "." + ext
 
-        Crypto.encryptFile(File(item.url_to_original!!), File(AppPath.likesCrypto_l, fileName), key)
+        Crypto.encryptFile(File(item.url_to_original!!), File(AppPath.l_likesCrypto, fileName), key)
             .onSuccess {
-                snackBarSuccess("Сохранен в сейф")
+                SnackBar.success("Сохранен в сейф")
                 Timber.i("!!! ScreenLAlbumSM downloadLikeCrypto success")
                 refresh()
             }
             .onFailure {
                 it.printStackTrace()
-                snackBarError("Ошибка сохранения в сейф")
+                SnackBar.error("Ошибка сохранения в сейф")
                 Timber.e(it, "!!! ScreenLAlbumSM downloadLikeCrypto error")
             }
 
@@ -92,11 +90,11 @@ class SavedL_Crypto(val kDownloader: KDownloader) {
         val file = File(fileName)
         if (file.exists()) {
             if (!file.delete()) {
-                snackBarError("Не удалось удалить файл: ${file.absolutePath}")
+                SnackBar.error("Не удалось удалить файл: ${file.absolutePath}")
             } else
-                snackBarInfo("Удален из сейфа")
+                SnackBar.info("Удален из сейфа")
         } else {
-            snackBarError("Файл не найден: ${file.absolutePath}")
+            SnackBar.error("Файл не найден: ${file.absolutePath}")
         }
         refresh()
     }
@@ -105,8 +103,8 @@ class SavedL_Crypto(val kDownloader: KDownloader) {
 
         try {
             println("!!! SavedL_Crypto refresh()")
-            val files = File(AppPath.likesCrypto_l).list()?.mapNotNull {
-                fileNameToPicsDetails(File(it), AppPath.likesCrypto_l)
+            val files = File(AppPath.l_likesCrypto).list()?.mapNotNull {
+                fileNameToPicsDetails(File(it), AppPath.l_likesCrypto)
             }
 
             if (files != null) {
@@ -115,7 +113,7 @@ class SavedL_Crypto(val kDownloader: KDownloader) {
             }
         } catch (e: Exception) {
             Timber.e("eee Ошибка получения списка crypto ${e.localizedMessage}")
-            snackBarError("Ошибка получения списка crypto")
+            SnackBar.error("Ошибка получения списка crypto")
         }
 
     }

@@ -3,10 +3,7 @@ package com.client.xvideos.redgifs.common.downloader
 import com.client.xvideos.common.AppPath
 import com.google.gson.GsonBuilder
 import com.client.xvideos.common.kdownloader.KDownloader
-import com.client.xvideos.common.eventBus.UiMessage
-import com.client.xvideos.common.eventBus.snackBarError
-import com.client.xvideos.common.eventBus.snackBarInfo
-import com.client.xvideos.common.eventBus.snackBarSuccess
+import com.client.xvideos.common.snackbar.SnackBar
 import com.client.xvideos.redgifs.model.GifsInfo
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -48,7 +45,7 @@ class Downloader @Inject constructor(
         //Записи нет можно скачивать
         if (!findVideoInDownload(item.id, item.userName)) {
 
-            val p = AppPath.cache_download_red + "/" + item.userName
+            val p = AppPath.r_cache_download + "/" + item.userName
             File(p).mkdirs()
 
             val imageUrl = if(item.urls.poster != null) item.urls.poster else item.urls.thumbnail
@@ -68,7 +65,7 @@ class Downloader @Inject constructor(
 
                 onError = {
                     println("!!! onError закачки: $it"); percent.value = -3f
-                    snackBarError("Ошибка закачки: $it")
+                    SnackBar.error("Ошибка закачки: $it")
                 },
 
                 onProgress = { it1 -> percent.value = it1 / 100f },
@@ -76,7 +73,7 @@ class Downloader @Inject constructor(
                     println("!!! onCompleted закачки")
                     percent.value = -2f
 
-                    snackBarSuccess("Скачивание завершено")
+                    SnackBar.error("Скачивание завершено")
                     val gson = GsonBuilder().create()
                     val text = gson.toJson(item)
                     File(p, "${item.id}.info").writeText(text.toString())
@@ -87,14 +84,14 @@ class Downloader @Inject constructor(
             )
         } else {
             //Toast("Файл есть к кеше")
-            snackBarInfo("Файл есть к кеше")
+            SnackBar.info("Файл есть к кеше")
         }
 
     }
 
     fun findVideoInDownload(id: String, name: String): Boolean {
         //val mainPath = AppPath.cache_download_red + "/" + name + "/" + id + ".mp4"
-        val mainPath = "${AppPath.cache_download_red}/$name/$id.mp4"
+        val mainPath = "${AppPath.r_cache_download}/$name/$id.mp4"
         val file = File(mainPath)
         return file.exists()
     }

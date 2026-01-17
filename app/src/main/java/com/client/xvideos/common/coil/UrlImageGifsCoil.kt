@@ -131,7 +131,7 @@ fun UrlImageGifsCoil(
             val fileName = url.substringAfterLast('/').substringBefore('?')
             val file = when (albumName) {
                 "likes", "crypto" -> File(url)
-                else -> File(AppPath.downloaded_albums_l, "$albumName/$fileName")
+                else -> File(AppPath.l_downloaded_albums, "$albumName/$fileName")
             }
             file
         }

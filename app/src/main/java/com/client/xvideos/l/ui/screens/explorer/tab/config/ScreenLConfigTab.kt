@@ -12,11 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.contextmenu.builder.item
-import androidx.compose.foundation.text.contextmenu.modifier.appendTextContextMenuComponents
-import androidx.compose.foundation.text.input.clearText
-import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.material3.HorizontalDivider
@@ -41,8 +36,8 @@ import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
-import com.client.xvideos.common.eventBus.snackBarSuccess
 import com.client.xvideos.common.settings.Settings
+import com.client.xvideos.common.snackbar.SnackBar
 import com.client.xvideos.common.traficStatistic.AppNetworkSpeedMonitor
 import com.client.xvideos.common.util.formatBytes
 import com.client.xvideos.common.util.getFolderSize
@@ -62,11 +57,6 @@ import dagger.multibindings.IntoMap
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.contextmenu.builder.item
-import androidx.compose.foundation.text.contextmenu.modifier.appendTextContextMenuComponents
-import androidx.compose.foundation.text.input.clearText
-import androidx.compose.foundation.text.input.rememberTextFieldState
 
 
 class ScreenLConfigTab : Screen {
@@ -138,7 +128,7 @@ class ScreenLConfigTab : Screen {
             ConfigTextAndMenuL("Размер миниатюры", currentDisplayName, ThumbnailsSize.displayNames) { selectedDisplayName ->
                 ThumbnailsSize.fromDisplayName(selectedDisplayName)?.apply {
                     Settings.thumbalistSize.setValue(value)
-                    snackBarSuccess("Размер миниатюры: $displayName")
+                    SnackBar.success("Размер миниатюры: $displayName")
                 }
             }
             Spacer(Modifier.height(4.dp))

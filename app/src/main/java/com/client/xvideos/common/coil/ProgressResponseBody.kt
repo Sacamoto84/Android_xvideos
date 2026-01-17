@@ -13,9 +13,7 @@ class ProgressResponseBody(
     private val progressListener: (bytesRead: Long, contentLength: Long, done: Boolean) -> Unit
 ) : ResponseBody() {
 
-    private val bufferedSource: BufferedSource by lazy {
-        source(responseBody.source()).buffer()
-    }
+    private val bufferedSource: BufferedSource by lazy { source(responseBody.source()).buffer() }
 
     override fun contentType() = responseBody.contentType()
 

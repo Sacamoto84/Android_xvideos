@@ -5,7 +5,7 @@ import timber.log.Timber
 import java.io.File
 
 fun blockGetGifsByUserNameAsListString(userName: String): List<String> {
-    val blockDir = File(AppPath.block_red, userName)
+    val blockDir = File(AppPath.r_block, userName)
 
     if (!blockDir.exists() || !blockDir.isDirectory) {
         Timber.w("Директория блокировок не найдена: ${blockDir.absolutePath}")

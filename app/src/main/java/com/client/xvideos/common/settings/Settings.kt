@@ -45,16 +45,6 @@ object Settings {
      */
     val thumbalistSize by lazy { SettingElementString( pref, "thumbalistSize", ThumbnailsSize.SMALL.value ) }
 
-    /**
-     * Стиль отображения на экране фуллскрин в стиле телеграмм
-     */
-    val lusciousFullScreenStyleTelegram by lazy { SettingElementBoolean( pref, "lusciousFullscreenStyleTelegram", false ) }
-
-    /**
-     * Обьем дискового кеша в МБ
-     */
-    val frescoDiskCacheCapacity by lazy { SettingElementInt(pref, "frescoDiskCacheCapacity", 2000) }
-
 
     //-- xvideos ---
 

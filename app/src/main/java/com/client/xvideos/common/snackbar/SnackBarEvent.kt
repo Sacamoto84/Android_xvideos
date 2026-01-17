@@ -1,4 +1,4 @@
-package com.client.xvideos.common.eventBus
+package com.client.xvideos.common.snackbar
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -11,16 +11,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.CheckCircleOutline
 import androidx.compose.material.icons.rounded.Check
-import androidx.compose.material.icons.rounded.Error
 import androidx.compose.material.icons.rounded.ErrorOutline
 import androidx.compose.material.icons.rounded.Info
-import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material.icons.rounded.WarningAmber
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
@@ -33,33 +30,30 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import com.client.xvideos.common.eventBus.Event
+import com.client.xvideos.common.eventBus.EventBus
 import com.client.xvideos.redgifs.common.ThemeRed
 
-sealed interface UiMessage {
-    val text: String
+object SnackBar{
+    //------------------------------------------------------------------------------
+    fun info(message: String) {
+        EventBus.postEvent( Event.ShowSnackBar(UiMessage.Info(message)))
+    }
 
+    fun error(message: String) {
+        EventBus.postEvent( Event.ShowSnackBar(UiMessage.Error(message)))
+    }
 
-    data class Info(override val text: String): UiMessage
-    data class Success(override val text: String): UiMessage
-    data class Error(override val text: String): UiMessage
-    data class Warning(override val text: String): UiMessage
-}
-//------------------------------------------------------------------------------
-fun snackBarInfo(message: String) {
-    EventBus.postEvent( Event.SnackBarRaw(UiMessage.Info(message)))
-}
+    fun success(message: String) {
+        EventBus.postEvent( Event.ShowSnackBar(UiMessage.Success(message)))
+    }
 
-fun snackBarError(message: String) {
-    EventBus.postEvent( Event.SnackBarRaw(UiMessage.Error(message)))
-}
-
-fun snackBarSuccess(message: String) {
-    EventBus.postEvent( Event.SnackBarRaw(UiMessage.Success(message)))
+    fun warning(message: String) {
+        EventBus.postEvent( Event.ShowSnackBar(UiMessage.Warning(message)))
+    }
 }
 
-fun snackBarWarning(message: String) {
-    EventBus.postEvent( Event.SnackBarRaw(UiMessage.Warning(message)))
-}
+
 //------------------------------------------------------------------------------
 
 @Preview

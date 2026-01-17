@@ -1,8 +1,7 @@
 package com.client.xvideos.l.featured.saved
 
 import com.client.xvideos.common.collectionDB.model.ISavedLCollection
-import com.client.xvideos.common.eventBus.snackBarError
-import com.client.xvideos.common.eventBus.snackBarSuccess
+import com.client.xvideos.common.snackbar.SnackBar
 import com.client.xvideos.common.util.toMD5
 import com.client.xvideos.l.model.PicsDetails
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -19,29 +18,29 @@ class SavedL_Collection(): ISavedLCollection<PicsDetails>(PicsDetails::class.jav
         println("!!! deleteItemFromCollection() item:$itemId collectionName:$collectionName")
         collectionDb.deleteItem(itemId, collectionName)
             .onSuccess {
-                snackBarSuccess("GIF удален из коллекции $collectionName")
+                SnackBar.success("GIF удален из коллекции $collectionName")
                 refreshCollectionList()
             }
-            .onFailure { e -> snackBarError("Ошибка удаления GIF из коллекции $collectionName ${e.message}") }
+            .onFailure { e -> SnackBar.error("Ошибка удаления GIF из коллекции $collectionName ${e.message}") }
     }
 
     override fun deleteCollection(collectionName: String) {
         collectionDb.deleteCollection(collectionName)
             .onSuccess {
-                snackBarSuccess("Коллекция $collectionName удалена")
+                SnackBar.success("Коллекция $collectionName удалена")
                 refreshCollectionList()
             }
-            .onFailure { e -> snackBarError("Ошибка удаления коллекции $collectionName ${e.message}") }
+            .onFailure { e -> SnackBar.error("Ошибка удаления коллекции $collectionName ${e.message}") }
     }
 
     override fun createCollection(collectionName: String) {
         println("!!! createCollection() collectionName:$collectionName")
         collectionDb.create(collectionName)
             .onSuccess {
-                snackBarSuccess("Коллекция $collectionName создана")
+                SnackBar.success("Коллекция $collectionName создана")
                 refreshCollectionList()
             }
-            .onFailure { e -> snackBarError("Ошибка создания коллекции $collectionName ${e.message}") }
+            .onFailure { e -> SnackBar.error("Ошибка создания коллекции $collectionName ${e.message}") }
     }
 
     @OptIn(DelicateCoroutinesApi::class)
@@ -51,7 +50,7 @@ class SavedL_Collection(): ISavedLCollection<PicsDetails>(PicsDetails::class.jav
             collectionList.clear()
             collectionList.addAll(a.getOrThrow())
         } else {
-            snackBarError("Ошибка чтения коллекций ${a.exceptionOrNull()?.message}")
+            SnackBar.error("Ошибка чтения коллекций ${a.exceptionOrNull()?.message}")
         }
     }
 

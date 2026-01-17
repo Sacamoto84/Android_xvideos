@@ -14,7 +14,7 @@ abstract class ISavedLCollection<T>(
 ){
     private val type = TypeToken.getParameterized(List::class.java, clazz).type
 
-    protected val collectionDb = CollectionDB<T>(AppPath.collection_l, type)
+    protected val collectionDb = CollectionDB<T>(AppPath.l_collection, type)
 
     var collectionList = mutableStateListOf<CollectionEntity<T>>()
 

@@ -35,7 +35,7 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.common.connectivityObserver.ConnectivityObserver
-import com.client.xvideos.common.eventBus.snackBarInfo
+import com.client.xvideos.common.snackbar.SnackBar
 import com.client.xvideos.common.urlVideoImage.UrlImage
 import com.client.xvideos.redgifs.model.search.SearchItemCreatorsResponse
 import com.client.xvideos.redgifs.model.search.SearchItemNichesResponse
@@ -142,7 +142,7 @@ class ScreenRedExplorerSearchSM @Inject constructor(
 
             searchText.collect { text ->
 
-                snackBarInfo(text)
+                SnackBar.info(text)
 
                 if (text == "") {
                     creatorsList.clear()
