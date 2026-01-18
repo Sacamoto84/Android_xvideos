@@ -3,14 +3,14 @@ package com.client.xvideos.l.theme
 import androidx.compose.ui.graphics.Color
 
 interface ThemeBackgroundLevel{
-    val colorLevel0: Color
-    val colorLevel1: Color
-    val colorLevel2: Color
-    val colorLevel3: Color
-    val colorLevel4: Color
-    val colorLevel5: Color
-    val colorLevel6: Color
-    val colorLevel7: Color
+    val gray0: Color
+    val gray1: Color
+    val gray2: Color
+    val gray3: Color
+    val gray4: Color
+    val gray5: Color
+    val gray6: Color
+    val gray7: Color
 
     val textColor : Color
 

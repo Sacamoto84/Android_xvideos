@@ -8,24 +8,20 @@ import androidx.compose.ui.unit.sp
 import com.client.xvideos.R
 import com.client.xvideos.redgifs.common.ThemeRed
 
-
 object ThemeL {
 
-
-    val themeBackgroundLevel = object : ThemeBackgroundLevel {
-        override val colorLevel0 = Color(0xFF141414)
-        override val colorLevel1 = Color(0xFF1F1F1F)
-        override val colorLevel2 = Color(0xFF282828)
-        override val colorLevel3 = Color(0xFF353535)
-        override val colorLevel4 = Color(0xFF3B3B3B)
-        override val colorLevel5 = Color(0xFF3F3F3F)
-        override val colorLevel6 = Color(0xFF414141)
-        override val colorLevel7 = Color(0xFF474747)
+    val grayLevel = object : ThemeBackgroundLevel {
+        override val gray0 = Color(0xFF141414)
+        override val gray1 = Color(0xFF1F1F1F)
+        override val gray2 = Color(0xFF282828)
+        override val gray3 = Color(0xFF353535)
+        override val gray4 = Color(0xFF3B3B3B)
+        override val gray5 = Color(0xFF3F3F3F)
+        override val gray6 = Color(0xFF414141)
+        override val gray7 = Color(0xFF474747)
         override val textColor = Color(0xFFC5C8C6)
         override val blue = Color(0xFF45687A)
     }
-
-
 
     val g0 = Color(0xFF4CAF50)
     val r0 = Color(0xFFF44336)
@@ -63,14 +59,8 @@ object ThemeL {
 
     val fontFamilyKarla = FontFamily(Font(R.font.karla))
 
-
-
-
     //--- Screen Config ---
     val styleTextConfigL = TextStyle(fontSize = 20.sp, color = textColor, fontFamily = fontFamilyKarla)
-
-
-
 
     //--- Expand Menu ---
     object ExpandMenu {
@@ -78,8 +68,5 @@ object ThemeL {
         val backgroundColor = Color(0xFFFFFAF5)  // Теплый белый с кремовым оттенком
         val style = TextStyle(  color = tintColor, fontFamily = ThemeRed.fontFamilyPopinsRegular, fontSize = 20.sp )
     }
-
-
-
 
 }

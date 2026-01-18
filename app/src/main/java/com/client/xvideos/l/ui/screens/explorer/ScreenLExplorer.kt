@@ -1,9 +1,12 @@
 package com.client.xvideos.l.ui.screens.explorer
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.BookmarkBorder
@@ -14,12 +17,16 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
@@ -28,6 +35,8 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
+import com.client.xvideos.LocalRootScreenModel
+import com.client.xvideos.R
 import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.depth
 import com.client.xvideos.l.ui.screens.explorer.tab.albumTopHits.ScreenLAlbumTopHits
@@ -63,6 +72,18 @@ class ScreenLExplorer() : Screen {
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
     override fun Content() {
+
+        val rootVm = LocalRootScreenModel.current
+
+        DisposableEffect(Unit) {
+            rootVm.showOverlay({
+                Image(painterResource(R.drawable.logo), contentDescription = null, modifier = Modifier.size(32.dp))
+            }
+            )
+            onDispose {
+                rootVm.hideOverlay()
+            }
+        }
 
         val navigator = LocalNavigator.currentOrThrow
 

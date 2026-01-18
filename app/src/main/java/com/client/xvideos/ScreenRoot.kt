@@ -71,9 +71,22 @@ import kotlinx.coroutines.flow.filterIsInstance
 import net.engawapg.lib.zoomable.ExperimentalZoomableApi
 import javax.inject.Inject
 
+//Глубина погружения навигации
+var depth by mutableIntStateOf(0)
+
 val LocalRootScreenModel = staticCompositionLocalOf<ScreenRootSM> { error("No ScreenRootSM provided") }
 
-// Глобальная ссылка на основной навигатор для доступа из любого места
+/**
+ * Глобальная ссылка на основной навигатор для доступа из любого места
+ * ```kotlin
+ * val mainNavigator = LocalMainNavigator.current
+ * mainNavigator?.let { nav ->
+ *     if (nav.lastItem !is ScreenLExplorer) {
+ *         nav.replaceAll(ScreenLExplorer())
+ *     }
+ * }
+ * ```
+ */
 val LocalMainNavigator = staticCompositionLocalOf<Navigator?> { null }
 
 object ScreenRoot : Screen {
@@ -170,6 +183,7 @@ object ScreenRoot : Screen {
                     }
                 },
                 containerColor = ThemeL.greyBackground,
+
                 snackbarHost = {
                     Box(modifier = Modifier.zIndex(Float.MAX_VALUE)) {
                         SnackbarHost(snackBarHostState) { data ->
@@ -224,7 +238,8 @@ object ScreenRoot : Screen {
                         }
                     }
                 }
-            ) { paddingValues ->
+            )
+            { paddingValues ->
 
                 // Основной навигатор приложения
                 Navigator(screen = MenuScreen) { nav ->
@@ -234,9 +249,8 @@ object ScreenRoot : Screen {
 
                 // Оверлей рисуется поверх Scaffold
                 vm.overlayContent.value?.let { content ->
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize().background(Color.Black.copy(alpha = 0.95f))
+                    Box( modifier = Modifier.fillMaxSize()
+                    //.background(Color.Transparent.copy(alpha = 0.95f))
                     ) { content() }
                 }
 
@@ -248,16 +262,14 @@ object ScreenRoot : Screen {
 
 }
 
-//Глубина погружения навигации
-var depth by mutableIntStateOf(0)
 
-class ScreenRootSM @Inject constructor(
 
-) : ScreenModel {
-
+class ScreenRootSM @Inject constructor() : ScreenModel
+{
     // состояние для фуллскрин-оверлея
     private val _overlayContent = mutableStateOf<(@Composable () -> Unit)?>(null)
     val overlayContent: State<(@Composable () -> Unit)?> = _overlayContent
+
     fun showOverlay(content: @Composable () -> Unit) {
         _overlayContent.value = content
     }
@@ -265,7 +277,6 @@ class ScreenRootSM @Inject constructor(
     fun hideOverlay() {
         _overlayContent.value = null
     }
-
 
 }
 

@@ -1,6 +1,5 @@
 package com.client.xvideos.l.net
 
-import com.client.xvideos.l.KtorRequestHandler
 import com.client.xvideos.l.model.AlbumDetails
 import com.client.xvideos.l.model.Content
 import com.client.xvideos.l.model.Cover
@@ -56,7 +55,7 @@ class AlbumInfo(
             val get = json["data"]?.asJsonObject?.get("album")?.asJsonObject?.get("get")?.asJsonObject
             val gson = Gson()
             parsed.value = gson.fromJson(get, AlbumDetails::class.java)
-            url = Luscious.Companion.HOME + parsed.value.url
+            url = Luscious.HOME + parsed.value.url
             albumPicsDetails.contentUrls()
         }
     }

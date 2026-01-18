@@ -37,28 +37,20 @@ fun AppNetworkSpeedMonitorLite() {
     val application = context.applicationContext as App
     val trafficData by application.networkTrafficMonitor.trafficFlow.collectAsStateWithLifecycle()
 
-
-    val rawProgress by remember{
-        derivedStateOf {
-            CoilProgressManager.progressMap.filter { !it.value.done }.size
-        }
-    }
-
-//    // Debounce: обновляем UI не чаще 100–200 мс
-    val progress by produceState(rawProgress) {
-        while (true) {
-            value = rawProgress
-            delay(200)
-        }
-    }
+//    val rawProgress by remember{
+//        derivedStateOf {
+//            CoilProgressManager.progressMap.filter { !it.value.done }.size
+//        }
+//    }
 //
-
-
-
-
-
-
-
+////    // Debounce: обновляем UI не чаще 100–200 мс
+//    val progress by produceState(rawProgress) {
+//        while (true) {
+//            value = rawProgress
+//            delay(200)
+//        }
+//    }
+//
     val formattedSpeed = remember (trafficData.downloadSpeed) {
         formatSpeed(trafficData.downloadSpeed)
     }
@@ -70,15 +62,6 @@ fun AppNetworkSpeedMonitorLite() {
     Row(
         modifier = Modifier.padding(end = 16.dp).fillMaxWidth(), horizontalArrangement = Arrangement.End
     ) {
-
-        Text(
-            progress.toString(),
-            color = Color.White,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
-            fontFamily = ThemeL.fontFamilyKarla,
-            modifier = Modifier.background(Color.Black).offset(0.5.dp, 0.5.dp)
-        )
 
         Box {
             Text(

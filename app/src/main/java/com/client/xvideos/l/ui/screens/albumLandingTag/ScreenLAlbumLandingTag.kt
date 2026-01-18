@@ -36,6 +36,7 @@ import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.client.xvideos.LocalRootScreenModel
 import com.client.xvideos.depth
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.model.AlbumListFilter
@@ -198,6 +199,7 @@ class ScreenLAlbumLandingTagSM @AssistedInject constructor(
         screenModelScope.launch {
             albumTopHits.value = luscious.getLandingPageAlbumTag(tag).getOrThrow()
         }
+
         depth = 100
     }
 

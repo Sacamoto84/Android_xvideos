@@ -4,6 +4,15 @@ import android.os.Build
 import android.os.Parcelable
 import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandIn
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -65,6 +74,7 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.common.coil.UrlImageGifsCoil
+import com.client.xvideos.common.noRippleClickable
 import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.theme.ThemeL
@@ -127,6 +137,10 @@ class FullScreenImage(
 //            //filteredPic.toList()
 //        }
 
+        /**
+         * Показ полностью фуллскрин
+         */
+        var isFullScreen by remember { mutableStateOf(false) }
 
         //val filteredPic = filteredPicArray.toList() 🔴 📚 🗂️ 💾 𝑹𝒖𝒍𝒆𝒔 ⚡️⭐⭐⭐⭐⭐
         val filteredPic = fullScreenImageFilteredPicArray.toList()
@@ -168,9 +182,7 @@ class FullScreenImage(
             }
         }
 
-        BackHandler {
-            isClosing = true
-        }
+        BackHandler { isClosing = true }
 
         // Текущий индекс из pagerState
         val currentIndex = pagerState.currentPage
@@ -219,13 +231,14 @@ class FullScreenImage(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-
-                //Шахматкая доска
+                //Шахматная доска
                 .checkerboardBackground(
                     squareSize = 12.dp,
                     lightColor = Color(0xFF252525),
                     darkColor = Color(0xFF181818)
                 )
+                .noRippleClickable( onClick = { isFullScreen = isFullScreen.not() } )
+
         ) {
 
             HorizontalPager(
@@ -247,22 +260,14 @@ class FullScreenImage(
                             else (pageItem.width.toFloat() / pageItem.height),
                             matchHeightConstraintsFirst = false
                         )
-                        .zIndex(
-                            if (pagerState.offsetForPage(page) <= 0) 0f else 100f
-                        )
+                        .zIndex( if (pagerState.offsetForPage(page) <= 0) 0f else 100f )
 
                 ) {
                     // Картинка с масштабированием и позиционированием
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                    ) {
+                    Box( modifier = Modifier.fillMaxSize() )
+                    {
                         UrlImageGifsCoil(
-                            rotate = rotate,
-                            contentScale = ContentScale.Fit,
-                            url = pageItem.url_to_original!!,
-                            modifier = Modifier
-                                .fillMaxSize()
+                            rotate = rotate, contentScale = ContentScale.Fit, url = pageItem.url_to_original!!, modifier = Modifier.fillMaxSize()
                                 .zoomable(
                                     zoomState = zoomState,
                                     enableOneFingerZoom = false,
@@ -274,7 +279,11 @@ class FullScreenImage(
                                                 zoomState.changeScale(2.5f, position)
                                             }
                                         }
+                                    },
+                                    onTap = {
+                                        isFullScreen = isFullScreen.not()
                                     }
+
                                 ),
                             onSuccess = { },
                             albumName = albumName,
@@ -288,121 +297,78 @@ class FullScreenImage(
                 }
             }
 
-            Box(modifier = Modifier.align(Alignment.TopStart)) {
-                Text(
-                    currentIndex.toString(),
-                    color = Color.Gray,
-                    modifier = Modifier.padding(start = 8.dp),
-                    fontFamily = ThemeL.fontFamilyKarla
-                )
-            }
+            Box(modifier = Modifier.align(Alignment.TopStart)) { Text( currentIndex.toString(), color = Color.Gray, modifier = Modifier.padding(start = 8.dp), fontFamily = ThemeL.fontFamilyKarla )}
 
-
-            Row(
-                modifier = Modifier
-                    .align(Alignment.TopStart)
-                    .offset(y = 8.dp)
-            ) {
-
-                IconButton(onClick = { rotate = rotate.not() }) {
-                    Icon(
-                        Icons.Default.ScreenRotation,
-                        contentDescription = null,
-                        tint = Color.White
-                    )
+            AnimatedVisibility(visible = !isFullScreen, enter = fadeIn(), exit = fadeOut())
+            {
+                //Верхние кнопки
+                Row(modifier = Modifier.align(Alignment.TopStart).offset(y = 8.dp))
+                {
+                    IconButton(onClick = { rotate = rotate.not() }) { Icon(Icons.Default.ScreenRotation, contentDescription = null, tint = Color.White) }
+                    IconButton(onClick = { }) { Icon( Icons.Default.Info, contentDescription = null, tint = Color.White ) }
                 }
-
-                IconButton(onClick = {  }) {
-                    Icon(
-                        Icons.Default.Info,
-                        contentDescription = null,
-                        tint = Color.White
-                    )
-                }
-
-
-            }
-
-
-
-
-            Box(
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .offset(y = 8.dp)
-            ) {
-                expandMenuViewModel.ExpandMenu(
-                    expandMenu,
-                    filteredPic[pagerState.currentPage],
-                    albumName
-                )
+                Box( modifier = Modifier.align(Alignment.TopEnd).offset(y = 8.dp) ) { expandMenuViewModel.ExpandMenu( expandMenu, filteredPic[pagerState.currentPage], albumName ) }
             }
 
             val coroutineScope = rememberCoroutineScope()
 
-            SwipeableBottomPanel { swipeableState, hiddenOffset ->
+            AnimatedVisibility(
+                visible = !isFullScreen,
+                enter = fadeIn() ,
+                exit  = fadeOut(),
+            )
+            {
+                SwipeableBottomPanel { swipeableState, hiddenOffset ->
 
-                Box(modifier = Modifier.align(Alignment.BottomCenter)) {
-                    LazyRow(
-                        state = lazyRowState,
-                        modifier = Modifier
-                            .height(72.dp)
+                    Box(modifier = Modifier.align(Alignment.BottomCenter)) {
+                        LazyRow(
+                            state = lazyRowState,
+                            modifier = Modifier
+                                .height(72.dp)
+//                                .pointerInput(Unit) {
+//                                    detectVerticalDragGestures(
+//                                        onVerticalDrag = { change, dragAmount ->
+//                                            swipeableState.performDrag(dragAmount)
+//                                            change.consume()
+//                                        },
+//                                        onDragEnd = {
+//                                            val targetState =
+//                                                if (swipeableState.offset.value < hiddenOffset / 2) 0 else 1
+//                                            coroutineScope.launch {
+//                                                swipeableState.animateTo(targetState)
+//                                            }
+//                                        }
+//                                    )
+//                                }
 
-                            .pointerInput(Unit) {
-                                detectVerticalDragGestures(
-                                    onVerticalDrag = { change, dragAmount ->
-                                        swipeableState.performDrag(dragAmount)
-                                        change.consume()
-                                    },
-                                    onDragEnd = {
-                                        val targetState =
-                                            if (swipeableState.offset.value < hiddenOffset / 2) 0 else 1
-                                        coroutineScope.launch {
-                                            swipeableState.animateTo(targetState)
-                                        }
-                                    }
-                                )
-                            }
 
-
-                    ) {
-                        itemsIndexed(
-                            filteredPic,
-                            key = { _, item -> item.url_to_original!! }) { index, it1 ->
-                            Box(
-                                modifier = Modifier
-                                    .padding(horizontal = 1.dp)
-                                    .clip(RoundedCornerShape(4.dp))
-                                    .aspectRatio(it1.width.toFloat() / it1.height)
-                                    .clickable(onClick = {
-                                        dataItem = it1
-                                        corruptCancel = true
-                                    })
-                                    .border(
-                                        2.dp,
-                                        if (index == currentIndex) Color.Yellow else Color.Transparent,
-                                        RoundedCornerShape(4.dp)
-                                    )
-                                    .padding(2.dp)
-                            ) {
-                                UrlImageGifsCoil(
-                                    url = it1.url_to_original!!,
+                        ) {
+                            itemsIndexed(
+                                filteredPic,
+                                key = { _, item -> item.url_to_original!! }) { index, it1 ->
+                                Box(
                                     modifier = Modifier
+                                        .padding(horizontal = 1.dp)
                                         .clip(RoundedCornerShape(4.dp))
-                                        .fillMaxSize(),
-                                    contentScale = ContentScale.FillBounds,
-                                    onSuccess = { },
-                                    albumName = albumName,
-                                    autoPlay = false,
-                                    isAnimated = it1.is_animated,
-                                    sizeButton = 20.dp,
-                                    sizeButtonIcon = 12.dp
-                                )
+                                        .aspectRatio(it1.width.toFloat() / it1.height)
+                                        .clickable(onClick = {
+                                            dataItem = it1
+                                            corruptCancel = true
+                                        })
+                                        .border(2.dp, if (index == currentIndex) Color.Yellow else Color.Transparent, RoundedCornerShape(4.dp)).padding(2.dp)
+                                ) {
+                                    UrlImageGifsCoil(
+                                        url = it1.url_to_original!!,
+                                        modifier = Modifier.clip(RoundedCornerShape(4.dp)).fillMaxSize(),
+                                        contentScale = ContentScale.FillBounds,
+                                        onSuccess = { }, albumName = albumName, autoPlay = false, isAnimated = it1.is_animated, sizeButton = 20.dp, sizeButtonIcon = 12.dp
+                                    )
+                                }
                             }
                         }
                     }
-                }
 
+                }
             }
 
         }
