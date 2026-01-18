@@ -26,7 +26,6 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
 
-
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SwipeableBottomPanel(

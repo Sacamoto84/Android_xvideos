@@ -19,10 +19,12 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -157,27 +159,14 @@ class FullScreenImage(
 
         var rotate by remember { mutableStateOf(false) }
 
-        //val zoomState = rememberZoomState()
-
-        val pagerState = rememberPagerState(
-            filteredPic.indexOf(item).coerceIn(0, filteredPic.lastIndex),
-            pageCount = { filteredPic.size }
-        )
+        val pagerState = rememberPagerState( filteredPic.indexOf(item).coerceIn(0, filteredPic.lastIndex), pageCount = { filteredPic.size } )
 
         // Состояние для LazyRow
-        val lazyRowState = rememberLazyListState(
-            cacheWindow = LazyLayoutCacheWindow(
-                ahead = 200.dp,
-                behind = 200.dp
-            )
-        )
+        val lazyRowState = rememberLazyListState( cacheWindow = LazyLayoutCacheWindow( ahead = 200.dp, behind = 200.dp ) )
 
         LaunchedEffect(isClosing) {
             if (isClosing) {
-                onClose(
-                    if (corruptCancel) filteredPic.indexOf(dataItem)
-                        .coerceIn(0, filteredPic.size - 1) else -1
-                )
+                onClose( if (corruptCancel) filteredPic.indexOf(dataItem).coerceIn(0, filteredPic.lastIndex) else -1 )
                 navigator.pop()
             }
         }
@@ -193,11 +182,7 @@ class FullScreenImage(
             )
         }
 
-        LaunchedEffect(currentIndex) {
-            if (currentIndex != initialIndex) {
-                corruptCancel = true
-            }
-        }
+        LaunchedEffect(currentIndex) { if (currentIndex != initialIndex) { corruptCancel = true } }
 
 
         // Автоматическая прокрутка LazyRow к текущему элементу
@@ -221,22 +206,14 @@ class FullScreenImage(
         // Также сбрасываем зум при изменении dataItem через кнопки или миниатюры
         LaunchedEffect(dataItem) {
             val newIndex = filteredPic.indexOf(dataItem)
-            if (newIndex != currentIndex) {
-                coroutineScope.launch {
-                    pagerState.animateScrollToPage(newIndex)
-                }
-            }
+            if (newIndex != currentIndex) { coroutineScope.launch { pagerState.animateScrollToPage(newIndex) } }
         }
 
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 //Шахматная доска
-                .checkerboardBackground(
-                    squareSize = 12.dp,
-                    lightColor = Color(0xFF252525),
-                    darkColor = Color(0xFF181818)
-                )
+                .checkerboardBackground( squareSize = 12.dp, lightColor = Color(0xFF252525), darkColor = Color(0xFF181818) )
                 .noRippleClickable( onClick = { isFullScreen = isFullScreen.not() } )
 
         ) {
@@ -302,15 +279,16 @@ class FullScreenImage(
             AnimatedVisibility(visible = !isFullScreen, enter = fadeIn(), exit = fadeOut())
             {
                 //Верхние кнопки
-                Row(modifier = Modifier.align(Alignment.TopStart).offset(y = 8.dp))
+                Row(modifier = Modifier.fillMaxWidth().align(Alignment.TopStart).offset(y = 8.dp), horizontalArrangement = Arrangement.SpaceBetween)
                 {
-                    IconButton(onClick = { rotate = rotate.not() }) { Icon(Icons.Default.ScreenRotation, contentDescription = null, tint = Color.White) }
-                    IconButton(onClick = { }) { Icon( Icons.Default.Info, contentDescription = null, tint = Color.White ) }
-                }
-                Box( modifier = Modifier.align(Alignment.TopEnd).offset(y = 8.dp) ) { expandMenuViewModel.ExpandMenu( expandMenu, filteredPic[pagerState.currentPage], albumName ) }
-            }
+                    Row {
+                        IconButton(onClick = { rotate = rotate.not() }) { Icon(Icons.Default.ScreenRotation, contentDescription = null, tint = Color.White) }
+                        IconButton(onClick = { }) { Icon( Icons.Default.Info, contentDescription = null, tint = Color.White ) }
+                    }
 
-            val coroutineScope = rememberCoroutineScope()
+                    Box( modifier = Modifier) { expandMenuViewModel.ExpandMenu( expandMenu, filteredPic[pagerState.currentPage], albumName ) }
+                }
+            }
 
             AnimatedVisibility(
                 visible = !isFullScreen,
@@ -321,28 +299,8 @@ class FullScreenImage(
                 SwipeableBottomPanel { swipeableState, hiddenOffset ->
 
                     Box(modifier = Modifier.align(Alignment.BottomCenter)) {
-                        LazyRow(
-                            state = lazyRowState,
-                            modifier = Modifier
-                                .height(72.dp)
-//                                .pointerInput(Unit) {
-//                                    detectVerticalDragGestures(
-//                                        onVerticalDrag = { change, dragAmount ->
-//                                            swipeableState.performDrag(dragAmount)
-//                                            change.consume()
-//                                        },
-//                                        onDragEnd = {
-//                                            val targetState =
-//                                                if (swipeableState.offset.value < hiddenOffset / 2) 0 else 1
-//                                            coroutineScope.launch {
-//                                                swipeableState.animateTo(targetState)
-//                                            }
-//                                        }
-//                                    )
-//                                }
-
-
-                        ) {
+                        LazyRow( state = lazyRowState, modifier = Modifier.height(72.dp) )
+                        {
                             itemsIndexed(
                                 filteredPic,
                                 key = { _, item -> item.url_to_original!! }) { index, it1 ->
