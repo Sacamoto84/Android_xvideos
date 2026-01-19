@@ -1,18 +1,18 @@
 [versions]
 accompanistSystemuicontroller = "0.36.0"
 activityKtx = "1.12.2"
-agp = "8.13.2"
+agp = "9.0.0"
 
 apolloRuntime = "4.3.3"
-componentsResources = "1.9.3"
+componentsResources = "1.10.0"
 composeThemeAdapter = "1.2.1"
 core = "1.49.6"
 coreSplashscreen = "1.2.0"
 diskLruCache = "1.7"
 
 gson = "2.13.2"
-hiltAndroid = "2.57.2"
-hiltAndroidCompiler = "2.57.2"
+hiltAndroid = "2.58"
+hiltAndroidCompiler = "2.58"
 hiltNavigationCompose = "1.3.0"
 imageLoader = "1.10.0"
 jsoup = "1.22.1"
