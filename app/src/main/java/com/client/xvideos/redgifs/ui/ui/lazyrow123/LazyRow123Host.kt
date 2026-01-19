@@ -4,6 +4,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.layout.LazyLayoutCacheWindow
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
@@ -55,12 +56,13 @@ private data class SearchParams(
     val queryNiches: String
 )
 
+@Stable
 @OptIn(FlowPreview::class)
 class LazyRow123Host(
     val connectivityObserver: ConnectivityObserver,
     val scope: CoroutineScope,
     val typePager: TypePager,
-    var extraString: String = "",
+    val extraString: String = "",
     val startOrder: Order = Order.LATEST,
     val startColumns: Int = 2,
     val visibleProfileInfo: Boolean = true,

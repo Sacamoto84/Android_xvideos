@@ -54,19 +54,47 @@ object ScreenLSavedLikesTab : Screen {
 
 }
 
+
+enum class AllImagGif{
+    ALL, IMAGE, GIF
+}
+
 class ScreenSavedLLikesSM @Inject constructor(
 val savedL: SavedL
 ) : ScreenModel {
 
     val host =  LazyRowPictureDetailsHost("likes")
 
+    /**
+     * Выбор типа отображаемого контента
+     */
+    val selectorFilter = AllImagGif.ALL
+
+    val original = savedL.likes.listUrl
+
     init {
-        val a = savedL.likes.listUrl
-        host.filteredPic = a
+        when(selectorFilter){
+            AllImagGif.ALL -> {selectAll()}
+            AllImagGif.IMAGE -> {selectImage()}
+            AllImagGif.GIF -> {selectGif()}
+        }
     }
 
     fun delete(item: PicsDetails){
         savedL.likes.remove(item.url_to_original!!)
+    }
+
+    fun selectGif(){
+        host.filteredPic.clear()
+        host.filteredPic.addAll(original.filter{it.is_animated})
+    }
+
+    fun selectImage(){
+        host.filteredPic  = original.filter{!it.is_animated} as SnapshotStateList<PicsDetails>
+    }
+
+    fun selectAll(){
+        host.filteredPic  = original
     }
 
 }
