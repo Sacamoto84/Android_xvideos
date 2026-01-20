@@ -38,9 +38,18 @@ import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
 import javax.inject.Inject
 
-object ScreenLSavedLikesTab : Screen {
+/**
+ * ![Extended FAB image](1https://ah-img.luscious.net/the-one/596517/1000026019_01KFCDPQ2VPGM41HXS4G543Z2P.1680x0.jpg?md5=9bYJbclKQfs6MvGig7YDpw&expires=1769523334)
 
-    private fun readResolve(): Any = ScreenLSavedLikesTab
+ * !2[256x75 Extended FAB image](https://media.istockphoto.com/id/1346600407/ru/векторная/здоровая-семейная-ходьба.jpg?s=612x612&w=0&k=20&c=1SdYbCJCqN1h7rHfr1XoqGjYWP43d3lEixOQb3GqvU4=)
+ * !2[256x Extended FAB image](https://media.istockphoto.com/id/1346600407/ru/векторная/здоровая-семейная-ходьба.jpg?s=612x612&w=0&k=20&c=1SdYbCJCqN1h7rHfr1XoqGjYWP43d3lEixOQb3GqvU4=)
+ * !2[x75 Extended FAB image](hhttps://media.istockphoto.com/id/1346600407/ru/векторная/здоровая-семейная-ходьба.jpg?s=612x612&w=0&k=20&c=1SdYbCJCqN1h7rHfr1XoqGjYWP43d3lEixOQb3GqvU4=)
+ *
+ * Space is not necessary but is used for readability.
+ */
+object L_ScreenSavedLikesTab : Screen {
+
+    private fun readResolve(): Any = L_ScreenSavedLikesTab
 
     override val key: ScreenKey = uniqueScreenKey
 
@@ -122,17 +131,9 @@ class ScreenSavedLLikesSM @Inject constructor(
 
     fun filterSelect(item: AllImagGif) {
         when (item) {
-            AllImagGif.ALL -> {
-                selectAll()
-            }
-
-            AllImagGif.IMAGE -> {
-                selectImage()
-            }
-
-            AllImagGif.GIF -> {
-                selectGif()
-            }
+            AllImagGif.ALL   -> { selectAll() }
+            AllImagGif.IMAGE -> { selectImage() }
+            AllImagGif.GIF   -> { selectGif() }
         }
     }
 

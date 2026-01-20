@@ -25,8 +25,7 @@ import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.l.ui.screens.TabRow
 import com.client.xvideos.l.ui.screens.explorer.tab.saved.albums.ScreenLSavedAlbumsTab
 import com.client.xvideos.l.ui.screens.explorer.tab.saved.crypto.ScreenLSavedLCryptoTab
-import com.client.xvideos.l.ui.screens.explorer.tab.saved.likes.ScreenLSavedLikesTab
-import com.client.xvideos.redgifs.ui.explorer.top.TabRow
+import com.client.xvideos.l.ui.screens.explorer.tab.saved.likes.L_ScreenSavedLikesTab
 import com.client.xvideos.redgifs.ui.ui.atom.TabBarPoints
 import com.client.xvideos.redgifs.common.ThemeRed
 import kotlinx.collections.immutable.persistentListOf
@@ -72,14 +71,14 @@ object SavedLTab : Screen {
                         onChangeState = {
                             if (it == screenType) {
                                 when (it) {
-                                    0 -> ScreenLSavedLikesTab.columnSelect.addColumn(g0, g1, g2, g3, g4)
-                                    4 -> ScreenLSavedLikesTab.columnSelect.addColumn(g0, g1, g2, g3, g4)
+                                    0 -> L_ScreenSavedLikesTab.columnSelect.addColumn(g0, g1, g2, g3, g4)
+                                    4 -> L_ScreenSavedLikesTab.columnSelect.addColumn(g0, g1, g2, g3, g4)
                                 }
                             }
                             screenType = it
                         },
-                        overlay0 = { TabBarPoints(ScreenLSavedLikesTab.columnSelect.column, screenType == 0) },
-                        overlay4 = { TabBarPoints(ScreenLSavedLikesTab.columnSelect.column, screenType == 4) },
+                        overlay0 = { TabBarPoints(L_ScreenSavedLikesTab.columnSelect.column, screenType == 0) },
+                        overlay4 = { TabBarPoints(L_ScreenSavedLikesTab.columnSelect.column, screenType == 4) },
                     )
                 }
             },
@@ -90,7 +89,7 @@ object SavedLTab : Screen {
 
             Box(modifier = Modifier.padding(bottom = paddingValues.calculateBottomPadding())) {
                 when (screenType) {
-                    0 -> ScreenLSavedLikesTab.Content()
+                    0 -> L_ScreenSavedLikesTab.Content()
                     1 -> ScreenLSavedAlbumsTab.Content()
                     2 -> {}
                     3 -> ScreenLSavedLCryptoTab.Content()

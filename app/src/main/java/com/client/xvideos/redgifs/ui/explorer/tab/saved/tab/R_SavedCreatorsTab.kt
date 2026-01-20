@@ -72,9 +72,9 @@ import dagger.multibindings.IntoMap
 import javax.inject.Inject
 
 
-object SavedCreatorsTab : Screen {
+object R_SavedCreatorsTab : Screen {
 
-    private fun readResolve(): Any = SavedCreatorsTab
+    private fun readResolve(): Any = R_SavedCreatorsTab
 
     override val key: ScreenKey = uniqueScreenKey
 

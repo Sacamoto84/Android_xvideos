@@ -54,6 +54,7 @@ object R_SavedLikesTab : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val vm: ScreenSavedLikesSM = getScreenModel()
 
+        //Изменение количества отображаемых елементов
         LaunchedEffect(columnSelect.column) {
             vm.likedHost.columns = columnSelect.column
         }

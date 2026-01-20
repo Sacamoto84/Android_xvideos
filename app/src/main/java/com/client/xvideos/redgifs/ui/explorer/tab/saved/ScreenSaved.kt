@@ -26,7 +26,7 @@ import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.l.ui.screens.TabRow
 import com.client.xvideos.redgifs.ui.explorer.tab.FavoritesTab
 import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.SavedCollectionTab
-import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.SavedCreatorsTab
+import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.R_SavedCreatorsTab
 import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.SavedDownloadTab
 import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.R_SavedLikesTab
 import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.SavedNichesTab
@@ -109,7 +109,7 @@ object SavedTab : Screen {
             Box(modifier = Modifier.padding(bottom = paddingValues.calculateBottomPadding())) {
                 when (screenType) {
                     0 -> R_SavedLikesTab.Content()
-                    1 -> SavedCreatorsTab.Content()
+                    1 -> R_SavedCreatorsTab.Content()
                     3 -> SavedDownloadTab.Content()
                     2 -> SavedNichesTab.Content()
                     4 -> SavedCollectionTab.Content()

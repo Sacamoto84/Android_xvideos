@@ -79,8 +79,7 @@ class ColumnSelect(private val pref: SettingElementInt){
 
     fun addColumn(g0: Boolean, g1: Boolean, g2: Boolean, g3: Boolean, g4: Boolean) {
         val flags = listOf(g0, g1, g2, g3, g4)
-        val enabledIndices =
-            flags.mapIndexedNotNull { index, enabled -> if (enabled) index else null }
+        val enabledIndices = flags.mapIndexedNotNull { index, enabled -> if (enabled) index else null }
         if (enabledIndices.isEmpty()) return // ничего не включено
         val currentIndex = column
         val currentPos = enabledIndices.indexOf(currentIndex).takeIf { it != -1 } ?: 2

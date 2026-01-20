@@ -27,6 +27,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -37,6 +38,7 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import com.client.xvideos.common.settings.Settings
+import com.client.xvideos.common.settings.ui.Config_G_0_4
 import com.client.xvideos.common.snackbar.SnackBar
 import com.client.xvideos.common.traficStatistic.AppNetworkSpeedMonitor
 import com.client.xvideos.common.util.formatBytes
@@ -49,6 +51,7 @@ import com.client.xvideos.l.ui.screens.explorer.tab.config.atom.ConfigTextAndChe
 import com.client.xvideos.l.ui.screens.explorer.tab.config.atom.ConfigTextAndMenuL
 import com.client.xvideos.l.ui.screens.explorer.tab.config.atom.ConfigTextL
 import com.client.xvideos.l.ui.screens.explorer.tab.config.atom.ScreenLConfig_Encrypt
+import com.client.xvideos.ui.theme.XvideosTheme
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -82,82 +85,94 @@ class ScreenLConfigTab : Screen {
             "Версия: неизвестна"
         }
 
-        Column(
-            modifier = Modifier
-                .background(ThemeL.greyBackground)
-                .displayCutoutPadding()
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState()),
-        ) {
-            Text(
-                "Настройки",
-                color = ThemeL.textColor,
-                style = TextStyle(
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 24.sp,
-                    fontFamily = ThemeL.fontFamilyKarla,
-                    textAlign = TextAlign.Center
-                ),
-                modifier = Modifier.fillMaxWidth()
-            )
-            HorizontalDivider(color = Color.DarkGray)
+        val size = getFolderSize(File(context.cacheDir, "fresco_main_cache").absoluteFile)
+        val diskCacheSizeText = formatBytes(size)
 
+        val thumbnailSize = Settings.thumbalistSize.field.collectAsStateWithLifecycle().value
+        val currentDisplayName = ThumbnailsSize.fromValue(thumbnailSize)?.displayName ?: "?"
 
-
-            ConfigTextL("I want to see this content:")
-            AudiencesType.entries.forEach { it ->
-                ConfigTextAndCheckBoxL(it.title, true, { })
-            }
-            Spacer(Modifier.height(4.dp))
-            HorizontalDivider(color = Color.DarkGray)
-            ScreenLConfig_Encrypt()
-            HorizontalDivider(color = Color.DarkGray)
-            AppNetworkSpeedMonitor()
-            HorizontalDivider(color = Color.DarkGray)
-            Spacer(Modifier.height(4.dp))
-            //ConfigTextL("BitmapCache: ${formatBytes(bitmapCache.toLong())}")
-
-            val size = getFolderSize(File(context.cacheDir, "fresco_main_cache").absoluteFile)
-            ConfigTextAndButtonL("Дисковый кеш: " + formatBytes(size), "Задать", {}, { })
-
-            //ConfigTextAndButtonL( "Очистить кеш картинок", "Очистить", {}, { FrescoUtils.clearCache() })
-
-            // --- Миниатюра ---
-            val thumbnailSize = Settings.thumbalistSize.field.collectAsStateWithLifecycle().value
-            val currentDisplayName = ThumbnailsSize.fromValue(thumbnailSize)?.displayName ?: "?"
-            ConfigTextAndMenuL("Размер миниатюры", currentDisplayName, ThumbnailsSize.displayNames) { selectedDisplayName ->
+        ScreenLConfigTabContent(
+            versionText = versionText,
+            diskCacheSizeText = diskCacheSizeText,
+            thumbnailSizeDisplayName = currentDisplayName,
+            onThumbnailSizeSelected = { selectedDisplayName ->
                 ThumbnailsSize.fromDisplayName(selectedDisplayName)?.apply {
                     Settings.thumbalistSize.setValue(value)
                     SnackBar.success("Размер миниатюры: $displayName")
                 }
             }
-            Spacer(Modifier.height(4.dp))
-            HorizontalDivider(color = Color.DarkGray)
-
-            // ---
-
-
-            Box(
-                modifier = Modifier
-                    .padding(horizontal = 8.dp)
-                    .padding(vertical = 2.dp)
-                    .height(32.dp)
-                    .fillMaxWidth(), contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    versionText,
-                    style = ThemeL.styleTextConfigL.copy(fontSize = 14.sp, color = ThemeL.grey2)
-                )
-            }
-            
-        }
-
-
+        )
     }
 
 }
 
 
+@Composable
+private fun ScreenLConfigTabContent(
+    versionText: String,
+    diskCacheSizeText: String,
+    thumbnailSizeDisplayName: String,
+    onThumbnailSizeSelected: (String) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .background(ThemeL.greyBackground)
+            .displayCutoutPadding()
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState()),
+    ) {
+        Text(
+            "Настройки",
+            color = ThemeL.textColor,
+            style = TextStyle(
+                fontWeight = FontWeight.Medium,
+                fontSize = 24.sp,
+                fontFamily = ThemeL.fontFamilyKarla,
+                textAlign = TextAlign.Center
+            ),
+            modifier = Modifier.fillMaxWidth()
+        )
+        HorizontalDivider(color = Color.DarkGray)
+
+        ConfigTextL("I want to see this content:")
+        AudiencesType.entries.forEach { it ->
+            ConfigTextAndCheckBoxL(it.title, true, { })
+        }
+        Spacer(Modifier.height(4.dp))
+        HorizontalDivider(color = Color.DarkGray)
+        ScreenLConfig_Encrypt()
+        HorizontalDivider(color = Color.DarkGray)
+        AppNetworkSpeedMonitor()
+        HorizontalDivider(color = Color.DarkGray)
+        Spacer(Modifier.height(4.dp))
+
+        ConfigTextAndButtonL("Дисковый кеш: $diskCacheSizeText", "Задать", {}, { })
+
+        ConfigTextAndMenuL(
+            "Размер миниатюры",
+            thumbnailSizeDisplayName,
+            ThumbnailsSize.displayNames,
+            onThumbnailSizeSelected
+        )
+        Spacer(Modifier.height(4.dp))
+        HorizontalDivider(color = Color.DarkGray)
+
+        Config_G_0_4("Likes")
+
+        Box(
+            modifier = Modifier
+                .padding(horizontal = 8.dp)
+                .padding(vertical = 2.dp)
+                .height(32.dp)
+                .fillMaxWidth(), contentAlignment = Alignment.Center
+        ) {
+            Text(
+                versionText,
+                style = ThemeL.styleTextConfigL.copy(fontSize = 14.sp, color = ThemeL.grey2)
+            )
+        }
+    }
+}
 
 
 class ScreenLExplorerSettingSM @Inject constructor(
@@ -186,4 +201,17 @@ abstract class ScreenModuleLExplorerSetting {
     @IntoMap
     @ScreenModelKey(ScreenLExplorerSettingSM::class)
     abstract fun bindScreenLExplorerSettingSreenModel(hiltListScreenModel: ScreenLExplorerSettingSM): ScreenModel
+}
+
+@Preview
+@Composable
+private fun ScreenLConfigTabPreview() {
+    XvideosTheme {
+        ScreenLConfigTabContent(
+            versionText = "Версия: 1.0.0 (1)",
+            diskCacheSizeText = "128 MB",
+            thumbnailSizeDisplayName = "Medium",
+            onThumbnailSizeSelected = {}
+        )
+    }
 }

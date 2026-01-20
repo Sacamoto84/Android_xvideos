@@ -23,11 +23,14 @@ import com.client.xvideos.l.theme.ThemeL
 
 @Composable
 fun AppNetworkSpeedMonitor() {
-
     val context = LocalContext.current
-    val application = context.applicationContext as App
-    val trafficData by application.networkTrafficMonitor.trafficFlow.collectAsStateWithLifecycle()
+    val application = context.applicationContext as? App
+    val trafficData = application?.networkTrafficMonitor?.trafficFlow?.collectAsStateWithLifecycle()?.value ?: TrafficData()
+    AppNetworkSpeedMonitorContent(trafficData)
+}
 
+@Composable
+fun AppNetworkSpeedMonitorContent(trafficData: TrafficData) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -44,26 +47,8 @@ fun AppNetworkSpeedMonitor() {
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
 
-        // Карточка скорости
-
-//            Column(
-//                modifier = Modifier.padding(0.dp)
-//            ) {
-//                Text( text = "Текущая скорость", fontSize = 18.sp, fontWeight = FontWeight.Medium, color = ThemeL.textColor )
-//                Spacer(modifier = Modifier.height(8.dp))
-//                SpeedRow( label = "⬇ Скачивание:", value = formatSpeed(trafficData.downloadSpeed) )
-//                Spacer(modifier = Modifier.height(6.dp))
-//                SpeedRow( label = "⬆ Загрузка:", value = formatSpeed(trafficData.uploadSpeed) )
-//            }
-
         Column(modifier = Modifier.padding(0.dp))
         {
-            //Text( text = "За текущую сессию", fontSize = 18.sp, fontWeight = FontWeight.Medium, color = ThemeL.textColor )
-            //Spacer(modifier = Modifier.height(8.dp))
-            //SpeedRow( label = "⬇ Скачано:", value = formatBytes(trafficData.sessionDownloaded) )
-            //Spacer(modifier = Modifier.height(6.dp))
-            //SpeedRow( label = "⬆ Загружено:", value = formatBytes(trafficData.sessionUploaded) )
-            //Spacer(modifier = Modifier.height(6.dp))
             SpeedRow(
                 label = "📊 За текущую сессию:",
                 value = formatBytes(trafficData.sessionDownloaded + trafficData.sessionUploaded)
@@ -73,25 +58,18 @@ fun AppNetworkSpeedMonitor() {
         // Карточка общих объемов
         Column(modifier = Modifier.padding(0.dp))
         {
-            //Text(text = "За все время", fontSize = 18.sp, fontWeight = FontWeight.Medium, color = ThemeL.textColor )
-            //Spacer(modifier = Modifier.height(8.dp))
-            //SpeedRow( label = "⬇ Скачано:", value = formatBytes(trafficData.totalDownloaded) )
-            //Spacer(modifier = Modifier.height(6.dp))
-            //SpeedRow( label = "⬆ Загружено:", value = formatBytes(trafficData.totalUploaded) )
-            //Spacer(modifier = Modifier.height(6.dp))
             SpeedRow(
                 label = "📊 За все время:",
                 value = formatBytes(trafficData.totalDownloaded + trafficData.totalUploaded)
             )
         }
-
     }
 }
 
 @Preview
 @Composable
 fun AppNetworkSpeedMonitorPreview() {
-    AppNetworkSpeedMonitor()
+    AppNetworkSpeedMonitorContent(TrafficData(sessionDownloaded = 1024, totalDownloaded = 2048))
 }
 
 @Composable
