@@ -28,9 +28,8 @@ import com.client.xvideos.redgifs.ui.explorer.tab.FavoritesTab
 import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.SavedCollectionTab
 import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.SavedCreatorsTab
 import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.SavedDownloadTab
-import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.SavedLikesTab
+import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.R_SavedLikesTab
 import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.SavedNichesTab
-import com.client.xvideos.redgifs.ui.explorer.top.TabRow
 import com.client.xvideos.redgifs.ui.ui.atom.TabBarPoints
 import com.client.xvideos.redgifs.common.ThemeRed
 import kotlinx.collections.immutable.persistentListOf
@@ -75,7 +74,7 @@ object SavedTab : Screen {
                         onChangeState = {
                             if (it == screenType) {
                                 when (it) {
-                                    0 -> SavedLikesTab.columnSelect.addColumn(g0, g1, g2, g3, g4)
+                                    0 -> R_SavedLikesTab.columnSelect.addColumn(g0, g1, g2, g3, g4)
                                     4 -> SavedCollectionTab.columnSelect.addColumn(
                                         g0,
                                         g1,
@@ -89,7 +88,7 @@ object SavedTab : Screen {
                         },
                         overlay0 = {
                             TabBarPoints(
-                                SavedLikesTab.columnSelect.column,
+                                R_SavedLikesTab.columnSelect.column,
                                 screenType == 0
                             )
                         },
@@ -109,7 +108,7 @@ object SavedTab : Screen {
 
             Box(modifier = Modifier.padding(bottom = paddingValues.calculateBottomPadding())) {
                 when (screenType) {
-                    0 -> SavedLikesTab.Content()
+                    0 -> R_SavedLikesTab.Content()
                     1 -> SavedCreatorsTab.Content()
                     3 -> SavedDownloadTab.Content()
                     2 -> SavedNichesTab.Content()

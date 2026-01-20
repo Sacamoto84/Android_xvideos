@@ -44,6 +44,17 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
+/**
+ * Staggered grid для отображения миниатюр изображений/видео альбома.
+ *
+ * Поддерживает кликабельные превью, полноэкранный просмотр с возвратом на позицию,
+ * контекстное меню, кастомные размеры миниатюр и индикатор прогресса прокрутки.
+ *
+ * @param host Контейнер состояния и данных альбома
+ * @param itemBefore Header-контент перед списком (опционально)
+ * @param expandMenu Тип меню дополнительных действий для элементов
+ * @param tag Тег для UI-тестов
+ */
 @OptIn(DelicateCoroutinesApi::class)
 @Composable
 fun LazyRowPictureDetails(
@@ -59,10 +70,7 @@ fun LazyRowPictureDetails(
 
     val rootVm = LocalRootScreenModel.current
 
-    val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForLazyStaggeredGrid(
-        host.state,
-        0
-    )
+    val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForLazyStaggeredGrid( host.state, 0 )
 
     val thumbnailsSize = Settings.thumbalistSize.field.collectAsStateWithLifecycle().value
 
@@ -73,9 +81,7 @@ fun LazyRowPictureDetails(
         LazyVerticalStaggeredGrid(
             state = host.state,
             columns = StaggeredGridCells.Fixed(host.columns),
-            modifier = Modifier
-                .fillMaxSize()
-                .then(if (tag.isNotEmpty()) Modifier.testTag(tag) else Modifier)
+            modifier = Modifier.fillMaxSize().then(if (tag.isNotEmpty()) Modifier.testTag(tag) else Modifier)
         ) {
 
             item(span = StaggeredGridItemSpan.FullLine) { itemBefore() }

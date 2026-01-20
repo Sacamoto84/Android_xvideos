@@ -40,9 +40,9 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import javax.inject.Inject
 
 
-object SavedLikesTab : Screen {
+object R_SavedLikesTab : Screen {
 
-    private fun readResolve(): Any = SavedLikesTab
+    private fun readResolve(): Any = R_SavedLikesTab
 
     override val key: ScreenKey = uniqueScreenKey
     @Transient
