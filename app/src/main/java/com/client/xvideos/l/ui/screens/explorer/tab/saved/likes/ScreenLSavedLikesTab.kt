@@ -3,22 +3,19 @@ package com.client.xvideos.l.ui.screens.explorer.tab.saved.likes
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
@@ -30,9 +27,8 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.l.featured.saved.SavedL
 import com.client.xvideos.l.model.PicsDetails
-import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.ui.element.expandMenu.ExpandMenuType
-import com.client.xvideos.l.ui.element.lazyRowPictureDetails.LazyRowPictureDetails
+import com.client.xvideos.l.ui.element.lazyRowPictureDetails.L_LazyRowPictureDetails
 import com.client.xvideos.l.ui.element.lazyRowPictureDetails.LazyRowPictureDetailsHost
 import com.client.xvideos.redgifs.ui.explorer.tab.gifs.ColumnSelect
 import dagger.Binds
@@ -57,11 +53,17 @@ object ScreenLSavedLikesTab : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val vm: ScreenSavedLLikesSM = getScreenModel()
 
+        LaunchedEffect(columnSelect.column) {
+            if (columnSelect.column != 0) {
+                vm.host.columns = columnSelect.column
+            }
+        }
+
         var selectedIndex by remember { mutableIntStateOf(0) }
         val options = listOf("All", "Image", "Gif")
 
         Scaffold(modifier = Modifier.fillMaxSize()) {
-            LazyRowPictureDetails(
+            L_LazyRowPictureDetails(
                 vm.host,
                 expandMenu = ExpandMenuType.LIKES,
                 tag = "lLikes",
@@ -80,7 +82,6 @@ object ScreenLSavedLikesTab : Screen {
                                 },
                                 selected = index == selectedIndex,
                                 label = { Text(label) },
-
                                 colors = SegmentedButtonDefaults.colors(
                                     activeContainerColor =  Color(0xFF938F99)// ThemeL.b0
                                 )

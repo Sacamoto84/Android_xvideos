@@ -37,7 +37,7 @@ import com.client.xvideos.depth
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.model.AlbumDetails
 import com.client.xvideos.l.ui.element.expandMenu.ExpandMenuType
-import com.client.xvideos.l.ui.element.lazyRowPictureDetails.LazyRowPictureDetails
+import com.client.xvideos.l.ui.element.lazyRowPictureDetails.L_LazyRowPictureDetails
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumDialogDeleteAlbum
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoAudiences
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoButtonSaveAlbum
@@ -139,7 +139,7 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
             containerColor = ThemeL.greyBackground
         ) { padding ->
 
-            LazyRowPictureDetails(
+            L_LazyRowPictureDetails(
 
                 host = vm.host,
                 expandMenu = ExpandMenuType.ALBUM,

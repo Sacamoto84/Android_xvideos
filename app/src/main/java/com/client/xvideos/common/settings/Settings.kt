@@ -27,13 +27,7 @@ object Settings {
     val current_count_gifTab by lazy { SettingElementInt(pref, "current_count_gifTab", 2) }
 
     val current_count_likesTab by lazy { SettingElementInt(pref, "current_count_likesTab", 2) }
-    val current_count_collectionTab by lazy {
-        SettingElementInt(
-            pref,
-            "current_count_collectionTab",
-            2
-        )
-    }
+    val current_count_collectionTab by lazy { SettingElementInt( pref, "current_count_collectionTab", 2 ) }
 
 
 

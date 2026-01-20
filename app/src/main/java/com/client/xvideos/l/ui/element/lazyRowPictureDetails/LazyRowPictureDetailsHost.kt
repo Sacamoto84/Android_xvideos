@@ -24,7 +24,10 @@ class LazyRowPictureDetailsHost(
 
     val state1 = LazyListState(cacheWindow = dpCacheWindow)
 
-    var columns by mutableIntStateOf(2)
+    /**
+     * Количество отображаемых столбцов
+     */
+    var columns by mutableIntStateOf(3)
 
     var selectedImage by mutableStateOf<PicsDetails?>(null)
 

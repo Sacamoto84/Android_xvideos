@@ -18,7 +18,7 @@ import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.l.featured.saved.SavedL
 import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.ui.element.expandMenu.ExpandMenuType
-import com.client.xvideos.l.ui.element.lazyRowPictureDetails.LazyRowPictureDetails
+import com.client.xvideos.l.ui.element.lazyRowPictureDetails.L_LazyRowPictureDetails
 import com.client.xvideos.l.ui.element.lazyRowPictureDetails.LazyRowPictureDetailsHost
 import com.client.xvideos.redgifs.ui.explorer.tab.gifs.ColumnSelect
 import dagger.Binds
@@ -45,7 +45,7 @@ object ScreenLSavedLCryptoTab : Screen {
         val vm: ScreenSavedLCryptoSM = getScreenModel()
 
         Scaffold(modifier = Modifier.fillMaxSize()) {
-            LazyRowPictureDetails( vm.host, expandMenu =  ExpandMenuType.CRYPTO )
+            L_LazyRowPictureDetails( vm.host, expandMenu =  ExpandMenuType.CRYPTO )
         }
 
     }
