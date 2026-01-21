@@ -28,7 +28,7 @@ import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import com.client.xvideos.common.collectionDB.ui.DaialogNewCollection
 import com.client.xvideos.common.connectivityObserver.ConnectivityObserver
-import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.SavedCollectionTab
+import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.R_SavedCollectionTab
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.LazyRow123
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.LazyRow123Host
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.TypePager
@@ -70,8 +70,8 @@ class ScreenCollectionName(val collectionName: String) : Screen {
             savedRed.collections.selectedCollection.value = null
         }
 
-        LaunchedEffect(SavedCollectionTab.columnSelect.column) {
-            vm.likedHost.columns = SavedCollectionTab.columnSelect.column
+        LaunchedEffect(R_SavedCollectionTab.columnSelect.column) {
+            vm.likedHost.columns = R_SavedCollectionTab.columnSelect.column
         }
 
         /* ---------- /Диалог ---------- */

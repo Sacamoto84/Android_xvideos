@@ -16,16 +16,6 @@ object Settings {
 
     fun init(prefs: SharedPreferences) { pref = prefs }
 
-    val gallery_count: List<SettingElementBoolean> by lazy {
-        listOf(
-            SettingElementBoolean(pref, "gallery_count_0", true),
-            SettingElementBoolean(pref, "gallery_count_1", false),
-            SettingElementBoolean(pref, "gallery_count_2", true),
-            SettingElementBoolean(pref, "gallery_count_3", true),
-            SettingElementBoolean(pref, "gallery_count_4", false),
-        )
-    }
-
     val current_count_niches by lazy { SettingElementInt(pref, "current_count_niches", 2) }
 
     val current_count_gifTab by lazy { SettingElementInt(pref, "current_count_gifTab", 2) }
@@ -47,6 +37,11 @@ object Settings {
      * Количество столбиков в L Likes Tab T 1 2 3 4
      */
     val l_likesTab_G_0_4 by lazy {  SettingElementList<Boolean>( pref, "l_likesTab_G_0_4",  typeToken = object : TypeToken<List<Boolean>>() {}.type , default = listOf(false, true, true, true, true))  }
+
+    /**
+     * Текущее количество столбиков в L Likes Tab
+     */
+    val l_likesTab_column_current_count by lazy { SettingElementInt(pref, "l_likesTab_column_current_count", 2) }
 
     //-- xvideos ---
 

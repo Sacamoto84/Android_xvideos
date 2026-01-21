@@ -25,7 +25,7 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.l.ui.screens.TabRow
 import com.client.xvideos.redgifs.ui.explorer.tab.FavoritesTab
-import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.SavedCollectionTab
+import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.R_SavedCollectionTab
 import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.R_SavedCreatorsTab
 import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.SavedDownloadTab
 import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.R_SavedLikesTab
@@ -74,14 +74,8 @@ object SavedTab : Screen {
                         onChangeState = {
                             if (it == screenType) {
                                 when (it) {
-                                    0 -> R_SavedLikesTab.columnSelect.addColumn(g0, g1, g2, g3, g4)
-                                    4 -> SavedCollectionTab.columnSelect.addColumn(
-                                        g0,
-                                        g1,
-                                        g2,
-                                        g3,
-                                        g4
-                                    )
+                                    0 -> R_SavedLikesTab.columnSelect.addColumn()
+                                    4 -> R_SavedCollectionTab.columnSelect.addColumn()
                                 }
                             }
                             screenType = it
@@ -94,7 +88,7 @@ object SavedTab : Screen {
                         },
                         overlay4 = {
                             TabBarPoints(
-                                SavedCollectionTab.columnSelect.column,
+                                R_SavedCollectionTab.columnSelect.column,
                                 screenType == 4
                             )
                         },
@@ -112,7 +106,7 @@ object SavedTab : Screen {
                     1 -> R_SavedCreatorsTab.Content()
                     3 -> SavedDownloadTab.Content()
                     2 -> SavedNichesTab.Content()
-                    4 -> SavedCollectionTab.Content()
+                    4 -> R_SavedCollectionTab.Content()
                     else -> FavoritesTab.Content()
                 }
             }

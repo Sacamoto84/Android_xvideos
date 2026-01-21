@@ -157,8 +157,9 @@ private fun ScreenLConfigTabContent(
         Spacer(Modifier.height(4.dp))
         HorizontalDivider(color = Color.DarkGray)
 
-        Config_G_0_4("Likes")
+        Config_G_0_4("Likes", Settings.l_likesTab_G_0_4)
 
+        HorizontalDivider(color = Color.DarkGray)
         Box(
             modifier = Modifier
                 .padding(horizontal = 8.dp)

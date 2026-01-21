@@ -50,7 +50,7 @@ import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.common.saved.SavedRed
 import com.client.xvideos.common.urlVideoImage.UrlImage
 import com.client.xvideos.redgifs.model.NichesInfo
-import com.client.xvideos.redgifs.ui.niche.ScreenRedNiche
+import com.client.xvideos.redgifs.ui.niche.R_ScreenNiche
 import com.client.xvideos.redgifs.ui.profile.atom.VerticalScrollbar
 import com.client.xvideos.redgifs.ui.profile.rememberVisibleRangePercentIgnoringFirstNForLazyColumn
 import com.composeunstyled.Text
@@ -144,7 +144,7 @@ object SavedNichesTab : Screen {
                                 .background(ThemeRed.colorBottomBarDivider)
                                 .clickable(onClick = {
                                     navigator.push(
-                                        ScreenRedNiche(it.id)
+                                        R_ScreenNiche(it.id)
                                     )
                                 }),
                             verticalAlignment = Alignment.CenterVertically,

@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.BookmarkBorder
@@ -23,11 +22,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
@@ -37,11 +34,10 @@ import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import com.client.xvideos.LocalRootScreenModel
 import com.client.xvideos.R
-import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.depth
 import com.client.xvideos.l.ui.screens.explorer.tab.albumTopHits.ScreenLAlbumTopHits
 import com.client.xvideos.l.ui.screens.explorer.tab.config.ScreenLConfigTab
-import com.client.xvideos.l.ui.screens.explorer.tab.saved.SavedLTab
+import com.client.xvideos.l.ui.screens.explorer.tab.saved.L_SavedTab
 import com.client.xvideos.l.ui.screens.screenAlbumList.ScreenLAlbumList
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.ui.explorer.tab.gifs.GifsTab
@@ -87,15 +83,7 @@ class ScreenLExplorer() : Screen {
 
         val navigator = LocalNavigator.currentOrThrow
 
-        LaunchedEffect(Unit) {
-            depth = 0
-        }
-
-        val g0 = Settings.gallery_count[0].field.collectAsStateWithLifecycle().value
-        val g1 = Settings.gallery_count[1].field.collectAsStateWithLifecycle().value
-        val g2 = Settings.gallery_count[2].field.collectAsStateWithLifecycle().value
-        val g3 = Settings.gallery_count[3].field.collectAsStateWithLifecycle().value
-        val g4 = Settings.gallery_count[4].field.collectAsStateWithLifecycle().value
+        LaunchedEffect(Unit) { depth = 0 }
 
         // ПЕРЕНЕСЕНО СЮДА: Теперь эти списки создаются внутри Composable
         val l = remember {
@@ -148,9 +136,9 @@ class ScreenLExplorer() : Screen {
                 when (screenType) {
                     0 -> ScreenLAlbumList.Content()
                     1 -> ScreenLAlbumTopHits.Content()
-                    2 -> SavedLTab.Content()
+                    2 -> L_SavedTab.Content()
                     3 -> ScreenLConfigTab().Content()
-                    else -> SavedLTab
+                    else -> L_SavedTab
                 }
                 //)
 

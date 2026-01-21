@@ -42,7 +42,7 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.common.connectivityObserver.ConnectivityObserver
-import com.client.xvideos.redgifs.ui.niche.ScreenRedNiche
+import com.client.xvideos.redgifs.ui.niche.R_ScreenNiche
 import com.client.xvideos.redgifs.ui.profile.atom.VerticalScrollbar
 import com.client.xvideos.redgifs.ui.profile.rememberVisibleRangePercentIgnoringFirstNForLazyColumn
 import com.client.xvideos.redgifs.ui.ui.atom.ButtonUp
@@ -194,7 +194,7 @@ object NichesTab : Screen {
                         if (item != null) {
                             Box(modifier = Modifier.padding(vertical = 4.dp)) {
                                 NichePreview2(niches = item, onClick = {
-                                    navigator.push(ScreenRedNiche(item.id))
+                                    navigator.push(R_ScreenNiche(item.id))
                                 }, savedRed = vm.hostDI.savedRed)
 
                                 Text(

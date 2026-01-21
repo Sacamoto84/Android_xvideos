@@ -24,21 +24,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.client.xvideos.common.settings.Settings
+import com.client.xvideos.common.settings.element.SettingElementList
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.composeunstyled.Text
 import com.skydoves.compose.stability.runtime.TraceRecomposition
 
-
 @Composable
-fun Config_G_0_4(text: String = "123453232") {
-//    Row(
-//        modifier = Modifier.padding(horizontal = 8.dp).padding(vertical = 2.dp).height(48.dp).fillMaxWidth(),
-//        horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically
-//    ) {
-//        Text(text, style = styleTextConfig)
-//        Text(value, style = styleTextConfig)
-//    }
-    val selectedOptions = remember { mutableStateListOf(false, false, true, true, false) }
+fun Config_G_0_4(text: String = "123453232", setting : SettingElementList<Boolean>) {
+
+    val list =  setting.field.collectAsStateWithLifecycle().value
+
+    //val selectedOptions = remember { mutableStateListOf(false, false, true, true, false) }
 
     Row(
         modifier = Modifier.padding(horizontal = 8.dp).padding(vertical = 2.dp).height(48.dp).fillMaxWidth(),
@@ -50,26 +48,28 @@ fun Config_G_0_4(text: String = "123453232") {
         MultiChoiceSegmentedButtonRow(
             modifier = Modifier.padding(start = 16.dp).fillMaxWidth()
         ) {
-            selectedOptions.forEachIndexed { index, label ->
+            list.forEachIndexed { index, label ->
                 SegmentedButton(
                     shape = SegmentedButtonDefaults.itemShape(
                         index = index,
-                        count = selectedOptions.size
+                        count = list.size
                     ),
-                    checked = selectedOptions[index],
+                    checked = list[index],
                     onCheckedChange = {
-                        selectedOptions[index] = !selectedOptions[index]
+                        val a = list.toMutableList()
+                        a[index] = a[index].not()
+                        setting.setValue(a)
                     },
 
                     //icon = { SegmentedButtonDefaults.Icon(selectedOptions[index]) },
 
                     label = {
                         when (index) {
-                            0 -> TabBarPoints(0, selectedOptions[index])
-                            1 -> TabBarPoints(1, selectedOptions[index])
-                            2 -> TabBarPoints(2, selectedOptions[index])
-                            3 -> TabBarPoints(3, selectedOptions[index])
-                            4 -> TabBarPoints(4, selectedOptions[index])
+                            0 -> TabBarPoints(0, list[index])
+                            1 -> TabBarPoints(1, list[index])
+                            2 -> TabBarPoints(2, list[index])
+                            3 -> TabBarPoints(3, list[index])
+                            4 -> TabBarPoints(4, list[index])
                         }
                     }
                 )
@@ -116,5 +116,5 @@ private fun TabBarPoints(count: Int, screenType: Boolean) {
 @Preview(showBackground = false)
 @Composable
 fun PreviewConfig_G_0_4() {
-    Config_G_0_4()
+    Config_G_0_4("777", Settings.l_likesTab_G_0_4)
 }

@@ -53,7 +53,7 @@ import com.client.xvideos.redgifs.ui.ui.sortByOrder.SortByOrder
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.model.Order
 
-class ScreenRedNiche(val nicheName: String = "pumped-pussy") : Screen {
+class R_ScreenNiche(val nicheName: String = "pumped-pussy") : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
 
@@ -65,11 +65,6 @@ class ScreenRedNiche(val nicheName: String = "pumped-pussy") : Screen {
 
         val columnSelect = remember { ColumnSelect(Settings.current_count_niches) }
 
-        val g0 = Settings.gallery_count[0].field.collectAsStateWithLifecycle().value
-        val g1 = Settings.gallery_count[1].field.collectAsStateWithLifecycle().value
-        val g2 = Settings.gallery_count[2].field.collectAsStateWithLifecycle().value
-        val g3 = Settings.gallery_count[3].field.collectAsStateWithLifecycle().value
-        val g4 = Settings.gallery_count[4].field.collectAsStateWithLifecycle().value
         val navigator = LocalNavigator.currentOrThrow
         val vm = getScreenModel<ScreenNicheSM, ScreenNicheSM.Factory> { factory -> factory.create(nicheName) }
         val sort = vm.lazyHost.sortType.collectAsStateWithLifecycle().value
@@ -118,7 +113,8 @@ class ScreenRedNiche(val nicheName: String = "pumped-pussy") : Screen {
                                 modifier = Modifier.width(46.dp).height(46.dp).clip(RoundedCornerShape(8.dp))
                                     .border(1.dp, Color.DarkGray, RoundedCornerShape(8.dp)).background(ThemeRed.colorCommonBackground)
                                     .clickable(onClick = {
-                                        columnSelect.addColumn( g0, g1, g2, g3, g4 ); vm.lazyHost.columns = columnSelect.column
+                                        columnSelect.addColumn(  );
+                                        vm.lazyHost.columns = columnSelect.column
                                     }), contentAlignment = Alignment.Center
                             ) { TabBarPoints(vm.lazyHost.columns, true) }
                             Spacer(modifier = Modifier.width(2.dp))
@@ -164,7 +160,7 @@ class ScreenRedNiche(val nicheName: String = "pumped-pussy") : Screen {
                                 items(vm.related.niches.size) {
                                     NichePreview(vm.related.niches[it], onClick = {
                                         navigator.push(
-                                            ScreenRedNiche(vm.related.niches[it].id)
+                                            R_ScreenNiche(vm.related.niches[it].id)
                                         )
                                     })
                                 }

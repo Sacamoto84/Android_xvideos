@@ -3,6 +3,7 @@ package com.client.xvideos.l.ui.screens.explorer.tab.saved.likes
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
@@ -16,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
@@ -54,7 +56,7 @@ object L_ScreenSavedLikesTab : Screen {
     override val key: ScreenKey = uniqueScreenKey
 
     @Transient
-    val columnSelect = ColumnSelect(Settings.current_count_likesTab)
+    val columnSelect = ColumnSelect(Settings.l_likesTab_column_current_count)
 
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
@@ -78,7 +80,7 @@ object L_ScreenSavedLikesTab : Screen {
                 tag = "lLikes",
                 itemBefore = {
 
-                    SingleChoiceSegmentedButtonRow(modifier = Modifier.displayCutoutPadding()) {
+                    SingleChoiceSegmentedButtonRow(modifier = Modifier.displayCutoutPadding().padding(horizontal = 8.dp)) {
                         options.forEachIndexed { index, label ->
                             SegmentedButton(
                                 shape = SegmentedButtonDefaults.itemShape(

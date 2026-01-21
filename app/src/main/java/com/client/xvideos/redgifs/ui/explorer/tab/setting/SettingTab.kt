@@ -51,6 +51,7 @@ import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.common.settings.ui.ConfigText
 import com.client.xvideos.common.settings.ui.ConfigTextAndButtonWithDialog
 import com.client.xvideos.common.settings.ui.ConfigTextAndCheckBox
+import com.client.xvideos.common.settings.ui.Config_G_0_4
 import com.client.xvideos.common.util.toPrettyCount3
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.common.di.HostDI
@@ -76,12 +77,6 @@ object SettingTab : Screen {
         val haptic = LocalHapticFeedback.current
 
         val context = LocalContext.current
-
-        val galey0 = Settings.gallery_count[0].field.collectAsState().value
-        val galey1 = Settings.gallery_count[1].field.collectAsState().value
-        val galey2 = Settings.gallery_count[2].field.collectAsState().value
-        val galey3 = Settings.gallery_count[3].field.collectAsState().value
-        val galey4 = Settings.gallery_count[4].field.collectAsState().value
 
         LaunchedEffect(Unit) {
             vm.sizeXvideos = getFolderSize(File(AppPath.main))
@@ -178,26 +173,30 @@ object SettingTab : Screen {
 
             HorizontalDivider(color = Color.DarkGray)
 
-            ConfigTextAndCheckBox(
-                "Тикток стиль",
-                galey0
-            ) { vm.screenModelScope.launch { Settings.gallery_count[0].setValue(it) } }
-            ConfigTextAndCheckBox(
-                "Один столбец",
-                galey1
-            ) { vm.screenModelScope.launch { Settings.gallery_count[1].setValue(it) } }
-            ConfigTextAndCheckBox(
-                "Два столбца",
-                galey2
-            ) { vm.screenModelScope.launch { Settings.gallery_count[2].setValue(it) } }
-            ConfigTextAndCheckBox(
-                "Три столбца",
-                galey3
-            ) { vm.screenModelScope.launch { Settings.gallery_count[3].setValue(it) } }
-            ConfigTextAndCheckBox(
-                "Четыре столбца",
-                galey4
-            ) { vm.screenModelScope.launch { Settings.gallery_count[4].setValue(it) } }
+            Config_G_0_4()
+
+//            ConfigTextAndCheckBox(
+//                "Тикток стиль",
+//                galey0
+//            ) { vm.screenModelScope.launch { Settings.gallery_count[0].setValue(it) } }
+//            ConfigTextAndCheckBox(
+//                "Один столбец",
+//                galey1
+//            ) { vm.screenModelScope.launch { Settings.gallery_count[1].setValue(it) } }
+//            ConfigTextAndCheckBox(
+//                "Два столбца",
+//                galey2
+//            ) { vm.screenModelScope.launch { Settings.gallery_count[2].setValue(it) } }
+//            ConfigTextAndCheckBox(
+//                "Три столбца",
+//                galey3
+//            ) { vm.screenModelScope.launch { Settings.gallery_count[3].setValue(it) } }
+//            ConfigTextAndCheckBox(
+//                "Четыре столбца",
+//                galey4
+//            ) { vm.screenModelScope.launch { Settings.gallery_count[4].setValue(it) } }
+
+
 
         }
     }

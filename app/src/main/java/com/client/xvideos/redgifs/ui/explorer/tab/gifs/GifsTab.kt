@@ -51,6 +51,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.common.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.common.settings.element.SettingElementInt
 import com.client.xvideos.common.settings.Settings
+import com.client.xvideos.common.settings.element.SettingElementList
 import com.client.xvideos.redgifs.ui.profile.ScreenRedProfile
 import com.client.xvideos.redgifs.ui.profile.atom.VerticalScrollbar
 import com.client.xvideos.redgifs.ui.profile.rememberVisibleRangePercentIgnoringFirstNForGrid
@@ -73,12 +74,12 @@ import javax.inject.Inject
 
 
 
-class ColumnSelect(private val pref: SettingElementInt){
+class ColumnSelect(private val pref: SettingElementInt, private val list: SettingElementList<Boolean> ){
 
     var column by mutableIntStateOf( pref.field.value )
 
-    fun addColumn(g0: Boolean, g1: Boolean, g2: Boolean, g3: Boolean, g4: Boolean) {
-        val flags = listOf(g0, g1, g2, g3, g4)
+    fun addColumn() {
+        val flags = list.field.value//listOf(g0, g1, g2, g3, g4)
         val enabledIndices = flags.mapIndexedNotNull { index, enabled -> if (enabled) index else null }
         if (enabledIndices.isEmpty()) return // ничего не включено
         val currentIndex = column

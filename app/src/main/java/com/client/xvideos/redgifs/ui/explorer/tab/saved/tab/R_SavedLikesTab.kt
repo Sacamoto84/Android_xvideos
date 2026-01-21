@@ -45,8 +45,9 @@ object R_SavedLikesTab : Screen {
     private fun readResolve(): Any = R_SavedLikesTab
 
     override val key: ScreenKey = uniqueScreenKey
+
     @Transient
-    val columnSelect  = ColumnSelect(Settings.current_count_likesTab)
+    val columnSelect = ColumnSelect(Settings.l_likesTab_column_current_count)
 
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable

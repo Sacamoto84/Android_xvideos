@@ -40,7 +40,7 @@ import com.client.xvideos.common.util.toPrettyCountInt
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.model.Niche
 import com.client.xvideos.redgifs.model.NichesInfo
-import com.client.xvideos.redgifs.ui.niche.ScreenRedNiche
+import com.client.xvideos.redgifs.ui.niche.R_ScreenNiche
 import com.client.xvideos.redgifs.common.saved.SavedRed
 
 @Composable
@@ -71,7 +71,7 @@ fun LazyRow123ExplorerNiches(
             if (item != null) {
                 Box(modifier = Modifier.padding(vertical = 4.dp)) {
                     NichePreview2(niches = item, onClick = {
-                        navigator.push(ScreenRedNiche(item.id))
+                        navigator.push(R_ScreenNiche(item.id))
                     }, savedRed = host.hostDI.savedRed)
                 }
             }

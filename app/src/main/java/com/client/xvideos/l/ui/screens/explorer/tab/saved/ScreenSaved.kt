@@ -17,11 +17,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
-import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.l.ui.screens.TabRow
 import com.client.xvideos.l.ui.screens.explorer.tab.saved.albums.ScreenLSavedAlbumsTab
 import com.client.xvideos.l.ui.screens.explorer.tab.saved.crypto.ScreenLSavedLCryptoTab
@@ -30,9 +28,9 @@ import com.client.xvideos.redgifs.ui.ui.atom.TabBarPoints
 import com.client.xvideos.redgifs.common.ThemeRed
 import kotlinx.collections.immutable.persistentListOf
 
-object SavedLTab : Screen {
+object L_SavedTab : Screen {
 
-    private fun readResolve(): Any = SavedLTab
+    private fun readResolve(): Any = L_SavedTab
 
     override val key: ScreenKey = uniqueScreenKey
 
@@ -50,14 +48,6 @@ object SavedLTab : Screen {
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
     override fun Content() {
-
-        val g0 = Settings.gallery_count[0].field.collectAsStateWithLifecycle().value
-        val g1 = Settings.gallery_count[1].field.collectAsStateWithLifecycle().value
-        val g2 = Settings.gallery_count[2].field.collectAsStateWithLifecycle().value
-        val g3 = Settings.gallery_count[3].field.collectAsStateWithLifecycle().value
-        val g4 = Settings.gallery_count[4].field.collectAsStateWithLifecycle().value
-
-
 
         Scaffold(
             bottomBar = {

@@ -67,9 +67,9 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import timber.log.Timber
 import javax.inject.Inject
 
-object SavedCollectionTab : Screen {
+object R_SavedCollectionTab : Screen {
 
-    private fun readResolve(): Any = SavedCollectionTab
+    private fun readResolve(): Any = R_SavedCollectionTab
 
     override val key: ScreenKey = uniqueScreenKey
 
