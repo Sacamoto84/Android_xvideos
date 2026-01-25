@@ -173,30 +173,8 @@ object SettingTab : Screen {
 
             HorizontalDivider(color = Color.DarkGray)
 
-            Config_G_0_4()
-
-//            ConfigTextAndCheckBox(
-//                "Тикток стиль",
-//                galey0
-//            ) { vm.screenModelScope.launch { Settings.gallery_count[0].setValue(it) } }
-//            ConfigTextAndCheckBox(
-//                "Один столбец",
-//                galey1
-//            ) { vm.screenModelScope.launch { Settings.gallery_count[1].setValue(it) } }
-//            ConfigTextAndCheckBox(
-//                "Два столбца",
-//                galey2
-//            ) { vm.screenModelScope.launch { Settings.gallery_count[2].setValue(it) } }
-//            ConfigTextAndCheckBox(
-//                "Три столбца",
-//                galey3
-//            ) { vm.screenModelScope.launch { Settings.gallery_count[3].setValue(it) } }
-//            ConfigTextAndCheckBox(
-//                "Четыре столбца",
-//                galey4
-//            ) { vm.screenModelScope.launch { Settings.gallery_count[4].setValue(it) } }
-
-
+            Config_G_0_4("Likes",Settings.r_likesTab_G_0_4)
+            
 
         }
     }

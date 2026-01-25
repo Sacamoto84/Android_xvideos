@@ -8,7 +8,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -34,11 +33,11 @@ import my.nanihadesuka.compose.ScrollbarSettings
 import timber.log.Timber
 import javax.inject.Inject
 
-object ScreenLSavedAlbumsTab : Screen {
+object L_ScreenSavedAlbumsTab : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
 
-    private fun readResolve(): Any = ScreenLSavedAlbumsTab
+    private fun readResolve(): Any = L_ScreenSavedAlbumsTab
 
     @Composable
     override fun Content() {

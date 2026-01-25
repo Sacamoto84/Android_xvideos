@@ -18,6 +18,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
@@ -32,7 +33,7 @@ import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.ui.element.expandMenu.ExpandMenuType
 import com.client.xvideos.l.ui.element.lazyRowPictureDetails.L_LazyRowPictureDetails
 import com.client.xvideos.l.ui.element.lazyRowPictureDetails.LazyRowPictureDetailsHost
-import com.client.xvideos.redgifs.ui.explorer.tab.gifs.ColumnSelect
+import com.client.xvideos.redgifs.ui.explorer.tab.gifs.ColumnSelect_AddColumn
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -40,6 +41,9 @@ import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
 import javax.inject.Inject
 
+fun L_ScreenSavedLikesTab_AddColumn(){
+    ColumnSelect_AddColumn(Settings.l_likesTab_column_current_count, Settings.l_likesTab_G_0_4)
+}
 /**
  * ![Extended FAB image](1https://ah-img.luscious.net/the-one/596517/1000026019_01KFCDPQ2VPGM41HXS4G543Z2P.1680x0.jpg?md5=9bYJbclKQfs6MvGig7YDpw&expires=1769523334)
 
@@ -55,18 +59,17 @@ object L_ScreenSavedLikesTab : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
 
-    @Transient
-    val columnSelect = ColumnSelect(Settings.l_likesTab_column_current_count)
-
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val vm: ScreenSavedLLikesSM = getScreenModel()
 
-        LaunchedEffect(columnSelect.column) {
-            if (columnSelect.column != 0) {
-                vm.host.columns = columnSelect.column
+        val column = Settings.l_likesTab_column_current_count.field.collectAsStateWithLifecycle().value
+
+        LaunchedEffect(column) {
+            if (column != 0) {
+                vm.host.columns = column
             }
         }
 

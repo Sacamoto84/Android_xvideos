@@ -57,9 +57,6 @@ class R_ScreenNiche(val nicheName: String = "pumped-pussy") : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
 
-    //@Transient
-    //val columnSelect = ColumnSelect(Settings.current_count_niches)
-
     @Composable
     override fun Content() {
 

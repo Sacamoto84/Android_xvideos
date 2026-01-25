@@ -74,7 +74,7 @@ object R_SavedCollectionTab : Screen {
     override val key: ScreenKey = uniqueScreenKey
 
     @Transient
-    val columnSelect  = ColumnSelect(Settings.current_count_collectionTab)
+    val columnSelect  = ColumnSelect(Settings.r_collectionTab_column_current_count)
 
     @OptIn(DelicateCoroutinesApi::class)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")

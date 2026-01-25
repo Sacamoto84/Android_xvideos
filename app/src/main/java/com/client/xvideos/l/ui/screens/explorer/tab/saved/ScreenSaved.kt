@@ -15,15 +15,20 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
+import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.l.ui.screens.TabRow
-import com.client.xvideos.l.ui.screens.explorer.tab.saved.albums.ScreenLSavedAlbumsTab
-import com.client.xvideos.l.ui.screens.explorer.tab.saved.crypto.ScreenLSavedLCryptoTab
+import com.client.xvideos.l.ui.screens.explorer.tab.saved.albums.L_ScreenSavedAlbumsTab
+import com.client.xvideos.l.ui.screens.explorer.tab.saved.crypto.L_ScreenSavedCryptoTab
+import com.client.xvideos.l.ui.screens.explorer.tab.saved.crypto.L_ScreenSavedCryptoTab_AddColumn
 import com.client.xvideos.l.ui.screens.explorer.tab.saved.likes.L_ScreenSavedLikesTab
+import com.client.xvideos.l.ui.screens.explorer.tab.saved.likes.L_ScreenSavedLikesTab_AddColumn
 import com.client.xvideos.redgifs.ui.ui.atom.TabBarPoints
 import com.client.xvideos.redgifs.common.ThemeRed
 import kotlinx.collections.immutable.persistentListOf
@@ -33,8 +38,6 @@ object L_SavedTab : Screen {
     private fun readResolve(): Any = L_SavedTab
 
     override val key: ScreenKey = uniqueScreenKey
-
-    var screenType by mutableIntStateOf(0)
 
     val l = persistentListOf(
         //Icons.Outlined.FavoriteBorder,
@@ -49,6 +52,11 @@ object L_SavedTab : Screen {
     @Composable
     override fun Content() {
 
+        var screenType by rememberSaveable{mutableIntStateOf(0)}
+
+        val columnLikes = Settings.l_likesTab_column_current_count.field.collectAsStateWithLifecycle().value
+        val columnCrypto = Settings.l_likesTab_column_current_count.field.collectAsStateWithLifecycle().value
+
         Scaffold(
             bottomBar = {
                 Column {
@@ -61,14 +69,14 @@ object L_SavedTab : Screen {
                         onChangeState = {
                             if (it == screenType) {
                                 when (it) {
-                                    0 -> L_ScreenSavedLikesTab.columnSelect.addColumn(g0, g1, g2, g3, g4)
-                                    4 -> L_ScreenSavedLikesTab.columnSelect.addColumn(g0, g1, g2, g3, g4)
+                                    0 -> L_ScreenSavedLikesTab_AddColumn()
+                                    4 -> L_ScreenSavedCryptoTab_AddColumn()
                                 }
                             }
                             screenType = it
                         },
-                        overlay0 = { TabBarPoints(L_ScreenSavedLikesTab.columnSelect.column, screenType == 0) },
-                        overlay4 = { TabBarPoints(L_ScreenSavedLikesTab.columnSelect.column, screenType == 4) },
+                        overlay0 = { TabBarPoints(columnLikes, screenType == 0) },
+                        overlay4 = { TabBarPoints(columnCrypto, screenType == 0)}
                     )
                 }
             },
@@ -80,9 +88,9 @@ object L_SavedTab : Screen {
             Box(modifier = Modifier.padding(bottom = paddingValues.calculateBottomPadding())) {
                 when (screenType) {
                     0 -> L_ScreenSavedLikesTab.Content()
-                    1 -> ScreenLSavedAlbumsTab.Content()
+                    1 -> L_ScreenSavedAlbumsTab.Content()
                     2 -> {}
-                    3 -> ScreenLSavedLCryptoTab.Content()
+                    3 -> L_ScreenSavedCryptoTab.Content()
                     else -> {}
                 }
             }

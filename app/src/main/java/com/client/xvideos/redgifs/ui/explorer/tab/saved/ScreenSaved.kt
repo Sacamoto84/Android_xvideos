@@ -56,12 +56,6 @@ object SavedTab : Screen {
     @Composable
     override fun Content() {
 
-        val g0 = Settings.gallery_count[0].field.collectAsStateWithLifecycle().value
-        val g1 = Settings.gallery_count[1].field.collectAsStateWithLifecycle().value
-        val g2 = Settings.gallery_count[2].field.collectAsStateWithLifecycle().value
-        val g3 = Settings.gallery_count[3].field.collectAsStateWithLifecycle().value
-        val g4 = Settings.gallery_count[4].field.collectAsStateWithLifecycle().value
-
         Scaffold(
             bottomBar = {
                 Column {

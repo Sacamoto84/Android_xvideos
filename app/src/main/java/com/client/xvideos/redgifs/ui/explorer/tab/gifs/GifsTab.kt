@@ -74,21 +74,15 @@ import javax.inject.Inject
 
 
 
-class ColumnSelect(private val pref: SettingElementInt, private val list: SettingElementList<Boolean> ){
-
-    var column by mutableIntStateOf( pref.field.value )
-
-    fun addColumn() {
-        val flags = list.field.value//listOf(g0, g1, g2, g3, g4)
+fun ColumnSelect_AddColumn(pref: SettingElementInt, list: SettingElementList<Boolean> ){
+        val flags = list.field.value
         val enabledIndices = flags.mapIndexedNotNull { index, enabled -> if (enabled) index else null }
         if (enabledIndices.isEmpty()) return // ничего не включено
-        val currentIndex = column
+        val currentIndex = pref.field.value
         val currentPos = enabledIndices.indexOf(currentIndex).takeIf { it != -1 } ?: 2
         val nextPos = (currentPos + 1) % enabledIndices.size
-        column = enabledIndices[nextPos]
-        pref.setValue(column)
-    }
 
+        pref.setValue(enabledIndices[nextPos])
 }
 
 
