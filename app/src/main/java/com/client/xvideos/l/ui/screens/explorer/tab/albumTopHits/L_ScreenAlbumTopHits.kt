@@ -58,11 +58,11 @@ import kotlinx.coroutines.launch
 import net.engawapg.lib.zoomable.ExperimentalZoomableApi
 import timber.log.Timber
 
-object ScreenLAlbumTopHits : Screen {
+object L_ScreenAlbumTopHits : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
 
-    private fun readResolve(): Any = ScreenLAlbumTopHits
+    private fun readResolve(): Any = L_ScreenAlbumTopHits
 
     @OptIn(ExperimentalZoomableApi::class)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")

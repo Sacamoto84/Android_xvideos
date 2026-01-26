@@ -23,7 +23,6 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.setValue
@@ -39,7 +38,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.model.ScreenModel
-import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
@@ -50,7 +48,6 @@ import com.client.xvideos.common.util.getFolderSize
 import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.common.settings.ui.ConfigText
 import com.client.xvideos.common.settings.ui.ConfigTextAndButtonWithDialog
-import com.client.xvideos.common.settings.ui.ConfigTextAndCheckBox
 import com.client.xvideos.common.settings.ui.Config_G_0_4
 import com.client.xvideos.common.util.toPrettyCount3
 import com.client.xvideos.redgifs.common.ThemeRed
@@ -60,13 +57,12 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
-import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
 
-object SettingTab : Screen {
+object R_ScreenSettingTab : Screen {
 
-    private fun readResolve(): Any = SettingTab
+    private fun readResolve(): Any = R_ScreenSettingTab
 
     override val key: ScreenKey = uniqueScreenKey
 

@@ -19,21 +19,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
-import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.l.ui.screens.TabRow
 import com.client.xvideos.redgifs.ui.explorer.tab.FavoritesTab
-import com.client.xvideos.redgifs.ui.explorer.tab.gifs.GifsTab
-import com.client.xvideos.redgifs.ui.explorer.tab.niches.NichesTab
-import com.client.xvideos.redgifs.ui.explorer.tab.saved.SavedTab
+import com.client.xvideos.redgifs.ui.explorer.tab.gifs.R_ScreenGifsTab
+import com.client.xvideos.redgifs.ui.explorer.tab.niches.R_ScreenNichesTab
+import com.client.xvideos.redgifs.ui.explorer.tab.saved.R_ScreenSavedTab
 import com.client.xvideos.redgifs.ui.explorer.tab.search.SearchTab
-import com.client.xvideos.redgifs.ui.explorer.tab.setting.SettingTab
-import com.client.xvideos.redgifs.ui.explorer.top.TabRow
+import com.client.xvideos.redgifs.ui.explorer.tab.setting.R_ScreenSettingTab
 import com.client.xvideos.redgifs.ui.ui.atom.TabBarPoints
 import com.client.xvideos.redgifs.common.ThemeRed
 import kotlinx.collections.immutable.persistentListOf
@@ -80,24 +77,24 @@ class ScreenRedExplorer() : Screen {
                     if (it == screenType) {
                         when (it) {
                             0 -> {
-                                GifsTab.columnSelect.addColumn(g0, g1, g2, g3, g4)
+                                //R_ScreenGifsTab.columnSelect.addColumn(g0, g1, g2, g3, g4)
                             }
                         }
                     }
                     screenType = it
                 },
-                overlay0 = { TabBarPoints(GifsTab.columnSelect.column, screenType == 0) },
+                //overlay0 = { TabBarPoints(R_ScreenGifsTab.columnSelect.column, screenType == 0) },
             )
 
 
         }, containerColor = ThemeRed.colorCommonBackground2) { paddingValues ->
             Box(modifier = Modifier.padding(bottom = paddingValues.calculateBottomPadding())) {
                 when (screenType) {
-                    0 -> GifsTab.Content()
-                    1 -> NichesTab.Content()
-                    2 -> SavedTab.Content()
+                    0 -> R_ScreenGifsTab.Content()
+                    1 -> R_ScreenNichesTab.Content()
+                    2 -> R_ScreenSavedTab.Content()
                     3 -> SearchTab.Content()
-                    4 -> SettingTab.Content()
+                    4 -> R_ScreenSettingTab.Content()
                     else -> FavoritesTab.Content()
                 }
             }

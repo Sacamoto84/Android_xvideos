@@ -12,6 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.screen.Screen
@@ -23,7 +24,6 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.common.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.common.settings.Settings
-import com.client.xvideos.redgifs.ui.explorer.tab.gifs.ColumnSelect
 import com.client.xvideos.redgifs.ui.profile.ScreenRedProfile
 import com.client.xvideos.redgifs.ui.profile.atom.VerticalScrollbar
 import com.client.xvideos.redgifs.ui.profile.rememberVisibleRangePercentIgnoringFirstNForGrid
@@ -46,8 +46,8 @@ object R_SavedLikesTab : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
 
-    @Transient
-    val columnSelect = ColumnSelect(Settings.l_likesTab_column_current_count)
+    //@Transient
+    //val columnSelect = ColumnSelect(Settings.l_likesTab_column_current_count)
 
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
@@ -55,9 +55,11 @@ object R_SavedLikesTab : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val vm: ScreenSavedLikesSM = getScreenModel()
 
+        val columnSelect = Settings.l_likesTab_column_current_count.field.collectAsStateWithLifecycle().value
+
         //Изменение количества отображаемых елементов
-        LaunchedEffect(columnSelect.column) {
-            vm.likedHost.columns = columnSelect.column
+        LaunchedEffect(columnSelect) {
+            vm.likedHost.columns = columnSelect
         }
 
         LaunchedEffect(vm.hostDI.savedRed.likes.list){
@@ -65,7 +67,7 @@ object R_SavedLikesTab : Screen {
         }
 
         val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForGrid(
-            gridState = vm.likedHost.state, itemsToIgnore = 0, numberOfColumns = columnSelect.column
+            gridState = vm.likedHost.state, itemsToIgnore = 0, numberOfColumns = columnSelect
         )
 
         Box(modifier = Modifier.fillMaxSize()) {

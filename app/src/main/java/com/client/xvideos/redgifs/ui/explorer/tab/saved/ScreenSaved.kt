@@ -18,11 +18,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
-import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.l.ui.screens.TabRow
 import com.client.xvideos.redgifs.ui.explorer.tab.FavoritesTab
 import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.R_SavedCollectionTab
@@ -34,9 +32,9 @@ import com.client.xvideos.redgifs.ui.ui.atom.TabBarPoints
 import com.client.xvideos.redgifs.common.ThemeRed
 import kotlinx.collections.immutable.persistentListOf
 
-object SavedTab : Screen {
+object R_ScreenSavedTab : Screen {
 
-    private fun readResolve(): Any = SavedTab
+    private fun readResolve(): Any = R_ScreenSavedTab
 
     override val key: ScreenKey = uniqueScreenKey
 
@@ -68,23 +66,23 @@ object SavedTab : Screen {
                         onChangeState = {
                             if (it == screenType) {
                                 when (it) {
-                                    0 -> R_SavedLikesTab.columnSelect.addColumn()
-                                    4 -> R_SavedCollectionTab.columnSelect.addColumn()
+                                    //0 -> R_SavedLikesTab.columnSelect.addColumn()
+                                    //4 -> R_SavedCollectionTab.columnSelect.addColumn()
                                 }
                             }
                             screenType = it
                         },
                         overlay0 = {
-                            TabBarPoints(
-                                R_SavedLikesTab.columnSelect.column,
-                                screenType == 0
-                            )
+//                            TabBarPoints(
+//                                R_SavedLikesTab.columnSelect.column,
+//                                screenType == 0
+//                            )
                         },
                         overlay4 = {
-                            TabBarPoints(
-                                R_SavedCollectionTab.columnSelect.column,
-                                screenType == 4
-                            )
+//                            TabBarPoints(
+//                                R_SavedCollectionTab.columnSelect.column,
+//                                screenType == 4
+//                            )
                         },
                     )
                 }

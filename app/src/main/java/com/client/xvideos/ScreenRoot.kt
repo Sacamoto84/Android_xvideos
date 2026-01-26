@@ -1,7 +1,6 @@
 package com.client.xvideos
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -57,7 +56,7 @@ import com.client.xvideos.common.eventBus.EventBus
 import com.client.xvideos.common.snackbar.UiMessage
 import com.client.xvideos.common.traficStatistic.AppNetworkSpeedMonitorLite
 import com.client.xvideos.l.theme.ThemeL
-import com.client.xvideos.l.ui.screens.explorer.ScreenLExplorer
+import com.client.xvideos.l.ui.screens.explorer.L_ScreenExplorer
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.ui.UiSnackbarVisuals
 import com.client.xvideos.redgifs.ui.show
@@ -149,9 +148,9 @@ object ScreenRoot : Screen {
                                     // Возврат к домашнему экрану через основной навигатор
                                     mainNavigator?.let { nav ->
                                         // Проверяем, не находимся ли мы уже на домашнем экране
-                                        if (nav.lastItem !is ScreenLExplorer) {
+                                        if (nav.lastItem !is L_ScreenExplorer) {
                                             // Очищаем весь стек и переходим к домашнему экрану
-                                            nav.replaceAll(ScreenLExplorer())
+                                            nav.replaceAll(L_ScreenExplorer())
                                         }
                                     }
                                 },
@@ -285,8 +284,8 @@ class ScreenRootSM @Inject constructor() : ScreenModel
 fun navigateToHome() {
     val mainNavigator = LocalMainNavigator.current
     mainNavigator?.let { nav ->
-        if (nav.lastItem !is ScreenLExplorer) {
-            nav.replaceAll(ScreenLExplorer())
+        if (nav.lastItem !is L_ScreenExplorer) {
+            nav.replaceAll(L_ScreenExplorer())
         }
     }
 }

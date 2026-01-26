@@ -25,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
@@ -34,13 +35,14 @@ import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import com.client.xvideos.LocalRootScreenModel
 import com.client.xvideos.R
+import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.depth
-import com.client.xvideos.l.ui.screens.explorer.tab.albumTopHits.ScreenLAlbumTopHits
-import com.client.xvideos.l.ui.screens.explorer.tab.config.ScreenLConfigTab
+import com.client.xvideos.l.ui.screens.explorer.tab.albumTopHits.L_ScreenAlbumTopHits
+import com.client.xvideos.l.ui.screens.explorer.tab.config.L_ScreenConfigTab
 import com.client.xvideos.l.ui.screens.explorer.tab.saved.L_SavedTab
-import com.client.xvideos.l.ui.screens.screenAlbumList.ScreenLAlbumList
+import com.client.xvideos.l.ui.screens.screenAlbumList.L_ScreenAlbumList
 import com.client.xvideos.redgifs.common.ThemeRed
-import com.client.xvideos.redgifs.ui.explorer.tab.gifs.GifsTab
+import com.client.xvideos.redgifs.ui.explorer.tab.gifs.R_ScreenGifsTab
 import com.client.xvideos.redgifs.ui.explorer.top.TabRow
 import com.client.xvideos.redgifs.ui.ui.atom.TabBarPoints
 import kotlinx.collections.immutable.persistentListOf
@@ -56,7 +58,7 @@ private fun RowScope.TabNavigationItem(tab: Tab) {
     )
 }
 
-class ScreenLExplorer() : Screen {
+class L_ScreenExplorer : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
 
@@ -104,6 +106,9 @@ class ScreenLExplorer() : Screen {
             )
         }
 
+        val columnR_ScreenGifsTab = Settings.l_gifsTab_column_current_count.field.collectAsStateWithLifecycle().value
+
+
         Scaffold(bottomBar = {
 
             TabRow(
@@ -123,7 +128,7 @@ class ScreenLExplorer() : Screen {
                     }
                     screenType = it
                 },
-                overlay0 = { TabBarPoints(GifsTab.columnSelect.column, screenType == 0) },
+                overlay0 = { TabBarPoints(columnR_ScreenGifsTab, screenType == 0) },
                 tags = tags
             )
 
@@ -134,10 +139,10 @@ class ScreenLExplorer() : Screen {
 
                 //Navigator(
                 when (screenType) {
-                    0 -> ScreenLAlbumList.Content()
-                    1 -> ScreenLAlbumTopHits.Content()
+                    0 -> L_ScreenAlbumList.Content()
+                    1 -> L_ScreenAlbumTopHits.Content()
                     2 -> L_SavedTab.Content()
-                    3 -> ScreenLConfigTab().Content()
+                    3 -> L_ScreenConfigTab().Content()
                     else -> L_SavedTab
                 }
                 //)

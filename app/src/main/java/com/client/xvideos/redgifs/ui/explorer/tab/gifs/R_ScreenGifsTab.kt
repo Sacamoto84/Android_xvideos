@@ -26,7 +26,6 @@ import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -85,20 +84,11 @@ fun ColumnSelect_AddColumn(pref: SettingElementInt, list: SettingElementList<Boo
         pref.setValue(enabledIndices[nextPos])
 }
 
+object R_ScreenGifsTab : Screen {
 
-
-
-
-
-
-object GifsTab : Screen {
-
-    private fun readResolve(): Any = GifsTab
+    private fun readResolve(): Any = R_ScreenGifsTab
 
     override val key: ScreenKey = uniqueScreenKey
-
-    @Transient
-    val columnSelect  = ColumnSelect(Settings.current_count_niches)
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
@@ -117,16 +107,18 @@ object GifsTab : Screen {
 
         val haptic = LocalHapticFeedback.current
 
+        val columnSelect  = Settings.r_current_count_niches.field.collectAsStateWithLifecycle().value
+
         val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForGrid(
-            gridState = vm.lazyHost.state, itemsToIgnore = 0, numberOfColumns = columnSelect.column
+            gridState = vm.lazyHost.state, itemsToIgnore = 0, numberOfColumns = columnSelect
         )
 
         val search = vm.hostDI.search
 
         val searchR = search.searchText.collectAsStateWithLifecycle().value
 
-        LaunchedEffect(columnSelect.column) {
-            vm.lazyHost.columns = columnSelect.column
+        LaunchedEffect(columnSelect) {
+            vm.lazyHost.columns = columnSelect
         }
 
         val isFocused = vm.hostDI.search.focused.collectAsStateWithLifecycle().value

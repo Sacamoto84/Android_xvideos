@@ -41,7 +41,6 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.common.urlVideoImage.UrlImage
-import com.client.xvideos.redgifs.ui.explorer.tab.gifs.ColumnSelect
 import com.client.xvideos.redgifs.ui.niche.atom.NichePreview
 import com.client.xvideos.redgifs.ui.niche.atom.NicheProfile
 import com.client.xvideos.redgifs.ui.niche.atom.NicheTopCreator
@@ -60,12 +59,15 @@ class R_ScreenNiche(val nicheName: String = "pumped-pussy") : Screen {
     @Composable
     override fun Content() {
 
-        val columnSelect = remember { ColumnSelect(Settings.current_count_niches) }
+        val columnSelect =  Settings.r_current_count_niches.field.collectAsStateWithLifecycle().value
 
         val navigator = LocalNavigator.currentOrThrow
         val vm = getScreenModel<ScreenNicheSM, ScreenNicheSM.Factory> { factory -> factory.create(nicheName) }
         val sort = vm.lazyHost.sortType.collectAsStateWithLifecycle().value
-        LaunchedEffect(Unit) { vm.lazyHost.columns = columnSelect.column }
+
+        LaunchedEffect(Unit) {
+            vm.lazyHost.columns = columnSelect
+        }
 
         Scaffold(
             bottomBar = {
@@ -110,8 +112,12 @@ class R_ScreenNiche(val nicheName: String = "pumped-pussy") : Screen {
                                 modifier = Modifier.width(46.dp).height(46.dp).clip(RoundedCornerShape(8.dp))
                                     .border(1.dp, Color.DarkGray, RoundedCornerShape(8.dp)).background(ThemeRed.colorCommonBackground)
                                     .clickable(onClick = {
-                                        columnSelect.addColumn(  );
-                                        vm.lazyHost.columns = columnSelect.column
+
+
+                                        //columnSelect.addColumn(  );
+                                        //vm.lazyHost.columns = columnSelect.column
+
+
                                     }), contentAlignment = Alignment.Center
                             ) { TabBarPoints(vm.lazyHost.columns, true) }
                             Spacer(modifier = Modifier.width(2.dp))

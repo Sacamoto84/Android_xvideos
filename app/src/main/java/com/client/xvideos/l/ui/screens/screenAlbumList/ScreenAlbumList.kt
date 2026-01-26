@@ -12,10 +12,8 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
@@ -50,7 +48,6 @@ import kotlinx.coroutines.launch
 import my.nanihadesuka.compose.LazyVerticalGridScrollbar
 import my.nanihadesuka.compose.ScrollbarSettings
 import net.engawapg.lib.zoomable.ExperimentalZoomableApi
-import timber.log.Timber
 
 
 class DefaultPagerState1(
@@ -86,9 +83,9 @@ class DefaultPagerState1(
 }
 
 
-object ScreenLAlbumList : Screen {
+object L_ScreenAlbumList : Screen {
 
-    private fun readResolve(): Any = ScreenLAlbumList
+    private fun readResolve(): Any = L_ScreenAlbumList
 
     @OptIn(ExperimentalZoomableApi::class)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")

@@ -62,9 +62,9 @@ import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
 import javax.inject.Inject
 
-object NichesTab : Screen {
+object R_ScreenNichesTab : Screen {
 
-    private fun readResolve(): Any = NichesTab
+    private fun readResolve(): Any = R_ScreenNichesTab
 
     override val key: ScreenKey = uniqueScreenKey
 
@@ -78,15 +78,9 @@ object NichesTab : Screen {
 
         val navigator = LocalNavigator.currentOrThrow
 
-
         val state = vm.lazyHost.stateColumn
-
         val listNiche = vm.lazyHost.pager.collectAsLazyPagingItems() as LazyPagingItems<Niche>
-
-        val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForLazyColumn(
-            gridState = state,
-            itemsToIgnore = 0
-        )
+        val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForLazyColumn( gridState = state, itemsToIgnore = 0 )
 
         val haptic = LocalHapticFeedback.current
 

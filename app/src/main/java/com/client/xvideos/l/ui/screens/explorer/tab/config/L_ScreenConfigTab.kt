@@ -61,8 +61,7 @@ import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
-
-class ScreenLConfigTab : Screen {
+class L_ScreenConfigTab : Screen {
 
     //private fun readResolve(): Any = ScreenLConfigTab
 

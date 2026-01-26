@@ -51,7 +51,6 @@ import com.client.xvideos.common.collectionDB.ui.DaialogNewCollection
 import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.common.urlVideoImage.UrlImage
 import com.client.xvideos.redgifs.model.GifsInfo
-import com.client.xvideos.redgifs.ui.explorer.tab.gifs.ColumnSelect
 import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.collection.ScreenCollectionName
 import com.composeunstyled.Text
 import com.client.xvideos.redgifs.common.ThemeRed
@@ -73,9 +72,6 @@ object R_SavedCollectionTab : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
 
-    @Transient
-    val columnSelect  = ColumnSelect(Settings.r_collectionTab_column_current_count)
-
     @OptIn(DelicateCoroutinesApi::class)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
@@ -88,6 +84,8 @@ object R_SavedCollectionTab : Screen {
         val savedRed = vm.hostDI.savedRed
 
         val selectedCollection = savedRed.collections.selectedCollection.collectAsStateWithLifecycle().value
+
+        val columnSelect  = Settings.r_collectionTab_column_current_count.field.collectAsStateWithLifecycle().value
 
         BackHandler {
             Timber.i("iii BackHandler SavedCollectionTab")
@@ -170,9 +168,6 @@ object R_SavedCollectionTab : Screen {
                 }
             )
         }
-
-
-
 
         Scaffold(topBar = {
             Text(

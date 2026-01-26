@@ -70,9 +70,20 @@ class ScreenCollectionName(val collectionName: String) : Screen {
             savedRed.collections.selectedCollection.value = null
         }
 
-        LaunchedEffect(R_SavedCollectionTab.columnSelect.column) {
-            vm.likedHost.columns = R_SavedCollectionTab.columnSelect.column
-        }
+
+
+
+
+
+//        LaunchedEffect(R_SavedCollectionTab.columnSelect.column) {
+//            vm.likedHost.columns = R_SavedCollectionTab.columnSelect.column
+//        }
+
+
+
+
+
+
 
         /* ---------- /Диалог ---------- */
         val block = vm.block

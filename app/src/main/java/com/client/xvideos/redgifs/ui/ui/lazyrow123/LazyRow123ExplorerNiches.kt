@@ -102,9 +102,11 @@ fun NichePreview2(niches: Niche, savedRed: SavedRed, onClick: () -> Unit) {
                     .size(64.dp)
             )
 
-            Column(modifier = Modifier
-                .padding(start = 8.dp)
-                .fillMaxWidth())
+            Column(
+                modifier = Modifier
+                    .padding(start = 8.dp)
+                    .fillMaxWidth()
+            )
             {
 
                 Text(
@@ -202,16 +204,16 @@ fun NichePreview2(niches: Niche, savedRed: SavedRed, onClick: () -> Unit) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 //Spacer(modifier = Modifier.width(4.dp))
-                repeat(niches.previews!!.size) {
+                repeat(niches.previews.size) {
                     UrlImage(
-                        niches.previews!![it].thumbnail,
+                        niches.previews[it].thumbnail,
                         modifier = Modifier
                             .aspectRatio(1f)
                             .weight(1f),
                         contentScale = ContentScale.Crop
                     )
                 }
-                repeat((3 - niches.previews!!.size).coerceIn(0,3)) {
+                repeat((3 - niches.previews.size).coerceIn(0, 3)) {
                     Box(
                         modifier = Modifier
                             .aspectRatio(1f)
