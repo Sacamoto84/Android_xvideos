@@ -102,15 +102,15 @@ android {
 dependencies {
 
     implementation libs.androidx.compose.runtime
-    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.3'
+    coreLibraryDesugaring libs.desugar.jdk.libs
 
     // Lottie для Compose
-    implementation "com.airbnb.android:lottie-compose:6.7.1"
+    implementation libs.lottie.compose
     // Коррутины
     //implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2"
     //implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2"
     //implementation("com.github.LottieFiles:dotlottie-android:0.5.0")
-    implementation ("com.airbnb.android:lottie:6.7.1")
+    implementation (libs.lottie)
 
     implementation(libs.androidx.core.splashscreen)
 
@@ -125,15 +125,14 @@ dependencies {
 
     // SLF4J к Timber мост
 
-    implementation 'org.slf4j:slf4j-android:1.7.36'
+    implementation libs.slf4j.android
 
-    implementation 'com.github.nanihadesuka:LazyColumnScrollbar:2.2.0'
+    implementation libs.lazycolumnscrollbar
 
-    implementation("com.github.SmartToolFactory:Compose-Zoom:0.5.0")
-    implementation 'com.github.SmartToolFactory:Compose-Extended-Gestures:2.0.0'
+    implementation(libs.compose.zoom)
+    implementation libs.compose.extended.gestures
 
-    implementation(libs.apollo.runtime)
-    implementation("com.github.javafaker:javafaker:1.0.2")
+    implementation(libs.javafaker)
 
     implementation libs.androidx.activity.ktx
     implementation libs.androidx.lifecycle.viewmodel.compose
@@ -271,10 +270,10 @@ dependencies {
     //implementation libs.animated.webp
     //implementation libs.webpsupport
 
-    implementation("io.coil-kt.coil3:coil-compose:3.3.0")
-    implementation("io.coil-kt.coil3:coil-network-okhttp:3.3.0")
-    implementation("io.coil-kt.coil3:coil-gif:3.3.0")
-    implementation("io.coil-kt.coil3:coil-network-cache-control:3.3.0")
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
+    implementation(libs.coil.gif)
+    implementation(libs.coil.network.cache.control)
 
     //implementation("com.github.bumptech.glide:glide:4.16.0")
     //ksp "com.github.bumptech.glide:compiler:4.16.0"
