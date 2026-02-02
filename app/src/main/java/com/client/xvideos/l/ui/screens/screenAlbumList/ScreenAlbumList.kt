@@ -15,8 +15,10 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -93,7 +95,9 @@ object L_ScreenAlbumList : Screen {
     override fun Content() {
 
         val navigator = LocalNavigator.currentOrThrow
-        val vm = getScreenModel<ScreenLAlbumListSM, ScreenLAlbumListSM.Factory> { factory -> factory.create(null) }
+        val vm = getScreenModel<ScreenLAlbumListSM, ScreenLAlbumListSM.Factory> { factory ->
+            factory.create(null)
+        }
         val bigList = vm.bigList
         val info = vm.info.collectAsStateWithLifecycle().value
         val currentFilter = vm.filter.collectAsStateWithLifecycle().value
@@ -104,6 +108,8 @@ object L_ScreenAlbumList : Screen {
         val scope = rememberCoroutineScope()
 
         var totalPages by remember { mutableIntStateOf(1) }
+
+        val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
         LaunchedEffect(info) { totalPages = info?.totalPages ?: 1 }
 
@@ -121,10 +127,10 @@ object L_ScreenAlbumList : Screen {
         }
 
         ModalNavigationDrawer(
-            drawerState = vm.drawerState,
+            drawerState = drawerState,
             drawerContent = {
                 // Filter overlay
-                Box(modifier = Modifier) {
+                Box(modifier = Modifier.padding(top = 4.dp)) {
                     AlbumListFilter(
                         filter = currentFilter,
                         filterGCount = filterGCount,
@@ -140,16 +146,20 @@ object L_ScreenAlbumList : Screen {
                     }
                 }
             },
-            scrimColor = Color.Transparent,
-            modifier = Modifier
-                .padding(top = 4.dp)
-                .fillMaxSize()
+            //scrimColor = Color.Transparent,
+            scrimColor = Color.Green,
+            modifier = Modifier.fillMaxSize()
         )
         {
-            Scaffold(
-                topBar = {
 
-                    if (isRequest) {
+            Box(Modifier.fillMaxSize()) {
+
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+
+                    topBar = {
+
+                        if (isRequest) {
 //                            val animColor by infiniteTransition.animateColor(
 //                                initialValue = Color.Transparent,
 //                                targetValue = Color(0xff0c94ff), // оранжевый
@@ -159,75 +169,78 @@ object L_ScreenAlbumList : Screen {
 //                                ),
 //                                label = "colorAnim"
 //                            )
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(2.dp)
-                                .background(Color(0xff0c94ff)), contentAlignment = Alignment.Center
-                        ) {}
-                    }
-
-                },
-                bottomBar = {
-                    AlbumListBottomBar(
-                        onClickVisibleFilter = { scope.launch { vm.drawerState.open() } },
-                        currentPage = vm.statePager.currentPage, totalPages = info?.totalPages ?: 1,
-                        onChange = {
-                            scope.launch { vm.statePager.scrollToPage(it) }
-                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                            vm.loadAlbumList(it)
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(2.dp)
+                                    .background(Color(0xff0c94ff)),
+                                contentAlignment = Alignment.Center
+                            ) {}
                         }
-                    )
-                },
-                containerColor = ThemeL.greyBackground
-            )
-            { padding ->
 
-                HorizontalPager(
-                    vm.statePager,
-                    Modifier
-                        .padding(bottom = padding.calculateBottomPadding())
-                        .fillMaxSize(),
-                    beyondViewportPageCount = 1,
-                    key = { page -> "${key}_page_$page" }
-                )
-                { page ->
+                    },
 
-                    val items = bigList[page]?.albumListImplInfoAndList?.items
-
-                    val stateGrid = if (vm.stateGrid.containsKey(page)) {
-                        vm.stateGrid[page]!!
-                    } else {
-                        vm.stateGrid.put(page, LazyGridState())
-                        vm.stateGrid[page]!!
-                    }
-
-                    //val stateGrid =  vm.stateGrid.get(page)         //rememberLazyGridState()
-
-                    LazyVerticalGridScrollbar(
-                        state = stateGrid,
-                        settings = ScrollbarSettings.Default.copy(
-                            thumbUnselectedColor = Color(0xFFA3A3A3),
-                            thumbSelectedColor = Color(0xFFB3B3B3),
-                            thumbThickness = 3.dp,
-                            scrollbarPadding = 0.dp,
-                            alwaysShowScrollbar = true
+                    bottomBar = {
+                        AlbumListBottomBar(
+                            onClickVisibleFilter = { scope.launch { vm.drawerState.open() } },
+                            currentPage = vm.statePager.currentPage,
+                            totalPages = info?.totalPages ?: 1,
+                            onChange = {
+                                scope.launch { vm.statePager.scrollToPage(it) }
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                vm.loadAlbumList(it)
+                            }
                         )
+                    },
+                    containerColor = ThemeL.greyBackground
+                )
+                { padding ->
+
+                    HorizontalPager(
+                        vm.statePager,
+                        Modifier
+                            .padding(bottom = padding.calculateBottomPadding())
+                            .fillMaxSize(),
+                        beyondViewportPageCount = 1,
+                        key = { page -> "${key}_page_$page" }
                     )
-                    {
-                        LazyVerticalGrid(
-                            state = stateGrid, modifier = Modifier.fillMaxSize(),
-                            columns = GridCells.Fixed(2)
+                    { page ->
+
+                        val items = bigList[page]?.albumListImplInfoAndList?.items
+
+                        val stateGrid = if (vm.stateGrid.containsKey(page)) {
+                            vm.stateGrid[page]!!
+                        } else {
+                            vm.stateGrid.put(page, LazyGridState())
+                            vm.stateGrid[page]!!
+                        }
+
+                        //val stateGrid =  vm.stateGrid.get(page)         //rememberLazyGridState()
+
+                        LazyVerticalGridScrollbar(
+                            state = stateGrid,
+                            settings = ScrollbarSettings.Default.copy(
+                                thumbUnselectedColor = Color(0xFFA3A3A3),
+                                thumbSelectedColor = Color(0xFFB3B3B3),
+                                thumbThickness = 3.dp,
+                                scrollbarPadding = 0.dp,
+                                alwaysShowScrollbar = true
+                            )
                         )
                         {
+                            LazyVerticalGrid(
+                                state = stateGrid, modifier = Modifier.fillMaxSize(),
+                                columns = GridCells.Fixed(2)
+                            )
+                            {
 
-                            item(key = "dummy", span = { GridItemSpan(maxLineSpan) }) {
-                                Spacer(
-                                    Modifier
-                                        .height(32.dp)
-                                        .background(ThemeL.red)
-                                )
-                            }
+                                item(key = "dummy", span = { GridItemSpan(maxLineSpan) }) {
+                                    Spacer(
+                                        Modifier
+                                            .height(32.dp)
+                                            .background(ThemeL.red)
+                                    )
+                                }
 
 //                                item(key = "page_selector", span = { GridItemSpan(maxLineSpan) })
 //                                {
@@ -247,45 +260,48 @@ object L_ScreenAlbumList : Screen {
 //                                    }
 //                                }
 
-                            items(
-                                items?.size ?: 0,
-                                key = { items?.get(it)?.id!! }) { index ->
-                                val item = items?.get(index)
-                                if (item != null) {
-                                    Box(
-                                        Modifier.padding(
-                                            vertical = 4.dp,
-                                            horizontal = 4.dp
-                                        ),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        AlbumListItem(
-                                            title = item.title,
-                                            coverUrl = item.cover.url,
-                                            numberOfAnimatedPictures = item.numberOfAnimatedPictures,
-                                            numberOfPictures = item.numberOfPictures,
+                                items(
+                                    items?.size ?: 0,
+                                    key = { items?.get(it)?.id!! }) { index ->
+                                    val item = items?.get(index)
+                                    if (item != null) {
+                                        Box(
+                                            Modifier.padding(
+                                                vertical = 4.dp,
+                                                horizontal = 4.dp
+                                            ),
+                                            contentAlignment = Alignment.Center
                                         ) {
-                                            navigator.push(ScreenLAlbum(item.id.toLong()))
+                                            AlbumListItem(
+                                                title = item.title,
+                                                coverUrl = item.cover.url,
+                                                numberOfAnimatedPictures = item.numberOfAnimatedPictures,
+                                                numberOfPictures = item.numberOfPictures,
+                                            ) {
+                                                navigator.push(ScreenLAlbum(item.id.toLong()))
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
-                    }
 
-                    val status = vm.bigList[page]?.status
+                        val status = vm.bigList[page]?.status
 
-                    if (status == StatusAlbumList.DOWNLOADING) {
-                        Box(
-                            modifier = Modifier.fillMaxSize().background(Color.Magenta),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator()
+                        if (status == StatusAlbumList.DOWNLOADING) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(Color.Magenta),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator()
+                            }
                         }
+
                     }
 
                 }
-
             }
         }
     }

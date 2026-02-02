@@ -1,8 +1,5 @@
 package com.client.xvideos.common.coil
 
-
-import android.annotation.SuppressLint
-import android.content.Context
 import android.graphics.drawable.AnimatedImageDrawable
 import android.os.Build
 import androidx.compose.foundation.background
@@ -42,11 +39,9 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
-import coil3.ImageLoader
 import coil3.asDrawable
 import coil3.compose.AsyncImage
 import coil3.compose.AsyncImagePainter
-import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.request.ImageRequest
 import coil3.size.Precision
 import coil3.size.Scale
@@ -55,60 +50,9 @@ import com.client.xvideos.l.theme.ThemeL
 import com.composeunstyled.Text
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
-import okhttp3.OkHttpClient
 import timber.log.Timber
 import java.io.File
-import java.security.SecureRandom
-import java.security.cert.X509Certificate
-import javax.net.ssl.SSLContext
-import javax.net.ssl.TrustManager
-import javax.net.ssl.X509TrustManager
 import kotlin.math.roundToInt
-
-enum class LoadingIndicator()
-
-
-
-private fun createUnsafeImageLoader(context: Context): ImageLoader {
-    // ── Створюємо trust-all сертифікат (дуже небезпечно — тільки для розробки/тестів!)
-    @SuppressLint("CustomX509TrustManager")
-    val trustAllCerts = arrayOf<TrustManager>(
-        object : X509TrustManager {
-            @SuppressLint("TrustAllX509TrustManager")
-            override fun checkClientTrusted(chain: Array<out X509Certificate>?, authType: String?) = Unit
-
-            @SuppressLint("TrustAllX509TrustManager")
-            override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String?) = Unit
-
-            override fun getAcceptedIssuers(): Array<X509Certificate> = emptyArray()
-        }
-    )
-
-    val sslContext = SSLContext.getInstance("TLS").apply {
-        init(null, trustAllCerts, SecureRandom())
-    }
-
-    val unsafeOkHttpClient = OkHttpClient.Builder()
-        .sslSocketFactory(sslContext.socketFactory, trustAllCerts[0] as X509TrustManager)
-        .hostnameVerifier { _, _ -> true }
-        .build()
-
-    return ImageLoader
-        .Builder(context)
-        .components {
-            // ← саме тут замінюємо старий .okHttpClient()
-            add(OkHttpNetworkFetcherFactory(callFactory = { unsafeOkHttpClient }))
-            // або коротше, якщо не потрібні додаткові параметри:
-            // add(OkHttpNetworkFetcherFactory(unsafeOkHttpClient))
-        }
-        // .logger(DebugLogger())           // ← раджу увімкнути під час дебагу
-        .build()
-}
-
-
-
-
-
 
 @Suppress("UiComposable")
 @OptIn(FlowPreview::class)
@@ -257,15 +201,12 @@ fun UrlImageGifsCoil(
     )
     {
 
-
-
-
             AsyncImage(
                 onState = { st ->
                     state = st
                 },
                 model = imageRequest,
-                imageLoader = if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) createUnsafeImageLoader(context) else imageLoader,
+                imageLoader = imageLoader,
                 contentDescription = null,
                 contentScale = contentScale,
 

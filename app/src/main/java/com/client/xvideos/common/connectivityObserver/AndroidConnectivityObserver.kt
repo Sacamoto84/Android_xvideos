@@ -57,17 +57,25 @@ class AndroidConnectivityObserver(
     private var networkCallback: NetworkCallback? = null
 
     init {
-        updateInitialConnectionState()
-        registerNetworkCallback()
 
-        // Автоматически отменяем callback при отмене scope
-        scope.launch {
-            try {
-                awaitCancellation()
-            } finally {
-                unregisterNetworkCallback()
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) {
+            _isConnected.value = true
+        }
+        else
+        {
+            updateInitialConnectionState()
+            registerNetworkCallback()
+
+            // Автоматически отменяем callback при отмене scope
+            scope.launch {
+                try {
+                    awaitCancellation()
+                } finally {
+                    unregisterNetworkCallback()
+                }
             }
         }
+
     }
 
     private fun updateInitialConnectionState() {
