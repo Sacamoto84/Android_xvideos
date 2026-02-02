@@ -71,6 +71,8 @@ android {
             //shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.debug
+
+            //debuggable true
         }
         benchmark {
             initWith release
