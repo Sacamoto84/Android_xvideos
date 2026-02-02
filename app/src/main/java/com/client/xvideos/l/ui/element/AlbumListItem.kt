@@ -39,8 +39,8 @@ fun AlbumListItem(
         modifier = Modifier
             .then(modifier)
             .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .border(1.dp, ThemeL.grey3, RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(8.dp))
+            .border(1.dp, ThemeL.grey3, RoundedCornerShape(8.dp))
             .clickable(onClick = onClick)
     ) {
 

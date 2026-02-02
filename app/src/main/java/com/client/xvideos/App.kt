@@ -3,6 +3,7 @@ package com.client.xvideos
 import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
+import android.os.Build
 import android.preference.PreferenceManager
 import androidx.compose.runtime.ExperimentalComposeRuntimeApi
 import coil3.ImageLoader
@@ -147,9 +148,9 @@ class App : Application(), SingletonImageLoader.Factory {
         // Настроить SLF4J для использования Timber
         //System.setProperty("slf4j.provider", "com.arcao.slf4j.timber.TimberLoggerProvider")
 
-//        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) {
-//            allowAllSSL()
-//        }
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) {
+            allowAllSSL()
+        }
 
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
         Settings.init(prefs)

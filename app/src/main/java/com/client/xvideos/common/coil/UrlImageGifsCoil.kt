@@ -1,5 +1,8 @@
 package com.client.xvideos.common.coil
 
+
+import android.annotation.SuppressLint
+import android.content.Context
 import android.graphics.drawable.AnimatedImageDrawable
 import android.os.Build
 import androidx.compose.foundation.background
@@ -11,13 +14,13 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Animation
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -39,21 +42,73 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
+import coil3.ImageLoader
 import coil3.asDrawable
 import coil3.compose.AsyncImage
 import coil3.compose.AsyncImagePainter
+import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.request.ImageRequest
 import coil3.size.Precision
 import coil3.size.Scale
 import com.client.xvideos.common.AppPath
 import com.client.xvideos.l.theme.ThemeL
+import com.composeunstyled.Text
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
+import okhttp3.OkHttpClient
 import timber.log.Timber
 import java.io.File
+import java.security.SecureRandom
+import java.security.cert.X509Certificate
+import javax.net.ssl.SSLContext
+import javax.net.ssl.TrustManager
+import javax.net.ssl.X509TrustManager
 import kotlin.math.roundToInt
 
 enum class LoadingIndicator()
+
+
+
+private fun createUnsafeImageLoader(context: Context): ImageLoader {
+    // ── Створюємо trust-all сертифікат (дуже небезпечно — тільки для розробки/тестів!)
+    @SuppressLint("CustomX509TrustManager")
+    val trustAllCerts = arrayOf<TrustManager>(
+        object : X509TrustManager {
+            @SuppressLint("TrustAllX509TrustManager")
+            override fun checkClientTrusted(chain: Array<out X509Certificate>?, authType: String?) = Unit
+
+            @SuppressLint("TrustAllX509TrustManager")
+            override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String?) = Unit
+
+            override fun getAcceptedIssuers(): Array<X509Certificate> = emptyArray()
+        }
+    )
+
+    val sslContext = SSLContext.getInstance("TLS").apply {
+        init(null, trustAllCerts, SecureRandom())
+    }
+
+    val unsafeOkHttpClient = OkHttpClient.Builder()
+        .sslSocketFactory(sslContext.socketFactory, trustAllCerts[0] as X509TrustManager)
+        .hostnameVerifier { _, _ -> true }
+        .build()
+
+    return ImageLoader
+        .Builder(context)
+        .components {
+            // ← саме тут замінюємо старий .okHttpClient()
+            add(OkHttpNetworkFetcherFactory(callFactory = { unsafeOkHttpClient }))
+            // або коротше, якщо не потрібні додаткові параметри:
+            // add(OkHttpNetworkFetcherFactory(unsafeOkHttpClient))
+        }
+        // .logger(DebugLogger())           // ← раджу увімкнути під час дебагу
+        .build()
+}
+
+
+
+
+
 
 @Suppress("UiComposable")
 @OptIn(FlowPreview::class)
@@ -154,14 +209,6 @@ fun UrlImageGifsCoil(
             .build()
     }
 
-//    // Painter для контроля анимации
-//    val painter = rememberAsyncImagePainter(
-//        model = imageRequest,
-//        imageLoader = imageLoader
-//    )
-
-    //val state = painter.state.collectAsState().value
-
     var state by remember { mutableStateOf<AsyncImagePainter.State>(AsyncImagePainter.State.Empty) }
 
     //// Управление воспроизведением анимации
@@ -210,88 +257,67 @@ fun UrlImageGifsCoil(
     )
     {
 
-        AsyncImage(
-            onState = { st ->
-                state = st
-            },
-            model = imageRequest,
-            imageLoader = imageLoader,
-            contentDescription = null,
-            contentScale = contentScale,
+
+
+
+            AsyncImage(
+                onState = { st ->
+                    state = st
+                },
+                model = imageRequest,
+                imageLoader = if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) createUnsafeImageLoader(context) else imageLoader,
+                contentDescription = null,
+                contentScale = contentScale,
 
 //            placeholder = forwardingPainter(
 //                painter = painterResource(R.drawable.placeholder),
 //                colorFilter = ColorFilter(Color.Red),
 //                alpha = 0.5f,
 //            ),
-            modifier = Modifier
+                modifier = Modifier
 
-                .background(ThemeL.grey5)
-                .then(
-                    if (isFullScreen && rotate) {
-                        Modifier.graphicsLayer(
+                    .background(ThemeL.grey5)
+                    .then(
+                        if (isFullScreen && rotate) {
+                            Modifier.graphicsLayer(
 
-                            rotationZ = 90f,
-                            scaleX = if (containerSize != IntSize.Zero) {
-                                if (containerSize.height > containerSize.width)
-                                    containerSize.height.toFloat() / containerSize.width
-                                else
-                                    containerSize.width.toFloat() / containerSize.height
-                            } else 1f,
+                                rotationZ = 90f,
+                                scaleX = if (containerSize != IntSize.Zero) {
+                                    if (containerSize.height > containerSize.width)
+                                        containerSize.height.toFloat() / containerSize.width
+                                    else
+                                        containerSize.width.toFloat() / containerSize.height
+                                } else 1f,
 
-                            scaleY = if (containerSize != IntSize.Zero) {
-                                if (containerSize.height > containerSize.width)
-                                    containerSize.height.toFloat() / containerSize.width
-                                else
-                                    containerSize.width.toFloat() / containerSize.height
-                            } else 1f
-                        )
+                                scaleY = if (containerSize != IntSize.Zero) {
+                                    if (containerSize.height > containerSize.width)
+                                        containerSize.height.toFloat() / containerSize.width
+                                    else
+                                        containerSize.width.toFloat() / containerSize.height
+                                } else 1f
+                            )
 
-                    } else
-                        Modifier
-                )
-                .fillMaxSize()
-                .then(
-                    if (isAnimated) {
-                        Modifier.clickable { isPlaying = !isPlaying }
-                    } else Modifier
-                )
-        )
+                        } else
+                            Modifier
+                    )
+                    .fillMaxSize()
+                    .then(
+                        if (isAnimated) {
+                            Modifier.clickable { isPlaying = !isPlaying }
+                        } else Modifier
+                    )
+            )
 
-//        Image(
-//            painter = painter,
-//            contentDescription = null,
-//            contentScale = contentScale,
-//            modifier = Modifier
-//                .background(ThemeL.grey5)
-//                .then(
-//                    if (rotate) {
-//                        Modifier.graphicsLayer(
-//                            rotationZ = 90f,
-//                            scaleX = if (containerSize != IntSize.Zero) {
-//                                if (containerSize.height > containerSize.width)
-//                                    containerSize.height.toFloat() / containerSize.width
-//                                else
-//                                    containerSize.width.toFloat() / containerSize.height
-//                            } else 1f,
-//
-//                            scaleY = if (containerSize != IntSize.Zero) {
-//                                if (containerSize.height > containerSize.width)
-//                                    containerSize.height.toFloat() / containerSize.width
-//                                else
-//                                    containerSize.width.toFloat() / containerSize.height
-//                            } else 1f
-//                        )
-//                    } else
-//                        Modifier
-//                )
-//                .fillMaxSize()
-//                .then(
-//                    if (isAnimated) {
-//                        Modifier.clickable { isPlaying = !isPlaying }
-//                    } else Modifier
-//                )
-//        )
+
+
+
+
+
+
+
+
+
+
 
 
         when (state) {

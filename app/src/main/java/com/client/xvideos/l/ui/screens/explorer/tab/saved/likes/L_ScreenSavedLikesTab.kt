@@ -63,6 +63,7 @@ object L_ScreenSavedLikesTab : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
+
         val vm: ScreenSavedLLikesSM = getScreenModel()
 
         val column = Settings.l_likesTab_column_current_count.field.collectAsStateWithLifecycle().value
