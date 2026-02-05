@@ -195,7 +195,7 @@ class App : Application(), SingletonImageLoader.Factory {
         //Composer.setDiagnosticStackTraceEnabled(BuildConfig.DEBUG)
 
 
-//        if (PermissionStorage.hasPermissions(this)) {
+        if (PermissionScreenActivity.PermissionStorage.hasPermissions(this)) {
 //
 ////            val savedRed = savedRed.get()
 //
@@ -213,7 +213,7 @@ class App : Application(), SingletonImageLoader.Factory {
 //                dbL.get().postJsonRamDao().deleteAll()
 //            }
 //
-//        }
+        }
 
 
         scope.launch {

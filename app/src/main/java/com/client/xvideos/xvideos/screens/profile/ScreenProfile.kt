@@ -8,7 +8,7 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 
-class ScreenProfile() : Screen {
+class ScreenProfile : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
 

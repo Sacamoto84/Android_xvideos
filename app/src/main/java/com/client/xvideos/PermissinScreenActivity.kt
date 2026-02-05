@@ -3,9 +3,7 @@ package com.client.xvideos
 import android.Manifest
 import android.content.Context
 import android.content.Intent
-import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -13,7 +11,6 @@ import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.annotation.OptIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -37,48 +34,46 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
-import androidx.media3.common.util.UnstableApi
+import androidx.core.net.toUri
+import androidx.lifecycle.lifecycleScope
 import com.alexstyl.warden.PermissionState
 import com.alexstyl.warden.Warden
 import com.client.xvideos.ui.theme.XvideosTheme
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class PermissionScreenActivity : ComponentActivity() {
 
-    @OptIn(UnstableApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        println("Запуск PermissionScreenActivity")
-
         setContent {
-
             XvideosTheme {
+                var hasPermission by remember {
+                    mutableStateOf(PermissionStorage.hasPermissions(this))
+                }
 
-                var granded by remember { mutableStateOf(false) }
+                // Проверка при запуске
+                LaunchedEffect(Unit) {
+                    if (hasPermission) {
+                        navigateToMain()
+                    }
+                }
 
-                if (!PermissionStorage.hasPermissions(this)) {
+                // Проверка при возврате из настроек
+                LaunchedEffect(hasPermission) {
+                    if (hasPermission) {
+                        navigateToMain()
+                    }
+                }
 
-                    LaunchedEffect(key1 = true, block = {
-                        while (!granded) {
-                            delay(100)
-                            granded = PermissionStorage.hasPermissions(applicationContext)
-                        }
-
-                        val intent = Intent(this@PermissionScreenActivity, MainActivity::class.java)
-                        startActivity(intent)
-                        finish()
-
-                    })
-
+                if (!hasPermission) {
                     Column(
-                        modifier = Modifier.fillMaxSize().background(Color.Black).semantics { testTagsAsResourceId = true }, Arrangement.Center
-                    )
-                    {
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.Black)
+                            .semantics { testTagsAsResourceId = true },
+                        verticalArrangement = Arrangement.Center
+                    ) {
                         Text(
                             text = "Отсутствуют Файловые разрешения",
                             modifier = Modifier.fillMaxWidth(),
@@ -88,8 +83,11 @@ class PermissionScreenActivity : ComponentActivity() {
                         )
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        Button( modifier = Modifier.testTag("bPermission"),
-                            onClick = { PermissionStorage.requestPermissions(applicationContext) }
+                        Button(
+                            modifier = Modifier.testTag("bPermission"),
+                            onClick = {
+                                PermissionStorage.requestPermissions(this@PermissionScreenActivity)
+                            }
                         ) {
                             Text(
                                 text = "Запрос",
@@ -99,86 +97,62 @@ class PermissionScreenActivity : ComponentActivity() {
                             )
                         }
                     }
-
                 }
-
             }
         }
-
-
     }
 
+    override fun onResume() {
+        super.onResume()
+        // Проверка при возврате из настроек
+        if (PermissionStorage.hasPermissions(this)) {
+            navigateToMain()
+        }
+    }
 
-    fun isLoggedIn(): Boolean {
-        // реализация метода
-        return true
+    private fun navigateToMain() {
+        startActivity(Intent(this, MainActivity::class.java))
+        finish()
     }
 
     object PermissionStorage {
 
-        fun hasPermissions(context: Context?): Boolean {
+        fun hasPermissions(context: Context): Boolean {
             return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                Environment.isExternalStorageManager() //Проверка есть ли разрешение? >=A11
+                Environment.isExternalStorageManager()
             } else {
-                (ContextCompat.checkSelfPermission(
-                    context!!,
+                ContextCompat.checkSelfPermission(
+                    context,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE
-                ) == PackageManager.PERMISSION_GRANTED)
+                ) == PackageManager.PERMISSION_GRANTED
             }
         }
 
-        @OptIn(DelicateCoroutinesApi::class, DelicateCoroutinesApi::class,
-            DelicateCoroutinesApi::class, DelicateCoroutinesApi::class
-        )
-        fun requestPermissions(context: Context) {
+        fun requestPermissions(activity: ComponentActivity) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-
-                GlobalScope.launch(Dispatchers.Main) {
-                    try {
-                        val intent =
-                            Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION).apply {
-                                addFlags(FLAG_ACTIVITY_NEW_TASK)
-
-                            }
-                        intent.addCategory("android.intent.category.DEFAULT")
-                        intent.data = Uri.parse(String.format("package:%s", context.packageName))
-                        //activity.startActivityForResult(intent, requestCode);
-                        context.startActivity(intent)
-                    } catch (e: Exception) {
-                        val intent = Intent()
-                        intent.action = Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION
-                        //activity.startActivityForResult(intent, requestCode);
-                        context.startActivity(intent)
+                try {
+                    val intent = Intent(
+                        Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
+                        "package:${activity.packageName}".toUri()
+                    ).apply {
+                        addCategory("android.intent.category.DEFAULT")
                     }
+                    activity.startActivity(intent)
+                } catch (e: Exception) {
+                    val intent = Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
+                    activity.startActivity(intent)
                 }
-
-
             } else {
+                activity.lifecycleScope.launch {
+                    val result = Warden.with(activity).requestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
-                GlobalScope.launch(Dispatchers.Main) {
-                    val result = Warden.with(context)
-                        .requestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    when (result) {
-                        is PermissionState.Denied -> Toast.makeText(
-                            context,
-                            "WRITE_EXTERNAL_STORAGE Denied",
-                            Toast.LENGTH_LONG
-                        ).show()
-
-                        PermissionState.Granted -> Toast.makeText(
-                            context,
-                            "WRITE_EXTERNAL_STORAGE Granted",
-                            Toast.LENGTH_LONG
-                        ).show()
+                    val message = when (result) {
+                        is PermissionState.Denied -> "WRITE_EXTERNAL_STORAGE Denied"
+                        PermissionState.Granted -> "WRITE_EXTERNAL_STORAGE Granted"
                     }
+                    Toast.makeText(activity, message, Toast.LENGTH_LONG).show()
                 }
-
             }
-
         }
-
     }
-
-
-
 }

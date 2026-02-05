@@ -4,8 +4,8 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,7 +21,6 @@ class ScreenTags(private val tag: String) : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
 
-    @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -36,11 +35,9 @@ class ScreenTags(private val tag: String) : Screen {
                     Text(vm.screen.title1, color = Color(0xFF787878))
                 }
             }
-
-        }) {
+        }) { _ ->
             TagsPaginatedListScreen(0)
         }
-
     }
 
 }

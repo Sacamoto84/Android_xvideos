@@ -50,7 +50,6 @@ storage = "1.6.0"
 googleGmsGoogleServices = "4.4.4"
 datastoreCoreAndroid = "1.2.0"
 volley = "1.2.1"
-nav3Core = "1.0.0"
 voyager = "1.1.0-beta03"
 warden = "1.0.0-alpha2"
 zoomable = "2.10.0"
@@ -99,10 +98,6 @@ androidx-material = { module = "androidx.compose.material:material", version.ref
 androidx-material-icons-core = { module = "androidx.compose.material:material-icons-core" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
-
-# Core Navigation 3 libraries
-androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "nav3Core" }
-androidx-navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "nav3Core" }
 
 #Media3
 androidx-media3-cast = { module = "androidx.media3:media3-cast", version.ref = "media3" }

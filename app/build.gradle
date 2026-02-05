@@ -347,10 +347,6 @@ dependencies {
     //implementation("androidx.compose.runtime:runtime-tracing:1.8.1")
     //implementation("androidx.compose.runtime:runtime-tracing")
 
-
-    implementation(libs.androidx.navigation3.ui)
-    implementation(libs.androidx.navigation3.runtime)
-
     implementation libs.kotlinx.collections.immutable
 
     implementation(libs.androidx.benchmark.macro.junit4)
