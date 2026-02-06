@@ -6,7 +6,6 @@ import com.client.xvideos.redgifs.network.api.RedApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -27,7 +26,7 @@ class SavedRed @Inject constructor(
     var tagsList = listOf<TagInfo>()
 
     @OptIn(DelicateCoroutinesApi::class)
-    fun refreshTagList() { GlobalScope.launch(Dispatchers.IO) { tagsList =
+    fun refreshTagList() { scope.launch(Dispatchers.IO) { tagsList =
         redApi.tags.getTags().getOrNull()?.tags ?: emptyList()
     } }
 

@@ -3,8 +3,7 @@ package com.client.xvideos.l.net.graphQl
 import com.client.xvideos.l.model.AlbumListFilter
 import com.client.xvideos.l.model.enum.AlbumType
 import com.client.xvideos.l.model.enum.ContentId
-import com.client.xvideos.l.model.PictureCountRank
-import java.util.Locale
+import com.client.xvideos.l.model.enum.PictureCountRank
 import java.util.Locale.getDefault
 
 
@@ -80,7 +79,7 @@ fun getAlbumListGraphQL1(
     }
 
 
-    if (filter.picture_count_rank != PictureCountRank.all) {
+    if (filter.picture_count_rank != PictureCountRank.All) {
         str.append("""{ "name": "picture_count_rank", "value": "${filter.picture_count_rank.count}" },""")
     }
 

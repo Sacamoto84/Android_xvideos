@@ -61,12 +61,12 @@ fun AlbumListFilter(
 ) {
 
 
+
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
     val maxHeight = screenHeight * 2 / 4
 
-    Column( modifier = Modifier.fillMaxHeight().alpha(0.95f).background(Color(0xFF242424))
-        .padding(horizontal = 4.dp).verticalScroll( rememberScrollState()) )
+    Column( modifier = Modifier.fillMaxHeight().alpha(0.95f).background(Color(0xFF474747)).padding(horizontal = 4.dp).verticalScroll( rememberScrollState()) )
     {
 
         Box( Modifier.fillMaxWidth().height(48.dp) )

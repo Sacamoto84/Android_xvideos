@@ -33,7 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.client.xvideos.l.theme.ThemeL
-import com.client.xvideos.l.model.PictureCountRank
+import com.client.xvideos.l.model.enum.PictureCountRank
 import com.client.xvideos.redgifs.common.ThemeRed
 
 private val style = TextStyle(
@@ -52,14 +52,14 @@ fun AlbumListFilterSize(value: PictureCountRank, onChanged: (PictureCountRank) -
     val itemS = listOf("Any", "0..25", "25..50", "50..100", "200..800", "800..3200", "3200..12800")
 
     val a = when (value) {
-        PictureCountRank.all -> "Any"
-        PictureCountRank.c0_25 -> "0..25"
-        PictureCountRank.c25_50 -> "25..50"
-        PictureCountRank.c50_100 -> "50..100"
-        PictureCountRank.c100_200 -> "100..200"
-        PictureCountRank.c200_800 -> "200..800"
-        PictureCountRank.c800_3200 -> "800..3200"
-        PictureCountRank.c3200_12800 -> "3200..12800"
+        PictureCountRank.All -> "Any"
+        PictureCountRank.C0_25 -> "0..25"
+        PictureCountRank.C25_50 -> "25..50"
+        PictureCountRank.C50_100 -> "50..100"
+        PictureCountRank.C100_200 -> "100..200"
+        PictureCountRank.C200_800 -> "200..800"
+        PictureCountRank.C800_3200 -> "800..3200"
+        PictureCountRank.C3200_12800 -> "3200..12800"
     }
 
     // --- Первое меню (Primary) ---
@@ -123,15 +123,15 @@ fun AlbumListFilterSize(value: PictureCountRank, onChanged: (PictureCountRank) -
                         onClick = {
 
                             val selected = when (item) {
-                                "Any" -> PictureCountRank.all
-                                "0..25" -> PictureCountRank.c0_25
-                                "25..50" -> PictureCountRank.c25_50
-                                "50..100" -> PictureCountRank.c50_100
-                                "100..200" -> PictureCountRank.c100_200
-                                "200..800" -> PictureCountRank.c200_800
-                                "800..3200" -> PictureCountRank.c800_3200
-                                "3200..12800" -> PictureCountRank.c3200_12800
-                                else -> PictureCountRank.all
+                                "Any" -> PictureCountRank.All
+                                "0..25" -> PictureCountRank.C0_25
+                                "25..50" -> PictureCountRank.C25_50
+                                "50..100" -> PictureCountRank.C50_100
+                                "100..200" -> PictureCountRank.C100_200
+                                "200..800" -> PictureCountRank.C200_800
+                                "800..3200" -> PictureCountRank.C800_3200
+                                "3200..12800" -> PictureCountRank.C3200_12800
+                                else -> PictureCountRank.All
                             }
 
                             onChanged(selected)
