@@ -27,6 +27,7 @@ junitVersion = "1.3.0"
 espressoCore = "3.7.0"
 kotlinxCollectionsImmutable = "0.4.0"
 kotlinxSerializationJson = "1.10.0"
+ksafe = "1.4.2"
 ktor= "3.4.0"
 
 lazycolumnscrollbar = "2.2.0"
@@ -89,6 +90,9 @@ image-loader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "imag
 javafaker = { module = "com.github.javafaker:javafaker", version.ref = "javafaker" }
 kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutable" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+
+ksafe = { module = "eu.anifantakis:ksafe", version.ref = "ksafe" }
+ksafe-compose = { module = "eu.anifantakis:ksafe-compose", version.ref = "ksafe" }
 
 lazycolumnscrollbar = { module = "com.github.nanihadesuka:LazyColumnScrollbar", version.ref = "lazycolumnscrollbar" }
 lottie = { module = "com.airbnb.android:lottie", version.ref = "lottie" }

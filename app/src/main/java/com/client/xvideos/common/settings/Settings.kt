@@ -1,12 +1,16 @@
 package com.client.xvideos.common.settings
 
+import android.annotation.SuppressLint
 import android.content.SharedPreferences
+import com.client.xvideos.App
 import com.client.xvideos.common.settings.element.SettingElementBoolean
 import com.client.xvideos.common.settings.element.SettingElementInt
 import com.client.xvideos.common.settings.element.SettingElementList
 import com.client.xvideos.common.settings.element.SettingElementString
 import com.client.xvideos.l.model.ThumbnailsSize
 import com.google.common.reflect.TypeToken
+import eu.anifantakis.lib.ksafe.KSafe
+import eu.anifantakis.lib.ksafe.invoke
 
 //data class DC_galleryCount(var g0: Boolean, var g1: Boolean, var g2: Boolean, var g3: Boolean, var g4: Boolean )
 
@@ -63,6 +67,13 @@ object Settings {
 
 
     //-- luscious ---
+
+    //Логин
+    fun l_LoginGet(): String{ return App.instance.ksafe.getDirect("", "l_login", true) }
+    fun l_loginSet(str : String){ App.instance.ksafe.putDirect("l_login", str) }
+    fun l_passGet(): String{ return App.instance.ksafe.getDirect("", "l_pass", true) }
+    fun l_passSet(str : String){ App.instance.ksafe.putDirect("l_pass", str) }
+
 
     /**
      * Размер миниатюры в галерее

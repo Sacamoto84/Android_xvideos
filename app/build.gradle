@@ -350,6 +350,12 @@ dependencies {
     implementation(libs.androidx.benchmark.macro.junit4)
     implementation(libs.androidx.junit)
     implementation(libs.androidx.uiautomator)
+
+
+
+    //https://github.com/ioannisa/KSafe
+    implementation(libs.ksafe)
+    implementation(libs.ksafe.compose)
 }
 
 ksp {
