@@ -1,15 +1,39 @@
 package com.client.xvideos.l.ui.screens
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
@@ -28,14 +52,33 @@ class L_ScreenExplorer : Screen {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun PContent() {
+
     var login by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
+    // Получаем доступ к обработчику ссылок
+    val uriHandler = LocalUriHandler.current
+
     Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
+        modifier = Modifier
+            .padding(horizontal = 16.dp)
+            .fillMaxSize()
+            .background(Color(0xFF212121)),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Top
     ) {
+
+        Text(
+            text = "https://www.luscious.net",
+            fontStyle = FontStyle.Italic,
+            textDecoration = TextDecoration.Underline,
+            color = ThemeL.b0,
+            modifier = Modifier.clickable { uriHandler.openUri("https://www.luscious.net") },
+            fontSize = 24.sp
+        )
+
+        Spacer(modifier = Modifier.height(32.dp))
+
         Text(
             text = "Авторизация",
             style = MaterialTheme.typography.headlineMedium,
@@ -44,24 +87,64 @@ private fun PContent() {
 
         Spacer(modifier = Modifier.height(32.dp))
 
+
+        Text(
+            "Логин",
+            color = ThemeL.textColor,
+            fontSize = 22.sp,
+            fontFamily = ThemeL.fontFamilyKarla
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
         OutlinedTextField(
             value = login,
             onValueChange = { login = it },
-            label = { Text("Логин") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+            modifier = Modifier
+
+                .fillMaxWidth(),
+            singleLine = true,
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color(0xFF484848),
+                unfocusedContainerColor = Color(0xFF3A3A3A),
+                focusedTextColor = Color(0xFFB8B7B7),
+                unfocusedTextColor = Color(0xFFB8B7B7),
+                focusedIndicatorColor = Color(0xFF888888),
+            ),
+            textStyle = TextStyle(
+                fontSize = 24.sp
+            )
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        Text(
+            "Пароль",
+            color = ThemeL.textColor,
+            fontSize = 22.sp,
+            fontFamily = ThemeL.fontFamilyKarla
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Пароль") },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth(),
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            singleLine = true
+            singleLine = true,
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color(0xFF484848),
+                unfocusedContainerColor = Color(0xFF3A3A3A),
+                focusedTextColor = Color(0xFFB8B7B7),
+                unfocusedTextColor = Color(0xFFB8B7B7),
+                focusedIndicatorColor = Color(0xFF888888),
+            ),
+            textStyle = TextStyle(
+                fontSize = 24.sp
+            )
         )
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -76,7 +159,7 @@ private fun PContent() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = false)
 @Composable
 fun PContentPreview() {
     PContent()

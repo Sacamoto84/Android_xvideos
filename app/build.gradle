@@ -354,8 +354,8 @@ dependencies {
 
 
     //https://github.com/ioannisa/KSafe
-    implementation(libs.ksafe)
-    implementation(libs.ksafe.compose)
+    //implementation(libs.ksafe)
+    //implementation(libs.ksafe.compose)
 }
 
 ksp {

@@ -14,7 +14,6 @@ import com.client.xvideos.common.eventBus.EventBus
 import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.common.traficStatistic.NetworkTrafficMonitor
 import dagger.hilt.android.HiltAndroidApp
-import eu.anifantakis.lib.ksafe.KSafe
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -64,7 +63,7 @@ fun allowAllSSL() {
 @HiltAndroidApp
 class App : Application(), SingletonImageLoader.Factory {
 
-    val ksafe = KSafe(applicationContext, lazyLoad = true)
+    //val ksafe = KSafe(applicationContext, lazyLoad = true)
 
     override fun newImageLoader(context: Context): ImageLoader {
         return CoilImageLoaderFactory.getImageLoader(this)
