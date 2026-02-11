@@ -197,6 +197,10 @@ class App : Application(), SingletonImageLoader.Factory {
 
 
         if (PermissionScreenActivity.PermissionStorage.hasPermissions(this)) {
+
+            // val masterkey = Masterkey.generate()
+
+
 //
 ////            val savedRed = savedRed.get()
 //

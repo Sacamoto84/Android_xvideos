@@ -9,10 +9,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -61,9 +63,9 @@ private fun PContent() {
 
     Column(
         modifier = Modifier
+            .background(Color(0xFF212121))
             .padding(horizontal = 16.dp)
-            .fillMaxSize()
-            .background(Color(0xFF212121)),
+            .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
@@ -149,12 +151,35 @@ private fun PContent() {
 
         Spacer(modifier = Modifier.height(32.dp))
 
+        HorizontalDivider(color = Color.DarkGray)
+
+        Spacer(modifier = Modifier.height(32.dp))
+
         Button(
             onClick = { /* TODO: Обработка входа */ },
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = ThemeL.primaryColor)
+            modifier = Modifier.fillMaxWidth().height(64.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = ThemeL.primaryColor),
+            shape = RoundedCornerShape(8.dp)
         ) {
-            Text(text = "ПРИНЯТЬ")
+            Text(
+                "Принять",
+                fontSize = 22.sp,
+                fontFamily = ThemeL.fontFamilyKarla
+            )
+        }
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Button(
+            onClick = { /* TODO: Обработка входа */ },
+            modifier = Modifier.fillMaxWidth().height(64.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = ThemeL.b0),
+            shape = RoundedCornerShape(8.dp)
+        ) {
+            Text(
+                "Назад",
+                fontSize = 22.sp,
+                fontFamily = ThemeL.fontFamilyKarla
+            )
         }
     }
 }

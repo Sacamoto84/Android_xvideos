@@ -356,6 +356,10 @@ dependencies {
     //https://github.com/ioannisa/KSafe
     //implementation(libs.ksafe)
     //implementation(libs.ksafe.compose)
+
+    // Source: https://mvnrepository.com/artifact/org.cryptomator/cryptofs
+    // https://github.com/cryptomator/cryptofs
+    //implementation("org.cryptomator:cryptofs:2.10.0-beta2")
 }
 
 ksp {

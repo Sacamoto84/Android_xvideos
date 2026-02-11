@@ -71,17 +71,17 @@ class L_ScreenExplorer : Screen {
     @Composable
     override fun Content() {
 
-        val rootVm = LocalRootScreenModel.current
+//        val rootVm = LocalRootScreenModel.current
 
-        DisposableEffect(Unit) {
-            rootVm.showOverlay({
-                Image(painterResource(R.drawable.logo), contentDescription = null, modifier = Modifier.size(32.dp))
-            }
-            )
-            onDispose {
-                rootVm.hideOverlay()
-            }
-        }
+//        DisposableEffect(Unit) {
+//            rootVm.showOverlay({
+//                Image(painterResource(R.drawable.logo), contentDescription = null, modifier = Modifier.size(32.dp))
+//            }
+//            )
+//            onDispose {
+//                rootVm.hideOverlay()
+//            }
+//        }
 
         val navigator = LocalNavigator.currentOrThrow
 

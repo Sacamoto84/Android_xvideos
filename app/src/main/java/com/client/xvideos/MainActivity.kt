@@ -1,5 +1,6 @@
 package com.client.xvideos
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
@@ -16,12 +17,20 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.IconButton
 import androidx.compose.material.Surface
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -93,7 +102,10 @@ class MainActivity : ComponentActivity()//, ImageLoaderFactory
                 //EdgeToEdgeFix()
 
                 Surface(
-                    modifier = Modifier.fillMaxSize().background(Color.Black).semantics { testTagsAsResourceId = true }
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black)
+                        .semantics { testTagsAsResourceId = true }
                     //.windowInsetsPadding(WindowInsets.ime)
                     //.consumeWindowInsets(WindowInsets.ime)
                     //.displayCutoutPadding()
@@ -116,23 +128,44 @@ object MenuScreen : Screen {
 
     private fun readResolve(): Any = MenuScreen
 
+    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
 
-        Column(
-            modifier = Modifier.fillMaxSize().background(Color(0xFF353535)),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Bottom
+
+        Scaffold(
+            topBar = {
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopEnd) {
+                    IconButton(onClick = {}, modifier = Modifier.displayCutoutPadding().size(48.dp)) {
+                        Icon(
+                            Icons.Default.Settings,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(40.dp)
+                        )
+                    }
+                }
+            }
         ) {
-            ButtonSelect(R.drawable.icon_xvideos_white) {
-                navigator.push(ScreenXDashBoards())
-            }
-            ButtonSelect(R.drawable.icon_luscious, "buttonL") {
-                navigator.push(L_ScreenExplorer()) // или ScreenLusciousRoot()
-            }
-            ButtonSelect(R.drawable.icon_red) {
-                navigator.push(ScreenRedRoot()) // или ScreenRedRoot()
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color(0xFF353535)),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Bottom
+            ) {
+
+
+                ButtonSelect(R.drawable.icon_xvideos_white) {
+                    navigator.push(ScreenXDashBoards())
+                }
+                ButtonSelect(R.drawable.icon_luscious, "buttonL") {
+                    navigator.push(L_ScreenExplorer()) // или ScreenLusciousRoot()
+                }
+                ButtonSelect(R.drawable.icon_red) {
+                    navigator.push(ScreenRedRoot()) // или ScreenRedRoot()
+                }
             }
         }
     }
@@ -151,8 +184,8 @@ private fun ButtonSelect(iconId: Int, tag : String= "", onClick: () -> Unit) {
             .background(Color(0xFF212121))
             .clickable { onClick() }
             .padding(vertical = 16.dp)
-            .then (
-                if (tag.isNotEmpty()){
+            .then(
+                if (tag.isNotEmpty()) {
                     Modifier.testTag(tag)
                 } else Modifier
             )
