@@ -23,7 +23,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,13 +42,13 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.client.xvideos.redgifs.common.ThemeRed
+import com.client.xvideos.redgifs.common.UsersRed
+import com.client.xvideos.redgifs.model.GifsInfo
 import com.client.xvideos.redgifs.ui.explorer.ScreenRedExplorer
 import com.client.xvideos.redgifs.ui.fullscreen.ScreenRedFullScreen
 import com.client.xvideos.redgifs.ui.top_this_week.ProfileInfo1
-import com.client.xvideos.redgifs.common.ThemeRed
-import com.client.xvideos.redgifs.model.GifsInfo
 import com.composeunstyled.Text
-import com.client.xvideos.redgifs.common.UsersRed
 import com.redgifs.common.block.ui.DialogBlock
 import com.redgifs.common.expand_menu_video.ExpandMenuVideo
 import com.redgifs.common.expand_menu_video.ExpandMenuVideoTags
@@ -88,7 +87,16 @@ fun LazyRow123(
 
     val downloadList = host.hostDI.downloadRed.downloadList.collectAsState().value
 
-    if (listGifs.itemCount == 0) { Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text( "Отсутствуют данные", color = Color.White, fontFamily = ThemeRed.fontFamilyDMsanss, fontSize = 20.sp ) }; return }
+    if (listGifs.itemCount == 0) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text(
+                "Отсутствуют данные",
+                color = Color.White,
+                fontFamily = ThemeRed.fontFamilyDMsanss,
+                fontSize = 20.sp
+            )
+        }; return
+    }
 
     val loadState = listGifs.loadState
     var wasRefreshLoading by remember { mutableStateOf(false) }
@@ -173,9 +181,12 @@ fun LazyRow123(
 
                             Box(
                                 modifier = Modifier
-                                    .padding(vertical = 2.dp).padding(horizontal = 2.dp).fillMaxSize().clip(RoundedCornerShape(8.dp))
-                                    .border(1.dp, Color.DarkGray, RoundedCornerShape(8.dp)),
-                                contentAlignment = Alignment.Center
+                                    .padding(vertical = 0.5.dp)
+                                    .padding(horizontal = 0.5.dp)
+                                    .fillMaxSize()
+                                //.clip(RoundedCornerShape(8.dp))
+                                //.border(1.dp, Color.DarkGray, RoundedCornerShape(8.dp)),
+                                , contentAlignment = Alignment.Center
                             ) {
 
                                 RedUrlVideoImageAndLongClick(
@@ -272,7 +283,8 @@ fun LazyRow123(
                                         }
 
                                         LazyRow123Icons(
-                                            modifier = Modifier.align(Alignment.BottomEnd)
+                                            modifier = Modifier
+                                                .align(Alignment.BottomEnd)
                                                 .offset(2.dp, 2.dp), host.hostDI.savedRed, item, downloadList
                                         )
                                     }
@@ -305,7 +317,11 @@ fun LazyRow123(
 
                     Box(
                         modifier = Modifier
-                            .padding(vertical = 2.dp).padding(horizontal = 2.dp).fillMaxSize().clip(RoundedCornerShape(12.dp)).border(1.dp, Color.DarkGray, RoundedCornerShape(12.dp)),
+                            .padding(vertical = 2.dp)
+                            .padding(horizontal = 2.dp)
+                            .fillMaxSize()
+                            .clip(RoundedCornerShape(12.dp))
+                            .border(1.dp, Color.DarkGray, RoundedCornerShape(12.dp)),
                         contentAlignment = Alignment.Center
                     ) {
 
@@ -338,15 +354,19 @@ fun LazyRow123(
                             }
                         }
 
-                        AnimatedVisibility( !isVideo, modifier = Modifier.align(Alignment.BottomStart).fillMaxWidth(),
+                        AnimatedVisibility( !isVideo, modifier = Modifier
+                            .align(Alignment.BottomStart)
+                            .fillMaxWidth(),
                             enter = slideInVertically( initialOffsetY = { fullHeight -> fullHeight }, animationSpec = tween(durationMillis = 200)
                             ), exit = slideOutVertically( targetOffsetY = { fullHeight -> fullHeight }, animationSpec = tween(durationMillis = 200) ) ) {
                             if (host.visibleProfileInfo) {
                                 ProfileInfo1(
-                                    modifier = Modifier.padding(
-                                        start = 2.dp,
-                                        bottom = 2.dp
-                                    ).align(Alignment.BottomStart),
+                                    modifier = Modifier
+                                        .padding(
+                                            start = 2.dp,
+                                            bottom = 2.dp
+                                        )
+                                        .align(Alignment.BottomStart),
                                     onClick = { onClickOpenProfile(item.userName) },
                                     videoItem = item,
                                     listUsers = UsersRed.listAllUsers,
@@ -361,8 +381,12 @@ fun LazyRow123(
                 }
             }
 
-            if (isInitialLoading) { Box( modifier = modifier.align(Alignment.Center).offset(0.dp, 40.dp), contentAlignment = Alignment.Center ) { CircularProgressIndicator(color = ThemeRed.colorYellow) } }
-            if (listGifs.loadState.append is LoadState.Loading && listGifs.itemCount > 0) { Box( modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp) ) { CircularProgressIndicator(color = ThemeRed.colorYellow) } }
+            if (isInitialLoading) { Box( modifier = modifier
+                .align(Alignment.Center)
+                .offset(0.dp, 40.dp), contentAlignment = Alignment.Center ) { CircularProgressIndicator(color = ThemeRed.colorYellow) } }
+            if (listGifs.loadState.append is LoadState.Loading && listGifs.itemCount > 0) { Box( modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(16.dp) ) { CircularProgressIndicator(color = ThemeRed.colorYellow) } }
 
         }
 

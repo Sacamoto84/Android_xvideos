@@ -1,6 +1,7 @@
 package com.client.xvideos.redgifs.ui.explorer.tab.saved.tab
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -11,6 +12,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.model.ScreenModel
@@ -24,13 +26,13 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.common.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.common.settings.Settings
+import com.client.xvideos.redgifs.common.di.HostDI
 import com.client.xvideos.redgifs.ui.profile.ScreenRedProfile
 import com.client.xvideos.redgifs.ui.profile.atom.VerticalScrollbar
 import com.client.xvideos.redgifs.ui.profile.rememberVisibleRangePercentIgnoringFirstNForGrid
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.LazyRow123
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.LazyRow123Host
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.TypePager
-import com.client.xvideos.redgifs.common.di.HostDI
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -58,9 +60,7 @@ object R_SavedLikesTab : Screen {
         val columnSelect = Settings.l_likesTab_column_current_count.field.collectAsStateWithLifecycle().value
 
         //Изменение количества отображаемых елементов
-        LaunchedEffect(columnSelect) {
-            vm.likedHost.columns = columnSelect
-        }
+        LaunchedEffect(columnSelect) { vm.likedHost.columns = columnSelect }
 
         LaunchedEffect(vm.hostDI.savedRed.likes.list){
             //vm.likedHost.refresh()
@@ -70,7 +70,7 @@ object R_SavedLikesTab : Screen {
             gridState = vm.likedHost.state, itemsToIgnore = 0, numberOfColumns = columnSelect
         )
 
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(modifier = Modifier.fillMaxSize().background(Color(0xFF303030))) {
 
             LazyRow123(
                 host = vm.likedHost,
@@ -82,9 +82,7 @@ object R_SavedLikesTab : Screen {
                 //gotoPosition = vm.likedHost.currentIndexGoto,
                 contentPadding = PaddingValues(0.dp),
                 contentBeforeList = { },
-
                 isRunLike = true
-
             )
 
             //---- Скролл ----

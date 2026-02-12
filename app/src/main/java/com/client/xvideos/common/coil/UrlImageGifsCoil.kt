@@ -216,8 +216,7 @@ fun UrlImageGifsCoil(
 //                alpha = 0.5f,
 //            ),
                 modifier = Modifier
-
-                    .background(ThemeL.grey5)
+                    .background(ThemeL.grey6)
                     .then(
                         if (isFullScreen && rotate) {
                             Modifier.graphicsLayer(

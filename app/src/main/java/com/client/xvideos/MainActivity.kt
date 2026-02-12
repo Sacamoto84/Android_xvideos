@@ -28,6 +28,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.IconButton
 import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -139,11 +140,10 @@ object MenuScreen : Screen {
                 Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopEnd) {
                     IconButton(onClick = {}, modifier = Modifier.displayCutoutPadding().size(48.dp)) {
                         Icon(
-                            Icons.Default.Settings,
+                            Icons.Default.MoreVert,
                             contentDescription = null,
                             tint = Color.White,
-                            modifier = Modifier.size(40.dp)
-                        )
+                            modifier = Modifier.size(40.dp))
                     }
                 }
             }

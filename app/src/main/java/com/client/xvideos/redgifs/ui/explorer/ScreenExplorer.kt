@@ -2,9 +2,7 @@ package com.client.xvideos.redgifs.ui.explorer
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.Group
@@ -12,7 +10,6 @@ import androidx.compose.material.icons.outlined.Movie
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -22,45 +19,30 @@ import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
-import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
-import cafe.adriel.voyager.navigator.tab.Tab
 import com.client.xvideos.l.ui.screens.TabRow
+import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.ui.explorer.tab.FavoritesTab
 import com.client.xvideos.redgifs.ui.explorer.tab.gifs.R_ScreenGifsTab
 import com.client.xvideos.redgifs.ui.explorer.tab.niches.R_ScreenNichesTab
 import com.client.xvideos.redgifs.ui.explorer.tab.saved.R_ScreenSavedTab
 import com.client.xvideos.redgifs.ui.explorer.tab.search.SearchTab
 import com.client.xvideos.redgifs.ui.explorer.tab.setting.R_ScreenSettingTab
-import com.client.xvideos.redgifs.ui.ui.atom.TabBarPoints
-import com.client.xvideos.redgifs.common.ThemeRed
-import kotlinx.collections.immutable.persistentListOf
 
-@Composable
-private fun RowScope.TabNavigationItem(tab: Tab) {
-    val tabNavigator = LocalTabNavigator.current
+private val l = listOf(
+    Icons.Outlined.Movie,
+    Icons.Outlined.Group,
+    Icons.Outlined.BookmarkBorder,
+    Icons.Outlined.Search,
+    Icons.Outlined.Settings
+)
 
-    BottomNavigationItem(
-        selected = tabNavigator.current.key == tab.key,
-        onClick = { tabNavigator.current = tab },
-        icon = { Icon(painter = tab.options.icon!!, contentDescription = tab.options.title) }
-    )
-}
-
-class ScreenRedExplorer() : Screen {
+class ScreenRedExplorer : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
 
     companion object {
         var screenType by mutableIntStateOf(0)
     }
-
-    val l = persistentListOf(
-        Icons.Outlined.Movie,
-        Icons.Outlined.Group,
-        Icons.Outlined.BookmarkBorder,
-        Icons.Outlined.Search,
-        Icons.Outlined.Settings
-    )
 
     @OptIn(ExperimentalMaterial3Api::class)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
