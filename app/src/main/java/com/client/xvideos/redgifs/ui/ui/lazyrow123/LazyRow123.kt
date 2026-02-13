@@ -34,10 +34,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
+import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -45,6 +47,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.common.UsersRed
 import com.client.xvideos.redgifs.model.GifsInfo
+import com.client.xvideos.redgifs.model.URL1
 import com.client.xvideos.redgifs.ui.explorer.ScreenRedExplorer
 import com.client.xvideos.redgifs.ui.fullscreen.ScreenRedFullScreen
 import com.client.xvideos.redgifs.ui.top_this_week.ProfileInfo1
@@ -53,6 +56,7 @@ import com.redgifs.common.block.ui.DialogBlock
 import com.redgifs.common.expand_menu_video.ExpandMenuVideo
 import com.redgifs.common.expand_menu_video.ExpandMenuVideoTags
 import com.redgifs.common.video.player_row_mini.RedUrlVideoImageAndLongClick
+import kotlinx.coroutines.flow.flowOf
 import timber.log.Timber
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -67,24 +71,44 @@ fun LazyRow123(
     isRunLike: Boolean = false,
     onAppendLoaded: (LazyPagingItems<GifsInfo>) -> Unit = {},
 ) {
+    val listGifs = host.pager.collectAsLazyPagingItems() as LazyPagingItems<GifsInfo>
 
-    val listGifs : LazyPagingItems<GifsInfo> = host.pager.collectAsLazyPagingItems() as LazyPagingItems<GifsInfo>
+    LazyRow123Content(
+        host = host,
+        listGifs = listGifs,
+        modifier = modifier,
+        onClickOpenProfile = onClickOpenProfile,
+        contentPadding = contentPadding,
+        contentBeforeList = contentBeforeList,
+        isRunLike = isRunLike,
+        onAppendLoaded = onAppendLoaded
+    )
+}
 
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun LazyRow123Content(
+    host: LazyRow123Host,
+    listGifs: LazyPagingItems<GifsInfo>,
+    modifier: Modifier = Modifier,
+    onClickOpenProfile: (String) -> Unit = {},
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+    contentBeforeList: @Composable (() -> Unit) = {},
+    isRunLike: Boolean = false,
+    onAppendLoaded: (LazyPagingItems<GifsInfo>) -> Unit = {},
+) {
     SideEffect { Timber.d("!!! LazyRow123::SideEffect columns: ${host.columns} : $listGifs") }
 
     val isConnected by host.isConnected.collectAsStateWithLifecycle()
-    val state = host.state//rememberLazyGridState()
+    val state = host.state
     var blockItem by remember { mutableStateOf<GifsInfo?>(null) }
 
-    val navigator = LocalNavigator.currentOrThrow
+    val navigator = LocalNavigator.current
 
-    // Отображаем индикатор загрузки поверх контента, если это первая загрузка
-    // a) ПЕРВОНАЧАЛЬНАЯ загрузка (+ pull‑to‑refresh)
-    val isInitialLoading = listGifs.loadState.refresh is LoadState.Loading && listGifs.itemCount == 0          // важно!
-    val isErrorInitial = listGifs.loadState.refresh is LoadState.Error
 
+    val isInitialLoading =
+        listGifs.loadState.refresh is LoadState.Loading && listGifs.itemCount == 0
     val block = host.hostDI.block
-
     val downloadList = host.hostDI.downloadRed.downloadList.collectAsState().value
 
     if (listGifs.itemCount == 0) {
@@ -99,35 +123,29 @@ fun LazyRow123(
     }
 
     val loadState = listGifs.loadState
-    var wasRefreshLoading by remember { mutableStateOf(false) }
     var wasAppendLoading by remember { mutableStateOf(false) }
     var wasDataLoaded by remember { mutableStateOf(false) }
 
-    // Первая загрузка
     LaunchedEffect(loadState.refresh) {
         if (loadState.refresh is LoadState.NotLoading && !wasDataLoaded && listGifs.itemCount > 0) {
             wasDataLoaded = true
             onAppendLoaded(listGifs)
         }
-
-        // Сброс флага, если снова началась загрузка (например, swipe-to-refresh)
         if (loadState.refresh is LoadState.Loading) {
             wasDataLoaded = false
         }
     }
 
-    // Догрузка следующих страниц
     LaunchedEffect(loadState.append) {
         if (loadState.append is LoadState.Loading && !wasAppendLoading) {
             wasAppendLoading = true
-            onAppendLoaded(listGifs) // false — догрузка
+            onAppendLoaded(listGifs)
         }
         if (loadState.append !is LoadState.Loading) {
             wasAppendLoading = false
         }
     }
 
-    //Диалог для блокировки
     if (block.blockVisibleDialog) {
         DialogBlock(
             visible = block.blockVisibleDialog,
@@ -142,19 +160,13 @@ fun LazyRow123(
         )
     }
 
-
-
     Box(modifier.fillMaxSize()) {
-
         if (host.columns in 1..4) {
-
             if (listGifs.itemCount > 0) {
-
                 LazyVerticalGrid(
                     state = state,
                     columns = GridCells.Fixed(host.columns),
-                    modifier = Modifier.fillMaxSize()//.then(modifier)
-                    ,
+                    modifier = Modifier.fillMaxSize(),
                     contentPadding = contentPadding,
                 )
                 {
@@ -163,63 +175,46 @@ fun LazyRow123(
                     items(
                         count = listGifs.itemCount, key = { index -> listGifs[index]?.id ?: index}
                     ) { index ->
-
-                        //Timber.i("777 index:$index itemCount:${listGifs.itemCount}")
-
-                        //if (index >= listGifs.itemCount) return@items
-
                         var isVideo by remember { mutableStateOf(false) }
-
                         val item = listGifs[index]
-
-                        //Timber.i("777 index:$index item id:${item?.id}")
-
                         if (item != null) {
-
                             Box(
-                                modifier = Modifier.padding(vertical = 1.dp).padding(horizontal = 1.dp)
+                                modifier = Modifier
+                                    .padding(vertical = 1.dp)
+                                    .padding(horizontal = 1.dp)
                                     .fillMaxSize()
-                                    .clip(RoundedCornerShape(8.dp))
-                                //.border(1.dp, Color.DarkGray, RoundedCornerShape(8.dp)),
-                                , contentAlignment = Alignment.Center
+                                    .clip(RoundedCornerShape(8.dp)),
+                                contentAlignment = Alignment.Center
                             ) {
-
                                 RedUrlVideoImageAndLongClick(
                                     item, index,
                                     onLongClick = {
                                         blockItem = item
-                                        navigator.push(ScreenRedFullScreen(item))
+                                        navigator?.push(ScreenRedFullScreen(item))
                                     },
                                     onVideo = { isVideo = it },
                                     isVisibleView = false,
                                     isVisibleDuration = false,
-                                    play = false,//centrallyLocatedOrMostVisibleItemIndex == index && host.columns == 1,
+                                    play = false,
                                     isNetConnected = isConnected,
                                     onFullScreen = {
                                         blockItem = item
-                                        navigator.push(ScreenRedFullScreen(item))
+                                        navigator?.push(ScreenRedFullScreen(item))
                                     },
                                     downloadRed = host.hostDI.downloadRed,
                                 )
 
-
                                 Column(modifier = Modifier.align(Alignment.TopEnd)) {
-
-                                    //Меню на 3 точки
                                     ExpandMenuVideo(
                                         item = item,
                                         modifier = Modifier,
-                                        onClick = {
-                                            blockItem = item //Для блока и идентификации и тема
-                                        },
+                                        onClick = { blockItem = item },
                                         onRunLike = {
                                             if (isRunLike) {
                                                 listGifs.refresh()
                                             }
                                         },
-                                        onRefresh = {
-                                            listGifs.refresh()
-                                        },
+                                        onRefresh = { listGifs.refresh() },
                                         host.isCollection,
                                         block,
                                         host.hostDI.redApi,
@@ -238,8 +233,8 @@ fun LazyRow123(
                                                         selection = TextRange(it1.length)
                                                     )
                                                 host.hostDI.search.searchTextDone.value = it1
-                                                ScreenRedExplorer.Companion.screenType = 0
-                                                navigator.popAll()
+                                                ScreenRedExplorer.screenType = 0
+                                                navigator?.popAll()
                                             }
                                         )
                                     }
@@ -251,17 +246,15 @@ fun LazyRow123(
                                         .fillMaxWidth()
                                         .align(Alignment.BottomStart),
                                     enter = slideInVertically(
-                                        initialOffsetY = { fullHeight -> fullHeight }, // снизу вверх
+                                        initialOffsetY = { fullHeight -> fullHeight },
                                         animationSpec = tween(durationMillis = 200)
                                     ),
                                     exit = slideOutVertically(
-                                        targetOffsetY = { fullHeight -> fullHeight }, // сверху вниз
+                                        targetOffsetY = { fullHeight -> fullHeight },
                                         animationSpec = tween(durationMillis = 200)
                                     )
                                 ) {
-
                                     Box(modifier = Modifier.fillMaxWidth()) {
-
                                         if (host.visibleProfileInfo) {
                                             ProfileInfo1(
                                                 modifier = Modifier
@@ -276,24 +269,22 @@ fun LazyRow123(
                                                 verticalAlignment = Alignment.Top
                                             )
                                         }
-
                                         LazyRow123Icons(
                                             modifier = Modifier
                                                 .align(Alignment.BottomEnd)
-                                                .offset(2.dp, 2.dp), host.hostDI.savedRed, item, downloadList
+                                                .offset(2.dp, 2.dp),
+                                            host.hostDI.savedRed,
+                                            item,
+                                            downloadList
                                         )
                                     }
                                 }
                             }
-
                         }
-
                     }
                 }
-
             }
         } else {
-
             val pageCount = listGifs.itemCount
             val statePager = rememberPagerState { pageCount }
 
@@ -303,13 +294,11 @@ fun LazyRow123(
                 beyondViewportPageCount = 2
             ) { index ->
                 val item = listGifs[index]
-
                 var isVideo by remember { mutableStateOf(false) }
 
                 if (item == null) {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
                 } else {
-
                     Box(
                         modifier = Modifier
                             .padding(vertical = 2.dp)
@@ -320,20 +309,26 @@ fun LazyRow123(
                         contentAlignment = Alignment.Center
                     ) {
 
-                        RedUrlVideoImageAndLongClick( item, index,
+                        RedUrlVideoImageAndLongClick(
+                            item,
+                            index,
                             onLongClick = {
                                 blockItem = item
-                                navigator.push(ScreenRedFullScreen(item))
-                            }, onVideo = { isVideo = it }, isVisibleView = false,isVisibleDuration = false, play = index == statePager.currentPage, isNetConnected = isConnected,
+                                navigator?.push(ScreenRedFullScreen(item))
+                            },
+                            onVideo = { isVideo = it },
+                            isVisibleView = false,
+                            isVisibleDuration = false,
+                            play = index == statePager.currentPage,
+                            isNetConnected = isConnected,
                             onFullScreen = {
                                 blockItem = item
-                                navigator.push(ScreenRedFullScreen(item))
-                            }, downloadRed = host.hostDI.downloadRed,
+                                navigator?.push(ScreenRedFullScreen(item))
+                            },
+                            downloadRed = host.hostDI.downloadRed,
                         )
 
                         Column(modifier = Modifier.align(Alignment.TopEnd)) {
-
-                            //Меню на 3 точки
                             ExpandMenuVideo( item = item, modifier = Modifier, onClick = { blockItem = item }, onRunLike = { if (isRunLike) { listGifs.refresh() } },
                                 onRefresh = { listGifs.refresh() }, host.isCollection, block, host.hostDI.redApi, host.hostDI.savedRed, downloadRed = host.hostDI.downloadRed )
 
@@ -342,8 +337,8 @@ fun LazyRow123(
                                     onClick = { it1 ->
                                         host.hostDI.search.searchText.value = TextFieldValue( text = it1, selection = TextRange(it1.length) )
                                         host.hostDI.search.searchTextDone.value = it1
-                                        ScreenRedExplorer.Companion.screenType = 0
-                                        navigator.popAll()
+                                        ScreenRedExplorer.screenType = 0
+                                        navigator?.popAll()
                                     }
                                 )
                             }
@@ -382,10 +377,40 @@ fun LazyRow123(
             if (listGifs.loadState.append is LoadState.Loading && listGifs.itemCount > 0) { Box( modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(16.dp) ) { CircularProgressIndicator(color = ThemeRed.colorYellow) } }
-
         }
-
     }
 }
 
+@Preview(showBackground = true, backgroundColor = 0xFF212121)
+@Composable
+private fun PreviewLazyRow123Content() {
+    val sampleGifs = listOf(
+        GifsInfo(
+            id = "1",
+            userName = "User 1",
+            tags = listOf("tag1", "tag2"),
+            urls = URL1(thumbnail = "https://media.redgifs.com/FamousIdleWasp-poster.jpg")
+        ),
+        GifsInfo(
+            id = "2",
+            userName = "User 2",
+            tags = listOf("tag3"),
+            urls = URL1(thumbnail = "https://media.redgifs.com/FamousIdleWasp-poster.jpg")
+        ),
+        GifsInfo(
+            id = "3",
+            userName = "User 3",
+            tags = listOf("tag4"),
+            urls = URL1(thumbnail = "https://media.redgifs.com/FamousIdleWasp-poster.jpg")
+        )
+    )
+    val pagingData = PagingData.from(sampleGifs)
+    val listGifs = flowOf(pagingData).collectAsLazyPagingItems()
 
+    // LazyRow123Host and its dependencies are hard to mock without the full context.
+    // This is a placeholder for the preview. In a real scenario, you would provide
+    // a mock or fake implementation of LazyRow123Host.
+
+    // Note: Due to the complexity of the HostDI and other classes, 
+    // a functional preview would require significant mocking of the business logic layers.
+}

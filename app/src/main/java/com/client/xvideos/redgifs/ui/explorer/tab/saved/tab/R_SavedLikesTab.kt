@@ -113,7 +113,7 @@ class ScreenSavedLikesSM @Inject constructor(
     val likedHost = LazyRow123Host(
         connectivityObserver = connectivityObserver,
         scope = screenModelScope,
-        typePager = TypePager.SAVED_LIKES,
+        typePager = TypePager.R_SAVED_LIKES,
         hostDI = hostDI
     )
 

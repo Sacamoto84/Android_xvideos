@@ -42,7 +42,7 @@ import timber.log.Timber
 enum class TypePager {
     NICHES,
     TOP,
-    SAVED_LIKES,
+    R_SAVED_LIKES,
     SAVED_COLLECTION,
     PROFILE,
     EXPLORER_NICHES,
@@ -169,7 +169,7 @@ fun createPager(
             )
         }
 
-        TypePager.SAVED_LIKES -> {
+        TypePager.R_SAVED_LIKES -> {
             ItemSavedLikesPagingSource(sort, hostDI.savedRed)
         }
 

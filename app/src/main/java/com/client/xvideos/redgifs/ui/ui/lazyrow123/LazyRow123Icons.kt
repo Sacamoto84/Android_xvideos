@@ -1,12 +1,16 @@
 package com.client.xvideos.redgifs.ui.ui.lazyrow123
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.client.xvideos.common.icons.IconCollection18
 import com.client.xvideos.common.icons.IconFavorite18
@@ -52,3 +56,26 @@ fun LazyRow123Icons(
 
 }
 
+@Preview(showBackground = true)
+@Composable
+private fun PreviewLazyRow123Icons() {
+    Column(
+        modifier = Modifier
+            .background(Color.DarkGray)
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        // Visual representation of icons for Preview purposes, 
+        // as SavedRed cannot be easily instantiated without its dependencies.
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.Bottom,
+            horizontalArrangement = Arrangement.End
+        ) {
+            IconCollection18(Modifier.padding(bottom = 6.dp, end = 6.dp))
+            IconPerson18(Modifier.padding(bottom = 6.dp, end = 6.dp))
+            IconFavorite18(Modifier.padding(bottom = 6.dp, end = 6.dp))
+            IconSave18(Modifier.padding(bottom = 6.dp, end = 6.dp))
+        }
+    }
+}

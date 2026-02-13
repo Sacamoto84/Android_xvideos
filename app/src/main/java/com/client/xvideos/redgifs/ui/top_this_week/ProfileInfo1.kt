@@ -3,6 +3,7 @@ package com.client.xvideos.redgifs.ui.top_this_week
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
@@ -56,16 +57,30 @@ fun ProfileInfo1(
             }
 
             if (visibleUserName)
-                Text(
-                    videoItem.userName,
-                    autoSize = TextAutoSize.StepBased(minFontSize = 6.sp, maxFontSize = 18.sp),
-                    minLines = 1,
-                    maxLines = 1,
-                    color = Color.White,
-                    fontFamily = ThemeRed.fontFamilyPopinsRegular,
-                    fontSize = 18.sp,
-                    modifier = Modifier.padding(start = 4.dp).offset(y= (-3).dp)
-                )
+                Column()
+                {
+                    Text(
+                        videoItem.id,
+                        autoSize = TextAutoSize.StepBased(minFontSize = 6.sp, maxFontSize = 18.sp),
+                        minLines = 1,
+                        maxLines = 1,
+                        color = Color.White,
+                        fontFamily = ThemeRed.fontFamilyPopinsRegular,
+                        fontSize = 18.sp,
+                        modifier = Modifier.padding(start = 4.dp).offset(y= (-3).dp)
+                    )
+                    Text(
+                        videoItem.userName,
+                        autoSize = TextAutoSize.StepBased(minFontSize = 6.sp, maxFontSize = 18.sp),
+                        minLines = 1,
+                        maxLines = 1,
+                        color = Color.White,
+                        fontFamily = ThemeRed.fontFamilyPopinsRegular,
+                        fontSize = 18.sp,
+                        modifier = Modifier.padding(start = 4.dp).offset(y= (-3).dp)
+                    )
+                }
+
 
     }
 }

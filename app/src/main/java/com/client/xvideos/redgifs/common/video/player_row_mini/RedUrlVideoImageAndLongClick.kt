@@ -6,6 +6,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -31,12 +32,14 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.sp
 import com.client.xvideos.BuildConfig
 import com.client.xvideos.common.AppPath
+import com.client.xvideos.common.coil.UrlImageGifsCoil
 import com.client.xvideos.common.urlVideoImage.UrlImage
 import com.client.xvideos.common.vibrate.vibrateWithPatternAndAmplitude
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.redgifs.common.downloader.DownloadRed
 import com.redgifs.common.video.player_row_mini.atom.Red_Video_Lite_Row2
 import com.client.xvideos.redgifs.model.GifsInfo
+import io.ktor.util.collections.getValue
 import timber.log.Timber
 import java.io.File
 
@@ -104,18 +107,24 @@ fun RedUrlVideoImageAndLongClick(
 
 
 
-    val imageUrl by remember {
-        mutableStateOf(
-            run {
+
+    val imageUrl : String = remember {
+        //mutableStateOf(
+        //    run {
                 val imagePath = "${AppPath.r_cache_download}/${item.userName}/${item.id}.jpg"
+
+                Timber.tag("???").i("Перерачсет imagePath.id = ${item.id}  [ $imagePath ]")
+
                 if (File(imagePath).exists()) {
                     imagePath
                 } else {
                     item.urls.poster ?: item.urls.thumbnail
                 }
-            }
-        )
+        //    }
+       // )
     }
+
+    Timber.tag("???").i("imageUrl = ${item.id}  $imageUrl ")
 
     Box(
         modifier = Modifier
@@ -168,13 +177,23 @@ fun RedUrlVideoImageAndLongClick(
             exit = fadeOut(animationSpec = tween(100))
         ) {
             Box{
-                UrlImage(
+
+//                UrlImage(
+//                    url = imageUrl,
+//                    contentScale = ContentScale.Fit,
+//                    modifier = Modifier
+//                        .fillMaxSize()
+//                        .alpha(if (isVideo) 0.8f else 1.0f),
+//                    //isGrayscale = isVideo
+//                )
+
+                UrlImageGifsCoil(
                     url = imageUrl,
                     contentScale = ContentScale.Fit,
                     modifier = Modifier
                         .fillMaxSize()
                         .alpha(if (isVideo) 0.8f else 1.0f),
-                    //isGrayscale = isVideo
+                    albumName = "likes"
                 )
 
                 if (isVideo) {
