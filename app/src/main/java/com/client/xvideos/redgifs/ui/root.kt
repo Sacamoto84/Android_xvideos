@@ -28,7 +28,7 @@ import com.client.xvideos.common.snackbar.UiMessage
 import com.client.xvideos.redgifs.common.di.HostDI
 import com.client.xvideos.redgifs.ui.explorer.ScreenRedExplorer
 import com.redgifs.common.downloader.ui.DownloadIndicator
-import com.redgifs.common.saved.DialogCollection
+import com.client.xvideos.redgifs.common.saved.DialogCollection
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

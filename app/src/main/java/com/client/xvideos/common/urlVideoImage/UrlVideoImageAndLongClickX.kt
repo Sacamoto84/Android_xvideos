@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import com.client.xvideos.common.coil.UrlImage
 import com.client.xvideos.common.vibrate.vibrateWithPatternAndAmplitude
 import com.client.xvideos.xvideos.model.ItemsX
 
@@ -58,7 +59,7 @@ fun UrlVideoImageAndLongClickX(
             UrlVideoLite(item.previewVideo)
         } else {
             //Показ картинки
-            UrlImage(item.previewImage, Modifier.fillMaxWidth())
+            UrlImage(item.previewImage, modifier = Modifier.fillMaxWidth())
             overlay.invoke()
         }
 

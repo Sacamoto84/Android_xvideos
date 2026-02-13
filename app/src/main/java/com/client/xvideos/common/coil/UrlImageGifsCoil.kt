@@ -54,10 +54,14 @@ import timber.log.Timber
 import java.io.File
 import kotlin.math.roundToInt
 
+enum class UrlImageAlbum{
+    DIRECT, CRYPTO
+}
+
 @Suppress("UiComposable")
 @OptIn(FlowPreview::class)
 @Composable
-fun UrlImageGifsCoil(
+fun UrlImage(
 
     url: String,
     urlGif : String?= null, //url для gif файла
@@ -65,7 +69,9 @@ fun UrlImageGifsCoil(
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Crop,
     loadIndicator: Boolean = true,
-    albumName: String,
+
+    albumName: UrlImageAlbum = UrlImageAlbum.DIRECT,
+
     isAnimated: Boolean = false,
     onSuccess: () -> Unit = {},
     onFailure: () -> Unit = {},
@@ -123,18 +129,16 @@ fun UrlImageGifsCoil(
     val total = progress.total
 
     val dataSource = remember(url, urlGif) {
-
-        if (url.contains("https://"))
+        if (url.startsWith("https://"))
             url.toUri()
         else {
             val fileName = url.substringAfterLast('/').substringBefore('?')
             val file = when (albumName) {
-                "likes", "crypto" -> File(url)
+                UrlImageAlbum.DIRECT -> File(url)
                 else -> File(AppPath.l_downloaded_albums, "$albumName/$fileName")
             }
             file
         }
-
     }
 
     // Один глобальный ImageLoader на всё приложение

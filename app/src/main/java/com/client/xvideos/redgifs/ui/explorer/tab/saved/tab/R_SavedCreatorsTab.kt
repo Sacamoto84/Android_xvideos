@@ -52,8 +52,8 @@ import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.client.xvideos.common.coil.UrlImage
 import com.client.xvideos.common.connectivityObserver.ConnectivityObserver
-import com.client.xvideos.common.urlVideoImage.UrlImage
 import com.client.xvideos.redgifs.ui.profile.ScreenRedProfile
 import com.client.xvideos.redgifs.ui.profile.atom.VerticalScrollbar
 import com.client.xvideos.redgifs.ui.profile.rememberVisibleRangePercentIgnoringFirstNForLazyColumn
@@ -177,7 +177,7 @@ object R_SavedCreatorsTab : Screen {
 
                                 if (it1.profileImageUrl != null) {
                                     UrlImage(
-                                        it1.profileImageUrl!!,
+                                        it1.profileImageUrl,
                                         modifier = Modifier.size(96.dp),
                                         contentScale = ContentScale.Crop
                                     )

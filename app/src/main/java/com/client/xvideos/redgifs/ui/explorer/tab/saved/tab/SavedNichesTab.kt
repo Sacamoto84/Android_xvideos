@@ -45,10 +45,10 @@ import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.client.xvideos.common.coil.UrlImage
 import com.client.xvideos.common.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.common.saved.SavedRed
-import com.client.xvideos.common.urlVideoImage.UrlImage
 import com.client.xvideos.redgifs.model.NichesInfo
 import com.client.xvideos.redgifs.ui.niche.R_ScreenNiche
 import com.client.xvideos.redgifs.ui.profile.atom.VerticalScrollbar

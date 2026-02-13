@@ -32,14 +32,15 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.sp
 import com.client.xvideos.BuildConfig
 import com.client.xvideos.common.AppPath
-import com.client.xvideos.common.coil.UrlImageGifsCoil
-import com.client.xvideos.common.urlVideoImage.UrlImage
+import com.client.xvideos.common.coil.UrlImage
+import com.client.xvideos.common.coil.UrlImageAlbum
+
 import com.client.xvideos.common.vibrate.vibrateWithPatternAndAmplitude
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.redgifs.common.downloader.DownloadRed
 import com.redgifs.common.video.player_row_mini.atom.Red_Video_Lite_Row2
 import com.client.xvideos.redgifs.model.GifsInfo
-import io.ktor.util.collections.getValue
+
 import timber.log.Timber
 import java.io.File
 
@@ -187,13 +188,13 @@ fun RedUrlVideoImageAndLongClick(
 //                    //isGrayscale = isVideo
 //                )
 
-                UrlImageGifsCoil(
+                UrlImage(
                     url = imageUrl,
                     contentScale = ContentScale.Fit,
                     modifier = Modifier
                         .fillMaxSize()
                         .alpha(if (isVideo) 0.8f else 1.0f),
-                    albumName = "likes"
+                    albumName = UrlImageAlbum.DIRECT
                 )
 
                 if (isVideo) {

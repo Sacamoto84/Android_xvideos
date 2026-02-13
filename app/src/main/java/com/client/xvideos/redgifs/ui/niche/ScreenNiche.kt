@@ -39,8 +39,8 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.client.xvideos.common.coil.UrlImage
 import com.client.xvideos.common.settings.Settings
-import com.client.xvideos.common.urlVideoImage.UrlImage
 import com.client.xvideos.redgifs.ui.niche.atom.NichePreview
 import com.client.xvideos.redgifs.ui.niche.atom.NicheProfile
 import com.client.xvideos.redgifs.ui.niche.atom.NicheTopCreator

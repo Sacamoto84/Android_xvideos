@@ -5,20 +5,12 @@ import android.os.Parcelable
 import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandIn
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkOut
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -38,10 +30,8 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.ScreenRotation
-import androidx.compose.material.icons.filled.Web
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -60,24 +50,19 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.ColorMatrix
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.client.xvideos.common.coil.UrlImageGifsCoil
+import com.client.xvideos.common.coil.UrlImage
 import com.client.xvideos.common.noRippleClickable
-import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.ui.element.expandMenu.ExpandMenuType
@@ -89,7 +74,6 @@ import kotlinx.parcelize.Parcelize
 import net.engawapg.lib.zoomable.ZoomState
 import net.engawapg.lib.zoomable.rememberZoomState
 import net.engawapg.lib.zoomable.zoomable
-import kotlin.math.absoluteValue
 
 var fullScreenImageFilteredPicArray: List<PicsDetails> = emptyList()
 
@@ -111,7 +95,7 @@ fun PagerState.endOffsetForPage(page: Int): Float {
 }
 
 @Parcelize
-class FullScreenImage(
+class L_FullScreenImage(
     val item: PicsDetails,
     val albumName: String,
     //val filteredPicArray: List<PicsDetails>,
@@ -243,7 +227,7 @@ class FullScreenImage(
                     // Картинка с масштабированием и позиционированием
                     Box( modifier = Modifier.fillMaxSize() )
                     {
-                        UrlImageGifsCoil(
+                        UrlImage(
                             rotate = rotate, contentScale = ContentScale.Fit, url = pageItem.url_to_original!!, modifier = Modifier.fillMaxSize()
                                 .zoomable(
                                     zoomState = zoomState,
@@ -315,7 +299,7 @@ class FullScreenImage(
                                         })
                                         .border(2.dp, if (index == currentIndex) Color.Yellow else Color.Transparent, RoundedCornerShape(4.dp)).padding(2.dp)
                                 ) {
-                                    UrlImageGifsCoil(
+                                    UrlImage(
                                         url = it1.url_to_original!!,
                                         modifier = Modifier.clip(RoundedCornerShape(4.dp)).fillMaxSize(),
                                         contentScale = ContentScale.FillBounds,

@@ -13,7 +13,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
-import com.client.xvideos.common.urlVideoImage.UrlImage
+import com.client.xvideos.common.coil.UrlImage
 import com.client.xvideos.l.model.AlbumDetails
 import com.client.xvideos.l.model.Cover
 import com.client.xvideos.l.model.Genre

@@ -28,7 +28,7 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.client.xvideos.common.urlVideoImage.UrlImage
+import com.client.xvideos.common.coil.UrlImage
 import com.client.xvideos.redgifs.ui.manager_block.bottomr_bar.BottomrBar
 import com.client.xvideos.redgifs.common.ThemeRed
 

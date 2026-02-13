@@ -29,9 +29,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.client.xvideos.R
+import com.client.xvideos.common.coil.UrlImage
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.common.saved.SavedRed
-import com.client.xvideos.common.urlVideoImage.UrlImage
 import com.client.xvideos.common.util.toPrettyCount
 import com.client.xvideos.redgifs.model.UserInfo
 import com.composeunstyled.Text
@@ -54,7 +54,7 @@ fun RedProfileCreaterInfo(item: UserInfo, savedRed: SavedRed) {
         ) {
 
             if (item.profileImageUrl != null) {
-                UrlImage(item.profileImageUrl!!, modifier = Modifier.size(96.dp))
+                UrlImage(item.profileImageUrl, modifier = Modifier.size(96.dp))
             } else {
                 Box(
                     modifier = Modifier

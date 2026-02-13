@@ -59,7 +59,7 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.common.AppPath
-import com.client.xvideos.common.urlVideoImage.UrlImage
+import com.client.xvideos.common.coil.UrlImage
 import com.client.xvideos.common.util.toPrettyCount3
 import com.client.xvideos.redgifs.ui.fullscreen.ScreenRedFullScreen
 import com.client.xvideos.redgifs.ui.profile.atom.VerticalScrollbar
@@ -113,7 +113,7 @@ object SavedDownloadTab : Screen {
 
                 icon = {
                     pending.profileImageUrl?.let {
-                        UrlImage(pending.profileImageUrl!!, modifier = Modifier.size(96.dp))
+                        UrlImage(pending.profileImageUrl, modifier = Modifier.size(96.dp))
                     }
                 },
 

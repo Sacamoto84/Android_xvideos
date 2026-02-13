@@ -42,12 +42,12 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.LocalRootScreenModel
-import com.client.xvideos.common.coil.UrlImageGifsCoil
+import com.client.xvideos.common.coil.UrlImage
 import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.ui.element.expandMenu.ExpandMenuType
 import com.client.xvideos.l.ui.element.expandMenu.ExpandMenuViewModel
-import com.client.xvideos.l.ui.screens.screenFullScreen.FullScreenImage
+import com.client.xvideos.l.ui.screens.screenFullScreen.L_FullScreenImage
 import com.client.xvideos.l.ui.screens.screenFullScreen.fullScreenImageFilteredPicArray
 import com.client.xvideos.redgifs.ui.profile.atom.VerticalScrollbar
 import com.client.xvideos.redgifs.ui.profile.rememberVisibleRangePercentIgnoringFirstNForLazyStaggeredGrid
@@ -122,7 +122,7 @@ fun L_LazyRowPictureDetails(
                                     ?: item.url_to_original
                             }
 
-                        UrlImageGifsCoil(
+                        UrlImage(
                             url = url,
                             urlGif = item.url_to_original,
                             modifier = Modifier
@@ -135,7 +135,7 @@ fun L_LazyRowPictureDetails(
                                         host.filteredPic.toList()
 
                                     navigator.push(
-                                        FullScreenImage(
+                                        L_FullScreenImage(
                                             item = item,
                                             onClose = { position ->
                                                 Timber.i("scrollToItem $position")

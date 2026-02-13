@@ -34,9 +34,9 @@ import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.client.xvideos.common.coil.UrlImage
 import com.client.xvideos.common.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.common.snackbar.SnackBar
-import com.client.xvideos.common.urlVideoImage.UrlImage
 import com.client.xvideos.redgifs.model.search.SearchItemCreatorsResponse
 import com.client.xvideos.redgifs.model.search.SearchItemNichesResponse
 import com.client.xvideos.redgifs.model.search.SearchItemTagsResponse

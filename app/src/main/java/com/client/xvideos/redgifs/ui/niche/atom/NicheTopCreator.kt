@@ -8,12 +8,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.client.xvideos.common.urlVideoImage.UrlImage
+import com.client.xvideos.common.coil.UrlImage
 import com.client.xvideos.redgifs.model.TopCreator
 
 @Composable
 fun NicheTopCreator(creator : TopCreator, onClick: () -> Unit) {
-
     UrlImage(creator.profileImageUrl, modifier = Modifier.padding(end =4.dp).size(96.dp).clip(RoundedCornerShape(8.dp)).clickable{onClick.invoke()})
-
 }
