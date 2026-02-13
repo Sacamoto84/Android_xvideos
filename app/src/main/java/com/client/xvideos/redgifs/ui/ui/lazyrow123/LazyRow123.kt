@@ -158,13 +158,10 @@ fun LazyRow123(
                     contentPadding = contentPadding,
                 )
                 {
-                    item(
-                        key = "before",
-                        span = { GridItemSpan(maxLineSpan) }) { contentBeforeList() }
+                    item( key = "before", span = { GridItemSpan(maxLineSpan) }) { contentBeforeList() }
 
                     items(
-                        count = listGifs.itemCount,
-                        key = { index -> listGifs[index]?.id ?: index}
+                        count = listGifs.itemCount, key = { index -> listGifs[index]?.id ?: index}
                     ) { index ->
 
                         //Timber.i("777 index:$index itemCount:${listGifs.itemCount}")
@@ -180,11 +177,9 @@ fun LazyRow123(
                         if (item != null) {
 
                             Box(
-                                modifier = Modifier
-                                    .padding(vertical = 0.5.dp)
-                                    .padding(horizontal = 0.5.dp)
+                                modifier = Modifier.padding(vertical = 1.dp).padding(horizontal = 1.dp)
                                     .fillMaxSize()
-                                //.clip(RoundedCornerShape(8.dp))
+                                    .clip(RoundedCornerShape(8.dp))
                                 //.border(1.dp, Color.DarkGray, RoundedCornerShape(8.dp)),
                                 , contentAlignment = Alignment.Center
                             ) {

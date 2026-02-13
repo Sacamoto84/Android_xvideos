@@ -29,7 +29,7 @@ android {
 
     defaultConfig {
         applicationId "com.client.xvideos"
-        minSdk 23
+        minSdk 26
         targetSdk 36
         versionCode 1
         versionName "154.7"
@@ -82,11 +82,11 @@ android {
 
         coreLibraryDesugaringEnabled = true
 
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '17'
     }
     buildFeatures {
         compose true
@@ -359,7 +359,7 @@ dependencies {
 
     // Source: https://mvnrepository.com/artifact/org.cryptomator/cryptofs
     // https://github.com/cryptomator/cryptofs
-    //implementation("org.cryptomator:cryptofs:2.10.0-beta2")
+    implementation("org.cryptomator:cryptofs:2.10.0-beta2")
 }
 
 ksp {
