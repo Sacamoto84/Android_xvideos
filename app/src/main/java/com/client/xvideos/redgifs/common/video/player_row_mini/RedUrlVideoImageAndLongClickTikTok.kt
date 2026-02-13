@@ -81,7 +81,7 @@ fun RedUrlVideoImageAndLongClickTikTok(
     var poster by remember { mutableStateOf(true) }
 
     val videoUri: String = remember(item.id, item.userName) {
-        Timber.tag("???").i("Перерачсет videoItem.id = ${item.id}")
+        //Timber.tag("???").i("Перерачсет videoItem.id = ${item.id}")
         //Определяем адрес откуда брать видео, из кеша или из сети
         if (downloadRed.downloader.findVideoInDownload(item.id, item.userName))
             "${AppPath.r_cache_download}/${item.userName}/${item.id}.mp4"

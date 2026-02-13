@@ -33,8 +33,6 @@ import androidx.compose.ui.unit.sp
 import com.client.xvideos.BuildConfig
 import com.client.xvideos.common.AppPath
 import com.client.xvideos.common.coil.UrlImage
-import com.client.xvideos.common.coil.UrlImageAlbum
-
 import com.client.xvideos.common.vibrate.vibrateWithPatternAndAmplitude
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.redgifs.common.downloader.DownloadRed
@@ -94,7 +92,7 @@ fun RedUrlVideoImageAndLongClick(
     }
 
     val videoUri: String = remember {
-        Timber.tag("???").i("Перерачсет videoItem.id = ${item.id}")
+        //Timber.tag("???").i("Перерачсет videoItem.id = ${item.id}")
         //Определяем адрес откуда брать видео, из кеша или из сети
         if (downloadRed.downloader.findVideoInDownload(item.id, item.userName))
             "${AppPath.r_cache_download}/${item.userName}/${item.id}.mp4"
@@ -114,7 +112,7 @@ fun RedUrlVideoImageAndLongClick(
         //    run {
                 val imagePath = "${AppPath.r_cache_download}/${item.userName}/${item.id}.jpg"
 
-                Timber.tag("???").i("Перерачсет imagePath.id = ${item.id}  [ $imagePath ]")
+                //Timber.tag("???").i("Перерачсет imagePath.id = ${item.id}  [ $imagePath ]")
 
                 if (File(imagePath).exists()) {
                     imagePath
@@ -194,7 +192,6 @@ fun RedUrlVideoImageAndLongClick(
                     modifier = Modifier
                         .fillMaxSize()
                         .alpha(if (isVideo) 0.8f else 1.0f),
-                    albumName = UrlImageAlbum.DIRECT
                 )
 
                 if (isVideo) {

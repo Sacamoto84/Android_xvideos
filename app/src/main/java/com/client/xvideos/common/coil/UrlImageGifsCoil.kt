@@ -54,9 +54,6 @@ import timber.log.Timber
 import java.io.File
 import kotlin.math.roundToInt
 
-enum class UrlImageAlbum{
-    DIRECT, CRYPTO
-}
 
 @Suppress("UiComposable")
 @OptIn(FlowPreview::class)
@@ -70,7 +67,7 @@ fun UrlImage(
     contentScale: ContentScale = ContentScale.Crop,
     loadIndicator: Boolean = true,
 
-    albumName: UrlImageAlbum = UrlImageAlbum.DIRECT,
+    albumName: String = "",
 
     isAnimated: Boolean = false,
     onSuccess: () -> Unit = {},
@@ -129,15 +126,14 @@ fun UrlImage(
     val total = progress.total
 
     val dataSource = remember(url, urlGif) {
-        if (url.startsWith("https://"))
+        if (url.startsWith("https://")) {
             url.toUri()
-        else {
+        } else {
             val fileName = url.substringAfterLast('/').substringBefore('?')
-            val file = when (albumName) {
-                UrlImageAlbum.DIRECT -> File(url)
-                else -> File(AppPath.l_downloaded_albums, "$albumName/$fileName")
-            }
-            file
+            if (albumName.isBlank())
+                File(url)
+            else
+                File(AppPath.l_downloaded_albums, "$albumName/$fileName")
         }
     }
 
