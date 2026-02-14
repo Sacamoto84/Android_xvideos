@@ -171,26 +171,25 @@ object R_ScreenNichesTab : Screen {
             }
         }, containerColor = ThemeRed.colorCommonBackground2) {
 
-            Box(
-                modifier = Modifier
-                    .padding(bottom = it.calculateBottomPadding())
-                    .fillMaxSize()
-            ) {
+            Box( modifier = Modifier.padding(bottom = it.calculateBottomPadding()).fillMaxSize() )
+            {
 
-                LazyColumn(
-                    state = state,
-                    modifier = Modifier.fillMaxSize(),
-                ) {
+                LazyColumn( state = state, modifier = Modifier.fillMaxSize() )
+                {
                     items(
+                        key = { index -> listNiche[index]?.id ?: index },
                         count = listNiche.itemCount,
                     ) { index ->
-                        val item = listNiche[index]
-                        if (item != null) {
-                            Box(modifier = Modifier.padding(vertical = 4.dp)) {
-                                NichePreview2(niches = item, onClick = {
-                                    navigator.push(R_ScreenNiche(item.id))
-                                }, savedRed = vm.hostDI.savedRed)
 
+                        val item = listNiche[index]
+
+                        if (item != null) {
+
+                            Box(modifier = Modifier.padding(vertical = 4.dp)) {
+
+                                NichePreview2(niches = item, onClick = { navigator.push(R_ScreenNiche(item.id)) }, savedRed = vm.hostDI.savedRed)
+
+                                //Индекс
                                 Text(
                                     index.toString(),
                                     color = Color.Gray,
@@ -202,6 +201,7 @@ object R_ScreenNichesTab : Screen {
                                         ), fontSize = 12.sp
                                 )
                             }
+
                         }
                     }
                 }

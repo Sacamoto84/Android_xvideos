@@ -5,6 +5,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,12 +14,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Text
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -36,7 +40,6 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.PagingData
@@ -45,16 +48,15 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import cafe.adriel.voyager.navigator.LocalNavigator
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.common.UsersRed
+import com.client.xvideos.redgifs.common.video.player_row_mini.RedUrlVideoImageAndLongClick
 import com.client.xvideos.redgifs.model.GifsInfo
 import com.client.xvideos.redgifs.model.URL1
 import com.client.xvideos.redgifs.ui.explorer.ScreenRedExplorer
 import com.client.xvideos.redgifs.ui.fullscreen.ScreenRedFullScreen
 import com.client.xvideos.redgifs.ui.top_this_week.ProfileInfo1
-import com.composeunstyled.Text
 import com.redgifs.common.block.ui.DialogBlock
 import com.redgifs.common.expand_menu_video.ExpandMenuVideo
 import com.redgifs.common.expand_menu_video.ExpandMenuVideoTags
-import com.client.xvideos.redgifs.common.video.player_row_mini.RedUrlVideoImageAndLongClick
 import kotlinx.coroutines.flow.flowOf
 import timber.log.Timber
 
@@ -99,41 +101,67 @@ fun LazyRow123Content(
     SideEffect { Timber.d("!!! LazyRow123::SideEffect columns: ${host.columns} : $listGifs") }
 
     val isConnected by host.isConnected.collectAsStateWithLifecycle()
+
     val state = host.state
+
     var blockItem by remember { mutableStateOf<GifsInfo?>(null) }
 
     val navigator = LocalNavigator.current
 
 
-    val isInitialLoading =
-        listGifs.loadState.refresh is LoadState.Loading && listGifs.itemCount == 0
+    /**
+     * Отображения индикатора первой загрузки
+     */
+    val isInitialLoading = listGifs.loadState.refresh is LoadState.Loading && listGifs.itemCount == 0
+
     val block = host.hostDI.block
+
     val downloadList = host.hostDI.downloadRed.downloadList.collectAsState().value
 
-    if (listGifs.itemCount == 0) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text(
-                "Отсутствуют данные",
-                color = Color.White,
-                fontFamily = ThemeRed.fontFamilyDMsanss,
-                fontSize = 20.sp
-            )
-        }; return
-    }
-
     val loadState = listGifs.loadState
+
     var wasAppendLoading by remember { mutableStateOf(false) }
+
     var wasDataLoaded by remember { mutableStateOf(false) }
 
+    var isIndicatorLoading by remember { mutableStateOf(true) }
+    var isIndicatorError by remember { mutableStateOf(false) }
+
+    var errorMessage by remember { mutableStateOf("") }
+
+    // 1. REFRESH - начальная загрузка / обновление всего списка
     LaunchedEffect(loadState.refresh) {
-        if (loadState.refresh is LoadState.NotLoading && !wasDataLoaded && listGifs.itemCount > 0) {
+
+        if (loadState.refresh is LoadState.NotLoading) {
+            isIndicatorLoading = false
+            isIndicatorError = false
             wasDataLoaded = true
             onAppendLoaded(listGifs)
         }
+
+        // Loading is in progress.
         if (loadState.refresh is LoadState.Loading) {
-            wasDataLoaded = false
+            isIndicatorLoading = true
+            isIndicatorError = false
         }
+
+        // Loading is in progress.
+        if (loadState.refresh is LoadState.Error) {
+
+            val error = (loadState.refresh as LoadState.Error).error
+            errorMessage = error.message ?: "Неизвестная ошибка"
+            Timber.i(errorMessage)
+            isIndicatorLoading = false
+            isIndicatorError = true
+        }
+
     }
+
+//    if (!wasDataLoaded) {
+//        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+//            CircularProgressIndicator()
+//        }; return
+//    }
 
     LaunchedEffect(loadState.append) {
         if (loadState.append is LoadState.Loading && !wasAppendLoading) {
@@ -160,7 +188,9 @@ fun LazyRow123Content(
     }
 
     Box(modifier.fillMaxSize()) {
+
         if (host.columns in 1..4) {
+
             if (listGifs.itemCount > 0) {
                 LazyVerticalGrid(
                     state = state,
@@ -283,7 +313,8 @@ fun LazyRow123Content(
                     }
                 }
             }
-        } else {
+
+        } else  {
             val pageCount = listGifs.itemCount
             val statePager = rememberPagerState { pageCount }
 
@@ -291,7 +322,8 @@ fun LazyRow123Content(
                 state = statePager,
                 modifier = Modifier.fillMaxSize(),
                 beyondViewportPageCount = 2
-            ) { index ->
+            )
+            { index ->
                 val item = listGifs[index]
                 var isVideo by remember { mutableStateOf(false) }
 
@@ -370,13 +402,28 @@ fun LazyRow123Content(
                 }
             }
 
-            if (isInitialLoading) { Box( modifier = modifier
-                .align(Alignment.Center)
-                .offset(0.dp, 40.dp), contentAlignment = Alignment.Center ) { CircularProgressIndicator(color = ThemeRed.colorYellow) } }
-            if (listGifs.loadState.append is LoadState.Loading && listGifs.itemCount > 0) { Box( modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(16.dp) ) { CircularProgressIndicator(color = ThemeRed.colorYellow) } }
         }
+
+        //Индикаторы
+
+        if (isIndicatorLoading) {
+            Box( modifier = modifier.align(Alignment.Center).offset(0.dp, 40.dp)
+                , contentAlignment = Alignment.Center ) { CircularProgressIndicator() }
+        }
+
+        if (isIndicatorError) {
+            Box( modifier = modifier.align(Alignment.Center).offset(0.dp, 40.dp)
+                , contentAlignment = Alignment.Center ) {
+                //CircularProgressIndicator(color = ThemeRed.colorRed)
+                Box(modifier = Modifier.size(64.dp).clip(CircleShape).background(ThemeRed.colorRed)){ }
+                Text(errorMessage, color = Color.White)
+            }
+        }
+
+//            if (listGifs.loadState.append is LoadState.Loading && listGifs.itemCount > 0) { Box( modifier = Modifier
+//                .align(Alignment.BottomCenter)
+//                .padding(16.dp) ) { CircularProgressIndicator(color = ThemeRed.colorYellow) } }
+
     }
 }
 

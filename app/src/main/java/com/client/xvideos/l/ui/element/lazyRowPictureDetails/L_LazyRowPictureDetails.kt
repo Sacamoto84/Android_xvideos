@@ -42,7 +42,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.client.xvideos.LocalRootScreenModel
+import com.client.xvideos.screen.LocalRootScreenModel
 import com.client.xvideos.common.coil.UrlImage
 import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.l.theme.ThemeL

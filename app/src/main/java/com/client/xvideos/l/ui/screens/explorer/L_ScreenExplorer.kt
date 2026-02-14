@@ -1,11 +1,9 @@
 package com.client.xvideos.l.ui.screens.explorer
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.BookmarkBorder
@@ -16,15 +14,12 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
@@ -33,16 +28,13 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
-import com.client.xvideos.LocalRootScreenModel
-import com.client.xvideos.R
 import com.client.xvideos.common.settings.Settings
-import com.client.xvideos.depth
+import com.client.xvideos.screen.depth
 import com.client.xvideos.l.ui.screens.explorer.tab.albumTopHits.L_ScreenAlbumTopHits
 import com.client.xvideos.l.ui.screens.explorer.tab.config.L_ScreenConfigTab
 import com.client.xvideos.l.ui.screens.explorer.tab.saved.L_SavedTab
 import com.client.xvideos.l.ui.screens.screenAlbumList.L_ScreenAlbumList
 import com.client.xvideos.redgifs.common.ThemeRed
-import com.client.xvideos.redgifs.ui.explorer.tab.gifs.R_ScreenGifsTab
 import com.client.xvideos.redgifs.ui.explorer.top.TabRow
 import com.client.xvideos.redgifs.ui.ui.atom.TabBarPoints
 import kotlinx.collections.immutable.persistentListOf

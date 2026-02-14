@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -44,86 +45,34 @@ import com.client.xvideos.redgifs.ui.niche.R_ScreenNiche
 import com.client.xvideos.redgifs.common.saved.SavedRed
 
 @Composable
-fun LazyRow123ExplorerNiches(
-    host: LazyRow123Host,
-    modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(0.dp),
-) {
-
-    val navigator = LocalNavigator.currentOrThrow
-
-    val listNiche = host.pager.collectAsLazyPagingItems() as LazyPagingItems<Niche>
-
-    val state = host.state//rememberLazyGridState()
-
-    if (listNiche.itemCount == 0) return
-
-    LazyVerticalGrid(
-        state = state,
-        columns = GridCells.Fixed(host.columns.coerceIn(1..3)),
-        modifier = Modifier.then(modifier),
-        contentPadding = contentPadding,
-    ) {
-        items(
-            count = listNiche.itemCount,
-        ) { index ->
-            val item = listNiche[index]
-            if (item != null) {
-                Box(modifier = Modifier.padding(vertical = 4.dp)) {
-                    NichePreview2(niches = item, onClick = {
-                        navigator.push(R_ScreenNiche(item.id))
-                    }, savedRed = host.hostDI.savedRed)
-                }
-            }
-        }
-    }
-
-}
-
-@Composable
 fun NichePreview2(niches: Niche, savedRed: SavedRed, onClick: () -> Unit) {
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .background(Color(0xFF323232))
-            .clickable { onClick() })
+    Row(
+        modifier = Modifier.padding(horizontal = 8.dp) .fillMaxWidth().height(78.dp)
+            .clip(RoundedCornerShape(16.dp)).background(Color(0xFF323232)).clickable { onClick() }, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween )
     {
 
-        ////////////////////////////////////////////
-        Row(modifier = Modifier.fillMaxWidth()) {
-            UrlImage(
-                niches.thumbnail,
-                modifier = Modifier
-                    .padding(top = 4.dp, start = 4.dp, bottom = 4.dp)
-                    .clip(RoundedCornerShape(topStart = 12.dp))
-                    .size(64.dp)
-            )
+            UrlImage( niches.thumbnail, modifier = Modifier.padding(start = 4.dp).size(70.dp).clip(RoundedCornerShape(topStart = 12.dp, bottomStart = 12.dp)) )
 
-            Column(
-                modifier = Modifier
-                    .padding(start = 8.dp)
-                    .fillMaxWidth()
-            )
+            Column( modifier = Modifier.padding(start = 8.dp, top = 4.dp, bottom = 4.dp).fillMaxWidth().fillMaxHeight(), verticalArrangement = Arrangement.SpaceBetween)
             {
 
                 Text(
                     text = niches.name,
-                    modifier = Modifier,
+                    modifier = Modifier.fillMaxWidth().height((70/3).dp),
                     color = Color.White,
                     fontSize = 18.sp,
                     fontFamily = ThemeRed.fontFamilyDMsanss
                 )
 
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().fillMaxHeight(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.Top
                 ) {
+
                     Column {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                        Row(modifier = Modifier.height((70/3).dp),verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 Icons.Outlined.Group,
                                 contentDescription = null,
@@ -138,7 +87,7 @@ fun NichePreview2(niches: Niche, savedRed: SavedRed, onClick: () -> Unit) {
                                 fontFamily = ThemeRed.fontFamilyDMsanss
                             )
                         }
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                        Row(modifier = Modifier.height((70/3).dp), verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 Icons.Outlined.Photo,
                                 contentDescription = null,
@@ -155,20 +104,17 @@ fun NichePreview2(niches: Niche, savedRed: SavedRed, onClick: () -> Unit) {
                         }
                     }
 
+
+
                     val isFollowed = savedRed.niches.list.any { it.id == niches.id }
 
                     Box(
                         modifier = Modifier
-                            .padding(end = 4.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .width(128.dp)
-                            .height(44.dp)
-                            .border(
-                                1.dp,
-                                if (isFollowed) Color.White else Color.Transparent,
-                                RoundedCornerShape(8.dp)
-                            )
-                            .background(if (isFollowed) Color.Black else ThemeRed.colorYellow)
+                            .padding(end = 6.dp)
+                            .width(128.dp).height(44.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .border( 1.dp, if (isFollowed) Color.White else Color.Transparent, RoundedCornerShape(10.dp))
+                            .background(if (isFollowed) Color(0xFF111111) else ThemeRed.colorYellow)
                             .clickable(onClick = {
 
                                 val nichesInfo = NichesInfo(
@@ -179,10 +125,7 @@ fun NichePreview2(niches: Niche, savedRed: SavedRed, onClick: () -> Unit) {
                                     thumbnail = niches.thumbnail,
                                 )
 
-                                if (isFollowed)
-                                    savedRed.niches.remove(nichesInfo)
-                                else
-                                    savedRed.niches.add(nichesInfo)
+                                if (isFollowed) savedRed.niches.remove(nichesInfo) else savedRed.niches.add(nichesInfo)
 
                             }), contentAlignment = Alignment.Center
                     ) {
@@ -191,8 +134,9 @@ fun NichePreview2(niches: Niche, savedRed: SavedRed, onClick: () -> Unit) {
                             color = if (isFollowed) Color.White else Color.Black
                         )
                     }
+
+
                 }
-            }
         }
         ////////////////////////////////////////////
 
