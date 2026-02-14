@@ -130,10 +130,15 @@ fun UrlImage(
             url.toUri()
         } else {
             val fileName = url.substringAfterLast('/').substringBefore('?')
-            if (albumName.isBlank())
+            if (albumName == "")
                 File(url)
-            else
-                File(AppPath.l_downloaded_albums, "$albumName/$fileName")
+            else {
+                when (albumName) {
+                    "l_likes" -> File(AppPath.l_likes, fileName)
+                    else -> File(AppPath.l_downloaded_albums, "$albumName/$fileName")
+                }
+
+            }
         }
     }
 

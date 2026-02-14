@@ -123,7 +123,7 @@ class ScreenSavedLLikesSM @Inject constructor(
     val savedL: SavedL
 ) : ScreenModel {
 
-    val host = LazyRowPictureDetailsHost("likes")
+    val host = LazyRowPictureDetailsHost("l_likes")
 
     /**
      * Выбор типа отображаемого контента
