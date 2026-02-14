@@ -189,7 +189,6 @@ fun UrlImage(
 
     Box(
         modifier = Modifier
-            .fillMaxSize()
             .then(modifier)
             .then(
                 if (isFullScreen) {

@@ -61,7 +61,7 @@ import com.client.xvideos.redgifs.common.di.HostDI
 import com.client.xvideos.redgifs.model.GifsInfo
 import com.client.xvideos.redgifs.common.UsersRed
 import com.redgifs.common.block.ui.DialogBlock
-import com.redgifs.common.downloader.DownloadRed
+import com.client.xvideos.redgifs.common.downloader.DownloadRed
 import com.redgifs.common.downloader.ui.DownloadIndicator
 import com.redgifs.common.expand_menu_video.ExpandMenuVideo
 import com.redgifs.common.expand_menu_video.ExpandMenuVideoTags

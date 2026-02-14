@@ -1,7 +1,9 @@
 package com.client.xvideos.redgifs.model
 
+import androidx.compose.runtime.Stable
 import com.google.gson.annotations.SerializedName
 
+@Stable
 data class GifsInfo(
     @SerializedName("id") val id: String = "id",
     @SerializedName("createDate") val createDate: Long = 0,

@@ -2,7 +2,7 @@ package com.client.xvideos.redgifs.common.di
 
 import com.client.xvideos.common.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.redgifs.common.block.BlockRed
-import com.redgifs.common.downloader.DownloadRed
+import com.client.xvideos.redgifs.common.downloader.DownloadRed
 import com.client.xvideos.redgifs.common.saved.SavedRed
 import com.client.xvideos.redgifs.common.search.SearchNichesRed
 import com.redgifs.common.search.SearchRed

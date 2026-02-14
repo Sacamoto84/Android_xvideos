@@ -1,4 +1,4 @@
-package com.redgifs.common.video.player_row_mini
+package com.client.xvideos.redgifs.common.video.player_row_mini
 
 import androidx.annotation.OptIn
 import androidx.compose.animation.AnimatedVisibility
@@ -6,7 +6,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -35,10 +34,9 @@ import com.client.xvideos.common.AppPath
 import com.client.xvideos.common.coil.UrlImage
 import com.client.xvideos.common.vibrate.vibrateWithPatternAndAmplitude
 import com.client.xvideos.redgifs.common.ThemeRed
-import com.redgifs.common.downloader.DownloadRed
+import com.client.xvideos.redgifs.common.downloader.DownloadRed
 import com.redgifs.common.video.player_row_mini.atom.Red_Video_Lite_Row2
 import com.client.xvideos.redgifs.model.GifsInfo
-
 import timber.log.Timber
 import java.io.File
 
@@ -87,9 +85,7 @@ fun RedUrlVideoImageAndLongClick(
 
     var poster by remember { mutableStateOf(true) }
 
-    LaunchedEffect(item) {
-        isVideo = false
-    }
+    LaunchedEffect(item) { isVideo = false }
 
     val videoUri: String = remember {
         //Timber.tag("???").i("Перерачсет videoItem.id = ${item.id}")
@@ -104,26 +100,14 @@ fun RedUrlVideoImageAndLongClick(
         }
     }
 
-
-
-
     val imageUrl : String = remember {
-        //mutableStateOf(
-        //    run {
                 val imagePath = "${AppPath.r_cache_download}/${item.userName}/${item.id}.jpg"
-
-                //Timber.tag("???").i("Перерачсет imagePath.id = ${item.id}  [ $imagePath ]")
-
                 if (File(imagePath).exists()) {
                     imagePath
                 } else {
                     item.urls.poster ?: item.urls.thumbnail
                 }
-        //    }
-       // )
     }
-
-    Timber.tag("???").i("imageUrl = ${item.id}  $imageUrl ")
 
     Box(
         modifier = Modifier
@@ -176,37 +160,13 @@ fun RedUrlVideoImageAndLongClick(
             exit = fadeOut(animationSpec = tween(100))
         ) {
             Box{
-
-//                UrlImage(
-//                    url = imageUrl,
-//                    contentScale = ContentScale.Fit,
-//                    modifier = Modifier
-//                        .fillMaxSize()
-//                        .alpha(if (isVideo) 0.8f else 1.0f),
-//                    //isGrayscale = isVideo
-//                )
-
-                UrlImage(
-                    url = imageUrl,
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .alpha(if (isVideo) 0.8f else 1.0f),
-                )
-
-                if (isVideo) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.align(Alignment.Center),
-                        color = Color.LightGray
-                    )
-                }
+                UrlImage( url = imageUrl, contentScale = ContentScale.Fit, modifier = Modifier.fillMaxSize().alpha(if (isVideo) 0.8f else 1.0f) )
+                if (isVideo) { CircularProgressIndicator( modifier = Modifier.align(Alignment.Center), color = Color.LightGray ) }
             }
 
         }
 
-        Box(modifier = Modifier.align(Alignment.TopStart)){
-            Text(index.toString(), color = Color.Gray, fontFamily = ThemeRed.fontFamilyDMsanss, fontSize = 16.sp)
-        }
+        Box(modifier = Modifier.align(Alignment.TopStart)){ Text(index.toString(), color = Color.Gray, fontFamily = ThemeRed.fontFamilyDMsanss, fontSize = 16.sp) }
 
     }
 

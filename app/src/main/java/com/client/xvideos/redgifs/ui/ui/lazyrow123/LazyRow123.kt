@@ -43,7 +43,6 @@ import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.common.UsersRed
 import com.client.xvideos.redgifs.model.GifsInfo
@@ -55,7 +54,7 @@ import com.composeunstyled.Text
 import com.redgifs.common.block.ui.DialogBlock
 import com.redgifs.common.expand_menu_video.ExpandMenuVideo
 import com.redgifs.common.expand_menu_video.ExpandMenuVideoTags
-import com.redgifs.common.video.player_row_mini.RedUrlVideoImageAndLongClick
+import com.client.xvideos.redgifs.common.video.player_row_mini.RedUrlVideoImageAndLongClick
 import kotlinx.coroutines.flow.flowOf
 import timber.log.Timber
 

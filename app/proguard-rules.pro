@@ -102,7 +102,7 @@
 -dontwarn com.client.xvideos.redgifs.ui.top_this_week.ScreenRedTopThisWeekSM
 -dontwarn com.client.xvideos.redgifs.common.block.BlockRed
 -dontwarn com.client.xvideos.redgifs.common.di.HostDI
--dontwarn com.redgifs.common.downloader.DownloadRed
+-dontwarn com.client.xvideos.redgifs.common.downloader.DownloadRed
 -dontwarn com.client.xvideos.redgifs.common.downloader.Downloader
 -dontwarn com.redgifs.common.downloader.di.moduleKDownloader_ProvideKDownloaderFactory
 -dontwarn com.client.xvideos.redgifs.common.saved.SavedRed
