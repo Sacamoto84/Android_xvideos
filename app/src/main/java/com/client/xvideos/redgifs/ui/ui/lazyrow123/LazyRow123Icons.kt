@@ -22,9 +22,9 @@ import com.client.xvideos.redgifs.model.GifsInfo
 @Composable
 fun LazyRow123Icons(
     modifier: Modifier = Modifier,
-    savedRed: SavedRed,
+    savedRed: () -> SavedRed,
     item: GifsInfo,
-    downloadList: List<GifsInfo>
+    isDownloaded: Boolean
 ) {
 
     Row(
@@ -33,22 +33,24 @@ fun LazyRow123Icons(
         horizontalArrangement = Arrangement.End
     ) {
 
-        if (savedRed.collections.collectionList.any { it.items.any { it2 -> it2.id == item.id } }) {
+        val saved = savedRed()
+
+        if (saved.collections.collectionList.any { it.items.any { it2 -> it2.id == item.id } }) {
             IconCollection18(Modifier.padding(bottom = 6.dp, end = 6.dp))
         }
 
         //
-        if (savedRed.creators.list.any { it.username == item.userName }) {
+        if (saved.creators.list.any { it.username == item.userName }) {
             IconPerson18(Modifier.padding(bottom = 6.dp, end = 6.dp))
         }
 
         //✅ Лайк
-        if (savedRed.likes.list.any { it.id == item.id }) {
+        if (saved.likes.list.any { it.id == item.id }) {
             IconFavorite18(Modifier.padding(bottom = 6.dp, end = 6.dp))
         }
 
         //✅ Иконка того что видео скачано
-        if (downloadList.any { it.id == item.id }) {
+        if (isDownloaded) {
             IconSave18(Modifier.padding(bottom = 6.dp, end = 6.dp))
         }
 

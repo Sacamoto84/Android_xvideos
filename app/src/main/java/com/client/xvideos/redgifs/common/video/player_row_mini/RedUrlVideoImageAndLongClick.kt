@@ -1,6 +1,5 @@
 package com.client.xvideos.redgifs.common.video.player_row_mini
 
-import androidx.annotation.OptIn
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -11,15 +10,13 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,15 +27,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.sp
-import com.client.xvideos.BuildConfig
 import com.client.xvideos.common.AppPath
 import com.client.xvideos.common.coil.UrlImage
 import com.client.xvideos.common.vibrate.vibrateWithPatternAndAmplitude
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.common.downloader.DownloadRed
-import com.redgifs.common.video.player_row_mini.atom.Red_Video_Lite_Row2
 import com.client.xvideos.redgifs.model.GifsInfo
-import timber.log.Timber
+import com.redgifs.common.video.player_row_mini.atom.Red_Video_Lite_Row2
 import java.io.File
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -64,16 +59,9 @@ fun RedUrlVideoImageAndLongClick(
 
     onVideo: (Boolean) -> Unit = {},       //true - видео, false - картинка
 
-    downloadRed: DownloadRed
+    downloadRed: () -> DownloadRed
 
 ) {
-
-//    if (BuildConfig.DEBUG) {
-//        SideEffect {
-//            Timber.i("@@@ RedUrlVideoImageAndLongClick() play:$play")
-//        }
-//    }
-
     val haptic = LocalHapticFeedback.current
     val context = LocalContext.current
     var isVideo by remember { mutableStateOf(false) }
@@ -81,19 +69,17 @@ fun RedUrlVideoImageAndLongClick(
     val interactionSource = remember { MutableInteractionSource() }
 
     LaunchedEffect(isVideo) { onVideo(isVideo) }
-
     LaunchedEffect(play) { isVideo = play }
 
     var poster by remember { mutableStateOf(true) }
 
-    LaunchedEffect(item) { isVideo = false }
+    // Сбрасываем состояние видео при смене ID
+    LaunchedEffect(item.id) { isVideo = false }
 
-    val videoUri: String = rememberSaveable {
-        //Timber.tag("???").i("Перерачсет videoItem.id = ${item.id}")
-        //Определяем адрес откуда брать видео, из кеша или из сети
-        if (downloadRed.downloader.findVideoInDownload(item.id, item.userName))
+    val videoUri = remember(item.id, item.userName, isNetConnected) {
+        if (downloadRed().downloader.findVideoInDownload(item.id, item.userName)) {
             "${AppPath.r_cache_download}/${item.userName}/${item.id}.mp4"
-        else {
+        } else {
             if (isNetConnected)
                 "https://api.redgifs.com/v2/gifs/${item.id.lowercase()}/hd.m3u8"
             else
@@ -101,13 +87,13 @@ fun RedUrlVideoImageAndLongClick(
         }
     }
 
-    val imageUrl : String = rememberSaveable {
-                val imagePath = "${AppPath.r_cache_download}/${item.userName}/${item.id}.jpg"
-                if (File(imagePath).exists()) {
-                    imagePath
-                } else {
-                    item.urls.poster ?: item.urls.thumbnail
-                }
+    val imageUrl = remember(item.id, item.userName) {
+        val imagePath = "${AppPath.r_cache_download}/${item.userName}/${item.id}.jpg"
+        if (File(imagePath).exists()) {
+            imagePath
+        } else {
+            item.urls.poster ?: item.urls.thumbnail
+        }
     }
 
     Box(
@@ -115,62 +101,69 @@ fun RedUrlVideoImageAndLongClick(
             .fillMaxSize()
             .aspectRatio(1080f / 1920)
             .combinedClickable(
-                indication = null, // 👈 отключает ripple
-                interactionSource = interactionSource, // 👈 обязательно для отключения ripple
-
+                indication = null,
+                interactionSource = interactionSource,
                 onDoubleClick = {
                     vibrateWithPatternAndAmplitude(context = context)
-                    onDoubleClick.invoke()
+                    onDoubleClick()
                 },
                 onLongClick = {
-                    //haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                     vibrateWithPatternAndAmplitude(context = context)
-                    onLongClick.invoke()
+                    onLongClick()
                 },
                 onClick = {
-                    isVideo = isVideo.not()
+                    isVideo = !isVideo
                     haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                 }
             )
             .then(modifier),
         contentAlignment = Alignment.Center
-
     ) {
-
         AnimatedVisibility(
-            isVideo,
+            visible = isVideo,
             enter = fadeIn(animationSpec = tween(100)),
             exit = fadeOut(animationSpec = tween(200))
         ) {
-
-            //Timber.i("@@@ RedUrlVideoImageAndLongClick() >> videoUri: $videoUri")
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Red_Video_Lite_Row2(
-                    videoUri,
+                    url = videoUri,
                     play = true,
-                    onClick = { isVideo = isVideo.not() },
-                    onLongClick = { onFullScreen.invoke() },
+                    onClick = { isVideo = !isVideo },
+                    onLongClick = { onFullScreen() },
                     poster = { poster = it }
                 )
             }
         }
 
         AnimatedVisibility(
-            poster || !isVideo,
+            visible = poster || !isVideo,
             enter = fadeIn(animationSpec = tween(100)),
             exit = fadeOut(animationSpec = tween(100))
         ) {
-            Box{
-                UrlImage( url = imageUrl, contentScale = ContentScale.Fit, modifier = Modifier.fillMaxSize().alpha(if (isVideo) 0.8f else 1.0f) )
-                if (isVideo) { CircularProgressIndicator( modifier = Modifier.align(Alignment.Center), color = Color.LightGray ) }
+            Box {
+                UrlImage(
+                    url = imageUrl,
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .alpha(if (isVideo) 0.8f else 1.0f)
+                )
+                if (isVideo) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center),
+                        color = Color.LightGray
+                    )
+                }
             }
-
         }
 
-        Box(modifier = Modifier.align(Alignment.TopStart)){ Text(index.toString(), color = Color.Gray, fontFamily = ThemeRed.fontFamilyDMsanss, fontSize = 16.sp) }
-
+        Box(modifier = Modifier.align(Alignment.TopStart)) {
+            Text(
+                text = index.toString(),
+                color = Color.Gray,
+                fontFamily = ThemeRed.fontFamilyDMsanss,
+                fontSize = 16.sp
+            )
+        }
     }
-
 }
-
-
