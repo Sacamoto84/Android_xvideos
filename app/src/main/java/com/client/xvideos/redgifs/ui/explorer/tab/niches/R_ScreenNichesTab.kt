@@ -91,15 +91,10 @@ object R_ScreenNichesTab : Screen {
         Scaffold(bottomBar = {
             Column(Modifier.background(ThemeRed.colorTabLevel1)) {
 
-                //Spacer(modifier = Modifier.height(1.dp))
                 HorizontalDivider(color = ThemeRed.colorBorderGray)
 
-                //Spacer(modifier = Modifier.height(2.dp))
-
-                val isVisible = !focused
-
                 val buttonOffsetX by animateDpAsState(
-                    targetValue = if (isVisible) 0.dp else 46.dp,
+                    targetValue = if (!focused) 0.dp else 46.dp,
                     animationSpec = tween(durationMillis = 300),
                     label = "ButtonUpOffset"
                 )
@@ -113,7 +108,6 @@ object R_ScreenNichesTab : Screen {
                 ) {
 
                     AnimatedVisibility(visible = !focused) {
-
                         SortByOrder(
                             listOf(
                                 Order.NICHES_SUBSCRIBERS_D,
@@ -127,10 +121,7 @@ object R_ScreenNichesTab : Screen {
                             onSelect = { vm.lazyHost.changeSortType(it) },
                             containerColor = ThemeRed.colorCommonBackground
                         )
-
                     }
-
-
 
                     vm.search.CustomBasicTextField(
                         value = vm.search.searchText.collectAsStateWithLifecycle().value,
@@ -173,35 +164,22 @@ object R_ScreenNichesTab : Screen {
 
             Box( modifier = Modifier.padding(bottom = it.calculateBottomPadding()).fillMaxSize() )
             {
-
                 LazyColumn( state = state, modifier = Modifier.fillMaxSize() )
                 {
                     items(
                         key = { index -> listNiche[index]?.id ?: index },
                         count = listNiche.itemCount,
                     ) { index ->
-
                         val item = listNiche[index]
-
                         if (item != null) {
-
                             Box(modifier = Modifier.padding(vertical = 4.dp)) {
-
                                 NichePreview2(niches = item, onClick = { navigator.push(R_ScreenNiche(item.id)) }, savedRed = vm.hostDI.savedRed)
 
                                 //Индекс
                                 Text(
-                                    index.toString(),
-                                    color = Color.Gray,
-                                    fontFamily = ThemeRed.fontFamilyDMsanss,
-                                    modifier = Modifier
-                                        .padding(end = 16.dp)
-                                        .align(
-                                            Alignment.TopEnd
-                                        ), fontSize = 12.sp
+                                    index.toString(), color = Color.Gray, fontFamily = ThemeRed.fontFamilyDMsanss, modifier = Modifier.padding(end = 16.dp).align( Alignment.TopEnd ), fontSize = 12.sp
                                 )
                             }
-
                         }
                     }
                 }
@@ -225,6 +203,11 @@ object R_ScreenNichesTab : Screen {
     }
 
 }
+
+
+
+
+
 
 
 class ScreenRedExplorerNichesSM @Inject constructor(

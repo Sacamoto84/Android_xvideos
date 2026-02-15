@@ -85,7 +85,7 @@ fun UrlImage(
     sizeLoadingIndicator: Dp = 32.dp, //Показ индикатора прогресса после индикатора загрузки
 
 
-    isVisibleProgressText: Boolean = true,   //Показ текста скачанных данных
+    isVisibleProgressText: Boolean = false,    //Показ текста скачанных данных
 
     isFullScreen: Boolean = false //Режим полного экрана с поддержкой поворота
 ) {
@@ -176,19 +176,9 @@ fun UrlImage(
                     drawable.stop()
                     Timber.d("!!! AnimatedImageDrawable stopped")
                 }
-            } else if (drawable is android.graphics.drawable.AnimatedVectorDrawable) {
-                if (isPlaying) {
-                    drawable.start()
-                } else {
-                    drawable.stop()
-                }
-            } else if (drawable is android.graphics.drawable.Animatable) {
-                if (isPlaying) {
-                    drawable.start()
-                } else {
-                    drawable.stop()
-                }
             }
+            else if (drawable is android.graphics.drawable.AnimatedVectorDrawable) { if (isPlaying) { drawable.start() } else { drawable.stop() } }
+            else if (drawable is android.graphics.drawable.Animatable) { if (isPlaying) { drawable.start() } else { drawable.stop() } }
         }
     }
 
@@ -252,70 +242,36 @@ fun UrlImage(
                     )
             )
 
-
-
-
-
-
-
-
-
-
-
-
-
         when (state) {
-            is AsyncImagePainter.State.Empty -> {
-
-            }
+            is AsyncImagePainter.State.Empty -> { }
 
             is AsyncImagePainter.State.Loading -> {
 
                 if (isVisibleLoadingIndicator) {
 
-                    Box(
-                        modifier = Modifier.matchParentSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
+                    Box( modifier = Modifier.matchParentSize(), contentAlignment = Alignment.Center )
+                    {
                         if (isAnimated) {
                             // Показываем прогресс в процентах если известен общий размер
                             if (total > 0 && bytes > 0) {
                                 val progress = (bytes.toFloat() / total.toFloat())
-                                CircularProgressIndicator(
-                                    progress = { progress },
-                                    modifier = Modifier.size(sizeLoadingIndicator)
-                                )
-
+                                CircularProgressIndicator( progress = { progress }, modifier = Modifier.size(sizeLoadingIndicator) )
                             } else {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(sizeLoadingIndicator),
-                                    color = Color.Gray
-                                )
+                                CircularProgressIndicator( modifier = Modifier.size(sizeLoadingIndicator), color = Color.Gray )
                             }
                         } else {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(sizeLoadingIndicator),
-                                color = Color.Gray
-                            )
+                            CircularProgressIndicator( modifier = Modifier.size(sizeLoadingIndicator), color = Color.Gray )
                         }
                     }
 
-
                 }
 
             }
 
-            is AsyncImagePainter.State.Success -> {
-
-            }
+            is AsyncImagePainter.State.Success -> { }
 
             is AsyncImagePainter.State.Error -> {
-                Box(
-                    modifier = Modifier.matchParentSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("Ошибка загрузки", color = Color.Gray)
-                }
+                Box( modifier = Modifier.matchParentSize(), contentAlignment = Alignment.Center ) { Text("Ошибка загрузки:\n${(state as AsyncImagePainter.State.Error).result.throwable.message}", color = Color.Gray) }
             }
         }
 
@@ -333,7 +289,6 @@ fun UrlImage(
                     .combinedClickable(
                         onClick = { isPlaying = !isPlaying },
                         onLongClick = {
-
 
                         }
                     )
@@ -358,47 +313,16 @@ fun UrlImage(
                 contentAlignment = Alignment.Center
             ) {
                 if (url.contains("https://")) {
-
-                    Icon(
-                        Icons.Default.Animation,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(sizeButtonIcon)
-                    )
-
+                    Icon( Icons.Default.Animation, contentDescription = null, tint = Color.White, modifier = Modifier.size(sizeButtonIcon) )
                 } else {
-
-                    Icon(
-                        if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
-                        contentDescription = null,
-                        tint = Color.Black,
-                        modifier = Modifier.size(sizeButtonIcon)
-                    )
-
-                    Icon(
-                        if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier
-                            .size(sizeButtonIcon)
-                            .offset((-0.5).dp, (-0.5).dp)
-                    )
-
+                    Icon( if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow, contentDescription = null, tint = Color.Black,  modifier = Modifier.size(sizeButtonIcon) )
+                    Icon( if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow, contentDescription = null, tint = Color.White, modifier = Modifier.size(sizeButtonIcon).offset((-0.5).dp, (-0.5).dp) )
                 }
             }
         }
 
-//        // Прогресс загрузки
-        if (isVisibleProgressText) {
-            Box(modifier = Modifier.align(Alignment.BottomEnd)) {
-                if (bytes > 1000) {
-                    ProgressText(
-                        bytesRead = bytes,
-                        totalBytes = total
-                    )
-                }
-            }
-        }
+        // Прогресс загрузки
+        if (isVisibleProgressText) { Box(modifier = Modifier.align(Alignment.BottomEnd)) { if (bytes > 1000) { ProgressText( bytesRead = bytes,  totalBytes = total ) } } }
 
     }
 
