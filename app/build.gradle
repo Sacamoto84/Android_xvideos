@@ -49,21 +49,21 @@ android {
         multiDexEnabled true
     }
 
-    signingConfigs {
-        debug {
-            storeFile file('D:\\AndroidKey\\MyKey.jks')
-            //storeFile file('/home/ivan/Android/AndroidKey/MyKey.jks')
-            storePassword '11111111'
-            keyAlias 'Sakamoto'
-            keyPassword '11111111'
-        }
-        release {
-            storeFile file('D:\\AndroidKey\\MyKey.jks')
-            storePassword '11111111'
-            keyPassword '11111111'
-            keyAlias 'Sakamoto'
-        }
-    }
+//    signingConfigs {
+//        debug {
+//            storeFile file('D:\\AndroidKey\\MyKey.jks')
+//            //storeFile file('/home/ivan/Android/AndroidKey/MyKey.jks')
+//            storePassword '11111111'
+//            keyAlias 'Sakamoto'
+//            keyPassword '11111111'
+//        }
+//        release {
+//            storeFile file('D:\\AndroidKey\\MyKey.jks')
+//            storePassword '11111111'
+//            keyPassword '11111111'
+//            keyAlias 'Sakamoto'
+//        }
+//    }
 
     buildTypes {
         release {

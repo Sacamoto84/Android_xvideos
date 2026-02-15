@@ -155,12 +155,6 @@ fun LazyRow123Content(
 
     }
 
-//    if (!wasDataLoaded) {
-//        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-//            CircularProgressIndicator()
-//        }; return
-//    }
-
     LaunchedEffect(loadState.append) {
         if (loadState.append is LoadState.Loading && !wasAppendLoading) {
             wasAppendLoading = true
@@ -313,6 +307,7 @@ fun LazyRow123Content(
             }
 
         } else  {
+
             val pageCount = listGifs.itemCount
             val statePager = rememberPagerState { pageCount }
 
@@ -322,6 +317,7 @@ fun LazyRow123Content(
                 beyondViewportPageCount = 2
             )
             { index ->
+
                 val item = listGifs[index]
                 var isVideo by remember { mutableStateOf(false) }
 
