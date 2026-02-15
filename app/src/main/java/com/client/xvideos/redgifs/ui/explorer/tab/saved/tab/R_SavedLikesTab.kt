@@ -86,14 +86,14 @@ object R_SavedLikesTab : Screen {
             )
 
             //---- Скролл ----
-            Box(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .align(Alignment.CenterEnd)
-                    .width(2.dp)
-            ) {
-                VerticalScrollbar(scrollPercent)
-            }
+//            Box(
+//                modifier = Modifier
+//                    .fillMaxHeight()
+//                    .align(Alignment.CenterEnd)
+//                    .width(2.dp)
+//            ) {
+//                VerticalScrollbar(scrollPercent)
+//            }
         }
 
 

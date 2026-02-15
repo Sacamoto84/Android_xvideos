@@ -100,7 +100,14 @@ object CoilImageLoaderFactory {
             }
         }
 
-        val okHttpClient = okHttpBuilder.build()
+        // Try to build OkHttpClient safely. In LayoutLib (Compose Preview), building OkHttpClient
+        // can fail with NoClassDefFoundError for Android-specific classes like conscrypt.
+        val okHttpClient = try {
+            okHttpBuilder.build()
+        } catch (e: Throwable) {
+            Timber.e(e, "Failed to build custom OkHttpClient (likely in Preview)")
+            null
+        }
 
         return ImageLoader.Builder(context)
             .components {
@@ -109,7 +116,11 @@ object CoilImageLoaderFactory {
                 } else {
                     add(GifDecoder.Factory())
                 }
-                add(OkHttpNetworkFetcherFactory(callFactory = { okHttpClient }))
+                // Use custom OkHttpClient only if it was built successfully.
+                // If not, Coil will fallback to its default network fetcher.
+                okHttpClient?.let {
+                    add(OkHttpNetworkFetcherFactory(callFactory = { it }))
+                }
             }
             .diskCache {
                 DiskCache.Builder()
@@ -135,84 +146,3 @@ object CoilImageLoaderFactory {
         }
     }
 }
-
-//object CoilImageLoaderFactory {
-//
-//    @Volatile
-//    private var instance: ImageLoader? = null
-//
-//    fun getImageLoader(context: Context): ImageLoader {
-//        return instance ?: synchronized(this) {
-//            instance ?: createImageLoader(context).also { instance = it }
-//        }
-//    }
-//
-//    @OptIn(ExperimentalCoilApi::class)
-//    fun createImageLoader(context: Context): ImageLoader {
-//
-//        val okHttpClient = OkHttpClient.Builder()
-//            // Настройка HTTP кеша
-//            .cache(
-//                okhttp3.Cache(
-//                    directory = File(context.cacheDir, "http_cache"),
-//                    maxSize = 500L * 1024L * 1024L // 500 MB
-//                )
-//            )
-//            .addNetworkInterceptor(
-//                ProgressInterceptor { requestUrl, bytes, total, done ->
-//                    //Timber.i("$requestUrl, $bytes, $total, $done Thread: ${Thread.currentThread().name}")
-//                    // По завершении
-//                    CoilProgressManager.updateProgress(
-//                        url = requestUrl,
-//                        bytes = bytes,
-//                        total = total.coerceAtLeast(0L),
-//                        done = done
-//                    )
-//                }
-//            )
-//            .build()
-//
-//
-//        return ImageLoader.Builder(context)
-//            .components {
-//                // Поддержка GIF и анимаций
-//                if (Build.VERSION.SDK_INT >= 28) {
-//                    add(AnimatedImageDecoder.Factory())
-//                } else {
-//                    add(GifDecoder.Factory())
-//                }
-//                // OkHttp для сетевых запросов
-//                add(OkHttpNetworkFetcherFactory(callFactory = { okHttpClient },  cacheStrategy = { CacheControlCacheStrategy() }))
-//            }
-//            // Настройка дискового кеша
-//            .diskCache {
-//                DiskCache.Builder()
-//                    .directory(File(context.cacheDir, "image_cache"))
-//                    .maxSizeBytes(500L * 1024L * 1024L) // 500 MB
-//                    .build()
-//            }
-//
-//
-//            // Настройка кеша в памяти
-//            .memoryCache {
-//                MemoryCache.Builder()
-//                    .maxSizePercent(context, 0.5) // 25% доступной памяти
-//                    .strongReferencesEnabled(true)
-//                    .build()
-//            }
-//            // Включить кросс-фейд по умолчанию
-//            //.crossfade(true)
-//            .allowHardware(true)
-//            // Включить логирование (для отладки)
-//            // .logger(DebugLogger())
-//            .build()
-//    }
-//
-//    // Метод для очистки кеша
-//    fun clearCache(context: Context) {
-//        getImageLoader(context).apply {
-//            memoryCache?.clear()
-//            diskCache?.clear()
-//        }
-//    }
-//}

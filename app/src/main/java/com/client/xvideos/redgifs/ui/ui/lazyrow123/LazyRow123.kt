@@ -208,11 +208,7 @@ fun LazyRow123Content(
                         val item = listGifs[index]
                         if (item != null) {
                             Box(
-                                modifier = Modifier
-                                    .padding(vertical = 1.dp)
-                                    .padding(horizontal = 1.dp)
-                                    .fillMaxSize()
-                                    .clip(RoundedCornerShape(8.dp)),
+                                modifier = Modifier.padding(vertical = 1.dp).padding(horizontal = 1.dp).fillMaxSize().clip(RoundedCornerShape(8.dp)),
                                 contentAlignment = Alignment.Center
                             ) {
                                 RedUrlVideoImageAndLongClick(
@@ -234,6 +230,7 @@ fun LazyRow123Content(
                                 )
 
                                 Column(modifier = Modifier.align(Alignment.TopEnd)) {
+
                                     ExpandMenuVideo(
                                         item = item,
                                         modifier = Modifier,
@@ -245,10 +242,10 @@ fun LazyRow123Content(
                                         },
                                         onRefresh = { listGifs.refresh() },
                                         host.isCollection,
-                                        block,
-                                        host.hostDI.redApi,
-                                        host.hostDI.savedRed,
-                                        downloadRed = host.hostDI.downloadRed
+                                        {block},
+                                        {host.hostDI.redApi},
+                                        {host.hostDI.savedRed},
+                                        downloadRed = {host.hostDI.downloadRed}
                                     )
 
                                     if (item.tags.isNotEmpty()) {
@@ -308,6 +305,7 @@ fun LazyRow123Content(
                                         )
                                     }
                                 }
+
                             }
                         }
                     }
@@ -361,7 +359,7 @@ fun LazyRow123Content(
 
                         Column(modifier = Modifier.align(Alignment.TopEnd)) {
                             ExpandMenuVideo( item = item, modifier = Modifier, onClick = { blockItem = item }, onRunLike = { if (isRunLike) { listGifs.refresh() } },
-                                onRefresh = { listGifs.refresh() }, host.isCollection, block, host.hostDI.redApi, host.hostDI.savedRed, downloadRed = host.hostDI.downloadRed )
+                                onRefresh = { listGifs.refresh() }, host.isCollection, {block}, {host.hostDI.redApi}, {host.hostDI.savedRed}, downloadRed = {host.hostDI.downloadRed} )
 
                             if (item.tags.isNotEmpty()) {
                                 ExpandMenuVideoTags( item = item, modifier = Modifier,

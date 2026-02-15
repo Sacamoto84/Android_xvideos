@@ -26,6 +26,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.client.xvideos.R
@@ -34,24 +35,34 @@ import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.common.saved.SavedRed
 import com.client.xvideos.common.util.toPrettyCount
 import com.client.xvideos.redgifs.model.UserInfo
+import com.client.xvideos.ui.theme.XvideosTheme
 import com.composeunstyled.Text
 
 @Composable
 fun RedProfileCreaterInfo(item: UserInfo, savedRed: SavedRed) {
+    val isFollow = savedRed.creators.list.any { it.username == item.username }
+    RedProfileCreaterInfo(
+        item = item,
+        isFollow = isFollow,
+        onFollowClick = {
+            if (isFollow) savedRed.creators.remove(item.username) else savedRed.creators.add(item)
+        }
+    )
+}
 
-    Column(
-        modifier = Modifier
-            .padding(top = 32.dp)
-            .fillMaxWidth()
-    ) {
+@Composable
+fun RedProfileCreaterInfo(
+    item: UserInfo,
+    isFollow: Boolean,
+    onFollowClick: () -> Unit
+) {
+
+    Column( modifier = Modifier.padding(top = 32.dp).fillMaxWidth() )
+    {
 
         //Top info
-        Row(
-            modifier = Modifier
-                .padding(top = 2.dp)
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+        Row( modifier = Modifier.padding(top = 2.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically )
+        {
 
             if (item.profileImageUrl != null) {
                 UrlImage(item.profileImageUrl, modifier = Modifier.size(96.dp))
@@ -72,31 +83,22 @@ fun RedProfileCreaterInfo(item: UserInfo, savedRed: SavedRed) {
                 }
             }
 
-            Column(modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)) {
+            Column( modifier = Modifier.fillMaxWidth().weight(1f) )
+            {
                 Row(
                     modifier = Modifier.wrapContentHeight(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Spacer(Modifier.width(8.dp))
-                    Text(
-                        item.username,
-                        color = Color.White,
-                        fontFamily = ThemeRed.fontFamilyPopinsMedium,
-                        fontSize = 28.sp,
-                        modifier = Modifier
-                    )
+                    Text( item.username, color = Color.White, fontFamily = ThemeRed.fontFamilyPopinsMedium, fontSize = 28.sp, modifier = Modifier )
                     Spacer(Modifier.width(8.dp))
                     Image(
                         painter = painterResource(id = R.drawable.verificed),
                         contentDescription = null,
-                        modifier = Modifier
-                            .size(26.dp)
+                        modifier = Modifier.size(26.dp)
                     )
                 }
 
-                val isFollow = savedRed.creators.list.any { it.username == item.username }
                 Box(
                     modifier = Modifier
                         .align(Alignment.Start)
@@ -112,9 +114,7 @@ fun RedProfileCreaterInfo(item: UserInfo, savedRed: SavedRed) {
                             RoundedCornerShape(16.dp)
                         )
                         .clickable {
-                            if (isFollow) savedRed.creators.remove(item.username) else savedRed.creators.add(
-                                item
-                            )
+                            onFollowClick()
                         }, contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -134,39 +134,18 @@ fun RedProfileCreaterInfo(item: UserInfo, savedRed: SavedRed) {
 
 
         Row(
-            modifier = Modifier
-                .padding(top = 8.dp, bottom = 8.dp)
-                .fillMaxWidth(),
+            modifier = Modifier.padding(top = 8.dp, bottom = 8.dp).fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceAround
         ) {
 
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-            ) {
-                Text(
-                    item.followers.toPrettyCount().toString(),
-                    color = Color.White,
-                    fontFamily = ThemeRed.fontFamilyPopinsMedium
-                )
-
-                Text(
-                    "Подписчиков",
-                    color = Color(0xFF9E9DA9),
-                    fontFamily = ThemeRed.fontFamilyPopinsRegular
-                )
-
+            Column( horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth().weight(1f) )
+            {
+                Text( item.followers.toPrettyCount().toString(), color = Color.White, fontFamily = ThemeRed.fontFamilyPopinsMedium )
+                Text( "Подписчиков", color = Color(0xFF9E9DA9), fontFamily = ThemeRed.fontFamilyPopinsRegular )
             }
 
-            Box(
-                Modifier
-                    .width(1.dp)
-                    .height(24.dp)
-                    .background(Color(0xFF3D3C53))
-            )
+            Box( Modifier.width(1.dp).height(24.dp).background(Color(0xFF3D3C53)) )
 
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -237,4 +216,28 @@ fun RedProfileCreaterInfo(item: UserInfo, savedRed: SavedRed) {
 
     }
 
+}
+
+@Preview
+@Composable
+fun RedProfileCreaterInfoPreview() {
+    val sampleUserInfo = UserInfo(
+        username = "lilijunex",
+        profileImageUrl = "https://userpic.redgifs.com/4/8c/48cc3668e114f878aafcc6dfd0a3d4f2.png",
+        followers = 68214,
+        views = 123194825,
+        publishedGifs = 421,
+        description = "Collared sub addicted to XL horse dildos",
+        url = "https://www.redgifs.com/users/lilijunex"
+    )
+
+    XvideosTheme {
+        Box(modifier = Modifier.background(ThemeRed.colorCommonBackground)) {
+            RedProfileCreaterInfo(
+                item = sampleUserInfo,
+                isFollow = false,
+                onFollowClick = {}
+            )
+        }
+    }
 }

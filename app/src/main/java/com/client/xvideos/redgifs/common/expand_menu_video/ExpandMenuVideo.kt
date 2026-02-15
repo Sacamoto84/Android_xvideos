@@ -35,12 +35,12 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.client.xvideos.redgifs.network.api.RedApi
-import com.client.xvideos.redgifs.model.GifsInfo
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.common.block.BlockRed
 import com.client.xvideos.redgifs.common.downloader.DownloadRed
 import com.client.xvideos.redgifs.common.saved.SavedRed
+import com.client.xvideos.redgifs.model.GifsInfo
+import com.client.xvideos.redgifs.network.api.RedApi
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -60,10 +60,10 @@ fun ExpandMenuVideo(
     onRunLike: () -> Unit = {},
     onRefresh: () -> Unit = {},
     isCollection : Boolean = false,
-    block: BlockRed,
-    redApi: RedApi,
-    savedRed: SavedRed,
-    downloadRed: DownloadRed,
+    block: () -> BlockRed,
+    redApi: () -> RedApi,
+    savedRed: () -> SavedRed,
+    downloadRed: () -> DownloadRed,
     haptic : ()->Unit = {}
 ) {
 
@@ -80,7 +80,9 @@ fun ExpandMenuVideo(
     )
     {
         IconButton(
-            modifier = Modifier.size(48.dp).menuAnchor(ExposedDropdownMenuAnchorType.SecondaryEditable),
+            modifier = Modifier
+                .size(48.dp)
+                .menuAnchor(ExposedDropdownMenuAnchorType.SecondaryEditable),
             onClick = {}) {
             Icon( Icons.Default.MoreVert, contentDescription = "", tint = Color.White, modifier = Modifier.size(24.dp))
         }
@@ -91,11 +93,15 @@ fun ExpandMenuVideo(
             modifier = Modifier.width(IntrinsicSize.Min),
             containerColor = Color(0xFFF1EDF4)//ThemeRed.colorCommonBackground
         ) {
-            DropdownMenuItem_Download(item, onClick = {downloadRed.downloadItem(it)}){ expanded = false }
-            DropdownMenuItem_Share(item, onClick = {downloadRed.downloadItem(it)}){ expanded = false }
-            DropdownMenuItem_Block(item = item, block = block){ expanded = false }
-            DropdownMenuItem_Like(item, onRunLike, savedRed){expanded = false}
-            DropdownMenuItem_Follow(item, redApi, savedRed){ expanded = false }
+            DropdownMenuItem_Download(
+                item,
+                onClick = { downloadRed.invoke().downloadItem(it) }) { expanded = false }
+            DropdownMenuItem_Share(
+                item,
+                onClick = { downloadRed.invoke().downloadItem(it) }) { expanded = false }
+            DropdownMenuItem_Block(item = item, block = block) { expanded = false }
+            DropdownMenuItem_Like(item, onRunLike, savedRed) { expanded = false }
+            DropdownMenuItem_Follow(item, redApi, savedRed) { expanded = false }
             DropdownMenuItem_AddCollection(item, savedRed) { expanded = false }
             if(isCollection) DropdownMenuItem_RemoveFromCollection(item, onRefresh, savedRed) { expanded = false }
         }
@@ -140,12 +146,12 @@ fun DropdownMenuItem_Share(item: GifsInfo? = null, onClick: (GifsInfo) -> Unit, 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DropdownMenuItem_Block(item: GifsInfo? = null, block: BlockRed, onDismiss: () -> Unit){
+fun DropdownMenuItem_Block(item: GifsInfo? = null, block:()-> BlockRed, onDismiss: () -> Unit){
     DropdownMenuItem(
         leadingIcon = {Icon(Icons.Default.Block, contentDescription = "", tint = tintColor)},
         text = { Text("Блокировать", style = style) },
         onClick = {
-            if (item == null) return@DropdownMenuItem; block.blockVisibleDialog = true
+            if (item == null) return@DropdownMenuItem; block.invoke().blockVisibleDialog = true
             onDismiss.invoke()
         }, contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
     )
@@ -153,8 +159,8 @@ fun DropdownMenuItem_Block(item: GifsInfo? = null, block: BlockRed, onDismiss: (
 
 @OptIn(ExperimentalMaterial3Api::class, DelicateCoroutinesApi::class)
 @Composable
-fun DropdownMenuItem_Like(item: GifsInfo? = null, onRunLike: () -> Unit, savedRed: SavedRed, onDismiss: () -> Unit){
-    val isLiked = savedRed.likes.list.any { it.id == item?.id }
+fun DropdownMenuItem_Like(item: GifsInfo? = null, onRunLike: () -> Unit, savedRed: ()-> SavedRed, onDismiss: () -> Unit){
+    val isLiked = savedRed.invoke().likes.list.any { it.id == item?.id }
     val textLiked = if (isLiked) "Unlike" else "Like"
     val textLikedIcon = if (isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder
     DropdownMenuItem(
@@ -164,7 +170,7 @@ fun DropdownMenuItem_Like(item: GifsInfo? = null, onRunLike: () -> Unit, savedRe
             if (item == null) return@DropdownMenuItem
             GlobalScope.launch {
                 delay(200)
-                if (!isLiked) savedRed.likes.add(item) else savedRed.likes.remove(item)
+                if (!isLiked) savedRed.invoke().likes.add(item) else savedRed.invoke().likes.remove(item)
                 onRunLike.invoke()
                 onDismiss.invoke()
             }
@@ -174,8 +180,8 @@ fun DropdownMenuItem_Like(item: GifsInfo? = null, onRunLike: () -> Unit, savedRe
 
 @OptIn(ExperimentalMaterial3Api::class, DelicateCoroutinesApi::class)
 @Composable
-fun DropdownMenuItem_Follow(item: GifsInfo? = null, redApi: RedApi, savedRed: SavedRed, onDismiss: () -> Unit){
-    val isFollowed = savedRed.creators.list.any { it.username == item?.userName }
+fun DropdownMenuItem_Follow(item: GifsInfo? = null, redApi:()-> RedApi, savedRed: ()->SavedRed, onDismiss: () -> Unit){
+    val isFollowed = savedRed.invoke().creators.list.any { it.username == item?.userName }
     val textFollowed = if (isFollowed) "Unfollow" else "Follow"
     val textFollowedIcon = if (isFollowed) Icons.Default.Person else Icons.Default.PermIdentity
     DropdownMenuItem(
@@ -187,12 +193,12 @@ fun DropdownMenuItem_Follow(item: GifsInfo? = null, redApi: RedApi, savedRed: Sa
                 delay(200)
                 if (!isFollowed) {
                     try {
-                        val a = redApi.readCreator(item.userName).getOrNull()
-                        savedRed.creators.add(a!!)
+                        val a = redApi.invoke().readCreator(item.userName).getOrNull()
+                        savedRed.invoke().creators.add(a!!)
                     } catch (e: Exception) { e.printStackTrace() }
                 }
                 else {
-                    savedRed.creators.remove(item.userName)
+                    savedRed.invoke().creators.remove(item.userName)
                 }
             }
             onDismiss.invoke()
@@ -202,7 +208,7 @@ fun DropdownMenuItem_Follow(item: GifsInfo? = null, redApi: RedApi, savedRed: Sa
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DropdownMenuItem_AddCollection(item: GifsInfo? = null, savedRed: SavedRed, onDismiss: () -> Unit){
+fun DropdownMenuItem_AddCollection(item: GifsInfo? = null, savedRed: ()->SavedRed, onDismiss: () -> Unit){
     DropdownMenuItem(
         leadingIcon = {
             Icon(
@@ -214,8 +220,8 @@ fun DropdownMenuItem_AddCollection(item: GifsInfo? = null, savedRed: SavedRed, o
         text = { Text("Add to Collection", style = style) },
         onClick = {
             if (item == null) return@DropdownMenuItem
-            savedRed.collections.collectionItemGifInfo = item
-            savedRed.collections.collectionVisibleDialog = true
+            savedRed.invoke().collections.collectionItemGifInfo = item
+            savedRed.invoke().collections.collectionVisibleDialog = true
             onDismiss.invoke()
         }, contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
     )
@@ -224,9 +230,9 @@ fun DropdownMenuItem_AddCollection(item: GifsInfo? = null, savedRed: SavedRed, o
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DropdownMenuItem_RemoveFromCollection(item: GifsInfo? = null, onRefresh: () -> Unit, savedRed: SavedRed, onDismiss: () -> Unit){
+fun DropdownMenuItem_RemoveFromCollection(item: GifsInfo? = null, onRefresh: () -> Unit, savedRed: ()->SavedRed, onDismiss: () -> Unit){
 
-    val selectedCollection = savedRed.collections.selectedCollection.collectAsStateWithLifecycle().value
+    val selectedCollection = savedRed.invoke().collections.selectedCollection.collectAsStateWithLifecycle().value
 
     DropdownMenuItem(
         leadingIcon = {
@@ -243,7 +249,7 @@ fun DropdownMenuItem_RemoveFromCollection(item: GifsInfo? = null, onRefresh: () 
                 onDismiss.invoke()
                 return@DropdownMenuItem
             }
-            savedRed.collections.deleteItemFromCollection(item.id, selectedCollection)
+            savedRed.invoke().collections.deleteItemFromCollection(item.id, selectedCollection)
             onRefresh.invoke()
 
             onDismiss.invoke()

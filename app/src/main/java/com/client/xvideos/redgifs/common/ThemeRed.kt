@@ -27,7 +27,7 @@ object ThemeRed {
 
     val colorBottomBarDivider = Color(0xFF323153)
 
-    val colorYellow= Color(0xFFECF95C)
+    val colorYellow= Color(0xFFEBFA63)
 
     val colorBlue= Color(0xFF61B2EB)
 

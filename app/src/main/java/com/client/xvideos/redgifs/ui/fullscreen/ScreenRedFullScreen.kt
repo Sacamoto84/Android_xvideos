@@ -331,10 +331,10 @@ class ScreenRedFullScreen(val item: GifsInfo) : Screen, ScreenTransition {
                         },
                         onRefresh = {},
                         isCollection = false,
-                        block = vm.hostDI.block,
-                        redApi = vm.hostDI.redApi,
-                        savedRed = vm.hostDI.savedRed,
-                        downloadRed = vm.hostDI.downloadRed
+                        block = {vm.hostDI.block},
+                        redApi = {vm.hostDI.redApi},
+                        savedRed = {vm.hostDI.savedRed},
+                        downloadRed = {vm.hostDI.downloadRed}
                     )
                 }
 

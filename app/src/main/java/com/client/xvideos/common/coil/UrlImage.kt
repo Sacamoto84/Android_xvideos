@@ -11,10 +11,10 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Animation
 import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -102,6 +103,23 @@ fun UrlImage(
 //    }
 
     val context = LocalContext.current
+
+    // В режиме превью возвращаем заглушку, чтобы избежать инициализации OkHttp/Conscrypt,
+    // которая вызывает NoClassDefFoundError в LayoutLib.
+    if (LocalInspectionMode.current) {
+        Box(
+            modifier = modifier.background(Color.Gray.copy(alpha = 0.2f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.Person,
+                contentDescription = null,
+                tint = Color.Gray,
+                modifier = Modifier.size(sizeButtonIcon)
+            )
+        }
+        return
+    }
 
     var containerSize by remember { mutableStateOf(IntSize.Zero) }
 

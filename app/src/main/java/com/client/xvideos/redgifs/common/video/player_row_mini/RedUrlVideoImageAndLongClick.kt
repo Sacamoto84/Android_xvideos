@@ -19,6 +19,7 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -67,11 +68,11 @@ fun RedUrlVideoImageAndLongClick(
 
 ) {
 
-    if (BuildConfig.DEBUG) {
-        SideEffect {
-            Timber.i("@@@ RedUrlVideoImageAndLongClick() play:$play")
-        }
-    }
+//    if (BuildConfig.DEBUG) {
+//        SideEffect {
+//            Timber.i("@@@ RedUrlVideoImageAndLongClick() play:$play")
+//        }
+//    }
 
     val haptic = LocalHapticFeedback.current
     val context = LocalContext.current
@@ -87,7 +88,7 @@ fun RedUrlVideoImageAndLongClick(
 
     LaunchedEffect(item) { isVideo = false }
 
-    val videoUri: String = remember {
+    val videoUri: String = rememberSaveable {
         //Timber.tag("???").i("Перерачсет videoItem.id = ${item.id}")
         //Определяем адрес откуда брать видео, из кеша или из сети
         if (downloadRed.downloader.findVideoInDownload(item.id, item.userName))
@@ -100,7 +101,7 @@ fun RedUrlVideoImageAndLongClick(
         }
     }
 
-    val imageUrl : String = remember {
+    val imageUrl : String = rememberSaveable {
                 val imagePath = "${AppPath.r_cache_download}/${item.userName}/${item.id}.jpg"
                 if (File(imagePath).exists()) {
                     imagePath

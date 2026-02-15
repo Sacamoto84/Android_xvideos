@@ -62,11 +62,11 @@ fun RedUrlVideoImageAndLongClickTikTok(
 
 ) {
 
-    if (BuildConfig.DEBUG) {
-        SideEffect {
-            Timber.i("@@@ RedUrlVideoImageAndLongClick() play:$play")
-        }
-    }
+//    if (BuildConfig.DEBUG) {
+//        SideEffect {
+//            Timber.i("@@@ RedUrlVideoImageAndLongClick() play:$play")
+//        }
+//    }
 
     val haptic = LocalHapticFeedback.current
     val context = LocalContext.current
