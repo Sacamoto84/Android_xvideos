@@ -245,23 +245,13 @@ class ScreenRedFullScreen(val item: GifsInfo) : Screen, ScreenTransition {
                         Icon(
                             painter = painterResource(R.drawable.collection_multi_input_svgrepo_com),
                             contentDescription = null,
-                            tint = Color.White,
-                            modifier = Modifier
-                                .padding(bottom = 6.dp, end = 6.dp)
-                                .size(18.dp)
+                            tint = Color.White, modifier = Modifier.padding(bottom = 6.dp, end = 6.dp).size(18.dp)
                         )
                     }
 
                     //
                     if (vm.hostDI.savedRed.creators.list.any { it.username == item.userName }) {
-                        Icon(
-                            Icons.Outlined.Person,
-                            contentDescription = null,
-                            tint = Color.White,
-                            modifier = Modifier
-                                .padding(bottom = 6.dp, end = 6.dp)
-                                .size(22.dp)
-                        )
+                        Icon( Icons.Outlined.Person, contentDescription = null, tint = Color.White,  modifier = Modifier.padding(bottom = 6.dp, end = 6.dp).size(22.dp) )
                     }
 
                     //✅ Лайк

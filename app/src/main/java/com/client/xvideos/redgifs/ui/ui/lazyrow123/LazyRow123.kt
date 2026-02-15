@@ -45,6 +45,7 @@ import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
 import cafe.adriel.voyager.navigator.LocalNavigator
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.common.UsersRed
@@ -122,11 +123,9 @@ fun LazyRow123Content(
 
     var wasAppendLoading by remember { mutableStateOf(false) }
 
-    var wasDataLoaded by remember { mutableStateOf(false) }
 
     var isIndicatorLoading by remember { mutableStateOf(true) }
     var isIndicatorError by remember { mutableStateOf(false) }
-
     var errorMessage by remember { mutableStateOf("") }
 
     // 1. REFRESH - начальная загрузка / обновление всего списка
@@ -135,7 +134,6 @@ fun LazyRow123Content(
         if (loadState.refresh is LoadState.NotLoading) {
             isIndicatorLoading = false
             isIndicatorError = false
-            wasDataLoaded = true
             onAppendLoaded(listGifs)
         }
 
@@ -202,7 +200,9 @@ fun LazyRow123Content(
                     item( key = "before", span = { GridItemSpan(maxLineSpan) }) { contentBeforeList() }
 
                     items(
-                        count = listGifs.itemCount, key = { index -> listGifs[index]?.id ?: index}
+                        count = listGifs.itemCount,
+                        key = listGifs.itemKey { it.id },
+                        contentType = { "video_grid_item" }
                     ) { index ->
                         var isVideo by remember { mutableStateOf(false) }
                         val item = listGifs[index]
