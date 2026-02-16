@@ -55,7 +55,7 @@ import com.client.xvideos.PermissionScreenActivity.PermissionStorage
 import com.client.xvideos.common.util.KeepScreenOn
 import com.client.xvideos.l.ui.screens.explorer.L_ScreenExplorer
 import com.client.xvideos.redgifs.ui.ScreenRedRoot
-import com.client.xvideos.screen.ScreenRoot
+import com.client.xvideos.screenRoot.ScreenRoot
 import com.client.xvideos.screens.dashboards.ScreenXDashBoards
 import com.client.xvideos.screens.videoplayer.video.cache.VideoPlayerCacheManager
 import com.client.xvideos.ui.theme.XvideosTheme

@@ -29,7 +29,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import com.client.xvideos.common.settings.Settings
-import com.client.xvideos.screen.depth
+import com.client.xvideos.screenRoot.depth
 import com.client.xvideos.l.ui.screens.explorer.tab.albumTopHits.L_ScreenAlbumTopHits
 import com.client.xvideos.l.ui.screens.explorer.tab.config.L_ScreenConfigTab
 import com.client.xvideos.l.ui.screens.explorer.tab.saved.L_SavedTab

@@ -33,7 +33,7 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.common.coil.UrlImage
-import com.client.xvideos.screen.depth
+import com.client.xvideos.screenRoot.depth
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.model.AlbumDetails
 import com.client.xvideos.l.ui.element.expandMenu.ExpandMenuType
