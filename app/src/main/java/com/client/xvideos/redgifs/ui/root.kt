@@ -2,22 +2,33 @@ package com.client.xvideos.redgifs.ui
 
 import android.annotation.SuppressLint
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import cafe.adriel.voyager.core.annotation.ExperimentalVoyagerApi
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
+import cafe.adriel.voyager.core.stack.StackEvent
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.transitions.ScreenTransition
+import com.client.xvideos.common.transition.SlideOrientation
 import com.client.xvideos.common.transition.SlideTransition
 import com.client.xvideos.redgifs.common.di.HostDI
 import com.client.xvideos.redgifs.common.saved.DialogCollection
@@ -38,6 +49,7 @@ class ScreenRedRoot() : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
 
+    @OptIn(ExperimentalVoyagerApi::class)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
     override fun Content() {
@@ -94,7 +106,19 @@ class ScreenRedRoot() : Screen {
                 modifier = Modifier.imePadding(),
                 bottomBar = { DownloadIndicator(percentDownload) }) {
                 Navigator(ScreenRedExplorer()) { navigator ->
-                    SlideTransition(navigator)
+                    //SlideTransition(navigator)
+
+                    ScreenTransition(
+                        navigator = navigator,
+                        transition = {
+                            val (initialOffset, targetOffset) = when (navigator.lastEvent) {
+                                StackEvent.Pop -> ({ size: Int -> -size }) to ({ size: Int -> size })
+                                else -> ({ size: Int -> size }) to ({ size: Int -> -size })
+                            }
+                            slideInHorizontally(tween(200), initialOffset) togetherWith  slideOutHorizontally(tween(200), targetOffset)
+                        }
+                    )
+
                 }
             }
         }

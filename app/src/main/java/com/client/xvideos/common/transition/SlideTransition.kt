@@ -44,7 +44,7 @@ fun SlideTransition(
 
 @ExperimentalVoyagerApi
 @Composable
-public fun SlideTransition(
+fun SlideTransition(
     navigator: Navigator,
     modifier: Modifier = Modifier,
     orientation: SlideOrientation = SlideOrientation.Horizontal,
