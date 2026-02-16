@@ -1,5 +1,11 @@
 package com.client.xvideos.redgifs.common.video
 
+import androidx.compose.animation.animateColor
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.awaitTouchSlopOrCancellation
@@ -10,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -43,6 +50,7 @@ fun CanvasTimeDurationLine1(
     timeABEnable: Boolean,
     visibleAB: Boolean = true,
     play: Boolean = false,
+    isBuffering: Boolean = false,
     onSeek: (Float) -> Unit,              // 🔹 при перетаскивании
     onSeekFinished: (() -> Unit)? = null, // 🔹 когда отпустили
     isVisibleTime: Boolean = true,
@@ -50,6 +58,17 @@ fun CanvasTimeDurationLine1(
 ) {
 
     var isDragging by remember { mutableStateOf(false) }
+
+    val infiniteTransition = rememberInfiniteTransition(label = "buffering")
+    val bufferingColor by infiniteTransition.animateColor(
+        initialValue = Color.White,
+        targetValue = Color(0xFF137CBD), // Синий
+        animationSpec = infiniteRepeatable(
+            animation = tween(1000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "bufferingColor"
+    )
 
     Row(
         modifier = Modifier
@@ -127,12 +146,15 @@ fun CanvasTimeDurationLine1(
             val canvasWidth = size.width
             val canvasHeight = size.height
 
+            val baseLineColor = if (isBuffering) bufferingColor else Color(0xff909090)
+            val stepColor = if (isBuffering) bufferingColor else Color.Gray
+
             if ((duration > 0) && (isVisibleStep)) {
                 val step = duration
                 val stepW = canvasWidth / duration
                 for (i in 0..step) {
                     drawLine(
-                        color = Color.Gray,
+                        color = stepColor,
                         start = Offset(x = i * stepW, y = canvasHeight / 2 - 0.dp.toPx()),
                         end = Offset(x = i * stepW, y = canvasHeight / 2 + 4.dp.toPx()),
                         strokeWidth = 2.dp.toPx(),
@@ -143,7 +165,7 @@ fun CanvasTimeDurationLine1(
 
             // Фон
             drawLine(
-                color = Color(0xff909090),
+                color = baseLineColor,
                 start = Offset(x = 0f, y = canvasHeight / 2),
                 end = Offset(x = canvasWidth, y = canvasHeight / 2),
                 strokeWidth = 2.dp.toPx(),
@@ -193,28 +215,28 @@ fun CanvasTimeDurationLine1(
 
         if (isVisibleTime) {
 
-Box {
+            Box {
 
-    Text(
-        duration.toDouble().toMinSec() + " ",
-        color = Color.Black,
-        fontSize = 12.sp,
-        textAlign = TextAlign.End,
-        fontFamily = ThemeRed.fontFamilyPopinsRegular,
-        modifier = Modifier
-            .width(44.dp)
-            .offset(0.5.dp, 0.5.dp)//.background(Color.Green)
-    )
+                Text(
+                    duration.toDouble().toMinSec() + " ",
+                    color = Color.Black,
+                    fontSize = 12.sp,
+                    textAlign = TextAlign.End,
+                    fontFamily = ThemeRed.fontFamilyPopinsRegular,
+                    modifier = Modifier
+                        .width(44.dp)
+                        .offset(0.5.dp, 0.5.dp)//.background(Color.Green)
+                )
 
-    Text(
-        duration.toDouble().toMinSec() + " ",
-        color = Color.White,
-        fontSize = 12.sp,
-        textAlign = TextAlign.End,
-        fontFamily = ThemeRed.fontFamilyPopinsRegular,
-        modifier = Modifier.width(44.dp)//.background(Color.Green)
-    )
-}
+                Text(
+                    duration.toDouble().toMinSec() + " ",
+                    color = Color.White,
+                    fontSize = 12.sp,
+                    textAlign = TextAlign.End,
+                    fontFamily = ThemeRed.fontFamilyPopinsRegular,
+                    modifier = Modifier.width(44.dp)//.background(Color.Green)
+                )
+            }
 
         }
     }
@@ -224,19 +246,31 @@ Box {
 @Composable
 fun CanvasTimeDurationLine1Preview() {
 
-        CanvasTimeDurationLine1(
-            currentTime = 7f,
-            duration = 20,
-            timeA = 2f,
-            timeB = 5f,
-            timeABEnable = false,
-            visibleAB = true,
-            play = false,
-            onSeek = { },
-            onSeekFinished = { },
-            isVisibleTime = true,
-            isVisibleStep = true
-        )
+    CanvasTimeDurationLine1(
+        currentTime = 7f,
+        duration = 20,
+        timeA = 2f,
+        timeB = 5f,
+        timeABEnable = false,
+        visibleAB = true,
+        play = false,
+        onSeek = { },
+        onSeekFinished = { },
+        isVisibleTime = true,
+        isVisibleStep = true
+    )
 
 }
 
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+fun CanvasTimeDurationLine1BufferingPreview() {
+    CanvasTimeDurationLine1(
+        currentTime = 5f,
+        duration = 20,
+        timeABEnable = false,
+        isBuffering = true,
+        onSeek = { },
+        onSeekFinished = { }
+    )
+}
