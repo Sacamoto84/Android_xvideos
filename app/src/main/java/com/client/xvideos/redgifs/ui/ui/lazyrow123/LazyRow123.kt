@@ -9,10 +9,13 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -20,6 +23,7 @@ import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
@@ -100,6 +104,10 @@ fun LazyRow123Content(
     val loadState = listGifs.loadState
     var wasAppendLoading by remember { mutableStateOf(false) }
 
+    val isAnyLoading = loadState.refresh is LoadState.Loading ||
+            loadState.append is LoadState.Loading ||
+            loadState.prepend is LoadState.Loading
+
     LaunchedEffect(loadState.refresh) {
         if (loadState.refresh is LoadState.NotLoading) {
             onAppendLoaded(listGifs)
@@ -170,31 +178,75 @@ fun LazyRow123Content(
                                 navigator?.popAll()
                             }
                         )
+                    } ?: Box(
+                        modifier = Modifier
+                            .padding(1.dp)
+                            .fillMaxWidth()
+                            .aspectRatio(0.7f)
+                            .clip(RoundedCornerShape(8.dp))
+                            .border(1.dp, Color.DarkGray, RoundedCornerShape(8.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                    }
+                }
+
+                if (loadState.append is LoadState.Loading) {
+                    item(span = { GridItemSpan(maxLineSpan) }) {
+                        Box(
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
                     }
                 }
             }
         } else {
-            val statePager = rememberPagerState { listGifs.itemCount }
+            val pagerCount = if (loadState.append is LoadState.Loading && listGifs.itemCount > 0) listGifs.itemCount + 1 else listGifs.itemCount
+            val statePager = rememberPagerState { pagerCount }
             VerticalPager(state = statePager, modifier = Modifier.fillMaxSize(), beyondViewportPageCount = 1) { index ->
-                listGifs[index]?.let { item ->
-                     Box(
-                        modifier = Modifier.padding(vertical = 2.dp).padding(horizontal = 2.dp).fillMaxSize().clip(RoundedCornerShape(12.dp)).border(1.dp, Color.DarkGray, RoundedCornerShape(12.dp)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        RedUrlVideoImageAndLongClick(
-                            item = item,
-                            index = index,
-                            onLongClick = { navigator?.push(ScreenRedFullScreen(item)) },
-                            isVisibleView = false,
-                            isVisibleDuration = false,
-                            play = true,
-                            isNetConnected = isConnected,
-                            onFullScreen = { navigator?.push(ScreenRedFullScreen(item)) },
-                            downloadRed = { host.hostDI.downloadRed },
-                        )
-                    }
-                } ?: Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
+                if (index < listGifs.itemCount) {
+                    listGifs[index]?.let { item ->
+                         Box(
+                            modifier = Modifier.padding(vertical = 2.dp).padding(horizontal = 2.dp).fillMaxSize().clip(RoundedCornerShape(12.dp)).border(1.dp, Color.DarkGray, RoundedCornerShape(12.dp)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            RedUrlVideoImageAndLongClick(
+                                item = item,
+                                index = index,
+                                onLongClick = { navigator?.push(ScreenRedFullScreen(item)) },
+                                isVisibleView = false,
+                                isVisibleDuration = false,
+                                play = true,
+                                isNetConnected = isConnected,
+                                onFullScreen = { navigator?.push(ScreenRedFullScreen(item)) },
+                                downloadRed = { host.hostDI.downloadRed },
+                            )
+                        }
+                    } ?: Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
+                } else {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
+                }
             }
+        }
+
+        if (loadState.refresh is LoadState.Loading && listGifs.itemCount == 0) {
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
+        }
+
+        if (isAnyLoading) {
+            LinearProgressIndicator(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.TopCenter)
+                    .height(2.dp),
+                color = Color.Red
+            )
         }
     }
 }
