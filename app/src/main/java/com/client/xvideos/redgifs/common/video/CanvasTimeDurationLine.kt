@@ -1,4 +1,4 @@
-package com.redgifs.common.video
+package com.client.xvideos.redgifs.common.video
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -105,7 +105,9 @@ fun CanvasTimeDurationLine1(
                     color = Color.Black,
                     fontSize = 12.sp,
                     fontFamily = ThemeRed.fontFamilyPopinsRegular,
-                    modifier = Modifier.width(44.dp).offset(0.5.dp, 0.5.dp)//.background(Color.Green)
+                    modifier = Modifier
+                        .width(44.dp)
+                        .offset(0.5.dp, 0.5.dp)//.background(Color.Green)
                 )
 
                 Text(
@@ -199,7 +201,9 @@ Box {
         fontSize = 12.sp,
         textAlign = TextAlign.End,
         fontFamily = ThemeRed.fontFamilyPopinsRegular,
-        modifier = Modifier.width(44.dp).offset(0.5.dp, 0.5.dp)//.background(Color.Green)
+        modifier = Modifier
+            .width(44.dp)
+            .offset(0.5.dp, 0.5.dp)//.background(Color.Green)
     )
 
     Text(

@@ -1,11 +1,16 @@
 package com.client.xvideos.redgifs.common.saved
 
+import com.client.xvideos.common.AppPath
 import com.client.xvideos.common.collectionDB.model.ISavedLCollection
 import com.client.xvideos.common.snackbar.SnackBar
 import com.client.xvideos.redgifs.model.GifsInfo
 import kotlinx.coroutines.DelicateCoroutinesApi
 
-class SavedRed_Collection() : ISavedLCollection<GifsInfo>(GifsInfo::class.java){
+class R_Saved_Collection : ISavedLCollection<GifsInfo>(
+    AppPath.r_collection,
+    GifsInfo::class.java
+)
+{
 
     override fun addCollection(item: GifsInfo, collectionName: String) {
         println("!!! addCollection() item:${item.id} collectionName:$collectionName")

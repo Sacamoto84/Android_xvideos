@@ -5,7 +5,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -49,7 +48,7 @@ import com.client.xvideos.redgifs.ui.explorer.ScreenRedExplorer
 import com.client.xvideos.redgifs.ui.fullscreen.ScreenRedFullScreen
 import com.client.xvideos.redgifs.ui.top_this_week.ProfileInfo1
 import com.redgifs.common.block.ui.DialogBlock
-import com.redgifs.common.expand_menu_video.ExpandMenuVideo
+import com.client.xvideos.redgifs.common.expand_menu_video.ExpandMenuVideo
 import com.redgifs.common.expand_menu_video.ExpandMenuVideoTags
 import timber.log.Timber
 
@@ -219,6 +218,7 @@ fun LazyRow123GridItem(
         modifier = Modifier
             .padding(1.dp)
             .fillMaxSize()
+            .border(1.dp, Color(0xFF555555), RoundedCornerShape(8.dp))
             .clip(RoundedCornerShape(8.dp)),
         contentAlignment = Alignment.Center
     ) {

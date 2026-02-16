@@ -63,9 +63,9 @@ import com.client.xvideos.redgifs.common.UsersRed
 import com.redgifs.common.block.ui.DialogBlock
 import com.client.xvideos.redgifs.common.downloader.DownloadRed
 import com.redgifs.common.downloader.ui.DownloadIndicator
-import com.redgifs.common.expand_menu_video.ExpandMenuVideo
+import com.client.xvideos.redgifs.common.expand_menu_video.ExpandMenuVideo
 import com.redgifs.common.expand_menu_video.ExpandMenuVideoTags
-import com.redgifs.common.video.CanvasTimeDurationLine1
+import com.client.xvideos.redgifs.common.video.CanvasTimeDurationLine1
 import com.redgifs.common.video.PlayerControls
 import com.redgifs.common.video.RedVideoPlayerWithMenu
 import dagger.Binds

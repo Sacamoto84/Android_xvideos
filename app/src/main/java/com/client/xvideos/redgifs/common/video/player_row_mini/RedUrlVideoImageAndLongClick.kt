@@ -33,7 +33,7 @@ import com.client.xvideos.common.vibrate.vibrateWithPatternAndAmplitude
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.common.downloader.DownloadRed
 import com.client.xvideos.redgifs.model.GifsInfo
-import com.redgifs.common.video.player_row_mini.atom.Red_Video_Lite_Row2
+import com.client.xvideos.redgifs.common.video.player_row_mini.atom.Red_Video_Lite_Row2
 import java.io.File
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -162,7 +162,7 @@ fun RedUrlVideoImageAndLongClick(
                 text = index.toString(),
                 color = Color.Gray,
                 fontFamily = ThemeRed.fontFamilyDMsanss,
-                fontSize = 16.sp
+                fontSize = 14.sp
             )
         }
     }

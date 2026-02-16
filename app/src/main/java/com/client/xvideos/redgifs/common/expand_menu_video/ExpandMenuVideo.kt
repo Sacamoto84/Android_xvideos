@@ -1,4 +1,4 @@
-package com.redgifs.common.expand_menu_video
+package com.client.xvideos.redgifs.common.expand_menu_video
 
 
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -48,8 +48,7 @@ import kotlinx.coroutines.launch
 
 
 private val tintColor = Color(0xFF48454E)
-private val style =
-    TextStyle(color = tintColor, fontFamily = ThemeRed.fontFamilyPopinsRegular, fontSize = 20.sp)
+private val style = TextStyle(color = tintColor, fontFamily = ThemeRed.fontFamilyPopinsRegular, fontSize = 20.sp)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -210,13 +209,7 @@ fun DropdownMenuItem_Follow(item: GifsInfo? = null, redApi:()-> RedApi, savedRed
 @Composable
 fun DropdownMenuItem_AddCollection(item: GifsInfo? = null, savedRed: ()->SavedRed, onDismiss: () -> Unit){
     DropdownMenuItem(
-        leadingIcon = {
-            Icon(
-                Icons.Default.AddCircleOutline,
-                contentDescription = "",
-                tint = tintColor
-            )
-        },
+        leadingIcon = { Icon( Icons.Default.AddCircleOutline, contentDescription = "", tint = tintColor ) },
         text = { Text("Add to Collection", style = style) },
         onClick = {
             if (item == null) return@DropdownMenuItem

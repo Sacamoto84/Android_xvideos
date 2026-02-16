@@ -79,6 +79,8 @@ class ScreenRedRoot() : Screen {
 
         BackHandler { Timber.i("iii BackHandler Root") }
 
+
+        //Диалог коллекции
         if (savedRed.collections.collectionVisibleDialog) {
             DialogCollection(
                 visible = savedRed.collections.collectionVisibleDialog,
@@ -89,10 +91,7 @@ class ScreenRedRoot() : Screen {
                 onSelectCollection = { collection ->
                     vm.screenModelScope.launch {
                         if ((savedRed.collections.collectionItemGifInfo != null)) {
-                            savedRed.collections.addCollection(
-                                savedRed.collections.collectionItemGifInfo!!,
-                                collection
-                            )
+                            savedRed.collections.addCollection( savedRed.collections.collectionItemGifInfo!!, collection )
                             savedRed.collections.collectionItemGifInfo = null
                             SnackBar.success("Элемент добавлен в коллекцию")
                             delay(800)
@@ -103,6 +102,8 @@ class ScreenRedRoot() : Screen {
                 savedRed = savedRed
             )
         }
+
+
 
         if (savedRed.collections.collectionVisibleDialogCreateNew) {
             DaialogNewCollection(

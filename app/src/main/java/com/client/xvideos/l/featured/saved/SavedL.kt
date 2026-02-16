@@ -14,7 +14,7 @@ class SavedL @Inject constructor(
     kDownloader: KDownloader,
 ) {
 
-    val collection = SavedL_Collection()
+    val collection = R_Saved_Collection()
 
     val albums = SavedL_Albums(db, scope)
     val likes = SavedL_Likes(kDownloader)

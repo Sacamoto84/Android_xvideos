@@ -11,7 +11,7 @@ import java.lang.reflect.Type
 /**
  *
  */
-class  CollectionDB<T>(val path : String = AppPath.r_collection, val type: Type) {
+class  CollectionDB<T>(val path : String, val type: Class<T>) {
 
     fun create(collectionName: String): Result<Boolean> {
         return try {
@@ -114,9 +114,10 @@ class  CollectionDB<T>(val path : String = AppPath.r_collection, val type: Type)
         val collections: List<CollectionEntity<T>> = root.listFiles { f -> f.isDirectory }?.map { dir ->
             val itemsInDir: List<T> = dir.listFiles { f -> f.isFile && f.extension == "collection" }?.mapNotNull { file ->
                 try {
-                    Gson().fromJson<T>(file.readText(Charsets.UTF_8), type)
+                    val text = file.readText(Charsets.UTF_8)
+                    Gson().fromJson<T>(text, type)
                 } catch (ex: Exception) {
-                    Timber.e(ex, "Failed to parse collection item: ${file.name} in ${dir.name}")
+                    Timber.e(ex, "!!! Не удалось проанализировать элемент коллекции: ${file.name} in ${dir.name}")
                     null
                 }
             } ?: emptyList()

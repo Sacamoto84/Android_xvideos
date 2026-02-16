@@ -1,12 +1,13 @@
 package com.client.xvideos.l.featured.saved
 
+import com.client.xvideos.common.AppPath
 import com.client.xvideos.common.collectionDB.model.ISavedLCollection
 import com.client.xvideos.common.snackbar.SnackBar
 import com.client.xvideos.common.util.toMD5
 import com.client.xvideos.l.model.PicsDetails
 import kotlinx.coroutines.DelicateCoroutinesApi
 
-class SavedL_Collection(): ISavedLCollection<PicsDetails>(PicsDetails::class.java) {
+class R_Saved_Collection: ISavedLCollection<PicsDetails>(AppPath.l_collection, PicsDetails::class.java) {
 
     override fun addCollection(item: PicsDetails, collectionName: String) {
         println("!!! addCollection() item:${item.url_to_original?.toMD5() ?: "0"} collectionName:$collectionName")

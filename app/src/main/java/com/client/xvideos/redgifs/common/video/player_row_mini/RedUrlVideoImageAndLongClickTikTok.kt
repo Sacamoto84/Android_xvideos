@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -25,14 +24,12 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
-import com.client.xvideos.BuildConfig
 import com.client.xvideos.common.AppPath
 import com.client.xvideos.common.coil.UrlImage
 import com.client.xvideos.common.vibrate.vibrateWithPatternAndAmplitude
 import com.client.xvideos.redgifs.common.downloader.DownloadRed
-import com.redgifs.common.video.player_row_mini.atom.Red_Video_Lite_Row2
+import com.client.xvideos.redgifs.common.video.player_row_mini.atom.Red_Video_Lite_Row2
 import com.client.xvideos.redgifs.model.GifsInfo
-import timber.log.Timber
 import java.io.File
 
 @OptIn(ExperimentalFoundationApi::class)

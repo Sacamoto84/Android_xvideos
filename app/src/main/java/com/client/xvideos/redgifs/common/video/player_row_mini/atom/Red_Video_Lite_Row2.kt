@@ -1,5 +1,9 @@
-package com.redgifs.common.video.player_row_mini.atom
+package com.client.xvideos.redgifs.common.video.player_row_mini.atom
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import com.client.xvideos.common.videoplayer.host.MediaPlayerEvent
 import com.client.xvideos.common.videoplayer.host.MediaPlayerHost
 import com.client.xvideos.common.videoplayer.model.ScreenResize
-import com.redgifs.common.video.CanvasTimeDurationLine1
+import com.client.xvideos.redgifs.common.video.CanvasTimeDurationLine1
 import com.redgifs.common.video.player_with_menu.atom.StaticPlayer
 
 
@@ -63,9 +67,14 @@ fun Red_Video_Lite_Row2(
 
         Box(modifier = Modifier.padding(bottom = 48.dp).fillMaxSize().combinedClickable(onClick = onClick, onLongClick = onLongClick))
 
-        if (!playerHost.poster) {
+        AnimatedVisibility(
+            visible = !playerHost.poster,
+            enter = fadeIn(animationSpec = tween(300)),
+            exit = fadeOut(animationSpec = tween(300)),
+            modifier = Modifier.align(Alignment.BottomEnd).fillMaxWidth(),
+        ) {
             Box(
-                Modifier.fillMaxWidth().align(Alignment.BottomEnd),
+                Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.BottomCenter
             ) {
                 CanvasTimeDurationLine1(
@@ -77,7 +86,7 @@ fun Red_Video_Lite_Row2(
                     visibleAB = false,
                     play = play,
                     onSeek = { playerHost.seekTo(it) },
-                    onSeekFinished = {},
+                    onSeekFinished = { playerHost.play() },
                     modifier = Modifier.padding(start = 2.dp, end = 2.dp).fillMaxWidth().offset(y = 5.dp),
                     isVisibleTime = true,
                     isVisibleStep = false

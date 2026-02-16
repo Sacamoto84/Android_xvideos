@@ -20,7 +20,7 @@ class SavedRed @Inject constructor(
     val likes       = SavedRed_Likes()
     val creators    = SavedRed_Creator()
     val niches      = SavedRed_Niches()
-    val collections = SavedRed_Collection()
+    val collections = R_Saved_Collection()
     val nichesCache = SavedRed_NichesCaches(scope, redApi)
 
     var tagsList = listOf<TagInfo>()
@@ -29,6 +29,12 @@ class SavedRed @Inject constructor(
     fun refreshTagList() { scope.launch(Dispatchers.IO) { tagsList =
         redApi.tags.getTags().getOrNull()?.tags ?: emptyList()
     } }
+
+    init {
+        collections.refreshCollectionList()
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////
 
 }
 

@@ -4,17 +4,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.client.xvideos.common.AppPath
 import com.client.xvideos.common.collectionDB.CollectionDB
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.MutableStateFlow
 
 abstract class ISavedLCollection<T>(
+    path: String,
     clazz: Class<T>
 ){
-    private val type = TypeToken.getParameterized(List::class.java, clazz).type
+    //private val type = TypeToken.getParameterized(List::class.java, clazz).type
 
-    protected val collectionDb = CollectionDB<T>(AppPath.l_collection, type)
+    val collectionDb = CollectionDB<T>(path, clazz)
 
     var collectionList = mutableStateListOf<CollectionEntity<T>>()
 
