@@ -1,6 +1,13 @@
 package com.client.xvideos.redgifs.ui.fullscreen
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideIn
+import androidx.compose.animation.slideOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -38,12 +45,15 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.annotation.ExperimentalVoyagerApi
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
+import cafe.adriel.voyager.core.screen.uniqueScreenKey
+import cafe.adriel.voyager.core.stack.StackEvent
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -79,8 +89,10 @@ import javax.inject.Inject
 @OptIn(ExperimentalVoyagerApi::class)
 class ScreenRedFullScreen(val item: GifsInfo) : Screen, ScreenTransition {
 
-    override val key: ScreenKey = "ScreenRedFullScreen"
+    //override val key: ScreenKey = "ScreenRedFullScreen"
 
+    override val key: ScreenKey
+        get() = uniqueScreenKey
 
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
@@ -334,6 +346,32 @@ class ScreenRedFullScreen(val item: GifsInfo) : Screen, ScreenTransition {
         }
 
     }
+
+
+    override fun enter(lastEvent: StackEvent): EnterTransition {
+        return fadeIn(tween(1500, delayMillis = 1500))
+    }
+
+    override fun exit(lastEvent: StackEvent): ExitTransition {
+        return fadeOut(tween(1500))
+    }
+
+//    override fun enter(lastEvent: StackEvent): EnterTransition {
+//        return slideIn { size ->
+//            val x = if (lastEvent == StackEvent.Pop) -size.width else size.width
+//            IntOffset(x = x, y = 0)
+//        }
+//    }
+//
+//    override fun exit(lastEvent: StackEvent): ExitTransition {
+//        return slideOut { size ->
+//            val x = if (lastEvent == StackEvent.Pop) size.width else -size.width
+//            IntOffset(x = x, y = 0)
+//        }
+//    }
+
+
+
 }
 
 class ScreenRedFullScreenSM @Inject constructor(
