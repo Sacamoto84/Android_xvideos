@@ -1,4 +1,4 @@
-package com.redgifs.common.video
+package com.client.xvideos.redgifs.common.video
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,6 +24,7 @@ import com.client.xvideos.common.videoplayer.host.MediaPlayerEvent
 import com.client.xvideos.common.videoplayer.host.MediaPlayerHost
 import com.client.xvideos.common.videoplayer.model.ScreenResize
 import com.client.xvideos.redgifs.common.ThemeRed
+import com.redgifs.common.video.PlayerControls
 import com.redgifs.common.video.player_with_menu.atom.VideoPlayerWithMenuContent
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.delay
@@ -46,7 +47,10 @@ fun RedVideoPlayerWithMenu(
     onClick: () -> Unit = {},
     autoRotate: Boolean,
     isCurrentPage : Boolean,
-    modifier : Modifier = Modifier
+    modifier : Modifier = Modifier,
+
+    isBuferring: (Boolean) -> Unit
+
 ) {
 
     if (BuildConfig.DEBUG) { SideEffect {
@@ -75,6 +79,12 @@ fun RedVideoPlayerWithMenu(
         playerHost.videoFitMode = ScreenResize.FIT
         playerHost.onEvent = { event ->
             when (event) {
+
+                is MediaPlayerEvent.BufferChange -> {
+                    val buffering  = event.isBuffering
+                    isBuferring(buffering)
+                }
+
                 is MediaPlayerEvent.CurrentTimeChange -> {
                     //println("!!!Current playback time: ${event.currentTime}s")
                     currentTime = event.currentTime

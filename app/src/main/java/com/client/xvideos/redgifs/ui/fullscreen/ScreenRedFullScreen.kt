@@ -6,8 +6,6 @@ import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideIn
-import androidx.compose.animation.slideOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -45,7 +43,6 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.annotation.ExperimentalVoyagerApi
@@ -77,7 +74,7 @@ import com.client.xvideos.redgifs.common.expand_menu_video.ExpandMenuVideo
 import com.redgifs.common.expand_menu_video.ExpandMenuVideoTags
 import com.client.xvideos.redgifs.common.video.CanvasTimeDurationLine1
 import com.redgifs.common.video.PlayerControls
-import com.redgifs.common.video.RedVideoPlayerWithMenu
+import com.client.xvideos.redgifs.common.video.RedVideoPlayerWithMenu
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -104,6 +101,8 @@ class ScreenRedFullScreen(val item: GifsInfo) : Screen, ScreenTransition {
         var blockItem by remember { mutableStateOf<GifsInfo?>(null) }
 
         val downloadList = vm.hostDI.downloadRed.downloadList.collectAsState().value
+
+        var isVideoBuffering by remember { mutableStateOf(false) }
 
         val videoUri: String = remember(item.id, item.userName) {
             Timber.tag("???").i("Перерасчет videoItem.id = ${item.id}")
@@ -149,7 +148,8 @@ class ScreenRedFullScreen(val item: GifsInfo) : Screen, ScreenTransition {
                                     vm.currentPlayerControls!!.seekTo(it)
                                 }
                             },
-                            onSeekFinished = { }, modifier = Modifier.padding(horizontal = 0.dp)
+                            onSeekFinished = { }, modifier = Modifier.padding(horizontal = 0.dp),
+                            isBuffering = isVideoBuffering
                         )
 
                     }
@@ -162,10 +162,10 @@ class ScreenRedFullScreen(val item: GifsInfo) : Screen, ScreenTransition {
                     }
                 }
             }
-        ) {
+        ) { pp ->
 
             RedVideoPlayerWithMenu(
-                modifier = Modifier.padding(bottom = it.calculateBottomPadding()/2),
+                modifier = Modifier.padding(bottom = pp.calculateBottomPadding()/2),
                 url = videoUri,
                 play = vm.play,
                 onChangeTime = { it1 ->
@@ -181,22 +181,21 @@ class ScreenRedFullScreen(val item: GifsInfo) : Screen, ScreenTransition {
                 enableAB = vm.enableAB,
                 onClick = { vm.play = !vm.play },
                 autoRotate = vm.autoRotate,
-                isCurrentPage = true
+                isCurrentPage = true,
+                isBuferring = { b ->
+                    isVideoBuffering = b
+                }
             )
 
             Row(
-                Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween
             ) {
 
                 Row(
                     modifier = Modifier
                         .padding(start = 8.dp)
                         .clickable(onClick = {
-                            navigator.push(
-                                ScreenRedProfile(item.userName)
-                            )
+                            navigator.push( ScreenRedProfile(item.userName) )
                         }),
                     verticalAlignment = Alignment.CenterVertically,
                 )
@@ -375,6 +374,7 @@ class ScreenRedFullScreenSM @Inject constructor(
     var currentPlayerTime by mutableFloatStateOf(0f)
     var currentPlayerDuration by mutableIntStateOf(0)
 
+    var bufferIng by mutableStateOf(false)
 
 }
 
