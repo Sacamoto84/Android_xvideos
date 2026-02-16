@@ -9,7 +9,7 @@ object ThemeRed {
     /**
      * Цвет основного фона
      */
-    val colorCommonBackground = Color(0xFF212121)
+    val colorCommonBackground = Color(0xFF303030)
 
     //Новый цвет
     val colorCommonBackground2 = Color(0xFF212121)

@@ -9,10 +9,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -39,13 +41,13 @@ import com.client.xvideos.ui.theme.XvideosTheme
 import com.composeunstyled.Text
 
 @Composable
-fun RedProfileCreaterInfo(item: UserInfo, savedRed: SavedRed) {
-    val isFollow = savedRed.creators.list.any { it.username == item.username }
+fun RedProfileCreaterInfo(item: UserInfo, savedRed: () -> SavedRed) {
+    val isFollow = savedRed().creators.list.any { it.username == item.username }
     RedProfileCreaterInfo(
         item = item,
         isFollow = isFollow,
         onFollowClick = {
-            if (isFollow) savedRed.creators.remove(item.username) else savedRed.creators.add(item)
+            if (isFollow) savedRed().creators.remove(item.username) else savedRed().creators.add(item)
         }
     )
 }
@@ -57,7 +59,7 @@ fun RedProfileCreaterInfo(
     onFollowClick: () -> Unit
 ) {
 
-    Column( modifier = Modifier.padding(top = 32.dp).fillMaxWidth() )
+    Column( modifier = Modifier.systemBarsPadding().displayCutoutPadding().padding(horizontal = 4.dp).fillMaxWidth() )
     {
 
         //Top info
@@ -132,12 +134,12 @@ fun RedProfileCreaterInfo(
         }
 
 
-
         Row(
             modifier = Modifier.padding(top = 8.dp, bottom = 8.dp).fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceAround
-        ) {
+        )
+        {
 
             Column( horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth().weight(1f) )
             {
@@ -212,7 +214,7 @@ fun RedProfileCreaterInfo(
             )
         }
 
-        Spacer(Modifier.width(8.dp))
+        Spacer(Modifier.height(8.dp))
 
     }
 

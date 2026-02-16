@@ -15,6 +15,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -42,6 +43,8 @@ fun Red_Video_Lite_Row2(
     var time by remember { mutableFloatStateOf(0f) }
     var duration by remember { mutableIntStateOf(0) }
 
+    var isBuffering by remember { mutableStateOf(false) }
+    
     //if (BuildConfig.DEBUG) { SideEffect { Timber.i("@@@ Red_Video_Lite_2Rrow() play = $play, url = $url time = $time, duration = $duration") } }
 
     val playerHost = remember { MediaPlayerHost(mediaUrl = url, isPaused = false, isMuted = true) }
@@ -54,6 +57,7 @@ fun Red_Video_Lite_Row2(
             when (event) {
                 is MediaPlayerEvent.CurrentTimeChange -> { time = event.currentTime }
                 is MediaPlayerEvent.TotalTimeChange -> { duration = event.totalTime }
+                is MediaPlayerEvent.BufferChange -> {isBuffering = event.isBuffering}
                 else -> {}
             }
         }
@@ -89,7 +93,8 @@ fun Red_Video_Lite_Row2(
                     onSeekFinished = { playerHost.play() },
                     modifier = Modifier.padding(start = 2.dp, end = 2.dp).fillMaxWidth().offset(y = 5.dp),
                     isVisibleTime = true,
-                    isVisibleStep = false
+                    isVisibleStep = false,
+                    isBuffering = isBuffering
                 )
             }
         }

@@ -17,9 +17,12 @@ import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,117 +35,139 @@ import androidx.compose.ui.unit.sp
 import com.client.xvideos.redgifs.common.ThemeRed
 
 @Composable
-fun TagsBlock(tags: List<String>, tagsSelect: List<String>, onClick: (String) -> Unit = {}) {
-    var expanded by remember { mutableStateOf(false) }
-    val sorted = remember(tags) { tags.sorted() }
+fun TagsBlock(
+    tags: List<String>,
+    tagsSelect: List<String>,
+    onClick: (String) -> Unit = {}
+) {
+    var expanded by rememberSaveable { mutableStateOf(false) }
+    
+    // Оптимизация 1: Мемоизация сортировки и сета для быстрого поиска
+    val sortedTags = remember(tags) { tags.sorted() }
+    val selectedSet = remember(tagsSelect) { tagsSelect.toSet() }
+    
+    // Оптимизация 2: Стабильная лямбда для предотвращения рекомпозиции чипов
+    val currentOnClick by rememberUpdatedState(onClick)
+    val stableOnClick = remember { { tag: String -> currentOnClick(tag) } }
 
     SubcomposeLayout { constraints ->
         val loose = constraints.copy(minWidth = 0, minHeight = 0)
         val maxW = constraints.maxWidth
 
-        /* ---------- измеряем все теги ---------- */
-        val tagPl = sorted.map { tag ->
-            subcompose("t_$tag") { TagChip(tag, tag in tagsSelect, onClick) }.first().measure(loose)
-        }
-
-        /* ---------- одна кнопка: текст зависит от expanded ---------- */
+        // Измеряем кнопку сразу, она нам нужна для расчетов лимита
         val btnPl = subcompose("btn") {
             ExpandCollapseButton(expanded) { expanded = !expanded }
         }.first().measure(loose)
 
-        /* ---------- формируем список для вывода ---------- */
-        val shown = if (expanded) {
-            tagPl + btnPl                                // все теги + кнопка «Скрыть»
-        } else {                                         // нужно уложить в 2 строки
-            val list = mutableListOf<Placeable>()
-            var rowW = 0
-            var lines = 1
-            for (p in tagPl) {
-                // резервируем место под кнопку, т.к. она будет последней
-                val need = p.width + if (lines == 2) btnPl.width else 0
-                if (rowW + need > maxW) {                // перенос
-                    lines++; if (lines > 2) break
-                    rowW = 0
+        val shownPlaceables = mutableListOf<Placeable>()
+        var currentRowW = 0
+        var currentLines = 1
+        var isOverflow = false
+
+        // Оптимизация 3: Subcompose только тех элементов, которые реально будут отображены
+        for (tag in sortedTags) {
+            val isSelected = tag in selectedSet
+            
+            // Предварительный замер (через subcompose только нужных)
+            val p = subcompose(tag) {
+                TagChip(tag, isSelected, stableOnClick)
+            }.first().measure(loose)
+
+            if (!expanded) {
+                val needW = p.width + if (currentLines == 2) btnPl.width else 0
+                if (currentRowW + needW > maxW) {
+                    if (currentLines >= 2) {
+                        isOverflow = true
+                        break
+                    }
+                    currentLines++
+                    currentRowW = 0
                 }
-                list += p; rowW += p.width
+            } else {
+                if (currentRowW + p.width > maxW) {
+                    currentRowW = 0
+                }
             }
-            list + btnPl                                 // кнопка «Показать все»
+            
+            shownPlaceables.add(p)
+            currentRowW += p.width
         }
 
-        /* ---------- высота ---------- */
-        var height = 0
-        var rowH = 0
-        var rowW = 0
-        shown.forEach { p ->
-            if (rowW + p.width > maxW) {
-                height += rowH; rowH = 0; rowW = 0
-            }
-            rowW += p.width
-            rowH = maxOf(rowH, p.height)
+        // Добавляем кнопку в список отрисовки, если нужно
+        if (expanded || isOverflow) {
+            shownPlaceables.add(btnPl)
         }
-        height += rowH
 
-        /* ---------- размещение ---------- */
-        layout(maxW, height) {
+        // Расчет итоговой высоты
+        var totalHeight = 0
+        var rowHeight = 0
+        var xAcc = 0
+        shownPlaceables.forEach { p ->
+            if (xAcc + p.width > maxW) {
+                totalHeight += rowHeight
+                xAcc = 0
+                rowHeight = 0
+            }
+            xAcc += p.width
+            rowHeight = maxOf(rowHeight, p.height)
+        }
+        totalHeight += rowHeight
+
+        layout(maxW, totalHeight) {
             var x = 0
             var y = 0
             var lineH = 0
-            shown.forEach { p ->
+            shownPlaceables.forEach { p ->
                 if (x + p.width > maxW) {
-                    x = 0; y += lineH; lineH = 0
+                    x = 0
+                    y += lineH
+                    lineH = 0
                 }
                 p.placeRelative(x, y)
-                x += p.width; lineH = maxOf(lineH, p.height)
+                x += p.width
+                lineH = maxOf(lineH, p.height)
             }
         }
     }
 }
 
-/* -------------------- CHIP -------------------- */
 @Composable
 private fun TagChip(text: String, select: Boolean, onClick: (String) -> Unit) {
-    var pressed by remember { mutableStateOf(false) }
-    val bg by animateColorAsState(
-        if (pressed) Color(0xFF652E45) else Color.Transparent
-    )
-
+    // Оптимизация 4: Упрощение модификаторов и удаление лишних состояний
     Text(
-        text, color =
-            if (select) Color.Black else Color.White,
+        text = text,
+        color = if (select) Color.Black else Color.White,
         fontSize = 14.sp,
         fontFamily = ThemeRed.fontFamilyPopinsRegular,
         modifier = Modifier
             .padding(horizontal = 4.dp, vertical = 2.dp)
             .height(32.dp)
-            .clip(RoundedCornerShape(50))
-            .background(if (select) ThemeRed.colorYellow else bg)
-            .border(1.dp, ThemeRed.colorYellow, RoundedCornerShape(50))
+            .clip(RoundedCornerShape(16.dp)) // Используем фиксированный радиус для скорости
+            .background(if (select) ThemeRed.colorYellow else Color.Transparent)
+            .border(1.dp, ThemeRed.colorYellow, RoundedCornerShape(16.dp))
+            .clickable { onClick(text) }
+            .padding(horizontal = 12.dp, vertical = 4.dp)
             .wrapContentWidth()
-            .padding(horizontal = 8.dp, vertical = 4.dp)
-            .clickable(onClick = { onClick.invoke(text) })
     )
 }
 
 @Composable
 private fun ExpandCollapseButton(expanded: Boolean, onClick: () -> Unit) {
-
     Box(
         modifier = Modifier
             .padding(horizontal = 4.dp, vertical = 2.dp)
             .size(32.dp)
-            .border(1.dp, ThemeRed.colorYellow, CircleShape),
+            .clip(CircleShape)
+            .background(Color.Transparent)
+            .border(1.dp, ThemeRed.colorYellow, CircleShape)
+            .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
         Icon(
-            imageVector = if (expanded) Icons.Default.Close else Icons.Filled.MoreHoriz,
-            contentDescription = "",
+            imageVector = if (expanded) Icons.Default.Close else Icons.Default.MoreHoriz,
+            contentDescription = null,
             tint = Color.White,
-            modifier = Modifier
-                .size(18.dp)
-                .clickable(
-                    onClick = onClick
-                )
+            modifier = Modifier.size(18.dp)
         )
     }
 }
-
