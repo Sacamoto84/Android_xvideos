@@ -196,6 +196,7 @@ object ScreenRoot : Screen {
                                 is UiMessage.Info -> Triple(Color(0xFF137CBD), Color.White, Icons.Default.Info)
                                 is UiMessage.Warning -> Triple(Color(0xFFFF8E0C), Color.White, Icons.Default.Info)
                             }
+
                             LaunchedEffect(data) {
                                 when (uiMsg) {
                                     is UiMessage.Success -> { delay(2000); data.dismiss() }
@@ -210,7 +211,7 @@ object ScreenRoot : Screen {
                                 modifier = Modifier
                                     .zIndex(Float.MAX_VALUE)
                                     .wrapContentWidth()
-                                    .padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
+                                    .padding(start = 16.dp, end = 16.dp, bottom = 104.dp),
                                 color = bg,
                                 contentColor = fg,
                                 shape = RoundedCornerShape(12.dp),
