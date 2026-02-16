@@ -4,60 +4,35 @@ import android.annotation.SuppressLint
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarVisuals
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.model.ScreenModel
-import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.Navigator
-import com.client.xvideos.common.collectionDB.ui.DaialogNewCollection
-import com.client.xvideos.common.snackbar.SnackBar
-import com.client.xvideos.common.snackbar.UiMessage
+import com.client.xvideos.common.transition.SlideTransition
 import com.client.xvideos.redgifs.common.di.HostDI
-import com.client.xvideos.redgifs.ui.explorer.ScreenRedExplorer
-import com.redgifs.common.downloader.ui.DownloadIndicator
 import com.client.xvideos.redgifs.common.saved.DialogCollection
+import com.client.xvideos.redgifs.ui.explorer.ScreenRedExplorer
+import com.client.xvideos.screen.LocalRootScreenModel
+import com.client.xvideos.screen.ScreenRootSM
+import com.redgifs.common.block.ui.DialogBlock
+import com.redgifs.common.downloader.ui.DownloadIndicator
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
-
-val LocalRootScreenModel = staticCompositionLocalOf<ScreenRedRootSM> {
-    error("No ScreenRedRootSM provided")
-}
-
-suspend fun SnackbarHostState.show(ui: UiMessage) = showSnackbar(UiSnackbarVisuals(ui))
-
-data class UiSnackbarVisuals(
-    val ui: UiMessage,
-    override val actionLabel: String? = null,
-) : SnackbarVisuals {
-
-    override val withDismissAction: Boolean = actionLabel != null
-
-    override val duration: SnackbarDuration =
-        if (withDismissAction) SnackbarDuration.Indefinite
-        else SnackbarDuration.Short
-
-    override val message: String get() = ui.text
-}
 
 class ScreenRedRoot() : Screen {
 
@@ -89,43 +64,38 @@ class ScreenRedRoot() : Screen {
                     savedRed.collections.collectionVisibleDialogCreateNew = true
                 },
                 onSelectCollection = { collection ->
-                    vm.screenModelScope.launch {
-                        if ((savedRed.collections.collectionItemGifInfo != null)) {
-                            savedRed.collections.addCollection( savedRed.collections.collectionItemGifInfo!!, collection )
-                            savedRed.collections.collectionItemGifInfo = null
-                            SnackBar.success("Элемент добавлен в коллекцию")
-                            delay(800)
-                            savedRed.collections.collectionVisibleDialog = false
-                        }
-                    }
+                    savedRed.collections.addCollection(
+                        savedRed.collections.collectionItemGifInfo!!,
+                        collection
+                    )
+                    savedRed.collections.collectionVisibleDialog = false
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                 },
                 savedRed = savedRed
             )
         }
 
-
-
-        if (savedRed.collections.collectionVisibleDialogCreateNew) {
-            DaialogNewCollection(
-                visible = savedRed.collections.collectionVisibleDialogCreateNew,
-                onDismiss = {
-                    savedRed.collections.collectionVisibleDialogCreateNew = false
-                    savedRed.collections.collectionVisibleDialog = true
-                },
-                onBlockConfirmed = { collection ->
-                    if ((collection != "")) {
-                        savedRed.collections.createCollection(collection)
-                        savedRed.collections.collectionVisibleDialogCreateNew = false
-                    }
+        //Диалог для блокировки
+        if (vm.hostDI.block.blockVisibleDialog) {
+            DialogBlock(
+                visible = vm.hostDI.block.blockVisibleDialog,
+                onDismiss = { vm.hostDI.block.blockVisibleDialog = false },
+                onBlockConfirmed = {
+                    // if (blockItem != null) {
+                    //     vm.hostDI.block.blockItem(blockItem!!)
+                    //     blockItem = null
+                    // }
                 }
             )
         }
 
-        CompositionLocalProvider(LocalRootScreenModel provides vm) {
+        CompositionLocalProvider(LocalRootScreenModel provides ScreenRootSM()) {
             Scaffold(
                 modifier = Modifier.imePadding(),
                 bottomBar = { DownloadIndicator(percentDownload) }) {
-                Navigator(ScreenRedExplorer())
+                Navigator(ScreenRedExplorer()) { navigator ->
+                    SlideTransition(navigator)
+                }
             }
         }
     }

@@ -55,12 +55,12 @@ import com.client.xvideos.MenuScreen
 import com.client.xvideos.common.eventBus.Event
 import com.client.xvideos.common.eventBus.EventBus
 import com.client.xvideos.common.snackbar.UiMessage
+import com.client.xvideos.common.snackbar.UiSnackbarVisuals
+import com.client.xvideos.common.snackbar.show
 import com.client.xvideos.common.traficStatistic.AppNetworkSpeedMonitorLite
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.ui.screens.explorer.L_ScreenExplorer
 import com.client.xvideos.redgifs.common.ThemeRed
-import com.client.xvideos.redgifs.ui.UiSnackbarVisuals
-import com.client.xvideos.redgifs.ui.show
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -277,29 +277,13 @@ class ScreenRootSM @Inject constructor() : ScreenModel
     fun hideOverlay() {
         _overlayContent.value = null
     }
-
-}
-
-// Расширение для удобного доступа к домашней навигации из любого экрана
-@Composable
-fun navigateToHome() {
-    val mainNavigator = LocalMainNavigator.current
-    mainNavigator?.let { nav ->
-        if (nav.lastItem !is L_ScreenExplorer) {
-            nav.replaceAll(L_ScreenExplorer())
-        }
-    }
 }
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class ScreenModuleRoot {
+abstract class ScreenRootModule {
     @Binds
     @IntoMap
     @ScreenModelKey(ScreenRootSM::class)
-    abstract fun bindScreenRootScreenModel(hiltListScreenModel: ScreenRootSM): ScreenModel
+    abstract fun bindScreenRootSM(sm: ScreenRootSM): ScreenModel
 }
-
-
-
-

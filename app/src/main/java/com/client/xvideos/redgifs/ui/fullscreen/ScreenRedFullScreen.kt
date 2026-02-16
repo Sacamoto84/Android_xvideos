@@ -6,8 +6,6 @@ import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideIn
-import androidx.compose.animation.slideOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -45,7 +43,6 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.annotation.ExperimentalVoyagerApi
@@ -89,10 +86,7 @@ import javax.inject.Inject
 @OptIn(ExperimentalVoyagerApi::class)
 class ScreenRedFullScreen(val item: GifsInfo) : Screen, ScreenTransition {
 
-    //override val key: ScreenKey = "ScreenRedFullScreen"
-
-    override val key: ScreenKey
-        get() = uniqueScreenKey
+    override val key: ScreenKey = uniqueScreenKey
 
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
@@ -110,14 +104,12 @@ class ScreenRedFullScreen(val item: GifsInfo) : Screen, ScreenTransition {
 
         val videoUri: String = remember(item.id, item.userName) {
             Timber.tag("???").i("Перерасчет videoItem.id = ${item.id}")
-            //Определяем адрес откуда брать видео, из кеша или из сети
             if (vm.downloadRed.downloader.findVideoInDownload(item.id, item.userName))
                 "${AppPath.r_cache_download}/${item.userName}/${item.id}.mp4"
             else
                 "https://api.redgifs.com/v2/gifs/${item.id.lowercase()}/hd.m3u8"
         }
 
-        //Диалог для блокировки
         if (vm.hostDI.block.blockVisibleDialog) {
             DialogBlock(
                 visible = vm.hostDI.block.blockVisibleDialog,
@@ -132,18 +124,15 @@ class ScreenRedFullScreen(val item: GifsInfo) : Screen, ScreenTransition {
         }
 
         Scaffold(
-            //containerColor = Color.Magenta,
             bottomBar = {
                 Column(modifier = Modifier.background(ThemeRed.colorCommonBackground)) {
 
                     Box(
                         Modifier
                             .padding(bottom = 1.dp)
-                            //.padding(horizontal = 16.dp)
                             .clip(RoundedCornerShape(0))
                             .height(32.dp)
                             .fillMaxWidth()
-                            //.alpha(al.value)
                             .background(ThemeRed.colorTabLevel0),
                         contentAlignment = Alignment.BottomCenter
                     ) {
@@ -162,10 +151,8 @@ class ScreenRedFullScreen(val item: GifsInfo) : Screen, ScreenTransition {
 
                     }
 
-                    //   }
                     Box(modifier = Modifier.background(ThemeRed.colorTabLevel1)) {
                         FeedControls_Container_Line0(vm)
-                        //HorizontalSeparator(Color.Transparent, thickness = 4.dp)
                         Box(modifier = Modifier.align(Alignment.BottomCenter)) {
                             DownloadIndicator(vm.downloadRed.downloader.percent.collectAsStateWithLifecycle().value)
                         }
@@ -261,12 +248,10 @@ class ScreenRedFullScreen(val item: GifsInfo) : Screen, ScreenTransition {
                         )
                     }
 
-                    //
                     if (vm.hostDI.savedRed.creators.list.any { it.username == item.userName }) {
                         Icon( Icons.Outlined.Person, contentDescription = null, tint = Color.White,  modifier = Modifier.padding(bottom = 6.dp, end = 6.dp).size(22.dp) )
                     }
 
-                    //✅ Лайк
                     if (vm.hostDI.savedRed.likes.list.any { it.id == item.id }) {
                         Icon(
                             Icons.Filled.FavoriteBorder,
@@ -278,7 +263,6 @@ class ScreenRedFullScreen(val item: GifsInfo) : Screen, ScreenTransition {
                         )
                     }
 
-                    //✅ Иконка того что видео скачано
                     if (
                         downloadList.any { it.id == item.id }
                     ) {
@@ -318,18 +302,14 @@ class ScreenRedFullScreen(val item: GifsInfo) : Screen, ScreenTransition {
                         },
                     )
 
-                    //Меню на 3 точки
                     ExpandMenuVideo(
                         item = item,
                         modifier = Modifier,
                         onClick = {
-                            blockItem = item //Для блока и идентификации и тема
+                            blockItem = item
                         },
                         haptic = { haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove) },
                         onRunLike = {
-                            // if (isRunLike) {
-                            //    listGifs.refresh()
-                            //}
                         },
                         onRefresh = {},
                         isCollection = false,
@@ -349,28 +329,12 @@ class ScreenRedFullScreen(val item: GifsInfo) : Screen, ScreenTransition {
 
 
     override fun enter(lastEvent: StackEvent): EnterTransition {
-        return fadeIn(tween(1500, delayMillis = 1500))
+        return fadeIn(tween(500))
     }
 
     override fun exit(lastEvent: StackEvent): ExitTransition {
-        return fadeOut(tween(1500))
+        return fadeOut(tween(500))
     }
-
-//    override fun enter(lastEvent: StackEvent): EnterTransition {
-//        return slideIn { size ->
-//            val x = if (lastEvent == StackEvent.Pop) -size.width else size.width
-//            IntOffset(x = x, y = 0)
-//        }
-//    }
-//
-//    override fun exit(lastEvent: StackEvent): ExitTransition {
-//        return slideOut { size ->
-//            val x = if (lastEvent == StackEvent.Pop) size.width else -size.width
-//            IntOffset(x = x, y = 0)
-//        }
-//    }
-
-
 
 }
 
@@ -381,31 +345,22 @@ class ScreenRedFullScreenSM @Inject constructor(
 ) : ScreenModel {
 
 
-    //═════════════════════════════════════════════════════════════════════════════════════════════════════╗
-    // Управление плеером                                                                                  ║
-    //══════════════════════════════════════════════════╦══════════════════════════════════════════════════╣
-    var play by mutableStateOf(true)                  //║                                                  ║
-    var mute by mutableStateOf(true)                  //║                                                  ║
-    var autoRotate by mutableStateOf(false)           //║ Включить автоматический поворот                  ║
+    var play by mutableStateOf(true)
+    var mute by mutableStateOf(true)
+    var autoRotate by mutableStateOf(false)
 
-    //══════════════════════════════════════════════════╬══════════════════════════════════════════════════╣
-    var enableAB by mutableStateOf(false)             //║                                                  ║
-    var timeA by mutableFloatStateOf(3f)              //║                                                  ║
-    var timeB by mutableFloatStateOf(6f)              //║                                                  ║
+    var enableAB by mutableStateOf(false)
+    var timeA by mutableFloatStateOf(3f)
+    var timeB by mutableFloatStateOf(6f)
 
-    //══════════════════════════════════════════════════╩══════════════════════════════════════════════════╣
-    var currentPlayerControls by mutableStateOf<PlayerControls?>(null)                                   //║
+    var currentPlayerControls by mutableStateOf<PlayerControls?>(null)
 
-    //═════════════════════════════════════════════════════════════════════════════════════════════════════╝
-    //═══ Состояния плеера ═════════════════════════════╦══════════════════════════════════════════════════╗
-    var currentPlayerTime by mutableFloatStateOf(0f)  //║ Текущее время                                    ║
-    var currentPlayerDuration by mutableIntStateOf(0) //║ Продолжительность видео                          ║
-    //══════════════════════════════════════════════════╩══════════════════════════════════════════════════╝
+    var currentPlayerTime by mutableFloatStateOf(0f)
+    var currentPlayerDuration by mutableIntStateOf(0)
 
 
 }
 
-//
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class ScreenModuleRedАFullScreen {
