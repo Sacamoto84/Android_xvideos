@@ -17,11 +17,11 @@ class SavedRed @Inject constructor(
 ) {
 
     /////////////////////////////////////////////////////////////////////////////////////////////
-    val likes       = SavedRed_Likes()
-    val creators    = SavedRed_Creator()
-    val niches      = SavedRed_Niches()
+    val likes       = R_Saved_Likes()
+    val creators    = R_Saved_Creator()
+    val niches      = R_Saved_Niches()
     val collections = R_Saved_Collection()
-    val nichesCache = SavedRed_NichesCaches(scope, redApi)
+    val nichesCache = R_Saved_NichesCaches(scope, redApi)
 
     var tagsList = listOf<TagInfo>()
 

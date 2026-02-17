@@ -17,7 +17,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
 
-class SavedRed_NichesCaches(
+class R_Saved_NichesCaches(
     val scope: CoroutineScope,
     val redApi: RedApi,
 ) {

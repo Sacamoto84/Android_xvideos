@@ -25,10 +25,9 @@ import com.client.xvideos.l.ui.screens.TabRow
 import com.client.xvideos.redgifs.ui.explorer.tab.FavoritesTab
 import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.R_SavedCollectionTab
 import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.R_SavedCreatorsTab
-import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.SavedDownloadTab
+import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.R_SavedDownloadTab
 import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.R_SavedLikesTab
 import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.SavedNichesTab
-import com.client.xvideos.redgifs.ui.ui.atom.TabBarPoints
 import com.client.xvideos.redgifs.common.ThemeRed
 import kotlinx.collections.immutable.persistentListOf
 
@@ -96,7 +95,7 @@ object R_ScreenSavedTab : Screen {
                 when (screenType) {
                     0 -> R_SavedLikesTab.Content()
                     1 -> R_SavedCreatorsTab.Content()
-                    3 -> SavedDownloadTab.Content()
+                    3 -> R_SavedDownloadTab.Content()
                     2 -> SavedNichesTab.Content()
                     4 -> R_SavedCollectionTab.Content()
                     else -> FavoritesTab.Content()

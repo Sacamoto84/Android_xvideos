@@ -2,8 +2,9 @@ package com.client.xvideos.redgifs.common.downloader
 
 import com.client.xvideos.common.AppPath
 import com.client.xvideos.common.di.ApplicationScope
-import com.google.gson.GsonBuilder
+import com.client.xvideos.common.snackbar.SnackBar
 import com.client.xvideos.redgifs.model.GifsInfo
+import com.google.gson.GsonBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,9 +37,7 @@ class DownloadRed @Inject constructor(
         scope.launch {
             try {
                 Timber.i("Начало загрузки: ${item.id}")
-                downloader.downloadRedName(item, onComplete = {
-                    refreshDownloadList()
-                })
+                downloader.downloadRedName(item, onComplete = { refreshDownloadList() })
                 Timber.i("Загрузка завершена: ${item.id}")
             } catch (e: Exception) {
                 Timber.e(e, "Ошибка при загрузке: ${item.id}")
@@ -51,9 +50,7 @@ class DownloadRed @Inject constructor(
             val rootDir = File(AppPath.r_cache_download)
 
             val infoFiles = if (rootDir.exists() && rootDir.isDirectory) {
-                rootDir.walkTopDown()
-                    .filter { it.isFile && it.extension == "info" }
-                    .toList()
+                rootDir.walkTopDown().filter { it.isFile && it.extension == "info" }.toList()
             } else {
                 emptyList()
             }
@@ -89,13 +86,28 @@ class DownloadRed @Inject constructor(
 
     fun delete(item: GifsInfo) {
         scope.launch(Dispatchers.IO) {
+
+            val userDirPath = AppPath.r_cache_download + SystemPathSeparator + item.userName
+            val userDir = File(userDirPath)
+
             val path0 = AppPath.r_cache_download+ SystemPathSeparator + item.userName + SystemPathSeparator + item.id+".mp4"
             val path1 = AppPath.r_cache_download+ SystemPathSeparator + item.userName + SystemPathSeparator + item.id+".info"
             val path2 = AppPath.r_cache_download+ SystemPathSeparator + item.userName + SystemPathSeparator + item.id+".jpg"
             File(path0).delete()
             File(path1).delete()
             File(path2).delete()
+
+            // Проверяем, осталась ли папка пользователя пустой
+            if (userDir.exists() && userDir.isDirectory) {
+                val files = userDir.listFiles()
+                if (files == null || files.isEmpty()) {
+                    userDir.delete()  // папка пустая → удаляем
+                }
+            }
+
             refreshDownloadList()
+
+            SnackBar.success("Gif удален")
         }
     }
 

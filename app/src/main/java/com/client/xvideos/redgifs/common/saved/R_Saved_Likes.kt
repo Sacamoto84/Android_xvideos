@@ -7,7 +7,7 @@ import com.client.xvideos.redgifs.model.GifsInfo
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlin.onSuccess
 
-class SavedRed_Likes() {
+class R_Saved_Likes {
 
     val likesDb = FileDB(AppPath.r_likes, "likes", GifsInfo::class.java)
 

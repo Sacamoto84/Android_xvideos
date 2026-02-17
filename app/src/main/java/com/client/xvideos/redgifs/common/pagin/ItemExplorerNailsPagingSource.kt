@@ -2,13 +2,13 @@ package com.client.xvideos.redgifs.common.pagin
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.client.xvideos.redgifs.common.saved.SavedRed_NichesCaches
+import com.client.xvideos.redgifs.common.saved.R_Saved_NichesCaches
 import com.client.xvideos.redgifs.model.Niche
 import com.client.xvideos.redgifs.model.Order
 import com.client.xvideos.redgifs.network.api.RedApi
 import timber.log.Timber
 
-class ItemExplorerNailsPagingSource (val order : Order, val textNiches : String, val redApi: RedApi, val cache : SavedRed_NichesCaches): PagingSource<Int, Niche>() {
+class ItemExplorerNailsPagingSource (val order : Order, val textNiches : String, val redApi: RedApi, val cache : R_Saved_NichesCaches): PagingSource<Int, Niche>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int,  Niche> {
 

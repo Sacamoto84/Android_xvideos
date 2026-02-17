@@ -7,7 +7,7 @@ import com.client.xvideos.redgifs.model.UserInfo
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlin.onSuccess
 
-class SavedRed_Creator() {
+class R_Saved_Creator {
 
     val creatorDb = FileDB(AppPath.r_creators, "creator", UserInfo::class.java)
 

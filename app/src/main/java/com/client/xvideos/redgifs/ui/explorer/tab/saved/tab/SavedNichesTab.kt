@@ -29,12 +29,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.model.ScreenModel
@@ -46,13 +48,13 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.common.coil.UrlImage
-import com.client.xvideos.common.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.common.saved.SavedRed
 import com.client.xvideos.redgifs.model.NichesInfo
 import com.client.xvideos.redgifs.ui.niche.R_ScreenNiche
 import com.client.xvideos.redgifs.ui.profile.atom.VerticalScrollbar
 import com.client.xvideos.redgifs.ui.profile.rememberVisibleRangePercentIgnoringFirstNForLazyColumn
+import com.client.xvideos.ui.theme.XvideosTheme
 import com.composeunstyled.Text
 import dagger.Binds
 import dagger.Module
@@ -73,92 +75,69 @@ object SavedNichesTab : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val vm: ScreenSavedNichesSM = getScreenModel()
-
         val state = rememberLazyListState()
 
         val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForLazyColumn(
             gridState = state, itemsToIgnore = 0
         )
 
-        /**  ➜ сюда запоминаем элемент, который пользователь хочет удалить  */
         var itemPendingDelete by remember { mutableStateOf<NichesInfo?>(null) }
 
-        /* ---------- Диалог подтверждения ---------- */
-        itemPendingDelete?.let { pending ->
-            AlertDialog(
-
-                icon = { UrlImage(pending.thumbnail, modifier = Modifier.size(96.dp)) },
-
-                onDismissRequest = { itemPendingDelete = null },
-
-                title = { Text("Удалить группу?", fontWeight = FontWeight.Bold, fontSize = 20.sp) },
-                text = {
-                    Text(buildAnnotatedString {
-                        append("Удалить «")
-                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) { append(pending.name) }
-                        append("» из сохранённых?")
-                    }, fontSize = 16.sp)
-                },
-
-                confirmButton = {
-                    TextButton(
-                        onClick = {
-                            vm.savedRed.niches.remove(pending)   // удаляем
-                            itemPendingDelete = null         // закрываем диалог
-                        }
-                    ) { Text("Удалить", fontSize = 16.sp, color = Color(0xFF6552A5)) }
-                },
-                dismissButton = {
-                    TextButton(
-                        onClick = { itemPendingDelete = null }
-                    ) { Text("Отмена", fontSize = 16.sp, color = Color(0xFF6552A5)) }
-                },
-
-                /* Доп. стили при желании */
-                containerColor = Color(0xFFEBE6EE)
-            )
-        }
-        /* ---------- /Диалог ---------- */
-
+        DeleteNicheDialog(
+            item = itemPendingDelete,
+            onDismiss = { itemPendingDelete = null },
+            onConfirm = { pending ->
+                vm.savedRed.niches.remove(pending)
+                itemPendingDelete = null
+            }
+        )
 
         Scaffold(topBar = {
-            Text(">Группы", modifier = Modifier.padding(start = 8.dp), color = ThemeRed.colorYellow, fontSize = 18.sp, fontFamily = ThemeRed.fontFamilyPopinsRegular)
+            Text(
+                ">Группы",
+                modifier = Modifier.padding(start = 8.dp),
+                color = ThemeRed.colorYellow,
+                fontSize = 18.sp,
+                fontFamily = ThemeRed.fontFamilyPopinsRegular
+            )
         }) { padding ->
 
-            Box(modifier = Modifier
-                .padding(top = padding.calculateTopPadding())
-                .fillMaxSize()) {
+            Box(
+                modifier = Modifier
+                    .padding(top = padding.calculateTopPadding())
+                    .fillMaxSize()
+            ) {
 
                 LazyColumn(
                     state = state,
                     modifier = Modifier.fillMaxSize()
                 )
                 {
-                    items(vm.savedRed.niches.list) {
+                    items(vm.savedRed.niches.list, key = { it.id }) { item ->
 
                         Row(
                             modifier = Modifier
-                                .padding(vertical = 2.dp)
-                                .padding(horizontal = 8.dp)
+                                .padding(vertical = 2.dp, horizontal = 6.dp)
                                 .fillMaxWidth()
-                                .background(ThemeRed.colorBottomBarDivider)
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(ThemeRed.colorTabLevel3)
                                 .clickable(onClick = {
                                     navigator.push(
-                                        R_ScreenNiche(it.id)
+                                        R_ScreenNiche(item.id)
                                     )
                                 }),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            UrlImage(it.thumbnail, modifier = Modifier.size(96.dp))
+                            UrlImage(item.thumbnail, modifier = Modifier.size(96.dp))
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                it.name,
+                                item.name,
                                 color = Color.White,
                                 fontSize = 20.sp,
                                 fontFamily = ThemeRed.fontFamilyDMsanss,
-                                maxLines = 3,              // сколько строк допускаем (можно убрать, чтобы было неограниченно)
-                                overflow = TextOverflow.Ellipsis,   // «…» если всё-таки не влезло
+                                maxLines = 3,
+                                overflow = TextOverflow.Ellipsis,
                                 modifier = Modifier.weight(1f)
                             )
 
@@ -167,9 +146,10 @@ object SavedNichesTab : Screen {
                                 modifier = Modifier
                                     .width(96.dp)
                                     .height(48.dp)
+                                    .clip(RoundedCornerShape(8.dp))
                                     .border(1.dp, Color.White, RoundedCornerShape(8.dp))
                                     .background(Color.Black)
-                                    .clickable { itemPendingDelete = it },
+                                    .clickable { itemPendingDelete = item },
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
@@ -186,28 +166,52 @@ object SavedNichesTab : Screen {
                     }
                 }
 
-                //---- Скролл ----
                 Box(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .align(Alignment.CenterEnd)
-                        .width(2.dp)
+                    modifier = Modifier.fillMaxHeight().align(Alignment.CenterEnd).width(2.dp)
                 ) {
                     VerticalScrollbar(scrollPercent)
                 }
             }
-
         }
     }
 }
 
-class ScreenSavedNichesSM @Inject constructor(
-    connectivityObserver: ConnectivityObserver,
-    val savedRed: SavedRed
-) : ScreenModel {
-
-
+@Composable
+private fun DeleteNicheDialog(
+    item: NichesInfo?,
+    onDismiss: () -> Unit,
+    onConfirm: (NichesInfo) -> Unit
+) {
+    item?.let { pending ->
+        AlertDialog(
+            icon = { UrlImage(pending.thumbnail, modifier = Modifier.clip(RoundedCornerShape(8.dp)).size(96.dp)) },
+            onDismissRequest = onDismiss,
+            title = { Text("Удалить группу?", fontWeight = FontWeight.Bold, fontSize = 20.sp) },
+            text = {
+                Text(buildAnnotatedString {
+                    append("Удалить «")
+                    withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) { append(pending.name) }
+                    append("» из сохранённых?")
+                }, fontSize = 16.sp)
+            },
+            confirmButton = {
+                TextButton(onClick = { onConfirm(pending) }) {
+                    Text("Удалить", fontSize = 16.sp, color = Color(0xFF6552A5))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = onDismiss) {
+                    Text("Отмена", fontSize = 16.sp, color = Color(0xFF6552A5))
+                }
+            },
+            containerColor = Color(0xFFEBE6EE)
+        )
+    }
 }
+
+class ScreenSavedNichesSM @Inject constructor(
+    val savedRed: SavedRed
+) : ScreenModel
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -215,5 +219,20 @@ abstract class ScreenModuleRedSavedNiches {
     @Binds
     @IntoMap
     @ScreenModelKey(ScreenSavedNichesSM::class)
-    abstract fun bindScreenRedSavedNichesScreenModel(hiltListScreenModel: ScreenSavedNichesSM): ScreenModel
+    abstract fun bindScreenRedSavedNichesScreenModel(screenModel: ScreenSavedNichesSM): ScreenModel
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun DeleteNicheDialogPreview() {
+    XvideosTheme {
+        DeleteNicheDialog(
+            item = NichesInfo(
+                name = "Sample Niche",
+                thumbnail = "https://via.placeholder.com/96"
+            ),
+            onDismiss = {},
+            onConfirm = {}
+        )
+    }
 }

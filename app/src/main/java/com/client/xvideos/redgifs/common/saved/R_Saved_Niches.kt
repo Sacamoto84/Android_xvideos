@@ -7,7 +7,7 @@ import com.client.xvideos.redgifs.model.NichesInfo
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlin.onSuccess
 
-class SavedRed_Niches() {
+class R_Saved_Niches {
 
     val nichesDb = FileDB(AppPath.r_niches, "niches", NichesInfo::class.java)
     val list = nichesDb.list
