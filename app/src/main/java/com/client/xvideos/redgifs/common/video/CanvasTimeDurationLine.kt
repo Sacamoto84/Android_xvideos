@@ -61,10 +61,11 @@ fun CanvasTimeDurationLine1(
 
     val infiniteTransition = rememberInfiniteTransition(label = "buffering")
     val bufferingColor by infiniteTransition.animateColor(
-        initialValue = Color.White,
-        targetValue = Color(0xFF137CBD), // Синий
+        initialValue = Color(0xFFCDECFB),
+        //targetValue = Color(0xFF137CBD), // Синий
+        targetValue = Color(0xFF73CDF1),
         animationSpec = infiniteRepeatable(
-            animation = tween(1000, easing = LinearEasing),
+            animation = tween(700, easing = LinearEasing),
             repeatMode = RepeatMode.Reverse
         ),
         label = "bufferingColor"

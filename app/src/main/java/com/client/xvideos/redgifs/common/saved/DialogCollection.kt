@@ -43,7 +43,7 @@ fun DialogCollection(
     onDismiss: () -> Unit,
     onBlockConfirmed: () -> Unit,
     onSelectCollection: (String) -> Unit = {},
-    savedRed: SavedRed
+    savedRed: () -> SavedRed
 ) {
 
     if (visible) {
@@ -64,7 +64,7 @@ fun DialogCollection(
                     modifier = Modifier.fillMaxWidth().weight(1f)
                 ){
                     LazyColumn(state = rememberLazyListState()) {
-                        items(savedRed.collections.collectionList) {
+                        items(savedRed().collections.collectionList) {
 
                             Row(
                                 modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)

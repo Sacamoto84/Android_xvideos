@@ -1,4 +1,4 @@
-package com.redgifs.common.expand_menu_video
+package com.client.xvideos.redgifs.common.expand_menu_video
 
 
 import androidx.compose.foundation.border
@@ -34,8 +34,7 @@ import com.client.xvideos.redgifs.model.GifsInfo
 
 
 private val tintColor = Color(0xFF48454E)
-private val style =
-    TextStyle(color = tintColor, fontFamily = ThemeRed.fontFamilyPopinsRegular, fontSize = 20.sp)
+private val style = TextStyle(color = tintColor, fontFamily = ThemeRed.fontFamilyPopinsRegular, fontSize = 20.sp)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

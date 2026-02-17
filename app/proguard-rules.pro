@@ -85,7 +85,7 @@
 -dontwarn com.client.common.videoplayer.util.PlaybackPreference$Companion
 -dontwarn com.client.common.videoplayer.util.PlaybackPreference
 -dontwarn com.client.xvideos.redgifs.ui.ScreenRedRoot
--dontwarn com.client.xvideos.redgifs.ui.ScreenRedRootSM
+-dontwarn com.client.xvideos.redgifs.ui.root.ScreenRedRootSM
 -dontwarn com.client.xvideos.redgifs.ui.explorer.tab.gifs.ScreenRedExplorerGifsSM
 -dontwarn com.client.xvideos.redgifs.ui.explorer.tab.niches.ScreenRedExplorerNichesSM
 -dontwarn com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.ScreenSavedCollectionSM

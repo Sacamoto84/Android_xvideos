@@ -53,7 +53,7 @@ import com.client.xvideos.redgifs.ui.fullscreen.ScreenRedFullScreen
 import com.client.xvideos.redgifs.ui.top_this_week.ProfileInfo1
 import com.redgifs.common.block.ui.DialogBlock
 import com.client.xvideos.redgifs.common.expand_menu_video.ExpandMenuVideo
-import com.redgifs.common.expand_menu_video.ExpandMenuVideoTags
+import com.client.xvideos.redgifs.common.expand_menu_video.ExpandMenuVideoTags
 import timber.log.Timber
 
 @OptIn(ExperimentalFoundationApi::class)

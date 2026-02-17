@@ -54,7 +54,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.PermissionScreenActivity.PermissionStorage
 import com.client.xvideos.common.util.KeepScreenOn
 import com.client.xvideos.l.ui.screens.explorer.L_ScreenExplorer
-import com.client.xvideos.redgifs.ui.ScreenRedRoot
+import com.client.xvideos.redgifs.ui.root.R_Screen_Root
 import com.client.xvideos.screenRoot.ScreenRoot
 import com.client.xvideos.screens.dashboards.ScreenXDashBoards
 import com.client.xvideos.screens.videoplayer.video.cache.VideoPlayerCacheManager
@@ -163,7 +163,7 @@ object MenuScreen : Screen {
                     navigator.push(L_ScreenExplorer()) // или ScreenLusciousRoot()
                 }
                 ButtonSelect(R.drawable.icon_red) {
-                    navigator.push(ScreenRedRoot()) // или ScreenRedRoot()
+                    navigator.push(R_Screen_Root()) // или ScreenRedRoot()
                 }
             }
         }

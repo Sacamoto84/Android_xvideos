@@ -30,6 +30,10 @@ class BlockRed @Inject constructor(
     @ApplicationScope private val scope: CoroutineScope
 ) {
 
+
+    //Блокируемый елемент
+    var blockItem : GifsInfo? = null
+
     //══════════ Блокировка ═══════════════════════════════════════════╦══════════════════════════════════════════════╗
     var blockVisibleDialog by mutableStateOf(false)                  //║ Показ диалога на добавление в блок лист      ║
     //var blockList = MutableStateFlow<List<GifsInfo>>(emptyList())  //║                                              ║

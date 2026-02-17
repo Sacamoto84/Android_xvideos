@@ -71,7 +71,7 @@ import com.redgifs.common.block.ui.DialogBlock
 import com.client.xvideos.redgifs.common.downloader.DownloadRed
 import com.redgifs.common.downloader.ui.DownloadIndicator
 import com.client.xvideos.redgifs.common.expand_menu_video.ExpandMenuVideo
-import com.redgifs.common.expand_menu_video.ExpandMenuVideoTags
+import com.client.xvideos.redgifs.common.expand_menu_video.ExpandMenuVideoTags
 import com.client.xvideos.redgifs.common.video.CanvasTimeDurationLine1
 import com.redgifs.common.video.PlayerControls
 import com.client.xvideos.redgifs.common.video.RedVideoPlayerWithMenu
@@ -232,12 +232,7 @@ class ScreenRedFullScreen(val item: GifsInfo) : Screen, ScreenTransition {
                                 .background(Color.DarkGray),
                             contentAlignment = Alignment.Center
                         ) {
-                            Icon(
-                                Icons.Default.Person,
-                                contentDescription = null,
-                                tint = Color.White,
-                                modifier = Modifier.size(18.dp)
-                            )
+                            Icon( Icons.Default.Person, contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp) )
                         }
                     }
 

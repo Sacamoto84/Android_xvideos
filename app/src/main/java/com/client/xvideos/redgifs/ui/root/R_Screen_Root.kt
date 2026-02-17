@@ -1,4 +1,4 @@
-package com.client.xvideos.redgifs.ui
+package com.client.xvideos.redgifs.ui.root
 
 import android.annotation.SuppressLint
 import androidx.activity.compose.BackHandler
@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -25,8 +24,10 @@ import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.ScreenTransition
+import com.client.xvideos.redgifs.common.block.BlockRed
 import com.client.xvideos.redgifs.common.di.HostDI
 import com.client.xvideos.redgifs.common.saved.DialogCollection
+import com.client.xvideos.redgifs.common.saved.SavedRed
 import com.client.xvideos.redgifs.ui.explorer.ScreenRedExplorer
 import com.client.xvideos.screenRoot.LocalRootScreenModel
 import com.client.xvideos.screenRoot.ScreenRootSM
@@ -40,7 +41,7 @@ import dagger.multibindings.IntoMap
 import timber.log.Timber
 import javax.inject.Inject
 
-class ScreenRedRoot() : Screen {
+class R_Screen_Root : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
 
@@ -51,50 +52,17 @@ class ScreenRedRoot() : Screen {
 
         val vm: ScreenRedRootSM = getScreenModel()
 
-        val scope = rememberCoroutineScope()
-
-        val haptic = LocalHapticFeedback.current
-
         val savedRed = vm.hostDI.savedRed
 
         val percentDownload = vm.hostDI.downloadRed.downloader.percent.collectAsStateWithLifecycle().value
 
         BackHandler { Timber.i("iii BackHandler Root") }
 
-
         //Диалог коллекции
-        if (savedRed.collections.collectionVisibleDialog) {
-            DialogCollection(
-                visible = savedRed.collections.collectionVisibleDialog,
-                onDismiss = { savedRed.collections.collectionVisibleDialog = false },
-                onBlockConfirmed = {
-                    savedRed.collections.collectionVisibleDialogCreateNew = true
-                },
-                onSelectCollection = { collection ->
-                    savedRed.collections.addCollection(
-                        savedRed.collections.collectionItemGifInfo!!,
-                        collection
-                    )
-                    savedRed.collections.collectionVisibleDialog = false
-                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                },
-                savedRed = savedRed
-            )
-        }
+        if (savedRed.collections.collectionVisibleDialog) { R_DialogCollection(savedRed = {savedRed}) }
 
         //Диалог для блокировки
-        if (vm.hostDI.block.blockVisibleDialog) {
-            DialogBlock(
-                visible = vm.hostDI.block.blockVisibleDialog,
-                onDismiss = { vm.hostDI.block.blockVisibleDialog = false },
-                onBlockConfirmed = {
-                    // if (blockItem != null) {
-                    //     vm.hostDI.block.blockItem(blockItem!!)
-                    //     blockItem = null
-                    // }
-                }
-            )
-        }
+        if (vm.hostDI.block.blockVisibleDialog) { R_DialogBlock(block = {vm.hostDI.block}) }
 
         CompositionLocalProvider(LocalRootScreenModel provides ScreenRootSM()) {
             Scaffold(
@@ -102,6 +70,7 @@ class ScreenRedRoot() : Screen {
                 bottomBar = { DownloadIndicator(percentDownload) }) {
                 Navigator(ScreenRedExplorer()) { navigator ->
                     //SlideTransition(navigator)
+
 
                     ScreenTransition(
                         navigator = navigator,
@@ -114,17 +83,59 @@ class ScreenRedRoot() : Screen {
                         }
                     )
 
+
                 }
             }
         }
     }
 }
 
-class ScreenRedRootSM @Inject constructor(
-    val hostDI: HostDI
-) : ScreenModel {
+
+
+
+
+@Composable
+private fun R_DialogBlock(block:  () -> BlockRed){
+
+    DialogBlock(
+        visible = block().blockVisibleDialog,
+        onDismiss = { block().blockVisibleDialog = false },
+        onBlockConfirmed = {
+            if (block().blockItem != null) {
+                block().blockItem(block().blockItem!!)
+                block().blockItem = null
+            }
+        }
+    )
 
 }
+
+
+    @Composable
+private fun R_DialogCollection(savedRed: () -> SavedRed){
+
+    val haptic = LocalHapticFeedback.current
+
+    DialogCollection(
+        visible = savedRed().collections.collectionVisibleDialog,
+        onDismiss = { savedRed().collections.collectionVisibleDialog = false },
+        onBlockConfirmed = {
+            savedRed().collections.collectionVisibleDialogCreateNew = true
+        },
+        onSelectCollection = { collection ->
+            savedRed().collections.addCollection(
+                savedRed().collections.collectionItemGifInfo!!,
+                collection
+            )
+            savedRed().collections.collectionVisibleDialog = false
+            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+        },
+        savedRed = savedRed
+    )
+
+}
+
+class ScreenRedRootSM @Inject constructor( val hostDI: HostDI ) : ScreenModel
 
 @Module
 @InstallIn(SingletonComponent::class)
