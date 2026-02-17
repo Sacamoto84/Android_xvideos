@@ -70,36 +70,9 @@ class ScreenCollectionName(val collectionName: String) : Screen {
             savedRed.collections.selectedCollection.value = null
         }
 
-
-
-
-
-
 //        LaunchedEffect(R_SavedCollectionTab.columnSelect.column) {
 //            vm.likedHost.columns = R_SavedCollectionTab.columnSelect.column
 //        }
-
-
-
-
-
-
-
-        /* ---------- /Диалог ---------- */
-        val block = vm.block
-        //Диалог для блокировки
-        if (block.blockVisibleDialog) {
-            DialogBlock(
-                visible = block.blockVisibleDialog,
-                onDismiss = { block.blockVisibleDialog = false },
-                onBlockConfirmed = {
-                    if ((blockItem != null)) {
-                        block.blockItem(blockItem!!)
-                        blockItem = null
-                    }
-                }
-            )
-        }
 
         var collectionVisibleDialogCreateNew by remember { mutableStateOf(false) }
 
@@ -120,7 +93,7 @@ class ScreenCollectionName(val collectionName: String) : Screen {
 
         Scaffold(topBar = {
             Text(
-                ">Коллекция>" + selectedCollection ?: "---",
+                ">Коллекция>$selectedCollection",
                 modifier = Modifier.padding(start = 8.dp),
                 color = ThemeRed.colorYellow,
                 fontSize = 18.sp,

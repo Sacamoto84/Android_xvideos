@@ -59,20 +59,7 @@ class ScreenRedProfile(val profileName: String) : Screen {
         val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForGrid(
             gridState = vm.likedHost.state, itemsToIgnore = 3, numberOfColumns = 2
         )
-
-        val block = vm.hostDI.block
-
-        //🟨🟨🟨🟨🟨🟨🟨🟨🎨🎨🎨🟨🟨🟨🟨🟨🟨🟨🟨
-        //╭┈┈ Диалог блокировки ┈┈╮
-        //│ Отмена    Блокировать │
-        //╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈╯
-        DialogBlock(
-            visible = block.blockVisibleDialog,
-            onDismiss = { block.blockVisibleDialog = false }) {
-            val a = vm.currentTikTokGifInfo; if (a != null) {
-                block.blockItem(a)
-            }
-        }
+        
         //🟨🟨🟨🟨🟨🟨🟨🟨⬆️⬆️⬆️⬆️⬆️❗
 
         Scaffold(containerColor = Color(0xFF303030)) {

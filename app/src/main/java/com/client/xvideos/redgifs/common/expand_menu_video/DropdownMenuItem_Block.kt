@@ -13,15 +13,17 @@ import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.redgifs.common.block.BlockRed
 import com.client.xvideos.redgifs.model.GifsInfo
 import com.client.xvideos.ui.theme.XvideosTheme
+import com.skydoves.compose.stability.runtime.TraceRecomposition
 
+@TraceRecomposition
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DropdownMenuItem_Block(item: GifsInfo? = null, block: () -> BlockRed, onDismiss: () -> Unit) {
     DropdownMenuItem_BlockContent(
         item = item,
         onBlockClick = {
-            block.invoke().blockItem = item
-            block.invoke().blockVisibleDialog = true
+            block().blockItem = item
+            block().blockVisibleDialog = true
         },
         onDismiss = onDismiss,
     )

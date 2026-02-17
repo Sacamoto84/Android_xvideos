@@ -79,8 +79,6 @@ object R_SavedCollectionTab : Screen {
 
         val vm = getScreenModel<ScreenSavedCollectionSM>()
 
-        var blockItem by rememberSaveable { mutableStateOf<GifsInfo?>(null) }
-
         val savedRed = vm.hostDI.savedRed
 
         val selectedCollection = savedRed.collections.selectedCollection.collectAsStateWithLifecycle().value
@@ -136,21 +134,6 @@ object R_SavedCollectionTab : Screen {
                 containerColor = Color(0xFFEBE6EE)
             )
         }
-        /* ---------- /Диалог ---------- */
-        val block = vm.block
-        //Диалог для блокировки
-        if (block.blockVisibleDialog) {
-            DialogBlock(
-                visible = block.blockVisibleDialog,
-                onDismiss = { block.blockVisibleDialog = false },
-                onBlockConfirmed = {
-                    if ((blockItem != null)) {
-                        block.blockItem(blockItem!!)
-                        blockItem = null
-                    }
-                }
-            )
-        }
 
         var collectionVisibleDialogCreateNew by remember { mutableStateOf(false) }
 
@@ -171,7 +154,7 @@ object R_SavedCollectionTab : Screen {
 
         Scaffold(topBar = {
             Text(
-                ">Коллекция>" + selectedCollection ?: "---",
+                ">Коллекция>$selectedCollection",
                 modifier = Modifier.padding(start = 8.dp),
                 color = ThemeRed.colorYellow,
                 fontSize = 18.sp,

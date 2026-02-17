@@ -43,6 +43,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
 import cafe.adriel.voyager.navigator.LocalNavigator
 import com.client.xvideos.redgifs.common.UsersRed
 import com.client.xvideos.redgifs.common.video.player_row_mini.RedUrlVideoImageAndLongClick
@@ -96,7 +97,7 @@ fun LazyRow123Content(
 
     val isConnected by host.isConnected.collectAsStateWithLifecycle()
     val state = host.state
-    var blockItem by remember { mutableStateOf<GifsInfo?>(null) }
+
     val navigator = LocalNavigator.current
     val block = host.hostDI.block
     val downloadList by host.hostDI.downloadRed.downloadList.collectAsState()
@@ -123,20 +124,6 @@ fun LazyRow123Content(
         }
     }
 
-    if (block.blockVisibleDialog) {
-        DialogBlock(
-            visible = block.blockVisibleDialog,
-            onDismiss = { block.blockVisibleDialog = false },
-            onBlockConfirmed = {
-                blockItem?.let {
-                    block.blockItem(it)
-                    listGifs.refresh()
-                    blockItem = null
-                }
-            }
-        )
-    }
-
     Box(modifier.fillMaxSize()) {
         if (host.columns in 1..4) {
             LazyVerticalGrid(
@@ -149,10 +136,7 @@ fun LazyRow123Content(
 
                 items(
                     count = listGifs.itemCount,
-                    key = { index ->
-                        val item = listGifs.peek(index)
-                        if (item == null) "placeholder_$index" else "${item.id}_$index"
-                    },
+                    key = listGifs.itemKey { it.id },
                     contentType = { "video_grid_item" }
                 ) { index ->
                     listGifs[index]?.let { item ->
@@ -168,7 +152,7 @@ fun LazyRow123Content(
                             isDownloaded = isDownloaded,
                             isRunLike = isRunLike,
                             onItemClick = {
-                                blockItem = item
+                                host.hostDI.block.blockItem = item
                                 navigator?.push(ScreenRedFullScreen(item))
                             },
                             onRefresh = { listGifs.refresh() },

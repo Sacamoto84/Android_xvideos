@@ -112,19 +112,6 @@ class ScreenRedFullScreen(val item: GifsInfo) : Screen, ScreenTransition {
                 "https://api.redgifs.com/v2/gifs/${item.id.lowercase()}/hd.m3u8"
         }
 
-        if (vm.hostDI.block.blockVisibleDialog) {
-            DialogBlock(
-                visible = vm.hostDI.block.blockVisibleDialog,
-                onDismiss = { vm.hostDI.block.blockVisibleDialog = false },
-                onBlockConfirmed = {
-                    if ((blockItem != null)) {
-                        vm.hostDI.block.blockItem(blockItem!!)
-                        blockItem = null
-                    }
-                }
-            )
-        }
-
         Scaffold(
             bottomBar = {
                 Column(modifier = Modifier.background(ThemeRed.colorCommonBackground)) {

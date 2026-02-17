@@ -24,9 +24,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.client.xvideos.ui.theme.XvideosTheme
 import com.composables.core.HorizontalSeparator
 
 @Composable
@@ -105,4 +107,16 @@ fun DialogBlock(
         }
     }
 
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun DialogBlockPreview() {
+    XvideosTheme {
+        DialogBlock(
+            visible = true,
+            onDismiss = {},
+            onBlockConfirmed = {}
+        )
+    }
 }
