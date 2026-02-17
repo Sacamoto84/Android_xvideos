@@ -9,10 +9,12 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.tooling.preview.Preview
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.redgifs.common.saved.SavedRed
 import com.client.xvideos.redgifs.model.GifsInfo
 import com.client.xvideos.redgifs.network.api.RedApi
+import com.client.xvideos.ui.theme.XvideosTheme
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -22,13 +24,10 @@ import kotlinx.coroutines.launch
 @Composable
 fun DropdownMenuItem_Follow(item: GifsInfo? = null, redApi:()-> RedApi, savedRed: ()->SavedRed, onDismiss: () -> Unit){
     val isFollowed = savedRed.invoke().creators.list.any { it.username == item?.userName }
-    val textFollowed = if (isFollowed) "Unfollow" else "Follow"
-    val textFollowedIcon = if (isFollowed) Icons.Default.Person else Icons.Default.PermIdentity
-    DropdownMenuItem(
-        leadingIcon = {Icon(textFollowedIcon, contentDescription = "", tint = ThemeL.ExpandMenu.tintColor)},
-        text = { Text(textFollowed, style = ThemeL.ExpandMenu.style) },
+    DropdownMenuItem_FollowContent(
+        isFollowed = isFollowed,
         onClick = {
-            if (item == null) return@DropdownMenuItem
+            if (item == null) return@DropdownMenuItem_FollowContent
             GlobalScope.launch {
                 delay(200)
                 if (!isFollowed) {
@@ -42,6 +41,33 @@ fun DropdownMenuItem_Follow(item: GifsInfo? = null, redApi:()-> RedApi, savedRed
                 }
             }
             onDismiss.invoke()
-        }, contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+        }
     )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun DropdownMenuItem_FollowContent(
+    isFollowed: Boolean,
+    onClick: () -> Unit
+) {
+    val textFollowed = if (isFollowed) "Unfollow" else "Follow"
+    val textFollowedIcon = if (isFollowed) Icons.Default.Person else Icons.Default.PermIdentity
+    DropdownMenuItem(
+        leadingIcon = {Icon(textFollowedIcon, contentDescription = "", tint = ThemeL.ExpandMenu.tintColor)},
+        text = { Text(textFollowed, style = ThemeL.ExpandMenu.style) },
+        onClick = onClick,
+        contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun DropdownMenuItem_FollowPreview() {
+    XvideosTheme {
+        DropdownMenuItem_FollowContent(
+            isFollowed = false,
+            onClick = {}
+        )
+    }
 }

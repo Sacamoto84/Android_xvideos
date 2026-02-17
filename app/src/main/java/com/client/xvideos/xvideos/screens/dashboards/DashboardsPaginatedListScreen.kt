@@ -13,7 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -105,8 +105,8 @@ fun DashboardsPaginatedListScreen(pageIndex: Int, vm: ScreenXDashBoardsScreenMod
         columns = GridCells.Fixed(itemsPerRow),
         modifier = Modifier.fillMaxSize(),
     ) {
-        items(l, key = {it.id})
-        { cell ->
+        itemsIndexed(l, key = { index, it -> "${it.id}_$index" })
+        { index, cell ->
 
             Box(
                 modifier = Modifier

@@ -43,7 +43,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.itemKey
 import cafe.adriel.voyager.navigator.LocalNavigator
 import com.client.xvideos.redgifs.common.UsersRed
 import com.client.xvideos.redgifs.common.video.player_row_mini.RedUrlVideoImageAndLongClick
@@ -150,7 +149,10 @@ fun LazyRow123Content(
 
                 items(
                     count = listGifs.itemCount,
-                    key = listGifs.itemKey { it.id },
+                    key = { index ->
+                        val item = listGifs.peek(index)
+                        if (item == null) "placeholder_$index" else "${item.id}_$index"
+                    },
                     contentType = { "video_grid_item" }
                 ) { index ->
                     listGifs[index]?.let { item ->

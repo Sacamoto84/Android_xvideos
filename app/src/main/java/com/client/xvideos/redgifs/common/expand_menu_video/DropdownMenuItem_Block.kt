@@ -8,19 +8,61 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.tooling.preview.Preview
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.redgifs.common.block.BlockRed
 import com.client.xvideos.redgifs.model.GifsInfo
+import com.client.xvideos.ui.theme.XvideosTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DropdownMenuItem_Block(item: GifsInfo? = null, block:()-> BlockRed, onDismiss: () -> Unit){
+fun DropdownMenuItem_Block(item: GifsInfo? = null, block: () -> BlockRed, onDismiss: () -> Unit) {
+    DropdownMenuItem_BlockContent(
+        item = item,
+        onBlockClick = {
+            block.invoke().blockItem = item
+            block.invoke().blockVisibleDialog = true
+        },
+        onDismiss = onDismiss,
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DropdownMenuItem_BlockContent(
+    item: GifsInfo? = null,
+    onBlockClick: () -> Unit,
+    onDismiss: () -> Unit,
+) {
     DropdownMenuItem(
-        leadingIcon = {Icon(Icons.Default.Block, contentDescription = "", tint = ThemeL.ExpandMenu.tintColor)},
+        leadingIcon = {
+            Icon(
+                Icons.Default.Block,
+                contentDescription = "",
+                tint = ThemeL.ExpandMenu.tintColor,
+            )
+        },
         text = { Text("Блокировать", style = ThemeL.ExpandMenu.style) },
         onClick = {
-            if (item == null) return@DropdownMenuItem; block.invoke().blockVisibleDialog = true
+            if (item == null) return@DropdownMenuItem
+            onBlockClick.invoke()
             onDismiss.invoke()
-        }, contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+        },
+        contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DropdownMenuItem_BlockPreview() {
+    XvideosTheme {
+        DropdownMenuItem_BlockContent(
+            item = GifsInfo(
+                id = "test_id",
+                userName = "test_user",
+                description = "Test Description",
+            ),
+            onBlockClick = {},
+        ) {}
+    }
 }

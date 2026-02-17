@@ -167,7 +167,10 @@ object R_ScreenNichesTab : Screen {
                 LazyColumn( state = state, modifier = Modifier.fillMaxSize() )
                 {
                     items(
-                        key = { index -> listNiche[index]?.id ?: index },
+                        key = { index -> 
+                            val item = listNiche.peek(index)
+                            if (item == null) "placeholder_$index" else "${item.id}_$index"
+                        },
                         count = listNiche.itemCount,
                     ) { index ->
                         val item = listNiche[index]
