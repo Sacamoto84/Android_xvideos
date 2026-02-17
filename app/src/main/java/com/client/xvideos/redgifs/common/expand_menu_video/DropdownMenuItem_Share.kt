@@ -8,14 +8,15 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.redgifs.model.GifsInfo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DropdownMenuItem_Share(item: GifsInfo? = null, onClick: (GifsInfo) -> Unit, onDismiss: () -> Unit){
     DropdownMenuItem(
-        leadingIcon = {Icon(Icons.Default.Share, contentDescription = "", tint = tintColor)},
-        text = { Text("Поделиться", style = style) },
+        leadingIcon = {Icon(Icons.Default.Share, contentDescription = "", tint = ThemeL.ExpandMenu.tintColor)},
+        text = { Text("Поделиться", style = ThemeL.ExpandMenu.style) },
         onClick = {
             if (item == null) return@DropdownMenuItem
             //DownloadRed.downloadItem(item)

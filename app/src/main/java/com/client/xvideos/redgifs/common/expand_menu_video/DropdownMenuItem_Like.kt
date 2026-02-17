@@ -9,6 +9,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.redgifs.common.saved.SavedRed
 import com.client.xvideos.redgifs.model.GifsInfo
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -23,8 +24,8 @@ fun DropdownMenuItem_Like(item: GifsInfo? = null, onRunLike: () -> Unit, savedRe
     val textLiked = if (isLiked) "Unlike" else "Like"
     val textLikedIcon = if (isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder
     DropdownMenuItem(
-        leadingIcon = {Icon(textLikedIcon, contentDescription = "", tint = tintColor)},
-        text = { Text(textLiked, style = style) },
+        leadingIcon = {Icon(textLikedIcon, contentDescription = "", tint = ThemeL.ExpandMenu.tintColor)},
+        text = { Text(textLiked, style = ThemeL.ExpandMenu.style) },
         onClick = {
             if (item == null) return@DropdownMenuItem
             GlobalScope.launch {

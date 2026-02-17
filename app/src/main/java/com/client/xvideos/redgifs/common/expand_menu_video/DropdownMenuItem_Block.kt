@@ -8,6 +8,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.redgifs.common.block.BlockRed
 import com.client.xvideos.redgifs.model.GifsInfo
 
@@ -15,8 +16,8 @@ import com.client.xvideos.redgifs.model.GifsInfo
 @Composable
 fun DropdownMenuItem_Block(item: GifsInfo? = null, block:()-> BlockRed, onDismiss: () -> Unit){
     DropdownMenuItem(
-        leadingIcon = {Icon(Icons.Default.Block, contentDescription = "", tint = tintColor)},
-        text = { Text("Блокировать", style = style) },
+        leadingIcon = {Icon(Icons.Default.Block, contentDescription = "", tint = ThemeL.ExpandMenu.tintColor)},
+        text = { Text("Блокировать", style = ThemeL.ExpandMenu.style) },
         onClick = {
             if (item == null) return@DropdownMenuItem; block.invoke().blockVisibleDialog = true
             onDismiss.invoke()

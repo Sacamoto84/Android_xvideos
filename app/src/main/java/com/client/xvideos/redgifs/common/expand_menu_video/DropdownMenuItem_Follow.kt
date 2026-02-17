@@ -9,6 +9,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.redgifs.common.saved.SavedRed
 import com.client.xvideos.redgifs.model.GifsInfo
 import com.client.xvideos.redgifs.network.api.RedApi
@@ -24,8 +25,8 @@ fun DropdownMenuItem_Follow(item: GifsInfo? = null, redApi:()-> RedApi, savedRed
     val textFollowed = if (isFollowed) "Unfollow" else "Follow"
     val textFollowedIcon = if (isFollowed) Icons.Default.Person else Icons.Default.PermIdentity
     DropdownMenuItem(
-        leadingIcon = {Icon(textFollowedIcon, contentDescription = "", tint = tintColor)},
-        text = { Text(textFollowed, style = style) },
+        leadingIcon = {Icon(textFollowedIcon, contentDescription = "", tint = ThemeL.ExpandMenu.tintColor)},
+        text = { Text(textFollowed, style = ThemeL.ExpandMenu.style) },
         onClick = {
             if (item == null) return@DropdownMenuItem
             GlobalScope.launch {

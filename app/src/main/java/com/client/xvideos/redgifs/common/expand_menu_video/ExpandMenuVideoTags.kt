@@ -27,10 +27,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.model.GifsInfo
+import com.client.xvideos.ui.theme.XvideosTheme
 
 
 private val tintColor = Color(0xFF48454E)
@@ -101,15 +103,14 @@ fun ExpandMenuVideoTags(
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
+@Preview(showBackground = true, backgroundColor = 0xFF303030)
+@Composable
+fun ExpandMenuVideoTagsPreview() {
+    XvideosTheme {
+        ExpandMenuVideoTags(
+            item = GifsInfo(
+                tags = listOf("Action", "Adventure", "Comedy", "Drama", "Fantasy", "Sci-Fi")
+            )
+        )
+    }
+}

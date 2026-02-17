@@ -9,6 +9,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.redgifs.common.saved.SavedRed
 import com.client.xvideos.redgifs.model.GifsInfo
 
@@ -23,10 +24,10 @@ fun DropdownMenuItem_RemoveFromCollection(item: GifsInfo? = null, onRefresh: () 
             Icon(
                 Icons.Default.RemoveCircleOutline,
                 contentDescription = "",
-                tint = tintColor
+                tint = ThemeL.ExpandMenu.tintColor
             )
         },
-        text = { Text("Remove from Collection", style = style) },
+        text = { Text("Remove from Collection", style = ThemeL.ExpandMenu.style) },
         onClick = {
             if (item == null) return@DropdownMenuItem
             if (selectedCollection == null) {

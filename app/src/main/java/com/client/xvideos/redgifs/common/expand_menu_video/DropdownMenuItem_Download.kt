@@ -9,6 +9,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.redgifs.model.GifsInfo
 import com.client.xvideos.ui.theme.XvideosTheme
 
@@ -16,8 +17,8 @@ import com.client.xvideos.ui.theme.XvideosTheme
 @Composable
 fun DropdownMenuItem_Download(item: GifsInfo? = null, onClick: (GifsInfo) -> Unit = {}, onDismiss: () -> Unit){
     DropdownMenuItem(
-        leadingIcon = {Icon(Icons.Filled.FileDownload, contentDescription = "", tint = tintColor)},
-        text = {Text("Скачать", style = style)},
+        leadingIcon = {Icon(Icons.Filled.FileDownload, contentDescription = "", tint = ThemeL.ExpandMenu.tintColor)},
+        text = {Text("Скачать", style = ThemeL.ExpandMenu.style)},
         onClick = {
             if (item == null) return@DropdownMenuItem
             onClick.invoke(item)
