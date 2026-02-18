@@ -12,8 +12,8 @@ import com.client.xvideos.redgifs.model.NichesInfo
 import com.client.xvideos.redgifs.model.NichesResponse
 import com.client.xvideos.redgifs.model.TopCreatorsResponse
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.LazyRow123Host
-import com.client.xvideos.redgifs.ui.ui.lazyrow123.TypePager
 import com.client.xvideos.redgifs.common.di.HostDI
+import com.client.xvideos.redgifs.ui.ui.lazyrow123.model.TypePager
 import dagger.Binds
 import dagger.Module
 import dagger.assisted.Assisted

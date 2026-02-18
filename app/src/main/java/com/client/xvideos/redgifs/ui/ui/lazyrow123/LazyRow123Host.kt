@@ -24,6 +24,7 @@ import com.client.xvideos.redgifs.common.pagin.ItemNailsPagingSource
 import com.client.xvideos.redgifs.common.pagin.ItemProfilePagingSource
 import com.redgifs.common.pagin.ItemSavedLikesPagingSource
 import com.client.xvideos.redgifs.common.pagin.ItemTopPagingSource
+import com.client.xvideos.redgifs.ui.ui.lazyrow123.model.TypePager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -38,16 +39,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
-
-enum class TypePager {
-    NICHES,
-    TOP,
-    R_SAVED_LIKES,
-    SAVED_COLLECTION,
-    PROFILE,
-    EXPLORER_NICHES,
-    EMPTY
-}
 
 private data class SearchParams(
     val query: String,

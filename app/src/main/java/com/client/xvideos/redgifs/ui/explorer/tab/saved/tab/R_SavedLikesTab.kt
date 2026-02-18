@@ -4,13 +4,10 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -28,11 +25,10 @@ import com.client.xvideos.common.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.redgifs.common.di.HostDI
 import com.client.xvideos.redgifs.ui.profile.ScreenRedProfile
-import com.client.xvideos.redgifs.ui.profile.atom.VerticalScrollbar
 import com.client.xvideos.redgifs.ui.profile.rememberVisibleRangePercentIgnoringFirstNForGrid
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.LazyRow123
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.LazyRow123Host
-import com.client.xvideos.redgifs.ui.ui.lazyrow123.TypePager
+import com.client.xvideos.redgifs.ui.ui.lazyrow123.model.TypePager
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -109,7 +105,6 @@ class ScreenSavedLikesSM @Inject constructor(
 
 ) : ScreenModel {
 
-    @OptIn(DelicateCoroutinesApi::class)
     val likedHost = LazyRow123Host(
         connectivityObserver = connectivityObserver,
         scope = screenModelScope,

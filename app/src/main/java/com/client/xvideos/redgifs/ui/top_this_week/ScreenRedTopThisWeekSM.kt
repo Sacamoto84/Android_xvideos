@@ -6,8 +6,8 @@ import cafe.adriel.voyager.hilt.ScreenModelKey
 import com.client.xvideos.common.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.redgifs.ui.top_this_week.model.VisibleType
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.LazyRow123Host
-import com.client.xvideos.redgifs.ui.ui.lazyrow123.TypePager
 import com.client.xvideos.redgifs.common.di.HostDI
+import com.client.xvideos.redgifs.ui.ui.lazyrow123.model.TypePager
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

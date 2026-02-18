@@ -61,12 +61,12 @@ import com.client.xvideos.redgifs.ui.profile.ScreenRedProfile
 import com.client.xvideos.redgifs.ui.profile.atom.VerticalScrollbar
 import com.client.xvideos.redgifs.ui.profile.rememberVisibleRangePercentIgnoringFirstNForLazyColumn
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.LazyRow123Host
-import com.client.xvideos.redgifs.ui.ui.lazyrow123.TypePager
 import com.composeunstyled.Text
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.model.Order
 import com.client.xvideos.redgifs.model.UserInfo
 import com.client.xvideos.redgifs.common.di.HostDI
+import com.client.xvideos.redgifs.ui.ui.lazyrow123.model.TypePager
 import com.client.xvideos.ui.theme.XvideosTheme
 import dagger.Binds
 import dagger.Module

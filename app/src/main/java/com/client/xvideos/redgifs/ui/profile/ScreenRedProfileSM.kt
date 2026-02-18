@@ -17,7 +17,6 @@ import com.client.xvideos.redgifs.model.GifsInfo
 import com.client.xvideos.redgifs.model.MediaType
 import com.client.xvideos.redgifs.model.Order
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.LazyRow123Host
-import com.client.xvideos.redgifs.ui.ui.lazyrow123.TypePager
 import com.client.xvideos.redgifs.common.di.HostDI
 import com.client.xvideos.redgifs.common.network.loadGifs
 import com.client.xvideos.redgifs.common.share.useCaseShareGifs
@@ -38,6 +37,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import com.client.xvideos.redgifs.model.UserInfo
+import com.client.xvideos.redgifs.ui.ui.lazyrow123.model.TypePager
 
 enum class TypeGifs(val value: String) {
     ALL("All"),

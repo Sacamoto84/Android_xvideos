@@ -17,9 +17,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
@@ -35,6 +37,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -46,22 +50,22 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.common.connectivityObserver.ConnectivityObserver
-import com.client.xvideos.common.settings.element.SettingElementInt
 import com.client.xvideos.common.settings.Settings
+import com.client.xvideos.common.settings.element.SettingElementInt
 import com.client.xvideos.common.settings.element.SettingElementList
+import com.client.xvideos.redgifs.common.ThemeRed
+import com.client.xvideos.redgifs.common.di.HostDI
+import com.client.xvideos.redgifs.model.Order
 import com.client.xvideos.redgifs.ui.profile.ScreenRedProfile
 import com.client.xvideos.redgifs.ui.profile.atom.VerticalScrollbar
 import com.client.xvideos.redgifs.ui.profile.rememberVisibleRangePercentIgnoringFirstNForGrid
 import com.client.xvideos.redgifs.ui.ui.atom.ButtonUp
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.LazyRow123
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.LazyRow123Host
-import com.client.xvideos.redgifs.ui.ui.lazyrow123.TypePager
+import com.client.xvideos.redgifs.ui.ui.lazyrow123.model.TypePager
 import com.client.xvideos.redgifs.ui.ui.sortByOrder.SortByOrder
-import com.client.xvideos.redgifs.common.ThemeRed
-import com.client.xvideos.redgifs.common.di.HostDI
-import com.client.xvideos.redgifs.model.Order
+import com.client.xvideos.ui.theme.XvideosTheme
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -71,17 +75,15 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+fun ColumnSelect_AddColumn(pref: SettingElementInt, list: SettingElementList<Boolean>) {
+    val flags = list.field.value
+    val enabledIndices = flags.mapIndexedNotNull { index, enabled -> if (enabled) index else null }
+    if (enabledIndices.isEmpty()) return
+    val currentIndex = pref.field.value
+    val currentPos = enabledIndices.indexOf(currentIndex).takeIf { it != -1 } ?: 2
+    val nextPos = (currentPos + 1) % enabledIndices.size
 
-
-fun ColumnSelect_AddColumn(pref: SettingElementInt, list: SettingElementList<Boolean> ){
-        val flags = list.field.value
-        val enabledIndices = flags.mapIndexedNotNull { index, enabled -> if (enabled) index else null }
-        if (enabledIndices.isEmpty()) return // ничего не включено
-        val currentIndex = pref.field.value
-        val currentPos = enabledIndices.indexOf(currentIndex).takeIf { it != -1 } ?: 2
-        val nextPos = (currentPos + 1) % enabledIndices.size
-
-        pref.setValue(enabledIndices[nextPos])
+    pref.setValue(enabledIndices[nextPos])
 }
 
 object R_ScreenGifsTab : Screen {
@@ -90,187 +92,165 @@ object R_ScreenGifsTab : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
 
-    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
-
         val vm: ScreenRedExplorerGifsSM = getScreenModel()
+        R_ScreenGifsTabContent(vm)
+    }
+}
 
-        val navigator = LocalNavigator.currentOrThrow
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun R_ScreenGifsTabContent(vm: ScreenRedExplorerGifsSM) {
+    val navigator = LocalNavigator.current
+    val host = vm.lazyHost.pager.collectAsLazyPagingItems()
+    val scope = rememberCoroutineScope()
+    val haptic = LocalHapticFeedback.current
 
-        val state = rememberPullToRefreshState()
-        var isRefreshing by remember { mutableStateOf(false) }
+    val columnSelect by Settings.current_count_gifTab.field.collectAsStateWithLifecycle()
+    val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForGrid(
+        gridState = vm.lazyHost.state,
+        itemsToIgnore = 0,
+        numberOfColumns = columnSelect
+    )
 
-        val host = vm.lazyHost.pager.collectAsLazyPagingItems()
+    val search = vm.hostDI.search
+    val searchR by search.searchText.collectAsStateWithLifecycle()
+    val isFocused by search.focused.collectAsStateWithLifecycle()
+    val sortType by vm.lazyHost.sortType.collectAsStateWithLifecycle()
 
-        val scope = rememberCoroutineScope()
-
-        val haptic = LocalHapticFeedback.current
-
-        val columnSelect  = Settings.r_current_count_niches.field.collectAsStateWithLifecycle().value
-
-        val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForGrid(
-            gridState = vm.lazyHost.state, itemsToIgnore = 0, numberOfColumns = columnSelect
-        )
-
-        val search = vm.hostDI.search
-
-        val searchR = search.searchText.collectAsStateWithLifecycle().value
-
-        LaunchedEffect(columnSelect) {
-            vm.lazyHost.columns = columnSelect
-        }
-
-        val isFocused = vm.hostDI.search.focused.collectAsStateWithLifecycle().value
-
-        Scaffold(bottomBar = {
-
-            Column(Modifier.background(ThemeRed.colorTabLevel1)) {
-                HorizontalDivider(color = ThemeRed.colorBorderGray)
-                Row(
-                    modifier = Modifier
-                        .padding(top = 1.dp, start = 1.dp)
-                        .background(ThemeRed.colorTabLevel1), verticalAlignment = Alignment.Bottom
-                ) {
-
-                    AnimatedVisibility(
-                        visible = !isFocused,
-                        enter = expandHorizontally(animationSpec = tween(durationMillis = 250)) + fadeIn(
-                            animationSpec = tween(durationMillis = 250)
-                        ),
-                        exit = shrinkHorizontally(animationSpec = tween(durationMillis = 250)) + fadeOut(
-                            animationSpec = tween(durationMillis = 250)
-                        ),
-                    ) {
-
-                        //
-                        if (searchR.text == "") {
-                            SortByOrder(
-                                containerColor = ThemeRed.colorCommonBackground,
-                                list = listOf(
-                                    Order.TOP_WEEK,
-                                    Order.TOP_MONTH,
-                                    Order.TOP_ALLTIME,
-                                    Order.TRENDING,
-                                    Order.LATEST
-                                ),
-                                selected = vm.lazyHost.sortType.collectAsStateWithLifecycle().value,
-                                onSelect = { vm.lazyHost.changeSortType(it) }
-
-                            )
-                        } else {
-                            SortByOrder(
-                                containerColor = ThemeRed.colorCommonBackground,
-                                list = listOf(Order.TOP, Order.TRENDING, Order.LATEST),
-                                selected = vm.lazyHost.sortType.collectAsStateWithLifecycle().value,
-                                onSelect = { vm.lazyHost.changeSortType(it) })
-                        }
-
-                    }
-
-                    search.CustomBasicTextField(
-                        modifier = Modifier
-                            .padding(start = 4.dp)
-                            .weight(1f)
-                    )
-
-                    Spacer(modifier = Modifier.width(4.dp))
-
-                    AnimatedVisibility(
-                        visible = !isFocused,
-
-                        enter = expandHorizontally(
-                            animationSpec = tween(durationMillis = 250),
-                            expandFrom = Alignment.Start
-                        ) + fadeIn(
-                            animationSpec = tween(durationMillis = 250)
-                        ),
-                        exit = shrinkHorizontally(
-                            animationSpec = tween(durationMillis = 250),
-                            shrinkTowards = Alignment.Start
-                        ) + fadeOut(
-                            animationSpec = tween(durationMillis = 250)
-                        ),
-
-                        ) {
-                        ButtonUp {
-                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                            vm.lazyHost.gotoUp()
-                        }
-                    }
-
-
-                }
-                Spacer(modifier = Modifier.height(1.dp))
-                HorizontalDivider(color = ThemeRed.colorCommonBackground)
-                HorizontalDivider(color = ThemeRed.colorBorderGray)
-            }
-        }, containerColor = ThemeRed.colorCommonBackground) {
-
-            Box(
-                modifier = Modifier
-                    .padding(bottom = it.calculateBottomPadding())
-                    .fillMaxSize()
-            ) {
-
-                PullToRefreshBox(
-                    isRefreshing = isRefreshing,
-                    onRefresh = {
-                        scope.launch {
-                            haptic.performHapticFeedback(HapticFeedbackType.Confirm)
-                            isRefreshing = true
-                            delay(500)
-                            isRefreshing = false
-                        }
-                        host.refresh()
-                    },
-                    modifier = Modifier,
-                    state = state,
-                    indicator = {
-                        Indicator(
-                            modifier = Modifier.align(Alignment.TopCenter),
-                            isRefreshing = isRefreshing,
-                            containerColor = Color.White,
-                            color = Color.Black,
-                            state = state
-                        )
-                    },
-                ) {
-
-
-                    LazyRow123(
-                        host = vm.lazyHost,
-                        modifier = Modifier.fillMaxSize(),
-                        onClickOpenProfile = { name ->
-                            vm.lazyHost.currentIndexGoto = vm.lazyHost.currentIndex
-                            navigator.push(ScreenRedProfile(name))
-                        },
-                        contentPadding = PaddingValues(top = 0.dp),
-                        contentBeforeList = { },
-                    )
-
-                    //---- Скролл ----
-                    Box(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .align(Alignment.CenterEnd)
-                            .width(2.dp)
-                    ) {
-                        VerticalScrollbar(scrollPercent)
-                    }
-
-
-                }
-
-
-            }
-
-
-        }
-
-
+    LaunchedEffect(columnSelect) {
+        vm.lazyHost.columns = columnSelect
     }
 
+    var isRefreshing by remember { mutableStateOf(false) }
+    val pullToRefreshState = rememberPullToRefreshState()
+
+    Scaffold(
+        bottomBar = {
+            StatelessGifsTabBottomBar(
+                searchField = { modifier ->
+                    search.CustomBasicTextField(modifier = modifier)
+                },
+                searchR = searchR,
+                isFocused = isFocused,
+                sortType = sortType,
+                onSortSelect = { vm.lazyHost.changeSortType(it) },
+                onUpClick = {
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    vm.lazyHost.gotoUp()
+                }
+            )
+        },
+        containerColor = ThemeRed.colorCommonBackground
+    ) { padding ->
+        Box(
+            modifier = Modifier
+                .padding(bottom = padding.calculateBottomPadding())
+                .fillMaxSize()
+        ) {
+            PullToRefreshBox(
+                isRefreshing = isRefreshing,
+                onRefresh = {
+                    scope.launch {
+                        haptic.performHapticFeedback(HapticFeedbackType.Confirm)
+                        isRefreshing = true
+                        delay(500)
+                        isRefreshing = false
+                    }
+                    host.refresh()
+                },
+                state = pullToRefreshState,
+                indicator = {
+                    Indicator(
+                        modifier = Modifier.align(Alignment.TopCenter),
+                        isRefreshing = isRefreshing,
+                        containerColor = Color.White,
+                        color = Color.Black,
+                        state = pullToRefreshState
+                    )
+                },
+            ) {
+                LazyRow123(
+                    host = vm.lazyHost,
+                    modifier = Modifier.fillMaxSize(),
+                    onClickOpenProfile = { name ->
+                        vm.lazyHost.currentIndexGoto = vm.lazyHost.currentIndex
+                        navigator?.push(ScreenRedProfile(name))
+                    },
+                    contentPadding = PaddingValues(top = 0.dp),
+                )
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .align(Alignment.CenterEnd)
+                        .width(2.dp)
+                ) {
+                    VerticalScrollbar(scrollPercent)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun StatelessGifsTabBottomBar(
+    searchField: @Composable (Modifier) -> Unit,
+    searchR: TextFieldValue,
+    isFocused: Boolean,
+    sortType: Order,
+    onSortSelect: (Order) -> Unit,
+    onUpClick: () -> Unit
+) {
+    Column(Modifier.background(ThemeRed.colorTabLevel1)) {
+        HorizontalDivider(color = ThemeRed.colorBorderGray)
+        Row(
+            modifier = Modifier
+                .padding(top = 1.dp, start = 1.dp)
+                .background(ThemeRed.colorTabLevel1),
+            verticalAlignment = Alignment.Bottom
+        ) {
+            AnimatedVisibility(
+                visible = !isFocused,
+                enter = expandHorizontally(animationSpec = tween(250)) + fadeIn(tween(250)),
+                exit = shrinkHorizontally(animationSpec = tween(250)) + fadeOut(tween(250)),
+            ) {
+                val orders = remember(searchR.text) {
+                    if (searchR.text.isEmpty()) {
+                        listOf(Order.TOP_WEEK, Order.TOP_MONTH, Order.TOP_ALLTIME, Order.TRENDING, Order.LATEST)
+                    } else {
+                        listOf(Order.TOP, Order.TRENDING, Order.LATEST)
+                    }
+                }
+                SortByOrder(
+                    containerColor = ThemeRed.colorCommonBackground,
+                    list = orders,
+                    selected = sortType,
+                    onSelect = onSortSelect
+                )
+            }
+
+            searchField(
+                Modifier
+                    .padding(start = 4.dp)
+                    .weight(1f)
+            )
+
+            Spacer(modifier = Modifier.width(4.dp))
+
+            AnimatedVisibility(
+                visible = !isFocused,
+                enter = expandHorizontally(animationSpec = tween(250), expandFrom = Alignment.Start) + fadeIn(tween(250)),
+                exit = shrinkHorizontally(animationSpec = tween(250), shrinkTowards = Alignment.Start) + fadeOut(tween(250)),
+            ) {
+                ButtonUp(onClick = onUpClick)
+            }
+        }
+        Spacer(modifier = Modifier.height(1.dp))
+        HorizontalDivider(color = ThemeRed.colorCommonBackground)
+        HorizontalDivider(color = ThemeRed.colorBorderGray)
+    }
 }
 
 class ScreenRedExplorerGifsSM @Inject constructor(
@@ -285,9 +265,7 @@ class ScreenRedExplorerGifsSM @Inject constructor(
         typePager = TypePager.TOP,
         hostDI = hostDI
     )
-
 }
-
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -296,4 +274,57 @@ abstract class ScreenModuleRedExplorerGifs {
     @IntoMap
     @ScreenModelKey(ScreenRedExplorerGifsSM::class)
     abstract fun bindScreenRedExplorerGifsSreenModel(hiltListScreenModel: ScreenRedExplorerGifsSM): ScreenModel
+}
+
+@Preview
+@Composable
+private fun GifsTabBottomBarPreview() {
+    XvideosTheme {
+        StatelessGifsTabBottomBar(
+            searchField = { modifier ->
+                Box(
+                    modifier
+                        .height(40.dp)
+                        .background(Color.DarkGray, RoundedCornerShape(4.dp)),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    Text(" Search...", color = Color.Gray, modifier = Modifier.padding(start = 8.dp))
+                }
+            },
+            searchR = TextFieldValue(""),
+            isFocused = false,
+            sortType = Order.TRENDING,
+            onSortSelect = {},
+            onUpClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun R_ScreenGifsTabSkeletonPreview() {
+    XvideosTheme {
+        Scaffold(
+            bottomBar = {
+                StatelessGifsTabBottomBar(
+                    searchField = { Box(it.height(40.dp).background(Color.DarkGray)) },
+                    searchR = TextFieldValue(""),
+                    isFocused = false,
+                    sortType = Order.TRENDING,
+                    onSortSelect = {},
+                    onUpClick = {}
+                )
+            },
+            containerColor = ThemeRed.colorCommonBackground
+        ) { padding ->
+            Box(
+                modifier = Modifier
+                    .padding(padding)
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("Gifs Content Placeholder", color = Color.White)
+            }
+        }
+    }
 }
