@@ -19,16 +19,45 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.client.xvideos.common.coil.UrlImage
 import com.client.xvideos.common.util.toPrettyCount
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.common.saved.SavedRed
 import com.client.xvideos.redgifs.model.NichesInfo
+import com.client.xvideos.ui.theme.XvideosTheme
 
 @Composable
-fun NicheProfile(savedRed: SavedRed, niche: NichesInfo) {
+fun NicheProfile(savedRed: () -> SavedRed, niche: NichesInfo) {
+    val isFollowed = savedRed().niches.list.any { it.id == niche.id }
 
+    NicheProfileContent(
+        niche = niche,
+        isFollowed = isFollowed,
+        onFollowClick = {
+            val nichesInfo = NichesInfo(
+                id = niche.id,
+                name = niche.name,
+                subscribers = niche.subscribers,
+                gifs = niche.gifs,
+                thumbnail = niche.thumbnail,
+            )
+
+            if (isFollowed)
+                savedRed().niches.remove(nichesInfo)
+            else
+                savedRed().niches.add(nichesInfo)
+        }
+    )
+}
+
+@Composable
+fun NicheProfileContent(
+    niche: NichesInfo,
+    isFollowed: Boolean,
+    onFollowClick: () -> Unit
+) {
     Box {
 
         Row(
@@ -60,7 +89,6 @@ fun NicheProfile(savedRed: SavedRed, niche: NichesInfo) {
                     color = color,
                     modifier = Modifier,
                     fontFamily = ThemeRed.fontFamilyDMsanss
-                    //textAlign = TextAlign.End
                 )
 
                 Text(
@@ -70,7 +98,7 @@ fun NicheProfile(savedRed: SavedRed, niche: NichesInfo) {
                 )
 
                 if (niche.id != "id") {
-                    ButtonFollow(savedRed = savedRed, niche = niche)
+                    ButtonFollowContent(isFollowed = isFollowed, onClick = onFollowClick)
                 }
 
             }
@@ -80,9 +108,33 @@ fun NicheProfile(savedRed: SavedRed, niche: NichesInfo) {
 }
 
 @Composable
-private fun ButtonFollow(savedRed: SavedRed, niche: NichesInfo) {
-    val isFollowed = savedRed.niches.list.any { it.id == niche.id }
+private fun ButtonFollow(savedRed: () -> SavedRed, niche: NichesInfo) {
+    val isFollowed = savedRed().niches.list.any { it.id == niche.id }
 
+    ButtonFollowContent(
+        isFollowed = isFollowed,
+        onClick = {
+            val nichesInfo = NichesInfo(
+                id = niche.id,
+                name = niche.name,
+                subscribers = niche.subscribers,
+                gifs = niche.gifs,
+                thumbnail = niche.thumbnail,
+            )
+
+            if (isFollowed)
+                savedRed().niches.remove(nichesInfo)
+            else
+                savedRed().niches.add(nichesInfo)
+        }
+    )
+}
+
+@Composable
+private fun ButtonFollowContent(
+    isFollowed: Boolean,
+    onClick: () -> Unit
+) {
     Box(
         modifier = Modifier
             .padding(end = 4.dp)
@@ -94,23 +146,8 @@ private fun ButtonFollow(savedRed: SavedRed, niche: NichesInfo) {
                 if (isFollowed) Color.White else Color.Transparent,
                 RoundedCornerShape(8.dp)
             )
-            .background(if (isFollowed) Color.Black else ThemeRed.colorYellow)
-            .clickable(onClick = {
-
-                val nichesInfo = NichesInfo(
-                    id = niche.id,
-                    name = niche.name,
-                    subscribers = niche.subscribers,
-                    gifs = niche.gifs,
-                    thumbnail = niche.thumbnail,
-                )
-
-                if (isFollowed)
-                    savedRed.niches.remove(nichesInfo)
-                else
-                    savedRed.niches.add(nichesInfo)
-
-            }), contentAlignment = Alignment.Center
+            .background(if (isFollowed) ThemeRed.colorTabLevel1 else ThemeRed.colorYellow)
+            .clickable(onClick = onClick), contentAlignment = Alignment.Center
     ) {
         Text(
             if (isFollowed) "Выйти" else "Подписаться",
@@ -119,23 +156,42 @@ private fun ButtonFollow(savedRed: SavedRed, niche: NichesInfo) {
     }
 }
 
-//@Preview
-//@Composable
-//fun ButtonFollowPreview() {
-//    val cacheMediaResponseDao: CacheMediaResponseDao? = null
-//    val redApi = RedApi(dao = cacheMediaResponseDao!!)
-//    val snackBarEvent = SnackBarEvent()
-//    val savedRed = SavedRed(redApi = redApi, snackBarEvent = snackBarEvent)
-//    val niche = NichesInfo(
-//        cover = "cover",
-//        description = "description",
-//        gifs = 0,
-//        id = "id",
-//        name = "name",
-//        owner = "owner",
-//        subscribers = 0,
-//        thumbnail = "thumbnail",
-//        rules = "rules"
-//    )
-//    ButtonFollow(savedRed, niche)
-//}
+@Preview
+@Composable
+fun NicheProfilePreview() {
+    XvideosTheme {
+        NicheProfileContent(
+            niche = NichesInfo(
+                id = "female-backs",
+                name = "Female Backs",
+                subscribers = 914,
+                gifs = 245,
+                thumbnail = "https://userpic.redgifs.com/niches/thumbnails/female-backs-dee7838f.jpg"
+            ),
+            isFollowed = false,
+            onFollowClick = {}
+        )
+    }
+}
+
+@Preview
+@Composable
+fun ButtonFollowPreview() {
+    XvideosTheme {
+        ButtonFollowContent(
+            isFollowed = false,
+            onClick = {}
+        )
+    }
+}
+
+@Preview
+@Composable
+fun ButtonFollowFollowedPreview() {
+    XvideosTheme {
+        ButtonFollowContent(
+            isFollowed = true,
+            onClick = {}
+        )
+    }
+}

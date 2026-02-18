@@ -14,26 +14,31 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.client.xvideos.common.coil.UrlImage
+import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.model.Niche
+import com.client.xvideos.redgifs.model.Preview as NichePreviewModel
+import com.client.xvideos.ui.theme.XvideosTheme
 
 @Composable
-fun NichePreview(niches: Niche, onClick: () -> Unit) {
+fun NichePreview(niches: () -> Niche, onClick: () -> Unit) {
 
-    Column(modifier = Modifier.fillMaxWidth().padding(end = 8.dp).clip(RoundedCornerShape(16.dp)).background(Color(0xFF323232)).clickable{onClick()}) {
+    Column(modifier = Modifier.fillMaxWidth().padding(end = 8.dp).clip(RoundedCornerShape(16.dp)).background(
+        ThemeRed.colorTabLevel3).clickable{onClick()}) {
 
         Row(modifier = Modifier) {
-            UrlImage(niches.thumbnail, modifier = Modifier.padding(start = 4.dp, top = 4.dp, bottom = 4.dp).clip(RoundedCornerShape(topStart = 12.dp)).size(64.dp))
-            Text(text = niches.name, modifier = Modifier.padding(start = 8.dp), color = Color.White)
+            UrlImage(niches().thumbnail, modifier = Modifier.padding(start = 4.dp, top = 4.dp, bottom = 4.dp).clip(RoundedCornerShape(topStart = 12.dp)).size(64.dp))
+            Text(text = niches().name, modifier = Modifier.padding(start = 8.dp), color = Color.White)
             //Text(text = "Join", modifier = Modifier.height(24.dp).background(ThemeRed.colorYellow), color = Color.Black)
         }
 
-        if (!niches.previews.isNullOrEmpty()) {
+        if (!niches().previews.isNullOrEmpty()) {
             Row(modifier = Modifier) {
                 repeat(3) {
                     UrlImage(
-                        niches.previews?.get(it)?.thumbnail ?: "",
+                        niches().previews?.get(it)?.thumbnail ?: "",
                         modifier = Modifier.padding(horizontal = 4.dp).size(96.dp),
                         contentScale = ContentScale.Crop
                     )
@@ -44,4 +49,37 @@ fun NichePreview(niches: Niche, onClick: () -> Unit) {
     }
 
 
+}
+
+@Preview
+@Composable
+fun NichePreviewPreview() {
+    XvideosTheme {
+        NichePreview(
+            niches = {
+                Niche(
+                    id = "female-backs",
+                    name = "Female Backs",
+                    gifs = 245,
+                    subscribers = 914,
+                    thumbnail = "https://userpic.redgifs.com/niches/thumbnails/female-backs-dee7838f.jpg",
+                    previews = listOf(
+                        NichePreviewModel(
+                            id = "dangerouswanmice",
+                            thumbnail = "https://media.redgifs.com/DangerousWanMice-mobile.jpg"
+                        ),
+                        NichePreviewModel(
+                            id = "weirddaringbovine",
+                            thumbnail = "https://media.redgifs.com/WeirdDaringBovine-mobile.jpg"
+                        ),
+                        NichePreviewModel(
+                            id = "unsteadyphonywren",
+                            thumbnail = "https://media.redgifs.com/UnsteadyPhonyWren-mobile.jpg"
+                        )
+                    )
+                )
+            },
+            onClick = {}
+        )
+    }
 }
