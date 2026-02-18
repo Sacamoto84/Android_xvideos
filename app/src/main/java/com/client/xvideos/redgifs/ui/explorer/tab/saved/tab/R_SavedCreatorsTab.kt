@@ -107,13 +107,16 @@ object R_SavedCreatorsTab : Screen {
             }
         )
 
-        Scaffold(topBar = {
+        Scaffold(
+containerColor = Color(0xFF303030)
+,
+            topBar = {
             Text(
                 ">Авторы",
                 modifier = Modifier.padding(start = 8.dp),
                 color = ThemeRed.colorYellow,
                 fontSize = 18.sp,
-                fontFamily = ThemeRed.fontFamilyPopinsRegular
+                fontFamily = ThemeRed.fontFamilyPopinsRegular,
             )
         }) { padding ->
             Box(

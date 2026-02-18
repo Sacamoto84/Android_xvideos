@@ -92,7 +92,7 @@
 -dontwarn com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.ScreenSavedCreatorSM
 -dontwarn com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.ScreenSavedDownloadSM
 -dontwarn com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.ScreenSavedLikesSM
--dontwarn com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.ScreenSavedNichesSM
+-dontwarn com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.savedNiche.ScreenSavedNichesSM
 -dontwarn com.client.xvideos.redgifs.ui.explorer.tab.search.ScreenRedExplorerSearchSM
 -dontwarn com.client.xvideos.redgifs.ui.explorer.tab.setting.ScreenRedExplorerSettingSM
 -dontwarn com.client.xvideos.redgifs.ui.fullscreen.ScreenRedFullScreenSM

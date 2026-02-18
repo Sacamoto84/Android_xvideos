@@ -1,4 +1,4 @@
-package com.client.xvideos.redgifs.ui.explorer.tab.saved.tab
+package com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.savedNiche
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
@@ -19,9 +19,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,12 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.model.ScreenModel
@@ -54,7 +47,6 @@ import com.client.xvideos.redgifs.model.NichesInfo
 import com.client.xvideos.redgifs.ui.niche.R_ScreenNiche
 import com.client.xvideos.redgifs.ui.profile.atom.VerticalScrollbar
 import com.client.xvideos.redgifs.ui.profile.rememberVisibleRangePercentIgnoringFirstNForLazyColumn
-import com.client.xvideos.ui.theme.XvideosTheme
 import com.composeunstyled.Text
 import dagger.Binds
 import dagger.Module
@@ -62,7 +54,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
 import javax.inject.Inject
-
 
 object SavedNichesTab : Screen {
 
@@ -83,7 +74,7 @@ object SavedNichesTab : Screen {
 
         var itemPendingDelete by remember { mutableStateOf<NichesInfo?>(null) }
 
-        DeleteNicheDialog(
+        DialogNicheDelete(
             item = itemPendingDelete,
             onDismiss = { itemPendingDelete = null },
             onConfirm = { pending ->
@@ -100,7 +91,9 @@ object SavedNichesTab : Screen {
                 fontSize = 18.sp,
                 fontFamily = ThemeRed.fontFamilyPopinsRegular
             )
-        }) { padding ->
+        },
+            containerColor = Color(0xFF303030)
+        ) { padding ->
 
             Box(
                 modifier = Modifier
@@ -122,9 +115,7 @@ object SavedNichesTab : Screen {
                                 .clip(RoundedCornerShape(8.dp))
                                 .background(ThemeRed.colorTabLevel3)
                                 .clickable(onClick = {
-                                    navigator.push(
-                                        R_ScreenNiche(item.id)
-                                    )
+                                    navigator.push( R_ScreenNiche(item.id) )
                                 }),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween
@@ -140,7 +131,6 @@ object SavedNichesTab : Screen {
                                 overflow = TextOverflow.Ellipsis,
                                 modifier = Modifier.weight(1f)
                             )
-
 
                             Box(
                                 modifier = Modifier
@@ -167,7 +157,10 @@ object SavedNichesTab : Screen {
                 }
 
                 Box(
-                    modifier = Modifier.fillMaxHeight().align(Alignment.CenterEnd).width(2.dp)
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .align(Alignment.CenterEnd)
+                        .width(2.dp)
                 ) {
                     VerticalScrollbar(scrollPercent)
                 }
@@ -176,42 +169,9 @@ object SavedNichesTab : Screen {
     }
 }
 
-@Composable
-private fun DeleteNicheDialog(
-    item: NichesInfo?,
-    onDismiss: () -> Unit,
-    onConfirm: (NichesInfo) -> Unit
-) {
-    item?.let { pending ->
-        AlertDialog(
-            icon = { UrlImage(pending.thumbnail, modifier = Modifier.clip(RoundedCornerShape(8.dp)).size(96.dp)) },
-            onDismissRequest = onDismiss,
-            title = { Text("Удалить группу?", fontWeight = FontWeight.Bold, fontSize = 20.sp) },
-            text = {
-                Text(buildAnnotatedString {
-                    append("Удалить «")
-                    withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) { append(pending.name) }
-                    append("» из сохранённых?")
-                }, fontSize = 16.sp)
-            },
-            confirmButton = {
-                TextButton(onClick = { onConfirm(pending) }) {
-                    Text("Удалить", fontSize = 16.sp, color = Color(0xFF6552A5))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = onDismiss) {
-                    Text("Отмена", fontSize = 16.sp, color = Color(0xFF6552A5))
-                }
-            },
-            containerColor = Color(0xFFEBE6EE)
-        )
-    }
-}
 
-class ScreenSavedNichesSM @Inject constructor(
-    val savedRed: SavedRed
-) : ScreenModel
+
+class ScreenSavedNichesSM @Inject constructor( val savedRed: SavedRed ) : ScreenModel
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -222,17 +182,3 @@ abstract class ScreenModuleRedSavedNiches {
     abstract fun bindScreenRedSavedNichesScreenModel(screenModel: ScreenSavedNichesSM): ScreenModel
 }
 
-@Preview(showBackground = true)
-@Composable
-private fun DeleteNicheDialogPreview() {
-    XvideosTheme {
-        DeleteNicheDialog(
-            item = NichesInfo(
-                name = "Sample Niche",
-                thumbnail = "https://via.placeholder.com/96"
-            ),
-            onDismiss = {},
-            onConfirm = {}
-        )
-    }
-}

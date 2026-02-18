@@ -27,7 +27,7 @@ import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.R_SavedCollectionTab
 import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.R_SavedCreatorsTab
 import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.R_SavedDownloadTab
 import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.R_SavedLikesTab
-import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.SavedNichesTab
+import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.savedNiche.SavedNichesTab
 import com.client.xvideos.redgifs.common.ThemeRed
 import kotlinx.collections.immutable.persistentListOf
 
