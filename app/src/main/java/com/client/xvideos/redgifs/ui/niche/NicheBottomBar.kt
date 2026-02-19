@@ -58,13 +58,13 @@ fun NicheBottomBar(
                     listOf(Order.TRENDING, Order.TOP, Order.LATEST),
                     currentSort,
                     onSelect = onSortChange,
-                    containerColor = ThemeRed.colorCommonBackground
+                    containerColor = ThemeRed.colorTabLevel0
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 UrlImage(
                     niche.thumbnail,
                     modifier = Modifier
-                        .size(46.dp)
+                        .size(45.dp)
                         .clip(RoundedCornerShape(8.dp))
                 )
             }
@@ -88,12 +88,12 @@ fun NicheBottomBar(
                         .size(46.dp)
                         .clip(RoundedCornerShape(8.dp))
                         .border(1.dp, Color.DarkGray, RoundedCornerShape(8.dp))
-                        .background(ThemeRed.colorCommonBackground),
+                        .background(ThemeRed.colorTabLevel0),
                     contentAlignment = Alignment.Center
                 ) {
                     TabBarPoints(columns, true)
                 }
-                Spacer(modifier = Modifier.width(2.dp))
+                Spacer(modifier = Modifier.width(4.dp))
                 ButtonUp(44.dp, onUpClick)
                 Spacer(modifier = Modifier.width(2.dp))
             }

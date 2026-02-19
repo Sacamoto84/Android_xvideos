@@ -152,7 +152,7 @@ fun NichesTabContent(
                             ),
                             selected = sortType,
                             onSelect = onSortTypeChange,
-                            containerColor = ThemeRed.colorCommonBackground
+                            containerColor = ThemeRed.colorTabLevel0
                         )
                     }
 
@@ -277,7 +277,7 @@ fun R_ScreenNichesTabPreview() {
             Box(
                 modifier
                     .height(44.dp)
-                    .background(Color(0xFF222222), RoundedCornerShape(8.dp)),
+                    .background(ThemeRed.colorTabLevel0, RoundedCornerShape(8.dp)),
                 contentAlignment = Alignment.CenterStart
             ) {
                 Text(

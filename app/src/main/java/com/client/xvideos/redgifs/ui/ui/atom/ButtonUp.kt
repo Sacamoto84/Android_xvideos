@@ -28,7 +28,7 @@ fun ButtonUp(width : Dp = 32.dp, onClick: () -> Unit) {
             .width(width)
             .clip(RoundedCornerShape(8.dp))
             .border(1.dp, Color(0x80757575), RoundedCornerShape(8.dp))
-            .background(ThemeRed.colorCommonBackground)
+            .background(ThemeRed.colorTabLevel0)
             .clickable(
                 onClick = onClick), contentAlignment = Alignment.Center
     ) {

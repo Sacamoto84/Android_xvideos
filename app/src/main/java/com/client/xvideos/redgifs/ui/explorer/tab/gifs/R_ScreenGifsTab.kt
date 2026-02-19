@@ -224,7 +224,7 @@ private fun StatelessGifsTabBottomBar(
                     }
                 }
                 SortByOrder(
-                    containerColor = ThemeRed.colorCommonBackground,
+                    containerColor = ThemeRed.colorTabLevel0,
                     list = orders,
                     selected = sortType,
                     onSelect = onSortSelect
