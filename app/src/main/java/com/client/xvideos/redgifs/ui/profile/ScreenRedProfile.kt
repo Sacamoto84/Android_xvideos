@@ -3,6 +3,7 @@ package com.client.xvideos.redgifs.ui.profile
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -18,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
@@ -26,12 +29,11 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.client.xvideos.redgifs.model.UserInfo
 import com.client.xvideos.redgifs.ui.profile.atom.RedProfileCreaterInfo
 import com.client.xvideos.redgifs.ui.profile.atom.VerticalScrollbar
 import com.client.xvideos.redgifs.ui.profile.tags.TagsBlock
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.LazyRow123
-import com.client.xvideos.redgifs.common.ThemeRed
-import com.redgifs.common.block.ui.DialogBlock
 import timber.log.Timber
 
 class ScreenRedProfile(val profileName: String) : Screen {
@@ -47,90 +49,157 @@ class ScreenRedProfile(val profileName: String) : Screen {
             factory.create(profileName)
         }
 
-        val isLoading = vm.isLoading.collectAsState().value
+        val isLoading by vm.isLoading.collectAsState()
 
-        val selector = vm.selector.collectAsStateWithLifecycle().value
+        val tags by vm.tags.collectAsStateWithLifecycle()
 
-        val tags = vm.tags.collectAsStateWithLifecycle().value
-
-        val tagsSelect = vm.tagsSelect.collectAsStateWithLifecycle().value
+        val tagsSelect by vm.tagsSelect.collectAsStateWithLifecycle()
 
         //Расчет процентов для скролл
         val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForGrid(
             gridState = vm.likedHost.state, itemsToIgnore = 3, numberOfColumns = 2
         )
-        
-        //🟨🟨🟨🟨🟨🟨🟨🟨⬆️⬆️⬆️⬆️⬆️❗
-
-        Scaffold(containerColor = Color(0xFF303030)) {
-            //Box(Modifier.padding(bottom = it.calculateBottomPadding())) {
-
-                Box(modifier = Modifier.fillMaxSize()) {
-
-                    LazyRow123(
-                        host = vm.likedHost,
-                        modifier = Modifier.fillMaxSize(),
-                        contentBeforeList = {
-                            Column(modifier = Modifier.fillMaxWidth()) {
-
-                                if (vm.creator != null) {
-                                    RedProfileCreaterInfo(vm.creator!!, savedRed = { vm.hostDI.savedRed })
-                                }
-
-                                if ((vm.creator != null) && (tags.isNotEmpty())) {
-                                    TagsBlock(tags.toList(), tagsSelect.toList(), {
-                                        vm.toggleSelectTag(it)
-                                    })
-                                    Spacer(modifier = Modifier.height(4.dp))
-                                }
 
 
-                            }
-                        },
-                        onAppendLoaded = { pager ->
-                            Timber.tag("Paging")
-                                .d("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Произошла загрузка следующей страницы!")
-                            pager.itemSnapshotList.let { it1 ->
-                                it1.items.forEach { it2 ->
-                                    val t = it2.tags
-                                    vm.tagsAdd(t)
-                                }
-                            }
-                        },
-                    )
 
-                    //Индикатор загрузки
-                    if (isLoading) {
-                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(56.dp),
-                                strokeWidth = 8.dp
-                            )
-                        }
+
+
+        RedProfileScreenContent(
+            creator = vm.creator,
+            tags = tags.toList(),
+            tagsSelect = tagsSelect.toList(),
+            isLoading = isLoading,
+            scrollPercent = scrollPercent,
+            likedHost = vm.likedHost,
+            onTagClick = { vm.toggleSelectTag(it) },
+            onAppendLoaded = { pager ->
+                Timber.tag("Paging")
+                    .d("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Произошла загрузка следующей страницы!")
+                pager.itemSnapshotList.let { it1 ->
+                    it1.items.forEach { it2 ->
+                        val t = it2.tags
+                        vm.tagsAdd(t)
                     }
-
-                    //---- Скролл ----
-                    Box(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .align(Alignment.CenterEnd)
-                            .width(2.dp)
-                    ) { VerticalScrollbar(scrollPercent) }
-
                 }
-
-
-            //}
-
-
-        }
+            },
+            savedRedProvider = { vm.hostDI.savedRed }
+        )
     }
 
 }
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@Composable
+fun RedProfileScreenContent(
+    creator: UserInfo?,
+    tags: List<String>,
+    tagsSelect: List<String>,
+    isLoading: Boolean,
+    scrollPercent: Pair<Float, Float>,
+    likedHost: com.client.xvideos.redgifs.ui.ui.lazyrow123.LazyRow123Host,
+    onTagClick: (String) -> Unit,
+    onAppendLoaded: (androidx.paging.compose.LazyPagingItems<com.client.xvideos.redgifs.model.GifsInfo>) -> Unit,
+    savedRedProvider: () -> com.client.xvideos.redgifs.common.saved.SavedRed
+) {
+
+
+
+
+
+    Scaffold(containerColor = Color(0xFF303030)) {
+
+        FlexibleBottomAppBar(
+        FlexibleBottomAppBar(
+            contentPadding = PaddingValues(horizontal = 96.dp),
+            horizontalArrangement = BottomAppBarDefaults.FlexibleFixedHorizontalArrangement,
+        ) {
+
+        }
+
+
+
+
+        Box(modifier = Modifier.fillMaxSize()) {
+
+            LazyRow123(
+                host = likedHost,
+                modifier = Modifier.fillMaxSize(),
+                contentBeforeList = {
+                    Column(modifier = Modifier.fillMaxWidth()) {
+
+                        if (creator != null) {
+                            RedProfileCreaterInfo(creator, savedRed = savedRedProvider)
+                        }
+
+                        if ((creator != null) && (tags.isNotEmpty())) {
+                            TagsBlock(tags, tagsSelect, onTagClick)
+                            Spacer(modifier = Modifier.height(4.dp))
+                        }
+
+                    }
+                },
+                onAppendLoaded = onAppendLoaded,
+            )
+
+            //Индикатор загрузки
+            if (isLoading) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(56.dp),
+                        strokeWidth = 8.dp
+                    )
+                }
+            }
+
+            //---- Скролл ----
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .align(Alignment.CenterEnd)
+                    .width(2.dp)
+            ) { VerticalScrollbar(scrollPercent) }
+
+        }
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF303030)
+@Composable
+fun ScreenRedProfilePreview() {
+    val mockUser = UserInfo(
+        name = "Sample Creator",
+        username = "sample_user",
+        description = "This is a sample description for the profile preview. It can be long and contain various information about the creator.",
+        followers = 1234,
+        gifs = 56,
+        profileImageUrl = null,
+        url = "https://www.redgifs.com/users/sample_user"
+    )
+
+    Column(modifier = Modifier.fillMaxSize()) {
+        RedProfileCreaterInfo(
+            item = mockUser,
+            isFollow = true,
+            onFollowClick = {}
+        )
+
+        TagsBlock(
+            tags = listOf("Outdoor", "Amateur", "Verified", "Solo", "Big Assets"),
+            tagsSelect = listOf("Verified"),
+            onClick = {}
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator(modifier = Modifier.size(32.dp))
+        }
+    }
+}
+
 //---- Скролл ----
 @Composable
-fun VerticalScrollbar1(scrollPercent:  Pair<Float, Float>) {
+fun VerticalScrollbar1(scrollPercent: Pair<Float, Float>) {
     Box(
         modifier = Modifier
             .fillMaxHeight()
@@ -138,4 +207,3 @@ fun VerticalScrollbar1(scrollPercent:  Pair<Float, Float>) {
             .width(2.dp)
     ) { VerticalScrollbar(scrollPercent) }
 }
-
