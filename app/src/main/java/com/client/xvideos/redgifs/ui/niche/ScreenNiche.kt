@@ -4,9 +4,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyRow
@@ -174,12 +176,14 @@ private fun NicheHeaderContent(
 ) {
     Column(
         modifier = Modifier
+            .displayCutoutPadding()
+            .systemBarsPadding()
             .fillMaxWidth()
             .background(Color(0xFF303030))
     ) {
 
         NicheProfileContent(
-            niche = niche,
+            niche = { niche },
             isFollowed = isFollowed,
             onFollowClick = onFollowClick
         )
@@ -188,10 +192,10 @@ private fun NicheHeaderContent(
             Text(
                 "Related Niches",
                 color = Color.White,
-                modifier = Modifier.padding(start = 16.dp, top = 16.dp),
+                modifier = Modifier.padding(start = 4.dp, top = 8.dp),
                 fontFamily = ThemeRed.fontFamilyDMsanss
             )
-            LazyRow(modifier = Modifier.padding(vertical = 6.dp).fillMaxWidth()) {
+            LazyRow(modifier = Modifier.padding(top = 4.dp).fillMaxWidth()) {
                 items(relatedNiches().niches) { item ->
                     NichePreview({item}, onClick = { onNicheClick(item.id) })
                 }
@@ -202,15 +206,17 @@ private fun NicheHeaderContent(
             Text(
                 "✨ Top Creators in ${niche.name}",
                 color = Color.White,
-                modifier = Modifier.padding(start = 16.dp, top = 16.dp),
+                modifier = Modifier.padding(start = 4.dp, top = 8.dp),
                 fontFamily = ThemeRed.fontFamilyDMsanss
             )
-            LazyRow(modifier = Modifier.padding(vertical = 8.dp)) {
+            LazyRow(modifier = Modifier.padding(vertical = 4.dp)) {
                 items(topCreators().creators) { creator ->
                     NicheTopCreator(creator, onClick = { onCreatorClick(creator.username) })
                 }
             }
         }
+
+        Spacer(Modifier.height(2.dp))
     }
 }
 

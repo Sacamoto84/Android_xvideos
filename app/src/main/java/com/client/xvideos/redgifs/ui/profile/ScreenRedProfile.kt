@@ -109,8 +109,6 @@ class ScreenRedProfile(val profileName: String) : Screen {
                         }
                     }
 
-                    //Text("      " + visibleItems.toString(), color = Color.White)
-
                     //---- Скролл ----
                     Box(
                         modifier = Modifier
@@ -118,8 +116,6 @@ class ScreenRedProfile(val profileName: String) : Screen {
                             .align(Alignment.CenterEnd)
                             .width(2.dp)
                     ) { VerticalScrollbar(scrollPercent) }
-
-                    //VerticalScrollbar1(scrollPercent)
 
                 }
 

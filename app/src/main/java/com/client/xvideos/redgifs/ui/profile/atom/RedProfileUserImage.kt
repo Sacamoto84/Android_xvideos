@@ -10,8 +10,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.displayCutoutPadding
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
@@ -67,7 +69,7 @@ fun RedProfileCreaterInfo(
         {
 
             if (item.profileImageUrl != null) {
-                UrlImage(item.profileImageUrl, modifier = Modifier.size(96.dp))
+                UrlImage(item.profileImageUrl, modifier = Modifier.clip(RoundedCornerShape(8.dp)).size(96.dp))
             } else {
                 Box(
                     modifier = Modifier
@@ -85,11 +87,11 @@ fun RedProfileCreaterInfo(
                 }
             }
 
-            Column( modifier = Modifier.fillMaxWidth().weight(1f) )
+            Column( modifier = Modifier.fillMaxWidth().height(96.dp), verticalArrangement = Arrangement.SpaceAround )
             {
                 Row(
-                    modifier = Modifier.wrapContentHeight(),
-                    verticalAlignment = Alignment.CenterVertically
+                    modifier = Modifier.height(48.dp),
+                    verticalAlignment = Alignment.Top
                 ) {
                     Spacer(Modifier.width(8.dp))
                     Text( item.username, color = Color.White, fontFamily = ThemeRed.fontFamilyPopinsMedium, fontSize = 28.sp, modifier = Modifier )
@@ -97,7 +99,7 @@ fun RedProfileCreaterInfo(
                     Image(
                         painter = painterResource(id = R.drawable.verificed),
                         contentDescription = null,
-                        modifier = Modifier.size(26.dp)
+                        modifier = Modifier.size(26.dp).offset(y = 8.dp)
                     )
                 }
 
@@ -108,12 +110,12 @@ fun RedProfileCreaterInfo(
                         //.width(96.dp)
                         .fillMaxWidth()
                         .height(48.dp)
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(if (isFollow) Color.Black else ThemeRed.colorYellow)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(if (isFollow) ThemeRed.colorTabLevel1 else ThemeRed.colorYellow)
                         .border(
                             1.dp,
                             if (isFollow) Color.White else Color.Transparent,
-                            RoundedCornerShape(16.dp)
+                            RoundedCornerShape(8.dp)
                         )
                         .clickable {
                             onFollowClick()

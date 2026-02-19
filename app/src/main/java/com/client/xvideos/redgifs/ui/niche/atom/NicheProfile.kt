@@ -12,15 +12,21 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.client.xvideos.R
 import com.client.xvideos.common.coil.UrlImage
 import com.client.xvideos.common.util.toPrettyCount
 import com.client.xvideos.redgifs.common.ThemeRed
@@ -33,7 +39,7 @@ fun NicheProfile(savedRed: () -> SavedRed, niche: NichesInfo) {
     val isFollowed = savedRed().niches.list.any { it.id == niche.id }
 
     NicheProfileContent(
-        niche = niche,
+        niche = { niche },
         isFollowed = isFollowed,
         onFollowClick = {
             val nichesInfo = NichesInfo(
@@ -54,19 +60,20 @@ fun NicheProfile(savedRed: () -> SavedRed, niche: NichesInfo) {
 
 @Composable
 fun NicheProfileContent(
-    niche: NichesInfo,
+    niche: () -> NichesInfo,
     isFollowed: Boolean,
     onFollowClick: () -> Unit
 ) {
-    Box {
 
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .padding(start = 4.dp)
+                .fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
             UrlImage(
-                niche.thumbnail,
+                niche().thumbnail,
                 modifier = Modifier
                     .size(128.dp)
                     .clip(RoundedCornerShape(8.dp))
@@ -74,37 +81,73 @@ fun NicheProfileContent(
 
             Column(
                 modifier = Modifier
-                    .padding(start = 8.dp).height(128.dp)
+                    .padding(start = 8.dp)
+                    .height(128.dp)
                     .weight(1f), verticalArrangement = Arrangement.SpaceBetween
             ) {
 
-                val color = if (niche.id == "id") Color.Transparent else Color.Gray
+                val color = if (niche().id == "id") Color.Transparent else Color.Gray
 
-                if (niche.id != "id") {
-                    Text(niche.name, color = Color.White, fontFamily = ThemeRed.fontFamilyDMsanss)
+                if (niche().id != "id") {
+                    Text(niche().name, color = Color.White, fontFamily = ThemeRed.fontFamilyDMsanss)
                 }
 
-                Text(
-                    niche.subscribers.toPrettyCount(),
-                    color = color,
-                    modifier = Modifier,
-                    fontFamily = ThemeRed.fontFamilyDMsanss
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        painter = painterResource(R.drawable.members),
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Text(
+                        text = niche().subscribers.toPrettyCount(),
+                        modifier = Modifier
+                            .padding(start = 4.dp, end = 4.dp)
+                            .wrapContentWidth(Alignment.CenterHorizontally),
+                        color = Color.White,
+                        textAlign = TextAlign.Center,
+                        fontSize = 16.sp
+                    )
+                }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        painter = painterResource(R.drawable.posts),
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Text(
+                        text = niche().gifs.toPrettyCount(),
+                        modifier = Modifier
+                            .padding(start = 4.dp, end = 4.dp)
+                            .wrapContentWidth(Alignment.CenterHorizontally),
+                        color = Color.White,
+                        textAlign = TextAlign.Center,
+                        fontSize = 16.sp
+                    )
+                }
 
-                Text(
-                    niche.gifs.toPrettyCount(),
-                    color = color,
-                    fontFamily = ThemeRed.fontFamilyDMsanss
-                )
+//                Text(
+//                    niche.subscribers.toPrettyCount(),
+//                    color = color,
+//                    modifier = Modifier,
+//                    fontFamily = ThemeRed.fontFamilyDMsanss
+//                )
+//
+//                Text(
+//                    niche.gifs.toPrettyCount(),
+//                    color = color,
+//                    fontFamily = ThemeRed.fontFamilyDMsanss
+//                )
 
-                if (niche.id != "id") {
+                if (niche().id != "id") {
                     ButtonFollowContent(isFollowed = isFollowed, onClick = onFollowClick)
                 }
 
             }
-        }
 
-    }
+
+        }
 }
 
 @Composable
@@ -142,9 +185,7 @@ private fun ButtonFollowContent(
             .width(128.dp)
             .height(44.dp)
             .border(
-                1.dp,
-                if (isFollowed) Color.White else Color.Transparent,
-                RoundedCornerShape(8.dp)
+                1.dp, if (isFollowed) Color.White else Color.Transparent, RoundedCornerShape(8.dp)
             )
             .background(if (isFollowed) ThemeRed.colorTabLevel1 else ThemeRed.colorYellow)
             .clickable(onClick = onClick), contentAlignment = Alignment.Center
@@ -161,13 +202,15 @@ private fun ButtonFollowContent(
 fun NicheProfilePreview() {
     XvideosTheme {
         NicheProfileContent(
-            niche = NichesInfo(
+            niche = {
+                NichesInfo(
                 id = "female-backs",
                 name = "Female Backs",
                 subscribers = 914,
                 gifs = 245,
                 thumbnail = "https://userpic.redgifs.com/niches/thumbnails/female-backs-dee7838f.jpg"
-            ),
+                )
+            },
             isFollowed = false,
             onFollowClick = {}
         )

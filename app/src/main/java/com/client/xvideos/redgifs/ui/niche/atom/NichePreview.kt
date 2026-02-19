@@ -39,7 +39,7 @@ import com.client.xvideos.ui.theme.XvideosTheme
 @Composable
 fun NichePreview(niches: () -> Niche, onClick: () -> Unit) {
 
-    Column(modifier = Modifier.height(80.dp).padding(end = 8.dp)
+    Column(modifier = Modifier.height(80.dp).padding(horizontal = 4.dp)
         .shadow(10.dp, RoundedCornerShape(8.dp))
         .clip(RoundedCornerShape(8.dp))
         .background(ThemeRed.colorTabLevel3)
