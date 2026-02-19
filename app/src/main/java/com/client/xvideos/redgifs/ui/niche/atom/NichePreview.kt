@@ -1,22 +1,36 @@
 package com.client.xvideos.redgifs.ui.niche.atom
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.dropShadow
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.client.xvideos.R
 import com.client.xvideos.common.coil.UrlImage
+import com.client.xvideos.common.util.toPrettyCount
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.model.Niche
 import com.client.xvideos.redgifs.model.Preview as NichePreviewModel
@@ -25,31 +39,37 @@ import com.client.xvideos.ui.theme.XvideosTheme
 @Composable
 fun NichePreview(niches: () -> Niche, onClick: () -> Unit) {
 
-    Column(modifier = Modifier.fillMaxWidth().padding(end = 8.dp).clip(RoundedCornerShape(16.dp)).background(
-        ThemeRed.colorTabLevel3).clickable{onClick()}) {
+    Column(modifier = Modifier.height(80.dp).padding(end = 8.dp)
+        .shadow(10.dp, RoundedCornerShape(8.dp))
+        .clip(RoundedCornerShape(8.dp))
+        .background(ThemeRed.colorTabLevel3)
+        .clickable{onClick()}
+    )
+    {
 
         Row(modifier = Modifier) {
-            UrlImage(niches().thumbnail, modifier = Modifier.padding(start = 4.dp, top = 4.dp, bottom = 4.dp).clip(RoundedCornerShape(topStart = 12.dp)).size(64.dp))
-            Text(text = niches().name, modifier = Modifier.padding(start = 8.dp), color = Color.White)
-            //Text(text = "Join", modifier = Modifier.height(24.dp).background(ThemeRed.colorYellow), color = Color.Black)
-        }
+            UrlImage(niches().thumbnail, modifier = Modifier.padding(4.dp).clip(RoundedCornerShape(6.dp)).size(72.dp))
 
-        if (!niches().previews.isNullOrEmpty()) {
-            Row(modifier = Modifier) {
-                repeat(3) {
-                    UrlImage(
-                        niches().previews?.get(it)?.thumbnail ?: "",
-                        modifier = Modifier.padding(horizontal = 4.dp).size(96.dp),
-                        contentScale = ContentScale.Crop
-                    )
-                }
-            }
+           Column(verticalArrangement = Arrangement.SpaceBetween, horizontalAlignment = Alignment.Start, modifier = Modifier.padding(vertical = 4.dp).fillMaxHeight()) {
+               Text(text = niches().name, modifier = Modifier.padding(end = 4.dp), color = Color.White, textAlign = TextAlign.Start, )
+
+               Row(verticalAlignment = Alignment.CenterVertically) {
+                   Icon(painter = painterResource(R.drawable.members), contentDescription = null, tint = Color.White,modifier = Modifier.size(16.dp))
+                   Text(text = niches().subscribers.toPrettyCount(), modifier = Modifier.padding(start = 4.dp, end = 4.dp).wrapContentWidth(Alignment.CenterHorizontally), color = Color.White, textAlign = TextAlign.Center, fontSize = 16.sp)
+               }
+               Row(verticalAlignment = Alignment.CenterVertically) {
+                   Icon( painter = painterResource(R.drawable.posts), contentDescription = null, tint = Color.White, modifier = Modifier.size(16.dp) )
+                   Text( text = niches().gifs.toPrettyCount(), modifier = Modifier.padding(start = 4.dp, end = 4.dp).wrapContentWidth(Alignment.CenterHorizontally), color = Color.White , textAlign = TextAlign.Center, fontSize = 16.sp)
+               }
+           }
+
         }
 
     }
 
-
 }
+
+
 
 @Preview
 @Composable

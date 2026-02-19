@@ -191,7 +191,7 @@ private fun NicheHeaderContent(
                 modifier = Modifier.padding(start = 16.dp, top = 16.dp),
                 fontFamily = ThemeRed.fontFamilyDMsanss
             )
-            LazyRow(modifier = Modifier.padding(vertical = 8.dp)) {
+            LazyRow(modifier = Modifier.padding(vertical = 6.dp).fillMaxWidth()) {
                 items(relatedNiches().niches) { item ->
                     NichePreview({item}, onClick = { onNicheClick(item.id) })
                 }
