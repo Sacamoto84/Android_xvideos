@@ -13,6 +13,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FlexibleBottomAppBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -88,6 +91,7 @@ class ScreenRedProfile(val profileName: String) : Screen {
 
 }
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun RedProfileScreenContent(
@@ -102,19 +106,16 @@ fun RedProfileScreenContent(
     savedRedProvider: () -> com.client.xvideos.redgifs.common.saved.SavedRed
 ) {
 
+    Scaffold(containerColor = Color(0xFF303030),
 
 
 
 
-    Scaffold(containerColor = Color(0xFF303030)) {
 
-        FlexibleBottomAppBar(
-        FlexibleBottomAppBar(
-            contentPadding = PaddingValues(horizontal = 96.dp),
-            horizontalArrangement = BottomAppBarDefaults.FlexibleFixedHorizontalArrangement,
         ) {
 
-        }
+
+
 
 
 

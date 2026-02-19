@@ -13,13 +13,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.BottomAppBarDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FlexibleBottomAppBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -53,28 +60,23 @@ class R_ScreenNiche(val nicheName: String = "pumped-pussy") : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val vm = getScreenModel<ScreenNicheSM, ScreenNicheSM.Factory> { factory -> factory.create(nicheName) }
-        val columnSelect = Settings.r_current_count_niches.field.collectAsStateWithLifecycle().value
-        val sort = vm.lazyHost.sortType.collectAsStateWithLifecycle().value
+        val columnSelect by Settings.r_current_count_niches.field.collectAsStateWithLifecycle()
+        val sort by vm.lazyHost.sortType.collectAsStateWithLifecycle()
         val savedRed = vm.hostDI.savedRed
         val followedList = savedRed.niches.list
-        val isFollowed = followedList.any { it.id == vm.niche.id }
+
+        val isFollowed = remember(followedList, vm.niche.id) {
+            followedList.any { it.id == vm.niche.id }
+        }
 
         LaunchedEffect(columnSelect) {
             vm.lazyHost.columns = columnSelect
         }
-
-        ScreenNicheContent(
-            niche = vm.niche,
-            relatedNiches = { vm.related },
-            topCreators = { vm.topCreator },
-            lazyHost = vm.lazyHost,
-            currentSort = sort,
-            onSortChange = { vm.lazyHost.changeSortType(it) },
-            onNicheClick = { id -> navigator.push(R_ScreenNiche(id)) },
-            onCreatorClick = { username -> navigator.push(ScreenRedProfile(username)) },
-            onUpClick = { vm.lazyHost.gotoUp() },
-            isFollowed = isFollowed,
-            onFollowClick = {
+        
+        val onNicheClick: (String) -> Unit = remember(navigator) { { id -> navigator.push(R_ScreenNiche(id)) } }
+        val onCreatorClick: (String) -> Unit = remember(navigator) { { username -> navigator.push(ScreenRedProfile(username)) } }
+        val onFollowClick: () -> Unit = remember(isFollowed, vm.niche) {
+            {
                 val nicheInfo = NichesInfo(
                     id = vm.niche.id,
                     name = vm.niche.name,
@@ -85,6 +87,20 @@ class R_ScreenNiche(val nicheName: String = "pumped-pussy") : Screen {
                 if (isFollowed) savedRed.niches.remove(nicheInfo)
                 else savedRed.niches.add(nicheInfo)
             }
+        }
+
+        ScreenNicheContent(
+            niche = vm.niche,
+            relatedNiches = { vm.related },
+            topCreators = { vm.topCreator },
+            lazyHost = vm.lazyHost,
+            currentSort = sort,
+            onSortChange = { vm.lazyHost.changeSortType(it) },
+            onNicheClick = onNicheClick,
+            onCreatorClick = onCreatorClick,
+            onUpClick = { vm.lazyHost.gotoUp() },
+            isFollowed = isFollowed,
+            onFollowClick = onFollowClick
         )
     }
 }
@@ -124,8 +140,8 @@ fun ScreenNicheContent(
                     contentBeforeList = {
                         NicheHeaderContent(
                             niche = niche,
-                            relatedNiches = relatedNiches,
-                            topCreators = topCreators,
+                            relatedNiches = relatedNiches(),
+                            topCreators = topCreators(),
                             onNicheClick = onNicheClick,
                             onCreatorClick = onCreatorClick,
                             isFollowed = isFollowed,
@@ -138,6 +154,7 @@ fun ScreenNicheContent(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun StatelessScreenNicheContent(
     niche: NichesInfo,
@@ -147,17 +164,28 @@ private fun StatelessScreenNicheContent(
     onUpClick: () -> Unit,
     content: @Composable (PaddingValues) -> Unit
 ) {
+
+    val scrollBehavior = BottomAppBarDefaults.exitAlwaysScrollBehavior()
+
     Scaffold(
         bottomBar = {
-            NicheBottomBar(
-                niche = niche,
-                currentSort = currentSort,
-                onSortChange = onSortChange,
-                columns = columns,
-                onUpClick = onUpClick
-            )
+                FlexibleBottomAppBar(
+                    horizontalArrangement = BottomAppBarDefaults.FlexibleFixedHorizontalArrangement,
+                    scrollBehavior = scrollBehavior,
+                    content = {
+                        NicheBottomBar(
+                            niche = niche,
+                            currentSort = currentSort,
+                            onSortChange = onSortChange,
+                            columns = columns,
+                            onUpClick = onUpClick
+                        )
+                    },
+                )
         },
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize()
+            .nestedScroll(scrollBehavior.nestedScrollConnection)
+        ,
         containerColor = Color(0xFF0F0F0F)
     ) { padding ->
         content(padding)
@@ -167,8 +195,8 @@ private fun StatelessScreenNicheContent(
 @Composable
 private fun NicheHeaderContent(
     niche: NichesInfo,
-    relatedNiches: () -> NichesResponse,
-    topCreators: () -> TopCreatorsResponse,
+    relatedNiches: NichesResponse,
+    topCreators: TopCreatorsResponse,
     onNicheClick: (String) -> Unit,
     onCreatorClick: (String) -> Unit,
     isFollowed: Boolean,
@@ -188,29 +216,45 @@ private fun NicheHeaderContent(
             onFollowClick = onFollowClick
         )
 
-        if (relatedNiches().niches.isNotEmpty()) {
+        val related = relatedNiches.niches
+        if (related.isNotEmpty()) {
             Text(
                 "Related Niches",
                 color = Color.White,
                 modifier = Modifier.padding(start = 4.dp, top = 8.dp),
                 fontFamily = ThemeRed.fontFamilyDMsanss
             )
-            LazyRow(modifier = Modifier.padding(top = 4.dp).fillMaxWidth()) {
-                items(relatedNiches().niches) { item ->
-                    NichePreview({item}, onClick = { onNicheClick(item.id) })
+            LazyRow(
+                modifier = Modifier.padding(top = 4.dp).fillMaxWidth(),
+                contentPadding = PaddingValues(horizontal = 4.dp)
+            ) {
+                items(
+                    items = related,
+                    key = { it.id },
+                    contentType = { "niche_preview" }
+                ) { item ->
+                    NichePreview({ item }, onClick = { onNicheClick(item.id) })
                 }
             }
         }
 
-        if (topCreators().creators.isNotEmpty()) {
+        val creators = topCreators.creators
+        if (creators.isNotEmpty()) {
             Text(
                 "✨ Top Creators in ${niche.name}",
                 color = Color.White,
                 modifier = Modifier.padding(start = 4.dp, top = 8.dp),
                 fontFamily = ThemeRed.fontFamilyDMsanss
             )
-            LazyRow(modifier = Modifier.padding(vertical = 4.dp)) {
-                items(topCreators().creators) { creator ->
+            LazyRow(
+                modifier = Modifier.padding(vertical = 4.dp),
+                contentPadding = PaddingValues(horizontal = 4.dp)
+            ) {
+                items(
+                    items = creators,
+                    key = { it.username },
+                    contentType = { "top_creator" }
+                ) { creator ->
                     NicheTopCreator(creator, onClick = { onCreatorClick(creator.username) })
                 }
             }
@@ -238,8 +282,8 @@ private fun ScreenNicheContentPreview() {
                 ) {
                     NicheHeaderContent(
                         niche = sampleNicheInfo,
-                        relatedNiches = { sampleNichesResponse },
-                        topCreators = { sampleTopCreatorsResponse },
+                        relatedNiches = sampleNichesResponse,
+                        topCreators = sampleTopCreatorsResponse,
                         onNicheClick = {},
                         onCreatorClick = {},
                         isFollowed = false,
@@ -265,8 +309,8 @@ private fun NicheHeaderContentPreview() {
     XvideosTheme {
         NicheHeaderContent(
             niche = sampleNicheInfo,
-            relatedNiches = { sampleNichesResponse },
-            topCreators = { sampleTopCreatorsResponse },
+            relatedNiches = sampleNichesResponse,
+            topCreators = sampleTopCreatorsResponse,
             onNicheClick = {},
             onCreatorClick = {},
             isFollowed = true,
