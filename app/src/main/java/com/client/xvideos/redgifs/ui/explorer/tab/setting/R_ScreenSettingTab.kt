@@ -35,6 +35,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.model.ScreenModel
@@ -44,11 +45,11 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import com.client.xvideos.common.AppPath
-import com.client.xvideos.common.util.getFolderSize
 import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.common.settings.ui.ConfigText
 import com.client.xvideos.common.settings.ui.ConfigTextAndButtonWithDialog
 import com.client.xvideos.common.settings.ui.Config_G_0_4
+import com.client.xvideos.common.util.getFolderSize
 import com.client.xvideos.common.util.toPrettyCount3
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.common.di.HostDI
@@ -79,101 +80,153 @@ object R_ScreenSettingTab : Screen {
             vm.sizeRedDownload = getFolderSize(File(AppPath.r_cache_download))
         }
 
-        Column(
-            modifier = Modifier
-                .background(ThemeRed.colorCommonBackground)
-                .displayCutoutPadding()
-                .fillMaxSize()
-        ) {
-
-            Text(
-                "Настройки",
-                color = Color.White,
-                style = TextStyle(
-                    fontSize = 24.sp,
-                    fontFamily = ThemeRed.fontFamilyDMsanss,
-                    textAlign = TextAlign.Center
-                ),
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            HorizontalDivider(color = Color.DarkGray)
-            ConfigText("Размер всех папок Red:", vm.sizeXvideos.toPrettyCount3())
-            HorizontalDivider(color = Color.DarkGray)
-            ConfigText("Размер папки Download:", vm.sizeRedDownload.toPrettyCount3())
-            HorizontalDivider(color = Color.DarkGray)
-
-            ConfigTextAndButtonWithDialog(
-                text = "Очистить папку Download",
-                value = "Очистить",
-                textDialogTitle = "Очистка папки Download",
-                textDialogBody = "Подтвердить очистку: ${vm.sizeRedDownload.toPrettyCount3()}",
-                textDialogButton = "Очистить",
-            ) {
+        StatelessR_ScreenSettingTab(
+            sizeXvideos = vm.sizeXvideos,
+            sizeRedDownload = vm.sizeRedDownload,
+            onClearDownloadClick = {
                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                 vm.hostDI.downloadRed.deleteAll {
                     vm.sizeXvideos = getFolderSize(File(AppPath.main))
                     vm.sizeRedDownload = getFolderSize(File(AppPath.r_cache_download))
                 }
-            }
-            HorizontalDivider(color = Color.DarkGray)
+            },
+            isNichesCacheDownloading = vm.hostDI.savedRed.nichesCache.isDownloading,
+            onRefreshNichesCacheClick = { vm.hostDI.savedRed.nichesCache.refresh() },
+            nichesCacheProgress = vm.hostDI.savedRed.nichesCache.progress,
+            nichesCacheSize = vm.hostDI.savedRed.nichesCache.size,
+            nichesCacheLastModifiedHour = vm.hostDI.savedRed.nichesCache.lastModifiedHour
+        )
+    }
+}
 
-            Row(
+@Composable
+fun StatelessR_ScreenSettingTab(
+    sizeXvideos: Long,
+    sizeRedDownload: Long,
+    onClearDownloadClick: () -> Unit,
+    isNichesCacheDownloading: Boolean,
+    onRefreshNichesCacheClick: () -> Unit,
+    nichesCacheProgress: Float,
+    nichesCacheSize: Int,
+    nichesCacheLastModifiedHour: Long
+) {
+    Column(
+        modifier = Modifier
+            .background(ThemeRed.colorCommonBackground)
+            .displayCutoutPadding()
+            .fillMaxSize()
+    ) {
+
+        Text(
+            "Настройки",
+            color = Color.White,
+            style = TextStyle(
+                fontSize = 24.sp,
+                fontFamily = ThemeRed.fontFamilyDMsanss,
+                textAlign = TextAlign.Center
+            ),
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        HorizontalDivider(color = Color.DarkGray)
+        ConfigText("Размер всех папок Red:", sizeXvideos.toPrettyCount3())
+        HorizontalDivider(color = Color.DarkGray)
+        ConfigText("Размер папки Download:", sizeRedDownload.toPrettyCount3())
+        HorizontalDivider(color = Color.DarkGray)
+
+        ConfigTextAndButtonWithDialog(
+            text = "Очистить папку Download",
+            value = "Очистить",
+            textDialogTitle = "Очистка папки Download",
+            textDialogBody = "Подтвердить очистку: ${sizeRedDownload.toPrettyCount3()}",
+            textDialogButton = "Очистить",
+            onClick = onClearDownloadClick
+        )
+        HorizontalDivider(color = Color.DarkGray)
+
+
+
+        ///////////////////////////////////
+        Row(
+            modifier = Modifier
+                .padding(start = 8.dp, end = 2.dp)
+                .padding(vertical = 2.dp)
+                .height(48.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text("Kеш Niches", style = styleTest)
+
+            if (isNichesCacheDownloading) {
+                CircularProgressIndicator(color = ThemeRed.colorBlue, modifier = Modifier.size(40.dp))
+            }
+
+            Box(
                 modifier = Modifier
-                    .padding(start = 8.dp, end = 2.dp)
-                    .padding(vertical = 2.dp)
                     .height(48.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                    .width(100.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .border(1.dp, ThemeRed.colorTabLevel3, RoundedCornerShape(8.dp))
+                    .background(ThemeRed.colorBottomBarDivider)
+                    .clickable(onClick = onRefreshNichesCacheClick), contentAlignment = Alignment.Center
             ) {
-                Text("Kеш Niches", style = styleTest)
-
-                if (vm.hostDI.savedRed.nichesCache.isDownloading) {
-                    CircularProgressIndicator(color = ThemeRed.colorBlue, modifier = Modifier.size(40.dp))
-                }
-
-                Box(
-                    modifier = Modifier
-                        .height(48.dp)
-                        .width(100.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .border(1.dp, ThemeRed.colorTabLevel3, RoundedCornerShape(8.dp))
-                        .background(ThemeRed.colorBottomBarDivider)
-                        .clickable(onClick = { vm.hostDI.savedRed.nichesCache.refresh() }), contentAlignment = Alignment.Center
-                ) {
-                    Text("Обновить", style = styleTest.copy(fontSize = 18.sp))
-                }
-
+                Text("Обновить", style = styleTest.copy(fontSize = 18.sp))
             }
-
-            if (vm.hostDI.savedRed.nichesCache.isDownloading) {
-                LinearProgressIndicator(
-                    progress = { vm.hostDI.savedRed.nichesCache.progress },
-                    modifier = Modifier
-                        .padding(horizontal = 4.dp)
-                        .fillMaxWidth(),
-                    color = ProgressIndicatorDefaults.linearColor,
-                    trackColor = ProgressIndicatorDefaults.linearTrackColor,
-                    strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
-                )
-            }
-            else
-                Spacer(modifier = Modifier.height(4.dp))
-
-            ConfigText("Размер", "${vm.hostDI.savedRed.nichesCache.size}")
-            val minutes = vm.hostDI.savedRed.nichesCache.lastModifiedMinute
-            val hour = vm.hostDI.savedRed.nichesCache.lastModifiedHour
-            ConfigText("Возраст", "${hour}h")
-
-
-            HorizontalDivider(color = Color.DarkGray)
-
-            Config_G_0_4("Likes",Settings.r_likesTab_G_0_4)
-            
 
         }
+
+        if (isNichesCacheDownloading) {
+            LinearProgressIndicator(
+                progress = { nichesCacheProgress },
+                modifier = Modifier
+                    .padding(horizontal = 4.dp)
+                    .fillMaxWidth(),
+                color = ProgressIndicatorDefaults.linearColor,
+                trackColor = ProgressIndicatorDefaults.linearTrackColor,
+                strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
+            )
+        } else
+            Spacer(modifier = Modifier.height(4.dp))
+
+        ConfigText("Размер", "$nichesCacheSize")
+        ConfigText("Возраст", "${nichesCacheLastModifiedHour}h")
+        ///////////////////////////////////
+
+
+
+
+        HorizontalDivider(color = Color.DarkGray)
+
+        Config_G_0_4("Likes", Settings.r_likesTab_G_0_4)
+
+
     }
+}
+
+
+
+
+
+
+@Preview(showBackground = true)
+@Composable
+fun R_ScreenSettingTabPreview() {
+    // Initialize Settings for the preview to avoid UninitializedPropertyAccessException
+    // This is necessary because Settings.r_likesTab_G_0_4 accesses a lateinit SharedPreferences
+    val context = LocalContext.current
+    Settings.init(context.getSharedPreferences("preview_prefs", 0))
+
+    StatelessR_ScreenSettingTab(
+        sizeXvideos = 123456789,
+        sizeRedDownload = 123456,
+        onClearDownloadClick = {},
+        isNichesCacheDownloading = true,
+        onRefreshNichesCacheClick = {},
+        nichesCacheProgress = 0.5f,
+        nichesCacheSize = 987,
+        nichesCacheLastModifiedHour = 2L
+    )
 }
 
 val styleTest = TextStyle(

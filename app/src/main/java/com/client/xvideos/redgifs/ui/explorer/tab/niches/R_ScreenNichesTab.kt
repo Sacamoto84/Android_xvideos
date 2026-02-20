@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,17 +19,20 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.tooling.preview.Preview
@@ -56,6 +60,7 @@ import com.client.xvideos.redgifs.common.saved.SavedRed
 import com.client.xvideos.redgifs.common.search.SearchNichesRed
 import com.client.xvideos.redgifs.model.Niche
 import com.client.xvideos.redgifs.model.Order
+import com.client.xvideos.redgifs.ui.explorer.tab.setting.styleTest
 import com.client.xvideos.redgifs.ui.niche.R_ScreenNiche
 import com.client.xvideos.redgifs.ui.profile.atom.VerticalScrollbar
 import com.client.xvideos.redgifs.ui.profile.rememberVisibleRangePercentIgnoringFirstNForLazyColumn
@@ -63,11 +68,13 @@ import com.client.xvideos.redgifs.ui.ui.atom.ButtonUp
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.LazyRow123Host
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.model.TypePager
 import com.client.xvideos.redgifs.ui.ui.sortByOrder.SortByOrder
+import com.client.xvideos.ui.theme.XvideosTheme
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -112,8 +119,14 @@ object R_ScreenNichesTab : Screen {
                     onValueChange = { vm.search.searchText.value = it },
                     onDone = { vm.search.searchTextDone.value = it },
                     modifier = modifier
+
                 )
-            }
+            },
+            isNichesCacheDownloading = vm.hostDI.savedRed.nichesCache.isDownloading,
+            onRefreshNichesCacheClick = {
+                vm.hostDI.savedRed.nichesCache.refresh()
+            },
+            nichesCacheProgress = vm.hostDI.savedRed.nichesCache.progress,
         )
     }
 }
@@ -131,29 +144,25 @@ fun NichesTabContent(
     onUpClick: () -> Unit,
     onNicheClick: (String) -> Unit,
     savedRed: () -> SavedRed?,
-    searchWidget: @Composable (Modifier) -> Unit
+    searchWidget: @Composable (Modifier) -> Unit,
+
+    isNichesCacheDownloading: Boolean,
+    onRefreshNichesCacheClick: () -> Unit,
+    nichesCacheProgress: Float
 ) {
     val haptic = LocalHapticFeedback.current
 
 
+
     //Данные отсутствует
     if (listNiche().itemCount == 0) {
-        Column(
-            modifier = Modifier.fillMaxSize().background(ThemeRed.colorTabLevel1),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-
-            Text("Отсутствует список Niches")
-
-            Button(onClick = {}) {
-                Text("Обновить")
+        Refresh(
+            onRefreshNichesCacheClick = onRefreshNichesCacheClick,
+            nichesCacheProgress = nichesCacheProgress,
+            refreshList = {
+                listNiche().refresh()
             }
-
-            LinearWavyProgressIndicator()
-
-
-        }
+        )
     } else {
 
         Scaffold(
@@ -278,6 +287,80 @@ fun NichesTabContent(
     }
 }
 
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun Refresh(
+    onRefreshNichesCacheClick: () -> Unit,
+    nichesCacheProgress: Float,
+    refreshList : () -> Unit = {}
+) {
+
+    LaunchedEffect(nichesCacheProgress) {
+        if (nichesCacheProgress == 1f) {
+            delay(1000)
+            refreshList.invoke()
+        }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(ThemeRed.colorTabLevel1),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        Text("Отсутствует список Niches", style = styleTest)
+
+        Spacer(Modifier.height(8.dp))
+
+        Button(
+            onClick = onRefreshNichesCacheClick,
+            colors = ButtonDefaults.buttonColors(containerColor = ThemeRed.colorBlue)
+        ) {
+            Text("Скачать список ", style = styleTest.copy(fontSize = 18.sp))
+        }
+
+        Spacer(Modifier.height(8.dp))
+
+
+        LinearWavyProgressIndicator(
+            progress = { nichesCacheProgress },
+            Modifier.graphicsLayer(
+                alpha = if (nichesCacheProgress > 0f) 1f else 0f
+            )
+        )
+
+    }
+
+
+//    if (isNichesCacheDownloading) {
+//        LinearProgressIndicator(
+//            progress = { nichesCacheProgress },
+//            modifier = Modifier
+//                .padding(horizontal = 4.dp)
+//                .fillMaxWidth(),
+//            color = ProgressIndicatorDefaults.linearColor,
+//            trackColor = ProgressIndicatorDefaults.linearTrackColor,
+//            strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
+//        )
+//    } else
+//        Spacer(modifier = Modifier.height(4.dp))
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
 @Preview(showBackground = true, backgroundColor = 0xFF121212)
 @Composable
 fun R_ScreenNichesTabPreview() {
@@ -317,7 +400,10 @@ fun R_ScreenNichesTabPreview() {
                     fontSize = 14.sp
                 )
             }
-        }
+        },
+        isNichesCacheDownloading = false,
+        onRefreshNichesCacheClick = {},
+        nichesCacheProgress = 1f
     )
 }
 
@@ -349,4 +435,29 @@ abstract class ScreenModuleRedExplorerNiches {
     @IntoMap
     @ScreenModelKey(ScreenRedExplorerNichesSM::class)
     abstract fun bindScreenRedExplorerNichesSreenModel(hiltListScreenModel: ScreenRedExplorerNichesSM): ScreenModel
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF282828)
+@Composable
+fun RefreshPreview() {
+    XvideosTheme {
+        Column(
+            modifier = Modifier
+                .background(ThemeRed.colorTabLevel1)
+                .padding(8.dp)
+        ) {
+            Refresh(
+                onRefreshNichesCacheClick = {},
+                nichesCacheProgress = 0f,
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Refresh(
+                //isNichesCacheDownloading = true,
+                onRefreshNichesCacheClick = {},
+                nichesCacheProgress = 0.45f,
+            )
+        }
+    }
 }
