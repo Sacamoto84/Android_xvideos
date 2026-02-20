@@ -17,8 +17,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,7 +35,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -90,16 +91,21 @@ object R_ScreenNichesTab : Screen {
         val searchText by vm.search.searchText.collectAsStateWithLifecycle()
         val isSearchFocused by vm.search.focused.collectAsStateWithLifecycle()
 
+        val onSortTypeChange: (Order) -> Unit = remember { { vm.lazyHost.changeSortType(it) } }
+        val onUpClick: () -> Unit = remember { { vm.lazyHost.gotoUpColumn() } }
+        val onNicheClick: (String) -> Unit =
+            remember(navigator) { { id -> navigator.push(R_ScreenNiche(id)) } }
+
         NichesTabContent(
-            listNiche = listNiche,
+            listNiche = { listNiche },
             state = vm.lazyHost.stateColumn,
             scrollPercent = scrollPercent,
             sortType = sortType,
-            onSortTypeChange = { vm.lazyHost.changeSortType(it) },
+            onSortTypeChange = onSortTypeChange,
             isSearchFocused = isSearchFocused,
-            onUpClick = { vm.lazyHost.gotoUpColumn() },
-            onNicheClick = { id -> navigator.push(R_ScreenNiche(id)) },
-            savedRed = vm.hostDI.savedRed,
+            onUpClick = onUpClick,
+            onNicheClick = onNicheClick,
+            savedRed = { vm.hostDI.savedRed },
             searchWidget = { modifier ->
                 vm.search.CustomBasicTextField(
                     value = searchText,
@@ -112,10 +118,11 @@ object R_ScreenNichesTab : Screen {
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun NichesTabContent(
-    listNiche: LazyPagingItems<Niche>,
+    listNiche: () -> LazyPagingItems<Niche>,
     state: LazyListState,
     scrollPercent: Pair<Float, Float>,
     sortType: Order,
@@ -123,126 +130,149 @@ fun NichesTabContent(
     isSearchFocused: Boolean,
     onUpClick: () -> Unit,
     onNicheClick: (String) -> Unit,
-    savedRed: SavedRed?,
+    savedRed: () -> SavedRed?,
     searchWidget: @Composable (Modifier) -> Unit
 ) {
     val haptic = LocalHapticFeedback.current
 
-    Scaffold(
-        bottomBar = {
-            Column(Modifier.background(ThemeRed.colorTabLevel1)) {
-                HorizontalDivider(color = ThemeRed.colorBorderGray)
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 2.dp, horizontal = 4.dp)
-                        .background(ThemeRed.colorTabLevel1),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    AnimatedVisibility(visible = !isSearchFocused) {
-                        SortByOrder(
-                            list = listOf(
-                                Order.NICHES_SUBSCRIBERS_D,
-                                Order.NICHES_SUBSCRIBERS_A,
-                                Order.NICHES_POST_D,
-                                Order.NICHES_POST_A,
-                                Order.NICHES_NAME_A_Z,
-                                Order.NICHES_NAME_Z_A
-                            ),
-                            selected = sortType,
-                            onSelect = onSortTypeChange,
-                            containerColor = ThemeRed.colorTabLevel0
-                        )
-                    }
 
-                    searchWidget( Modifier.padding(horizontal = 4.dp).weight(1f) )
-
-                    AnimatedVisibility(visible = !isSearchFocused) {
-                        ButtonUp {
-                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                            onUpClick()
-                        }
-                    }
-                }
-                HorizontalDivider(color = ThemeRed.colorBorderGray)
-            }
-        },
-        containerColor = ThemeRed.colorCommonBackground2
-    ) { paddingValues ->
-        Box(
-            modifier = Modifier.padding(bottom = paddingValues.calculateBottomPadding()).fillMaxSize()
+    //Данные отсутствует
+    if (listNiche().itemCount == 0) {
+        Column(
+            modifier = Modifier.fillMaxSize().background(ThemeRed.colorTabLevel1),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            LazyColumn(
-                state = state,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                items(
-                    count = listNiche.itemCount,
-                    key = listNiche.itemKey { it.id },
-                    contentType = listNiche.itemContentType { "niche" }
-                ) { index ->
 
-                    val item = listNiche[index]
+            Text("Отсутствует список Niches")
 
-                    if (item != null) {
-                        Box(modifier = Modifier.padding(vertical = 4.dp)) {
+            Button(onClick = {}) {
+                Text("Обновить")
+            }
 
-                            if (savedRed != null) {
-                                NichePreview2(
-                                    niches = { item },
-                                    onClick = { onNicheClick(item.id) },
-                                    savedRed = { savedRed }
-                                )
-                            } else {
-                                // Placeholder for Preview
-                                Box(
-                                    modifier = Modifier
-                                        .padding(horizontal = 8.dp)
-                                        .fillMaxWidth().height(78.dp)
-                                        .background(Color(0xFF323232), RoundedCornerShape(16.dp)),
-                                    contentAlignment = Alignment.CenterStart
-                                ) {
-                                    Text(
-                                        text = item.name,
-                                        color = Color.White, modifier = Modifier.padding(start = 16.dp),
-                                        fontFamily = ThemeRed.fontFamilyDMsanss
-                                    )
-                                }
-                            }
+            LinearWavyProgressIndicator()
 
-                            Text(
-                                text = (index + 1).toString(),
-                                color = Color.Gray,
-                                fontFamily = ThemeRed.fontFamilyDMsanss,
-                                modifier = Modifier
-                                    .padding(top = 8.dp, end = 16.dp)
-                                    .align(Alignment.TopEnd),
-                                fontSize = 10.sp
+
+        }
+    } else {
+
+        Scaffold(
+            bottomBar = {
+                Column(Modifier.background(ThemeRed.colorTabLevel1)) {
+                    HorizontalDivider(color = ThemeRed.colorBorderGray)
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 2.dp, horizontal = 4.dp)
+                            .background(ThemeRed.colorTabLevel1),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        AnimatedVisibility(visible = !isSearchFocused) {
+                            SortByOrder(
+                                list = listOf(
+                                    Order.NICHES_SUBSCRIBERS_D,
+                                    Order.NICHES_SUBSCRIBERS_A,
+                                    Order.NICHES_POST_D,
+                                    Order.NICHES_POST_A,
+                                    Order.NICHES_NAME_A_Z,
+                                    Order.NICHES_NAME_Z_A
+                                ),
+                                selected = sortType,
+                                onSelect = onSortTypeChange,
+                                containerColor = ThemeRed.colorTabLevel0
                             )
                         }
-                    }
-                }
-                
-                if (listNiche.loadState.refresh is LoadState.Loading || listNiche.loadState.append is LoadState.Loading) {
-                    item {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(24.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(color = ThemeRed.colorYellow)
+
+                        searchWidget(Modifier
+                            .padding(horizontal = 4.dp)
+                            .weight(1f))
+
+                        AnimatedVisibility(visible = !isSearchFocused) {
+                            ButtonUp {
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                onUpClick()
+                            }
                         }
                     }
+                    HorizontalDivider(color = ThemeRed.colorBorderGray)
                 }
-            }
-
-            // Scrollbar
+            },
+            containerColor = ThemeRed.colorTabLevel1
+        ) { paddingValues ->
             Box(
-                modifier = Modifier.fillMaxHeight().align(Alignment.CenterEnd).width(2.dp)
+                modifier = Modifier
+                    .padding(bottom = paddingValues.calculateBottomPadding())
+                    .fillMaxSize()
             ) {
-                VerticalScrollbar(scrollPercent)
+                LazyColumn(
+                    state = state,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(
+                        count = listNiche().itemCount,
+                        key = listNiche().itemKey { it.id },
+                        contentType = listNiche().itemContentType { "niche" }
+                    ) { index ->
+
+                        val item = listNiche()[index]
+
+                        if (item != null) {
+                            val currentSavedRed = remember { savedRed() }
+
+                            Box(modifier = Modifier.padding(vertical = 2.dp)) {
+                                if (currentSavedRed != null) {
+                                    NichePreview2(
+                                        niches = { item },
+                                        onClick = { onNicheClick(item.id) },
+                                        savedRed = { currentSavedRed }
+                                    )
+                                } else {
+                                    // Placeholder for Preview
+                                    Box(
+                                        modifier = Modifier
+                                            .padding(horizontal = 8.dp)
+                                            .fillMaxWidth()
+                                            .height(78.dp)
+                                            .background(
+                                                ThemeRed.colorTabLevel3,
+                                                RoundedCornerShape(16.dp)
+                                            ),
+                                        contentAlignment = Alignment.CenterStart
+                                    ) {
+                                        Text(
+                                            text = item.name,
+                                            color = Color.White,
+                                            modifier = Modifier.padding(start = 16.dp),
+                                            fontFamily = ThemeRed.fontFamilyDMsanss
+                                        )
+                                    }
+                                }
+
+                                Text(
+                                    text = (index + 1).toString(),
+                                    color = Color.Gray,
+                                    fontFamily = ThemeRed.fontFamilyDMsanss,
+                                    modifier = Modifier
+                                        .padding(top = 8.dp, end = 16.dp)
+                                        .align(Alignment.TopEnd),
+                                    fontSize = 10.sp
+                                )
+                            }
+                        }
+                    }
+
+                }
+
+                // Scrollbar
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .align(Alignment.CenterEnd)
+                        .width(2.dp)
+                ) {
+                    VerticalScrollbar(scrollPercent)
+                }
             }
         }
     }
@@ -264,7 +294,7 @@ fun R_ScreenNichesTabPreview() {
     val listNiche = flowOf(pagingData).collectAsLazyPagingItems()
     
     NichesTabContent(
-        listNiche = listNiche,
+        listNiche = { listNiche },
         state = rememberLazyListState(),
         scrollPercent = 0f to 0.3f,
         sortType = Order.NICHES_SUBSCRIBERS_D,
@@ -272,7 +302,7 @@ fun R_ScreenNichesTabPreview() {
         isSearchFocused = false,
         onUpClick = {},
         onNicheClick = {},
-        savedRed = null,
+        savedRed = { null },
         searchWidget = { modifier ->
             Box(
                 modifier

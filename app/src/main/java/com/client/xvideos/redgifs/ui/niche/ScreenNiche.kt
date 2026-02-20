@@ -140,8 +140,8 @@ fun ScreenNicheContent(
                     contentBeforeList = {
                         NicheHeaderContent(
                             niche = niche,
-                            relatedNiches = relatedNiches(),
-                            topCreators = topCreators(),
+                            relatedNiches = relatedNiches,
+                            topCreators = topCreators,
                             onNicheClick = onNicheClick,
                             onCreatorClick = onCreatorClick,
                             isFollowed = isFollowed,
@@ -195,8 +195,8 @@ private fun StatelessScreenNicheContent(
 @Composable
 private fun NicheHeaderContent(
     niche: NichesInfo,
-    relatedNiches: NichesResponse,
-    topCreators: TopCreatorsResponse,
+    relatedNiches: () -> NichesResponse,
+    topCreators: () -> TopCreatorsResponse,
     onNicheClick: (String) -> Unit,
     onCreatorClick: (String) -> Unit,
     isFollowed: Boolean,
@@ -216,7 +216,7 @@ private fun NicheHeaderContent(
             onFollowClick = onFollowClick
         )
 
-        val related = relatedNiches.niches
+        val related = relatedNiches().niches
         if (related.isNotEmpty()) {
             Text(
                 "Related Niches",
@@ -238,7 +238,7 @@ private fun NicheHeaderContent(
             }
         }
 
-        val creators = topCreators.creators
+        val creators = topCreators().creators
         if (creators.isNotEmpty()) {
             Text(
                 "✨ Top Creators in ${niche.name}",
@@ -282,8 +282,8 @@ private fun ScreenNicheContentPreview() {
                 ) {
                     NicheHeaderContent(
                         niche = sampleNicheInfo,
-                        relatedNiches = sampleNichesResponse,
-                        topCreators = sampleTopCreatorsResponse,
+                        relatedNiches = { sampleNichesResponse },
+                        topCreators = { sampleTopCreatorsResponse },
                         onNicheClick = {},
                         onCreatorClick = {},
                         isFollowed = false,
@@ -309,8 +309,8 @@ private fun NicheHeaderContentPreview() {
     XvideosTheme {
         NicheHeaderContent(
             niche = sampleNicheInfo,
-            relatedNiches = sampleNichesResponse,
-            topCreators = sampleTopCreatorsResponse,
+            relatedNiches = { sampleNichesResponse },
+            topCreators = { sampleTopCreatorsResponse },
             onNicheClick = {},
             onCreatorClick = {},
             isFollowed = true,

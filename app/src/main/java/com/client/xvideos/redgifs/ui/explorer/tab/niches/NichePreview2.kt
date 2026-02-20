@@ -14,9 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Group
-import androidx.compose.material.icons.outlined.Photo
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,9 +21,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.client.xvideos.R
 import com.client.xvideos.common.coil.UrlImage
 import com.client.xvideos.common.util.toPrettyCountInt
 import com.client.xvideos.redgifs.common.ThemeRed
@@ -36,23 +35,25 @@ import com.client.xvideos.redgifs.model.NichesInfo
 import com.client.xvideos.ui.theme.XvideosTheme
 
 @Composable
-fun NichePreview2(niches: () -> Niche, savedRed: () -> SavedRed, onClick: () -> Unit) {
+fun NichePreview2(niches: () -> Niche, savedRed: () -> SavedRed?, onClick: () -> Unit) {
     val niche = niches()
-    val isFollowed = savedRed().niches.list.any { it.id == niche.id }
+    val isFollowed = savedRed()?.niches?.list?.any { it.id == niche.id } == true
 
     NichePreview2Content(
-        niche = niche,
+        niche = { niche },
         isFollowed = isFollowed,
         onFollowClick = {
-            val nichesInfo = NichesInfo(
-                id = niche.id,
-                name = niche.name,
-                subscribers = niche.subscribers,
-                gifs = niche.gifs,
-                thumbnail = niche.thumbnail,
-            )
+            savedRed()?.let {
+                val nichesInfo = NichesInfo(
+                    id = niche.id,
+                    name = niche.name,
+                    subscribers = niche.subscribers,
+                    gifs = niche.gifs,
+                    thumbnail = niche.thumbnail,
+                )
 
-            if (isFollowed) savedRed().niches.remove(nichesInfo) else savedRed().niches.add(nichesInfo)
+                if (isFollowed) it.niches.remove(nichesInfo) else it.niches.add(nichesInfo)
+            }
         },
         onClick = onClick
     )
@@ -60,41 +61,54 @@ fun NichePreview2(niches: () -> Niche, savedRed: () -> SavedRed, onClick: () -> 
 
 @Composable
 private fun NichePreview2Content(
-    niche: Niche,
+    niche: () -> Niche,
     isFollowed: Boolean,
     onFollowClick: () -> Unit,
     onClick: () -> Unit
 ) {
     Row(
-        modifier = Modifier.padding(horizontal = 8.dp).fillMaxWidth().height(78.dp)
-            .clip(RoundedCornerShape(16.dp)).background(Color(0xFF323232)).clickable { onClick() },
+        modifier = Modifier
+            .padding(horizontal = 8.dp)
+            .fillMaxWidth()
+            .height(78.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(ThemeRed.colorTabLevel3)
+            .clickable { onClick() },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     )
     {
 
         UrlImage(
-            niche.thumbnail,
-            modifier = Modifier.padding(start = 4.dp).size(70.dp)
+            niche().thumbnail,
+            modifier = Modifier
+                .padding(start = 4.dp)
+                .size(70.dp)
                 .clip(RoundedCornerShape(topStart = 12.dp, bottomStart = 12.dp))
         )
 
         Column(
-            modifier = Modifier.padding(start = 8.dp, top = 4.dp, bottom = 4.dp).fillMaxWidth()
+            modifier = Modifier
+                .padding(start = 8.dp, top = 4.dp, bottom = 4.dp)
+                .fillMaxWidth()
                 .fillMaxHeight(), verticalArrangement = Arrangement.SpaceBetween
         )
         {
 
             Text(
-                text = niche.name,
-                modifier = Modifier.fillMaxWidth().height((70 / 3).dp),
+                text = niche().name,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height((70 / 3).dp),
                 color = Color.White,
                 fontSize = 18.sp,
                 fontFamily = ThemeRed.fontFamilyDMsanss
             )
 
             Row(
-                modifier = Modifier.fillMaxWidth().fillMaxHeight(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.Top
             ) {
@@ -105,15 +119,15 @@ private fun NichePreview2Content(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
-                            Icons.Outlined.Group,
+                            painterResource(R.drawable.members),
                             contentDescription = null,
                             modifier = Modifier.size(18.dp),
-                            tint = Color(0XFF959595)
+                            tint = Color.LightGray,
                         )
                         Text(
-                            text = niche.subscribers.toPrettyCountInt(),
+                            text = niche().subscribers.toPrettyCountInt(),
                             modifier = Modifier.padding(start = 4.dp),
-                            color = Color(0XFF959595),
+                            color = Color.LightGray,
                             fontSize = 16.sp,
                             fontFamily = ThemeRed.fontFamilyDMsanss
                         )
@@ -123,15 +137,15 @@ private fun NichePreview2Content(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
-                            Icons.Outlined.Photo,
+                            painterResource(R.drawable.posts),
                             contentDescription = null,
                             modifier = Modifier.size(18.dp),
-                            tint = Color(0XFF959595)
+                            tint = Color.LightGray,
                         )
                         Text(
-                            text = niche.gifs.toPrettyCountInt(),
+                            text = niche().gifs.toPrettyCountInt(),
                             modifier = Modifier.padding(start = 4.dp),
-                            color = Color(0XFF959595),
+                            color = Color.LightGray,
                             fontSize = 16.sp,
                             fontFamily = ThemeRed.fontFamilyDMsanss
                         )
@@ -141,14 +155,15 @@ private fun NichePreview2Content(
                 Box(
                     modifier = Modifier
                         .padding(end = 6.dp)
-                        .width(128.dp).height(44.dp)
+                        .width(128.dp)
+                        .height(44.dp)
                         .clip(RoundedCornerShape(10.dp))
                         .border(
                             1.dp,
                             if (isFollowed) Color.White else Color.Transparent,
                             RoundedCornerShape(10.dp)
                         )
-                        .background(if (isFollowed) Color(0xFF111111) else ThemeRed.colorYellow)
+                        .background(if (isFollowed) ThemeRed.colorTabLevel0 else ThemeRed.colorYellow)
                         .clickable(onClick = onFollowClick), contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -166,14 +181,16 @@ private fun NichePreview2Content(
 fun NichePreview2Preview() {
     XvideosTheme {
         NichePreview2Content(
-            niche = Niche(
+            niche = {
+                Niche(
                 id = "female-backs",
                 name = "Female Backs",
                 gifs = 245,
                 subscribers = 914,
                 thumbnail = "https://userpic.redgifs.com/niches/thumbnails/female-backs-dee7838f.jpg",
                 previews = emptyList()
-            ),
+                )
+            },
             isFollowed = false,
             onFollowClick = {},
             onClick = {}
@@ -186,14 +203,16 @@ fun NichePreview2Preview() {
 fun NichePreview2FollowedPreview() {
     XvideosTheme {
         NichePreview2Content(
-            niche = Niche(
+            niche = {
+                Niche(
                 id = "female-backs",
                 name = "Female Backs",
                 gifs = 245,
                 subscribers = 914,
                 thumbnail = "https://userpic.redgifs.com/niches/thumbnails/female-backs-dee7838f.jpg",
                 previews = emptyList()
-            ),
+                )
+            },
             isFollowed = true,
             onFollowClick = {},
             onClick = {}
