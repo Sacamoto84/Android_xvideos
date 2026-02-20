@@ -39,6 +39,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -104,7 +105,7 @@ object R_ScreenNichesTab : Screen {
             remember(navigator) { { id -> navigator.push(R_ScreenNiche(id)) } }
 
         NichesTabContent(
-            listNiche = { listNiche },
+            items = listNiche,
             state = vm.lazyHost.stateColumn,
             scrollPercent = scrollPercent,
             sortType = sortType,
@@ -112,17 +113,15 @@ object R_ScreenNichesTab : Screen {
             isSearchFocused = isSearchFocused,
             onUpClick = onUpClick,
             onNicheClick = onNicheClick,
-            savedRed = { vm.hostDI.savedRed },
+            savedRed = vm.hostDI.savedRed,
             searchWidget = { modifier ->
                 vm.search.CustomBasicTextField(
                     value = searchText,
                     onValueChange = { vm.search.searchText.value = it },
                     onDone = { vm.search.searchTextDone.value = it },
                     modifier = modifier
-
                 )
             },
-            isNichesCacheDownloading = vm.hostDI.savedRed.nichesCache.isDownloading,
             onRefreshNichesCacheClick = {
                 vm.hostDI.savedRed.nichesCache.refresh()
             },
@@ -135,7 +134,7 @@ object R_ScreenNichesTab : Screen {
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun NichesTabContent(
-    listNiche: () -> LazyPagingItems<Niche>,
+    items: LazyPagingItems<Niche>,
     state: LazyListState,
     scrollPercent: Pair<Float, Float>,
     sortType: Order,
@@ -143,28 +142,21 @@ fun NichesTabContent(
     isSearchFocused: Boolean,
     onUpClick: () -> Unit,
     onNicheClick: (String) -> Unit,
-    savedRed: () -> SavedRed?,
+    savedRed: SavedRed?,
     searchWidget: @Composable (Modifier) -> Unit,
-
-    isNichesCacheDownloading: Boolean,
     onRefreshNichesCacheClick: () -> Unit,
     nichesCacheProgress: Float
 ) {
     val haptic = LocalHapticFeedback.current
+    val loadState = items.loadState
 
-
-
-    //Данные отсутствует
-    if (listNiche().itemCount == 0) {
+    if (items.itemCount == 0 && loadState.refresh is LoadState.NotLoading) {
         Refresh(
             onRefreshNichesCacheClick = onRefreshNichesCacheClick,
             nichesCacheProgress = nichesCacheProgress,
-            refreshList = {
-                listNiche().refresh()
-            }
+            refreshList = { items.refresh() }
         )
     } else {
-
         Scaffold(
             bottomBar = {
                 Column(Modifier.background(ThemeRed.colorTabLevel1)) {
@@ -219,22 +211,18 @@ fun NichesTabContent(
                     modifier = Modifier.fillMaxSize()
                 ) {
                     items(
-                        count = listNiche().itemCount,
-                        key = listNiche().itemKey { it.id },
-                        contentType = listNiche().itemContentType { "niche" }
+                        count = items.itemCount,
+                        key = items.itemKey { it.id },
+                        contentType = items.itemContentType { "niche" }
                     ) { index ->
-
-                        val item = listNiche()[index]
-
+                        val item = items[index]
                         if (item != null) {
-                            val currentSavedRed = remember { savedRed() }
-
                             Box(modifier = Modifier.padding(vertical = 2.dp)) {
-                                if (currentSavedRed != null) {
+                                if (savedRed != null) {
                                     NichePreview2(
                                         niches = { item },
                                         onClick = { onNicheClick(item.id) },
-                                        savedRed = { currentSavedRed }
+                                        savedRed = { savedRed }
                                     )
                                 } else {
                                     // Placeholder for Preview
@@ -270,7 +258,6 @@ fun NichesTabContent(
                             }
                         }
                     }
-
                 }
 
                 // Scrollbar
@@ -287,15 +274,13 @@ fun NichesTabContent(
     }
 }
 
-
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun Refresh(
     onRefreshNichesCacheClick: () -> Unit,
     nichesCacheProgress: Float,
-    refreshList : () -> Unit = {}
+    refreshList: () -> Unit = {}
 ) {
-
     LaunchedEffect(nichesCacheProgress) {
         if (nichesCacheProgress == 1f) {
             delay(1000)
@@ -310,56 +295,23 @@ fun Refresh(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
         Text("Отсутствует список Niches", style = styleTest)
-
         Spacer(Modifier.height(8.dp))
-
         Button(
             onClick = onRefreshNichesCacheClick,
             colors = ButtonDefaults.buttonColors(containerColor = ThemeRed.colorBlue)
         ) {
             Text("Скачать список ", style = styleTest.copy(fontSize = 18.sp))
         }
-
         Spacer(Modifier.height(8.dp))
-
-
         LinearWavyProgressIndicator(
             progress = { nichesCacheProgress },
             Modifier.graphicsLayer(
                 alpha = if (nichesCacheProgress > 0f) 1f else 0f
             )
         )
-
     }
-
-
-//    if (isNichesCacheDownloading) {
-//        LinearProgressIndicator(
-//            progress = { nichesCacheProgress },
-//            modifier = Modifier
-//                .padding(horizontal = 4.dp)
-//                .fillMaxWidth(),
-//            color = ProgressIndicatorDefaults.linearColor,
-//            trackColor = ProgressIndicatorDefaults.linearTrackColor,
-//            strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
-//        )
-//    } else
-//        Spacer(modifier = Modifier.height(4.dp))
-
-
 }
-
-
-
-
-
-
-
-
-
-
 
 @Preview(showBackground = true, backgroundColor = 0xFF121212)
 @Composable
@@ -377,7 +329,7 @@ fun R_ScreenNichesTabPreview() {
     val listNiche = flowOf(pagingData).collectAsLazyPagingItems()
     
     NichesTabContent(
-        listNiche = { listNiche },
+        items = listNiche,
         state = rememberLazyListState(),
         scrollPercent = 0f to 0.3f,
         sortType = Order.NICHES_SUBSCRIBERS_D,
@@ -385,7 +337,7 @@ fun R_ScreenNichesTabPreview() {
         isSearchFocused = false,
         onUpClick = {},
         onNicheClick = {},
-        savedRed = { null },
+        savedRed = null,
         searchWidget = { modifier ->
             Box(
                 modifier
@@ -401,7 +353,6 @@ fun R_ScreenNichesTabPreview() {
                 )
             }
         },
-        isNichesCacheDownloading = false,
         onRefreshNichesCacheClick = {},
         nichesCacheProgress = 1f
     )
@@ -412,7 +363,6 @@ class ScreenRedExplorerNichesSM @Inject constructor(
     val hostDI: HostDI,
     val search: SearchNichesRed
 ) : ScreenModel {
-
     val lazyHost = LazyRow123Host(
         connectivityObserver = connectivityObserver,
         scope = screenModelScope,
@@ -450,11 +400,8 @@ fun RefreshPreview() {
                 onRefreshNichesCacheClick = {},
                 nichesCacheProgress = 0f,
             )
-
             Spacer(modifier = Modifier.height(16.dp))
-
             Refresh(
-                //isNichesCacheDownloading = true,
                 onRefreshNichesCacheClick = {},
                 nichesCacheProgress = 0.45f,
             )
