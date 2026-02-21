@@ -11,10 +11,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.composeunstyled.Text
 import com.client.xvideos.redgifs.common.ThemeRed
+import com.client.xvideos.ui.theme.XvideosTheme
 
 @Composable
 fun TabBarPoints(count: Int, screenType: Boolean) {
@@ -42,5 +44,21 @@ fun TabBarPoints(count: Int, screenType: Boolean) {
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF303030)
+@Composable
+fun TabBarPointsPreview() {
+    XvideosTheme {
+        TabBarPoints(count = 3, screenType = true)
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF303030)
+@Composable
+fun TabBarPointsZeroPreview() {
+    XvideosTheme {
+        TabBarPoints(count = 0, screenType = false)
     }
 }

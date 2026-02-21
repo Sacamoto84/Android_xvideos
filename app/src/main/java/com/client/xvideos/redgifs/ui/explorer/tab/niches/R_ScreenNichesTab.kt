@@ -1,12 +1,10 @@
 package com.client.xvideos.redgifs.ui.explorer.tab.niches
 
 import android.annotation.SuppressLint
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,7 +19,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -33,8 +30,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -65,10 +60,8 @@ import com.client.xvideos.redgifs.ui.explorer.tab.setting.styleTest
 import com.client.xvideos.redgifs.ui.niche.R_ScreenNiche
 import com.client.xvideos.redgifs.ui.profile.atom.VerticalScrollbar
 import com.client.xvideos.redgifs.ui.profile.rememberVisibleRangePercentIgnoringFirstNForLazyColumn
-import com.client.xvideos.redgifs.ui.ui.atom.ButtonUp
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.LazyRow123Host
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.model.TypePager
-import com.client.xvideos.redgifs.ui.ui.sortByOrder.SortByOrder
 import com.client.xvideos.ui.theme.XvideosTheme
 import dagger.Binds
 import dagger.Module
@@ -105,7 +98,7 @@ object R_ScreenNichesTab : Screen {
             remember(navigator) { { id -> navigator.push(R_ScreenNiche(id)) } }
 
         NichesTabContent(
-            items = listNiche,
+            items = { listNiche },
             state = vm.lazyHost.stateColumn,
             scrollPercent = scrollPercent,
             sortType = sortType,
@@ -113,7 +106,7 @@ object R_ScreenNichesTab : Screen {
             isSearchFocused = isSearchFocused,
             onUpClick = onUpClick,
             onNicheClick = onNicheClick,
-            savedRed = vm.hostDI.savedRed,
+            savedRed = { vm.hostDI.savedRed },
             searchWidget = { modifier ->
                 vm.search.CustomBasicTextField(
                     value = searchText,
@@ -134,7 +127,7 @@ object R_ScreenNichesTab : Screen {
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun NichesTabContent(
-    items: LazyPagingItems<Niche>,
+    items: () -> LazyPagingItems<Niche>,
     state: LazyListState,
     scrollPercent: Pair<Float, Float>,
     sortType: Order,
@@ -142,62 +135,30 @@ fun NichesTabContent(
     isSearchFocused: Boolean,
     onUpClick: () -> Unit,
     onNicheClick: (String) -> Unit,
-    savedRed: SavedRed?,
+    savedRed: () -> SavedRed?,
     searchWidget: @Composable (Modifier) -> Unit,
     onRefreshNichesCacheClick: () -> Unit,
     nichesCacheProgress: Float
 ) {
-    val haptic = LocalHapticFeedback.current
-    val loadState = items.loadState
 
-    if (items.itemCount == 0 && loadState.refresh is LoadState.NotLoading) {
+    val loadState = items().loadState
+
+    if (items().itemCount == 0 && loadState.refresh is LoadState.NotLoading) {
         Refresh(
             onRefreshNichesCacheClick = onRefreshNichesCacheClick,
             nichesCacheProgress = nichesCacheProgress,
-            refreshList = { items.refresh() }
+            refreshList = { items().refresh() }
         )
     } else {
         Scaffold(
             bottomBar = {
-                Column(Modifier.background(ThemeRed.colorTabLevel1)) {
-                    HorizontalDivider(color = ThemeRed.colorBorderGray)
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 2.dp, horizontal = 4.dp)
-                            .background(ThemeRed.colorTabLevel1),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        AnimatedVisibility(visible = !isSearchFocused) {
-                            SortByOrder(
-                                list = listOf(
-                                    Order.NICHES_SUBSCRIBERS_D,
-                                    Order.NICHES_SUBSCRIBERS_A,
-                                    Order.NICHES_POST_D,
-                                    Order.NICHES_POST_A,
-                                    Order.NICHES_NAME_A_Z,
-                                    Order.NICHES_NAME_Z_A
-                                ),
-                                selected = sortType,
-                                onSelect = onSortTypeChange,
-                                containerColor = ThemeRed.colorTabLevel0
-                            )
-                        }
-
-                        searchWidget(Modifier
-                            .padding(horizontal = 4.dp)
-                            .weight(1f))
-
-                        AnimatedVisibility(visible = !isSearchFocused) {
-                            ButtonUp {
-                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                onUpClick()
-                            }
-                        }
-                    }
-                    HorizontalDivider(color = ThemeRed.colorBorderGray)
-                }
+                NichesBottomBar(
+                    isSearchFocused = isSearchFocused,
+                    sortType = sortType,
+                    onSortTypeChange = onSortTypeChange,
+                    onUpClick = onUpClick,
+                    searchWidget = searchWidget
+                )
             },
             containerColor = ThemeRed.colorTabLevel1
         ) { paddingValues ->
@@ -211,18 +172,18 @@ fun NichesTabContent(
                     modifier = Modifier.fillMaxSize()
                 ) {
                     items(
-                        count = items.itemCount,
-                        key = items.itemKey { it.id },
-                        contentType = items.itemContentType { "niche" }
+                        count = items().itemCount,
+                        key = items().itemKey { it.id },
+                        contentType = items().itemContentType { "niche" }
                     ) { index ->
-                        val item = items[index]
+                        val item = items()[index]
                         if (item != null) {
                             Box(modifier = Modifier.padding(vertical = 2.dp)) {
-                                if (savedRed != null) {
+                                if (savedRed() != null) {
                                     NichePreview2(
                                         niches = { item },
                                         onClick = { onNicheClick(item.id) },
-                                        savedRed = { savedRed }
+                                        savedRed = { savedRed() }
                                     )
                                 } else {
                                     // Placeholder for Preview
@@ -329,7 +290,7 @@ fun R_ScreenNichesTabPreview() {
     val listNiche = flowOf(pagingData).collectAsLazyPagingItems()
     
     NichesTabContent(
-        items = listNiche,
+        items = { listNiche },
         state = rememberLazyListState(),
         scrollPercent = 0f to 0.3f,
         sortType = Order.NICHES_SUBSCRIBERS_D,
@@ -337,7 +298,7 @@ fun R_ScreenNichesTabPreview() {
         isSearchFocused = false,
         onUpClick = {},
         onNicheClick = {},
-        savedRed = null,
+        savedRed = { null },
         searchWidget = { modifier ->
             Box(
                 modifier
