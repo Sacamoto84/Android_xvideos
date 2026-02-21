@@ -21,7 +21,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.client.xvideos.redgifs.common.UsersRed
 import com.client.xvideos.redgifs.common.block.BlockRed
@@ -33,7 +32,6 @@ import com.client.xvideos.redgifs.common.video.player_row_mini.RedUrlVideoImageA
 import com.client.xvideos.redgifs.model.GifsInfo
 import com.client.xvideos.redgifs.network.api.RedApi
 import com.client.xvideos.redgifs.ui.top_this_week.ProfileInfo1
-import com.client.xvideos.ui.theme.XvideosTheme
 
 @Composable
 fun LazyRow123GridItem(
@@ -90,13 +88,10 @@ fun LazyRow123GridItemContent(
     var isVideo by remember { mutableStateOf(false) }
 
     Box(
-        modifier = Modifier
-            .padding(1.dp)
-            .fillMaxSize()
-            .border(1.dp, Color(0xFF555555), RoundedCornerShape(8.dp))
-            .clip(RoundedCornerShape(8.dp)),
+        modifier = Modifier.padding(1.dp).fillMaxSize().border(1.dp, Color(0xFF555555), RoundedCornerShape(8.dp)).clip(RoundedCornerShape(8.dp)),
         contentAlignment = Alignment.Center
-    ) {
+    )
+    {
         RedUrlVideoImageAndLongClick(
             item = item,
             index = index,
@@ -122,9 +117,7 @@ fun LazyRow123GridItemContent(
                 downloadRed = downloadRed
             )
 
-            if (item.tags.isNotEmpty()) {
-                ExpandMenuVideoTags(item = item, onClick = onTagClick)
-            }
+            if (item.tags.isNotEmpty()) { ExpandMenuVideoTags(item = item, onClick = onTagClick) }
         }
 
         AnimatedVisibility(
@@ -157,31 +150,3 @@ fun LazyRow123GridItemContent(
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF303030)
-@Composable
-private fun LazyRow123GridItemPreview() {
-    XvideosTheme {
-        LazyRow123GridItemContent(
-            item = GifsInfo(
-                id = "sample_id",
-                userName = "sample_user",
-                tags = listOf("tag1", "tag2")
-            ),
-            index = 0,
-            isConnected = true,
-            isDownloaded = false,
-            isRunLike = true,
-            isCollection = false,
-            visibleProfileInfo = true,
-            columns = 2,
-            block = { TODO() },
-            redApi = { TODO() },
-            savedRed = { TODO() },
-            downloadRed = { TODO() },
-            onItemClick = {},
-            onRefresh = {},
-            onClickOpenProfile = {},
-            onTagClick = {}
-        )
-    }
-}

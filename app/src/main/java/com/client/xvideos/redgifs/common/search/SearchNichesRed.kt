@@ -73,6 +73,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.client.xvideos.common.di.ApplicationScope
 import com.client.xvideos.common.room.dao.r.R_SearchHistoryDao
 import com.client.xvideos.common.room.entity.r.R_SearchHistoryEntity
+import com.client.xvideos.common.snackbar.SnackBar
 import com.client.xvideos.common.util.toPrettyCount2
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.common.saved.SavedRed
@@ -119,10 +120,15 @@ class SearchNichesRed @Inject constructor(
     init{
         scope.launch {
             searchText.collect {
-                if (it != ""){
-                    val a = redApi.searchNichesShort(it)
-                    searchTextSuggestions.value = a
+                try {
+                    if (it != ""){
+                        val a = redApi.searchNichesShort(it)
+                        searchTextSuggestions.value = a
+                    }
+                }catch (e: Exception){
+                    SnackBar.error(e.localizedMessage!!)
                 }
+
             }
         }
     }
@@ -148,9 +154,9 @@ class SearchNichesRed @Inject constructor(
             searchTagSuggestion = searchTagSuggestion,
             searchTextValue = searchTextValue,
             onSuggestionClick = { suggestion ->
-                searchText.value = suggestion.text
-                searchTextDone.value = suggestion.text
-                stack.addLast(suggestion.text)
+                searchText.value = suggestion.name
+                searchTextDone.value = suggestion.name
+                stack.addLast(suggestion.name)
             },
             onUndoClick = {
                 if (stack.isNotEmpty()){
@@ -270,7 +276,7 @@ fun CustomBasicTextFieldContent(
                         items(searchTagSuggestion) {
 
                             val query = searchTextValue
-                            val text = it.text
+                            val text = it.name
                             val startIndex = text.indexOf(query, ignoreCase = true)
                             val annotatedString = buildAnnotatedString {
                                 if (startIndex != -1) {
@@ -290,7 +296,7 @@ fun CustomBasicTextFieldContent(
                                 ) {
 
                                     Text(
-                                        it.text,
+                                        it.name,
                                         fontFamily = ThemeRed.fontFamilyDMsanss,
                                         fontSize = 18.sp,
                                         textAlign = TextAlign.Start,
@@ -591,8 +597,8 @@ fun CustomBasicTextFieldPreview() {
                 onValueChange = {},
                 onDone = {},
                 searchTagSuggestion = listOf(
-                    SearchItemNichesResponse("niche", "Anal Sex", "anal-sex", null, 276347),
-                    SearchItemNichesResponse("niche", "Anal Gape", "anal-gape", null, 154321)
+                    //SearchItemNichesResponse("niche", "Anal Sex", "anal-sex", null, 276347),
+                    //SearchItemNichesResponse("niche", "Anal Gape", "anal-gape", null, 154321)
                 ),
                 searchTextValue = "Anal",
                 onSuggestionClick = {},

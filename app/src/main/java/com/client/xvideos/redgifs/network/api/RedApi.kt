@@ -14,6 +14,7 @@ import com.client.xvideos.redgifs.model.TopCreatorsResponse
 import com.client.xvideos.redgifs.model.UserInfo
 import com.client.xvideos.redgifs.model.search.SearchItemNichesResponse
 import com.client.xvideos.redgifs.model.search.SearchItemTagsResponse
+import com.client.xvideos.redgifs.model.search.SearchNichesShortResponse
 import com.client.xvideos.redgifs.model.tag.TagSuggestion
 import com.client.xvideos.redgifs.network.http.ApiClient
 import com.client.xvideos.redgifs.network.http.Route
@@ -368,8 +369,9 @@ class RedApi @Inject constructor(
     suspend fun searchNichesShort(text: String): List<SearchItemNichesResponse> {
         val route = Route(method = "GET", path = "/v2/niches/search?query={text}", "text" to text)
         val res = api.requestText(route).getOrNull()
-        val listType = object : TypeToken<List<SearchItemNichesResponse>>() {}.type
-        val niches: List<SearchItemNichesResponse> = Gson().fromJson(res, listType)
+        val listType = object : TypeToken<SearchNichesShortResponse>() {}.type
+        val a : SearchNichesShortResponse= Gson().fromJson(res, listType)
+        val niches: List<SearchItemNichesResponse> = a.niches
         return niches
     }
 

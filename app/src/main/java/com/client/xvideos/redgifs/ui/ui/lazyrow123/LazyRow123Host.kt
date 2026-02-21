@@ -151,27 +151,12 @@ fun createPager(
             )
         }
 
-        TypePager.TOP -> {
-            ItemTopPagingSource(
-                sort = sort,
-                searchText = searchText,
-                block = hostDI.block,
-                redApi = hostDI.redApi,
-            )
-        }
+        TypePager.TOP -> { ItemTopPagingSource( sort = sort, searchText = searchText, block = hostDI.block, redApi = hostDI.redApi ) }
 
-        TypePager.R_SAVED_LIKES -> {
-            ItemSavedLikesPagingSource(sort, hostDI.savedRed)
-        }
+        TypePager.R_SAVED_LIKES -> { ItemSavedLikesPagingSource(sort, hostDI.savedRed) }
 
-        TypePager.EXPLORER_NICHES -> {
-            ItemExplorerNailsPagingSource(
-                order = sort,
-                textNiches = textNiches,
-                redApi = hostDI.redApi,
-                hostDI.savedRed.nichesCache
-            )
-        }
+        //Поиск и отображение списка Niches в Explorer
+        TypePager.EXPLORER_NICHES -> { ItemExplorerNailsPagingSource( order = sort, textNiches = textNiches, cache = hostDI.savedRed.nichesCache ) }
 
         TypePager.PROFILE -> {
             ItemProfilePagingSource(
@@ -183,16 +168,9 @@ fun createPager(
             )
         }
 
-        TypePager.EMPTY -> {
-            ItemEmptyPagingSource()
-        }
+        TypePager.EMPTY -> { ItemEmptyPagingSource() }
 
-        TypePager.SAVED_COLLECTION -> {
-            ItemCollectionPagingSource(
-                collection = extraString,
-                savedRed = hostDI.savedRed,
-            )
-        }
+        TypePager.SAVED_COLLECTION -> { ItemCollectionPagingSource( collection = extraString, savedRed = hostDI.savedRed ) }
 
     }
     return pagingSourceFactory as PagingSource<Int, Any>
