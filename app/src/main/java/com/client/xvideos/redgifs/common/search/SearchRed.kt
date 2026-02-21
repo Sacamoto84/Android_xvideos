@@ -1,4 +1,4 @@
-package com.redgifs.common.search
+package com.client.xvideos.redgifs.common.search
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -89,13 +89,14 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
+import javax.inject.Provider
 import javax.inject.Singleton
 
 @Singleton
 class SearchRed @Inject constructor(
     val dao: R_SearchHistoryDao,
     val savedRed: SavedRed,
-    redApiIn: javax.inject.Provider<RedApi>,
+    redApiIn: Provider<RedApi>,
     @ApplicationScope val scope: CoroutineScope
 ) {
 

@@ -92,7 +92,6 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
-
 @Singleton
 class SearchNichesRed @Inject constructor(
     val dao: R_SearchHistoryDao,
@@ -246,6 +245,7 @@ fun CustomBasicTextFieldContent(
     expandMenuHistory: @Composable () -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
+
     var isFocused by remember { mutableStateOf(false) }
     val imeVisible = WindowInsets.ime.getBottom(LocalDensity.current) > 0
     val keyboardController = LocalSoftwareKeyboardController.current
