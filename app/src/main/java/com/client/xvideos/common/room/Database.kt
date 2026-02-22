@@ -14,14 +14,16 @@ import com.client.xvideos.common.room.dao.l.L_AlbumPictureCacheDao
 import com.client.xvideos.common.room.dao.r.R_BlockDao
 import com.client.xvideos.common.room.dao.r.R_CacheMediaResponseDao
 import com.client.xvideos.common.room.dao.r.R_GifsInfoDao
-import com.client.xvideos.common.room.dao.r.R_SearchHistoryDao
+import com.client.xvideos.common.room.dao.r.R_SearchHistoryExplorerDao
+import com.client.xvideos.common.room.dao.r.R_SearchHistoryNichesDao
 import com.client.xvideos.common.room.entity.CacheUrlStringRamEntity
 import com.client.xvideos.common.room.entity.CacheUrlStringRomEntity
 import com.client.xvideos.common.room.entity.l.L_AlbumPictureCacheEntity
 import com.client.xvideos.common.room.entity.r.R_BlockEntity
 import com.client.xvideos.common.room.entity.r.R_CacheMediaResponseEntity
 import com.client.xvideos.common.room.entity.r.R_GifsInfoEntity
-import com.client.xvideos.common.room.entity.r.R_SearchHistoryEntity
+import com.client.xvideos.common.room.entity.r.R_SearchHistoryExplorerEntity
+import com.client.xvideos.common.room.entity.r.R_SearchHistoryNichesEntity
 import com.client.xvideos.xvideos.model.ItemsX
 import dagger.Module
 import dagger.Provides
@@ -54,10 +56,10 @@ import javax.inject.Singleton
         R_CacheMediaResponseEntity::class,
         R_BlockEntity::class,
         R_GifsInfoEntity::class,
-        R_SearchHistoryEntity::class
-
+        R_SearchHistoryExplorerEntity::class, //История поиска Explorer
+        R_SearchHistoryNichesEntity::class    //История поиска Niches
     ],
-    version = 7,
+    version = 8,
     autoMigrations = [
         //AutoMigration(from = 4, to = 5)
     ],
@@ -73,7 +75,10 @@ abstract class AppDatabase : RoomDatabase() {
 
     //--- Red ---
     abstract fun gifInfoDao(): R_GifsInfoDao
-    abstract fun searchHistoryDao(): R_SearchHistoryDao
+    abstract fun searchHistoryExplorerDao(): R_SearchHistoryExplorerDao
+
+    abstract fun searchHistoryNichesDao(): R_SearchHistoryNichesDao
+
     abstract fun blockDao(): R_BlockDao
     abstract fun cacheMediaResponseDao(): R_CacheMediaResponseDao
 }

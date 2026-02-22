@@ -4,7 +4,8 @@ import com.client.xvideos.common.room.AppDatabase
 import com.client.xvideos.common.room.dao.r.R_BlockDao
 import com.client.xvideos.common.room.dao.r.R_CacheMediaResponseDao
 import com.client.xvideos.common.room.dao.r.R_GifsInfoDao
-import com.client.xvideos.common.room.dao.r.R_SearchHistoryDao
+import com.client.xvideos.common.room.dao.r.R_SearchHistoryExplorerDao
+import com.client.xvideos.common.room.dao.r.R_SearchHistoryNichesDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,9 +24,16 @@ object RoomRedGifsModule {
 
     @Singleton
     @Provides
-    fun provideSearchDao(appDatabase: AppDatabase): R_SearchHistoryDao {
-        return appDatabase.searchHistoryDao()
+    fun provideSearchExplorerDao(appDatabase: AppDatabase): R_SearchHistoryExplorerDao {
+        return appDatabase.searchHistoryExplorerDao()
     }
+
+    @Singleton
+    @Provides
+    fun provideSearchNichesDao(appDatabase: AppDatabase): R_SearchHistoryNichesDao {
+        return appDatabase.searchHistoryNichesDao()
+    }
+
 
     @Singleton
     @Provides

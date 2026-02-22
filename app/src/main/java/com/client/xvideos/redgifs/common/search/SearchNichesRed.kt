@@ -52,7 +52,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
@@ -71,8 +70,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.client.xvideos.common.di.ApplicationScope
-import com.client.xvideos.common.room.dao.r.R_SearchHistoryDao
-import com.client.xvideos.common.room.entity.r.R_SearchHistoryEntity
+import com.client.xvideos.common.room.dao.r.R_SearchHistoryExplorerDao
 import com.client.xvideos.common.snackbar.SnackBar
 import com.client.xvideos.common.util.toPrettyCount2
 import com.client.xvideos.redgifs.common.ThemeRed
@@ -82,9 +80,7 @@ import com.client.xvideos.redgifs.model.tag.TagInfo
 import com.client.xvideos.redgifs.network.api.RedApi
 import com.client.xvideos.ui.theme.XvideosTheme
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
@@ -94,27 +90,12 @@ import javax.inject.Singleton
 
 @Singleton
 class SearchNichesRed @Inject constructor(
-    val dao: R_SearchHistoryDao,
+    val dao: R_SearchHistoryExplorerDao,
     val savedRed: SavedRed,
     val redApi: RedApi,
-    @ApplicationScope val scope: CoroutineScope
-) {
+    @ApplicationScope scope: CoroutineScope
+) : ISearchTemplate(scope) {
 
-    /**
-     * Отображаемый текст
-     */
-    var searchText = MutableStateFlow("")
-
-    /**
-     * Текст по которому будет идти запрос на сервер
-     */
-    var searchTextDone = MutableStateFlow("")
-
-    val focused = MutableStateFlow(false)
-
-    var searchTextSuggestions = MutableStateFlow<List<SearchItemNichesResponse>>(emptyList())
-
-    val stack = ArrayDeque<String>()
 
     init{
         scope.launch {
@@ -206,7 +187,7 @@ class SearchNichesRed @Inject constructor(
     }
 
     //Dao
-    @OptIn(DelicateCoroutinesApi::class)
+
     val history: StateFlow<List<String>> =
         dao.observeAllTexts()
             .stateIn(
@@ -215,18 +196,7 @@ class SearchNichesRed @Inject constructor(
                 initialValue = emptyList()
             )
 
-    @OptIn(DelicateCoroutinesApi::class)
-    fun add(text: String) = GlobalScope.launch {
-        dao.insertAndTrim(R_SearchHistoryEntity(text = text))
-    }
 
-    @OptIn(DelicateCoroutinesApi::class)
-    fun delete(text: String) = GlobalScope.launch {
-        dao.deleteByTexts(text = text)
-    }
-
-    @OptIn(DelicateCoroutinesApi::class)
-    fun clear() = GlobalScope.launch { dao.deleteAll() }
 
 }
 
@@ -258,7 +228,8 @@ fun CustomBasicTextFieldContent(
     }
 
     Column (
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier
+            .fillMaxWidth()
             .background(ThemeRed.colorCommonBackground2, RoundedCornerShape(8.dp))
             .border(
                 width = if (isFocused) 2.dp else 1.dp,
@@ -270,9 +241,13 @@ fun CustomBasicTextFieldContent(
 
 
         AnimatedVisibility(isFocused) {
-            Box(Modifier.fillMaxWidth().height(126.dp)) {
+            Box(Modifier
+                .fillMaxWidth()
+                .height(126.dp)) {
                 Column {
-                    LazyColumn(Modifier.fillMaxSize().weight(1f)) {
+                    LazyColumn(Modifier
+                        .fillMaxSize()
+                        .weight(1f)) {
                         items(searchTagSuggestion) {
 
                             val query = searchTextValue
@@ -288,7 +263,10 @@ fun CustomBasicTextFieldContent(
                                 } else { append(text) }
                             }
 
-                            Box(Modifier.padding(start = 3.dp, top = 1.dp, end = 3.dp).background(ThemeRed.colorTabLevel2).clickable(onClick = { onSuggestionClick(it) })){
+                            Box(Modifier
+                                .padding(start = 3.dp, top = 1.dp, end = 3.dp)
+                                .background(ThemeRed.colorTabLevel2)
+                                .clickable(onClick = { onSuggestionClick(it) })){
 
                                 Row(
                                     modifier = Modifier.fillMaxSize(),
@@ -349,7 +327,9 @@ fun CustomBasicTextFieldContent(
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(start = 4.dp).height(46.dp)
+            modifier = Modifier
+                .padding(start = 4.dp)
+                .height(46.dp)
         ) {
 
             if ((value == "") && (!isFocused)) {
@@ -399,11 +379,17 @@ fun CustomBasicTextFieldContent(
 
             if (value != "") {
                 Icon( Icons.Default.Clear, contentDescription = null, tint = Color(0xFF757575),
-                    modifier = Modifier.width(36.dp).height(46.dp).clickable(onClick = onClearClick))
+                    modifier = Modifier
+                        .width(36.dp)
+                        .height(46.dp)
+                        .clickable(onClick = onClearClick))
             }
 
             Icon( Icons.Default.Undo, contentDescription = null, tint = Color(0xFF757575),
-                modifier = Modifier.width(36.dp).height(46.dp).clickable(onClick = onUndoClick))
+                modifier = Modifier
+                    .width(36.dp)
+                    .height(46.dp)
+                    .clickable(onClick = onUndoClick))
 
             expandMenuHistory()
         }
@@ -522,7 +508,9 @@ fun ExpandMenuHelperContent(
             shape = RoundedCornerShape(16.dp)
         ) {
 
-            FlowRow(Modifier.padding(4.dp).fillMaxSize(), maxItemsInEachRow = 10) {
+            FlowRow(Modifier
+                .padding(4.dp)
+                .fillMaxSize(), maxItemsInEachRow = 10) {
                 tags.sortedByDescending { it.count }.take(200).forEach {
                     Box(
                         modifier = Modifier
@@ -560,7 +548,9 @@ fun ExpandMenuHelperContent(
 @Composable
 fun ExpandMenuHistoryPreview() {
     XvideosTheme {
-        Box(Modifier.background(ThemeRed.colorTabLevel1).padding(20.dp)) {
+        Box(Modifier
+            .background(ThemeRed.colorTabLevel1)
+            .padding(20.dp)) {
             ExpandMenuHistoryContent(
                 items = listOf("Anal", "BDSM", "Creampie"),
                 onItemClick = {},
@@ -574,7 +564,9 @@ fun ExpandMenuHistoryPreview() {
 @Composable
 fun ExpandMenuHelperPreview() {
     XvideosTheme {
-        Box(Modifier.background(ThemeRed.colorTabLevel1).padding(20.dp)) {
+        Box(Modifier
+            .background(ThemeRed.colorTabLevel1)
+            .padding(20.dp)) {
             ExpandMenuHelperContent(
                 tags = listOf(
                     TagInfo("Anal", 5000),
@@ -591,7 +583,9 @@ fun ExpandMenuHelperPreview() {
 @Composable
 fun CustomBasicTextFieldPreview() {
     XvideosTheme {
-        Box(Modifier.background(ThemeRed.colorTabLevel1).padding(20.dp)) {
+        Box(Modifier
+            .background(ThemeRed.colorTabLevel1)
+            .padding(20.dp)) {
             CustomBasicTextFieldContent(
                 value = "Anal",
                 onValueChange = {},

@@ -3,12 +3,34 @@ package com.client.xvideos.common.room.entity.r
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
+
+//История в эдитке поиска Gifs и Niches
+
+
+interface SearchHistory {
+    val text: String
+    val timeCreate: Long
+}
+
 /**
- * Таблица с кешем строк ответов от сервера
+ * Таблица историей запросов в окне поиска Explorer
  */
-@Entity(tableName = "search_red_history")
-data class R_SearchHistoryEntity(
+@Entity(tableName = "r_search_history_explorer")
+data class R_SearchHistoryExplorerEntity(
     @PrimaryKey
-    val text: String,
-    val timeCreate: Long = System.currentTimeMillis(),
-)
+    override val text: String,
+    override val timeCreate: Long = System.currentTimeMillis(),
+) : SearchHistory
+
+/**
+ * Таблица историей запросов в окне поиска Niches
+ */
+@Entity(tableName = "r_search_history_niches")
+data class R_SearchHistoryNichesEntity(
+    @PrimaryKey
+    override val text: String,
+    override val timeCreate: Long = System.currentTimeMillis(),
+) : SearchHistory
+
+
+

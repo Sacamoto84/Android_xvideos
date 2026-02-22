@@ -5,24 +5,25 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.client.xvideos.common.room.entity.r.R_SearchHistoryEntity
+import com.client.xvideos.common.room.entity.r.R_SearchHistoryExplorerEntity
+import com.client.xvideos.redgifs.common.search.IDaoSearchTemplate
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface R_SearchHistoryDao {
+interface R_SearchHistoryExplorerDao : IDaoSearchTemplate  {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(item: R_SearchHistoryEntity)
+    suspend fun insert(item: R_SearchHistoryExplorerEntity)
 
-    @Query("SELECT text FROM search_red_history ORDER BY timeCreate DESC")
-    fun observeAllTexts(): Flow<List<String>>   // <‑‑ поток изменений
+    @Query("SELECT text FROM r_search_history_explorer ORDER BY timeCreate DESC")
+    override fun observeAllTexts(): Flow<List<String>>   // <‑‑ поток изменений
 
-    @Query("DELETE FROM search_red_history")
-    suspend fun deleteAll()
+    @Query("DELETE FROM r_search_history_explorer")
+    override suspend fun deleteAll()
 
 
     @Transaction
-    suspend fun insertAndTrim(item: R_SearchHistoryEntity, limit: Int = 10) {
+    suspend fun insertAndTrim(item: R_SearchHistoryExplorerEntity, limit: Int = 10) {
         insert(item)
         deleteOlderThanLimit(limit)
     }
@@ -36,10 +37,10 @@ interface R_SearchHistoryDao {
      */
     @Query(
         """
-        DELETE FROM search_red_history 
+        DELETE FROM r_search_history_explorer 
         WHERE rowid NOT IN (
             SELECT rowid 
-            FROM search_red_history 
+            FROM r_search_history_explorer 
             ORDER BY timeCreate DESC 
             LIMIT :limit
         )
@@ -48,7 +49,7 @@ interface R_SearchHistoryDao {
     suspend fun deleteOlderThanLimit(limit: Int)
 
 
-    @Query("DELETE FROM search_red_history WHERE text = :text")
-    suspend fun deleteByTexts(text: String)
+    @Query("DELETE FROM r_search_history_explorer WHERE text = :text")
+    override suspend fun deleteByTexts(text: String)
 
 }
