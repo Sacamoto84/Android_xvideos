@@ -2,6 +2,7 @@ package com.client.xvideos.redgifs.common.search
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -34,82 +35,144 @@ import androidx.compose.ui.unit.sp
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.ui.theme.XvideosTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
+/**
+ * Stateful version of the history menu.
+ */
 @Composable
 fun ExpandMenuHistoryContent(
-    items: ()->List<String>,
+    items: () -> List<String>,
     modifier: Modifier = Modifier,
     onClick: (String) -> Unit = {},
     onDeleteClick: (String) -> Unit = {}
 ) {
-
     var expanded by remember { mutableStateOf(false) }
 
-    ExposedDropdownMenuBox(
+    ExpandMenuHistoryContentStateless(
         expanded = expanded,
         onExpandedChange = { expanded = it },
-        modifier = Modifier.then(modifier)
+        items = items(),
+        modifier = modifier,
+        onClick = {
+            onClick(it)
+            expanded = false
+        },
+        onDeleteClick = onDeleteClick
     )
-    {
+}
+
+/**
+ * Stateless version for better optimization and previews.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ExpandMenuHistoryContentStateless(
+    expanded: Boolean,
+    onExpandedChange: (Boolean) -> Unit,
+    items: List<String>,
+    modifier: Modifier = Modifier,
+    onClick: (String) -> Unit = {},
+    onDeleteClick: (String) -> Unit = {}
+) {
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = onExpandedChange,
+        modifier = modifier
+    ) {
         IconButton(
-            modifier = Modifier.padding(end = 4.dp).height(46.dp).width(24.dp)
+            modifier = Modifier
+                .padding(end = 4.dp)
+                .height(46.dp)
+                .width(24.dp)
                 .menuAnchor(ExposedDropdownMenuAnchorType.SecondaryEditable),
-            onClick = {}) {
+            onClick = { onExpandedChange(!expanded) }
+        ) {
             Icon(
-                if (expanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
-                contentDescription = "", tint = Color(0xFF757575),  modifier = Modifier.size(24.dp)
+                imageVector = if (expanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
+                contentDescription = null,
+                tint = Color(0xFF757575),
+                modifier = Modifier.size(24.dp)
             )
         }
 
         ExposedDropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false },
+            onDismissRequest = { onExpandedChange(false) },
             modifier = Modifier.width(IntrinsicSize.Min),
             containerColor = ThemeRed.colorBottomBarDivider
         ) {
-            //DropdownMenuItem_Download(item){ expanded = false }
-
-            items().reversed().forEach {
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp)
-                        .clickable(onClick = {
-                            onClick(it)
-                        }),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        it,
-                        color = Color.White,
-                        fontSize = 22.sp,
-                        modifier = Modifier
-                            .padding(vertical = 4.dp)
-                            .padding(start = 16.dp),
-                        fontFamily = ThemeRed.fontFamilyDMsanss
-                    )
-
-                    IconButton(onClick = { onDeleteClick(it) }) {
-                        Icon( Icons.Default.Clear, contentDescription = null, tint = Color.LightGray )
-                    }
-                }
-
+            val reversedItems = remember(items) { items.reversed() }
+            reversedItems.forEach { item ->
+                HistoryMenuItem(
+                    text = item,
+                    onClick = { onClick(item) },
+                    onDeleteClick = { onDeleteClick(item) }
+                )
             }
-
         }
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF303030)
 @Composable
-fun PreviewExpandMenuHistory() {
+private fun HistoryMenuItem(
+    text: String,
+    onClick: () -> Unit,
+    onDeleteClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp)
+            .clickable(onClick = onClick),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = text,
+            color = Color.White,
+            fontSize = 22.sp,
+            modifier = Modifier
+                .padding(vertical = 4.dp)
+                .padding(start = 16.dp),
+            fontFamily = ThemeRed.fontFamilyDMsanss
+        )
+
+        IconButton(onClick = onDeleteClick) {
+            Icon(
+                imageVector = Icons.Default.Clear,
+                contentDescription = null,
+                tint = Color.LightGray
+            )
+        }
+    }
+}
+
+@Preview(name = "Collapsed State", showBackground = false, backgroundColor = 0xFF303030)
+@Composable
+fun PreviewExpandMenuHistoryCollapsed() {
     XvideosTheme {
         Surface(color = ThemeRed.colorCommonBackground) {
-            ExpandMenuHistoryContent(
-                items = {listOf("Search Query 1", "Search Query 2", "Search Query 3")}
+            ExpandMenuHistoryContentStateless(
+                expanded = false,
+                onExpandedChange = {},
+                items = listOf("Query 1", "Query 2")
             )
+        }
+    }
+}
+
+@Preview(name = "Expanded State", showBackground = true, backgroundColor = 0xFF303030)
+@Composable
+fun PreviewExpandMenuHistoryExpanded() {
+    val sampleItems = listOf("Search Query 1", "Search Query 2", "Search Query 3")
+    XvideosTheme {
+        Surface(color = ThemeRed.colorCommonBackground) {
+            Column(modifier = Modifier.height(250.dp)) {
+                ExpandMenuHistoryContentStateless(
+                    expanded = true,
+                    onExpandedChange = {},
+                    items = sampleItems
+                )
+            }
         }
     }
 }
