@@ -71,6 +71,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.client.xvideos.common.di.ApplicationScope
 import com.client.xvideos.common.room.dao.r.R_SearchHistoryExplorerDao
+import com.client.xvideos.common.room.dao.r.R_SearchHistoryNichesDao
 import com.client.xvideos.common.snackbar.SnackBar
 import com.client.xvideos.common.util.toPrettyCount2
 import com.client.xvideos.redgifs.common.ThemeRed
@@ -80,7 +81,6 @@ import com.client.xvideos.redgifs.model.tag.TagInfo
 import com.client.xvideos.redgifs.network.api.RedApi
 import com.client.xvideos.ui.theme.XvideosTheme
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
@@ -89,12 +89,12 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class SearchNichesRed @Inject constructor(
-    val dao: R_SearchHistoryExplorerDao,
+class R_SearchNiches @Inject constructor(
+    dao: R_SearchHistoryNichesDao,
     val savedRed: SavedRed,
     val redApi: RedApi,
     @ApplicationScope scope: CoroutineScope
-) : ISearchTemplate(scope) {
+) : ISearchTemplate(scope, dao) {
 
 
     init{
@@ -191,7 +191,7 @@ class SearchNichesRed @Inject constructor(
     val history: StateFlow<List<String>> =
         dao.observeAllTexts()
             .stateIn(
-                scope = GlobalScope,
+                scope = scope,
                 started = SharingStarted.WhileSubscribed(5_000),
                 initialValue = emptyList()
             )

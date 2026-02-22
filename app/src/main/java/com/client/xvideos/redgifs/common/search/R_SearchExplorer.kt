@@ -11,17 +11,13 @@ import javax.inject.Provider
 import javax.inject.Singleton
 
 @Singleton
-class SearchRed @Inject constructor(
+class R_SearchExplorer @Inject constructor(
     @ApplicationScope scope: CoroutineScope,
     dao: R_SearchHistoryExplorerDao,
-
-    //val savedRed: SavedRed,
-
     redApiIn: Provider<RedApi>,
-
 ) : ISearchTemplate(scope, dao) {
 
-    val  redApi = redApiIn.get()
+    val redApi = redApiIn.get()
 
     init {
         scope.launch {
@@ -30,23 +26,12 @@ class SearchRed @Inject constructor(
                     val request = if (it == "") " " else it
                     val a = redApi.getTagSuggestions(request)
                     searchTextSuggestions.value = a.getOrThrow()
-                }catch (e: Exception){
+                } catch (e: Exception) {
                     Timber.e("!!! SearchRed searchText.collect ${e.localizedMessage}")
                 }
             }
         }
     }
-
-    //Dao
-    override fun add(text: String) = scope.launch {
-        dao.insertAndTrim(R_SearchHistoryEntity(text = text))
-    }
-
-    override fun delete(text: String) = scope.launch {
-        dao.deleteByTexts(text = text)
-    }
-
-    override fun clear() = scope.launch { dao.deleteAll() }
 
 }
 

@@ -12,7 +12,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -22,7 +21,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -31,16 +29,10 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Undo
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuAnchorType
-import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -106,88 +98,28 @@ abstract class ISearchTemplate(
 
     val focused = MutableStateFlow(false)
 
-    @OptIn(ExperimentalMaterial3Api::class)
+
     @Composable
     fun ExpandMenuHistory(
-        items: List<String>,
+        items: () -> List<String>,
         modifier: Modifier = Modifier,
     ) {
-
-        var expanded by remember { mutableStateOf(false) }
-
-        ExposedDropdownMenuBox(
-            expanded = expanded,
-            onExpandedChange = { expanded = it },
-            modifier = Modifier.then(modifier)
-        )
-        {
-            IconButton(
-                modifier = Modifier
-                    .padding(end = 4.dp)
-                    .height(46.dp)
-                    .width(24.dp)
-                    .menuAnchor(ExposedDropdownMenuAnchorType.SecondaryEditable),
-                onClick = {}) {
-                Icon(
-                    if (expanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
-                    contentDescription = "",
-                    tint = Color(0xFF757575),
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-
-            ExposedDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-                modifier = Modifier.width(IntrinsicSize.Min),
-                containerColor = ThemeRed.colorBottomBarDivider
-            ) {
-                //DropdownMenuItem_Download(item){ expanded = false }
-
-                items.reversed().forEach {
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 8.dp)
-                            .clickable(onClick = {
-                                searchText.value = TextFieldValue(
-                                    text = it,
-                                    selection = TextRange(it.length) // курсор в конец
-                                ).toString()
-                            }),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            it,
-                            color = Color.White,
-                            fontSize = 22.sp,
-                            modifier = Modifier
-                                .padding(vertical = 4.dp)
-                                .padding(start = 16.dp),
-                            fontFamily = ThemeRed.fontFamilyDMsanss
-                        )
-
-                        IconButton(onClick = {
-                            scope.launch(Dispatchers.Main){
-                                delete(it)
-                            }
-                        }) {
-                            Icon(
-                                Icons.Default.Clear,
-                                contentDescription = null,
-                                tint = Color.LightGray
-                            )
-                        }
-                    }
-
+        ExpandMenuHistoryContent(
+            items = items,
+            modifier = modifier,
+            onClick = {
+                searchText.value = TextFieldValue(
+                    text = it,
+                    selection = TextRange(it.length) // курсор в конец
+                ).toString()
+            },
+            onDeleteClick = {
+                scope.launch(Dispatchers.Main) {
+                    delete(it)
                 }
-
             }
-        }
+        )
     }
-
 
     @Composable
     fun CustomBasicTextField(
@@ -457,7 +389,6 @@ abstract class ISearchTemplate(
         }
         //}
     }
-
 
 
     val history: StateFlow<List<String>> = dao.observeAllTexts().stateIn( scope = scope, started = SharingStarted.WhileSubscribed(5_000), initialValue = emptyList() )

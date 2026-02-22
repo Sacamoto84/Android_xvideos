@@ -53,7 +53,7 @@ import com.client.xvideos.common.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.common.di.HostDI
 import com.client.xvideos.redgifs.common.saved.SavedRed
-import com.client.xvideos.redgifs.common.search.SearchNichesRed
+import com.client.xvideos.redgifs.common.search.R_SearchNiches
 import com.client.xvideos.redgifs.model.Niche
 import com.client.xvideos.redgifs.model.Order
 import com.client.xvideos.redgifs.ui.explorer.tab.setting.styleTest
@@ -322,7 +322,7 @@ fun R_ScreenNichesTabPreview() {
 class ScreenRedExplorerNichesSM @Inject constructor(
     connectivityObserver: ConnectivityObserver,
     val hostDI: HostDI,
-    val search: SearchNichesRed
+    val search: R_SearchNiches
 ) : ScreenModel {
     val lazyHost = LazyRow123Host(
         connectivityObserver = connectivityObserver,
