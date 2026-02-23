@@ -173,7 +173,17 @@ abstract class ISearchTemplate(
                 ExpandMenuHistory(items = {historyItems})
             },
             searchText = searchText,
-            searchTextSuggestions = searchTextSuggestions
+            searchTextSuggestions = searchTextSuggestions,
+            searchTextDone = searchTextDone,
+            stack = stack,
+
+            onDone = {
+                scope.launch(Dispatchers.Main) {
+                    add(it)
+                }
+            }
+
+
         )
 
     }

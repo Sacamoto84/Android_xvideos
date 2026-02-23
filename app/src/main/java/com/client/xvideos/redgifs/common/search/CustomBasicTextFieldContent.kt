@@ -63,6 +63,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.client.xvideos.common.util.toPrettyCount2
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.model.tag.TagSuggestion
 import kotlinx.coroutines.delay
@@ -72,9 +73,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 fun CustomBasicTextFieldContent(
     searchText: MutableStateFlow<String>,
     searchTextSuggestions: MutableStateFlow<List<TagSuggestion>>,
+    searchTextDone: MutableStateFlow<String>,
+    stack: ArrayDeque<String>,
     modifier: Modifier = Modifier,
 
-    expandMenuHistory : @Composable () -> Unit
+    expandMenuHistory : @Composable () -> Unit,
+
+
+
+
+    onDone : (String) -> Unit
 ) {
 
     val value = searchText.collectAsStateWithLifecycle().value
@@ -97,7 +105,7 @@ fun CustomBasicTextFieldContent(
             // Клавиатура скрылась, убираем фокус
             focusManager.clearFocus()
         }
-        focused.value = imeVisible
+        //focused.value = imeVisible
     }
 
 
@@ -144,12 +152,7 @@ fun CustomBasicTextFieldContent(
                                 if (startIndex != -1) {
                                     append(text.substring(0, startIndex))
                                     withStyle(style = SpanStyle(color = ThemeRed.colorYellow)) {
-                                        append(
-                                            text.substring(
-                                                startIndex,
-                                                startIndex + query.length
-                                            )
-                                        )
+                                        append(text.substring( startIndex, startIndex + query.length ) )
                                     }
                                     append(text.substring(startIndex + query.length))
                                 } else {
@@ -260,8 +263,9 @@ fun CustomBasicTextFieldContent(
                 // 2. Обрабатываем её нажатие
                 keyboardActions = KeyboardActions(
                     onDone = {
-                        searchTextDone.value = value.text
-                        add(value.text)                         // например, запускаем поиск
+                        searchTextDone.value = value
+                        //add(value)                         // например, запускаем поиск
+                        onDone(value)
                         focusManager.clearFocus()          // убираем курсор
                         keyboardController?.hide()         // закрываем клавиатуру
                     }
