@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,6 +21,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -32,8 +32,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Undo
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
@@ -52,14 +52,13 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -76,25 +75,16 @@ fun CustomBasicTextFieldContent(
     searchTextDone: MutableStateFlow<String>,
     stack: ArrayDeque<String>,
     modifier: Modifier = Modifier,
-
-    expandMenuHistory : @Composable () -> Unit,
-
-
-
-
-    onDone : (String) -> Unit
+    expandMenuHistory: @Composable () -> Unit,
+    onDone: (String) -> Unit
 ) {
-
     val value = searchText.collectAsStateWithLifecycle().value
-
     val searchTagSuggestion = searchTextSuggestions.collectAsStateWithLifecycle().value
-
 
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
     var isFocused by remember { mutableStateOf(false) }
 
-    // Отслеживаем высоту клавиатуры
     val imeVisible = WindowInsets.ime.getBottom(LocalDensity.current) > 0
     val keyboardController = LocalSoftwareKeyboardController.current
 
@@ -102,23 +92,25 @@ fun CustomBasicTextFieldContent(
 
     LaunchedEffect(imeVisible) {
         if (!imeVisible) {
-            // Клавиатура скрылась, убираем фокус
             focusManager.clearFocus()
         }
-        //focused.value = imeVisible
     }
-
 
     var delayFocus by remember { mutableStateOf(false) }
 
     LaunchedEffect(isFocused) {
-        if (isFocused) { delay(500) } else { delay(1) }
+        if (isFocused) {
+            delay(500)
+        } else {
+            delay(1)
+        }
         delayFocus = isFocused
     }
 
     Column(
         modifier = modifier
-            .padding(top = if (isFocused) 4.dp else 0.dp).fillMaxWidth()
+            .padding(top = if (isFocused) 4.dp else 0.dp)
+            .fillMaxWidth()
             .background(ThemeRed.colorCommonBackground2, RoundedCornerShape(8.dp))
             .border(
                 width = if (isFocused) 2.dp else 1.dp,
@@ -126,24 +118,28 @@ fun CustomBasicTextFieldContent(
                 shape = RoundedCornerShape(8.dp)
             ),
     ) {
-
-
         AnimatedVisibility(
             delayFocus,
-            enter = expandVertically(animationSpec = tween(durationMillis = 500)) + fadeIn( animationSpec = tween(durationMillis = 500) ),
-            exit = shrinkVertically(animationSpec = tween(durationMillis = 500)) + fadeOut( animationSpec = tween(durationMillis = 500) ),
+            enter = expandVertically(animationSpec = tween(durationMillis = 500)) + fadeIn(
+                animationSpec = tween(durationMillis = 500)
+            ),
+            exit = shrinkVertically(animationSpec = tween(durationMillis = 500)) + fadeOut(
+                animationSpec = tween(durationMillis = 500)
+            ),
         ) {
-
-            Box( Modifier.padding(top = 1.dp).fillMaxWidth().height(126.dp) )
-            {
-                Column()
-                {
+            Box(
+                Modifier
+                    .padding(top = 1.dp)
+                    .fillMaxWidth()
+                    .height(126.dp)
+            ) {
+                Column {
                     Spacer(modifier = Modifier.height(4.dp))
                     LazyColumn(
-                        Modifier.fillMaxSize().weight(1f)
-                    )
-                    {
-
+                        Modifier
+                            .fillMaxSize()
+                            .weight(1f)
+                    ) {
                         items(searchTagSuggestion) {
                             val query = searchTextValue
                             val text = it.text
@@ -152,7 +148,7 @@ fun CustomBasicTextFieldContent(
                                 if (startIndex != -1) {
                                     append(text.substring(0, startIndex))
                                     withStyle(style = SpanStyle(color = ThemeRed.colorYellow)) {
-                                        append(text.substring( startIndex, startIndex + query.length ) )
+                                        append(text.substring(startIndex, startIndex + query.length))
                                     }
                                     append(text.substring(startIndex + query.length))
                                 } else {
@@ -165,28 +161,34 @@ fun CustomBasicTextFieldContent(
                                     .padding(start = 3.dp, top = 1.dp, end = 3.dp)
                                     .background(ThemeRed.colorTabLevel2)
                                     .clickable(onClick = {
-                                        searchText.value = TextFieldValue(
-                                            text = it.text,
-                                            selection = TextRange(it.text.length) // курсор в конец
-                                        ).toString()
+                                        searchText.value = it.text
                                         searchTextDone.value = it.text
                                         stack.addLast(it.text)
                                     })
                             ) {
-
                                 Row(
                                     modifier = Modifier.fillMaxSize(),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-
                                     Text(
-                                        it.text, fontFamily = ThemeRed.fontFamilyDMsanss, fontSize = 18.sp, textAlign = TextAlign.Start,
-                                        color = Color.Black, modifier = Modifier.padding(start = 4.dp).height(30.dp).offset(1.dp, 1.dp).alignByBaseline()
+                                        it.text,
+                                        fontFamily = ThemeRed.fontFamilyDMsanss,
+                                        fontSize = 18.sp,
+                                        textAlign = TextAlign.Start,
+                                        color = Color.Black,
+                                        modifier = Modifier
+                                            .padding(start = 4.dp)
+                                            .height(30.dp)
+                                            .offset(1.dp, 1.dp)
+                                            .alignByBaseline()
                                     )
                                 }
 
-                                Row( modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween )
-                                {
+                                Row(
+                                    modifier = Modifier.fillMaxSize(),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
                                     Text(
                                         annotatedString,
                                         fontFamily = ThemeRed.fontFamilyDMsanss,
@@ -210,9 +212,7 @@ fun CustomBasicTextFieldContent(
                                             .height(30.dp)
                                             .alignByBaseline()
                                     )
-
                                 }
-
                             }
                         }
                     }
@@ -223,21 +223,10 @@ fun CustomBasicTextFieldContent(
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(start = 4.dp).height(46.dp)
+            modifier = Modifier
+                .padding(start = 12.dp, end = 4.dp)
+                .height(46.dp)
         ) {
-
-
-//                if ((value == "") && (!isFocused)) {
-//                    Icon(
-//                        imageVector = Icons.Default.Search,
-//                        contentDescription = null,
-//                        tint = Color(0xFF757575),
-//                        modifier = Modifier.padding(start = 4.dp)
-//                    )
-//                }
-
-            //Spacer(modifier = Modifier.width(4.dp))
-
             BasicTextField(
                 value = value,
                 onValueChange = { searchText.value = it },
@@ -254,55 +243,41 @@ fun CustomBasicTextFieldContent(
                     .fillMaxWidth()
                     .onFocusChanged { focusState -> isFocused = focusState.isFocused },
                 cursorBrush = SolidColor(Color.Gray),
-
-                // 1. Говорим IME, что нам нужна кнопка «Done»
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Done, keyboardType = KeyboardType.Text
                 ),
-
-                // 2. Обрабатываем её нажатие
                 keyboardActions = KeyboardActions(
                     onDone = {
                         searchTextDone.value = value
-                        //add(value)                         // например, запускаем поиск
                         onDone(value)
-                        focusManager.clearFocus()          // убираем курсор
-                        keyboardController?.hide()         // закрываем клавиатуру
+                        focusManager.clearFocus()
+                        keyboardController?.hide()
                     }
                 )
             )
 
-
-            //Кнопка очистка
             if (value != "") {
                 Icon(
                     Icons.Default.Clear, contentDescription = null, tint = Color(0xFF757575),
                     modifier = Modifier
-                        .width(36.dp)
-                        .height(46.dp)
+                        .size(36.dp)
+                        .padding(4.dp)
                         .clickable(onClick = {
                             searchTextDone.value = ""
-                            searchText.value = TextFieldValue(
-                                text = "",
-                                selection = TextRange("".length) // курсор в конец
-                            ).toString()
+                            searchText.value = ""
                         })
                 )
             }
 
-            //Кнопка назад
             Icon(
                 Icons.Default.Undo, contentDescription = null, tint = Color(0xFF757575),
                 modifier = Modifier
-                    .width(36.dp)
-                    .height(46.dp)
+                    .size(36.dp)
+                    .padding(4.dp)
                     .clickable(onClick = {
                         if (!stack.isEmpty()) {
                             val s = stack.removeLast()
-                            searchText.value = TextFieldValue(
-                                text = s,
-                                selection = TextRange(s.length) // курсор в конец
-                            ).toString()
+                            searchText.value = s
                             searchTextDone.value = s
                         }
                     })
@@ -311,7 +286,45 @@ fun CustomBasicTextFieldContent(
             expandMenuHistory()
         }
     }
-    //}
+}
 
+@Preview(showBackground = true, backgroundColor = 0xFF303030)
+@Composable
+fun PreviewCustomBasicTextFieldContent() {
+    val searchText = remember { MutableStateFlow("big t") }
+    val searchTextSuggestions = remember {
+        MutableStateFlow(
+            listOf(
+                TagSuggestion(123456, "big tits", "tag"),
+                TagSuggestion(789, "big toys", "tag"),
+                TagSuggestion(4567, "big thighs", "tag")
+            )
+        )
+    }
+    val searchTextDone = remember { MutableStateFlow("") }
+    val stack = remember { ArrayDeque<String>() }
 
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        CustomBasicTextFieldContent(
+            searchText = searchText,
+            searchTextSuggestions = searchTextSuggestions,
+            searchTextDone = searchTextDone,
+            stack = stack,
+            expandMenuHistory = {
+                Icon(
+                    Icons.Default.History,
+                    contentDescription = null,
+                    tint = Color(0xFF757575),
+                    modifier = Modifier
+                        .size(36.dp)
+                        .padding(4.dp)
+                )
+            },
+            onDone = {}
+        )
+    }
 }

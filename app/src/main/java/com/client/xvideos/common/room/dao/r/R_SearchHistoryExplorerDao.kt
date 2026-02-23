@@ -16,18 +16,16 @@ interface R_SearchHistoryExplorerDao : IDaoSearchTemplate  {
     suspend fun insert(item: R_SearchHistoryExplorerEntity)
 
     @Query("SELECT text FROM r_search_history_explorer ORDER BY timeCreate DESC")
-    override fun observeAllTexts(): Flow<List<String>>   // <‑‑ поток изменений
+    override fun observeAllTexts(): Flow<List<String>>
 
     @Query("DELETE FROM r_search_history_explorer")
     override suspend fun deleteAll()
 
-
     @Transaction
-    suspend fun insertAndTrim(item: R_SearchHistoryExplorerEntity, limit: Int = 10) {
-        insert(item)
+    override suspend fun insertAndTrim(text: String, limit: Int) {
+        insert(R_SearchHistoryExplorerEntity(text))
         deleteOlderThanLimit(limit)
     }
-
 
     /**
      * Удаляем всё, что не входит в последние [limit] строк,
@@ -47,7 +45,6 @@ interface R_SearchHistoryExplorerDao : IDaoSearchTemplate  {
         """
     )
     suspend fun deleteOlderThanLimit(limit: Int)
-
 
     @Query("DELETE FROM r_search_history_explorer WHERE text = :text")
     override suspend fun deleteByTexts(text: String)

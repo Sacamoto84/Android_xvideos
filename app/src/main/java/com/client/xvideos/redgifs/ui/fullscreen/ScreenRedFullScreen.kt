@@ -279,7 +279,7 @@ class ScreenRedFullScreen(val item: GifsInfo) : Screen, ScreenTransition {
                         item = item,
                         modifier = Modifier,
                         onClick = { it1 ->
-                            vm.hostDI.search.searchText.value = TextFieldValue(text = it1, selection = TextRange(it1.length))
+                            vm.hostDI.search.searchText.value = TextFieldValue(text = it1, selection = TextRange(it1.length)).toString()
                             vm.hostDI.search.searchTextDone.value = it1
                             ScreenRedExplorer.Companion.screenType = 0
                             navigator.pop()

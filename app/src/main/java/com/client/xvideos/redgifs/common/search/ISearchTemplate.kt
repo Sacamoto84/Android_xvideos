@@ -129,43 +129,13 @@ abstract class ISearchTemplate(
 
     @Composable
     fun CustomBasicTextField(
-        value: String,
-        onValueChange: (String) -> Unit,
-        onDone: (String) -> Unit = {},
         modifier: Modifier = Modifier,
     ) {
         val searchTagSuggestion by searchTextSuggestions.collectAsStateWithLifecycle()
         val historyItems by history.collectAsState()
         val searchTextValue by searchText.collectAsStateWithLifecycle()
 
-
-
         CustomBasicTextFieldContent(
-//            value = value,
-//            onValueChange = onValueChange,
-//            onDone = {
-//                onDone(it)
-//                add(it)
-//            },
-//            searchTagSuggestion = searchTagSuggestion,
-//            searchTextValue = searchTextValue,
-//            onSuggestionClick = { suggestion ->
-//                searchText.value = suggestion.name
-//                searchTextDone.value = suggestion.name
-//                stack.addLast(suggestion.name)
-//            },
-//            onUndoClick = {
-//                if (stack.isNotEmpty()){
-//                    val s = stack.removeLast()
-//                    searchText.value = s
-//                    searchTextDone.value = s
-//                }
-//            },
-//            onClearClick = {
-//                onDone("")
-//                onValueChange("")
-//            },
-//            onFocusChange = { focused.value = it },
 
             modifier = modifier,
 
