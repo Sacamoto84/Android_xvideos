@@ -210,12 +210,9 @@ private fun StatelessGifsTabBottomBar(
 ) {
     Column(Modifier.background(ThemeRed.colorTabLevel1)) {
         HorizontalDivider(color = ThemeRed.colorBorderGray)
-        Row(
-            modifier = Modifier
-                .padding(top = 1.dp, start = 1.dp)
-                .background(ThemeRed.colorTabLevel1),
-            verticalAlignment = Alignment.Bottom
-        ) {
+        Row( modifier = Modifier.padding(top = 1.dp, start = 1.dp).background(ThemeRed.colorTabLevel1), verticalAlignment = Alignment.Bottom )
+        {
+
             AnimatedVisibility(
                 visible = !isFocused,
                 enter = expandHorizontally(animationSpec = tween(250)) + fadeIn(tween(250)),

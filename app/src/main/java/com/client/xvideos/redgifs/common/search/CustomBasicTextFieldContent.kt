@@ -106,17 +106,19 @@ fun CustomBasicTextFieldContent(
                 shape = RoundedCornerShape(8.dp)
             ),
     ) {
+        //Список
         AnimatedVisibility(
             visible = showSuggestions && suggestions.isNotEmpty(),
             enter = expandVertically(animationSpec = tween(400)) + fadeIn(tween(400)),
             exit = shrinkVertically(animationSpec = tween(400)) + fadeOut(tween(400)),
         ) {
             SuggestionList(
-                suggestions = suggestions,
+                suggestions = { suggestions },
                 query = value,
                 onSuggestionClick = onSuggestionClick
             )
         }
+
 
         SearchInputRow(
             value = value,
@@ -136,7 +138,7 @@ fun CustomBasicTextFieldContent(
 
 @Composable
 private fun SuggestionList(
-    suggestions: List<TagSuggestion>,
+    suggestions: () -> List<TagSuggestion>,
     query: String,
     onSuggestionClick: (TagSuggestion) -> Unit
 ) {
@@ -146,13 +148,10 @@ private fun SuggestionList(
             .height(130.dp)
     ) {
         Spacer(modifier = Modifier.height(4.dp))
-        LazyColumn(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-        ) {
+        LazyColumn( modifier = Modifier.weight(1f).fillMaxWidth() )
+        {
             items(
-                items = suggestions,
+                items = suggestions(),
                 key = { it.text } // Ключ для оптимизации списка
             ) { suggestion ->
                 SuggestionItem(
@@ -192,30 +191,10 @@ private fun SuggestionItem(
         }
     }
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(34.dp)
-            .padding(horizontal = 12.dp)
-            .clickable(onClick = onClick),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(
-            text = annotatedString,
-            fontFamily = ThemeRed.fontFamilyDMsanss,
-            fontSize = 18.sp,
-            color = Color.White,
-            maxLines = 1
-        )
-
-        Text(
-            text = suggestion.gifs.toPrettyCount2(),
-            fontFamily = ThemeRed.fontFamilyDMsanss,
-            fontSize = 16.sp,
-            color = Color.Gray,
-            maxLines = 1
-        )
+    Row( modifier = Modifier.fillMaxWidth().height(34.dp).padding(horizontal = 12.dp).clickable(onClick = onClick), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween )
+    {
+        Text( text = annotatedString, fontFamily = ThemeRed.fontFamilyDMsanss, fontSize = 18.sp, color = Color.White, maxLines = 1 )
+        Text( text = suggestion.gifs.toPrettyCount2(), fontFamily = ThemeRed.fontFamilyDMsanss, fontSize = 16.sp, color = Color.Gray, maxLines = 1 )
     }
 }
 
@@ -229,12 +208,8 @@ private fun SearchInputRow(
     onDone: (String) -> Unit,
     expandMenuHistory: @Composable () -> Unit
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .padding(start = 12.dp, end = 4.dp)
-            .height(48.dp)
-    ) {
+    Row( verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(start = 12.dp, end = 4.dp).height(48.dp) )
+    {
         BasicTextField(
             value = value,
             onValueChange = onValueChange,
@@ -245,20 +220,13 @@ private fun SearchInputRow(
                 fontFamily = ThemeRed.fontFamilyDMsanss,
                 textAlign = TextAlign.Left
             ),
-            modifier = Modifier
-                .weight(1f)
-                .onFocusChanged { onFocusChanged(it.isFocused) },
+            modifier = Modifier.weight(1f).onFocusChanged { onFocusChanged(it.isFocused) },
             cursorBrush = SolidColor(ThemeRed.colorYellow),
-            keyboardOptions = KeyboardOptions(
-                imeAction = ImeAction.Done,
-                keyboardType = KeyboardType.Text
-            ),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = KeyboardType.Text ),
             keyboardActions = KeyboardActions(onDone = { onDone(value) })
         )
 
-        if (value.isNotEmpty()) {
-            SearchIconButton(icon = Icons.Default.Clear, onClick = onClearClick)
-        }
+        if (value.isNotEmpty()) { SearchIconButton(icon = Icons.Default.Clear, onClick = onClearClick) }
 
         SearchIconButton(icon = Icons.Default.Undo, onClick = onUndoClick)
 
@@ -271,15 +239,7 @@ private fun SearchIconButton(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     onClick: () -> Unit
 ) {
-    Icon(
-        imageVector = icon,
-        contentDescription = null,
-        tint = Color(0xFF757575),
-        modifier = Modifier
-            .size(38.dp)
-            .padding(6.dp)
-            .clickable(onClick = onClick)
-    )
+    Icon( imageVector = icon, contentDescription = null, tint = Color(0xFF757575), modifier = Modifier.size(38.dp).padding(6.dp).clickable(onClick = onClick) )
 }
 
 @Preview(showBackground = true, backgroundColor = 0xFF121212)
@@ -323,7 +283,7 @@ fun PreviewSuggestionList() {
     )
     XvideosTheme {
         SuggestionList(
-            suggestions = suggestions,
+            suggestions = { suggestions },
             query = "big",
             onSuggestionClick = {}
         )
@@ -332,7 +292,7 @@ fun PreviewSuggestionList() {
 
 @Preview(showBackground = true, backgroundColor = 0xFF212121)
 @Composable
-fun PreviewSuggestionItem() {
+fun P_SuggestionItem() {
     val suggestion = TagSuggestion(123456, "big tits", "tag")
     XvideosTheme {
         SuggestionItem(
