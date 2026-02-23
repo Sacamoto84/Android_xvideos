@@ -28,6 +28,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
+import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.History
@@ -52,6 +53,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -59,7 +61,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.client.xvideos.common.util.toPrettyCount2
 import com.client.xvideos.redgifs.common.ThemeRed
-import com.client.xvideos.redgifs.model.tag.TagSuggestion
 import com.client.xvideos.ui.theme.XvideosTheme
 import kotlinx.coroutines.delay
 
@@ -70,14 +71,20 @@ import kotlinx.coroutines.delay
 fun CustomBasicTextFieldContent(
     value: String,
     onValueChange: (String) -> Unit,
-    suggestions: List<TagSuggestion>,
-    onSuggestionClick: (TagSuggestion) -> Unit,
+
+    suggestions: ()->List<SuggestionItem>,
+    onSuggestionClick: (SuggestionItem) -> Unit,
+
     onClearClick: () -> Unit,
     onUndoClick: () -> Unit,
     onDone: (String) -> Unit,
     modifier: Modifier = Modifier,
     expandMenuHistory: @Composable () -> Unit
 ) {
+
+
+
+
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
     var isFocused by remember { mutableStateOf(false) }
@@ -108,14 +115,12 @@ fun CustomBasicTextFieldContent(
     ) {
         //Список
         AnimatedVisibility(
-            visible = showSuggestions && suggestions.isNotEmpty(),
+            visible = showSuggestions && suggestions().isNotEmpty(),
             enter = expandVertically(animationSpec = tween(400)) + fadeIn(tween(400)),
             exit = shrinkVertically(animationSpec = tween(400)) + fadeOut(tween(400)),
         ) {
             SuggestionList(
-                suggestions = { suggestions },
-                query = value,
-                onSuggestionClick = onSuggestionClick
+                suggestions = suggestions , query = value, onSuggestionClick = onSuggestionClick
             )
         }
 
@@ -138,14 +143,12 @@ fun CustomBasicTextFieldContent(
 
 @Composable
 private fun SuggestionList(
-    suggestions: () -> List<TagSuggestion>,
+    suggestions: () -> List<SuggestionItem>,
     query: String,
-    onSuggestionClick: (TagSuggestion) -> Unit
+    onSuggestionClick: (SuggestionItem) -> Unit
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(130.dp)
+        modifier = Modifier.fillMaxWidth().height(130.dp)
     ) {
         Spacer(modifier = Modifier.height(4.dp))
         LazyColumn( modifier = Modifier.weight(1f).fillMaxWidth() )
@@ -171,7 +174,7 @@ private fun SuggestionList(
 
 @Composable
 private fun SuggestionItem(
-    suggestion: TagSuggestion,
+    suggestion: SuggestionItem,
     query: String,
     onClick: () -> Unit
 ) {
@@ -194,7 +197,7 @@ private fun SuggestionItem(
     Row( modifier = Modifier.fillMaxWidth().height(34.dp).padding(horizontal = 12.dp).clickable(onClick = onClick), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween )
     {
         Text( text = annotatedString, fontFamily = ThemeRed.fontFamilyDMsanss, fontSize = 18.sp, color = Color.White, maxLines = 1 )
-        Text( text = suggestion.gifs.toPrettyCount2(), fontFamily = ThemeRed.fontFamilyDMsanss, fontSize = 16.sp, color = Color.Gray, maxLines = 1 )
+        Text( text = suggestion.count.toPrettyCount2(), fontFamily = ThemeRed.fontFamilyDMsanss, fontSize = 16.sp, color = Color.Gray, maxLines = 1 )
     }
 }
 
@@ -246,17 +249,18 @@ private fun SearchIconButton(
 @Composable
 fun PreviewCustomBasicTextFieldContent() {
     var text by remember { mutableStateOf("big t") }
+
     val suggestions = listOf(
-        TagSuggestion(123456, "big tits", "tag"),
-        TagSuggestion(789, "big toys", "tag"),
-        TagSuggestion(4567, "big thighs", "tag")
+        SuggestionItem("big tits", 123456),
+        SuggestionItem("big toys", 789),
+        SuggestionItem("big thighs", 4567)
     )
 
     Box(Modifier.padding(16.dp)) {
         CustomBasicTextFieldContent(
             value = text,
             onValueChange = { text = it },
-            suggestions = suggestions,
+            suggestions = { suggestions },
             onSuggestionClick = { text = it.text },
             onClearClick = { text = "" },
             onUndoClick = {},
@@ -277,9 +281,9 @@ fun PreviewCustomBasicTextFieldContent() {
 @Composable
 fun PreviewSuggestionList() {
     val suggestions = listOf(
-        TagSuggestion(123456, "big tits", "tag"),
-        TagSuggestion(789, "big toys", "tag"),
-        TagSuggestion(4567, "big thighs", "tag")
+        SuggestionItem("big tits", 123456),
+        SuggestionItem("big toys" ,789),
+        SuggestionItem("big thighs",4567)
     )
     XvideosTheme {
         SuggestionList(
@@ -293,7 +297,7 @@ fun PreviewSuggestionList() {
 @Preview(showBackground = true, backgroundColor = 0xFF212121)
 @Composable
 fun P_SuggestionItem() {
-    val suggestion = TagSuggestion(123456, "big tits", "tag")
+    val suggestion = SuggestionItem("big tits", 123456)
     XvideosTheme {
         SuggestionItem(
             suggestion = suggestion,

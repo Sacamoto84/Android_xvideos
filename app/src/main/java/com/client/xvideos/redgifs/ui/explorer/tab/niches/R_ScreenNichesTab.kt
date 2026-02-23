@@ -89,7 +89,7 @@ object R_ScreenNichesTab : Screen {
         val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForLazyColumn(gridState = vm.lazyHost.stateColumn)
         
         val sortType by vm.lazyHost.sortType.collectAsStateWithLifecycle()
-        val searchText by vm.search.searchText.collectAsStateWithLifecycle()
+
         val isSearchFocused by vm.search.focused.collectAsStateWithLifecycle()
 
         val onSortTypeChange: (Order) -> Unit = remember { { vm.lazyHost.changeSortType(it) } }

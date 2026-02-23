@@ -4,9 +4,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.client.xvideos.redgifs.common.saved.SavedRed
-import com.client.xvideos.redgifs.model.tag.TagSuggestion
+import com.google.gson.annotations.SerializedName
+import io.ktor.util.collections.getValue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,6 +18,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+data class SuggestionItem(
+    @SerializedName("text") val text: String,  //
+    @SerializedName("count") val count: Long,  //
+)
 
 abstract class ISearchTemplate(
     val scope: CoroutineScope,
@@ -25,7 +32,7 @@ abstract class ISearchTemplate(
     /**
      * Отображаемый текст
      */
-    var searchText = MutableStateFlow("")
+    var searchText = MutableStateFlow(TextFieldValue(""))
 
     /**
      * Текст по которому будет идти запрос на сервер
@@ -33,7 +40,8 @@ abstract class ISearchTemplate(
     var searchTextDone = MutableStateFlow("")
 
 
-    var searchTextSuggestions = MutableStateFlow<List<TagSuggestion>>(emptyList())
+
+    var searchTextSuggestions = MutableStateFlow<List<SuggestionItem>>(emptyList())
 
     val stack = ArrayDeque<String>()
 
@@ -47,9 +55,8 @@ abstract class ISearchTemplate(
         ExpandMenuHistoryContent( 
             items = items, 
             modifier = modifier,  
-            onClick = { 
-                // Исправлено: передаем чистую строку вместо TextFieldValue.toString()
-                searchText.value = it 
+            onClick = {
+                searchText.value = TextFieldValue( text = it, selection = TextRange(it.length) )
             }, 
             onDeleteClick = { scope.launch(Dispatchers.Main) { delete(it) } } 
         )
@@ -64,7 +71,7 @@ abstract class ISearchTemplate(
         ExpandMenuHelperContent(
             tags = savedRed.tagsList,
             onTagClick = { tag ->
-                searchText.value = tag.name
+                searchText.value = TextFieldValue( text =  tag.name, selection = TextRange( tag.name.length) )
                 searchTextDone.value = tag.name
             },
             modifier = modifier
@@ -83,25 +90,25 @@ abstract class ISearchTemplate(
 
         CustomBasicTextFieldContent(
             modifier = modifier,
-            value = text,
+            value = text.text,
             onValueChange = { 
-                searchText.value = it 
+                searchText.value = TextFieldValue( text = it, selection = TextRange(it.length) )
             },
-            suggestions = searchTagSuggestions,
+            suggestions = { searchTagSuggestions },
             onSuggestionClick = { suggestion ->
-                searchText.value = suggestion.text
+                searchText.value = TextFieldValue( text = suggestion.text, selection = TextRange(suggestion.text.length) )
                 searchTextDone.value = suggestion.text
                 scope.launch(Dispatchers.Main) {
                     add(suggestion.text)
                 }
             },
             onClearClick = {
-                searchText.value = ""
+                searchText.value = TextFieldValue( text = "", selection = TextRange("".length) )
             },
             onUndoClick = {
                 if (stack.isNotEmpty()) {
                     val last = stack.removeLast()
-                    searchText.value = last
+                    searchText.value = TextFieldValue( text = last, selection = TextRange(last.length) )
                 }
             },
             onDone = {

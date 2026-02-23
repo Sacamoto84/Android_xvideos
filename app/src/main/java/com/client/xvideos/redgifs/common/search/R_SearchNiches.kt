@@ -23,8 +23,8 @@ class R_SearchNiches @Inject constructor(
         scope.launch {
             searchText.collect {
                 try {
-                    if (it != ""){
-                        val a = redApi.searchNichesShort(it).map { itt -> TagSuggestion( text = itt.name, gifs = itt.gifs, type = "type" ) }
+                    if (it.text != ""){
+                        val a = redApi.searchNichesShort(it.text).map { itt -> SuggestionItem(text = itt.name, count = itt.gifs) }
                         searchTextSuggestions.value = a
                     }
                 }catch (e: Exception){
