@@ -90,9 +90,9 @@ abstract class ISearchTemplate(
 
         CustomBasicTextFieldContent(
             modifier = modifier,
-            value = text.text,
+            value = text,
             onValueChange = { 
-                searchText.value = TextFieldValue( text = it, selection = TextRange(it.length) )
+                searchText.value = TextFieldValue( text = it.text, selection = TextRange(it.text.length) )
             },
             suggestions = { searchTagSuggestions },
             onSuggestionClick = { suggestion ->

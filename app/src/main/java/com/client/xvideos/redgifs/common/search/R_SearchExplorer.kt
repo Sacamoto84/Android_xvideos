@@ -23,9 +23,12 @@ class R_SearchExplorer @Inject constructor(
         scope.launch {
             searchText.collect {
                 try {
-                    val request = if (it == "") " " else it
-                    val a = redApi.getTagSuggestions(request)
-                    searchTextSuggestions.value = a.getOrThrow()
+                    val request = if (it.text == "") " " else it.text
+
+                    searchTextSuggestions.value = redApi.getTagSuggestions(request)
+                        .map { list -> list.map { s -> SuggestionItem(text = s.text, count = s.gifs) } }
+                        .getOrDefault(emptyList())
+
                 } catch (e: Exception) {
                     Timber.e("!!! SearchRed searchText.collect ${e.localizedMessage}")
                 }

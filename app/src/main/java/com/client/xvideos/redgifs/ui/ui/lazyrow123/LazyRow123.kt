@@ -158,7 +158,7 @@ fun LazyRow123Content(
                             onRefresh = { listGifs.refresh() },
                             onClickOpenProfile = onClickOpenProfile,
                             onTagClick = { tag ->
-                                host.hostDI.search.searchText.value = TextFieldValue(tag, TextRange(tag.length)).toString()
+                                host.hostDI.search.searchText.value = TextFieldValue(tag, TextRange(tag.length))
                                 host.hostDI.search.searchTextDone.value = tag
                                 ScreenRedExplorer.screenType = 0
                                 navigator?.popAll()

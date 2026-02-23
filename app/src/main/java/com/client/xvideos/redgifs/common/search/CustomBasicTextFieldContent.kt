@@ -69,8 +69,8 @@ import kotlinx.coroutines.delay
  */
 @Composable
 fun CustomBasicTextFieldContent(
-    value: String,
-    onValueChange: (String) -> Unit,
+    value: TextFieldValue,
+    onValueChange: (TextFieldValue) -> Unit,
 
     suggestions: ()->List<SuggestionItem>,
     onSuggestionClick: (SuggestionItem) -> Unit,
@@ -120,7 +120,7 @@ fun CustomBasicTextFieldContent(
             exit = shrinkVertically(animationSpec = tween(400)) + fadeOut(tween(400)),
         ) {
             SuggestionList(
-                suggestions = suggestions , query = value, onSuggestionClick = onSuggestionClick
+                suggestions = suggestions , query = value.text, onSuggestionClick = onSuggestionClick
             )
         }
 
@@ -203,8 +203,8 @@ private fun SuggestionItem(
 
 @Composable
 private fun SearchInputRow(
-    value: String,
-    onValueChange: (String) -> Unit,
+    value: TextFieldValue,
+    onValueChange: (TextFieldValue) -> Unit,
     onFocusChanged: (Boolean) -> Unit,
     onClearClick: () -> Unit,
     onUndoClick: () -> Unit,
@@ -226,10 +226,10 @@ private fun SearchInputRow(
             modifier = Modifier.weight(1f).onFocusChanged { onFocusChanged(it.isFocused) },
             cursorBrush = SolidColor(ThemeRed.colorYellow),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = KeyboardType.Text ),
-            keyboardActions = KeyboardActions(onDone = { onDone(value) })
+            keyboardActions = KeyboardActions(onDone = { onDone(value.text) })
         )
 
-        if (value.isNotEmpty()) { SearchIconButton(icon = Icons.Default.Clear, onClick = onClearClick) }
+        if (value.text.isNotEmpty()) { SearchIconButton(icon = Icons.Default.Clear, onClick = onClearClick) }
 
         SearchIconButton(icon = Icons.Default.Undo, onClick = onUndoClick)
 
@@ -248,7 +248,7 @@ private fun SearchIconButton(
 @Preview(showBackground = true, backgroundColor = 0xFF121212)
 @Composable
 fun PreviewCustomBasicTextFieldContent() {
-    var text by remember { mutableStateOf("big t") }
+    val text = remember { TextFieldValue("big t") }
 
     val suggestions = listOf(
         SuggestionItem("big tits", 123456),
@@ -259,10 +259,10 @@ fun PreviewCustomBasicTextFieldContent() {
     Box(Modifier.padding(16.dp)) {
         CustomBasicTextFieldContent(
             value = text,
-            onValueChange = { text = it },
+            onValueChange = {  },
             suggestions = { suggestions },
-            onSuggestionClick = { text = it.text },
-            onClearClick = { text = "" },
+            onSuggestionClick = {  },
+            onClearClick = { },
             onUndoClick = {},
             onDone = {},
             expandMenuHistory = {
@@ -310,13 +310,14 @@ fun P_SuggestionItem() {
 @Preview(showBackground = true, backgroundColor = 0xFF212121)
 @Composable
 fun PreviewSearchInputRow() {
-    var text by remember { mutableStateOf("big t") }
+    val text = remember { TextFieldValue("big t") }
+
     XvideosTheme {
         SearchInputRow(
             value = text,
-            onValueChange = { text = it },
+            onValueChange = { },
             onFocusChanged = {},
-            onClearClick = { text = "" },
+            onClearClick = {  },
             onUndoClick = {},
             onDone = {},
             expandMenuHistory = {
