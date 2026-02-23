@@ -15,14 +15,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -44,7 +41,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
@@ -61,50 +57,42 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.client.xvideos.common.util.toPrettyCount2
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.model.tag.TagSuggestion
+import com.client.xvideos.ui.theme.XvideosTheme
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
 
+/**
+ * Оптимизированный Stateless компонент поисковой строки.
+ */
 @Composable
 fun CustomBasicTextFieldContent(
-    searchText: MutableStateFlow<String>,
-    searchTextSuggestions: MutableStateFlow<List<TagSuggestion>>,
-    searchTextDone: MutableStateFlow<String>,
-    stack: ArrayDeque<String>,
+    value: String,
+    onValueChange: (String) -> Unit,
+    suggestions: List<TagSuggestion>,
+    onSuggestionClick: (TagSuggestion) -> Unit,
+    onClearClick: () -> Unit,
+    onUndoClick: () -> Unit,
+    onDone: (String) -> Unit,
     modifier: Modifier = Modifier,
-    expandMenuHistory: @Composable () -> Unit,
-    onDone: (String) -> Unit
+    expandMenuHistory: @Composable () -> Unit
 ) {
-    val value = searchText.collectAsStateWithLifecycle().value
-    val searchTagSuggestion = searchTextSuggestions.collectAsStateWithLifecycle().value
-
-    val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
     var isFocused by remember { mutableStateOf(false) }
 
+    // Авто-сброс фокуса при закрытии клавиатуры
     val imeVisible = WindowInsets.ime.getBottom(LocalDensity.current) > 0
-    val keyboardController = LocalSoftwareKeyboardController.current
-
-    val searchTextValue = searchText.collectAsStateWithLifecycle().value
-
     LaunchedEffect(imeVisible) {
-        if (!imeVisible) {
-            focusManager.clearFocus()
-        }
+        if (!imeVisible && isFocused) focusManager.clearFocus()
     }
 
-    var delayFocus by remember { mutableStateOf(false) }
-
+    // Задержка появления подсказок для плавности
+    var showSuggestions by remember { mutableStateOf(false) }
     LaunchedEffect(isFocused) {
-        if (isFocused) {
-            delay(500)
-        } else {
-            delay(1)
-        }
-        delayFocus = isFocused
+        if (isFocused) delay(300) else delay(100)
+        showSuggestions = isFocused
     }
 
     Column(
@@ -119,212 +107,273 @@ fun CustomBasicTextFieldContent(
             ),
     ) {
         AnimatedVisibility(
-            delayFocus,
-            enter = expandVertically(animationSpec = tween(durationMillis = 500)) + fadeIn(
-                animationSpec = tween(durationMillis = 500)
-            ),
-            exit = shrinkVertically(animationSpec = tween(durationMillis = 500)) + fadeOut(
-                animationSpec = tween(durationMillis = 500)
-            ),
+            visible = showSuggestions && suggestions.isNotEmpty(),
+            enter = expandVertically(animationSpec = tween(400)) + fadeIn(tween(400)),
+            exit = shrinkVertically(animationSpec = tween(400)) + fadeOut(tween(400)),
         ) {
-            Box(
-                Modifier
-                    .padding(top = 1.dp)
-                    .fillMaxWidth()
-                    .height(126.dp)
-            ) {
-                Column {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    LazyColumn(
-                        Modifier
-                            .fillMaxSize()
-                            .weight(1f)
-                    ) {
-                        items(searchTagSuggestion) {
-                            val query = searchTextValue
-                            val text = it.text
-                            val startIndex = text.indexOf(query, ignoreCase = true)
-                            val annotatedString = buildAnnotatedString {
-                                if (startIndex != -1) {
-                                    append(text.substring(0, startIndex))
-                                    withStyle(style = SpanStyle(color = ThemeRed.colorYellow)) {
-                                        append(text.substring(startIndex, startIndex + query.length))
-                                    }
-                                    append(text.substring(startIndex + query.length))
-                                } else {
-                                    append(text)
-                                }
-                            }
-
-                            Box(
-                                Modifier
-                                    .padding(start = 3.dp, top = 1.dp, end = 3.dp)
-                                    .background(ThemeRed.colorTabLevel2)
-                                    .clickable(onClick = {
-                                        searchText.value = it.text
-                                        searchTextDone.value = it.text
-                                        stack.addLast(it.text)
-                                    })
-                            ) {
-                                Row(
-                                    modifier = Modifier.fillMaxSize(),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        it.text,
-                                        fontFamily = ThemeRed.fontFamilyDMsanss,
-                                        fontSize = 18.sp,
-                                        textAlign = TextAlign.Start,
-                                        color = Color.Black,
-                                        modifier = Modifier
-                                            .padding(start = 4.dp)
-                                            .height(30.dp)
-                                            .offset(1.dp, 1.dp)
-                                            .alignByBaseline()
-                                    )
-                                }
-
-                                Row(
-                                    modifier = Modifier.fillMaxSize(),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Text(
-                                        annotatedString,
-                                        fontFamily = ThemeRed.fontFamilyDMsanss,
-                                        fontSize = 18.sp,
-                                        textAlign = TextAlign.Start,
-                                        color = Color.White,
-                                        modifier = Modifier
-                                            .padding(start = 4.dp)
-                                            .height(30.dp)
-                                            .alignByBaseline()
-                                    )
-
-                                    Text(
-                                        it.gifs.toPrettyCount2(),
-                                        fontFamily = ThemeRed.fontFamilyDMsanss,
-                                        fontSize = 18.sp,
-                                        textAlign = TextAlign.Start,
-                                        color = Color.White,
-                                        modifier = Modifier
-                                            .padding(start = 4.dp)
-                                            .height(30.dp)
-                                            .alignByBaseline()
-                                    )
-                                }
-                            }
-                        }
-                    }
-                    HorizontalDivider(color = ThemeRed.colorBorderGray, thickness = 1.dp)
-                }
-            }
+            SuggestionList(
+                suggestions = suggestions,
+                query = value,
+                onSuggestionClick = onSuggestionClick
+            )
         }
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .padding(start = 12.dp, end = 4.dp)
-                .height(46.dp)
-        ) {
-            BasicTextField(
-                value = value,
-                onValueChange = { searchText.value = it },
-                singleLine = true,
-                textStyle = TextStyle(
-                    fontSize = 18.sp,
-                    lineHeight = 20.sp,
-                    color = Color.White,
-                    fontFamily = ThemeRed.fontFamilyDMsanss,
-                    textAlign = TextAlign.Left
-                ),
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .onFocusChanged { focusState -> isFocused = focusState.isFocused },
-                cursorBrush = SolidColor(Color.Gray),
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Done, keyboardType = KeyboardType.Text
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = {
-                        searchTextDone.value = value
-                        onDone(value)
-                        focusManager.clearFocus()
-                        keyboardController?.hide()
-                    }
-                )
-            )
-
-            if (value != "") {
-                Icon(
-                    Icons.Default.Clear, contentDescription = null, tint = Color(0xFF757575),
-                    modifier = Modifier
-                        .size(36.dp)
-                        .padding(4.dp)
-                        .clickable(onClick = {
-                            searchTextDone.value = ""
-                            searchText.value = ""
-                        })
-                )
-            }
-
-            Icon(
-                Icons.Default.Undo, contentDescription = null, tint = Color(0xFF757575),
-                modifier = Modifier
-                    .size(36.dp)
-                    .padding(4.dp)
-                    .clickable(onClick = {
-                        if (!stack.isEmpty()) {
-                            val s = stack.removeLast()
-                            searchText.value = s
-                            searchTextDone.value = s
-                        }
-                    })
-            )
-
-            expandMenuHistory()
-        }
+        SearchInputRow(
+            value = value,
+            onValueChange = onValueChange,
+            onFocusChanged = { isFocused = it },
+            onClearClick = onClearClick,
+            onUndoClick = onUndoClick,
+            onDone = {
+                onDone(it)
+                focusManager.clearFocus()
+                keyboardController?.hide()
+            },
+            expandMenuHistory = expandMenuHistory
+        )
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF303030)
 @Composable
-fun PreviewCustomBasicTextFieldContent() {
-    val searchText = remember { MutableStateFlow("big t") }
-    val searchTextSuggestions = remember {
-        MutableStateFlow(
-            listOf(
-                TagSuggestion(123456, "big tits", "tag"),
-                TagSuggestion(789, "big toys", "tag"),
-                TagSuggestion(4567, "big thighs", "tag")
-            )
-        )
-    }
-    val searchTextDone = remember { MutableStateFlow("") }
-    val stack = remember { ArrayDeque<String>() }
-
-    Box(
+private fun SuggestionList(
+    suggestions: List<TagSuggestion>,
+    query: String,
+    onSuggestionClick: (TagSuggestion) -> Unit
+) {
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .height(130.dp)
     ) {
+        Spacer(modifier = Modifier.height(4.dp))
+        LazyColumn(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+        ) {
+            items(
+                items = suggestions,
+                key = { it.text } // Ключ для оптимизации списка
+            ) { suggestion ->
+                SuggestionItem(
+                    suggestion = suggestion,
+                    query = query,
+                    onClick = { onSuggestionClick(suggestion) }
+                )
+            }
+        }
+        HorizontalDivider(
+            color = ThemeRed.colorBorderGray.copy(alpha = 0.5f),
+            thickness = 1.dp,
+            modifier = Modifier.padding(horizontal = 8.dp)
+        )
+    }
+}
+
+@Composable
+private fun SuggestionItem(
+    suggestion: TagSuggestion,
+    query: String,
+    onClick: () -> Unit
+) {
+    val annotatedString = remember(suggestion.text, query) {
+        buildAnnotatedString {
+            val text = suggestion.text
+            val startIndex = text.indexOf(query, ignoreCase = true)
+            if (startIndex != -1 && query.isNotEmpty()) {
+                append(text.substring(0, startIndex))
+                withStyle(style = SpanStyle(color = ThemeRed.colorYellow)) {
+                    append(text.substring(startIndex, startIndex + query.length))
+                }
+                append(text.substring(startIndex + query.length))
+            } else {
+                append(text)
+            }
+        }
+    }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(34.dp)
+            .padding(horizontal = 12.dp)
+            .clickable(onClick = onClick),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = annotatedString,
+            fontFamily = ThemeRed.fontFamilyDMsanss,
+            fontSize = 18.sp,
+            color = Color.White,
+            maxLines = 1
+        )
+
+        Text(
+            text = suggestion.gifs.toPrettyCount2(),
+            fontFamily = ThemeRed.fontFamilyDMsanss,
+            fontSize = 16.sp,
+            color = Color.Gray,
+            maxLines = 1
+        )
+    }
+}
+
+@Composable
+private fun SearchInputRow(
+    value: String,
+    onValueChange: (String) -> Unit,
+    onFocusChanged: (Boolean) -> Unit,
+    onClearClick: () -> Unit,
+    onUndoClick: () -> Unit,
+    onDone: (String) -> Unit,
+    expandMenuHistory: @Composable () -> Unit
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .padding(start = 12.dp, end = 4.dp)
+            .height(48.dp)
+    ) {
+        BasicTextField(
+            value = value,
+            onValueChange = onValueChange,
+            singleLine = true,
+            textStyle = TextStyle(
+                fontSize = 20.sp, // Увеличен шрифт для соответствия скриншоту
+                color = Color.White,
+                fontFamily = ThemeRed.fontFamilyDMsanss,
+                textAlign = TextAlign.Left
+            ),
+            modifier = Modifier
+                .weight(1f)
+                .onFocusChanged { onFocusChanged(it.isFocused) },
+            cursorBrush = SolidColor(ThemeRed.colorYellow),
+            keyboardOptions = KeyboardOptions(
+                imeAction = ImeAction.Done,
+                keyboardType = KeyboardType.Text
+            ),
+            keyboardActions = KeyboardActions(onDone = { onDone(value) })
+        )
+
+        if (value.isNotEmpty()) {
+            SearchIconButton(icon = Icons.Default.Clear, onClick = onClearClick)
+        }
+
+        SearchIconButton(icon = Icons.Default.Undo, onClick = onUndoClick)
+
+        expandMenuHistory()
+    }
+}
+
+@Composable
+private fun SearchIconButton(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    onClick: () -> Unit
+) {
+    Icon(
+        imageVector = icon,
+        contentDescription = null,
+        tint = Color(0xFF757575),
+        modifier = Modifier
+            .size(38.dp)
+            .padding(6.dp)
+            .clickable(onClick = onClick)
+    )
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF121212)
+@Composable
+fun PreviewCustomBasicTextFieldContent() {
+    var text by remember { mutableStateOf("big t") }
+    val suggestions = listOf(
+        TagSuggestion(123456, "big tits", "tag"),
+        TagSuggestion(789, "big toys", "tag"),
+        TagSuggestion(4567, "big thighs", "tag")
+    )
+
+    Box(Modifier.padding(16.dp)) {
         CustomBasicTextFieldContent(
-            searchText = searchText,
-            searchTextSuggestions = searchTextSuggestions,
-            searchTextDone = searchTextDone,
-            stack = stack,
+            value = text,
+            onValueChange = { text = it },
+            suggestions = suggestions,
+            onSuggestionClick = { text = it.text },
+            onClearClick = { text = "" },
+            onUndoClick = {},
+            onDone = {},
             expandMenuHistory = {
                 Icon(
                     Icons.Default.History,
                     contentDescription = null,
                     tint = Color(0xFF757575),
-                    modifier = Modifier
-                        .size(36.dp)
-                        .padding(4.dp)
+                    modifier = Modifier.size(38.dp).padding(6.dp)
                 )
-            },
-            onDone = {}
+            }
+        )
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF121212)
+@Composable
+fun PreviewSuggestionList() {
+    val suggestions = listOf(
+        TagSuggestion(123456, "big tits", "tag"),
+        TagSuggestion(789, "big toys", "tag"),
+        TagSuggestion(4567, "big thighs", "tag")
+    )
+    XvideosTheme {
+        SuggestionList(
+            suggestions = suggestions,
+            query = "big",
+            onSuggestionClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF212121)
+@Composable
+fun PreviewSuggestionItem() {
+    val suggestion = TagSuggestion(123456, "big tits", "tag")
+    XvideosTheme {
+        SuggestionItem(
+            suggestion = suggestion,
+            query = "big",
+            onClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF212121)
+@Composable
+fun PreviewSearchInputRow() {
+    var text by remember { mutableStateOf("big t") }
+    XvideosTheme {
+        SearchInputRow(
+            value = text,
+            onValueChange = { text = it },
+            onFocusChanged = {},
+            onClearClick = { text = "" },
+            onUndoClick = {},
+            onDone = {},
+            expandMenuHistory = {
+                Icon(
+                    Icons.Default.History,
+                    contentDescription = null,
+                    tint = Color(0xFF757575),
+                    modifier = Modifier.size(38.dp).padding(6.dp)
+                )
+            }
+        )
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF212121)
+@Composable
+fun PreviewSearchIconButton() {
+    XvideosTheme {
+        SearchIconButton(
+            icon = Icons.Default.Clear,
+            onClick = {}
         )
     }
 }

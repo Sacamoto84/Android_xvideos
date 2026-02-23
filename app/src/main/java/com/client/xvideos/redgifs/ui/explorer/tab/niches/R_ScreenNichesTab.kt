@@ -108,12 +108,7 @@ object R_ScreenNichesTab : Screen {
             onNicheClick = onNicheClick,
             savedRed = { vm.hostDI.savedRed },
             searchWidget = { modifier ->
-                vm.search.CustomBasicTextField(
-                    value = searchText,
-                    onValueChange = { vm.search.searchText.value = it },
-                    onDone = { vm.search.searchTextDone.value = it },
-                    modifier = modifier
-                )
+                vm.search.CustomBasicTextField( modifier = modifier )
             },
             onRefreshNichesCacheClick = {
                 vm.hostDI.savedRed.nichesCache.refresh()
