@@ -48,15 +48,7 @@ abstract class ISearchTemplate(
     val focused = MutableStateFlow(false)
 
 
-    @Composable
-    fun ExpandMenuHistory( items: () -> List<String>, modifier: Modifier = Modifier ) {
-        ExpandMenuHistoryContent( 
-            items = items, 
-            modifier = modifier,  
-            onClick = { searchText.value = TextFieldValue( text = it, selection = TextRange(it.length) ) },
-            onDeleteClick = { scope.launch(Dispatchers.Main) { delete(it) } } 
-        )
-    }
+
 
 
     @Composable
@@ -92,9 +84,14 @@ abstract class ISearchTemplate(
             onSuggestionClick = { suggestion ->
                 searchText.value = TextFieldValue( text = suggestion.text, selection = TextRange(suggestion.text.length) )
                 searchTextDone.value = suggestion.text
+
                 scope.launch(Dispatchers.Main) {
-                    add(suggestion.text)
+                    if ( suggestion.text.isNotEmpty() ) {
+                        add(suggestion.text)
+                        stack.addLast(suggestion.text)
+                    }
                 }
+
             },
             onClearClick = {
                 searchText.value = TextFieldValue( text = "", selection = TextRange("".length) )
@@ -108,11 +105,19 @@ abstract class ISearchTemplate(
             onDone = {
                 searchTextDone.value = it
                 scope.launch(Dispatchers.Main) {
-                    add(it)
+                    if ( it.isNotEmpty() ) {
+                        add(it)
+                        stack.addLast(it)
+                    }
                 }
             },
             expandMenuHistory = {
-                ExpandMenuHistory(items = { historyItems })
+                ExpandMenuHistoryContent(items = { historyItems },
+                    onClick = {
+                        searchText.value = TextFieldValue( text = it, selection = TextRange(it.length) )
+                        searchTextDone.value = it },
+                    onDeleteClick = { scope.launch(Dispatchers.Main) { delete(it) } }
+                )
             },
             onFocused = {
                 focused.value = it

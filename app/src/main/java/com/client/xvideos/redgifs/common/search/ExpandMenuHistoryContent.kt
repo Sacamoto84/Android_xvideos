@@ -2,11 +2,13 @@ package com.client.xvideos.redgifs.common.search
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -14,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -80,16 +83,14 @@ fun ExpandMenuHistoryContentStateless(
     ) {
         IconButton(
             modifier = Modifier
-                .padding(end = 4.dp)
-                .height(46.dp)
-                .width(24.dp)
+                .padding(end = 4.dp).height(46.dp).width(24.dp)
                 .menuAnchor(ExposedDropdownMenuAnchorType.SecondaryEditable),
             onClick = { onExpandedChange(!expanded) }
         ) {
             Icon(
-                imageVector = if (expanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
+                imageVector = Icons.Default.History,
                 contentDescription = null,
-                tint = Color(0xFF757575),
+                tint = if (expanded) Color.White else Color(0xFF757575),
                 modifier = Modifier.size(24.dp)
             )
         }
@@ -98,7 +99,8 @@ fun ExpandMenuHistoryContentStateless(
             expanded = expanded,
             onDismissRequest = { onExpandedChange(false) },
             modifier = Modifier.width(IntrinsicSize.Min),
-            containerColor = ThemeRed.colorBottomBarDivider
+            containerColor = ThemeRed.colorBottomBarDivider,
+            shadowElevation = 8.dp
         ) {
             val reversedItems = remember(items) { items.reversed() }
             reversedItems.forEach { item ->
@@ -119,22 +121,23 @@ private fun HistoryMenuItem(
     onDeleteClick: () -> Unit
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp)
-            .clickable(onClick = onClick),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 6.dp).clickable(onClick = onClick),
+        horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = text,
-            color = Color.White,
-            fontSize = 22.sp,
-            modifier = Modifier
-                .padding(vertical = 4.dp)
-                .padding(start = 16.dp),
-            fontFamily = ThemeRed.fontFamilyDMsanss
-        )
+
+        Box() {
+            Text(
+                text = text, color = Color.Black, fontSize = 18.sp,
+                modifier = Modifier.padding(vertical = 0.dp).padding(start = 16.dp).offset(0.75.dp, 0.75.dp),
+                fontFamily = ThemeRed.fontFamilyDMsanss
+            )
+
+            Text(
+                text = text, color = Color.White, fontSize = 18.sp,
+                modifier = Modifier.padding(vertical = 0.dp).padding(start = 16.dp),
+                fontFamily = ThemeRed.fontFamilyDMsanss
+            )
+        }
 
         IconButton(onClick = onDeleteClick) {
             Icon(

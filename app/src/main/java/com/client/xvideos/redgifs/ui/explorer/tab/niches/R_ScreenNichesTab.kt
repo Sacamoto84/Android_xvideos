@@ -97,6 +97,9 @@ object R_ScreenNichesTab : Screen {
         val onNicheClick: (String) -> Unit =
             remember(navigator) { { id -> navigator.push(R_ScreenNiche(id)) } }
 
+        val countNichesInCache = vm.hostDI.savedRed.nichesCache.list.size
+
+
         NichesTabContent(
             items = { listNiche },
             state = vm.lazyHost.stateColumn,
@@ -114,6 +117,7 @@ object R_ScreenNichesTab : Screen {
                 vm.hostDI.savedRed.nichesCache.refresh()
             },
             nichesCacheProgress = vm.hostDI.savedRed.nichesCache.progress,
+            countNichesInCache = countNichesInCache
         )
     }
 }
@@ -133,12 +137,13 @@ fun NichesTabContent(
     savedRed: () -> SavedRed?,
     searchWidget: @Composable (Modifier) -> Unit,
     onRefreshNichesCacheClick: () -> Unit,
-    nichesCacheProgress: Float
+    nichesCacheProgress: Float,
+    countNichesInCache : Int
 ) {
 
     val loadState = items().loadState
 
-    if (items().itemCount == 0 && loadState.refresh is LoadState.NotLoading) {
+    if (countNichesInCache == 0) {
         Refresh(
             onRefreshNichesCacheClick = onRefreshNichesCacheClick,
             nichesCacheProgress = nichesCacheProgress,
@@ -300,7 +305,8 @@ fun R_ScreenNichesTabPreview() {
             }
         },
         onRefreshNichesCacheClick = {},
-        nichesCacheProgress = 1f
+        nichesCacheProgress = 1f,
+        countNichesInCache = 10
     )
 }
 
