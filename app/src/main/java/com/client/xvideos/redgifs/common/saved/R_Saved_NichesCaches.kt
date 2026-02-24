@@ -60,6 +60,9 @@ class R_Saved_NichesCaches(
                 val gson = GsonBuilder().setPrettyPrinting().create()
                 val json = gson.toJson(niches)
                 val file = File(AppPath.r_nichesCache, "niches.json")
+                if (file.exists()) {
+                    file.delete()
+                }
                 file.writeText(json)
                 size = list.size
                 timeRefresh()

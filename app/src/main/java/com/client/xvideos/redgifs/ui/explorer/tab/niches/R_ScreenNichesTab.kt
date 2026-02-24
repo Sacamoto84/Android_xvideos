@@ -1,27 +1,41 @@
 package com.client.xvideos.redgifs.ui.explorer.tab.niches
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandIn
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -152,7 +166,7 @@ fun NichesTabContent(
     nichesCacheProgress: Float,
     countNichesInCache : Int,
     isNichesCacheDownloaded : Boolean = false,
-    cacheHour : Long = 1L
+    cacheHour : Long
 ) {
 
 
@@ -187,14 +201,16 @@ fun NichesTabContent(
                 modifier = Modifier.padding(bottom = paddingValues.calculateBottomPadding()).fillMaxSize()
             )
             {
-                LazyColumn( state = state, modifier = Modifier.displayCutoutPadding().fillMaxSize() )
+                LazyColumn( state = state, modifier = Modifier.fillMaxSize(), contentPadding = WindowInsets.displayCutout.asPaddingValues() )
                 {
 
                     item{
-                        if (cacheHour >= 0){
+                        AnimatedVisibility(cacheHour > 72, enter = fadeIn(), exit = fadeOut() )
+                        {
                             RefreshMini(
                                 onRefreshNichesCacheClick = onRefreshNichesCacheClick,
                                 nichesCacheProgress = nichesCacheProgress,
+                                cacheHour = cacheHour
                             )
                         }
                     }
@@ -271,7 +287,9 @@ fun Refresh(
     }
 
     Column(
-        modifier = Modifier.fillMaxSize().background(ThemeRed.colorTabLevel1),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(ThemeRed.colorTabLevel1),
         verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
@@ -298,8 +316,9 @@ fun Refresh(
 @Composable
 fun RefreshMini(
     onRefreshNichesCacheClick: () -> Unit,
-    nichesCacheProgress: Float,
+    nichesCacheProgress: Float= 0f,
     refreshList: () -> Unit = {},
+    cacheHour : Long = 1L
 ) {
     LaunchedEffect(nichesCacheProgress) {
         if (nichesCacheProgress == 1f) {
@@ -309,26 +328,51 @@ fun RefreshMini(
     }
 
     Row(
-        modifier = Modifier.fillMaxSize().background(ThemeRed.colorTabLevel1),
+        modifier = Modifier.padding(horizontal = 8.dp).padding(vertical = 4.dp).fillMaxSize().background(ThemeRed.colorTabLevel1), verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    )
+    {
 
-    ) {
-
-        Text("Старый список Niches", style = styleTest.copy(fontSize = 12.sp))
+        Text("Старый список Niches, возраст $cacheHour часов", style = styleTest.copy(fontSize = 14.sp))
 
         Spacer(Modifier.height(8.dp))
-        Button(
-            onClick = onRefreshNichesCacheClick,
-            colors = ButtonDefaults.buttonColors(containerColor = ThemeRed.colorBlue)
-        ) {
-            Text("Скачать список ", style = styleTest.copy(fontSize = 18.sp))
-        }
-        Spacer(Modifier.height(16.dp))
-        LinearWavyProgressIndicator(
-            progress = { nichesCacheProgress },
-            Modifier.graphicsLayer(
-                alpha = if (nichesCacheProgress > 0f) 1f else 0f
+
+
+        Box() {
+
+            if (nichesCacheProgress == 0f) {
+                IconButton(onClick = onRefreshNichesCacheClick, modifier = Modifier.size(36.dp)) {
+                    Icon(
+                        Icons.Default.Refresh,
+                        contentDescription = "Refresh",
+                        tint = Color.White,
+                        modifier = Modifier.size(34.dp).background(
+                            ThemeRed.colorBlue,
+                            CircleShape
+                        ).padding(4.dp)
+                    )
+                }
+            }
+
+
+
+            CircularWavyProgressIndicator(
+                progress = { nichesCacheProgress },
+                Modifier.size(36.dp)
+
+                    .graphicsLayer(
+                        alpha = if (nichesCacheProgress > 0f) 1f else 0f
+                    )
             )
-        )
+
+        }
+//        LinearWavyProgressIndicator(
+//            progress = { nichesCacheProgress },
+//            Modifier.graphicsLayer(
+//                alpha = if (nichesCacheProgress > 0f) 1f else 0f
+//            )
+//        )
+
     }
 }
 
@@ -376,7 +420,9 @@ fun R_ScreenNichesTabPreview() {
         },
         onRefreshNichesCacheClick = {},
         nichesCacheProgress = 1f,
-        countNichesInCache = 10
+        countNichesInCache = 10,
+        isNichesCacheDownloaded = true,
+        cacheHour = 1
     )
 }
 
