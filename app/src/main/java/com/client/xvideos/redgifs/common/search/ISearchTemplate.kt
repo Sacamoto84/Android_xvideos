@@ -49,15 +49,11 @@ abstract class ISearchTemplate(
 
 
     @Composable
-    fun ExpandMenuHistory(
-        items: () -> List<String>, modifier: Modifier = Modifier,
-    ) {
+    fun ExpandMenuHistory( items: () -> List<String>, modifier: Modifier = Modifier ) {
         ExpandMenuHistoryContent( 
             items = items, 
             modifier = modifier,  
-            onClick = {
-                searchText.value = TextFieldValue( text = it, selection = TextRange(it.length) )
-            }, 
+            onClick = { searchText.value = TextFieldValue( text = it, selection = TextRange(it.length) ) },
             onDeleteClick = { scope.launch(Dispatchers.Main) { delete(it) } } 
         )
     }
@@ -91,9 +87,7 @@ abstract class ISearchTemplate(
         CustomBasicTextFieldContent(
             modifier = modifier,
             value = text,
-            onValueChange = { 
-                searchText.value = TextFieldValue( text = it.text, selection = TextRange(it.text.length) )
-            },
+            onValueChange = { searchText.value = it },
             suggestions = { searchTagSuggestions },
             onSuggestionClick = { suggestion ->
                 searchText.value = TextFieldValue( text = suggestion.text, selection = TextRange(suggestion.text.length) )
@@ -119,6 +113,9 @@ abstract class ISearchTemplate(
             },
             expandMenuHistory = {
                 ExpandMenuHistory(items = { historyItems })
+            },
+            onFocused = {
+                focused.value = it
             }
         )
 

@@ -35,33 +35,16 @@ fun NichesBottomBar(
     Column(Modifier.background(ThemeRed.colorTabLevel1)) {
         HorizontalDivider(color = ThemeRed.colorBorderGray)
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 2.dp, horizontal = 4.dp)
-                .background(ThemeRed.colorTabLevel1),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp, horizontal = 4.dp).background(ThemeRed.colorTabLevel1),
+            horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Bottom
         )
         {
             AnimatedVisibility(visible = !isSearchFocused) {
-                SortByOrder(
-                    list = listOf(
-                        Order.NICHES_SUBSCRIBERS_D,
-                        Order.NICHES_SUBSCRIBERS_A,
-                        Order.NICHES_POST_D,
-                        Order.NICHES_POST_A,
-                        Order.NICHES_NAME_A_Z,
-                        Order.NICHES_NAME_Z_A
-                    ),
-                    selected = sortType,
-                    onSelect = onSortTypeChange,
-                    containerColor = ThemeRed.colorTabLevel0
-                )
+                SortByOrder( list = listOf( Order.NICHES_SUBSCRIBERS_D, Order.NICHES_SUBSCRIBERS_A, Order.NICHES_POST_D, Order.NICHES_POST_A, Order.NICHES_NAME_A_Z, Order.NICHES_NAME_Z_A ),
+                    selected = sortType, onSelect = onSortTypeChange, containerColor = ThemeRed.colorTabLevel0 )
             }
 
-            searchWidget(Modifier
-                .padding(horizontal = 4.dp)
-                .weight(1f))
+            searchWidget(Modifier.padding(horizontal = 4.dp).weight(1f))
 
             AnimatedVisibility(visible = !isSearchFocused) {
                 ButtonUp {

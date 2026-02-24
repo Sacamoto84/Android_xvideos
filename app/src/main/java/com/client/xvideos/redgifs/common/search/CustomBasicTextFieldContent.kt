@@ -45,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -79,11 +80,11 @@ fun CustomBasicTextFieldContent(
     onUndoClick: () -> Unit,
     onDone: (String) -> Unit,
     modifier: Modifier = Modifier,
-    expandMenuHistory: @Composable () -> Unit
+    expandMenuHistory: @Composable () -> Unit,
+
+    onFocused: (Boolean) -> Unit
+
 ) {
-
-
-
 
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -100,6 +101,8 @@ fun CustomBasicTextFieldContent(
     LaunchedEffect(isFocused) {
         if (isFocused) delay(300) else delay(100)
         showSuggestions = isFocused
+
+        onFocused(isFocused)
     }
 
     Column(
@@ -211,14 +214,14 @@ private fun SearchInputRow(
     onDone: (String) -> Unit,
     expandMenuHistory: @Composable () -> Unit
 ) {
-    Row( verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(start = 12.dp, end = 4.dp).height(48.dp) )
+    Row( verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(start = 12.dp, end = 4.dp).height(46.dp) )
     {
         BasicTextField(
             value = value,
             onValueChange = onValueChange,
             singleLine = true,
             textStyle = TextStyle(
-                fontSize = 20.sp, // Увеличен шрифт для соответствия скриншоту
+                fontSize = 18.sp,
                 color = Color.White,
                 fontFamily = ThemeRed.fontFamilyDMsanss,
                 textAlign = TextAlign.Left
@@ -239,7 +242,7 @@ private fun SearchInputRow(
 
 @Composable
 private fun SearchIconButton(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     onClick: () -> Unit
 ) {
     Icon( imageVector = icon, contentDescription = null, tint = Color(0xFF757575), modifier = Modifier.size(38.dp).padding(6.dp).clickable(onClick = onClick) )
@@ -259,9 +262,9 @@ fun PreviewCustomBasicTextFieldContent() {
     Box(Modifier.padding(16.dp)) {
         CustomBasicTextFieldContent(
             value = text,
-            onValueChange = {  },
+            onValueChange = { },
             suggestions = { suggestions },
-            onSuggestionClick = {  },
+            onSuggestionClick = { },
             onClearClick = { },
             onUndoClick = {},
             onDone = {},
@@ -272,7 +275,9 @@ fun PreviewCustomBasicTextFieldContent() {
                     tint = Color(0xFF757575),
                     modifier = Modifier.size(38.dp).padding(6.dp)
                 )
-            }
+            },
+            modifier = Modifier,
+            onFocused = {}
         )
     }
 }

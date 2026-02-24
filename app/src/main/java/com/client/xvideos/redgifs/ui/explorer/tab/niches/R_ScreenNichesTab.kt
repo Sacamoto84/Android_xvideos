@@ -158,28 +158,18 @@ fun NichesTabContent(
             containerColor = ThemeRed.colorTabLevel1
         ) { paddingValues ->
             Box(
-                modifier = Modifier
-                    .padding(bottom = paddingValues.calculateBottomPadding())
-                    .fillMaxSize()
-            ) {
-                LazyColumn(
-                    state = state,
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    items(
-                        count = items().itemCount,
-                        key = items().itemKey { it.id },
-                        contentType = items().itemContentType { "niche" }
-                    ) { index ->
+                modifier = Modifier.padding(bottom = paddingValues.calculateBottomPadding()).fillMaxSize()
+            )
+            {
+                LazyColumn( state = state, modifier = Modifier.fillMaxSize() )
+                {
+                    items( count = items().itemCount, key = items().itemKey { it.id }, contentType = items().itemContentType { "niche" } )
+                    { index ->
                         val item = items()[index]
                         if (item != null) {
                             Box(modifier = Modifier.padding(vertical = 2.dp)) {
                                 if (savedRed() != null) {
-                                    NichePreview2(
-                                        niches = { item },
-                                        onClick = { onNicheClick(item.id) },
-                                        savedRed = { savedRed() }
-                                    )
+                                    NichePreview2( niches = { item }, onClick = { onNicheClick(item.id) }, savedRed = { savedRed() } )
                                 } else {
                                     // Placeholder for Preview
                                     Box(
@@ -319,6 +309,7 @@ class ScreenRedExplorerNichesSM @Inject constructor(
     val hostDI: HostDI,
     val search: R_SearchNiches
 ) : ScreenModel {
+
     val lazyHost = LazyRow123Host(
         connectivityObserver = connectivityObserver,
         scope = screenModelScope,
