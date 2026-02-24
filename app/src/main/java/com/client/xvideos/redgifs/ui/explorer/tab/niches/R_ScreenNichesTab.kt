@@ -5,12 +5,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -97,8 +100,15 @@ object R_ScreenNichesTab : Screen {
         val onNicheClick: (String) -> Unit =
             remember(navigator) { { id -> navigator.push(R_ScreenNiche(id)) } }
 
+        /**
+         * Количество элементов в кэше
+         */
         val countNichesInCache = vm.hostDI.savedRed.nichesCache.list.size
 
+        /**
+         * Флаг загрузки кэша
+         */
+        val isNichesCacheDownloaded = vm.hostDI.savedRed.nichesCache.isDownloaded
 
         NichesTabContent(
             items = { listNiche },
@@ -117,7 +127,9 @@ object R_ScreenNichesTab : Screen {
                 vm.hostDI.savedRed.nichesCache.refresh()
             },
             nichesCacheProgress = vm.hostDI.savedRed.nichesCache.progress,
-            countNichesInCache = countNichesInCache
+            countNichesInCache = countNichesInCache,
+            isNichesCacheDownloaded = isNichesCacheDownloaded,
+            cacheHour = vm.hostDI.savedRed.nichesCache.lastModifiedHour
         )
     }
 }
@@ -138,16 +150,24 @@ fun NichesTabContent(
     searchWidget: @Composable (Modifier) -> Unit,
     onRefreshNichesCacheClick: () -> Unit,
     nichesCacheProgress: Float,
-    countNichesInCache : Int
+    countNichesInCache : Int,
+    isNichesCacheDownloaded : Boolean = false,
+    cacheHour : Long = 1L
 ) {
 
-    val loadState = items().loadState
+
+   LaunchedEffect(isNichesCacheDownloaded) {
+       if (isNichesCacheDownloaded) {
+           delay(100)
+           items().refresh()
+       }
+   }
 
     if (countNichesInCache == 0) {
         Refresh(
             onRefreshNichesCacheClick = onRefreshNichesCacheClick,
             nichesCacheProgress = nichesCacheProgress,
-            refreshList = { items().refresh() }
+            refreshList = { items().refresh() },
         )
     } else {
         Scaffold(
@@ -160,14 +180,25 @@ fun NichesTabContent(
                     searchWidget = searchWidget
                 )
             },
-            containerColor = ThemeRed.colorTabLevel1
+            containerColor = ThemeRed.colorTabLevel1,
+            modifier = Modifier.fillMaxSize()
         ) { paddingValues ->
             Box(
                 modifier = Modifier.padding(bottom = paddingValues.calculateBottomPadding()).fillMaxSize()
             )
             {
-                LazyColumn( state = state, modifier = Modifier.fillMaxSize() )
+                LazyColumn( state = state, modifier = Modifier.displayCutoutPadding().fillMaxSize() )
                 {
+
+                    item{
+                        if (cacheHour >= 0){
+                            RefreshMini(
+                                onRefreshNichesCacheClick = onRefreshNichesCacheClick,
+                                nichesCacheProgress = nichesCacheProgress,
+                            )
+                        }
+                    }
+
                     items( count = items().itemCount, key = items().itemKey { it.id }, contentType = items().itemContentType { "niche" } )
                     { index ->
                         val item = items()[index]
@@ -230,7 +261,7 @@ fun NichesTabContent(
 fun Refresh(
     onRefreshNichesCacheClick: () -> Unit,
     nichesCacheProgress: Float,
-    refreshList: () -> Unit = {}
+    refreshList: () -> Unit = {},
 ) {
     LaunchedEffect(nichesCacheProgress) {
         if (nichesCacheProgress == 1f) {
@@ -240,13 +271,12 @@ fun Refresh(
     }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(ThemeRed.colorTabLevel1),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = Modifier.fillMaxSize().background(ThemeRed.colorTabLevel1),
+        verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
         Text("Отсутствует список Niches", style = styleTest)
+
         Spacer(Modifier.height(8.dp))
         Button(
             onClick = onRefreshNichesCacheClick,
@@ -254,7 +284,7 @@ fun Refresh(
         ) {
             Text("Скачать список ", style = styleTest.copy(fontSize = 18.sp))
         }
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(16.dp))
         LinearWavyProgressIndicator(
             progress = { nichesCacheProgress },
             Modifier.graphicsLayer(
@@ -263,6 +293,46 @@ fun Refresh(
         )
     }
 }
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun RefreshMini(
+    onRefreshNichesCacheClick: () -> Unit,
+    nichesCacheProgress: Float,
+    refreshList: () -> Unit = {},
+) {
+    LaunchedEffect(nichesCacheProgress) {
+        if (nichesCacheProgress == 1f) {
+            delay(1000)
+            refreshList.invoke()
+        }
+    }
+
+    Row(
+        modifier = Modifier.fillMaxSize().background(ThemeRed.colorTabLevel1),
+
+    ) {
+
+        Text("Старый список Niches", style = styleTest.copy(fontSize = 12.sp))
+
+        Spacer(Modifier.height(8.dp))
+        Button(
+            onClick = onRefreshNichesCacheClick,
+            colors = ButtonDefaults.buttonColors(containerColor = ThemeRed.colorBlue)
+        ) {
+            Text("Скачать список ", style = styleTest.copy(fontSize = 18.sp))
+        }
+        Spacer(Modifier.height(16.dp))
+        LinearWavyProgressIndicator(
+            progress = { nichesCacheProgress },
+            Modifier.graphicsLayer(
+                alpha = if (nichesCacheProgress > 0f) 1f else 0f
+            )
+        )
+    }
+}
+
+
 
 @Preview(showBackground = true, backgroundColor = 0xFF121212)
 @Composable

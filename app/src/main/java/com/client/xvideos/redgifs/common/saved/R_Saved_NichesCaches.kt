@@ -27,7 +27,11 @@ class R_Saved_NichesCaches(
     var size by mutableIntStateOf(-1)
 
     var isDownloading by mutableStateOf(false)
+
     var progress by mutableFloatStateOf(0f)
+
+    var isDownloaded by mutableStateOf(false)
+
     var lastModifiedHour by mutableLongStateOf(-1)
     var lastModifiedMinute by mutableLongStateOf(-1)
 
@@ -61,6 +65,7 @@ class R_Saved_NichesCaches(
                 timeRefresh()
                 SnackBar.success("Обновление завершено")
                 isDownloading = false
+                isDownloaded = true
             } catch (e: Exception) {
                 SnackBar.error("Ошибка обновления ${e.toString()}")
                 isDownloading = false
