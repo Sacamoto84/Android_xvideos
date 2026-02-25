@@ -63,6 +63,7 @@ class R_ScreenNiche(val nicheName: String = "pumped-pussy") : Screen {
         val columnSelect by Settings.r_current_count_niches.field.collectAsStateWithLifecycle()
         val sort by vm.lazyHost.sortType.collectAsStateWithLifecycle()
         val savedRed = vm.hostDI.savedRed
+
         val followedList = savedRed.niches.list
 
         val isFollowed = remember(followedList, vm.niche.id) {
@@ -75,6 +76,7 @@ class R_ScreenNiche(val nicheName: String = "pumped-pussy") : Screen {
         
         val onNicheClick: (String) -> Unit = remember(navigator) { { id -> navigator.push(R_ScreenNiche(id)) } }
         val onCreatorClick: (String) -> Unit = remember(navigator) { { username -> navigator.push(ScreenRedProfile(username)) } }
+
         val onFollowClick: () -> Unit = remember(isFollowed, vm.niche) {
             {
                 val nicheInfo = NichesInfo(

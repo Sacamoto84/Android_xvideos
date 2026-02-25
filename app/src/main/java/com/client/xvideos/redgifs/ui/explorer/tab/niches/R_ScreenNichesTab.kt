@@ -80,6 +80,7 @@ import com.client.xvideos.redgifs.ui.profile.rememberVisibleRangePercentIgnoring
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.LazyRow123Host
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.model.TypePager
 import com.client.xvideos.ui.theme.XvideosTheme
+import com.skydoves.compose.stability.runtime.TraceRecomposition
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -226,13 +227,7 @@ fun NichesTabContent(
                                     // Placeholder for Preview
                                     Box(
                                         modifier = Modifier
-                                            .padding(horizontal = 8.dp)
-                                            .fillMaxWidth()
-                                            .height(78.dp)
-                                            .background(
-                                                ThemeRed.colorTabLevel3,
-                                                RoundedCornerShape(16.dp)
-                                            ),
+                                            .padding(horizontal = 8.dp).fillMaxWidth().height(78.dp).background( ThemeRed.colorTabLevel3, RoundedCornerShape(16.dp) ),
                                         contentAlignment = Alignment.CenterStart
                                     ) {
                                         Text(
@@ -243,16 +238,6 @@ fun NichesTabContent(
                                         )
                                     }
                                 }
-
-                                Text(
-                                    text = (index + 1).toString(),
-                                    color = Color.Gray,
-                                    fontFamily = ThemeRed.fontFamilyDMsanss,
-                                    modifier = Modifier
-                                        .padding(top = 8.dp, end = 16.dp)
-                                        .align(Alignment.TopEnd),
-                                    fontSize = 10.sp
-                                )
                             }
                         }
                     }
@@ -337,7 +322,6 @@ fun RefreshMini(
 
         Spacer(Modifier.height(8.dp))
 
-
         Box() {
 
             if (nichesCacheProgress == 0f) {
@@ -366,12 +350,6 @@ fun RefreshMini(
             )
 
         }
-//        LinearWavyProgressIndicator(
-//            progress = { nichesCacheProgress },
-//            Modifier.graphicsLayer(
-//                alpha = if (nichesCacheProgress > 0f) 1f else 0f
-//            )
-//        )
 
     }
 }
@@ -405,9 +383,7 @@ fun R_ScreenNichesTabPreview() {
         savedRed = { null },
         searchWidget = { modifier ->
             Box(
-                modifier
-                    .height(44.dp)
-                    .background(ThemeRed.colorTabLevel0, RoundedCornerShape(8.dp)),
+                modifier.height(44.dp).background(ThemeRed.colorTabLevel0, RoundedCornerShape(8.dp)),
                 contentAlignment = Alignment.CenterStart
             ) {
                 Text(

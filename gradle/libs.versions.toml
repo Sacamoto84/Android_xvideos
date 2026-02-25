@@ -3,7 +3,7 @@ accompanistSystemuicontroller = "0.36.0"
 activityKtx = "1.12.4"
 agp = "9.0.1"
 
-coil = "3.3.0"
+coil = "3.4.0"
 componentsResources = "1.10.1"
 composeExtendedGestures = "2.0.0"
 composeThemeAdapter = "1.2.1"
