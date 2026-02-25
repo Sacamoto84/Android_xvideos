@@ -21,6 +21,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -51,6 +52,7 @@ import com.client.xvideos.redgifs.ui.profile.ScreenRedProfile
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.LazyRow123
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.LazyRow123Host
 import com.client.xvideos.ui.theme.XvideosTheme
+import timber.log.Timber
 
 class R_ScreenNiche(val nicheName: String = "pumped-pussy") : Screen {
 
@@ -66,8 +68,10 @@ class R_ScreenNiche(val nicheName: String = "pumped-pussy") : Screen {
 
         val followedList = savedRed.niches.list
 
-        val isFollowed = remember(followedList, vm.niche.id) {
-            followedList.any { it.id == vm.niche.id }
+        val isFollowed by remember(vm.niche.id) {
+            derivedStateOf {
+                followedList.any { it.id == vm.niche.id }
+            }
         }
 
         LaunchedEffect(columnSelect) {
@@ -79,15 +83,21 @@ class R_ScreenNiche(val nicheName: String = "pumped-pussy") : Screen {
 
         val onFollowClick: () -> Unit = remember(isFollowed, vm.niche) {
             {
-                val nicheInfo = NichesInfo(
-                    id = vm.niche.id,
-                    name = vm.niche.name,
-                    subscribers = vm.niche.subscribers,
-                    gifs = vm.niche.gifs,
-                    thumbnail = vm.niche.thumbnail,
-                )
-                if (isFollowed) savedRed.niches.remove(nicheInfo)
-                else savedRed.niches.add(nicheInfo)
+
+                Timber.i("!!!!!! onFollowClick isFollowed: $isFollowed ${vm.niche.id}")
+
+                val nicheInfo = vm.niche
+//                    NichesInfo(
+//                    id = vm.niche.id,
+//                    name = vm.niche.name,
+//                    subscribers = vm.niche.subscribers,
+//                    gifs = vm.niche.gifs,
+//                    thumbnail = vm.niche.thumbnail,
+//                )
+                if (isFollowed)
+                    savedRed.niches.remove(nicheInfo)
+                else
+                    savedRed.niches.add(nicheInfo)
             }
         }
 
@@ -185,7 +195,8 @@ private fun StatelessScreenNicheContent(
                     },
                 )
         },
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
             .nestedScroll(scrollBehavior.nestedScrollConnection)
         ,
         containerColor = Color(0xFF0F0F0F)
@@ -227,7 +238,9 @@ private fun NicheHeaderContent(
                 fontFamily = ThemeRed.fontFamilyDMsanss
             )
             LazyRow(
-                modifier = Modifier.padding(top = 4.dp).fillMaxWidth(),
+                modifier = Modifier
+                    .padding(top = 4.dp)
+                    .fillMaxWidth(),
                 contentPadding = PaddingValues(horizontal = 4.dp)
             ) {
                 items(

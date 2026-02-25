@@ -104,16 +104,16 @@ object R_ScreenNichesTab : Screen {
         val navigator = LocalNavigator.currentOrThrow
 
         val listNiche = vm.nichesPager.collectAsLazyPagingItems()
-        val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForLazyColumn(gridState = vm.lazyHost.stateColumn)
-        
+
         val sortType by vm.lazyHost.sortType.collectAsStateWithLifecycle()
 
         val isSearchFocused by vm.search.focused.collectAsStateWithLifecycle()
 
         val onSortTypeChange: (Order) -> Unit = remember { { vm.lazyHost.changeSortType(it) } }
-        val onUpClick: () -> Unit = remember { { vm.lazyHost.gotoUpColumn() } }
-        val onNicheClick: (String) -> Unit =
-            remember(navigator) { { id -> navigator.push(R_ScreenNiche(id)) } }
+        val onUpClick: () -> Unit = remember { {
+            vm.lazyHost.gotoUpColumn()
+        } }
+        val onNicheClick: (String) -> Unit = remember(navigator) { { id -> navigator.push(R_ScreenNiche(id)) } }
 
         /**
          * Количество элементов в кэше
@@ -127,8 +127,6 @@ object R_ScreenNichesTab : Screen {
 
         NichesTabContent(
             items = { listNiche },
-            state = vm.lazyHost.stateColumn,
-            scrollPercent = scrollPercent,
             sortType = sortType,
             onSortTypeChange = onSortTypeChange,
             isSearchFocused = isSearchFocused,
@@ -154,8 +152,6 @@ object R_ScreenNichesTab : Screen {
 @Composable
 fun NichesTabContent(
     items: () -> LazyPagingItems<Niche>,
-    state: LazyListState,
-    scrollPercent: Pair<Float, Float>,
     sortType: Order,
     onSortTypeChange: (Order) -> Unit,
     isSearchFocused: Boolean,
@@ -170,6 +166,9 @@ fun NichesTabContent(
     cacheHour : Long
 ) {
 
+    val state = rememberLazyListState()
+
+    val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForLazyColumn(gridState = state)
 
    LaunchedEffect(isNichesCacheDownloaded) {
        if (isNichesCacheDownloaded) {
@@ -222,7 +221,7 @@ fun NichesTabContent(
                         if (item != null) {
                             Box(modifier = Modifier.padding(vertical = 2.dp)) {
                                 if (savedRed() != null) {
-                                    NichePreview2( niches = { item }, onClick = { onNicheClick(item.id) }, savedRed = { savedRed() } )
+                                    NichePreview2( niches = { item }, onClick = { onNicheClick(item.id) }, savedRed = { savedRed()!! } )
                                 } else {
                                     // Placeholder for Preview
                                     Box(
@@ -373,8 +372,6 @@ fun R_ScreenNichesTabPreview() {
     
     NichesTabContent(
         items = { listNiche },
-        state = rememberLazyListState(),
-        scrollPercent = 0f to 0.3f,
         sortType = Order.NICHES_SUBSCRIBERS_D,
         onSortTypeChange = {},
         isSearchFocused = false,

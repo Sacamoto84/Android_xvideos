@@ -17,6 +17,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,15 +38,23 @@ import com.client.xvideos.redgifs.model.NichesInfo
 import com.client.xvideos.ui.theme.XvideosTheme
 
 @Composable
-fun NichePreview2(niches: () -> Niche, savedRed: () -> SavedRed?, onClick: () -> Unit) {
+fun NichePreview2(niches: () -> Niche, savedRed: () -> SavedRed, onClick: () -> Unit) {
+
     val niche = niches()
-    val isFollowed = savedRed()?.niches?.list?.any { it.id == niche.id } == true
+
+    //val isFollowed = savedRed().niches.list.any { it.id == niche.id }
+
+    val isFollowed by remember(niches()) {
+        derivedStateOf {
+            savedRed().niches.list.any { it.id == niche.id }
+        }
+    }
 
     NichePreview2Content(
         niche = { niche },
         isFollowed = isFollowed,
         onFollowClick = {
-            savedRed()?.let {
+            savedRed().let {
                 val nichesInfo = NichesInfo(
                     id = niche.id,
                     name = niche.name,
