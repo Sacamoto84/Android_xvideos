@@ -35,6 +35,7 @@ import com.client.xvideos.l.ui.screens.explorer.tab.config.L_ScreenConfigTab
 import com.client.xvideos.l.ui.screens.explorer.tab.saved.L_SavedTab
 import com.client.xvideos.l.ui.screens.screenAlbumList.L_ScreenAlbumList
 import com.client.xvideos.redgifs.common.ThemeRed
+import com.client.xvideos.redgifs.ui.explorer.tab.gifs.ColumnSelect_AddColumn
 import com.client.xvideos.redgifs.ui.explorer.top.TabRow
 import com.client.xvideos.redgifs.ui.ui.atom.TabBarPoints
 import kotlinx.collections.immutable.persistentListOf
@@ -100,7 +101,6 @@ class L_ScreenExplorer : Screen {
 
         val columnR_ScreenGifsTab = Settings.l_gifsTab_column_current_count.field.collectAsStateWithLifecycle().value
 
-
         Scaffold(bottomBar = {
 
             TabRow(
@@ -110,12 +110,7 @@ class L_ScreenExplorer : Screen {
                 onChangeState = {
                     if (it == screenType) {
                         when (it) {
-                            // 0 -> {
-                            //     SavedLTab.columnSelect.addColumn(g0, g1, g2, g3, g4)
-                            // }
-                            1 -> {
-
-                            }
+                             0 -> { ColumnSelect_AddColumn(Settings.l_gifsTab_column_current_count, Settings.l_gifsTab_G_0_4) }
                         }
                     }
                     screenType = it

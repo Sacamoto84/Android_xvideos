@@ -16,17 +16,21 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
+import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.l.ui.screens.TabRow
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.ui.explorer.tab.FavoritesTab
+import com.client.xvideos.redgifs.ui.explorer.tab.gifs.ColumnSelect_AddColumn
 import com.client.xvideos.redgifs.ui.explorer.tab.gifs.R_ScreenGifsTab
 import com.client.xvideos.redgifs.ui.explorer.tab.niches.R_ScreenNichesTab
 import com.client.xvideos.redgifs.ui.explorer.tab.saved.R_ScreenSavedTab
 import com.client.xvideos.redgifs.ui.explorer.tab.search.SearchTab
 import com.client.xvideos.redgifs.ui.explorer.tab.setting.R_ScreenSettingTab
+import com.client.xvideos.redgifs.ui.ui.atom.TabBarPoints
 
 private val l = listOf(
     Icons.Outlined.Movie,
@@ -49,6 +53,8 @@ class ScreenRedExplorer : Screen {
     @Composable
     override fun Content() {
 
+        val overlay0 = Settings.r_explorerGifsTab_column_current_count.field.collectAsStateWithLifecycle().value
+
         Scaffold(bottomBar = {
 
             TabRow(
@@ -58,14 +64,12 @@ class ScreenRedExplorer : Screen {
                 onChangeState = {
                     if (it == screenType) {
                         when (it) {
-                            0 -> {
-                                //R_ScreenGifsTab.columnSelect.addColumn(g0, g1, g2, g3, g4)
-                            }
+                            0 -> { ColumnSelect_AddColumn(Settings.r_explorerGifsTab_column_current_count, Settings.r_explorerGifsTab_G_0_4) }
                         }
                     }
                     screenType = it
                 },
-                //overlay0 = { TabBarPoints(R_ScreenGifsTab.columnSelect.column, screenType == 0) },
+                overlay0 = { TabBarPoints(overlay0, screenType == 0) },
             )
 
 

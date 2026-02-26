@@ -107,7 +107,8 @@ private fun R_ScreenGifsTabContent(vm: ScreenRedExplorerGifsSM) {
     val scope = rememberCoroutineScope()
     val haptic = LocalHapticFeedback.current
 
-    val columnSelect by Settings.current_count_gifTab.field.collectAsStateWithLifecycle()
+    val columnSelect by Settings.r_explorerGifsTab_column_current_count.field.collectAsStateWithLifecycle()
+
     val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForGrid(
         gridState = vm.lazyHost.state,
         itemsToIgnore = 0,

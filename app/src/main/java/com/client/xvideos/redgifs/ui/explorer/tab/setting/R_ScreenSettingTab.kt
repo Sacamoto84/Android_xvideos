@@ -200,6 +200,8 @@ fun StatelessR_ScreenSettingTab(
 
         HorizontalDivider(color = Color.DarkGray)
 
+        Config_G_0_4("Explorer", Settings.r_explorerGifsTab_G_0_4)
+
         Config_G_0_4("Лайки", Settings.r_likesTab_G_0_4)
 
         Config_G_0_4("Коллекция", Settings.r_collectionTab_G_0_4)

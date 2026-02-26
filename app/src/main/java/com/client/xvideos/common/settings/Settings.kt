@@ -21,6 +21,17 @@ object Settings {
     //-- red ---
 
 
+    val r_explorerGifsTab_G_0_4 by lazy {  SettingElementList<Boolean>( pref, "r_explorerGifsTab_G_0_4",  typeToken = object : TypeToken<List<Boolean>>() {}.type , default = listOf(false, true, true, true, true))  }
+
+
+    /**
+     * Текущее количество столбиков в L Gifs Tab
+     */
+    val r_explorerGifsTab_column_current_count by lazy { SettingElementInt(pref, "r_explorerGifsTab_column_current_count", 2) }
+
+
+
+
 
     /**
      * Количество столбиков в R Saved Likes Tab T 1 2 3 4
@@ -72,10 +83,15 @@ object Settings {
      */
     val l_gifsTab_G_0_4 by lazy {  SettingElementList<Boolean>( pref, "l_gifsTab_G_0_4",  typeToken = object : TypeToken<List<Boolean>>() {}.type , default = listOf(false, true, true, true, true))  }
 
+
     /**
      * Текущее количество столбиков в L Gifs Tab
      */
     val l_gifsTab_column_current_count by lazy { SettingElementInt(pref, "l_gifsTab_column_current_count", 2) }
+
+
+
+
 
 
 
@@ -91,8 +107,6 @@ object Settings {
      */
     val l_likesTab_column_current_count by lazy { SettingElementInt(pref, "l_likesTab_column_current_count", 2) }
 
-
-
     /**
      * Количество столбиков в L Likes Tab T 1 2 3 4
      */
@@ -102,6 +116,9 @@ object Settings {
      * Текущее количество столбиков в L Crypto Tab
      */
     val l_cryptoTab_column_current_count by lazy { SettingElementInt(pref, "l_cryptoTab_column_current_count", 2) }
+
+
+
 
 
 
