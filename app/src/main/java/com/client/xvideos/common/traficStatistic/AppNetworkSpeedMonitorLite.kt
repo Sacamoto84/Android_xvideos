@@ -1,32 +1,32 @@
 package com.client.xvideos.common.traficStatistic
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.client.xvideos.App
-import com.client.xvideos.common.coil.CoilProgressItem
-import com.client.xvideos.common.coil.CoilProgressManager
 import com.client.xvideos.common.util.formatBytes
-import com.client.xvideos.common.util.formatSpeed
 import com.client.xvideos.l.theme.ThemeL
-import kotlinx.coroutines.delay
+import com.client.xvideos.ui.theme.XvideosTheme
+import kotlin.math.roundToInt
 
 @Composable
 fun AppNetworkSpeedMonitorLite() {
@@ -51,56 +51,60 @@ fun AppNetworkSpeedMonitorLite() {
 //        }
 //    }
 //
-    val formattedSpeed = remember (trafficData.downloadSpeed) {
-        formatSpeed(trafficData.downloadSpeed)
+    AppNetworkSpeedMonitorLiteContent(
+        downloadSpeed = trafficData.downloadSpeed,
+        sessionDownloaded = trafficData.sessionDownloaded
+    )
+}
+
+fun formatSpeed(bytesPerSecond: Long): String {
+    return when {
+        bytesPerSecond < 0 -> "0 Б/c"
+        bytesPerSecond < 1024 -> "$bytesPerSecond Б/с"
+        bytesPerSecond < 1024 * 1024 -> "${(bytesPerSecond / 1024.0).roundToInt()} КБ/C"
+        bytesPerSecond < 1024 * 1024 * 1024 -> "${(bytesPerSecond / (1024.0 * 1024.0) * 10).roundToInt() / 10.0} МБ/c"
+        else -> "${(bytesPerSecond / (1024.0 * 1024.0 * 1024.0) * 100).roundToInt() / 100.0} GBs"
     }
+}
 
-    val formattedBytes = remember(trafficData.sessionDownloaded) {
-        formatBytes(trafficData.sessionDownloaded)
-    }
+private val style = TextStyle(
+    color = Color.Black,
+    fontSize = 8.sp,
+    fontWeight = FontWeight.Medium,
+    fontFamily = ThemeL.fontFamilyKarla,
+    lineHeight = 8.sp
+)
 
-    Row(
-        modifier = Modifier.padding(end = 16.dp).fillMaxWidth(), horizontalArrangement = Arrangement.End
-    ) {
+private val styleW = style.copy(color = Color.White )
 
-        Box {
-            Text(
-                formattedSpeed,
-                color = Color.Black,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Medium,
-                fontFamily = ThemeL.fontFamilyKarla,
-                modifier = Modifier.offset(0.5.dp, 0.5.dp)
-            )
+@Composable
+fun AppNetworkSpeedMonitorLiteContent(
+    downloadSpeed: Long,
+    sessionDownloaded: Long
+) {
+    val formattedSpeed = remember(downloadSpeed) { formatSpeed(downloadSpeed) }
+    val formattedBytes = remember(sessionDownloaded) { formatBytes(sessionDownloaded) }
 
-            Text(
-                formattedSpeed,
-                color = ThemeL.textColor,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Medium,
-                fontFamily = ThemeL.fontFamilyKarla
-            )
+    Row( modifier = Modifier.padding(end = 16.dp).fillMaxWidth(), horizontalArrangement = Arrangement.End )
+    {
+        Box() {
+            Text( formattedSpeed, style = style, modifier = Modifier.offset(0.5.dp, 0.5.dp))
+            Text( formattedSpeed, style = styleW )
         }
-
         Box {
-
-            Text(
-                " / $formattedBytes",
-                color = Color.Black,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Medium,
-                fontFamily = ThemeL.fontFamilyKarla,
-                modifier = Modifier.offset(0.5.dp, 0.5.dp)
-            )
-
-            Text(
-                " / $formattedBytes",
-                color = ThemeL.textColor,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Medium,
-                fontFamily = ThemeL.fontFamilyKarla
-            )
+            Text( " / $formattedBytes", style = style, modifier = Modifier.offset(0.5.dp, 0.5.dp))
+            Text( " / $formattedBytes", style = styleW )
         }
     }
+}
 
+@Preview(showBackground = true, backgroundColor = 0xFF303030)
+@Composable
+fun AppNetworkSpeedMonitorLitePreview() {
+    XvideosTheme {
+        AppNetworkSpeedMonitorLiteContent(
+            downloadSpeed = 1024 * 1024 * 2, // 2 MB/s
+            sessionDownloaded = 1024 * 1024 * 150 // 150 MB
+        )
+    }
 }

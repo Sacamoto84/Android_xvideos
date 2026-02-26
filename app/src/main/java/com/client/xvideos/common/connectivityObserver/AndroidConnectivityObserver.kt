@@ -38,7 +38,7 @@ object ConnectivityModule {
         @ApplicationContext context: Context,
         //@ApplicationScope scope: CoroutineScope
     ): ConnectivityObserver {
-        return AndroidConnectivityObserver(context, CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate))
+        return AndroidConnectivityObserver(context, CoroutineScope(SupervisorJob() + Dispatchers.IO))
     }
 
 }

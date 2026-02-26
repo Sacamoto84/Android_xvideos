@@ -19,6 +19,8 @@ data class TrafficData(
 @Singleton
 class NetworkTrafficMonitor @Inject constructor() {
 
+    val timeout = 2000L
+
     private val appUid = android.os.Process.myUid()
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
@@ -67,7 +69,7 @@ class NetworkTrafficMonitor @Inject constructor() {
             flow {
                 while (currentCoroutineContext().isActive) {
                     emit(calculateTrafficData())
-                    delay(1000) // Обновление каждую секунду
+                    delay(timeout) // Обновление каждую 2 секунду
                 }
             }
                 .flowOn(Dispatchers.IO)
@@ -92,7 +94,7 @@ class NetworkTrafficMonitor @Inject constructor() {
             return _trafficFlow.value.copy(isSupported = false)
         }
 
-        val timeDiff = (currentTime - previousTime) / 1000.0
+        val timeDiff = (currentTime - previousTime) / timeout.toFloat()
 
         val downloadSpeed = if (timeDiff > 0 && previousRxBytes > 0) {
             ((currentRxBytes - previousRxBytes) / timeDiff).toLong().coerceAtLeast(0L)
