@@ -1,4 +1,4 @@
-package com.client.xvideos.redgifs.common.saved
+package com.client.xvideos.common.collectionDB.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -37,6 +37,7 @@ import androidx.compose.ui.window.Dialog
 import com.client.xvideos.common.coil.UrlImage
 import com.client.xvideos.common.collectionDB.model.CollectionEntity
 import com.client.xvideos.redgifs.common.ThemeRed
+import com.client.xvideos.redgifs.common.saved.SavedRed
 import com.client.xvideos.redgifs.model.GifsInfo
 import com.client.xvideos.redgifs.model.URL1
 import com.client.xvideos.ui.theme.XvideosTheme

@@ -17,6 +17,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,6 +25,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -52,6 +55,11 @@ fun DaialogNewCollection(
     if (!visible) return               // короче читается
 
     var text by remember { mutableStateOf("") }
+    val focusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -66,14 +74,14 @@ fun DaialogNewCollection(
 
             Text("Создать коллекцию", color = Color.White, modifier = Modifier.padding(start = 8.dp, top = 8.dp), fontSize = 18.sp)
 
-            /* Поле ввода названия (или чего вам нужно) */
+            /* Поле ввода названия */
             OutlinedTextField(
                 value = text,
                 onValueChange = { text = it },
-                modifier = Modifier.padding(horizontal = 8.dp).padding(bottom = 8.dp).fillMaxWidth(),
+                modifier = Modifier.padding(horizontal = 8.dp).padding(bottom = 8.dp)
+                    .fillMaxWidth().focusRequester(focusRequester),
                 singleLine = true,
                 label = { Text("Название коллекции") },
-
             )
 
             HorizontalSeparator(Color(0xFF363636))
@@ -89,14 +97,8 @@ fun DaialogNewCollection(
                 verticalAlignment = Alignment.CenterVertically
             ) {
 
-                TextButton(
-                    onClick = onDismiss
-                ) {
-                    Text("Отмена")
-                }
-
+                TextButton( onClick = onDismiss ) { Text("Отмена") }
                 Spacer(Modifier.width(8.dp))
-
                 Button(
                     //colors = ButtonDefaults.buttonColors(containerColor = ThemeRed.colorYellow),
                     onClick = {
@@ -106,10 +108,7 @@ fun DaialogNewCollection(
                     shape = RoundedCornerShape(8.dp),
                     contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
                 ) {
-                    Text(
-                        text = "Создать",
-                        color = Color.Black
-                    )
+                    Text( text = "Создать", color = Color.Black )
                 }
             }
         }

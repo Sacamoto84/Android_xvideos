@@ -24,9 +24,10 @@ import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.ScreenTransition
+import com.client.xvideos.common.collectionDB.ui.DaialogNewCollection
 import com.client.xvideos.redgifs.common.block.BlockRed
 import com.client.xvideos.redgifs.common.di.HostDI
-import com.client.xvideos.redgifs.common.saved.DialogCollection
+import com.client.xvideos.common.collectionDB.ui.DialogCollection
 import com.client.xvideos.redgifs.common.saved.SavedRed
 import com.client.xvideos.redgifs.ui.explorer.ScreenRedExplorer
 import com.client.xvideos.screenRoot.LocalRootScreenModel
@@ -61,8 +62,27 @@ class R_Screen_Root : Screen {
         //Диалог коллекции
         if (savedRed.collections.visibleDialog) { R_DialogCollection(savedRed = {savedRed}) }
 
+        if (savedRed.collections.visibleDialogCreateNew) {
+
+                DaialogNewCollection(
+                    visible = savedRed.collections.visibleDialogCreateNew,
+                    onDismiss = { savedRed.collections.visibleDialogCreateNew = false },
+                    onBlockConfirmed = { collection ->
+                        if ((collection != "")) {
+                            savedRed.collections.createCollection(collection)
+                            savedRed.collections.visibleDialogCreateNew = false
+                        }
+                    }
+                )
+
+        }
+
+
         //Диалог для блокировки
         if (vm.hostDI.block.blockVisibleDialog) { R_DialogBlock(block = {vm.hostDI.block}) }
+
+
+
 
         CompositionLocalProvider(LocalRootScreenModel provides ScreenRootSM()) {
             Scaffold(

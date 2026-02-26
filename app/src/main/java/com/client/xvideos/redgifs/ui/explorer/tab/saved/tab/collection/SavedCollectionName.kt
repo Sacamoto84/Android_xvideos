@@ -71,22 +71,22 @@ class ScreenCollectionName(val collectionName: String) : Screen {
 //            vm.likedHost.columns = R_SavedCollectionTab.columnSelect.column
 //        }
 
-        var collectionVisibleDialogCreateNew by remember { mutableStateOf(false) }
+        //var collectionVisibleDialogCreateNew by remember { mutableStateOf(false) }
 
-        if (collectionVisibleDialogCreateNew) {
-            DaialogNewCollection(
-                visible = collectionVisibleDialogCreateNew,
-                onDismiss = {
-                    collectionVisibleDialogCreateNew = false
-                },
-                onBlockConfirmed = { collection ->
-                    if ((collection != "")) {
-                        savedRed.collections.createCollection(collection)
-                        collectionVisibleDialogCreateNew = false
-                    }
-                }
-            )
-        }
+//        if (collectionVisibleDialogCreateNew) {
+//            DaialogNewCollection(
+//                visible = collectionVisibleDialogCreateNew,
+//                onDismiss = {
+//                    collectionVisibleDialogCreateNew = false
+//                },
+//                onBlockConfirmed = { collection ->
+//                    if ((collection != "")) {
+//                        savedRed.collections.createCollection(collection)
+//                        collectionVisibleDialogCreateNew = false
+//                    }
+//                }
+//            )
+//        }
 
         Scaffold(topBar = {
             Text(
