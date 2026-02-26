@@ -21,7 +21,7 @@ fun DropdownMenuItem_AddCollection(item: GifsInfo? = null, savedRed: ()->SavedRe
         onClick = {
             if (item == null) return@DropdownMenuItem_AddCollectionContent
             savedRed.invoke().collections.collectionItemGifInfo = item
-            savedRed.invoke().collections.collectionVisibleDialog = true
+            savedRed.invoke().collections.visibleDialog = true
             onDismiss.invoke()
         }
     )

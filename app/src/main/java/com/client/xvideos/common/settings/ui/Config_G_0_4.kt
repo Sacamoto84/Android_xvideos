@@ -1,10 +1,10 @@
 package com.client.xvideos.common.settings.ui
 
+import android.preference.PreferenceManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -15,20 +15,20 @@ import androidx.compose.material3.MultiChoiceSegmentedButtonRow
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.common.settings.element.SettingElementList
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.composeunstyled.Text
+import com.google.common.reflect.TypeToken
 import com.skydoves.compose.stability.runtime.TraceRecomposition
 
 @Composable
@@ -116,5 +116,16 @@ private fun TabBarPoints(count: Int, screenType: Boolean) {
 @Preview(showBackground = false)
 @Composable
 fun PreviewConfig_G_0_4() {
-    Config_G_0_4("777", Settings.l_likesTab_G_0_4)
+    // We create a local instance of SettingElementList for the preview to avoid 
+    // UninitializedPropertyAccessException from Settings.pref
+    val context = LocalContext.current
+    val setting = remember {
+        SettingElementList<Boolean>(
+            sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context),
+            name = "l_likesTab_G_0_4",
+            typeToken = object : TypeToken<List<Boolean>>() {}.type,
+            default = listOf(false, true, true, true, true)
+        )
+    }
+    Config_G_0_4("777", setting)
 }

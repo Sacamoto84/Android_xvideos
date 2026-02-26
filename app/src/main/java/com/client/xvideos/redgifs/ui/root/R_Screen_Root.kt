@@ -59,7 +59,7 @@ class R_Screen_Root : Screen {
         BackHandler { Timber.i("iii BackHandler Root") }
 
         //Диалог коллекции
-        if (savedRed.collections.collectionVisibleDialog) { R_DialogCollection(savedRed = {savedRed}) }
+        if (savedRed.collections.visibleDialog) { R_DialogCollection(savedRed = {savedRed}) }
 
         //Диалог для блокировки
         if (vm.hostDI.block.blockVisibleDialog) { R_DialogBlock(block = {vm.hostDI.block}) }
@@ -90,10 +90,6 @@ class R_Screen_Root : Screen {
     }
 }
 
-
-
-
-
 @Composable
 private fun R_DialogBlock(block:  () -> BlockRed){
 
@@ -111,23 +107,24 @@ private fun R_DialogBlock(block:  () -> BlockRed){
 }
 
 
-    @Composable
+@Composable
 private fun R_DialogCollection(savedRed: () -> SavedRed){
 
     val haptic = LocalHapticFeedback.current
 
     DialogCollection(
-        visible = savedRed().collections.collectionVisibleDialog,
-        onDismiss = { savedRed().collections.collectionVisibleDialog = false },
-        onBlockConfirmed = {
-            savedRed().collections.collectionVisibleDialogCreateNew = true
+        visible = savedRed().collections.visibleDialog,
+        onDismiss = { savedRed().collections.visibleDialog = false },
+        onClickNewCollection = {
+            //Отобразить диалог создания новой коллекции
+            savedRed().collections.visibleDialogCreateNew = true
         },
         onSelectCollection = { collection ->
             savedRed().collections.addCollection(
                 savedRed().collections.collectionItemGifInfo!!,
                 collection
             )
-            savedRed().collections.collectionVisibleDialog = false
+            savedRed().collections.visibleDialog = false
             haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
         },
         savedRed = savedRed

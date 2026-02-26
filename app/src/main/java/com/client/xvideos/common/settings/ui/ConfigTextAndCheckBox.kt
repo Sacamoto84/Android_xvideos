@@ -38,12 +38,8 @@ fun PreviewTrue() {
 fun ConfigTextAndCheckBox(text: String, value: Boolean, onValueChange: (Boolean) -> Unit) {
     Row(
         modifier = Modifier
-            .padding(horizontal = 8.dp)
-            .padding(vertical = 2.dp)
-            .height(48.dp)
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+            .padding(horizontal = 8.dp).padding(vertical = 2.dp).height(48.dp).fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically
     ) {
         Text(text, style = styleTextConfig)
         Checkbox(value, onValueChange, colors = CheckboxDefaults.colors(disabledColor = Color.White, uncheckedColor = Color.Gray))

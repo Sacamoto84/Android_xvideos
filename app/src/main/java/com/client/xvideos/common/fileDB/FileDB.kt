@@ -2,7 +2,6 @@ package com.client.xvideos.common.fileDB
 
 import androidx.compose.runtime.mutableStateListOf
 import com.google.gson.GsonBuilder
-import com.google.gson.reflect.TypeToken
 import timber.log.Timber
 import java.io.File
 import java.io.FileNotFoundException
@@ -12,8 +11,6 @@ import java.io.IOException
  * val nichesDb = FileDB<NichesInfo>(AppPath.niches_red, "niches", object : TypeToken<NichesInfo>() {}.type)
  */
 class FileDB<T>(val dirPath: String, val extension: String, private val clazz: Class<T> ) {
-
-    private val type = TypeToken.getParameterized(List::class.java, clazz).type
 
     var list = mutableStateListOf<T>()
 
