@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -234,9 +235,11 @@ private fun SearchInputRow(
 
         if (value.text.isNotEmpty()) { SearchIconButton(icon = Icons.Default.Clear, onClick = onClearClick) }
 
-        SearchIconButton(icon = Icons.Default.Undo, onClick = onUndoClick)
+        //SearchIconButton(icon = Icons.Default.Undo, onClick = onUndoClick)
 
         expandMenuHistory()
+
+        //Spacer(Modifier.width(4.dp))
     }
 }
 

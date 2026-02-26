@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,6 +28,7 @@ import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import com.client.xvideos.common.collectionDB.ui.DaialogNewCollection
 import com.client.xvideos.common.connectivityObserver.ConnectivityObserver
+import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.common.block.BlockRed
 import com.client.xvideos.redgifs.common.di.HostDI
@@ -67,26 +69,10 @@ class ScreenCollectionName(val collectionName: String) : Screen {
             savedRed.collections.selectedCollection.value = null
         }
 
-//        LaunchedEffect(R_SavedCollectionTab.columnSelect.column) {
-//            vm.likedHost.columns = R_SavedCollectionTab.columnSelect.column
-//        }
+        val columnSelect  = Settings.r_collectionTab_column_current_count.field.collectAsStateWithLifecycle().value
 
-        //var collectionVisibleDialogCreateNew by remember { mutableStateOf(false) }
-
-//        if (collectionVisibleDialogCreateNew) {
-//            DaialogNewCollection(
-//                visible = collectionVisibleDialogCreateNew,
-//                onDismiss = {
-//                    collectionVisibleDialogCreateNew = false
-//                },
-//                onBlockConfirmed = { collection ->
-//                    if ((collection != "")) {
-//                        savedRed.collections.createCollection(collection)
-//                        collectionVisibleDialogCreateNew = false
-//                    }
-//                }
-//            )
-//        }
+        //Изменение количества отображаемых елементов
+        LaunchedEffect(columnSelect) { vm.likedHost.columns = columnSelect }
 
         Scaffold(topBar = {
             Text(

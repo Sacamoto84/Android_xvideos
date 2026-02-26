@@ -18,9 +18,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
+import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.l.ui.screens.TabRow
 import com.client.xvideos.redgifs.ui.explorer.tab.FavoritesTab
 import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.R_SavedCollectionTab
@@ -29,6 +31,8 @@ import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.R_SavedDownloadTab
 import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.R_SavedLikesTab
 import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.savedNiche.SavedNichesTab
 import com.client.xvideos.redgifs.common.ThemeRed
+import com.client.xvideos.redgifs.ui.explorer.tab.gifs.ColumnSelect_AddColumn
+import com.client.xvideos.redgifs.ui.ui.atom.TabBarPoints
 import kotlinx.collections.immutable.persistentListOf
 
 object R_ScreenSavedTab : Screen {
@@ -53,6 +57,10 @@ object R_ScreenSavedTab : Screen {
     @Composable
     override fun Content() {
 
+        val overlay0 = Settings.r_likesTab_column_current_count.field.collectAsStateWithLifecycle().value
+
+        val overlay4 = Settings.r_collectionTab_column_current_count.field.collectAsStateWithLifecycle().value
+
         Scaffold(
             bottomBar = {
                 Column {
@@ -65,24 +73,14 @@ object R_ScreenSavedTab : Screen {
                         onChangeState = {
                             if (it == screenType) {
                                 when (it) {
-                                    //0 -> R_SavedLikesTab.columnSelect.addColumn()
-                                    //4 -> R_SavedCollectionTab.columnSelect.addColumn()
+                                    0 -> { ColumnSelect_AddColumn(Settings.r_likesTab_column_current_count, Settings.r_likesTab_G_0_4) }
+                                    4 -> { ColumnSelect_AddColumn(Settings.r_collectionTab_column_current_count, Settings.r_collectionTab_G_0_4) }
                                 }
                             }
                             screenType = it
                         },
-                        overlay0 = {
-//                            TabBarPoints(
-//                                R_SavedLikesTab.columnSelect.column,
-//                                screenType == 0
-//                            )
-                        },
-                        overlay4 = {
-//                            TabBarPoints(
-//                                R_SavedCollectionTab.columnSelect.column,
-//                                screenType == 4
-//                            )
-                        },
+                        overlay0 = { TabBarPoints( overlay0, screenType == 0 ) },
+                        overlay4 = { TabBarPoints( overlay4, screenType == 4 ) },
                     )
                 }
             },

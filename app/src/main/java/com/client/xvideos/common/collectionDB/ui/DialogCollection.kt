@@ -86,9 +86,7 @@ fun DialogCollectionContent(
             style = TextStyle(fontWeight = FontWeight.Medium, fontSize = 16.sp)
         )
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
+            modifier = Modifier.fillMaxWidth().weight(1f)
         ) {
             LazyColumn(state = rememberLazyListState()) {
                 items(collectionList) {

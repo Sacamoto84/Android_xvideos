@@ -86,8 +86,6 @@ object R_SavedCollectionTab : Screen {
 
         val selectedCollection = savedRed.collections.selectedCollection.collectAsStateWithLifecycle().value
 
-        val columnSelect  = Settings.r_collectionTab_column_current_count.field.collectAsStateWithLifecycle().value
-
         BackHandler {
             Timber.i("iii BackHandler SavedCollectionTab")
             savedRed.collections.selectedCollection.value = null

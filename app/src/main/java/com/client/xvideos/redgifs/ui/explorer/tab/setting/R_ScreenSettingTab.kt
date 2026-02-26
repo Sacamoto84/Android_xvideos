@@ -58,6 +58,8 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 import javax.inject.Inject
 
@@ -73,11 +75,11 @@ object R_ScreenSettingTab : Screen {
 
         val haptic = LocalHapticFeedback.current
 
-        val context = LocalContext.current
-
         LaunchedEffect(Unit) {
-            vm.sizeXvideos = getFolderSize(File(AppPath.main))
-            vm.sizeRedDownload = getFolderSize(File(AppPath.r_cache_download))
+            withContext(Dispatchers.IO) {
+                vm.sizeXvideos = getFolderSize(File(AppPath.main))
+                vm.sizeRedDownload = getFolderSize(File(AppPath.r_cache_download))
+            }
         }
 
         StatelessR_ScreenSettingTab(
@@ -198,7 +200,9 @@ fun StatelessR_ScreenSettingTab(
 
         HorizontalDivider(color = Color.DarkGray)
 
-        Config_G_0_4("Likes", Settings.r_likesTab_G_0_4)
+        Config_G_0_4("Лайки", Settings.r_likesTab_G_0_4)
+
+        Config_G_0_4("Коллекция", Settings.r_collectionTab_G_0_4)
 
 
     }

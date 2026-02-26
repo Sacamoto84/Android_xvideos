@@ -35,7 +35,7 @@ fun NichesBottomBar(
     Column(Modifier.background(ThemeRed.colorTabLevel1)) {
         HorizontalDivider(color = ThemeRed.colorBorderGray)
         Row(
-            modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp, horizontal = 4.dp).background(ThemeRed.colorTabLevel1),
+            modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp).background(ThemeRed.colorTabLevel1),
             horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Bottom
         )
         {

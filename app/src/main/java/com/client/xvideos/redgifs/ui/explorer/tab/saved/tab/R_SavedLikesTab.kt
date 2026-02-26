@@ -56,7 +56,7 @@ object R_SavedLikesTab : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val vm: ScreenSavedLikesSM = getScreenModel()
 
-        val columnSelect = Settings.l_likesTab_column_current_count.field.collectAsStateWithLifecycle().value
+        val columnSelect = Settings.r_likesTab_column_current_count.field.collectAsStateWithLifecycle().value
 
         //Изменение количества отображаемых елементов
         LaunchedEffect(columnSelect) { vm.likedHost.columns = columnSelect }

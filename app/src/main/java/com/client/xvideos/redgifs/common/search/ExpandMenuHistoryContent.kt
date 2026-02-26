@@ -82,8 +82,7 @@ fun ExpandMenuHistoryContentStateless(
         modifier = modifier
     ) {
         IconButton(
-            modifier = Modifier
-                .padding(end = 4.dp).height(46.dp).width(24.dp)
+            modifier = Modifier.height(46.dp).width(46.dp)
                 .menuAnchor(ExposedDropdownMenuAnchorType.SecondaryEditable),
             onClick = { onExpandedChange(!expanded) }
         ) {
@@ -91,7 +90,7 @@ fun ExpandMenuHistoryContentStateless(
                 imageVector = Icons.Default.History,
                 contentDescription = null,
                 tint = if (expanded) Color.White else Color(0xFF757575),
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(30.dp)
             )
         }
 

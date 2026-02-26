@@ -40,7 +40,7 @@ object Settings {
     /**
      * Количество столбиков в R Saved Collection Tab T 1 2 3 4
      */
-    val r_collectionTab_G_0_4 by lazy {  SettingElementList( pref, "r_likesTab_G_0_4",  typeToken = object : TypeToken<List<Boolean>>() {}.type , default = listOf(false, true, true, true, true))  }
+    val r_collectionTab_G_0_4 by lazy {  SettingElementList( pref, "r_collectionTab_G_0_4",  typeToken = object : TypeToken<List<Boolean>>() {}.type , default = listOf(false, true, true, true, true))  }
 
     /**
      * Текущее количество столбиков в R Saved Collection Tab
