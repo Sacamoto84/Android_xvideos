@@ -128,24 +128,19 @@ private fun R_ScreenGifsTabContent(vm: ScreenRedExplorerGifsSM) {
 
     Scaffold(
         bottomBar = {
-//            StatelessGifsTabBottomBar(
-//                searchField = { modifier ->
-//                    search.CustomBasicTextField(
-//                        modifier = modifier,
-//                        value = TODO(),
-//                        onValueChange = TODO(),
-//                        onDone = TODO()
-//                    )
-//                },
-//                searchR = searchR,
-//                isFocused = isFocused,
-//                sortType = sortType,
-//                onSortSelect = { vm.lazyHost.changeSortType(it) },
-//                onUpClick = {
-//                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-//                    vm.lazyHost.gotoUp()
-//                }
-//            )
+            StatelessGifsTabBottomBar(
+                searchField = { modifier ->
+                    search.CustomBasicTextField( modifier = modifier )
+                },
+                searchR = searchR,
+                isFocused = isFocused,
+                sortType = sortType,
+                onSortSelect = { vm.lazyHost.changeSortType(it) },
+                onUpClick = {
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    vm.lazyHost.gotoUp()
+                }
+            )
         },
         containerColor = ThemeRed.colorCommonBackground
     ) { padding ->

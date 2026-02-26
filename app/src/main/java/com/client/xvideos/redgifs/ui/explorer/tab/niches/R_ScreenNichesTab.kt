@@ -110,9 +110,11 @@ object R_ScreenNichesTab : Screen {
         val isSearchFocused by vm.search.focused.collectAsStateWithLifecycle()
 
         val onSortTypeChange: (Order) -> Unit = remember { { vm.lazyHost.changeSortType(it) } }
+
         val onUpClick: () -> Unit = remember { {
             vm.lazyHost.gotoUpColumn()
         } }
+
         val onNicheClick: (String) -> Unit = remember(navigator) { { id -> navigator.push(R_ScreenNiche(id)) } }
 
         /**
@@ -126,7 +128,7 @@ object R_ScreenNichesTab : Screen {
         val isNichesCacheDownloaded = vm.hostDI.savedRed.nichesCache.isDownloaded
 
         NichesTabContent(
-            items = { listNiche },
+            items =  listNiche ,
             sortType = sortType,
             onSortTypeChange = onSortTypeChange,
             isSearchFocused = isSearchFocused,
@@ -151,7 +153,7 @@ object R_ScreenNichesTab : Screen {
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun NichesTabContent(
-    items: () -> LazyPagingItems<Niche>,
+    items: LazyPagingItems<Niche>,
     sortType: Order,
     onSortTypeChange: (Order) -> Unit,
     isSearchFocused: Boolean,
@@ -173,7 +175,7 @@ fun NichesTabContent(
    LaunchedEffect(isNichesCacheDownloaded) {
        if (isNichesCacheDownloaded) {
            delay(100)
-           items().refresh()
+           items.refresh()
        }
    }
 
@@ -181,7 +183,7 @@ fun NichesTabContent(
         Refresh(
             onRefreshNichesCacheClick = onRefreshNichesCacheClick,
             nichesCacheProgress = nichesCacheProgress,
-            refreshList = { items().refresh() },
+            refreshList = { items.refresh() },
         )
     } else {
         Scaffold(
@@ -215,9 +217,9 @@ fun NichesTabContent(
                         }
                     }
 
-                    items( count = items().itemCount, key = items().itemKey { it.id }, contentType = items().itemContentType { "niche" } )
+                    items( count = items.itemCount, key = items.itemKey { it.id }, contentType = items.itemContentType { "niche" } )
                     { index ->
-                        val item = items()[index]
+                        val item = items[index]
                         if (item != null) {
                             Box(modifier = Modifier.padding(vertical = 2.dp)) {
                                 if (savedRed() != null) {
@@ -353,8 +355,6 @@ fun RefreshMini(
     }
 }
 
-
-
 @Preview(showBackground = true, backgroundColor = 0xFF121212)
 @Composable
 fun R_ScreenNichesTabPreview() {
@@ -371,7 +371,7 @@ fun R_ScreenNichesTabPreview() {
     val listNiche = flowOf(pagingData).collectAsLazyPagingItems()
     
     NichesTabContent(
-        items = { listNiche },
+        items = listNiche,
         sortType = Order.NICHES_SUBSCRIBERS_D,
         onSortTypeChange = {},
         isSearchFocused = false,
