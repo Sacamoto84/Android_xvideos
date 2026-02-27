@@ -107,7 +107,7 @@ fun NicheBottomBar(
 fun NicheBottomBarPreview() {
     XvideosTheme {
         NicheBottomBar(
-            niche = NichesInfo(name = "Sample Niche", thumbnail = ""),
+            niche = NichesInfo(id = "id", name = "Sample Niche", thumbnail = ""),
             currentSort = Order.TRENDING,
             onSortChange = {},
             columns = 2,

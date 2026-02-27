@@ -61,6 +61,7 @@ private fun DialogNicheDeletePreview() {
     XvideosTheme {
         DialogNicheDelete(
             item = NichesInfo(
+                id = "id",
                 name = "Sample Niche",
                 thumbnail = "https://via.placeholder.com/96"
             ),

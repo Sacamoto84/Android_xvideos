@@ -109,7 +109,8 @@ fun ExpandMenuVideoTagsPreview() {
     XvideosTheme {
         ExpandMenuVideoTags(
             item = GifsInfo(
-                tags = listOf("Action", "Adventure", "Comedy", "Drama", "Fantasy", "Sci-Fi")
+                tags = listOf("Action", "Adventure", "Comedy", "Drama", "Fantasy", "Sci-Fi"),
+                id = "id",
             )
         )
     }

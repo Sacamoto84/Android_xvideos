@@ -147,50 +147,30 @@ class RedApi @Inject constructor(
     }
 
 
-
+    /**
+     * ```kotlin
+     *  Получить последние 50 элементов
+     *  https://api.redgifs.com/v2/users/panteritaaaa/search?order=latest&count=50&page=1
+     *  https://api.redgifs.com/v2/users/relative_rub/search?order=latest&count=50&page=1
+     * ```
+     *
+     * Версия с тегами
+     * ```kotlin
+     *  https://api.redgifs.com/v2/users/entakeeke1a/search?order=new&count=40&tags=Amateur%2CArmpit%2CArmpits
+     * ```
+     */
     suspend fun searchCreator(
         userName: String = "lilijunex",
         page: Int = 1,
         count: Int = 100,
         order: Order = Order.LATEST,
         type: MediaType = MediaType.GIF,
-    ): Result<CreatorResponse> {
-        val route = Route(
-            method = "GET",
-            path = "/v2/users/{username}/search?page={page}&count={count}&order={order}&type={type}",
-            "username" to userName,
-            "page" to page,
-            "count" to count,
-            "order" to order.value,
-            "type" to type.value
-        )
-        val res = api.request<CreatorResponse>(route)
-        return res
-    }
-
-    //
-    //https://api.redgifs.com/v2/users/entakeeke1a/search?order=new&count=40&tags=Amateur%2CArmpit%2CArmpits
-    suspend fun searchCreator(
-        userName: String = "lilijunex",
-        page: Int = 1,
-        count: Int = 100,
-        order: Order = Order.LATEST,
-        type: MediaType = MediaType.GIF,
-        tags: List<String>
+        tags: List<String> = emptyList()
     ): Result <CreatorResponse> {
 
-        val route = Route(
-            method = "GET",
-            path = "/v2/users/{username}/search?order={order}&page={page}&count={count}&type={type}&tags={tags}",
-            "username" to userName,
-            "page" to page,
-            "count" to count,
-            "order" to order.value,
-            "type" to type.value,
-            "tags" to tags.joinToString(",")
-        )
-
-        val res = api.request<CreatorResponse >(route)
+        val route = if (tags.isNotEmpty()) Route( method = "GET", path = "/v2/users/{username}/search?order={order}&page={page}&count={count}&type={type}&tags={tags}", "username" to userName, "page" to page, "count" to count, "order" to order.value, "type" to type.value, "tags" to tags.joinToString(",") )
+                    else Route( method = "GET", path = "/v2/users/{username}/search?page={page}&count={count}&order={order}&type={type}", "username" to userName, "page" to page, "count" to count, "order" to order.value, "type" to type.value )
+        val res = api.request<CreatorResponse>(route)
         return res
     }
 

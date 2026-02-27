@@ -165,7 +165,7 @@ private fun DialogCollectionPreview() {
             CollectionEntity(
                 collection = "Favorites",
                 items = listOf(
-                    GifsInfo(urls = URL1(thumbnail = ""))
+                    GifsInfo(id = "trtt", urls = URL1(thumbnail = ""))
                 )
             ),
             CollectionEntity(

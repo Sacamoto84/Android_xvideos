@@ -245,7 +245,7 @@ private fun R_SavedCollectionTabPreview() {
         val sampleCollections = listOf(
             CollectionEntity(
                 collection = "Favorites",
-                items = listOf(GifsInfo(urls = URL1(thumbnail = "")))
+                items = listOf(GifsInfo(id = "id", urls = URL1(thumbnail = "")))
             ),
             CollectionEntity(
                 collection = "Private",
