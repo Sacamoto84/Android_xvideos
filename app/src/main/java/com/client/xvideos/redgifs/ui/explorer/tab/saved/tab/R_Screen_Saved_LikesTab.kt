@@ -41,9 +41,9 @@ import dagger.multibindings.IntoMap
 import javax.inject.Inject
 
 
-object R_SavedLikesTab : Screen {
+object R_Screen_Saved_LikesTab : Screen {
 
-    private fun readResolve(): Any = R_SavedLikesTab
+    private fun readResolve(): Any = R_Screen_Saved_LikesTab
 
     override val key: ScreenKey = uniqueScreenKey
 

@@ -69,9 +69,9 @@ import dagger.multibindings.IntoMap
 import java.io.File
 import javax.inject.Inject
 
-object R_SavedDownloadTab : Screen {
+object R_Screen_Saved_DownloadTab : Screen {
 
-    private fun readResolve(): Any = R_SavedDownloadTab
+    private fun readResolve(): Any = R_Screen_Saved_DownloadTab
 
     override val key: ScreenKey = uniqueScreenKey
 

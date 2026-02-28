@@ -1,36 +1,34 @@
 package com.client.xvideos.redgifs.common.saved
 
-import androidx.compose.runtime.mutableStateListOf
 import com.client.xvideos.common.AppPath
 import com.client.xvideos.common.fileDB.FileDB
 import com.client.xvideos.common.snackbar.SnackBar
 import com.client.xvideos.redgifs.model.GifsInfo
 import com.client.xvideos.redgifs.model.MediaType
-import com.client.xvideos.redgifs.model.UserInfo
 import com.client.xvideos.redgifs.network.api.RedApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-
+import timber.log.Timber
 
 class R_Saved_Subscriptions(
     val scope: CoroutineScope,
     val redApi: RedApi,
 ) {
 
-    val creatorDb = FileDB(AppPath.r_subscriptions, "subscriptions", UserInfo::class.java)
+    private val creatorDb = FileDB(AppPath.r_subscriptions, "subscriptions", String::class.java)
 
     /**
      * Список авторов на которых подписаны
      */
     var listCreators = creatorDb.list
 
+    init {
+        refresh()
+    }
 
-
-    fun add(item: UserInfo) {
-        println("!!! add subscriptions() id:${item.username}")
-        creatorDb.insert(item.username, item)
+    fun add(item: String) {
+        println("!!! add subscriptions() id:${item}")
+        creatorDb.insert(item, item)
             .onSuccess {
                 SnackBar.success("Автор добавлен")
                 listCreators.add(item)
@@ -45,7 +43,6 @@ class R_Saved_Subscriptions(
         creatorDb.delete(username)
             .onSuccess {
                 SnackBar.info("Автор удален")
-                //creatorsList.remove(item)
                 refresh()
             }
             .onFailure { e -> SnackBar.error("Ошибка удаления Автора ${e.message}") }
@@ -61,11 +58,16 @@ class R_Saved_Subscriptions(
         return redApi.searchCreator(userName = name, count = 50, type = MediaType.ALL).getOrThrow().gifs
     }
 
-    suspend fun refreshSubcription() : List<GifsInfo>{
+
+    suspend fun refreshSubscription() : List<GifsInfo>{
         val res  = mutableListOf<GifsInfo>()
         listCreators.forEach {
-            try { res.addAll(read50LastItem(it.username)) }
-            catch (e: Exception){ }
+            try {
+                res.addAll(read50LastItem(it))
+            }
+            catch (e: Exception){
+                Timber.e(e)
+            }
         }
         return res
     }

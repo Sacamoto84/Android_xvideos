@@ -11,6 +11,7 @@ import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Group
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Save
+import androidx.compose.material.icons.outlined.Subscriptions
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -25,13 +26,14 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.l.ui.screens.TabRow
 import com.client.xvideos.redgifs.ui.explorer.tab.FavoritesTab
-import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.R_SavedCollectionTab
-import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.R_SavedCreatorsTab
-import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.R_SavedDownloadTab
-import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.R_SavedLikesTab
+import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.R_Screen_CollectionTab
+import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.R_Screen_CreatorsTab
+import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.R_Screen_Saved_DownloadTab
+import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.R_Screen_Saved_LikesTab
 import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.savedNiche.SavedNichesTab
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.ui.explorer.tab.gifs.ColumnSelect_AddColumn
+import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.R_Screen_Saved_SubscriptionsTab
 import com.client.xvideos.redgifs.ui.ui.atom.TabBarPoints
 import kotlinx.collections.immutable.persistentListOf
 
@@ -51,6 +53,8 @@ object R_ScreenSavedTab : Screen {
         //Icons.Outlined.Dataset,
         //Icons.Outlined.Folder,
         Icons.Outlined.Apps,
+        Icons.Outlined.Subscriptions,
+
     )
 
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -91,11 +95,12 @@ object R_ScreenSavedTab : Screen {
 
             Box(modifier = Modifier.padding(bottom = paddingValues.calculateBottomPadding())) {
                 when (screenType) {
-                    0 -> R_SavedLikesTab.Content()
-                    1 -> R_SavedCreatorsTab.Content()
-                    3 -> R_SavedDownloadTab.Content()
+                    0 -> R_Screen_Saved_LikesTab.Content()
+                    1 -> R_Screen_CreatorsTab.Content()
+                    3 -> R_Screen_Saved_DownloadTab.Content()
                     2 -> SavedNichesTab.Content()
-                    4 -> R_SavedCollectionTab.Content()
+                    4 -> R_Screen_CollectionTab.Content()
+                    5 -> R_Screen_Saved_SubscriptionsTab.Content()
                     else -> FavoritesTab.Content()
                 }
             }

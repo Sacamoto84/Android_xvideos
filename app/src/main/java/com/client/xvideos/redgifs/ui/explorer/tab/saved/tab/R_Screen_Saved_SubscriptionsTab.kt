@@ -99,12 +99,7 @@ class ScreenSavedSubscriptionsSM @Inject constructor(
     val hostDI : HostDI
 ) : ScreenModel {
 
-    val likedHost = LazyRow123Host(
-        connectivityObserver = connectivityObserver,
-        scope = screenModelScope,
-        typePager = TypePager.SUBSCRIPTIONS,
-        hostDI = hostDI
-    )
+    val likedHost = LazyRow123Host( connectivityObserver = connectivityObserver, scope = screenModelScope, typePager = TypePager.SUBSCRIPTIONS, hostDI = hostDI )
 
 }
 

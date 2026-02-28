@@ -165,7 +165,7 @@ class RedApi @Inject constructor(
 
             if (tags.isNotEmpty()) Route(
                 method = "GET",
-                path = "/v2/users/{username}/search?order={order}&page={page}&count={count}&type={type}&tags={tags}",
+                path = "/v2/users/{username}/search?order={order}&page={page}&count={count}&&tags={tags}",
                 "username" to userName,
                 "page" to page,
                 "count" to count,
@@ -174,7 +174,7 @@ class RedApi @Inject constructor(
             )
             else Route(
                 method = "GET",
-                path = "/v2/users/{username}/search?page={page}&count={count}&order={order}&type={type}",
+                path = "/v2/users/{username}/search?page={page}&count={count}&order={order}",
                 "username" to userName,
                 "page" to page,
                 "count" to count,

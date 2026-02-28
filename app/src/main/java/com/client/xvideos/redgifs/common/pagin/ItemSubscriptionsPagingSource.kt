@@ -13,7 +13,7 @@ class ItemSubscriptionsPagingSource (val savedRed: SavedRed): PagingSource<Int, 
 
         return try {
             Timber.d("!!! >>>ItemLikesPagingSource::load()")
-            val res = savedRed.subscriptions.refreshSubcription()
+            val res = savedRed.subscriptions.refreshSubscription().sortedByDescending{it.createDate}
             LoadResult.Page( data = res, prevKey = null,   nextKey = null )
 
         } catch (e: Exception) {

@@ -75,9 +75,9 @@ import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
 import javax.inject.Inject
 
-object R_SavedCreatorsTab : Screen {
+object R_Screen_CreatorsTab : Screen {
 
-    private fun readResolve(): Any = R_SavedCreatorsTab
+    private fun readResolve(): Any = R_Screen_CreatorsTab
 
     override val key: ScreenKey = uniqueScreenKey
 

@@ -50,8 +50,6 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.Navigator
 import com.client.xvideos.common.coil.UrlImage
 import com.client.xvideos.common.collectionDB.model.CollectionEntity
-import com.client.xvideos.common.collectionDB.ui.DaialogNewCollection
-import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.common.block.BlockRed
 import com.client.xvideos.redgifs.common.di.HostDI
@@ -69,9 +67,9 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import timber.log.Timber
 import javax.inject.Inject
 
-object R_SavedCollectionTab : Screen {
+object R_Screen_CollectionTab : Screen {
 
-    private fun readResolve(): Any = R_SavedCollectionTab
+    private fun readResolve(): Any = R_Screen_CollectionTab
 
     override val key: ScreenKey = uniqueScreenKey
 

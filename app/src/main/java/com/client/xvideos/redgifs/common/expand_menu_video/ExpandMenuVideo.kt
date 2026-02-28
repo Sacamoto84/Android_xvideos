@@ -73,6 +73,8 @@ fun ExpandMenuVideo(
         DropdownMenuItem_Follow(item, redApi, savedRed) { expanded = false }
         DropdownMenuItem_AddCollection(item, savedRed) { expanded = false }
         if(isCollection) DropdownMenuItem_RemoveFromCollection(item, onRefresh, savedRed) { expanded = false }
+
+        DropdownMenuItem_Subscribtion(item, savedRed) {expanded = false }
     }
 }
 
