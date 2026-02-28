@@ -21,7 +21,11 @@ class SavedRed @Inject constructor(
     val creators    = R_Saved_Creator()
     val niches      = R_Saved_Niches()
     val collections = R_Saved_Collection()
+
+    val subscriptions = R_Saved_Subscriptions(scope, redApi)
+
     val nichesCache = R_Saved_NichesCaches(scope, redApi)
+
 
     var tagsList = listOf<TagInfo>()
 

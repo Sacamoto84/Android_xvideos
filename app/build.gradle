@@ -101,6 +101,9 @@ android {
 
 dependencies {
 
+
+    implementation(libs.androidx.runtime)
+
     implementation libs.androidx.compose.runtime
     coreLibraryDesugaring libs.desugar.jdk.libs
 

@@ -34,7 +34,8 @@ enum class Order(val value: String) {
 
 enum class MediaType(val value: String) {
     IMAGE("i"),
-    GIF("g");
+    GIF("g"),
+    ALL("all")
 }
 
 

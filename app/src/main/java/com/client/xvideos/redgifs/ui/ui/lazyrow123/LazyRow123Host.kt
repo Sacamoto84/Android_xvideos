@@ -22,7 +22,8 @@ import com.redgifs.common.pagin.ItemEmptyPagingSource
 import com.client.xvideos.redgifs.common.pagin.ItemExplorerNailsPagingSource
 import com.client.xvideos.redgifs.common.pagin.ItemNailsPagingSource
 import com.client.xvideos.redgifs.common.pagin.ItemProfilePagingSource
-import com.redgifs.common.pagin.ItemSavedLikesPagingSource
+import com.client.xvideos.redgifs.common.pagin.ItemSavedLikesPagingSource
+import com.client.xvideos.redgifs.common.pagin.ItemSubscriptionsPagingSource
 import com.client.xvideos.redgifs.common.pagin.ItemTopPagingSource
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.model.TypePager
 import kotlinx.coroutines.CoroutineScope
@@ -154,6 +155,9 @@ fun createPager(
         TypePager.TOP -> { ItemTopPagingSource( sort = sort, searchText = searchText, block = hostDI.block, redApi = hostDI.redApi ) }
 
         TypePager.R_SAVED_LIKES -> { ItemSavedLikesPagingSource(sort, hostDI.savedRed) }
+
+        TypePager.SUBSCRIPTIONS -> { ItemSubscriptionsPagingSource(hostDI.savedRed) }
+
 
         //Поиск и отображение списка Niches в Explorer
         TypePager.EXPLORER_NICHES -> { ItemExplorerNailsPagingSource( order = sort, textNiches = textNiches, cache = hostDI.savedRed.nichesCache ) }

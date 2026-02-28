@@ -44,8 +44,3 @@ data class NichesInfo(
     @SerializedName("thumbnail") val thumbnail: String = "thumbnail", //200x200 картинка
     @SerializedName("rules") val rules: String? = "rules",
 )
-
-
-
-
-

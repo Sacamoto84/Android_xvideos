@@ -7,5 +7,10 @@ enum class TypePager {
     SAVED_COLLECTION,
     PROFILE,
     EXPLORER_NICHES,
-    EMPTY
+    EMPTY,
+
+    SUBSCRIPTIONS
+
+
+
 }
