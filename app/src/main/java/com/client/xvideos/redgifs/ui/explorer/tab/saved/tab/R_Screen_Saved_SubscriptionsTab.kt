@@ -27,14 +27,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.paging.compose.collectAsLazyPagingItems
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.screen.Screen
@@ -80,11 +80,33 @@ object R_Screen_Saved_SubscriptionsTab : Screen {
             numberOfColumns = 3
         )
 
+        val pager = vm.likedHost.pager.collectAsLazyPagingItems()
+
+        var selectCreatorName by remember { mutableStateOf<String?>(null) }
+
+        // Используем SnapshotStateList напрямую для реактивности UI
+        val selectedListCreator = vm.hostDI.savedRed.subscriptions.selectedListCreator
+
+        // Обработка нажатия: переключаем флаг и обновляем пейджер
+        if (selectCreatorName != null) {
+            val index = selectedListCreator.indexOfFirst { it.name == selectCreatorName }
+            if (index != -1) {
+                val item = selectedListCreator[index]
+                // Обновляем элемент в SnapshotStateList для триггера Compose
+                selectedListCreator[index] = item.copy(select = !item.select)
+                // Сбрасываем имя, чтобы не зациклиться
+                selectCreatorName = null
+                // Обновляем данные из сети
+                pager.refresh()
+            }
+        }
+
         SubscriptionsTabContent(
             host = vm.likedHost,
             scrollPercent = scrollPercent,
-            listCreatorSelectedCreator = vm.hostDI.savedRed.subscriptions.selectedListCreator,
-            onOpenProfile = { navigator.push(ScreenRedProfile(it)) }
+            listCreatorSelectedCreator = selectedListCreator,
+            onOpenProfile = { navigator.push(ScreenRedProfile(it)) },
+            onSelectCreator = { selectCreatorName = it }
         )
     }
 }
@@ -92,52 +114,42 @@ object R_Screen_Saved_SubscriptionsTab : Screen {
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun SubscriptionsTabContent(
-    host: LazyRow123Host,
+    host: LazyRow123Host?,
     scrollPercent: Pair<Float, Float>,
-    listCreatorSelectedCreator: SnapshotStateList<SelectedCreator>,
-    onOpenProfile: (String) -> Unit
+    listCreatorSelectedCreator: List<SelectedCreator>,
+    onOpenProfile: (String) -> Unit,
+    onSelectCreator: (String) -> Unit
 ) {
-    var selectCreator by remember { mutableStateOf<String?>(null) }
-
-    val selectedListCreator = remember(selectCreator, listCreatorSelectedCreator.toList()) {
-
-        if (selectCreator != null) {
-            for (i in listCreatorSelectedCreator.indices) {
-                val a = listCreatorSelectedCreator[i]
-                if (a.name == selectCreator) {
-                    a.select = a.select.not()
-                }
-            }
-            selectCreator = null
-        }
-
-        listCreatorSelectedCreator.toMutableStateList()
-
-    }
-
-
-
-
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = Color(0xFF303030)
     ) { padding ->
-
         Box(
-            modifier = Modifier.fillMaxSize().padding(padding)
-        )
-        {
-            LazyRow123(
-                host = host,
-                modifier = Modifier.fillMaxSize(),
-                onClickOpenProfile = onOpenProfile,
-                contentPadding = PaddingValues(0.dp),
-                contentBeforeList = {
-                    CreatorsHeader( listCreators = selectedListCreator, onCreatorClick = { selectCreator = it } )
-                },
-                isRunLike = true
-            )
-
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+        ) {
+            if (host != null) {
+                LazyRow123(
+                    host = host,
+                    modifier = Modifier.fillMaxSize(),
+                    onClickOpenProfile = onOpenProfile,
+                    contentPadding = PaddingValues(0.dp),
+                    contentBeforeList = {
+                        CreatorsHeader(
+                            listCreators = listCreatorSelectedCreator,
+                            onCreatorClick = onSelectCreator
+                        )
+                    },
+                    isRunLike = true
+                )
+            } else {
+                // Fallback for Preview
+                CreatorsHeader(
+                    listCreators = listCreatorSelectedCreator,
+                    onCreatorClick = onSelectCreator
+                )
+            }
 
             //---- Скролл ----
             Box(
@@ -150,8 +162,6 @@ fun SubscriptionsTabContent(
             }
         }
     }
-
-
 }
 
 @Composable
@@ -193,7 +203,6 @@ fun CreatorChip(
                 onClick = onClick,
                 indication = null,
                 interactionSource = null,
-                enabled = true,
             )
             .padding(4.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -227,6 +236,22 @@ fun CreatorChip(
         )
         Spacer(Modifier.width(4.dp))
     }
+}
+
+@Preview
+@Composable
+fun SubscriptionsTabPreview() {
+    SubscriptionsTabContent(
+        host = null,
+        scrollPercent = 0f to 0.2f,
+        listCreatorSelectedCreator = listOf(
+            SelectedCreator("Creator 1", true),
+            SelectedCreator("Another One", false),
+            SelectedCreator("Superstar", true)
+        ),
+        onOpenProfile = {},
+        onSelectCreator = {}
+    )
 }
 
 class ScreenSavedSubscriptionsSM @Inject constructor(

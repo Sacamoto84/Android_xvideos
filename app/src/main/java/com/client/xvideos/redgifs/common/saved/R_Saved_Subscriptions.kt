@@ -32,6 +32,18 @@ class R_Saved_Subscriptions(
 
     init {
         refresh()
+        syncSelectedList()
+    }
+
+    private fun syncSelectedList() {
+        val currentNames = selectedListCreator.map { it.name }.toSet()
+        // Добавляем новых, которых нет в списке
+        listCreators.filter { it !in currentNames }.forEach {
+            selectedListCreator.add(SelectedCreator(it, true))
+        }
+        // Удаляем тех, кого больше нет в подписках
+        val creatorsSet = listCreators.toSet()
+        selectedListCreator.removeAll { it.name !in creatorsSet }
     }
 
     fun add(item: String) {
@@ -40,6 +52,7 @@ class R_Saved_Subscriptions(
             .onSuccess {
                 SnackBar.success("Автор добавлен")
                 listCreators.add(item)
+                syncSelectedList()
             }
             .onFailure { e ->
                 SnackBar.error("Ошибка добавления Автора ${e.message}")
@@ -52,6 +65,7 @@ class R_Saved_Subscriptions(
             .onSuccess {
                 SnackBar.info("Автор удален")
                 refresh()
+                syncSelectedList()
             }
             .onFailure { e -> SnackBar.error("Ошибка удаления Автора ${e.message}") }
     }
@@ -70,10 +84,7 @@ class R_Saved_Subscriptions(
     suspend fun refreshSubscription() : List<GifsInfo>{
         val res  = mutableListOf<GifsInfo>()
 
-        val a = listCreators.map { SelectedCreator(it, true) }
-
-        selectedListCreator.clear()
-        selectedListCreator.addAll(a)
+        syncSelectedList()
 
         selectedListCreator.filter { it.select }.forEach {
             try {
