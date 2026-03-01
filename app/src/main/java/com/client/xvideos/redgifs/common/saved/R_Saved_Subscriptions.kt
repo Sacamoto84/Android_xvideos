@@ -1,5 +1,6 @@
 package com.client.xvideos.redgifs.common.saved
 
+import androidx.compose.runtime.mutableStateListOf
 import com.client.xvideos.common.AppPath
 import com.client.xvideos.common.fileDB.FileDB
 import com.client.xvideos.common.snackbar.SnackBar
@@ -9,6 +10,9 @@ import com.client.xvideos.redgifs.network.api.RedApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import timber.log.Timber
+
+
+data class SelectedCreator(val name: String, var select: Boolean)
 
 class R_Saved_Subscriptions(
     val scope: CoroutineScope,
@@ -21,6 +25,9 @@ class R_Saved_Subscriptions(
      * Список авторов на которых подписаны
      */
     var listCreators = creatorDb.list
+
+    val selectedListCreator = mutableStateListOf<SelectedCreator>()
+
 
     init {
         refresh()

@@ -27,11 +27,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.model.ScreenModel
@@ -60,6 +60,9 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
 import javax.inject.Inject
+
+data class SelectedCreator(val name: String, var select: Boolean)
+
 
 object R_Screen_Saved_SubscriptionsTab : Screen {
 
@@ -90,42 +93,49 @@ object R_Screen_Saved_SubscriptionsTab : Screen {
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun SubscriptionsTabContent(
-    host: LazyRow123Host?,
+    host: LazyRow123Host,
     scrollPercent: Pair<Float, Float>,
     listCreators: List<String>,
     onOpenProfile: (String) -> Unit
 ) {
     var selectCreator by remember { mutableStateOf<String?>(null) }
 
+    val selectedListCreator = remember(selectCreator, listCreators) {
+        listCreators.map { SelectedCreator(it, selectCreator == it) }.toMutableStateList()
+    }
+
+
+
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = Color(0xFF303030)
     ) { padding ->
-        Box(modifier = Modifier.fillMaxSize().padding(padding)) {
 
-            if (host != null) {
-                LazyRow123(
-                    host = host,
-                    modifier = Modifier.fillMaxSize(),
-                    onClickOpenProfile = onOpenProfile,
-                    contentPadding = PaddingValues(0.dp),
-                    contentBeforeList = {
-                        CreatorsHeader(
-                            listCreators = listCreators,
-                            selectedCreator = selectCreator,
-                            onCreatorClick = { selectCreator = it }
-                        )
-                    },
-                    isRunLike = true
-                )
-            } else {
-                // Fallback for Preview
-                CreatorsHeader(
-                    listCreators = listCreators,
-                    selectedCreator = selectCreator,
-                    onCreatorClick = { selectCreator = it }
-                )
-            }
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+        )
+        {
+
+
+            LazyRow123(
+                host = host,
+                modifier = Modifier.fillMaxSize(),
+                onClickOpenProfile = onOpenProfile,
+                contentPadding = PaddingValues(0.dp),
+                contentBeforeList = {
+                    CreatorsHeader(
+                        listCreators = selectedListCreator,
+                        onCreatorClick = {
+                            selectCreator = if (selectCreator == null) it else if (selectCreator == it) null else it
+                        }
+                    )
+                },
+                isRunLike = true
+            )
+
 
             //---- Скролл ----
             Box(
@@ -138,20 +148,25 @@ fun SubscriptionsTabContent(
             }
         }
     }
+
+
 }
 
 @Composable
 fun CreatorsHeader(
-    listCreators: List<String>,
-    selectedCreator: String?,
+    listCreators: List<SelectedCreator>,
     onCreatorClick: (String) -> Unit
 ) {
-    FlowRow(modifier = Modifier.fillMaxWidth().padding(4.dp)) {
+    FlowRow(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(4.dp)
+    ) {
         listCreators.forEach { creator ->
             CreatorChip(
-                creator = creator,
-                isSelected = selectedCreator == creator,
-                onClick = { onCreatorClick(creator) }
+                creator = creator.name,
+                isSelected = creator.select,
+                onClick = { onCreatorClick(creator.name) }
             )
         }
     }
@@ -205,17 +220,6 @@ fun CreatorChip(
         )
         Spacer(Modifier.width(4.dp))
     }
-}
-
-@Preview
-@Composable
-fun SubscriptionsTabPreview() {
-    SubscriptionsTabContent(
-        host = null,
-        scrollPercent = 0f to 0.2f,
-        listCreators = listOf("Creator1", "Creator2", "LongCreatorName", "Short"),
-        onOpenProfile = {}
-    )
 }
 
 class ScreenSavedSubscriptionsSM @Inject constructor(
