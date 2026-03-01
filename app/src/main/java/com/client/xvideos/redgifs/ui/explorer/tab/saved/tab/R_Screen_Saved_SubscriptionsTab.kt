@@ -27,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,6 +49,7 @@ import com.client.xvideos.common.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.common.UsersRed
 import com.client.xvideos.redgifs.common.di.HostDI
+import com.client.xvideos.redgifs.common.saved.SelectedCreator
 import com.client.xvideos.redgifs.ui.profile.ScreenRedProfile
 import com.client.xvideos.redgifs.ui.profile.atom.VerticalScrollbar
 import com.client.xvideos.redgifs.ui.profile.rememberVisibleRangePercentIgnoringFirstNForGrid
@@ -60,9 +62,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
 import javax.inject.Inject
-
-data class SelectedCreator(val name: String, var select: Boolean)
-
 
 object R_Screen_Saved_SubscriptionsTab : Screen {
 
@@ -78,13 +77,13 @@ object R_Screen_Saved_SubscriptionsTab : Screen {
         val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForGrid(
             gridState = vm.likedHost.state,
             itemsToIgnore = 0,
-            numberOfColumns = 2
+            numberOfColumns = 3
         )
 
         SubscriptionsTabContent(
             host = vm.likedHost,
             scrollPercent = scrollPercent,
-            listCreators = vm.hostDI.savedRed.subscriptions.listCreators,
+            listCreatorSelectedCreator = vm.hostDI.savedRed.subscriptions.selectedListCreator,
             onOpenProfile = { navigator.push(ScreenRedProfile(it)) }
         )
     }
@@ -95,13 +94,25 @@ object R_Screen_Saved_SubscriptionsTab : Screen {
 fun SubscriptionsTabContent(
     host: LazyRow123Host,
     scrollPercent: Pair<Float, Float>,
-    listCreators: List<String>,
+    listCreatorSelectedCreator: SnapshotStateList<SelectedCreator>,
     onOpenProfile: (String) -> Unit
 ) {
     var selectCreator by remember { mutableStateOf<String?>(null) }
 
-    val selectedListCreator = remember(selectCreator, listCreators) {
-        listCreators.map { SelectedCreator(it, selectCreator == it) }.toMutableStateList()
+    val selectedListCreator = remember(selectCreator, listCreatorSelectedCreator.toList()) {
+
+        if (selectCreator != null) {
+            for (i in listCreatorSelectedCreator.indices) {
+                val a = listCreatorSelectedCreator[i]
+                if (a.name == selectCreator) {
+                    a.select = a.select.not()
+                }
+            }
+            selectCreator = null
+        }
+
+        listCreatorSelectedCreator.toMutableStateList()
+
     }
 
 
@@ -113,25 +124,16 @@ fun SubscriptionsTabContent(
     ) { padding ->
 
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
+            modifier = Modifier.fillMaxSize().padding(padding)
         )
         {
-
-
             LazyRow123(
                 host = host,
                 modifier = Modifier.fillMaxSize(),
                 onClickOpenProfile = onOpenProfile,
                 contentPadding = PaddingValues(0.dp),
                 contentBeforeList = {
-                    CreatorsHeader(
-                        listCreators = selectedListCreator,
-                        onCreatorClick = {
-                            selectCreator = if (selectCreator == null) it else if (selectCreator == it) null else it
-                        }
-                    )
+                    CreatorsHeader( listCreators = selectedListCreator, onCreatorClick = { selectCreator = it } )
                 },
                 isRunLike = true
             )
@@ -184,10 +186,15 @@ fun CreatorChip(
             .clip(RoundedCornerShape(50))
             .border(1.dp, Color.Gray, RoundedCornerShape(50))
             .background(
-                if (isSelected) Color.DarkGray else Color.Transparent,
+                if (isSelected) Color.Gray else Color.Transparent,
                 RoundedCornerShape(50)
             )
-            .combinedClickable(onClick = onClick)
+            .combinedClickable(
+                onClick = onClick,
+                indication = null,
+                interactionSource = null,
+                enabled = true,
+            )
             .padding(4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

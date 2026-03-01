@@ -1,6 +1,7 @@
 package com.client.xvideos.redgifs.common.saved
 
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.toMutableStateList
 import com.client.xvideos.common.AppPath
 import com.client.xvideos.common.fileDB.FileDB
 import com.client.xvideos.common.snackbar.SnackBar
@@ -68,9 +69,15 @@ class R_Saved_Subscriptions(
 
     suspend fun refreshSubscription() : List<GifsInfo>{
         val res  = mutableListOf<GifsInfo>()
-        listCreators.forEach {
+
+        val a = listCreators.map { SelectedCreator(it, true) }
+
+        selectedListCreator.clear()
+        selectedListCreator.addAll(a)
+
+        selectedListCreator.filter { it.select }.forEach {
             try {
-                res.addAll(read50LastItem(it))
+                res.addAll(read50LastItem(it.name))
             }
             catch (e: Exception){
                 Timber.e(e)
