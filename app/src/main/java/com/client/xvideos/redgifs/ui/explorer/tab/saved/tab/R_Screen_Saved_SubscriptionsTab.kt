@@ -2,17 +2,38 @@ package com.client.xvideos.redgifs.ui.explorer.tab.saved.tab
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.screen.Screen
@@ -22,7 +43,10 @@ import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.client.xvideos.common.coil.UrlImage
 import com.client.xvideos.common.connectivityObserver.ConnectivityObserver
+import com.client.xvideos.redgifs.common.ThemeRed
+import com.client.xvideos.redgifs.common.UsersRed
 import com.client.xvideos.redgifs.common.di.HostDI
 import com.client.xvideos.redgifs.ui.profile.ScreenRedProfile
 import com.client.xvideos.redgifs.ui.profile.atom.VerticalScrollbar
@@ -37,44 +61,71 @@ import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
 import javax.inject.Inject
 
-
 object R_Screen_Saved_SubscriptionsTab : Screen {
 
     private fun readResolve(): Any = R_Screen_Saved_SubscriptionsTab
 
     override val key: ScreenKey = uniqueScreenKey
 
-    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val vm: ScreenSavedSubscriptionsSM = getScreenModel()
 
-        //val columnSelect = Settings.r_likesTab_column_current_count.field.collectAsStateWithLifecycle().value
+        val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForGrid(
+            gridState = vm.likedHost.state,
+            itemsToIgnore = 0,
+            numberOfColumns = 2
+        )
 
-        //Изменение количества отображаемых елементов
-        //LaunchedEffect(columnSelect) { vm.likedHost.columns = columnSelect }
+        SubscriptionsTabContent(
+            host = vm.likedHost,
+            scrollPercent = scrollPercent,
+            listCreators = vm.hostDI.savedRed.subscriptions.listCreators,
+            onOpenProfile = { navigator.push(ScreenRedProfile(it)) }
+        )
+    }
+}
 
-//        LaunchedEffect(vm.hostDI.savedRed.likes.list){
-//            //vm.likedHost.refresh()
-//        }
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@Composable
+fun SubscriptionsTabContent(
+    host: LazyRow123Host?,
+    scrollPercent: Pair<Float, Float>,
+    listCreators: List<String>,
+    onOpenProfile: (String) -> Unit
+) {
+    var selectCreator by remember { mutableStateOf<String?>(null) }
 
-        val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForGrid( gridState = vm.likedHost.state, itemsToIgnore = 0, numberOfColumns = 2 )
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        containerColor = Color(0xFF303030)
+    ) { padding ->
+        Box(modifier = Modifier.fillMaxSize().padding(padding)) {
 
-        Box(modifier = Modifier.fillMaxSize().background(Color(0xFF303030))) {
-
-            LazyRow123(
-                host = vm.likedHost,
-                modifier = Modifier.fillMaxSize(),
-                onClickOpenProfile = {
-                    //vm.likedHost.currentIndexGoto = vm.likedHost.currentIndex
-                    navigator.push(ScreenRedProfile(it))
-                },
-                //gotoPosition = vm.likedHost.currentIndexGoto,
-                contentPadding = PaddingValues(0.dp),
-                contentBeforeList = { },
-                isRunLike = true
-            )
+            if (host != null) {
+                LazyRow123(
+                    host = host,
+                    modifier = Modifier.fillMaxSize(),
+                    onClickOpenProfile = onOpenProfile,
+                    contentPadding = PaddingValues(0.dp),
+                    contentBeforeList = {
+                        CreatorsHeader(
+                            listCreators = listCreators,
+                            selectedCreator = selectCreator,
+                            onCreatorClick = { selectCreator = it }
+                        )
+                    },
+                    isRunLike = true
+                )
+            } else {
+                // Fallback for Preview
+                CreatorsHeader(
+                    listCreators = listCreators,
+                    selectedCreator = selectCreator,
+                    onCreatorClick = { selectCreator = it }
+                )
+            }
 
             //---- Скролл ----
             Box(
@@ -86,21 +137,98 @@ object R_Screen_Saved_SubscriptionsTab : Screen {
                 VerticalScrollbar(scrollPercent)
             }
         }
-
-
     }
+}
 
+@Composable
+fun CreatorsHeader(
+    listCreators: List<String>,
+    selectedCreator: String?,
+    onCreatorClick: (String) -> Unit
+) {
+    FlowRow(modifier = Modifier.fillMaxWidth().padding(4.dp)) {
+        listCreators.forEach { creator ->
+            CreatorChip(
+                creator = creator,
+                isSelected = selectedCreator == creator,
+                onClick = { onCreatorClick(creator) }
+            )
+        }
+    }
+}
 
+@Composable
+fun CreatorChip(
+    creator: String,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .padding(4.dp)
+            .clip(RoundedCornerShape(50))
+            .border(1.dp, Color.Gray, RoundedCornerShape(50))
+            .background(
+                if (isSelected) Color.DarkGray else Color.Transparent,
+                RoundedCornerShape(50)
+            )
+            .combinedClickable(onClick = onClick)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .clip(CircleShape)
+                .background(Color.DarkGray),
+            contentAlignment = Alignment.Center
+        ) {
+            val url = UsersRed.listAllUsers.find { it.username == creator }?.profileImageUrl
+            if (url != null) {
+                UrlImage(url = url)
+            } else {
+                Icon(
+                    Icons.Default.Person,
+                    contentDescription = null,
+                    modifier = Modifier.size(24.dp),
+                    tint = Color.White
+                )
+            }
+        }
 
+        Spacer(Modifier.width(8.dp))
+        Text(
+            text = creator,
+            fontSize = 16.sp,
+            color = Color.White,
+            fontFamily = ThemeRed.fontFamilyPopinsRegular
+        )
+        Spacer(Modifier.width(4.dp))
+    }
+}
+
+@Preview
+@Composable
+fun SubscriptionsTabPreview() {
+    SubscriptionsTabContent(
+        host = null,
+        scrollPercent = 0f to 0.2f,
+        listCreators = listOf("Creator1", "Creator2", "LongCreatorName", "Short"),
+        onOpenProfile = {}
+    )
 }
 
 class ScreenSavedSubscriptionsSM @Inject constructor(
     connectivityObserver: ConnectivityObserver,
-    val hostDI : HostDI
+    val hostDI: HostDI
 ) : ScreenModel {
 
-    val likedHost = LazyRow123Host( connectivityObserver = connectivityObserver, scope = screenModelScope, typePager = TypePager.SUBSCRIPTIONS, hostDI = hostDI )
-
+    val likedHost = LazyRow123Host(
+        connectivityObserver = connectivityObserver,
+        scope = screenModelScope,
+        typePager = TypePager.SUBSCRIPTIONS,
+        hostDI = hostDI
+    )
 }
 
 @Module
