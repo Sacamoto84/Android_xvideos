@@ -14,7 +14,7 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import timber.log.Timber
 
 
-data class SelectedCreator(val name: String, var select: Boolean)
+data class SelectedCreator(val name: String, var select: Boolean, val urlProfile : String?)
 
 class R_Saved_Subscriptions(
     val scope: CoroutineScope,
@@ -40,7 +40,7 @@ class R_Saved_Subscriptions(
         val currentNames = selectedListCreator.map { it.name }.toSet()
         // Добавляем новых, которых нет в списке
         listCreators.map{it.username}.filter { it !in currentNames }.forEach {
-            selectedListCreator.add(SelectedCreator(it, true))
+            selectedListCreator.add(SelectedCreator(it, true, listCreators.firstOrNull{ itt -> itt.username  ==  it}?.profileImageUrl ))
         }
         // Удаляем тех, кого больше нет в подписках
         val creatorsSet = listCreators.map{it.username}.toSet()

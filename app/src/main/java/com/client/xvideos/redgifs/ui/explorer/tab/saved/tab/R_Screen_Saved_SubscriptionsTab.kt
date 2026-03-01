@@ -50,6 +50,7 @@ import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.common.UsersRed
 import com.client.xvideos.redgifs.common.di.HostDI
 import com.client.xvideos.redgifs.common.saved.SelectedCreator
+import com.client.xvideos.redgifs.model.UserInfo
 import com.client.xvideos.redgifs.ui.profile.ScreenRedProfile
 import com.client.xvideos.redgifs.ui.profile.atom.VerticalScrollbar
 import com.client.xvideos.redgifs.ui.profile.rememberVisibleRangePercentIgnoringFirstNForGrid
@@ -84,6 +85,8 @@ object R_Screen_Saved_SubscriptionsTab : Screen {
 
         var selectCreatorName by remember { mutableStateOf<String?>(null) }
 
+        var userToDelete by remember { mutableStateOf<SelectedCreator?>(null) }
+
         // Используем SnapshotStateList напрямую для реактивности UI
         val selectedListCreator = vm.hostDI.savedRed.subscriptions.selectedListCreator
 
@@ -107,8 +110,18 @@ object R_Screen_Saved_SubscriptionsTab : Screen {
             listCreatorSelectedCreator = selectedListCreator,
             onOpenProfile = { navigator.push(ScreenRedProfile(it)) },
             onSelectCreator = { selectCreatorName = it },
-            onLongClick = {
+            onLongClick = { name ->
+                userToDelete = selectedListCreator.toList().firstOrNull { it.name == name }
+            }
+        )
+
+        DialogSubscriptionDelete(
+            user = { userToDelete },
+            onDismiss = { userToDelete = null },
+            onConfirm = {
                 vm.hostDI.savedRed.subscriptions.remove(it)
+                userToDelete = null
+                pager.refresh()
             }
         )
     }
@@ -182,6 +195,7 @@ fun CreatorsHeader(
         listCreators.forEach { creator ->
             CreatorChip(
                 creator = creator.name,
+                url = creator.urlProfile,
                 isSelected = creator.select,
                 onClick = { onCreatorClick(creator.name) },
                 onLongClick = { onLongClick(creator.name) }
@@ -193,6 +207,7 @@ fun CreatorsHeader(
 @Composable
 fun CreatorChip(
     creator: String,
+    url: String? = null,
     isSelected: Boolean,
     onClick: () -> Unit,
     onLongClick: () -> Unit = {}
@@ -222,7 +237,7 @@ fun CreatorChip(
                 .background(Color.DarkGray),
             contentAlignment = Alignment.Center
         ) {
-            val url = UsersRed.listAllUsers.find { it.username == creator }?.profileImageUrl
+
             if (url != null) {
                 UrlImage(url = url)
             } else {
@@ -253,9 +268,9 @@ fun SubscriptionsTabPreview() {
         host = null,
         scrollPercent = 0f to 0.2f,
         listCreatorSelectedCreator = listOf(
-            SelectedCreator("Creator 1", true),
-            SelectedCreator("Another One", false),
-            SelectedCreator("Superstar", true)
+            SelectedCreator("Creator 1", true, null),
+            SelectedCreator("Another One", false, null),
+            SelectedCreator("Superstar", true, null)
         ),
         onOpenProfile = {},
         onSelectCreator = {}
