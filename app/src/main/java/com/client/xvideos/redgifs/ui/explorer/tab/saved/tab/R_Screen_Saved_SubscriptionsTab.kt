@@ -106,7 +106,10 @@ object R_Screen_Saved_SubscriptionsTab : Screen {
             scrollPercent = scrollPercent,
             listCreatorSelectedCreator = selectedListCreator,
             onOpenProfile = { navigator.push(ScreenRedProfile(it)) },
-            onSelectCreator = { selectCreatorName = it }
+            onSelectCreator = { selectCreatorName = it },
+            onLongClick = {
+                vm.hostDI.savedRed.subscriptions.remove(it)
+            }
         )
     }
 }
@@ -118,16 +121,15 @@ fun SubscriptionsTabContent(
     scrollPercent: Pair<Float, Float>,
     listCreatorSelectedCreator: List<SelectedCreator>,
     onOpenProfile: (String) -> Unit,
-    onSelectCreator: (String) -> Unit
+    onSelectCreator: (String) -> Unit,
+    onLongClick : (String) -> Unit = {}
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = Color(0xFF303030)
     ) { padding ->
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
+            modifier = Modifier.fillMaxSize().padding(padding)
         ) {
             if (host != null) {
                 LazyRow123(
@@ -138,7 +140,8 @@ fun SubscriptionsTabContent(
                     contentBeforeList = {
                         CreatorsHeader(
                             listCreators = listCreatorSelectedCreator,
-                            onCreatorClick = onSelectCreator
+                            onCreatorClick = onSelectCreator,
+                            onLongClick = onLongClick
                         )
                     },
                     isRunLike = true
@@ -147,7 +150,8 @@ fun SubscriptionsTabContent(
                 // Fallback for Preview
                 CreatorsHeader(
                     listCreators = listCreatorSelectedCreator,
-                    onCreatorClick = onSelectCreator
+                    onCreatorClick = onSelectCreator,
+                    onLongClick = onLongClick
                 )
             }
 
@@ -167,7 +171,8 @@ fun SubscriptionsTabContent(
 @Composable
 fun CreatorsHeader(
     listCreators: List<SelectedCreator>,
-    onCreatorClick: (String) -> Unit
+    onCreatorClick: (String) -> Unit,
+    onLongClick : (String) -> Unit = {}
 ) {
     FlowRow(
         modifier = Modifier
@@ -178,7 +183,8 @@ fun CreatorsHeader(
             CreatorChip(
                 creator = creator.name,
                 isSelected = creator.select,
-                onClick = { onCreatorClick(creator.name) }
+                onClick = { onCreatorClick(creator.name) },
+                onLongClick = { onLongClick(creator.name) }
             )
         }
     }
@@ -188,7 +194,8 @@ fun CreatorsHeader(
 fun CreatorChip(
     creator: String,
     isSelected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onLongClick: () -> Unit = {}
 ) {
     Row(
         modifier = Modifier
@@ -201,6 +208,7 @@ fun CreatorChip(
             )
             .combinedClickable(
                 onClick = onClick,
+                onLongClick = onLongClick,
                 indication = null,
                 interactionSource = null,
             )

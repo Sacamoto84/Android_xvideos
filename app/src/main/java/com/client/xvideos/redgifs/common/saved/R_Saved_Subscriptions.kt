@@ -7,6 +7,7 @@ import com.client.xvideos.common.fileDB.FileDB
 import com.client.xvideos.common.snackbar.SnackBar
 import com.client.xvideos.redgifs.model.GifsInfo
 import com.client.xvideos.redgifs.model.MediaType
+import com.client.xvideos.redgifs.model.UserInfo
 import com.client.xvideos.redgifs.network.api.RedApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -20,7 +21,7 @@ class R_Saved_Subscriptions(
     val redApi: RedApi,
 ) {
 
-    private val creatorDb = FileDB(AppPath.r_subscriptions, "subscriptions", String::class.java)
+    private val creatorDb = FileDB(AppPath.r_subscriptions, "subscriptions", UserInfo::class.java)
 
     /**
      * Список авторов на которых подписаны
@@ -38,17 +39,17 @@ class R_Saved_Subscriptions(
     private fun syncSelectedList() {
         val currentNames = selectedListCreator.map { it.name }.toSet()
         // Добавляем новых, которых нет в списке
-        listCreators.filter { it !in currentNames }.forEach {
+        listCreators.map{it.username}.filter { it !in currentNames }.forEach {
             selectedListCreator.add(SelectedCreator(it, true))
         }
         // Удаляем тех, кого больше нет в подписках
-        val creatorsSet = listCreators.toSet()
+        val creatorsSet = listCreators.map{it.username}.toSet()
         selectedListCreator.removeAll { it.name !in creatorsSet }
     }
 
-    fun add(item: String) {
+    fun add(item: UserInfo) {
         println("!!! add subscriptions() id:${item}")
-        creatorDb.insert(item, item)
+        creatorDb.insert(item.username, item)
             .onSuccess {
                 SnackBar.success("Автор добавлен")
                 listCreators.add(item)

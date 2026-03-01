@@ -13,6 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.redgifs.common.saved.SavedRed
 import com.client.xvideos.redgifs.model.GifsInfo
+import com.client.xvideos.redgifs.network.api.RedApi
 import com.client.xvideos.ui.theme.XvideosTheme
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
@@ -21,9 +22,9 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, DelicateCoroutinesApi::class)
 @Composable
-fun DropdownMenuItem_Subscribtion(item: GifsInfo? = null, savedRed: ()->SavedRed, onDismiss: () -> Unit){
+fun DropdownMenuItem_Subscribtion(item: GifsInfo? = null, redApi:()-> RedApi , savedRed: ()->SavedRed, onDismiss: () -> Unit){
 
-    val isSubscribed = savedRed.invoke().subscriptions.listCreators.any { it == item?.userName }
+    val isSubscribed = savedRed.invoke().subscriptions.listCreators.any { it.username == item?.userName }
 
     DropdownMenuItem_SubscriptionContent(
 
@@ -36,7 +37,8 @@ fun DropdownMenuItem_Subscribtion(item: GifsInfo? = null, savedRed: ()->SavedRed
                 delay(200)
                 if (!isSubscribed) {
                     try {
-                        savedRed.invoke().subscriptions.add(item.userName)
+                        val a = redApi.invoke().readCreator(item.userName).getOrNull()
+                        savedRed.invoke().subscriptions.add(a!!)
                     } catch (e: Exception) { e.printStackTrace() }
                 }
                 else {
