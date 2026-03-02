@@ -47,6 +47,11 @@ fun ProfileInfo1(
         {
 
             val a = listUsers.firstOrNull { it1 -> it1.username == videoItem.userName }
+
+            if (a == null){
+
+            }
+
             if ((a != null) && (a.profileImageUrl != null)) {
                 Box( modifier = Modifier.clip(RoundedCornerShape(cornerRadius)).size(sizeIcon), contentAlignment = Alignment.Center )
                 { UrlImage( a.profileImageUrl, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop ) }

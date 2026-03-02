@@ -73,7 +73,7 @@ class Downloader @Inject constructor(
                     println("!!! onCompleted закачки")
                     percent.value = -2f
 
-                    SnackBar.error("Скачивание завершено")
+                    SnackBar.success("Скачивание завершено")
                     val gson = GsonBuilder().create()
                     val text = gson.toJson(item)
                     File(p, "${item.id}.info").writeText(text.toString())

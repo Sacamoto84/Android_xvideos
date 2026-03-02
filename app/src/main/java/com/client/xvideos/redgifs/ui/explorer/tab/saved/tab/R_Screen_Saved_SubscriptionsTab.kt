@@ -22,15 +22,21 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -62,6 +68,8 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 object R_Screen_Saved_SubscriptionsTab : Screen {
@@ -137,6 +145,14 @@ fun SubscriptionsTabContent(
     onSelectCreator: (String) -> Unit,
     onLongClick : (String) -> Unit = {}
 ) {
+
+    val scope = rememberCoroutineScope()
+    val haptic = LocalHapticFeedback.current
+    var isRefreshing by remember { mutableStateOf(false) }
+    val pullToRefreshState = rememberPullToRefreshState()
+    val pager = host?.pager?.collectAsLazyPagingItems()
+
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = Color(0xFF303030)
@@ -144,38 +160,54 @@ fun SubscriptionsTabContent(
         Box(
             modifier = Modifier.fillMaxSize().padding(padding)
         ) {
-            if (host != null) {
-                LazyRow123(
-                    host = host,
-                    modifier = Modifier.fillMaxSize(),
-                    onClickOpenProfile = onOpenProfile,
-                    contentPadding = PaddingValues(0.dp),
-                    contentBeforeList = {
-                        CreatorsHeader(
-                            listCreators = listCreatorSelectedCreator,
-                            onCreatorClick = onSelectCreator,
-                            onLongClick = onLongClick
-                        )
-                    },
-                    isRunLike = true
-                )
-            } else {
-                // Fallback for Preview
-                CreatorsHeader(
-                    listCreators = listCreatorSelectedCreator,
-                    onCreatorClick = onSelectCreator,
-                    onLongClick = onLongClick
-                )
-            }
 
-            //---- Скролл ----
-            Box(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .align(Alignment.CenterEnd)
-                    .width(2.dp)
+
+            PullToRefreshBox(
+                isRefreshing = isRefreshing,
+                onRefresh = {
+                    scope.launch {
+                        haptic.performHapticFeedback(HapticFeedbackType.Confirm)
+                        isRefreshing = true
+                        delay(500)
+                        isRefreshing = false
+                    }
+                    pager?.refresh()
+                },
+                state = pullToRefreshState,
+                indicator = {
+                    Indicator(
+                        modifier = Modifier.align(Alignment.TopCenter),
+                        isRefreshing = isRefreshing,
+                        containerColor = Color.White,
+                        color = Color.Black,
+                        state = pullToRefreshState
+                    )
+                },
             ) {
-                VerticalScrollbar(scrollPercent)
+
+
+                if (host != null) {
+                    LazyRow123(
+                        host = host,
+                        modifier = Modifier.fillMaxSize(),
+                        onClickOpenProfile = onOpenProfile,
+                        contentPadding = PaddingValues(0.dp),
+                        contentBeforeList = {
+                            CreatorsHeader(
+                                listCreators = listCreatorSelectedCreator,
+                                onCreatorClick = onSelectCreator,
+                                onLongClick = onLongClick
+                            )
+                        },
+                        isRunLike = true
+                    )
+                } else {
+                    // Fallback for Preview
+                    CreatorsHeader( listCreators = listCreatorSelectedCreator, onCreatorClick = onSelectCreator, onLongClick = onLongClick )
+                }
+
+                //---- Скролл ----
+                Box( modifier = Modifier.fillMaxHeight().align(Alignment.CenterEnd).width(2.dp) ) { VerticalScrollbar(scrollPercent) }
             }
         }
     }

@@ -109,20 +109,14 @@ private fun R_ScreenGifsTabContent(vm: ScreenRedExplorerGifsSM) {
 
     val columnSelect by Settings.r_explorerGifsTab_column_current_count.field.collectAsStateWithLifecycle()
 
-    val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForGrid(
-        gridState = vm.lazyHost.state,
-        itemsToIgnore = 0,
-        numberOfColumns = columnSelect
-    )
+    val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForGrid( gridState = vm.lazyHost.state, itemsToIgnore = 0, numberOfColumns = columnSelect )
 
     val search = vm.hostDI.search
     val searchR by search.searchText.collectAsStateWithLifecycle()
     val isFocused by search.focused.collectAsStateWithLifecycle()
     val sortType by vm.lazyHost.sortType.collectAsStateWithLifecycle()
 
-    LaunchedEffect(columnSelect) {
-        vm.lazyHost.columns = columnSelect
-    }
+    LaunchedEffect(columnSelect) { vm.lazyHost.columns = columnSelect }
 
     var isRefreshing by remember { mutableStateOf(false) }
     val pullToRefreshState = rememberPullToRefreshState()
@@ -130,9 +124,7 @@ private fun R_ScreenGifsTabContent(vm: ScreenRedExplorerGifsSM) {
     Scaffold(
         bottomBar = {
             StatelessGifsTabBottomBar(
-                searchField = { modifier ->
-                    search.CustomBasicTextField( modifier = modifier )
-                },
+                searchField = { modifier -> search.CustomBasicTextField( modifier = modifier ) },
                 searchR = searchR,
                 isFocused = isFocused,
                 sortType = sortType,
@@ -145,11 +137,8 @@ private fun R_ScreenGifsTabContent(vm: ScreenRedExplorerGifsSM) {
         },
         containerColor = ThemeRed.colorCommonBackground
     ) { padding ->
-        Box(
-            modifier = Modifier
-                .padding(bottom = padding.calculateBottomPadding())
-                .fillMaxSize()
-        ) {
+        Box( modifier = Modifier.padding(bottom = padding.calculateBottomPadding()).fillMaxSize() )
+        {
             PullToRefreshBox(
                 isRefreshing = isRefreshing,
                 onRefresh = {
