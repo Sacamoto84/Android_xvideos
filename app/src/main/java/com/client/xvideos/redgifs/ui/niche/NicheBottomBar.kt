@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.TextAutoSize
@@ -29,7 +30,7 @@ import com.client.xvideos.common.coil.UrlImage
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.model.NichesInfo
 import com.client.xvideos.redgifs.model.Order
-import com.client.xvideos.redgifs.ui.ui.atom.ButtonUp
+import com.client.xvideos.redgifs.ui.ui.atom.ButtonUpCircle
 import com.client.xvideos.redgifs.ui.ui.atom.TabBarPoints
 import com.client.xvideos.redgifs.ui.ui.sortByOrder.SortByOrder
 import com.client.xvideos.ui.theme.XvideosTheme
@@ -43,58 +44,63 @@ fun NicheBottomBar(
     onUpClick: () -> Unit
 ) {
     Column {
-        HorizontalDivider(color = ThemeRed.colorBorderGray)
+        //HorizontalDivider(color = ThemeRed.colorBorderGray)
         Row(
             modifier = Modifier
-                .fillMaxWidth()
+                //.fillMaxWidth()
+                //.clip(RoundedCornerShape(50f))
                 .height(48.dp)
-                .background(ThemeRed.colorTabLevel1),
+                //.background(ThemeRed.colorTabLevel1)
+                .padding(horizontal = 0.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Spacer(modifier = Modifier.width(2.dp))
+
                 SortByOrder(
                     listOf(Order.TRENDING, Order.TOP, Order.LATEST),
                     currentSort,
                     onSelect = onSortChange,
-                    containerColor = ThemeRed.colorTabLevel0
+                    containerColor = ThemeRed.colorTabLevel0,
+                    circle = true
                 )
-                Spacer(modifier = Modifier.width(4.dp))
-                UrlImage(
-                    niche.thumbnail,
-                    modifier = Modifier
-                        .size(45.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                )
-            }
 
-            BasicText(
-                niche.name,
-                modifier = Modifier
-                    .padding(horizontal = 4.dp)
-                    .weight(1f),
-                style = TextStyle(
-                    color = Color.LightGray,
-                    fontSize = 18.sp,
-                    fontFamily = ThemeRed.fontFamilyDMsanss
-                ),
-                autoSize = TextAutoSize.StepBased(10.sp, 18.sp)
-            )
+                Spacer(modifier = Modifier.width(4.dp))
+//                UrlImage(
+//                    niche.thumbnail,
+//                    modifier = Modifier
+//                        .size(45.dp)
+//                        .clip(RoundedCornerShape(50))
+//                )
+            }
+            Spacer(modifier = Modifier.width(4.dp))
+
+//            BasicText(
+//                niche.name,
+//                modifier = Modifier
+//                    .padding(horizontal = 4.dp)
+//                    .weight(1f),
+//                style = TextStyle(
+//                    color = Color.LightGray,
+//                    fontSize = 18.sp,
+//                    fontFamily = ThemeRed.fontFamilyDMsanss
+//                ),
+//                autoSize = TextAutoSize.StepBased(10.sp, 18.sp)
+//            )
 
             Row(verticalAlignment = Alignment.CenterVertically) {
+
                 Box(
-                    modifier = Modifier
-                        .size(46.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .border(1.dp, Color.DarkGray, RoundedCornerShape(8.dp))
-                        .background(ThemeRed.colorTabLevel0),
-                    contentAlignment = Alignment.Center
+                    modifier = Modifier.size(44.dp).clip(CircleShape)
+                        .border(1.dp, Color.DarkGray, CircleShape)
+                        .background(ThemeRed.colorTabLevel0), contentAlignment = Alignment.Center
                 ) {
                     TabBarPoints(columns, true)
                 }
+
                 Spacer(modifier = Modifier.width(4.dp))
-                ButtonUp(44.dp, onUpClick)
+                ButtonUpCircle(44.dp, onUpClick)
                 Spacer(modifier = Modifier.width(2.dp))
             }
         }

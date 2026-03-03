@@ -1,21 +1,17 @@
 package com.client.xvideos.redgifs.ui.ui.lazyrow123
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -24,6 +20,9 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
@@ -31,11 +30,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -45,15 +47,14 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import cafe.adriel.voyager.navigator.LocalNavigator
-import com.client.xvideos.redgifs.common.UsersRed
 import com.client.xvideos.redgifs.common.video.player_row_mini.RedUrlVideoImageAndLongClick
 import com.client.xvideos.redgifs.model.GifsInfo
 import com.client.xvideos.redgifs.ui.explorer.ScreenRedExplorer
 import com.client.xvideos.redgifs.ui.fullscreen.ScreenRedFullScreen
-import com.client.xvideos.redgifs.ui.top_this_week.ProfileInfo1
-import com.redgifs.common.block.ui.DialogBlock
-import com.client.xvideos.redgifs.common.expand_menu_video.ExpandMenuVideo
-import com.client.xvideos.redgifs.common.expand_menu_video.ExpandMenuVideoTags
+import com.client.xvideos.redgifs.ui.profile.atom.VerticalScrollbar
+import com.client.xvideos.redgifs.ui.profile.rememberVisibleRangePercentIgnoringFirstNForGrid
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -67,18 +68,63 @@ fun LazyRow123(
     isRunLike: Boolean = false,
     onAppendLoaded: (LazyPagingItems<GifsInfo>) -> Unit = {},
 ) {
+
     val listGifs = host.pager.collectAsLazyPagingItems() as LazyPagingItems<GifsInfo>
 
-    LazyRow123Content(
-        host = host,
-        listGifs = listGifs,
-        modifier = modifier,
-        onClickOpenProfile = onClickOpenProfile,
-        contentPadding = contentPadding,
-        contentBeforeList = contentBeforeList,
-        isRunLike = isRunLike,
-        onAppendLoaded = onAppendLoaded
+    val scope = rememberCoroutineScope()
+    val haptic = LocalHapticFeedback.current
+    var isRefreshing by remember { mutableStateOf(false) }
+    val pullToRefreshState = rememberPullToRefreshState()
+
+    val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForGrid(
+        gridState = host.state,
+        itemsToIgnore = 0,
+        numberOfColumns = host.columns
     )
+
+    PullToRefreshBox(
+        isRefreshing = isRefreshing,
+        onRefresh = {
+            scope.launch {
+                haptic.performHapticFeedback(HapticFeedbackType.Confirm)
+                isRefreshing = true
+                delay(500)
+                isRefreshing = false
+            }
+            listGifs.refresh()
+        },
+        state = pullToRefreshState,
+        indicator = {
+            Indicator(
+                modifier = Modifier.align(Alignment.TopCenter),
+                isRefreshing = isRefreshing,
+                containerColor = Color.White,
+                color = Color.Black,
+                state = pullToRefreshState
+            )
+        },
+    ) {
+
+        LazyRow123Content(
+            host = host,
+            listGifs = listGifs,
+            modifier = modifier,
+            onClickOpenProfile = onClickOpenProfile,
+            contentPadding = contentPadding,
+            contentBeforeList = contentBeforeList,
+            isRunLike = isRunLike,
+            onAppendLoaded = onAppendLoaded
+        )
+
+        //---- Скролл ----
+        Box(
+            modifier = Modifier
+                .fillMaxHeight()
+                .align(Alignment.CenterEnd)
+                .width(2.dp)
+        ) { VerticalScrollbar(scrollPercent) }
+    }
+
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -197,7 +243,12 @@ fun LazyRow123Content(
                 if (index < listGifs.itemCount) {
                     listGifs[index]?.let { item ->
                          Box(
-                            modifier = Modifier.padding(vertical = 2.dp).padding(horizontal = 2.dp).fillMaxSize().clip(RoundedCornerShape(12.dp)).border(1.dp, Color.DarkGray, RoundedCornerShape(12.dp)),
+                            modifier = Modifier
+                                .padding(vertical = 2.dp)
+                                .padding(horizontal = 2.dp)
+                                .fillMaxSize()
+                                .clip(RoundedCornerShape(12.dp))
+                                .border(1.dp, Color.DarkGray, RoundedCornerShape(12.dp)),
                             contentAlignment = Alignment.Center
                         ) {
                             RedUrlVideoImageAndLongClick(

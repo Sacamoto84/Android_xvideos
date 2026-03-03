@@ -85,12 +85,7 @@ class LazyRow123Host(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val pager: Flow<PagingData<Any>> =
-        combine(
-            hostDI.search.searchTextDone,
-            sortType,
-            tags,
-            hostDI.searchNiches.searchTextDone,
-        )
+        combine( hostDI.search.searchTextDone, sortType, tags, hostDI.searchNiches.searchTextDone )
         { text, sort, tags, textNiches ->
             SearchParams(text.trim(), sort, tags.joinToString(","), textNiches)
         }
@@ -98,23 +93,15 @@ class LazyRow123Host(
             .distinctUntilChanged()                                 // ③ игнорируем дубли
             .flatMapLatest { params ->                              // ④ НОВЫЙ Pager при каждом изменении
                 Pager(
-                    config = PagingConfig(
-                        pageSize = 100,
-                        prefetchDistance = 10,
-                        initialLoadSize = 100
-                    ),
+                    config = PagingConfig( pageSize = 100, prefetchDistance = 10, initialLoadSize = 100 ),
                     pagingSourceFactory = {
                         Timber.d("!!! >>>pagingSourceFactory{...}")
                         gotoUp()
                         gotoUpColumn()
                         createPager(
-                            typePager = typePager,
-                            sort = params.sort,
-                            extraString = extraString,
-                            searchText = params.query,
-                            tags = tags.value.toList(),
-                            hostDI = hostDI,
-                            textNiches = params.queryNiches
+                            typePager = typePager,  sort = params.sort,
+                            extraString = extraString, searchText = params.query,
+                            tags = tags.value.toList(), hostDI = hostDI, textNiches = params.queryNiches
                         )
                     }
                 ).flow

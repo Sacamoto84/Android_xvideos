@@ -42,12 +42,10 @@ fun SortByOrder(
     list: List<Order>,
     selected: Order,
     onSelect: (Order) -> Unit,
-    containerColor: Color = Color.Transparent
+    containerColor: Color = Color.Transparent,
+    circle : Boolean = false
 ) {
-
-    if (!list.any { it == selected }) {
-        onSelect(Order.LATEST)
-    }
+    if (!list.any { it == selected }) { onSelect(Order.LATEST) }
 
     var expanded by remember { mutableStateOf(false) }
 
@@ -60,7 +58,7 @@ fun SortByOrder(
             expanded = it
         },
         modifier = Modifier
-            .clip(RoundedCornerShape(8.dp))
+            .clip(if (!circle) RoundedCornerShape(8.dp) else RoundedCornerShape(50))
             .background(containerColor)
 
     )
@@ -71,13 +69,11 @@ fun SortByOrder(
                 .width(100.dp)
                 .height(46.dp)
                 .menuAnchor(ExposedDropdownMenuAnchorType.SecondaryEditable)
+
                 .border(
-                    1.dp, Color(0xFF3A3A3A),
-                    RoundedCornerShape(8.dp)
-                )
-                .clickable(onClick = {
-                    expanded = true
-                }),
+                    1.dp, Color(0xFF3A3A3A), if (!circle) RoundedCornerShape(8.dp) else RoundedCornerShape(50))
+
+                .clickable(onClick = { expanded = true }),
             horizontalArrangement = Arrangement.SpaceAround
         ) {
 

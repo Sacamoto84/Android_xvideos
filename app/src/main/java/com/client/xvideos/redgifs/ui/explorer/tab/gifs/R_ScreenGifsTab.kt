@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -22,8 +21,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -58,7 +55,6 @@ import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.common.di.HostDI
 import com.client.xvideos.redgifs.model.Order
 import com.client.xvideos.redgifs.ui.profile.ScreenRedProfile
-import com.client.xvideos.redgifs.ui.profile.atom.VerticalScrollbar
 import com.client.xvideos.redgifs.ui.profile.rememberVisibleRangePercentIgnoringFirstNForGrid
 import com.client.xvideos.redgifs.ui.ui.atom.ButtonUp
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.LazyRow123
@@ -71,8 +67,6 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 fun ColumnSelect_AddColumn(pref: SettingElementInt, list: SettingElementList<Boolean>) {
@@ -103,13 +97,10 @@ object R_ScreenGifsTab : Screen {
 @Composable
 private fun R_ScreenGifsTabContent(vm: ScreenRedExplorerGifsSM) {
     val navigator = LocalNavigator.current
-    val host = vm.lazyHost.pager.collectAsLazyPagingItems()
-    val scope = rememberCoroutineScope()
+
     val haptic = LocalHapticFeedback.current
 
     val columnSelect by Settings.r_explorerGifsTab_column_current_count.field.collectAsStateWithLifecycle()
-
-    val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForGrid( gridState = vm.lazyHost.state, itemsToIgnore = 0, numberOfColumns = columnSelect )
 
     val search = vm.hostDI.search
     val searchR by search.searchText.collectAsStateWithLifecycle()
@@ -118,8 +109,6 @@ private fun R_ScreenGifsTabContent(vm: ScreenRedExplorerGifsSM) {
 
     LaunchedEffect(columnSelect) { vm.lazyHost.columns = columnSelect }
 
-    var isRefreshing by remember { mutableStateOf(false) }
-    val pullToRefreshState = rememberPullToRefreshState()
 
     Scaffold(
         bottomBar = {
@@ -137,30 +126,10 @@ private fun R_ScreenGifsTabContent(vm: ScreenRedExplorerGifsSM) {
         },
         containerColor = ThemeRed.colorCommonBackground
     ) { padding ->
-        Box( modifier = Modifier.padding(bottom = padding.calculateBottomPadding()).fillMaxSize() )
+        Box( modifier = Modifier
+            .padding(bottom = padding.calculateBottomPadding())
+            .fillMaxSize() )
         {
-            PullToRefreshBox(
-                isRefreshing = isRefreshing,
-                onRefresh = {
-                    scope.launch {
-                        haptic.performHapticFeedback(HapticFeedbackType.Confirm)
-                        isRefreshing = true
-                        delay(500)
-                        isRefreshing = false
-                    }
-                    host.refresh()
-                },
-                state = pullToRefreshState,
-                indicator = {
-                    Indicator(
-                        modifier = Modifier.align(Alignment.TopCenter),
-                        isRefreshing = isRefreshing,
-                        containerColor = Color.White,
-                        color = Color.Black,
-                        state = pullToRefreshState
-                    )
-                },
-            ) {
                 LazyRow123(
                     host = vm.lazyHost,
                     modifier = Modifier.fillMaxSize(),
@@ -170,16 +139,6 @@ private fun R_ScreenGifsTabContent(vm: ScreenRedExplorerGifsSM) {
                     },
                     contentPadding = PaddingValues(top = 0.dp),
                 )
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .align(Alignment.CenterEnd)
-                        .width(2.dp)
-                ) {
-                    VerticalScrollbar(scrollPercent)
-                }
-            }
         }
     }
 }
@@ -195,7 +154,9 @@ private fun StatelessGifsTabBottomBar(
 ) {
     Column(Modifier.background(ThemeRed.colorTabLevel1)) {
         HorizontalDivider(color = ThemeRed.colorBorderGray)
-        Row( modifier = Modifier.padding(top = 1.dp, start = 1.dp).background(ThemeRed.colorTabLevel1), verticalAlignment = Alignment.Bottom )
+        Row( modifier = Modifier
+            .padding(top = 1.dp, start = 1.dp)
+            .background(ThemeRed.colorTabLevel1), verticalAlignment = Alignment.Bottom )
         {
 
             AnimatedVisibility(
@@ -294,7 +255,9 @@ private fun R_ScreenGifsTabSkeletonPreview() {
         Scaffold(
             bottomBar = {
                 StatelessGifsTabBottomBar(
-                    searchField = { Box(it.height(40.dp).background(Color.DarkGray)) },
+                    searchField = { Box(it
+                        .height(40.dp)
+                        .background(Color.DarkGray)) },
                     searchR = TextFieldValue(""),
                     isFocused = false,
                     sortType = Order.TRENDING,

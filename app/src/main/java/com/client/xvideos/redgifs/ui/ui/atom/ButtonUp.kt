@@ -5,7 +5,9 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowUpward
@@ -41,8 +43,36 @@ fun ButtonUp(width : Dp = 32.dp, onClick: () -> Unit) {
     }
 }
 
+@Composable
+fun ButtonUpCircle(size : Dp = 46.dp, onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .size(size)
+            .clip(CircleShape)
+            .border(1.dp, Color(0x80757575), CircleShape)
+            .background(ThemeRed.colorTabLevel0)
+            .clickable(
+                onClick = onClick), contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            Icons.Filled.ArrowUpward,
+            contentDescription = null,
+            tint = Color.LightGray,
+            modifier = Modifier
+        )
+    }
+}
+
 @Preview
 @Composable
 fun ButtonUpPreview() {
     ButtonUp(onClick = {})
 }
+
+@Preview
+@Composable
+fun ButtonUpCirclePreview() {
+    ButtonUpCircle(onClick = {})
+}
+
+

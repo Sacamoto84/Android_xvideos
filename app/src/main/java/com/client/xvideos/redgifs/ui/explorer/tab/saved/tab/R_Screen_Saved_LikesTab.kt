@@ -4,17 +4,14 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.compose.collectAsLazyPagingItems
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.screen.Screen
@@ -28,8 +25,6 @@ import com.client.xvideos.common.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.redgifs.common.di.HostDI
 import com.client.xvideos.redgifs.ui.profile.ScreenRedProfile
-import com.client.xvideos.redgifs.ui.profile.atom.VerticalScrollbar
-import com.client.xvideos.redgifs.ui.profile.rememberVisibleRangePercentIgnoringFirstNForGrid
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.LazyRow123
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.LazyRow123Host
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.model.TypePager
@@ -39,7 +34,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
 import javax.inject.Inject
-
 
 object R_Screen_Saved_LikesTab : Screen {
 
@@ -58,16 +52,12 @@ object R_Screen_Saved_LikesTab : Screen {
 
         val columnSelect = Settings.r_likesTab_column_current_count.field.collectAsStateWithLifecycle().value
 
-        //Изменение количества отображаемых елементов
+        val pager = vm.likedHost.pager.collectAsLazyPagingItems()
+
+        //Изменение количества отображаемых элементов
         LaunchedEffect(columnSelect) { vm.likedHost.columns = columnSelect }
 
-        LaunchedEffect(vm.hostDI.savedRed.likes.list){
-            //vm.likedHost.refresh()
-        }
-
-        val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForGrid(
-            gridState = vm.likedHost.state, itemsToIgnore = 0, numberOfColumns = columnSelect
-        )
+        LaunchedEffect(vm.hostDI.savedRed.likes.list){ pager.refresh() }
 
         Box(modifier = Modifier.fillMaxSize().background(Color(0xFF303030))) {
 
@@ -84,15 +74,6 @@ object R_Screen_Saved_LikesTab : Screen {
                 isRunLike = true
             )
 
-            //---- Скролл ----
-            Box(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .align(Alignment.CenterEnd)
-                    .width(2.dp)
-            ) {
-                VerticalScrollbar(scrollPercent)
-            }
         }
 
 

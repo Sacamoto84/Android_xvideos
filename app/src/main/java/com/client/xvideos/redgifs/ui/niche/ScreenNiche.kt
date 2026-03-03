@@ -9,16 +9,32 @@ import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FlexibleBottomAppBar
+import androidx.compose.material3.FloatingToolbarDefaults
+import androidx.compose.material3.FloatingToolbarDefaults.ScreenOffset
+import androidx.compose.material3.FloatingToolbarExitDirection.Companion.Bottom
+import androidx.compose.material3.FloatingToolbarScrollBehavior
+import androidx.compose.material3.HorizontalFloatingToolbar
+import androidx.compose.material3.Icon
+import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TooltipAnchorPosition
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -30,6 +46,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
@@ -132,7 +149,9 @@ fun ScreenNicheContent(
             Box(
                 modifier = Modifier
                     .background(Color(0xFF303030))
-                    .padding(bottom = padding.calculateBottomPadding())
+
+                    //.padding(bottom = padding.calculateBottomPadding())
+
                     .fillMaxSize()
                     .systemBarsPadding()
             ) {
@@ -148,7 +167,11 @@ fun ScreenNicheContent(
                             onNicheClick = onNicheClick,
                             onCreatorClick = onCreatorClick,
                             isFollowed = isFollowed,
-                            onFollowClick = onFollowClick
+                            onFollowClick = onFollowClick,
+                            currentSort = currentSort,
+                            onSortChange = onSortChange,
+                            columns = lazyHost.columns,
+                            onUpClick = onUpClick,
                         )
                     }
                 )
@@ -168,31 +191,40 @@ private fun StatelessScreenNicheContent(
     content: @Composable (PaddingValues) -> Unit
 ) {
 
-    val scrollBehavior = BottomAppBarDefaults.exitAlwaysScrollBehavior()
+
+    val exitAlwaysScrollBehavior = FloatingToolbarDefaults.exitAlwaysScrollBehavior(exitDirection = Bottom)
 
     Scaffold(
-        bottomBar = {
-                FlexibleBottomAppBar(
-                    horizontalArrangement = BottomAppBarDefaults.FlexibleFixedHorizontalArrangement,
-                    scrollBehavior = scrollBehavior,
-                    content = {
-                        NicheBottomBar(
-                            niche = niche,
-                            currentSort = currentSort,
-                            onSortChange = onSortChange,
-                            columns = columns,
-                            onUpClick = onUpClick
-                        )
-                    },
-                )
-        },
         modifier = Modifier
             .fillMaxSize()
-            .nestedScroll(scrollBehavior.nestedScrollConnection)
-        ,
+            .nestedScroll(exitAlwaysScrollBehavior),
         containerColor = Color(0xFF0F0F0F)
     ) { padding ->
-        content(padding)
+
+        Box(Modifier.padding(padding)) {
+
+            content(padding)
+
+            HorizontalFloatingToolbar(
+                colors = FloatingToolbarDefaults.standardFloatingToolbarColors( toolbarContainerColor = Color(0xFF505050) ),
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .offset(y = -ScreenOffset)
+                    .zIndex(9f),
+                expanded = true,
+                leadingContent = {},
+                trailingContent = {},
+                content = {
+                    NicheBottomBar(niche = niche, currentSort = currentSort, onSortChange = onSortChange, columns = columns, onUpClick = onUpClick )
+                },
+                scrollBehavior = exitAlwaysScrollBehavior,
+            )
+
+        }
+
+
+
+
     }
 }
 
@@ -204,7 +236,11 @@ private fun NicheHeaderContent(
     onNicheClick: (String) -> Unit,
     onCreatorClick: (String) -> Unit,
     isFollowed: Boolean,
-    onFollowClick: () -> Unit
+    onFollowClick: () -> Unit,
+    currentSort: Order,
+    onSortChange: (Order) -> Unit,
+    columns: Int,
+    onUpClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -267,6 +303,8 @@ private fun NicheHeaderContent(
         }
 
         Spacer(Modifier.height(2.dp))
+
+        NicheBottomBar(niche = niche, currentSort = currentSort, onSortChange = onSortChange, columns = columns, onUpClick = onUpClick )
     }
 }
 
@@ -283,7 +321,7 @@ private fun ScreenNicheContentPreview() {
             content = { padding ->
                 Column(
                     modifier = Modifier
-                        .padding(bottom = padding.calculateBottomPadding())
+                        //.padding(bottom = padding.calculateBottomPadding())
                         .fillMaxSize()
                 ) {
                     NicheHeaderContent(
@@ -293,7 +331,11 @@ private fun ScreenNicheContentPreview() {
                         onNicheClick = {},
                         onCreatorClick = {},
                         isFollowed = false,
-                        onFollowClick = {}
+                        onFollowClick = {},
+                        currentSort = Order.NICHES_NAME_A_Z,
+                        onSortChange = {},
+                        columns = 2,
+                        onUpClick = { },
                     )
                     Box(
                         modifier = Modifier
@@ -320,7 +362,11 @@ private fun NicheHeaderContentPreview() {
             onNicheClick = {},
             onCreatorClick = {},
             isFollowed = true,
-            onFollowClick = {}
+            onFollowClick = {},
+            currentSort = Order.NICHES_NAME_A_Z,
+            onSortChange = {},
+            columns = 2,
+            onUpClick = {},
         )
     }
 }
