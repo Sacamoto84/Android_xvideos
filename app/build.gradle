@@ -118,11 +118,11 @@ dependencies {
     implementation(libs.androidx.core.splashscreen)
 
     implementation libs.androidx.compose.runtime.saved.instance.state
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
+    //testImplementation(libs.junit)
+    //androidTestImplementation(libs.androidx.junit)
+    //androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
+    //androidTestImplementation(libs.androidx.ui.test.junit4)
 
     implementation libs.androidx.security.crypto
 
@@ -162,16 +162,16 @@ dependencies {
     implementation libs.androidx.animation.core
     implementation libs.ui
     implementation libs.androidx.foundation.layout
-    implementation libs.androidx.junit.ktx
+    //implementation libs.androidx.junit.ktx
 
     //implementation libs.firebase.auth
     //implementation libs.firebase.firestore.ktx
 
-    testImplementation libs.junit
-    androidTestImplementation libs.androidx.junit
-    androidTestImplementation libs.androidx.espresso.core
+    //testImplementation libs.junit
+    //androidTestImplementation libs.androidx.junit
+    //androidTestImplementation libs.androidx.espresso.core
     androidTestImplementation platform(libs.androidx.compose.bom)
-    androidTestImplementation libs.androidx.ui.test.junit4
+    //androidTestImplementation libs.androidx.ui.test.junit4
     debugImplementation libs.androidx.ui.tooling
     debugImplementation libs.androidx.ui.test.manifest
 
@@ -351,9 +351,9 @@ dependencies {
 
     implementation libs.kotlinx.collections.immutable
 
-    implementation(libs.androidx.benchmark.macro.junit4)
-    implementation(libs.androidx.junit)
-    implementation(libs.androidx.uiautomator)
+    //implementation(libs.androidx.benchmark.macro.junit4)
+    //implementation(libs.androidx.junit)
+    //implementation(libs.androidx.uiautomator)
 
 
 

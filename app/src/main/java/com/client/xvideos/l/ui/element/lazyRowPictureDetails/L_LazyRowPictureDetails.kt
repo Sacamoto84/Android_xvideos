@@ -105,7 +105,7 @@ fun L_LazyRowPictureDetails(
 
             itemsIndexed(
                 host.filteredPic,
-                key = { _, item -> item.url_to_original!! }
+                key = { index, item -> item.url_to_original ?: index }
             ) { index, item ->
 
                 if (item.url_to_original != null) {

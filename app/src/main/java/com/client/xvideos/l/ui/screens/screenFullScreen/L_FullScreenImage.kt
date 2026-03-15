@@ -208,7 +208,7 @@ class L_FullScreenImage(
                 pageSpacing = 0.dp,
                 beyondViewportPageCount = 1,
                 reverseLayout = false,
-                key = { page -> filteredPic[page].url_to_original!! }
+                key = { page -> filteredPic.getOrNull(page)?.url_to_original ?: page }
             ) { page ->
                 val pageItem = filteredPic[page]
                 val zoomState = rememberZoomState()
@@ -228,7 +228,7 @@ class L_FullScreenImage(
                     Box( modifier = Modifier.fillMaxSize() )
                     {
                         UrlImage(
-                            rotate = rotate, contentScale = ContentScale.Fit, url = pageItem.url_to_original!!, modifier = Modifier.fillMaxSize()
+                            rotate = rotate, contentScale = ContentScale.Fit, url = pageItem.url_to_original ?: "", modifier = Modifier.fillMaxSize()
                                 .zoomable(
                                     zoomState = zoomState,
                                     enableOneFingerZoom = false,
@@ -287,7 +287,7 @@ class L_FullScreenImage(
                         {
                             itemsIndexed(
                                 filteredPic,
-                                key = { _, item -> item.url_to_original!! }) { index, it1 ->
+                                key = { index, item -> item.url_to_original ?: index }) { index, it1 ->
                                 Box(
                                     modifier = Modifier
                                         .padding(horizontal = 1.dp)
@@ -300,7 +300,7 @@ class L_FullScreenImage(
                                         .border(2.dp, if (index == currentIndex) Color.Yellow else Color.Transparent, RoundedCornerShape(4.dp)).padding(2.dp)
                                 ) {
                                     UrlImage(
-                                        url = it1.url_to_original!!,
+                                        url = it1.url_to_original ?: "",
                                         modifier = Modifier.clip(RoundedCornerShape(4.dp)).fillMaxSize(),
                                         contentScale = ContentScale.FillBounds,
                                         onSuccess = { }, albumName = albumName, autoPlay = false, isAnimated = it1.is_animated, sizeButton = 20.dp, sizeButtonIcon = 12.dp

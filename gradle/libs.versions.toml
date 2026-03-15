@@ -4,7 +4,7 @@ activityKtx = "1.12.4"
 agp = "9.1.0"
 
 coil = "3.4.0"
-componentsResources = "1.10.1"
+componentsResources = "1.10.2"
 composeExtendedGestures = "2.0.0"
 composeThemeAdapter = "1.2.1"
 composeZoom = "0.5.0"
@@ -28,7 +28,7 @@ espressoCore = "3.7.0"
 kotlinxCollectionsImmutable = "0.4.0"
 kotlinxSerializationJson = "1.10.0"
 ksafe = "1.4.2"
-ktor= "3.4.0"
+ktor= "3.4.1"
 
 lazycolumnscrollbar = "2.2.0"
 lifecycleProcess = "2.10.0"
@@ -209,5 +209,5 @@ kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "ko
 google-gms-google-services = { id = "com.google.gms.google-services", version.ref = "googleGmsGoogleServices" }
 android-library = { id = "com.android.library", version.ref = "agp" }
 
-stability-analyzer = { id = "com.github.skydoves.compose.stability.analyzer", version = "0.6.6" }
+stability-analyzer = { id = "com.github.skydoves.compose.stability.analyzer", version = "0.7.0" }
 android-test = { id = "com.android.test", version.ref = "agp" }
