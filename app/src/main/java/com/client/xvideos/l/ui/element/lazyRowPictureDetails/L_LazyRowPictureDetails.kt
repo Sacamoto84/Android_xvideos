@@ -103,10 +103,8 @@ fun L_LazyRowPictureDetails(
                 itemBefore()
             }
 
-            itemsIndexed(
-                host.filteredPic,
-                key = { index, item -> item.url_to_original ?: index }
-            ) { index, item ->
+            itemsIndexed( host.filteredPic, key = { index, item -> item.url_to_original ?: index } )
+            { index, item ->
 
                 if (item.url_to_original != null) {
                     Box(
@@ -119,8 +117,7 @@ fun L_LazyRowPictureDetails(
                             if (item.thumbnails.isEmpty()) {
                                 item.url_to_original
                             } else {
-                                item.thumbnails.firstOrNull { it.size == thumbnailsSize }?.url
-                                    ?: item.url_to_original
+                                item.thumbnails.firstOrNull { it.size == thumbnailsSize }?.url ?: item.url_to_original
                             }
 
                         UrlImage(
@@ -161,20 +158,11 @@ fun L_LazyRowPictureDetails(
 
                         Text(
                             index.toString(),
-                            modifier = Modifier
-                                .padding(start = 4.dp)
-                                .align(Alignment.TopStart),
-                            color = ThemeL.textColor,
-                            fontFamily = ThemeL.fontFamilyKarla,
-                            fontSize = 14.sp
+                            modifier = Modifier.padding(start = 4.dp).align(Alignment.TopStart), color = ThemeL.textColor, fontFamily = ThemeL.fontFamilyKarla, fontSize = 14.sp
                         )
 
                         Box(modifier = Modifier.align(Alignment.TopEnd)) {
-                            expandMenuViewModel.ExpandMenu(
-                                expandMenu,
-                                item,
-                                host.albumName
-                            )
+                            expandMenuViewModel.ExpandMenu( expandMenu, item, host.albumName )
                         }
                     }
                 }

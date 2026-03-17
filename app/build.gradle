@@ -258,29 +258,10 @@ dependencies {
 
     implementation libs.kotlinx.serialization.json
 
-    //implementation "com.github.skydoves:landscapist-glide:2.4.1"
-    //implementation libs.landscapist.placeholder
-    //implementation libs.landscapist.coil
-    //implementation(libs.landscapist.fresco)
-    //implementation(libs.landscapist.fresco.websupport)
-    //implementation(libs.landscapist.glide)
-
-    //implementation 'com.github.bumptech.glide:glide:5.0.4'
-
-    //implementation libs.animated.base
-    //implementation libs.fresco
-    //implementation libs.animated.gif
-    //implementation libs.animated.webp
-    //implementation libs.webpsupport
-
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
     implementation(libs.coil.gif)
     implementation(libs.coil.network.cache.control)
-
-    //implementation("com.github.bumptech.glide:glide:4.16.0")
-    //ksp "com.github.bumptech.glide:compiler:4.16.0"
-
 
     //implementation('network.chaintech:compose-multiplatform-media-player:1.0.40')
 
@@ -363,7 +344,8 @@ dependencies {
 
     // Source: https://mvnrepository.com/artifact/org.cryptomator/cryptofs
     // https://github.com/cryptomator/cryptofs
-    implementation("org.cryptomator:cryptofs:2.10.0-beta2")
+    //noinspection NewerVersionAvailable
+    implementation(libs.cryptofs)
 }
 
 ksp {

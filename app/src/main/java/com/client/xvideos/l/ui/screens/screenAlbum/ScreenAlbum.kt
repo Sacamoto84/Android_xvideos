@@ -125,9 +125,7 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
             bottomBar = {
                 if (album?.albumPicsDetails?.percentLoad != 1.0f) {
                     LinearProgressIndicator(
-                        progress = {
-                            album?.albumPicsDetails?.percentLoad ?: 0f
-                        },
+                        progress = { album?.albumPicsDetails?.percentLoad ?: 0f },
                         modifier = Modifier.fillMaxWidth(),
                         color = ProgressIndicatorDefaults.linearColor,
                         trackColor = ProgressIndicatorDefaults.linearTrackColor,
@@ -140,30 +138,18 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
         ) { padding ->
 
             L_LazyRowPictureDetails(
-
                 host = vm.host,
                 expandMenu = ExpandMenuType.ALBUM,
                 itemBefore = {
                     Column(modifier = Modifier.padding(horizontal = 4.dp)) {
-
                         if (parsed != null) {
 
                             Row {
-                                UrlImage(
-                                    parsed.cover.url,
-                                    modifier = Modifier.size(72.dp)
-                                )
+                                UrlImage( parsed.cover.url, modifier = Modifier.size(72.dp) )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Column {
-                                    Text(
-                                        parsed.title,
-                                        color = ThemeL.textColor,
-                                        fontFamily = ThemeL.fontFamilyDMsanss
-                                    )
-                                    Text(
-                                        "${parsed.number_of_animated_pictures} gifs / ${parsed.number_of_pictures} pictures",
-                                        color = ThemeL.textColor
-                                    )
+                                    Text( parsed.title, color = ThemeL.textColor, fontFamily = ThemeL.fontFamilyDMsanss )
+                                    Text( "${parsed.number_of_animated_pictures} gifs / ${parsed.number_of_pictures} pictures", color = ThemeL.textColor )
                                 }
                             }
 
