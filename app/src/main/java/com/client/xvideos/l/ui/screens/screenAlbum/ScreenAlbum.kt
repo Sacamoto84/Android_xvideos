@@ -78,7 +78,8 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
 
         LaunchedEffect(vm.showOnlyAnimated, parsed, album?.albumPicsDetails?.pics?.size) {
 
-            Timber.d("!!! iiii LaunchedEffect animated = ${vm.showOnlyAnimated} size:${album?.albumPicsDetails?.pics?.size}")
+            Timber.d("!!! iiii ScreenLAlbum LaunchedEffect animated = ${vm.showOnlyAnimated} size:${album?.albumPicsDetails?.pics?.size}")
+
             if (parsed == null) return@LaunchedEffect
 
             val allPics = album?.albumPicsDetails?.pics?.toList() ?: emptyList()

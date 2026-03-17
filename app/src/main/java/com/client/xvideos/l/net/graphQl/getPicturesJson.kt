@@ -12,12 +12,29 @@ fun getPicturesJson(albumId: Int, page: Int = 1): String {
                 }
             }
         }
+        
         fragment pageInfo on FacetCollectionInfo {
-            page total_items total_pages items_per_page url_complete
+           page
+           total_items
+           total_pages
+           items_per_page
+           url_complete
         }
+        
         fragment PicUrls on Picture {
-           height width is_animated url_to_original url_to_video  thumbnails { width height size url }
+           height
+           width
+           is_animated
+           url_to_original
+           url_to_video
+           thumbnails {
+               width
+               height
+               size
+               url
+           }
         }
+        
     """.trimIndent()
 
     val json = mapOf(

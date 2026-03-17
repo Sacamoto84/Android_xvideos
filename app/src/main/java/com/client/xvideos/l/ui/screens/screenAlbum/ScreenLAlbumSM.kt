@@ -59,7 +59,6 @@ class ScreenLAlbumSM @AssistedInject constructor(
 
     val host = LazyRowPictureDetailsHost(idAlbum.toString())
 
-
     val downloader: DownloaderAlbum
 
     init {

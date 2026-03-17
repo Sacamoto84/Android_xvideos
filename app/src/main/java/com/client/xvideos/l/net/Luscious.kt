@@ -29,7 +29,7 @@ class Luscious(
 
     /**
      *
-     *         Return an `Album` object based on albumInput
+     *         Возвращает объект `Album` на основе параметра albumInput;
      *
      *         albumInput can either be an integer, being the album Id
      *         Example (NSFW)<https://www.luscious.net/albums/animated-gifs_374481/>'s Id being 374481

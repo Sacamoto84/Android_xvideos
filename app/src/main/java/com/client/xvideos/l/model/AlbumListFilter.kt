@@ -15,8 +15,6 @@ data class AlbumListFilter(
     val content_id : ContentId = ContentId.All,
     val genresPlus : List<Genre> = emptyList(),
     val genresMinus: List<Genre> = emptyList(),
-
     val tagPlus : List<String> = emptyList(),
     val tagMinus : List<String> = emptyList(),
-
     )

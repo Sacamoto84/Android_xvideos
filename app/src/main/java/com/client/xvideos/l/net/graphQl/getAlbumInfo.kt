@@ -10,8 +10,20 @@ fun getAlbumInfo(albumId: Int): String {
             }
         }
         fragment AlbumStandard on Album {
-           created id title tags is_manga content genres cover description audiences 
-            number_of_pictures number_of_animated_pictures url download_url
+           created 
+           id 
+           title 
+           tags 
+           is_manga 
+           content 
+           genres 
+           cover 
+           description 
+           audiences 
+           number_of_pictures 
+           number_of_animated_pictures
+           url
+           download_url
         }
     """.trimIndent()
 

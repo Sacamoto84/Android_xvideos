@@ -99,26 +99,18 @@ fun L_LazyRowPictureDetails(
             modifier = Modifier.fillMaxSize().then(if (tag.isNotEmpty()) Modifier.testTag(tag) else Modifier)
         ) {
 
-            item(span = StaggeredGridItemSpan.FullLine) {
-                itemBefore()
-            }
+            item(span = StaggeredGridItemSpan.FullLine) { itemBefore() }
 
             itemsIndexed( host.filteredPic, key = { index, item -> item.url_to_original ?: index } )
             { index, item ->
 
-                if (item.url_to_original != null) {
-                    Box(
-                        modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.Center
-                    ) {
+                //if (item.url_to_original != null)
+                //{
+                    Box( modifier = Modifier.fillMaxWidth(),      contentAlignment = Alignment.Center )
+                    {
                         val aspect = item.width.toFloat() / item.height
 
-                        val url =
-                            if (item.thumbnails.isEmpty()) {
-                                item.url_to_original
-                            } else {
-                                item.thumbnails.firstOrNull { it.size == thumbnailsSize }?.url ?: item.url_to_original
-                            }
+                        val url = if (item.thumbnails.isEmpty()) { item.url_to_original ?: "" } else { item.thumbnails.firstOrNull { it.size == thumbnailsSize }?.url ?: item.url_to_original ?: ""}
 
                         UrlImage(
                             url = url,
@@ -130,8 +122,7 @@ fun L_LazyRowPictureDetails(
                                 .clipToBounds()
                                 .border(0.5.dp, Color.Gray)
                                 .clickable {
-                                    fullScreenImageFilteredPicArray =
-                                        host.filteredPic.toList()
+                                    fullScreenImageFilteredPicArray = host.filteredPic.toList()
 
                                     navigator.push(
                                         L_FullScreenImage(
@@ -161,164 +152,29 @@ fun L_LazyRowPictureDetails(
                             modifier = Modifier.padding(start = 4.dp).align(Alignment.TopStart), color = ThemeL.textColor, fontFamily = ThemeL.fontFamilyKarla, fontSize = 14.sp
                         )
 
-                        Box(modifier = Modifier.align(Alignment.TopEnd)) {
-                            expandMenuViewModel.ExpandMenu( expandMenu, item, host.albumName )
-                        }
+                        Box(modifier = Modifier.align(Alignment.TopEnd)) { expandMenuViewModel.ExpandMenu( expandMenu, item, host.albumName ) }
                     }
-                }
+                //}
             }
         }
 
         /** Вертикальный индикатор прокрутки */
-        Box(
-            modifier = Modifier
-                .fillMaxHeight()
-                .align(Alignment.CenterEnd)
-                .width(2.dp)
-        ) {
-            VerticalScrollbar(scrollPercent)
-        }
+        Box( modifier = Modifier.fillMaxHeight().align(Alignment.CenterEnd).width(2.dp) ) { VerticalScrollbar(scrollPercent) }
 
         /** FloatingButton "Вверх" */
-        AnimatedVisibility(
-            visible = showScrollToTop,
-            modifier = Modifier.align(Alignment.BottomEnd),
-            enter = fadeIn() + scaleIn(),
-            exit = fadeOut() + scaleOut()
-        ) {
+        AnimatedVisibility( visible = showScrollToTop, modifier = Modifier.align(Alignment.BottomEnd), enter = fadeIn() + scaleIn(),  exit = fadeOut() + scaleOut() )
+        {
             FloatingActionButton(
                 onClick = {
-                    haptic.performHapticFeedback(
-                        androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove
-                    )
+                    haptic.performHapticFeedback( androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove )
                     scope.launch { host.state.scrollToItem(0) }
                 },
                 modifier = Modifier.padding(16.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Default.KeyboardArrowUp,
-                    contentDescription = "Scroll to top"
-                )
+                Icon( imageVector = Icons.Default.KeyboardArrowUp, contentDescription = "Scroll to top" )
             }
         }
+
     }
 }
 
-
-//@OptIn(DelicateCoroutinesApi::class)
-//@Composable
-//fun L_LazyRowPictureDetails(
-//    host: LazyRowPictureDetailsHost,
-//    itemBefore: @Composable () -> Unit = {},
-//    expandMenu: ExpandMenuType,
-//    tag: String = ""
-//) {
-//
-//    val expandMenuViewModel: ExpandMenuViewModel = hiltViewModel()
-//
-//    val navigator = LocalNavigator.currentOrThrow
-//
-//    val rootVm = LocalRootScreenModel.current
-//
-//    val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForLazyStaggeredGrid( host.state, 0 )
-//
-//    val thumbnailsSize = Settings.thumbalistSize.field.collectAsStateWithLifecycle().value
-//
-//    val haptic = LocalHapticFeedback.current
-//
-//    Box(modifier = Modifier.fillMaxSize()) {
-//
-//        LazyVerticalStaggeredGrid(
-//            state = host.state,
-//            columns = StaggeredGridCells.Fixed(host.columns),
-//            modifier = Modifier.fillMaxSize().then(if (tag.isNotEmpty()) Modifier.testTag(tag) else Modifier)
-//        ) {
-//
-//            item(span = StaggeredGridItemSpan.FullLine) { itemBefore() }
-//
-//            itemsIndexed(host.filteredPic, key = { index, item -> item.url_to_original!! }
-//
-//            ) { index, item ->
-//
-//                if (item.url_to_original != null) {
-//                    Box(
-//                        modifier = Modifier.fillMaxWidth(),
-//                        contentAlignment = Alignment.Center
-//                    ) {
-//                        val aspect = item.width.toFloat() / item.height
-//
-//                        val url =
-//                            if (item.thumbnails.isEmpty()) item.url_to_original else {
-//                                item.thumbnails.firstOrNull { it.size == thumbnailsSize }?.url
-//                                    ?: item.url_to_original
-//                            } //"small" large_thumbnail
-//
-//
-//                        UrlImageGifsCoil(
-//                            url,
-//                            urlGif = item.url_to_original,
-//                            modifier = Modifier
-//                                .padding(2.dp)
-//                                .aspectRatio(aspect)
-//                                .clipToBounds()
-//                                .border(0.5.dp, Color.Gray)
-//                                .clickable {
-//
-//                                    fullScreenImageFilteredPicArray = host.filteredPic.toList()
-//
-//                                    navigator.push(
-//                                        FullScreenImage(
-//                                            item = item,
-//                                            onClose = { it1 ->
-//                                                Timber.i("scrollToItem 1 $it1")
-//                                                if (it1 != -1) {
-//                                                    rootVm.screenModelScope.launch {
-//                                                        host.state.scrollToItem(it1)
-//                                                        delay(100)
-//                                                    }
-//                                                }
-//                                            },
-//                                            albumName = host.albumName,
-//                                            //filteredPicArray = host.filteredPic.toList(),
-//                                            expandMenu = expandMenu,
-//                                            autoPlay = true,
-//                                            isAnimated = item.is_animated,
-//                                        )
-//                                    )
-//                                },
-//                            // contentScale = ContentScale.FillBounds,
-//                            albumName = host.albumName,
-//                            isAnimated = item.is_animated
-//                        )
-//
-//                        Text(
-//                            index.toString(),
-//                            modifier = Modifier
-//                                .padding(start = 4.dp)
-//                                .align(Alignment.TopStart),
-//                            color = ThemeL.textColor,
-//                            fontFamily = ThemeL.fontFamilyKarla,
-//                            fontSize = 14.sp
-//                        )
-//
-//                        Box(modifier = Modifier.align(Alignment.TopEnd)) {
-//                            expandMenuViewModel.ExpandMenu(expandMenu, item, host.albumName)
-//                        }
-//
-//                    }
-//                }
-//            }
-//        }
-//
-//        //---- Скролл ----
-//        Box(
-//            modifier = Modifier
-//                .fillMaxHeight()
-//                .align(Alignment.CenterEnd)
-//                .width(2.dp)
-//        ) {
-//            VerticalScrollbar(scrollPercent)
-//        }
-//    }
-//
-//}
