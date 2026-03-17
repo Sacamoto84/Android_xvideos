@@ -67,7 +67,7 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
 
         val album = vm.albumInfo.collectAsStateWithLifecycle().value
 
-        val parsed = vm.albumInfo.collectAsStateWithLifecycle().value?.parsed?.collectAsStateWithLifecycle()?.value
+        val parsed = vm.albumInfo.collectAsStateWithLifecycle().value?.albumInfo?.collectAsStateWithLifecycle()?.value
 
         val saved = vm.saved.albums.list.any { it.id == parsed?.id }
 

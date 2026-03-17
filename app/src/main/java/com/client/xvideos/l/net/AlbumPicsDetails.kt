@@ -25,7 +25,7 @@ class AlbumPicsDetails(
 
     var percentLoad by mutableFloatStateOf(0f)
 
-    suspend fun openPage(page: Int): List<PicsDetails> {
+    private suspend fun openPage(page: Int): List<PicsDetails> {
         val gson = Gson()
         val list = mutableListOf<PicsDetails>()
 

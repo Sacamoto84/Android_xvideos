@@ -20,11 +20,9 @@ class AlbumInfo(
     scope: CoroutineScope,
 ) {
 
-    var url: String = ""
-
     val albumPicsDetails = AlbumPicsDetails(id,  repository)
 
-    val parsed = MutableStateFlow(
+    val albumInfo = MutableStateFlow(
         AlbumDetails(
             id = "",
             title = "",
@@ -54,20 +52,18 @@ class AlbumInfo(
             val json = JsonParser.parseString(res).asJsonObject
             val get = json["data"]?.asJsonObject?.get("album")?.asJsonObject?.get("get")?.asJsonObject
             val gson = Gson()
-            parsed.value = gson.fromJson(get, AlbumDetails::class.java)
-            url = Luscious.HOME + parsed.value.url
+            albumInfo.value = gson.fromJson(get, AlbumDetails::class.java)
+            //url = Luscious.HOME + albumInfo.value.url
             albumPicsDetails.contentUrls()
         }
     }
 
-
-
     /**
      * Возвращает url миниатюры альбома
      */
-    val thumbnail: String by lazy { parsed.value.cover.url }
+    val thumbnail: String by lazy { albumInfo.value.cover.url }
 
-    val downloadUrl: String by lazy { Luscious.Companion.HOME + parsed.value.download_url }
+    val downloadUrl: String by lazy { Luscious.Companion.HOME + albumInfo.value.download_url }
 
 
 //    val artists: List<String> by lazy {
