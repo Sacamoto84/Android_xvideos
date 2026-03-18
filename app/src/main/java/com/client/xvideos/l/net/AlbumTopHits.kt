@@ -24,7 +24,7 @@ class AlbumTopHitsImpl(
         scope.launch {
             Timber.i("!!! getAlbumTopHits")
             val q = getAlbumListTopHitsQuery()
-            val res = repository.openURI(Luscious.Companion.API, q)
+            val res = repository.openURI(q)
             if (res.isFailure) return@launch
             val json = JsonParser.parseString(res.getOrNull()).asJsonObject
             val get =

@@ -8,8 +8,6 @@ inline fun <reified T : RepositoryResult> Flow<RepositoryResult>.filterResult():
     return filterIsInstance<T>()
 }
 
-
-
 // Команды для репозитория
 sealed class RepositoryAction {
 

@@ -110,7 +110,7 @@ fun L_LazyRowPictureDetails(
                     {
                         val aspect = item.width.toFloat() / item.height
 
-                        val url = if (item.thumbnails.isEmpty()) { item.url_to_original ?: "" } else { item.thumbnails.firstOrNull { it.size == thumbnailsSize }?.url ?: item.url_to_original ?: ""}
+                        val url = if (item.thumbnails.isNullOrEmpty()) { item.url_to_original ?: "" } else { item.thumbnails.firstOrNull { it.size == thumbnailsSize }?.url ?: item.url_to_original ?: ""}
 
                         UrlImage(
                             url = url,

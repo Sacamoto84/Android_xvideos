@@ -25,26 +25,14 @@ object LusciousModule {
 
     @Singleton
     @Provides
-    fun provideDownloader(
-        @ApplicationContext context: Context
-    ): KDownloader {
-        return KDownloader.create(context, DownloaderConfig(false))
-    }
+    fun provideDownloader( @ApplicationContext context: Context ): KDownloader { return KDownloader.create(context, DownloaderConfig(false)) }
 
     @Singleton
     @Provides
     fun provideRepository(
-        db: AppDatabase,
-        @ApplicationScope scope: CoroutineScope,
-        @ApplicationContext context: Context
+        db: AppDatabase, @ApplicationScope scope: CoroutineScope, @ApplicationContext context: Context
     ): Repository {
-        return Repository(
-            db,
-            scope,
-            BuildConfig.luscious_email,
-            BuildConfig.luscious_password,
-            context
-        )
+        return Repository( db, scope, BuildConfig.luscious_email, BuildConfig.luscious_password, context )
     }
 
     @Singleton

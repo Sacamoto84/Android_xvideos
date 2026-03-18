@@ -88,7 +88,7 @@ data class getAlbumListAggregationsResult(
 
             //Timber.i("!!! getAlbumListAggregations $q")
 
-            val result = repository.openURI(Luscious.Companion.API, q)
+            val result = repository.openURI(q)
             if (result.isFailure) {
                 Timber.i("!!! getAlbumListAggregations error ${result.exceptionOrNull()}")
                 return Result.failure(result.exceptionOrNull()!!)
@@ -207,7 +207,7 @@ data class getAlbumListAggregationsResult(
             val filter = filterIn ?: AlbumListFilter()
             val q = getAlbumListGraphQL1(page, filter)
 
-            val result = repository.openURI( Luscious.Companion.API,  q, config = RepositoryUriConfig.CACHE_RAM )
+            val result = repository.openURI(q, config = RepositoryUriConfig.CACHE_RAM )
 
             if (result.isFailure) {
                 Timber.e("!!! getAlbumList error ${result.exceptionOrNull()}")

@@ -43,7 +43,7 @@ class AlbumInfo(
 
     init {
         scope.launch {
-            val result = repository.openURI(Luscious.Companion.API, getAlbumInfo(id), config = RepositoryUriConfig.CACHE_ROM)
+            val result = repository.openURI(getAlbumInfo(id), config = RepositoryUriConfig.CACHE_ROM)
             if (result.isFailure) {
                 Timber.e("!!! getAlbumInfo $id error ${result.exceptionOrNull()}")
                 return@launch

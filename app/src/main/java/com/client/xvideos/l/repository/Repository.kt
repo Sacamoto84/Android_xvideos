@@ -8,6 +8,7 @@ import com.client.xvideos.common.room.entity.CacheUrlStringRomEntity
 import com.client.xvideos.common.snackbar.SnackBar
 import com.client.xvideos.common.util.toMD5
 import com.client.xvideos.l.KtorRequestHandler
+import com.client.xvideos.l.net.Luscious
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -25,8 +26,11 @@ class Repository(
     context: Context
 ) {
 
+    //Точка входа для GraphQL
+    val apiUrl = Luscious.Companion.API
+
     init {
-        clearTemp()
+        clearRamDao()
         Password.loadPassword(context)
     }
 
@@ -42,8 +46,8 @@ class Repository(
     private val cacheUrlStringRomDao = dbCache.cacheUrlStringRomDao()
     private val cacheUrlStringRamDao = dbCache.cacheUrlStringRamDao()
 
+
     suspend fun openURI(
-        url: String,
         data: String,
         type: RepositoryUriType = RepositoryUriType.POST,
         config: RepositoryUriConfig = RepositoryUriConfig.DIRECT
@@ -54,9 +58,7 @@ class Repository(
         try {
             if (!handler.loggedIn) {
                 handler.login()
-                while (!handler.loggedIn) {
-                    delay(1000)
-                }
+                while (!handler.loggedIn) { delay(1000) }
             }
         }
         catch (e: Exception){
@@ -68,15 +70,17 @@ class Repository(
 
             when (config) {
 
+                //Запрос без кеширования
                 RepositoryUriConfig.DIRECT -> {
                     try {
-                       val res = handler.postJson(url, data)
+                       val res = handler.postJson(apiUrl, data)
                        return Result.success(res)
                     }catch (e: Exception){
                        return Result.failure(e)
                     }
                 }
 
+                //Сделать запись в ROOM если нет в базе, иначе прочитать из него
                 RepositoryUriConfig.CACHE_ROM -> {
                     try {
                         val cacheKey = data.toMD5()
@@ -85,7 +89,7 @@ class Repository(
                             //Timber.i("!!! openURI() CACHE_ROM res != null response:${res.content}")
                             return Result.success(res.content)
                         }
-                        val response = handler.postJson(url, data)
+                        val response = handler.postJson(apiUrl, data)
 
                         if (response.contains("{\"errors\":")){
                             SnackBar.error(response)
@@ -103,6 +107,7 @@ class Repository(
                     }
                 }
 
+                //Сделать запись в ROOM RAM если нет в базе, иначе прочитать из него
                 RepositoryUriConfig.CACHE_RAM -> {
                     try {
                         val cacheKey = data.toMD5()
@@ -111,7 +116,7 @@ class Repository(
                             //Timber.i("!!! openURI() CACHE_RAM res != null response:${res.content}")
                             return Result.success(res.content)
                         }
-                        val response = handler.postJson(url, data)
+                        val response = handler.postJson(apiUrl, data)
 
                         if (response.contains("{\"errors\":")){
                             SnackBar.error(response)
@@ -122,11 +127,7 @@ class Repository(
 
                         //Timber.i("!!! openURI() CACHE_RAM net response:$response")
 
-                        if (response.contains("{\"errors\":"))
-                        {
-                            SnackBar.error(response)
-                        }
-
+                        if (response.contains("{\"errors\":")) { SnackBar.error(response) }
                         return Result.success(response)
                     }
                     catch (e: Exception){
@@ -142,18 +143,9 @@ class Repository(
         return Result.failure(Exception("Некорректный тип запроса"))
     }
 
-
-    fun clearTemp(){
-        scope.launch {
-            withContext(Dispatchers.Main) {
-                cacheUrlStringRamDao.deleteAll()
-            }
-        }
+    private fun clearRamDao(){
+        scope.launch { withContext(Dispatchers.Main) { cacheUrlStringRamDao.deleteAll() } }
     }
-
-
-
-
 
 }
 

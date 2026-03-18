@@ -40,9 +40,7 @@ class KtorRequestHandler(
 
     val client = HttpClient(OkHttp) {
 
-        install(ContentNegotiation) {
-            gson()
-        }
+        install(ContentNegotiation) { gson() }
 
         // Подключаем поддержку куков (сохраняет cookies между запросами)
         install(HttpCookies) {
@@ -64,13 +62,8 @@ class KtorRequestHandler(
             socketTimeoutMillis = timeoutMillis
         }
 
-        defaultRequest {
-            headers.append("User-Agent", faker.internet().userAgentAny())
-        }
-
-        install(Logging) {
-            level = LogLevel.ALL
-        }
+        defaultRequest { headers.append("User-Agent", faker.internet().userAgentAny()) }
+        install(Logging) { level = LogLevel.ALL }
     }
 
     suspend fun get(url: String, params: Map<String, String> = emptyMap()): String {
@@ -92,7 +85,7 @@ class KtorRequestHandler(
         }
     }
 
-    suspend fun post(url: String, formData: Map<String, String> = emptyMap()): String {
+    private suspend fun post(url: String, formData: Map<String, String> = emptyMap()): String {
         return retry {
             client.post {
                 url(url)

@@ -14,10 +14,9 @@ suspend fun LandingPageAlbumTag(
     try {
         Timber.i("!!! LandingPageAlbumTag init")
         val q = getLandingPageAlbumTag(tag)
-        val res = repository.openURI(Luscious.Companion.API, q)
+        val res = repository.openURI(q)
         val json = JsonParser.parseString(res.getOrThrow()).asJsonObject
-        val get =
-            json["data"]?.asJsonObject?.get("landing_page_album")?.asJsonObject?.get("tag")?.asJsonObject
+        val get =  json["data"]?.asJsonObject?.get("landing_page_album")?.asJsonObject?.get("tag")?.asJsonObject
         val gson = Gson()
         return Result.success(gson.fromJson(get, Landing_page_albumType::class.java))
     } catch (e: Exception) {

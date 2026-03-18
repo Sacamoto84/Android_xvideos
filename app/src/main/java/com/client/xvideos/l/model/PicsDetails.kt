@@ -60,16 +60,16 @@ data class PicsDetails(
     @SerializedName("is_animated") val is_animated: Boolean,
     @SerializedName("url_to_original") val url_to_original: String?,
     @SerializedName("url_to_video") val url_to_video: String?,
-    @SerializedName("album") val album: String = "null",
-    @SerializedName("thumbnails") val thumbnails: List<Thumbnails> = emptyList()
+    @SerializedName("album") val album: String? = "null",
+    @SerializedName("thumbnails") val thumbnails: List<Thumbnails>? = emptyList()
 ) : Parcelable
 
 @Parcelize
 data class Thumbnails(
     @SerializedName("width") val width: Int,    //640,
     @SerializedName("height") val height: Int,  //3779,
-    @SerializedName("size") val size: String,   //"small", "xMax"
-    @SerializedName("url") val url: String      //"https://..."
+    @SerializedName("size") val size: String?,   //"small", "xMax"
+    @SerializedName("url") val url: String?      //"https://..."
 ) : Parcelable
 
 /**
