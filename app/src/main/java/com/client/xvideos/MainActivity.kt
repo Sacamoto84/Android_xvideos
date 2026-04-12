@@ -61,12 +61,28 @@ import com.client.xvideos.screens.videoplayer.video.cache.VideoPlayerCacheManage
 import com.client.xvideos.ui.theme.XvideosTheme
 import dagger.hilt.android.AndroidEntryPoint
 
+/**
+ * Базовый URL для стартовой точки работы с основным сайтом.
+ */
 const val urlStart = "https://www.xv-ru.com"
 
+/**
+ * Главная activity приложения.
+ *
+ * Отвечает за:
+ * - настройку edge-to-edge режима и системных панелей;
+ * - проверку необходимых разрешений перед запуском основного UI;
+ * - инициализацию кеша видеоплеера;
+ * - отображение корневого Compose-интерфейса приложения.
+ */
 @AndroidEntryPoint
 class MainActivity : ComponentActivity()//, ImageLoaderFactory
 {
 
+    /**
+     * Инициализирует окно, скрывает системные панели, проверяет разрешения
+     * и поднимает корневой Compose UI.
+     */
     @OptIn(ExperimentalVoyagerApi::class, ExperimentalLayoutApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -124,6 +140,11 @@ class MainActivity : ComponentActivity()//, ImageLoaderFactory
     }
 }
 
+/**
+ * Стартовый экран выбора раздела приложения.
+ *
+ * Предоставляет быстрый переход к основным источникам контента.
+ */
 object MenuScreen : Screen {
 
     private fun readResolve(): Any = MenuScreen
@@ -132,7 +153,6 @@ object MenuScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-
 
         Scaffold(
             topBar = {
@@ -148,29 +168,36 @@ object MenuScreen : Screen {
             }
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color(0xFF353535)),
+                modifier = Modifier.fillMaxSize().background(Color(0xFF353535)),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Bottom
             ) {
 
-
                 ButtonSelect(R.drawable.icon_xvideos_white) {
                     navigator.push(ScreenXDashBoards())
                 }
+
                 ButtonSelect(R.drawable.icon_luscious, "buttonL") {
-                    navigator.push(L_ScreenExplorer()) // или ScreenLusciousRoot()
+                    navigator.
+                    push(L_ScreenExplorer()) // или ScreenLusciousRoot()
                 }
                 ButtonSelect(R.drawable.icon_red) {
                     navigator.push(R_Screen_Root()) // или ScreenRedRoot()
                 }
+
             }
         }
     }
 }
 
 
+/**
+ * Универсальная кнопка выбора раздела с иконкой.
+ *
+ * @param iconId ресурс drawable, отображаемый внутри кнопки.
+ * @param tag optional test tag для UI-тестов.
+ * @param onClick callback, вызываемый при нажатии.
+ */
 @Composable
 private fun ButtonSelect(iconId: Int, tag : String= "", onClick: () -> Unit) {
 
@@ -202,12 +229,20 @@ private fun ButtonSelect(iconId: Int, tag : String= "", onClick: () -> Unit) {
 
 }
 
+/**
+ * Preview стартового меню для быстрой проверки в Compose Preview.
+ */
 @Preview(device = "id:pixel_9_pro")
 @Composable
 private fun MenuPreview() {
     MenuScreen.Content()
 }
 
+/**
+ * Вспомогательный composable для дополнительной коррекции edge-to-edge поведения.
+ *
+ * Принудительно обновляет insets и скрывает status bar, когда это необходимо.
+ */
 @Composable
 fun EdgeToEdgeFix() {
     val context = LocalContext.current

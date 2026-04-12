@@ -18,8 +18,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,6 +33,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
@@ -48,55 +51,56 @@ class PermissionScreenActivity : ComponentActivity() {
 
         setContent {
             XvideosTheme {
-                var hasPermission by remember {
-                    mutableStateOf(PermissionStorage.hasPermissions(this))
-                }
+                var hasPermission by remember { mutableStateOf(PermissionStorage.hasPermissions(this)) }
 
-                // Проверка при запуске
-                LaunchedEffect(Unit) {
-                    if (hasPermission) {
-                        navigateToMain()
-                    }
-                }
-
-                // Проверка при возврате из настроек
                 LaunchedEffect(hasPermission) {
                     if (hasPermission) {
                         navigateToMain()
                     }
                 }
 
-                if (!hasPermission) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(Color.Black)
-                            .semantics { testTagsAsResourceId = true },
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = "Отсутствуют Файловые разрешения",
-                            modifier = Modifier.fillMaxWidth(),
-                            textAlign = TextAlign.Center,
-                            fontSize = 24.sp,
-                            color = Color(0xFFFFE800)
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        Button(
-                            modifier = Modifier.testTag("bPermission"),
-                            onClick = {
-                                PermissionStorage.requestPermissions(this@PermissionScreenActivity)
-                            }
-                        ) {
-                            Text(
-                                text = "Запрос",
-                                modifier = Modifier.fillMaxWidth(),
-                                textAlign = TextAlign.Center,
-                                fontSize = 24.sp
-                            )
-                        }
+                PermissionScreenContent(
+                    hasPermission = hasPermission,
+                    onRequestPermission = {
+                        PermissionStorage.requestPermissions(this@PermissionScreenActivity)
                     }
+                )
+            }
+        }
+    }
+
+    @Composable
+    private fun PermissionScreenContent(
+        hasPermission: Boolean,
+        onRequestPermission: () -> Unit
+    ) {
+        if (!hasPermission) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black)
+                    .semantics { testTagsAsResourceId = true },
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = "Отсутствуют Файловые разрешения",
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center,
+                    fontSize = 24.sp,
+                    color = Color(0xFFFFE800)
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(
+                    modifier = Modifier.padding(horizontal = 8.dp).testTag("bPermission"),
+                    onClick = onRequestPermission
+                ) {
+                    Text(
+                        text = "Запрос",
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center,
+                        fontSize = 24.sp
+                    )
                 }
             }
         }
@@ -113,6 +117,17 @@ class PermissionScreenActivity : ComponentActivity() {
     private fun navigateToMain() {
         startActivity(Intent(this, MainActivity::class.java))
         finish()
+    }
+
+    @Preview(showBackground = true)
+    @Composable
+    private fun PermissionScreenPreview() {
+        XvideosTheme {
+            PermissionScreenContent(
+                hasPermission = false,
+                onRequestPermission = {}
+            )
+        }
     }
 
     object PermissionStorage {
@@ -138,7 +153,7 @@ class PermissionScreenActivity : ComponentActivity() {
                         addCategory("android.intent.category.DEFAULT")
                     }
                     activity.startActivity(intent)
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     val intent = Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
                     activity.startActivity(intent)
                 }
