@@ -11,6 +11,21 @@ import com.google.common.reflect.TypeToken
 
 //data class DC_galleryCount(var g0: Boolean, var g1: Boolean, var g2: Boolean, var g3: Boolean, var g4: Boolean )
 
+/**
+ * Централизованная точка доступа к настройкам приложения, которые хранятся в [SharedPreferences].
+ *
+ * Объект инициализируется один раз через [init], после чего предоставляет ленивый доступ
+ * к типизированным настройкам через обёртки [SettingElementBoolean], [SettingElementInt],
+ * [SettingElementString] и [SettingElementList].
+ *
+ * Настройки сгруппированы по функциональным зонам приложения:
+ * - `r_*` — настройки разделов RedGifs;
+ * - `l_*` — настройки разделов Luscious;
+ * - `xvideos_*` — настройки, относящиеся к основному разделу Xvideos.
+ *
+ * Важно: [init] должен быть вызван до первого обращения к любому полю объекта,
+ * иначе доступ к `pref` приведёт к ошибке инициализации.
+ */
 object Settings {
 
     private lateinit var pref: SharedPreferences
@@ -88,12 +103,6 @@ object Settings {
      * Текущее количество столбиков в L Gifs Tab
      */
     val l_gifsTab_column_current_count by lazy { SettingElementInt(pref, "l_gifsTab_column_current_count", 2) }
-
-
-
-
-
-
 
 
 

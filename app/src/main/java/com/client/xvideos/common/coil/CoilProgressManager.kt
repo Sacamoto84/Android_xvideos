@@ -21,9 +21,7 @@ object CoilProgressManager {
     }
 
     // Опционально: очистка
-    fun clear(url: String) {
-        _progressMap.remove(url)
-    }
+    fun clear(url: String) { _progressMap.remove(url) }
 
     fun clearAll() {
         _progressMap.clear()

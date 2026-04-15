@@ -21,5 +21,7 @@ class SettingElementInt(private val sharedPrefs: SharedPreferences, val name: St
     }
 
     init { sharedPrefs.registerOnSharedPreferenceChangeListener(listener) }
+
     fun clear() { sharedPrefs.unregisterOnSharedPreferenceChangeListener(listener) }
+
 }
