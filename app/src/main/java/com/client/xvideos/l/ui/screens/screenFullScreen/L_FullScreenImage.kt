@@ -63,10 +63,13 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.common.coil.UrlImage
 import com.client.xvideos.common.noRippleClickable
+import com.client.xvideos.common.videoplayer.host.MediaPlayerHost
+import com.client.xvideos.common.videoplayer.model.ScreenResize
 import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.ui.element.expandMenu.ExpandMenuType
 import com.client.xvideos.l.ui.element.expandMenu.ExpandMenuViewModel
+import com.redgifs.common.video.player_with_menu.atom.VideoPlayerWithMenuContent
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.IgnoredOnParcel
@@ -227,32 +230,44 @@ class L_FullScreenImage(
                     // Картинка с масштабированием и позиционированием
                     Box( modifier = Modifier.fillMaxSize() )
                     {
-                        UrlImage(
-                            rotate = rotate, contentScale = ContentScale.Fit, url = pageItem.url_to_original ?: "", modifier = Modifier.fillMaxSize()
-                                .zoomable(
-                                    zoomState = zoomState,
-                                    enableOneFingerZoom = false,
-                                    onDoubleTap = { position ->
-                                        coroutineScope.launch {
-                                            if (zoomState.scale > 1.0f) {
-                                                zoomState.changeScale(1.0f, Offset.Zero)
-                                            } else {
-                                                zoomState.changeScale(2.5f, position)
+                        val videoUrl = pageItem.lVideoUrl()
+                        if (videoUrl != null) {
+                            LFullScreenVideo(
+                                url = videoUrl,
+                                autoPlay = autoPlay,
+                                isCurrentPage = currentIndex == page,
+                                rotate = rotate,
+                                modifier = Modifier.fillMaxSize(),
+                                onTap = { isFullScreen = isFullScreen.not() }
+                            )
+                        } else {
+                            UrlImage(
+                                rotate = rotate, contentScale = ContentScale.Fit, url = pageItem.url_to_original ?: "", modifier = Modifier.fillMaxSize()
+                                    .zoomable(
+                                        zoomState = zoomState,
+                                        enableOneFingerZoom = false,
+                                        onDoubleTap = { position ->
+                                            coroutineScope.launch {
+                                                if (zoomState.scale > 1.0f) {
+                                                    zoomState.changeScale(1.0f, Offset.Zero)
+                                                } else {
+                                                    zoomState.changeScale(2.5f, position)
+                                                }
                                             }
+                                        },
+                                        onTap = {
+                                            isFullScreen = isFullScreen.not()
                                         }
-                                    },
-                                    onTap = {
-                                        isFullScreen = isFullScreen.not()
-                                    }
 
-                                ),
-                            onSuccess = { },
-                            albumName = albumName,
-                            autoPlay = autoPlay,
-                            isAnimated = pageItem.is_animated,
-                            isVisible = currentIndex == page,
-                            isFullScreen = true
-                        )
+                                    ),
+                                onSuccess = { },
+                                albumName = albumName,
+                                autoPlay = autoPlay,
+                                isAnimated = pageItem.is_animated,
+                                isVisible = currentIndex == page,
+                                isFullScreen = true
+                            )
+                        }
 
                     }
                 }
@@ -315,6 +330,59 @@ class L_FullScreenImage(
 
         }
     }
+}
+
+@Composable
+private fun LFullScreenVideo(
+    url: String,
+    autoPlay: Boolean,
+    isCurrentPage: Boolean,
+    rotate: Boolean,
+    modifier: Modifier = Modifier,
+    onTap: () -> Unit
+) {
+    val playerHost = remember(url) {
+        MediaPlayerHost(
+            mediaUrl = url,
+            isPaused = !autoPlay || !isCurrentPage,
+            isMuted = true
+        )
+    }
+
+    LaunchedEffect(playerHost) {
+        playerHost.videoFitMode = ScreenResize.FIT
+    }
+
+    LaunchedEffect(autoPlay, isCurrentPage) {
+        if (autoPlay && isCurrentPage) {
+            playerHost.play()
+        } else {
+            playerHost.pause()
+        }
+    }
+
+    VideoPlayerWithMenuContent(
+        modifier = modifier,
+        playerHost = playerHost,
+        onClick = onTap,
+        autoRotate = rotate
+    )
+}
+
+private fun PicsDetails.lVideoUrl(): String? {
+    if (!is_animated) return null
+
+    return url_to_video?.takeIf { it.isNotBlank() }
+        ?: url_to_original?.takeIf { it.isVideoFileUrl() }
+}
+
+private fun String.isVideoFileUrl(): Boolean {
+    val path = substringBefore('?').substringBefore('#')
+    return path.endsWith(".mp4", ignoreCase = true) ||
+            path.endsWith(".webm", ignoreCase = true) ||
+            path.endsWith(".m3u8", ignoreCase = true) ||
+            path.endsWith(".m4v", ignoreCase = true) ||
+            path.endsWith(".mov", ignoreCase = true)
 }
 
 // Дополнительная функция для создания кастомного Modifier для блокировки pager при зуме
