@@ -2,7 +2,6 @@ package com.client.xvideos.l.net
 
 import com.client.xvideos.l.model.Album
 import com.client.xvideos.l.model.AlbumListFilter
-import com.client.xvideos.l.model.AlbumResponse
 import com.client.xvideos.l.model.FacetCollectionInfo
 import com.client.xvideos.l.net.graphQl.getAlbumListGraphQL1
 import com.client.xvideos.l.net.graphQl.getAlbumListWithAggregations
@@ -173,8 +172,7 @@ data class getAlbumListAggregationsResult(
 
             filterPictureCountStateCount
         } catch (e: Exception) {
-            Timber.i("!!! getAlbumListAggregations Exception $e")
-            e.printStackTrace()
+            Timber.w("!!! getAlbumListAggregations Exception ${e.localizedMessage}")
             return Result.failure(e)
 
         }
@@ -210,14 +208,20 @@ data class getAlbumListAggregationsResult(
             val result = repository.openURI(q, config = RepositoryUriConfig.CACHE_RAM )
 
             if (result.isFailure) {
-                Timber.e("!!! getAlbumList error ${result.exceptionOrNull()}")
-                return Result.failure(result.exceptionOrNull()!!)
+                Timber.w("!!! getAlbumList error: ${result.exceptionOrNull()?.message}")
+                return Result.failure(result.exceptionOrNull() ?: IllegalStateException("getAlbumList unknown error"))
             }
-            val res = result.getOrThrow()
-            val gson = Gson()
-            val a = gson.fromJson(res, AlbumResponse::class.java)
-            val info = a.data.album.list.info
-            items.addAll(a.data.album.list.items)
+            val parsed = parseAlbumListResponse(result.getOrThrow(), filter, page)
+            if (parsed.isFailure) {
+                Timber.w("!!! getAlbumList parse error: ${parsed.exceptionOrNull()?.message}")
+                repository.deleteCache(q, RepositoryUriConfig.CACHE_RAM)
+                repository.deleteCache(q, RepositoryUriConfig.CACHE_ROM)
+                return Result.failure(parsed.exceptionOrNull() ?: IllegalStateException("getAlbumList parse error"))
+            }
+
+            val parsedResult = parsed.getOrThrow()
+            val info = parsedResult.info
+            items.addAll(parsedResult.items)
             //Timber.i("!!! getAlbumList info ${info.page} ${items.toList()}")
             return Result.success(
                 AlbumListImplInfoAndList(
@@ -228,8 +232,48 @@ data class getAlbumListAggregationsResult(
                 )
             )
         } catch (e: Exception) {
-            Timber.i("!!! getAlbumList Exception ${e.localizedMessage}")
-            e.printStackTrace()
+            Timber.w("!!! getAlbumList Exception ${e.localizedMessage}")
             return Result.failure(e)
         }
     }
+
+private fun parseAlbumListResponse(
+    response: String,
+    filter: AlbumListFilter,
+    page: Int
+): Result<AlbumListImplInfoAndList> = runCatching {
+    val json = JsonParser.parseString(response).asJsonObject
+    val listJson = json["data"]
+        ?.takeIf { it.isJsonObject }
+        ?.asJsonObject
+        ?.get("album")
+        ?.takeIf { it.isJsonObject }
+        ?.asJsonObject
+        ?.get("list")
+        ?.takeIf { it.isJsonObject }
+        ?.asJsonObject
+        ?: error("AlbumList response missing data.album.list")
+
+    val infoJson = listJson["info"]
+        ?.takeIf { it.isJsonObject }
+        ?: error("AlbumList response missing data.album.list.info")
+
+    val itemsJson = listJson["items"]
+        ?.takeIf { it.isJsonArray }
+        ?.asJsonArray
+        ?: error("AlbumList response missing data.album.list.items")
+
+    val gson = Gson()
+    val info = gson.fromJson(infoJson, FacetCollectionInfo::class.java)
+        ?: error("AlbumList response info is empty")
+    val items = itemsJson.mapNotNull { itemJson ->
+        gson.fromJson(itemJson, Album::class.java)
+    }
+
+    AlbumListImplInfoAndList(
+        info = info,
+        items = items,
+        filter = filter,
+        page = page
+    )
+}

@@ -20,6 +20,10 @@ class AlbumInfo(
     scope: CoroutineScope,
 ) {
 
+    private companion object {
+        val gson = Gson()
+    }
+
     val albumPicsDetails = AlbumPicsDetails(id,  repository)
 
     val albumInfo = MutableStateFlow(
@@ -43,19 +47,46 @@ class AlbumInfo(
 
     init {
         scope.launch {
-            val result = repository.openURI(getAlbumInfo(id), config = RepositoryUriConfig.CACHE_ROM)
+            val query = getAlbumInfo(id)
+            val result = repository.openURI(query, config = RepositoryUriConfig.CACHE_ROM)
             if (result.isFailure) {
-                Timber.e("!!! getAlbumInfo $id error ${result.exceptionOrNull()}")
+                Timber.w("!!! getAlbumInfo $id error: ${result.exceptionOrNull()?.message}")
                 return@launch
             }
-            val res = result.getOrThrow()
-            val json = JsonParser.parseString(res).asJsonObject
-            val get = json["data"]?.asJsonObject?.get("album")?.asJsonObject?.get("get")?.asJsonObject
-            val gson = Gson()
-            albumInfo.value = gson.fromJson(get, AlbumDetails::class.java)
+            var parsed = parseAlbumDetails(result.getOrThrow())
+            if (parsed.isFailure) {
+                Timber.w("!!! getAlbumInfo $id CACHE_ROM parse error, retry DIRECT: ${parsed.exceptionOrNull()?.message}")
+                repository.deleteCache(query, RepositoryUriConfig.CACHE_ROM)
+                val directResult = repository.openURI(query, config = RepositoryUriConfig.DIRECT)
+                if (directResult.isFailure) {
+                    Timber.w("!!! getAlbumInfo $id DIRECT error: ${directResult.exceptionOrNull()?.message}")
+                    return@launch
+                }
+                parsed = parseAlbumDetails(directResult.getOrThrow())
+            }
+
+            if (parsed.isFailure) {
+                Timber.w("!!! getAlbumInfo $id parse error: ${parsed.exceptionOrNull()?.message}")
+                return@launch
+            }
+
+            albumInfo.value = parsed.getOrThrow()
             //url = Luscious.HOME + albumInfo.value.url
             albumPicsDetails.contentUrls()
         }
+    }
+
+    private fun parseAlbumDetails(response: String): Result<AlbumDetails> = runCatching {
+        val json = JsonParser.parseString(response).asJsonObject
+        val get = json["data"]
+            ?.asJsonObject
+            ?.get("album")
+            ?.asJsonObject
+            ?.get("get")
+            ?.asJsonObject
+            ?: error("AlbumInfo response missing data.album.get")
+        gson.fromJson(get, AlbumDetails::class.java)
+            ?: error("AlbumInfo response data.album.get is empty")
     }
 
     /**
@@ -64,7 +95,6 @@ class AlbumInfo(
     val thumbnail: String by lazy { albumInfo.value.cover.url }
 
     val downloadUrl: String by lazy { Luscious.Companion.HOME + albumInfo.value.download_url }
-
 
 //    val artists: List<String> by lazy {
 //        tags.filter { it.category == "Artist" }.map { it.name }

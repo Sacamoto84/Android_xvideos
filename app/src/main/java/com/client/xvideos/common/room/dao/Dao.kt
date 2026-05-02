@@ -19,6 +19,9 @@ interface CacheUrlStringRamDao {
     @Query("SELECT * FROM cache_url_string_ram WHERE url = :url")
     suspend fun get(url: String): CacheUrlStringRamEntity?
 
+    @Query("DELETE FROM cache_url_string_ram WHERE url = :url")
+    suspend fun delete(url: String)
+
     // ✅ Удаление всего кеша
     @Query("DELETE FROM cache_url_string_ram")
     suspend fun deleteAll()
@@ -34,6 +37,9 @@ interface CacheUrlStringRomDao {
 
     @Query("SELECT * FROM cache_url_string_rom WHERE url = :url")
     suspend fun get(url: String): CacheUrlStringRomEntity?
+
+    @Query("DELETE FROM cache_url_string_rom WHERE url = :url")
+    suspend fun delete(url: String)
 
     @Query("DELETE FROM cache_url_string_rom WHERE timeCreate < :time")
     suspend fun deleteOld(time: Long)
