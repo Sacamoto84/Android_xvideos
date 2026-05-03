@@ -17,6 +17,8 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import com.client.xvideos.common.coil.UrlImage
 import com.client.xvideos.common.vibrate.vibrateWithPatternAndAmplitude
 import com.client.xvideos.xvideos.model.ItemsX
+import com.client.xvideos.xvideos.parcer.parserVideoPreviewFromImageUrl
+import timber.log.Timber
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -30,6 +32,11 @@ fun UrlVideoImageAndLongClickX(
     val haptic = LocalHapticFeedback.current
     val context = LocalContext.current
     var isVideo by remember { mutableStateOf(false) }
+    val previewVideoUrl = remember(item.previewImage, item.previewVideo) {
+        parserVideoPreviewFromImageUrl(item.previewImage)
+            .takeIf { it.isNotBlank() && !it.equals("null", ignoreCase = true) }
+            ?: item.previewVideo
+    }
 
     Box(
         modifier = Modifier
@@ -46,7 +53,21 @@ fun UrlVideoImageAndLongClickX(
                     onLongClick.invoke()
                 },
                 onClick = {
-                    isVideo = isVideo.not()
+                    val nextIsVideo = !isVideo
+                    isVideo = nextIsVideo
+                    if (nextIsVideo) {
+                        Timber.i(
+                            """
+                            !!! X preview item click
+                            id: ${item.id}
+                            title: ${item.title}
+                            href: ${item.href}
+                            poster: ${item.previewImage}
+                            parsed preview video: $previewVideoUrl
+                            saved preview video: ${item.previewVideo}
+                            """.trimIndent()
+                        )
+                    }
                     haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                 }
             )
@@ -56,7 +77,16 @@ fun UrlVideoImageAndLongClickX(
 
         if (isVideo) {
             //Показ видео
-            UrlVideoLite(item.previewVideo)
+            UrlVideoLite(
+                url = previewVideoUrl,
+                posterUrl = item.previewImage,
+                modifier = Modifier.fillMaxSize(),
+                fallbackUrls = listOf(item.previewVideo),
+                onClick = {
+                    isVideo = !isVideo
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                }
+            )
         } else {
             //Показ картинки
             UrlImage(item.previewImage, modifier = Modifier.fillMaxWidth())

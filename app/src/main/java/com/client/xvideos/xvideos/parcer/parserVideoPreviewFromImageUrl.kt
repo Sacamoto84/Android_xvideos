@@ -5,13 +5,62 @@ package com.client.xvideos.xvideos.parcer
 
 fun parserVideoPreviewFromImageUrl(s: String): String {
 
-    if (s == "null")
+    val source = s.trim()
+    if (source.isBlank() || source.equals("null", ignoreCase = true)) {
         return "null"
+    }
 
-    val l = s.split("/").toMutableList()
-    l.removeAt(l.lastIndex)
-    l[4] = "videopreview"
-    l[l.lastIndex] += "_169.mp4"
-    val a = l.joinToString("/")
-    return a
+    val url = source.substringBefore('?').substringBefore('#')
+    val parts = url.split("/")
+    val newCdnPreview = parserNewCdnPreviewUrl(parts)
+    if (newCdnPreview != null) {
+        return newCdnPreview
+    }
+
+    val videosIndex = parts.indexOf("videos")
+    val fileName = parts.lastOrNull().orEmpty()
+    val hash = fileName
+        .substringBefore('.')
+        .replace(Regex("-\\d+$"), "")
+        .takeIf { it.isNotBlank() }
+        ?: return "null"
+
+    val folders = if (videosIndex >= 0 && parts.size > videosIndex + 4) {
+        parts.subList(videosIndex + 2, videosIndex + 5)
+    } else if (hash.length >= 6) {
+        listOf(hash.substring(0, 2), hash.substring(2, 4), hash.substring(4, 6))
+    } else {
+        return "null"
+    }
+
+    if (videosIndex < 0) return "null"
+
+    val previewParts = buildList {
+        addAll(parts.take(videosIndex + 1))
+        add("videopreview")
+        addAll(folders)
+        add("${hash}_169.mp4")
+    }
+    return previewParts.joinToString("/")
+}
+
+private fun parserNewCdnPreviewUrl(parts: List<String>): String? {
+    val hostIndex = parts.indexOfFirst { it.contains("xvideos-cdn.com", ignoreCase = true) }
+    if (hostIndex < 0) return null
+
+    val host = parts[hostIndex]
+    if (!host.startsWith("thumb", ignoreCase = true)) return null
+
+    val fileName = parts.lastOrNull().orEmpty()
+    if (!fileName.equals("preview.mp4", ignoreCase = true) &&
+        !fileName.startsWith("xv_", ignoreCase = true) &&
+        !fileName.startsWith("mozaique", ignoreCase = true)
+    ) {
+        return null
+    }
+
+    val pathParts = parts.drop(hostIndex + 1)
+    if (pathParts.size < 3) return null
+
+    return parts.dropLast(1).joinToString("/") + "/preview.mp4"
 }
