@@ -70,14 +70,14 @@ class MediaPlayerHost(
 
     // Public actions
     fun loadUrl(mediaUrl: String, headers: Map<String, String>? = null, drmConfig: DrmConfig? = null) {
+        this.headers = headers
+        this.drmConfig = drmConfig
         if (url != mediaUrl) {
             url = mediaUrl
             scope.launch(Dispatchers.IO) {
                 fetchAndUpdateMediaInfo(mediaUrl)
             }
         }
-        this.headers = headers
-        this.drmConfig = drmConfig
     }
 
     fun play() {
@@ -225,7 +225,7 @@ class MediaPlayerHost(
         setAudioTrack(null)
         setSubTitle(null)
         if (videoUrl.endsWith(".m3u8", ignoreCase = true)) {
-            val m3u8Data = m3u8Helper.fetchM3U8Data(videoUrl)
+            val m3u8Data = m3u8Helper.fetchM3U8Data(videoUrl, headers)
 
             withContext(Dispatchers.Main) {
                 updateVideoQualityOptions(m3u8Data.videoQualities)

@@ -19,21 +19,33 @@ data class M3U8Data(
 )
 
 class M3U8Helper {
-    suspend fun fetchM3U8Data(url: String): M3U8Data {
+    suspend fun fetchM3U8Data(url: String, requestHeaders: Map<String, String>? = null): M3U8Data {
         val m3u8Content = withContext(Dispatchers.IO) {
-            val client = HttpClient(OkHttp){
+            val client = HttpClient(OkHttp) {
                 defaultRequest {
-                    headers.append("Referer", "https://www.redgifs.com/")
-                    headers.append("Origin", "https://www.redgifs.com")
-                    headers.append(HttpHeaders.UserAgent, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 YaBrowser/25.6.0.0 Safari/537.36")
-                    headers.append(HttpHeaders.Accept, "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
-                    headers.append(HttpHeaders.AcceptEncoding, "identity")
-                    headers.append(HttpHeaders.AcceptLanguage, "ru,en;q=0.9")
+                    (requestHeaders ?: redgifsRequestHeaders()).forEach { (name, value) ->
+                        headers.append(name, value)
+                    }
                 }
             }
-            client.get(url).bodyAsText()
+            try {
+                client.get(url).bodyAsText()
+            } finally {
+                client.close()
+            }
         }
         return parseM3U8Content(m3u8Content, url)
+    }
+
+    private fun redgifsRequestHeaders(): Map<String, String> {
+        return mapOf(
+            "Referer" to "https://www.redgifs.com/",
+            "Origin" to "https://www.redgifs.com",
+            HttpHeaders.UserAgent to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 YaBrowser/25.6.0.0 Safari/537.36",
+            HttpHeaders.Accept to "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+            HttpHeaders.AcceptEncoding to "identity",
+            HttpHeaders.AcceptLanguage to "ru,en;q=0.9"
+        )
     }
 
     private fun parseM3U8Content(m3u8Content: String, baseUrl: String): M3U8Data {

@@ -34,6 +34,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.ScreenRotation
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -240,6 +241,8 @@ class L_FullScreenImage(
                         if (videoUrl != null) {
                             LFullScreenVideo(
                                 url = videoUrl,
+                                previewUrl = pageItem.lPreviewImageUrl("large_thumbnail"),
+                                albumName = albumName,
                                 autoPlay = autoPlay,
                                 isCurrentPage = currentIndex == page,
                                 rotate = rotate,
@@ -354,6 +357,8 @@ class L_FullScreenImage(
 @Composable
 private fun LFullScreenVideo(
     url: String,
+    previewUrl: String,
+    albumName: String,
     autoPlay: Boolean,
     isCurrentPage: Boolean,
     rotate: Boolean,
@@ -368,9 +373,14 @@ private fun LFullScreenVideo(
             headers = lMediaRequestHeaders()
         )
     }
+    var playbackError by remember(url) { mutableStateOf(false) }
 
     LaunchedEffect(playerHost) {
         playerHost.videoFitMode = ScreenResize.FIT
+        playerHost.onError = {
+            playbackError = true
+            timber.log.Timber.e("!!! L fullscreen video error: ${it.message}")
+        }
     }
 
     LaunchedEffect(autoPlay, isCurrentPage) {
@@ -381,12 +391,47 @@ private fun LFullScreenVideo(
         }
     }
 
-    VideoPlayerWithMenuContent(
-        modifier = modifier,
-        playerHost = playerHost,
-        onClick = onTap,
-        autoRotate = rotate
-    )
+    Box(modifier = modifier) {
+        VideoPlayerWithMenuContent(
+            modifier = Modifier.fillMaxSize(),
+            playerHost = playerHost,
+            onClick = onTap,
+            autoRotate = rotate
+        )
+
+        AnimatedVisibility(
+            visible = playerHost.poster || playbackError,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            if (previewUrl.isNotBlank() && !previewUrl.isLVideoFileUrl()) {
+                UrlImage(
+                    url = previewUrl,
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier.fillMaxSize(),
+                    albumName = albumName,
+                    autoPlay = false,
+                    isAnimated = false
+                )
+            } else {
+                Box(
+                    modifier = Modifier
+                        .background(Color(0xFF202020))
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(Icons.Default.PlayArrow, contentDescription = null, tint = Color.White)
+                }
+            }
+        }
+
+        if (playerHost.poster && !playbackError) {
+            CircularProgressIndicator(
+                modifier = Modifier.align(Alignment.Center),
+                color = Color.LightGray
+            )
+        }
+    }
 }
 
 // Дополнительная функция для создания кастомного Modifier для блокировки pager при зуме

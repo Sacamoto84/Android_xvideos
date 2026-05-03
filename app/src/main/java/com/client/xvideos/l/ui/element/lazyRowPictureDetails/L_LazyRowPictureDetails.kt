@@ -22,6 +22,7 @@ import androidx.compose.foundation.lazy.staggeredgrid.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -158,6 +159,8 @@ fun L_LazyRowPictureDetails(
                             if (playInline && videoUrl != null) {
                                 LInlineAnimationVideo(
                                     url = videoUrl,
+                                    previewUrl = previewUrl,
+                                    albumName = host.albumName,
                                     modifier = Modifier.fillMaxSize()
                                 )
                             } else if (previewUrl.isNotBlank() && !previewUrl.isLVideoFileUrl()) {
@@ -239,6 +242,8 @@ fun L_LazyRowPictureDetails(
 @Composable
 private fun LInlineAnimationVideo(
     url: String,
+    previewUrl: String,
+    albumName: String,
     modifier: Modifier = Modifier
 ) {
     val playerHost = remember(url) {
@@ -249,18 +254,50 @@ private fun LInlineAnimationVideo(
             headers = lMediaRequestHeaders()
         )
     }
+    var playbackError by remember(url) { mutableStateOf(false) }
 
     LaunchedEffect(playerHost) {
         playerHost.videoFitMode = ScreenResize.FILL
+        playerHost.onError = {
+            playbackError = true
+            Timber.e("!!! L inline video error: ${it.message}")
+        }
         playerHost.play()
     }
 
-    VideoPlayerWithMenuContent(
-        modifier = modifier,
-        playerHost = playerHost,
-        onClick = {},
-        autoRotate = false
-    )
+    Box(modifier = modifier) {
+        VideoPlayerWithMenuContent(
+            modifier = Modifier.fillMaxSize(),
+            playerHost = playerHost,
+            onClick = {},
+            autoRotate = false
+        )
+
+        AnimatedVisibility(
+            visible = playerHost.poster || playbackError,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            if (previewUrl.isNotBlank() && !previewUrl.isLVideoFileUrl()) {
+                UrlImage(
+                    url = previewUrl,
+                    contentScale = ContentScale.FillHeight,
+                    modifier = Modifier.fillMaxSize(),
+                    albumName = albumName,
+                    isAnimated = false
+                )
+            } else {
+                AnimatedVideoPlaceholder(modifier = Modifier.fillMaxSize())
+            }
+        }
+
+        if (playerHost.poster && !playbackError) {
+            CircularProgressIndicator(
+                modifier = Modifier.align(Alignment.Center),
+                color = Color.LightGray
+            )
+        }
+    }
 }
 
 @Composable
