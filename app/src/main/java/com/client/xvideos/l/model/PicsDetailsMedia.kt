@@ -8,9 +8,9 @@ fun PicsDetails.lAnimationVideoUrl(): String? {
 
 fun PicsDetails.lDownloadUrl(): String? {
     return if (is_animated) {
-        lAnimationVideoUrl() ?: url_to_original?.takeIf { it.isNotBlank() }
+        lAnimationVideoUrl() ?: lImageMediaUrl()
     } else {
-        url_to_original?.takeIf { it.isNotBlank() }
+        lImageMediaUrl()
     }
 }
 
@@ -22,14 +22,34 @@ fun PicsDetails.lPreviewImageUrl(thumbnailsSize: String): String {
         ?: thumbnails
             ?.firstOrNull { !it.url.isNullOrBlank() && !it.url.isLVideoFileUrl() }
             ?.url
-        ?: url_to_original.orEmpty()
+        ?: lImageMediaUrl().orEmpty()
 }
 
 fun PicsDetails.lFullScreenImageUrls(): List<String> {
-    val original = url_to_original
-        ?.takeIf { it.isNotBlank() && !it.isLVideoFileUrl() }
+    val localOriginal = url_to_original
+        ?.takeIf { it.isLocalImagePath() }
 
-    val previews = thumbnails
+    val thumbnails = lThumbnailImageUrlsBySize()
+
+    val fallbackOriginal = url_to_original
+        ?.takeIf { thumbnails.isEmpty() && it.isNotBlank() && !it.isLVideoFileUrl() }
+
+    return (listOfNotNull(localOriginal) + thumbnails + listOfNotNull(fallbackOriginal)).distinct()
+}
+
+fun PicsDetails.lImageMediaUrl(): String? {
+    val localOriginal = url_to_original?.takeIf { it.isLocalImagePath() }
+    return localOriginal
+        ?: lBestThumbnailImageUrl()
+        ?: url_to_original?.takeIf { it.isNotBlank() && !it.isLVideoFileUrl() }
+}
+
+fun PicsDetails.lBestThumbnailImageUrl(): String? {
+    return lThumbnailImageUrlsBySize().firstOrNull()
+}
+
+fun PicsDetails.lThumbnailImageUrlsBySize(): List<String> {
+    return thumbnails
         .orEmpty()
         .asSequence()
         .filter {
@@ -43,8 +63,7 @@ fun PicsDetails.lFullScreenImageUrls(): List<String> {
         })
         .mapNotNull { it.url }
         .toList()
-
-    return (listOfNotNull(original) + previews).distinct()
+        .distinct()
 }
 
 fun PicsDetails.lSavedFileName(): String? {
@@ -88,6 +107,13 @@ fun String.lUrlFileName(): String {
 
 fun String.lUrlExtension(): String {
     return lUrlFileName().substringAfterLast('.', missingDelimiterValue = "")
+}
+
+private fun String.isLocalImagePath(): Boolean {
+    return isNotBlank() &&
+            !startsWith("http://", ignoreCase = true) &&
+            !startsWith("https://", ignoreCase = true) &&
+            !isLVideoFileUrl()
 }
 
 private const val L_MEDIA_USER_AGENT =

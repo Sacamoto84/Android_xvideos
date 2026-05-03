@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.setValue
 import com.client.xvideos.l.model.PicsDetails
+import com.client.xvideos.l.model.lBestThumbnailImageUrl
 import com.client.xvideos.l.net.graphQl.GraphQlRequest
 import com.client.xvideos.l.repository.Repository
 import com.client.xvideos.l.repository.RepositoryUriConfig
@@ -25,7 +26,6 @@ class AlbumPicsDetails(
 
     private companion object {
         val gson = Gson()
-        val thumbnailRegex = Regex("""\.\d+x\d+(?=\.\w+$)""")
     }
 
     val pics = mutableStateListOf<PicsDetails>()
@@ -129,7 +129,7 @@ class AlbumPicsDetails(
     }
 
     private suspend fun appendPage(page: PageLoadResult, pages: Int) {
-        val corrected = correctionPictureUrl(page.items)
+        val corrected = normalizePictureUrls(page.items)
         withContext(Dispatchers.Main) {
             totalPages = pages
             percentLoad = page.page.toFloat() / pages
@@ -153,40 +153,15 @@ class AlbumPicsDetails(
         }.getOrNull()
     }
 
-    private fun correctionPictureUrl(l: List<PicsDetails>): List<PicsDetails> {
-        val res = mutableListOf<PicsDetails>()
-
-        l.forEach { item ->
-            val thumbUrl = item.thumbnails?.firstOrNull()?.url
-
-            if (thumbUrl != null) {
-                runCatching {
-                    val originalUrl = item.url_to_original?.takeIf { it.isNotBlank() }
-                        ?: urlToOriginal(thumbUrl)
-                    item.copy(url_to_original = originalUrl)
-                }.onSuccess {
-                    res.add(it)
-                }.onFailure {
-                    Timber.w(it, "!!! AlbumPicsDetails $id correction url error")
-                    res.add(item)
-                }
+    private fun normalizePictureUrls(l: List<PicsDetails>): List<PicsDetails> {
+        return l.map { item ->
+            val thumbnailUrl = item.lBestThumbnailImageUrl()
+            if (!thumbnailUrl.isNullOrBlank()) {
+                item.copy(url_to_original = thumbnailUrl)
             } else {
-                res.add(item)
+                item
             }
         }
-
-        return res
-    }
-
-
-    //https://cdni.luscious.net/venividivici2k13/603323/millie_beachside_dem_01KHBSB2THB9YFJCQT22P9NGCS.640x0.jpg?md5=sn0bj1zYPF7ziGsGKnGRQA&expires=1773900756
-    fun urlToOriginal(str: String): String {
-        // 1. Убираем всё после ?
-        val withoutQuery = str.substringBefore('?')
-
-        // 2. Убираем .ЧИСЛОxЧИСЛО перед .jpg / .png и т.п.
-        //    Работает для .640x0, .1280x1920, .0x0 и подобных
-        return withoutQuery.replace(thumbnailRegex, "")
     }
 
 
