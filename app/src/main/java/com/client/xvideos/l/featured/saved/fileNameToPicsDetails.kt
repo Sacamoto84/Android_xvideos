@@ -8,14 +8,14 @@ fun fileNameToPicsDetails(file: File, folder : String): PicsDetails? {
 
     val name = file.nameWithoutExtension// убираем .jpg / .png и т.п.
 
-    val parts = name.split("_", limit = 4)
+    val parts = name.split("_", limit = 5)
 
     if (parts.size < 4) return null
 
     val width = parts[0].toIntOrNull() ?: return null
     val height = parts[1].toIntOrNull() ?: return null
     val is_animated = parts[2].toBooleanStrictOrNull() ?: false
-    val album = parts[3].toIntOrNull().toString()
+    val album = parts.getOrNull(3) ?: "null"
 
     val path = File(folder, file.name).absolutePath
 

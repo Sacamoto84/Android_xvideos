@@ -5,8 +5,9 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -20,14 +21,18 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.lazy.staggeredgrid.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -45,6 +50,11 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.screenRoot.LocalRootScreenModel
 import com.client.xvideos.common.coil.UrlImage
 import com.client.xvideos.common.settings.Settings
+import com.client.xvideos.common.videoplayer.host.MediaPlayerHost
+import com.client.xvideos.common.videoplayer.model.ScreenResize
+import com.client.xvideos.l.model.isLVideoFileUrl
+import com.client.xvideos.l.model.lAnimationVideoUrl
+import com.client.xvideos.l.model.lPreviewImageUrl
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.ui.element.expandMenu.ExpandMenuType
 import com.client.xvideos.l.ui.element.expandMenu.ExpandMenuViewModel
@@ -52,6 +62,7 @@ import com.client.xvideos.l.ui.screens.screenFullScreen.L_FullScreenImage
 import com.client.xvideos.l.ui.screens.screenFullScreen.fullScreenImageFilteredPicArray
 import com.client.xvideos.redgifs.ui.profile.atom.VerticalScrollbar
 import com.client.xvideos.redgifs.ui.profile.rememberVisibleRangePercentIgnoringFirstNForLazyStaggeredGrid
+import com.redgifs.common.video.player_with_menu.atom.VideoPlayerWithMenuContent
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -110,42 +121,88 @@ fun L_LazyRowPictureDetails(
                     {
                         val aspect = item.width.toFloat() / item.height
 
-                        val url = if (item.thumbnails.isNullOrEmpty()) { item.url_to_original ?: "" } else { item.thumbnails.firstOrNull { it.size == thumbnailsSize }?.url ?: item.url_to_original ?: ""}
+                        val previewUrl = item.lPreviewImageUrl(thumbnailsSize)
+                        val videoUrl = item.lAnimationVideoUrl()
+                        var playInline by remember(item.url_to_original, item.url_to_video) { mutableStateOf(false) }
 
-                        UrlImage(
-                            url = url,
-                            contentScale = ContentScale.FillHeight,
-                            urlGif = item.url_to_original,
+                        fun openFullScreen() {
+                            fullScreenImageFilteredPicArray = host.filteredPic.toList()
+                            navigator.push(
+                                L_FullScreenImage(
+                                    item = item,
+                                    onClose = { position ->
+                                        Timber.i("scrollToItem $position")
+                                        if (position != -1) {
+                                            rootVm.screenModelScope.launch {
+                                                host.state.scrollToItem(position)
+                                                delay(100)
+                                            }
+                                        }
+                                    },
+                                    albumName = host.albumName,
+                                    expandMenu = expandMenu,
+                                    autoPlay = true,
+                                    isAnimated = item.is_animated,
+                                )
+                            )
+                        }
+
+                        Box(
                             modifier = Modifier
                                 .padding(2.dp)
                                 .aspectRatio(aspect)
                                 .clipToBounds()
                                 .border(0.5.dp, Color.Gray)
-                                .clickable {
-                                    fullScreenImageFilteredPicArray = host.filteredPic.toList()
+                        ) {
+                            if (playInline && videoUrl != null) {
+                                LInlineAnimationVideo(
+                                    url = videoUrl,
+                                    modifier = Modifier.fillMaxSize()
+                                )
+                            } else if (previewUrl.isNotBlank() && !previewUrl.isLVideoFileUrl()) {
+                                UrlImage(
+                                    url = previewUrl,
+                                    contentScale = ContentScale.FillHeight,
+                                    urlGif = item.url_to_original,
+                                    modifier = Modifier.fillMaxSize(),
+                                    albumName = host.albumName,
+                                    isAnimated = false
+                                )
+                            } else {
+                                AnimatedVideoPlaceholder(modifier = Modifier.fillMaxSize())
+                            }
 
-                                    navigator.push(
-                                        L_FullScreenImage(
-                                            item = item,
-                                            onClose = { position ->
-                                                Timber.i("scrollToItem $position")
-                                                if (position != -1) {
-                                                    rootVm.screenModelScope.launch {
-                                                        host.state.scrollToItem(position)
-                                                        delay(100)
-                                                    }
-                                                }
-                                            },
-                                            albumName = host.albumName,
-                                            expandMenu = expandMenu,
-                                            autoPlay = true,
-                                            isAnimated = item.is_animated,
-                                        )
+                            Box(
+                                modifier = Modifier
+                                    .matchParentSize()
+                                    .combinedClickable(
+                                        onClick = {
+                                            if (videoUrl != null) {
+                                                playInline = true
+                                            } else {
+                                                openFullScreen()
+                                            }
+                                        },
+                                        onLongClick = if (videoUrl != null) {
+                                            { openFullScreen() }
+                                        } else {
+                                            null
+                                        }
                                     )
-                                },
-                            albumName = host.albumName,
-                            isAnimated = item.is_animated
-                        )
+                            )
+
+                            if (videoUrl != null && !playInline) {
+                                Icon(
+                                    imageVector = Icons.Default.PlayArrow,
+                                    contentDescription = null,
+                                    tint = Color.White,
+                                    modifier = Modifier
+                                        .align(Alignment.BottomStart)
+                                        .padding(6.dp)
+                                        .background(Color.Black.copy(alpha = 0.45f))
+                                )
+                            }
+                        }
 
                         Text(
                             index.toString(),
@@ -178,3 +235,42 @@ fun L_LazyRowPictureDetails(
     }
 }
 
+@Composable
+private fun LInlineAnimationVideo(
+    url: String,
+    modifier: Modifier = Modifier
+) {
+    val playerHost = remember(url) {
+        MediaPlayerHost(
+            mediaUrl = url,
+            isPaused = false,
+            isMuted = true
+        )
+    }
+
+    LaunchedEffect(playerHost) {
+        playerHost.videoFitMode = ScreenResize.FILL
+        playerHost.play()
+    }
+
+    VideoPlayerWithMenuContent(
+        modifier = modifier,
+        playerHost = playerHost,
+        onClick = {},
+        autoRotate = false
+    )
+}
+
+@Composable
+private fun AnimatedVideoPlaceholder(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier.background(ThemeL.grey6),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            imageVector = Icons.Default.PlayArrow,
+            contentDescription = null,
+            tint = Color.White
+        )
+    }
+}

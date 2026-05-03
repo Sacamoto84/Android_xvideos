@@ -5,6 +5,8 @@ import com.client.xvideos.common.AppPath
 import com.client.xvideos.common.kdownloader.KDownloader
 import com.client.xvideos.common.snackbar.SnackBar
 import com.client.xvideos.l.model.PicsDetails
+import com.client.xvideos.l.model.lDownloadUrl
+import com.client.xvideos.l.model.lSavedFileName
 import timber.log.Timber
 import java.io.File
 
@@ -70,13 +72,19 @@ private fun downloadLikes(
     onError: () -> Unit
 ) {
 
-    val fileName = item.width.toString()+"_"+item.height+"_"+item.is_animated+"_"+item.album+"_"+item.url_to_original?.substringAfterLast('/')?.substringBefore('?')
+    val downloadUrl = item.lDownloadUrl()
+    val fileName = item.lSavedFileName()
+    if (downloadUrl == null || fileName == null) {
+        Timber.e(">>> Download Likes missing media url")
+        onError()
+        return
+    }
 
     val dir = File(AppPath.l_likes)
     dir.mkdirs()
 
     val request = kDownloader
-        .newRequestBuilder(item.url_to_original!!, dir.absolutePath, fileName)
+        .newRequestBuilder(downloadUrl, dir.absolutePath, fileName)
         .tag("likes")
         .build()
 

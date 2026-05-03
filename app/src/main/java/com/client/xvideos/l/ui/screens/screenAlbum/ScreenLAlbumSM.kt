@@ -12,12 +12,13 @@ import com.client.xvideos.common.AppPath
 import com.client.xvideos.common.di.ApplicationScope
 import com.client.xvideos.common.kdownloader.KDownloader
 import com.client.xvideos.common.snackbar.SnackBar
-import com.client.xvideos.common.util.toMD5
 import com.client.xvideos.l.featured.downloader.DownloaderAlbum
 import com.client.xvideos.l.featured.downloader.DownloaderL
 import com.client.xvideos.l.featured.saved.SavedL
 import com.client.xvideos.l.featured.share.useCaseShareFile
 import com.client.xvideos.l.model.PicsDetails
+import com.client.xvideos.l.model.lDownloadUrl
+import com.client.xvideos.l.model.lSavedFileName
 import com.client.xvideos.l.net.AlbumInfo
 import com.client.xvideos.l.net.Luscious
 import com.client.xvideos.l.ui.element.lazyRowPictureDetails.LazyRowPictureDetailsHost
@@ -111,7 +112,8 @@ class ScreenLAlbumSM @AssistedInject constructor(
     fun saveFullAlbum() {
         scope.launch {
             val pic = albumInfo.value?.albumPicsDetails?.pics?.toList()
-                ?.map { it.url_to_original } as List<String>
+                ?.mapNotNull { it.lDownloadUrl() }
+                ?: emptyList()
             downloader.saveAlbums(pic, albumInfo.value!!.id.toString())
         }
     }
@@ -139,14 +141,12 @@ class ScreenLAlbumSM @AssistedInject constructor(
     fun share(item: PicsDetails) {
         scope.launch(Dispatchers.Main) {
             Timber.i("!!! share item = ${item.url_to_original} isAnimated: ${item.is_animated}")
-            val name = item.url_to_original?.substringAfterLast('/')?.substringBefore('?') //xxx.yyy
-
-            val ext = if (item.is_animated && name?.split(".")?.get(1) == "jpg") "gif" else name?.split(".")?.get(1)
-
-            val fileName =
-                item.width.toString() + "_" + item.height + "_" + item.is_animated + "_" + item.album + "_" + name?.toMD5()
-                    ?.dropLast(24) + "." + ext
-            val url = item.url_to_original!!
+            val fileName = item.lSavedFileName()
+            val url = item.lDownloadUrl()
+            if (fileName == null || url == null) {
+                SnackBar.error("Нет ссылки для файла")
+                return@launch
+            }
             val client = HttpClient()
             val downloadsDir = AppPath.l_cacheDownload
             val file = File(downloadsDir, fileName)

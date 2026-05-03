@@ -8,6 +8,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -31,6 +32,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.ScreenRotation
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -66,6 +68,9 @@ import com.client.xvideos.common.noRippleClickable
 import com.client.xvideos.common.videoplayer.host.MediaPlayerHost
 import com.client.xvideos.common.videoplayer.model.ScreenResize
 import com.client.xvideos.l.model.PicsDetails
+import com.client.xvideos.l.model.isLVideoFileUrl
+import com.client.xvideos.l.model.lAnimationVideoUrl
+import com.client.xvideos.l.model.lPreviewImageUrl
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.ui.element.expandMenu.ExpandMenuType
 import com.client.xvideos.l.ui.element.expandMenu.ExpandMenuViewModel
@@ -230,7 +235,7 @@ class L_FullScreenImage(
                     // Картинка с масштабированием и позиционированием
                     Box( modifier = Modifier.fillMaxSize() )
                     {
-                        val videoUrl = pageItem.lVideoUrl()
+                        val videoUrl = pageItem.lAnimationVideoUrl()
                         if (videoUrl != null) {
                             LFullScreenVideo(
                                 url = videoUrl,
@@ -314,12 +319,25 @@ class L_FullScreenImage(
                                         })
                                         .border(2.dp, if (index == currentIndex) Color.Yellow else Color.Transparent, RoundedCornerShape(4.dp)).padding(2.dp)
                                 ) {
-                                    UrlImage(
-                                        url = it1.url_to_original ?: "",
-                                        modifier = Modifier.clip(RoundedCornerShape(4.dp)).fillMaxSize(),
-                                        contentScale = ContentScale.FillBounds,
-                                        onSuccess = { }, albumName = albumName, autoPlay = false, isAnimated = it1.is_animated, sizeButton = 20.dp, sizeButtonIcon = 12.dp
-                                    )
+                                    val thumbUrl = it1.lPreviewImageUrl("large_thumbnail")
+                                    if (thumbUrl.isNotBlank() && !thumbUrl.isLVideoFileUrl()) {
+                                        UrlImage(
+                                            url = thumbUrl,
+                                            modifier = Modifier.clip(RoundedCornerShape(4.dp)).fillMaxSize(),
+                                            contentScale = ContentScale.FillBounds,
+                                            onSuccess = { }, albumName = albumName, autoPlay = false, isAnimated = false, sizeButton = 20.dp, sizeButtonIcon = 12.dp
+                                        )
+                                    } else {
+                                        Box(
+                                            modifier = Modifier
+                                                .clip(RoundedCornerShape(4.dp))
+                                                .background(Color(0xFF202020))
+                                                .fillMaxSize(),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Icon(Icons.Default.PlayArrow, contentDescription = null, tint = Color.White)
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -367,22 +385,6 @@ private fun LFullScreenVideo(
         onClick = onTap,
         autoRotate = rotate
     )
-}
-
-private fun PicsDetails.lVideoUrl(): String? {
-    if (!is_animated) return null
-
-    return url_to_video?.takeIf { it.isNotBlank() }
-        ?: url_to_original?.takeIf { it.isVideoFileUrl() }
-}
-
-private fun String.isVideoFileUrl(): Boolean {
-    val path = substringBefore('?').substringBefore('#')
-    return path.endsWith(".mp4", ignoreCase = true) ||
-            path.endsWith(".webm", ignoreCase = true) ||
-            path.endsWith(".m3u8", ignoreCase = true) ||
-            path.endsWith(".m4v", ignoreCase = true) ||
-            path.endsWith(".mov", ignoreCase = true)
 }
 
 // Дополнительная функция для создания кастомного Modifier для блокировки pager при зуме

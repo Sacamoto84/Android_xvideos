@@ -6,8 +6,9 @@ import com.client.xvideos.common.encrypting.Crypto
 import com.client.xvideos.common.encrypting.Password
 import com.client.xvideos.common.kdownloader.KDownloader
 import com.client.xvideos.common.snackbar.SnackBar
-import com.client.xvideos.common.util.toMD5
 import com.client.xvideos.l.model.PicsDetails
+import com.client.xvideos.l.model.lDownloadUrl
+import com.client.xvideos.l.model.lSavedFileName
 import timber.log.Timber
 import java.io.File
 
@@ -29,15 +30,15 @@ class SavedL_Crypto(val kDownloader: KDownloader) {
             return
         }
 
-        val name = item.url_to_original?.substringAfterLast('/')?.substringBefore('?') //xxx.yyy
-        val ext = name?.split(".")?.get(1)
-
-        val fileName =
-            item.width.toString() + "_" + item.height + "_" + item.is_animated + "_" + item.album + "_" +
-                    name?.toMD5()?.dropLast(24) + "." + ext
+        val downloadUrl = item.lDownloadUrl()
+        val fileName = item.lSavedFileName()
+        if (downloadUrl == null || fileName == null) {
+            SnackBar.error("Нет ссылки для сохранения в сейф")
+            return
+        }
 
         Crypto.downloadAndEncryptFile(
-            item.url_to_original!!,
+            downloadUrl,
             File(AppPath.l_likesCrypto, fileName),
             Password.key!!
         )
@@ -64,14 +65,14 @@ class SavedL_Crypto(val kDownloader: KDownloader) {
             return
         }
 
-        val name = item.url_to_original?.substringAfterLast('/')?.substringBefore('?') //xxx.yyy
-        val ext = name?.split(".")?.get(1)
+        val fileName = item.lSavedFileName()
+        if (fileName == null || item.url_to_original.isNullOrBlank()) {
+            SnackBar.error("Нет файла для сохранения в сейф")
+            return
+        }
+        val sourceFile = item.url_to_original
 
-        val fileName =
-            item.width.toString() + "_" + item.height + "_" + item.is_animated + "_" + item.album + "_" +
-                    name?.toMD5()?.dropLast(24) + "." + ext
-
-        Crypto.encryptFile(File(item.url_to_original!!), File(AppPath.l_likesCrypto, fileName), key)
+        Crypto.encryptFile(File(sourceFile), File(AppPath.l_likesCrypto, fileName), key)
             .onSuccess {
                 SnackBar.success("Сохранен в сейф")
                 Timber.i("!!! ScreenLAlbumSM downloadLikeCrypto success")
