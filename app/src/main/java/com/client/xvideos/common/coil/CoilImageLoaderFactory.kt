@@ -130,8 +130,8 @@ object CoilImageLoaderFactory {
             }
             .memoryCache {
                 MemoryCache.Builder()
-                    .maxSizePercent(context, 0.25) // было 0.5 — можно уменьшить, если память жрёт
-                    .strongReferencesEnabled(true)
+                    .maxSizePercent(context, 0.10)
+                    .strongReferencesEnabled(false)
                     .build()
             }
             .allowHardware(true)

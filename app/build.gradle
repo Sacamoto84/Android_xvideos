@@ -102,6 +102,9 @@ android {
 dependencies {
 
 
+
+    implementation(libs.androidx.compose.ui.android)
+
     implementation(libs.androidx.runtime)
 
     implementation libs.androidx.compose.runtime

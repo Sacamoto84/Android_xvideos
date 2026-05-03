@@ -43,6 +43,7 @@ import androidx.core.net.toUri
 import coil3.asDrawable
 import coil3.compose.AsyncImage
 import coil3.compose.AsyncImagePainter
+import coil3.compose.rememberConstraintsSizeResolver
 import coil3.request.ImageRequest
 import coil3.size.Precision
 import coil3.size.Scale
@@ -163,13 +164,15 @@ fun UrlImage(
     // Один глобальный ImageLoader на всё приложение
     val imageLoader = remember {CoilImageLoaderFactory.getImageLoader(context) }
 
-    val imageRequest = remember(dataSource, rotate) {
+    val sizeResolver = rememberConstraintsSizeResolver()
+
+    val imageRequest = remember(dataSource, rotate, isFullScreen, sizeResolver) {
         ImageRequest.Builder(context)
             .data(dataSource)
             .scale(Scale.FIT)
             .apply {
                 if (!isFullScreen) {
-                    //size(512, 64)
+                    size(sizeResolver)
                     precision(Precision.INEXACT)
                 }
             }
@@ -229,6 +232,7 @@ fun UrlImage(
 //            ),
                 modifier = Modifier
                     .background(ThemeL.grey6)
+                    .then(if (!isFullScreen) Modifier.then(sizeResolver) else Modifier)
                     .then(
                         if (isFullScreen && rotate) {
                             Modifier.graphicsLayer(

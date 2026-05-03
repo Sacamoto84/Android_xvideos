@@ -50,6 +50,7 @@ timber = "5.0.1"
 storage = "1.6.0"
 googleGmsGoogleServices = "4.4.4"
 datastoreCoreAndroid = "1.2.1"
+uiAndroid = "1.11.0"
 volley = "1.2.1"
 voyager = "1.1.0-beta03"
 warden = "1.0.0-alpha2"
@@ -63,7 +64,9 @@ benchmarkMacroJunit4 = "1.4.1"
 accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanistSystemuicontroller" }
 androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activityKtx" }
 androidx-adaptive = { module = "androidx.compose.material3.adaptive:adaptive" }
+androidx-compose-ui-android = { module = "androidx.compose.ui:ui-android", version.ref = "uiAndroid" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+
 #Material
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
