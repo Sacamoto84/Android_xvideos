@@ -33,10 +33,12 @@ class KtorRequestHandler(
     private val maxRetries: Int = 5,
     private val retryStatusCodes: Set<Int> = setOf(413, 429, 500, 502, 503, 504),
     private val backoffFactor: Long = 1000,
-    private val username : String? = null,
-    private val password : String? = null
+    username: String? = null,
+    password: String? = null
 ) {
     private val faker = Faker()
+    private var username: String? = username
+    private var password: String? = password
 
     val client = HttpClient(OkHttp) {
 
@@ -147,18 +149,33 @@ class KtorRequestHandler(
     var loggedIn: Boolean = false
         private set
 
-    suspend fun login(
+    fun setCredentials(username: String?, password: String?) {
+        val normalizedUsername = username?.trim().orEmpty()
+        val normalizedPassword = password.orEmpty()
+        if (this.username != normalizedUsername || this.password != normalizedPassword) {
+            loggedIn = false
+            this.username = normalizedUsername
+            this.password = normalizedPassword
+        }
+    }
+
+    fun close() {
+        client.close()
+    }
+
+    suspend fun login(): Boolean
         //username: String? = null,
         //password: String? = null,
-    ) {
-        if (username == null || password == null) {
+    {
+        if (username.isNullOrBlank() || password.isNullOrBlank()) {
             println("Username or password not provided")
-            return
+            loggedIn = false
+            return false
         }
 
         val formData = mapOf(
-            "login" to username,
-            "password" to password,
+            "login" to username.orEmpty(),
+            "password" to password.orEmpty(),
             "remember" to "on"
         )
 
@@ -166,7 +183,8 @@ class KtorRequestHandler(
             post(LOGIN, formData)
         } catch (e: Exception) {
             println("Login request failed: ${e.message}")
-            return
+            loggedIn = false
+            return false
         }
 
         if ("The username and/or password you specified are not correct." in response) {
@@ -176,6 +194,7 @@ class KtorRequestHandler(
             loggedIn = true
             println("Login successful")
         }
+        return loggedIn
     }
     // ! --- Login --- !
 

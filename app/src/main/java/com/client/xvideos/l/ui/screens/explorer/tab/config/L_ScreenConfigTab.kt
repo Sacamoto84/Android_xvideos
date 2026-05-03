@@ -46,7 +46,9 @@ import com.client.xvideos.common.util.getFolderSize
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.model.ThumbnailsSize
 import com.client.xvideos.l.model.enum.AudiencesType
+import com.client.xvideos.l.repository.Repository
 import com.client.xvideos.l.ui.screens.explorer.tab.config.atom.ConfigTextAndButtonL
+import com.client.xvideos.l.ui.screens.explorer.tab.config.atom.ConfigTextAndButtonWithDialogL
 import com.client.xvideos.l.ui.screens.explorer.tab.config.atom.ConfigTextAndCheckBoxL
 import com.client.xvideos.l.ui.screens.explorer.tab.config.atom.ConfigTextAndMenuL
 import com.client.xvideos.l.ui.screens.explorer.tab.config.atom.ConfigTextL
@@ -94,6 +96,7 @@ class L_ScreenConfigTab : Screen {
             versionText = versionText,
             diskCacheSizeText = diskCacheSizeText,
             thumbnailSizeDisplayName = currentDisplayName,
+            onLogout = vm::logout,
             onThumbnailSizeSelected = { selectedDisplayName ->
                 ThumbnailsSize.fromDisplayName(selectedDisplayName)?.apply {
                     Settings.thumbalistSize.setValue(value)
@@ -111,8 +114,11 @@ private fun ScreenLConfigTabContent(
     versionText: String,
     diskCacheSizeText: String,
     thumbnailSizeDisplayName: String,
+    onLogout: () -> Unit,
     onThumbnailSizeSelected: (String) -> Unit
 ) {
+    val savedLogin = Settings.l_login.field.collectAsStateWithLifecycle().value
+
     Column(
         modifier = Modifier
             .background(ThemeL.greyBackground)
@@ -141,6 +147,23 @@ private fun ScreenLConfigTabContent(
         HorizontalDivider(color = Color.DarkGray)
         ScreenLConfig_Encrypt()
         HorizontalDivider(color = Color.DarkGray)
+
+        ConfigTextAndButtonWithDialogL(
+            text = "Профиль L",
+            value = if (savedLogin.isBlank()) "Нет" else "Выйти",
+            textDialogTitle = "Выйти из профиля L",
+            textDialogBody = if (savedLogin.isBlank()) {
+                "Вы не авторизованы в L."
+            } else {
+                "При следующем открытии L нужно будет снова ввести логин и пароль: $savedLogin"
+            },
+            textDialogButton = "Выйти",
+            onClick = {
+                onLogout()
+            }
+        )
+        HorizontalDivider(color = Color.DarkGray)
+
         AppNetworkSpeedMonitor()
         HorizontalDivider(color = Color.DarkGray)
         Spacer(Modifier.height(4.dp))
@@ -176,10 +199,16 @@ private fun ScreenLConfigTabContent(
 
 
 class ScreenLExplorerSettingSM @Inject constructor(
+    private val repository: Repository
 ) : ScreenModel {
 
     var sizeXvideos by mutableLongStateOf(0L)
     var sizeRedDownload by mutableLongStateOf(0L)
+
+    fun logout() {
+        repository.logout()
+        SnackBar.success("Профиль L закрыт")
+    }
 
 
     init {
@@ -211,6 +240,7 @@ private fun ScreenLConfigTabPreview() {
             versionText = "Версия: 1.0.0 (1)",
             diskCacheSizeText = "128 MB",
             thumbnailSizeDisplayName = "Medium",
+            onLogout = {},
             onThumbnailSizeSelected = {}
         )
     }

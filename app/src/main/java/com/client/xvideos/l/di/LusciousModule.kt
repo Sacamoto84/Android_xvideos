@@ -1,7 +1,6 @@
 package com.client.xvideos.l.di
 
 import android.content.Context
-import com.client.xvideos.BuildConfig
 import com.client.xvideos.common.di.ApplicationScope
 import com.client.xvideos.common.kdownloader.DownloaderConfig
 import com.client.xvideos.common.kdownloader.KDownloader
@@ -32,7 +31,7 @@ object LusciousModule {
     fun provideRepository(
         db: AppDatabase, @ApplicationScope scope: CoroutineScope, @ApplicationContext context: Context
     ): Repository {
-        return Repository( db, scope, BuildConfig.luscious_email, BuildConfig.luscious_password, context )
+        return Repository( db, scope, context )
     }
 
     @Singleton

@@ -5,6 +5,7 @@ import com.client.xvideos.common.encrypting.Password
 import com.client.xvideos.common.room.AppDatabase
 import com.client.xvideos.common.room.entity.CacheUrlStringRamEntity
 import com.client.xvideos.common.room.entity.CacheUrlStringRomEntity
+import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.common.snackbar.SnackBar
 import com.client.xvideos.common.util.toMD5
 import com.client.xvideos.l.KtorRequestHandler
@@ -12,7 +13,6 @@ import com.client.xvideos.l.net.Luscious
 import com.google.gson.JsonParser
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -22,8 +22,6 @@ class Repository(
     //private val luscious: Luscious,
     private val scope: CoroutineScope,
     //private val saved: SavedL
-    username: String? = null,
-    password: String? = null,
     context: Context
 ) {
 
@@ -35,18 +33,28 @@ class Repository(
         Password.loadPassword(context)
     }
 
-    private val handler = KtorRequestHandler(
-        timeoutMillis = 5000,
-        maxRetries = 5,
-        retryStatusCodes = setOf(413, 429, 500, 502, 503, 504),
-        backoffFactor = 1000,
-        username,
-        password
-    )
+    @Volatile
+    private var handler = createHandler()
 
     private val cacheUrlStringRomDao = dbCache.cacheUrlStringRomDao()
     private val cacheUrlStringRamDao = dbCache.cacheUrlStringRamDao()
 
+    private fun createHandler(): KtorRequestHandler {
+        return KtorRequestHandler(
+            timeoutMillis = 5000,
+            maxRetries = 5,
+            retryStatusCodes = setOf(413, 429, 500, 502, 503, 504),
+            backoffFactor = 1000
+        )
+    }
+
+    fun logout() {
+        Settings.l_login.setValue("")
+        Settings.l_pass.setValue("")
+        val oldHandler = handler
+        handler = createHandler()
+        oldHandler.close()
+    }
 
     suspend fun openURI(
         data: String,
@@ -57,9 +65,17 @@ class Repository(
         //Timber.i("!!! openURI() data:$data type:$type config:$config")
 
         try {
+            val username = Settings.l_login.field.value.trim()
+            val password = Settings.l_pass.field.value
+            if (username.isBlank() || password.isBlank()) {
+                return Result.failure(IllegalStateException("Luscious credentials are not configured"))
+            }
+            handler.setCredentials(username, password)
             if (!handler.loggedIn) {
-                handler.login()
-                while (!handler.loggedIn) { delay(1000) }
+                val loggedIn = handler.login()
+                if (!loggedIn) {
+                    return Result.failure(IllegalStateException("Luscious login failed"))
+                }
             }
         }
         catch (e: Exception){

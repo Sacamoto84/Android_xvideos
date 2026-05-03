@@ -17,12 +17,6 @@ plugins {
 }
 
 
-def secretsFile = rootProject.file("../secrets.properties")
-def secrets = new Properties()
-if (secretsFile.exists()) {
-    secrets.load(new FileInputStream(secretsFile))
-}
-
 android {
     namespace 'com.client.xvideos'
     compileSdk 37
@@ -42,9 +36,6 @@ android {
             }
         }
 
-
-        buildConfigField "String", "luscious_email", "\"${secrets['luscious_email']}\""
-        buildConfigField "String", "luscious_password", "\"${secrets['luscious_password']}\""
 
         multiDexEnabled true
     }

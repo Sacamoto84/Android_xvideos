@@ -6,8 +6,8 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.FormatListBulleted
 import androidx.compose.material.icons.outlined.BookmarkBorder
-import androidx.compose.material.icons.outlined.FormatListBulleted
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Topic
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -30,6 +30,7 @@ import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.screenRoot.depth
+import com.client.xvideos.l.ui.screens.LLoginContent
 import com.client.xvideos.l.ui.screens.explorer.tab.albumTopHits.L_ScreenAlbumTopHits
 import com.client.xvideos.l.ui.screens.explorer.tab.config.L_ScreenConfigTab
 import com.client.xvideos.l.ui.screens.explorer.tab.saved.L_SavedTab
@@ -80,10 +81,23 @@ class L_ScreenExplorer : Screen {
 
         LaunchedEffect(Unit) { depth = 0 }
 
+        val savedLogin = Settings.l_login.field.collectAsStateWithLifecycle().value
+        val savedPassword = Settings.l_pass.field.collectAsStateWithLifecycle().value
+
+        if (savedLogin.isBlank() || savedPassword.isBlank()) {
+            LLoginContent(
+                initialLogin = savedLogin,
+                initialPassword = savedPassword,
+                onSaved = {},
+                onBack = { navigator.pop() }
+            )
+            return
+        }
+
         // ПЕРЕНЕСЕНО СЮДА: Теперь эти списки создаются внутри Composable
         val l = remember {
             persistentListOf(
-                Icons.Outlined.FormatListBulleted,
+                Icons.AutoMirrored.Outlined.FormatListBulleted,
                 Icons.Outlined.Topic,
                 Icons.Outlined.BookmarkBorder,
                 Icons.Outlined.Settings
