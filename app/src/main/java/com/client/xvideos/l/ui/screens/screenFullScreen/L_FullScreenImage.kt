@@ -14,11 +14,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
@@ -29,15 +31,20 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.ScreenRotation
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -73,7 +80,9 @@ import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.model.Thumbnails
 import com.client.xvideos.l.model.isLVideoFileUrl
 import com.client.xvideos.l.model.lAnimationVideoUrl
+import com.client.xvideos.l.model.lDownloadUrl
 import com.client.xvideos.l.model.lFullScreenImageUrls
+import com.client.xvideos.l.model.lImageMediaUrl
 import com.client.xvideos.l.model.lMediaRequestHeaders
 import com.client.xvideos.l.model.lPreviewImageUrl
 import com.client.xvideos.l.theme.ThemeL
@@ -155,6 +164,7 @@ class L_FullScreenImage(
         val coroutineScope = rememberCoroutineScope()
 
         var rotate by remember { mutableStateOf(false) }
+        var showInfoDialog by remember { mutableStateOf(false) }
 
         val pagerState = rememberPagerState( filteredPic.indexOf(item).coerceIn(0, filteredPic.lastIndex), pageCount = { filteredPic.size } )
 
@@ -214,6 +224,14 @@ class L_FullScreenImage(
                 .noRippleClickable( onClick = { isFullScreen = isFullScreen.not() } )
 
         ) {
+            if (showInfoDialog) {
+                LPictureInfoDialog(
+                    item = filteredPic.getOrNull(currentIndex) ?: dataItem,
+                    position = currentIndex,
+                    total = filteredPic.size,
+                    onDismiss = { showInfoDialog = false }
+                )
+            }
 
             HorizontalPager(
                 state = pagerState,
@@ -315,7 +333,7 @@ class L_FullScreenImage(
                 {
                     Row {
                         IconButton(onClick = { rotate = rotate.not() }) { Icon(Icons.Default.ScreenRotation, contentDescription = null, tint = Color.White) }
-                        IconButton(onClick = { }) { Icon( Icons.Default.Info, contentDescription = null, tint = Color.White ) }
+                        IconButton(onClick = { showInfoDialog = true }) { Icon( Icons.Default.Info, contentDescription = null, tint = Color.White ) }
                     }
 
                     Box( modifier = Modifier) { expandMenuViewModel.ExpandMenu( expandMenu, filteredPic[pagerState.currentPage], albumName ) }
@@ -459,6 +477,100 @@ private fun LFullScreenVideo(
 }
 
 // Дополнительная функция для создания кастомного Modifier для блокировки pager при зуме
+@Composable
+private fun LPictureInfoDialog(
+    item: PicsDetails,
+    position: Int,
+    total: Int,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Информация") },
+        text = {
+            SelectionContainer {
+                Column(
+                    modifier = Modifier
+                        .heightIn(max = 520.dp)
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    Text(
+                        text = lPictureInfoText(item, position, total),
+                        color = Color.LightGray,
+                        fontFamily = ThemeL.fontFamilyKarla
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text("OK")
+            }
+        },
+        containerColor = Color(0xFF202020),
+        titleContentColor = Color.White,
+        textContentColor = Color.LightGray
+    )
+}
+
+private fun lPictureInfoText(
+    item: PicsDetails,
+    position: Int,
+    total: Int
+): String = buildString {
+    appendLine("Позиция: ${position + 1} / $total")
+    appendLine("Альбом: ${item.album ?: "-"}")
+    appendLine("Размер: ${item.width} x ${item.height}")
+    appendLine("Соотношение: ${item.width}:${item.height}")
+    appendLine("Анимация: ${item.is_animated}")
+    appendLine()
+
+    appendLine("Используемая картинка:")
+    appendLine(item.lImageMediaUrl() ?: "-")
+    appendLine()
+
+    appendLine("URL для скачивания:")
+    appendLine(item.lDownloadUrl() ?: "-")
+    appendLine()
+
+    appendLine("URL видео:")
+    appendLine(item.lAnimationVideoUrl() ?: item.url_to_video ?: "-")
+    appendLine()
+
+    appendLine("url_to_original:")
+    appendLine(item.url_to_original ?: "-")
+    appendLine()
+
+    appendLine("url_to_video raw:")
+    appendLine(item.url_to_video ?: "-")
+    appendLine()
+
+    appendLine("FullScreen candidates (${item.lFullScreenImageUrls().size}):")
+    item.lFullScreenImageUrls().forEachIndexed { index, url ->
+        appendLine("${index + 1}. $url")
+    }
+    appendLine()
+
+    appendLine("Preview large_thumbnail:")
+    appendLine(item.lPreviewImageUrl("large_thumbnail").ifBlank { "-" })
+    appendLine()
+
+    appendLine("Preview small:")
+    appendLine(item.lPreviewImageUrl("small").ifBlank { "-" })
+    appendLine()
+
+    appendLine("Preview xMax:")
+    appendLine(item.lPreviewImageUrl("xMax").ifBlank { "-" })
+    appendLine()
+
+    val thumbnails = item.thumbnails.orEmpty()
+    appendLine("Thumbnails (${thumbnails.size}):")
+    thumbnails.forEachIndexed { index, thumbnail ->
+        appendLine("${index + 1}. size=${thumbnail.size ?: "-"} ${thumbnail.width}x${thumbnail.height}")
+        appendLine(thumbnail.url ?: "-")
+    }
+}
+
 fun Modifier.blockPagerWhenZoomed(zoomState: ZoomState): Modifier = this.then(
     if (zoomState.scale > 1.1f) {
         Modifier.pointerInput(Unit) {
@@ -518,6 +630,7 @@ private fun LFullScreenImagePreviewContent(
 ) {
     val currentItem = items.getOrElse(currentIndex) { items.first() }
     val imageUrl = currentItem.lFullScreenImageUrls().firstOrNull().orEmpty()
+    var showInfoDialog by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -528,6 +641,15 @@ private fun LFullScreenImagePreviewContent(
                 darkColor = Color(0xFF181818)
             )
     ) {
+        if (showInfoDialog) {
+            LPictureInfoDialog(
+                item = currentItem,
+                position = currentIndex,
+                total = items.size,
+                onDismiss = { showInfoDialog = false }
+            )
+        }
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -572,7 +694,7 @@ private fun LFullScreenImagePreviewContent(
                 IconButton(onClick = {}) {
                     Icon(Icons.Default.ScreenRotation, contentDescription = null, tint = Color.White)
                 }
-                IconButton(onClick = {}) {
+                IconButton(onClick = { showInfoDialog = true }) {
                     Icon(Icons.Default.Info, contentDescription = null, tint = Color.White)
                 }
             }
