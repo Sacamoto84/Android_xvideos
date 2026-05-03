@@ -32,7 +32,7 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
@@ -62,7 +62,12 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -88,6 +93,7 @@ import com.client.xvideos.l.model.lPreviewImageUrl
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.ui.element.expandMenu.ExpandMenuType
 import com.client.xvideos.l.ui.element.expandMenu.ExpandMenuViewModel
+import com.client.xvideos.l.ui.screens.screenAlbum.ScreenLAlbum
 import com.redgifs.common.video.player_with_menu.atom.VideoPlayerWithMenuContent
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.launch
@@ -98,6 +104,8 @@ import net.engawapg.lib.zoomable.rememberZoomState
 import net.engawapg.lib.zoomable.zoomable
 
 var fullScreenImageFilteredPicArray: List<PicsDetails> = emptyList()
+
+private const val TAG_URL = "url"
 
 fun lerp(start: Float, stop: Float, fraction: Float): Float {
     return start + (stop - start) * fraction
@@ -229,7 +237,11 @@ class L_FullScreenImage(
                     item = filteredPic.getOrNull(currentIndex) ?: dataItem,
                     position = currentIndex,
                     total = filteredPic.size,
-                    onDismiss = { showInfoDialog = false }
+                    onDismiss = { showInfoDialog = false },
+                    onAlbumClick = { albumId ->
+                        showInfoDialog = false
+                        navigator.push(ScreenLAlbum(albumId))
+                    }
                 )
             }
 
@@ -482,24 +494,36 @@ private fun LPictureInfoDialog(
     item: PicsDetails,
     position: Int,
     total: Int,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onAlbumClick: ((Long) -> Unit)? = null
 ) {
+    val albumId = item.album?.toLongOrNull()
+    val uriHandler = LocalUriHandler.current
+
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Информация") },
         text = {
-            SelectionContainer {
-                Column(
-                    modifier = Modifier
-                        .heightIn(max = 520.dp)
-                        .verticalScroll(rememberScrollState())
-                ) {
-                    Text(
-                        text = lPictureInfoText(item, position, total),
-                        color = Color.LightGray,
-                        fontFamily = ThemeL.fontFamilyKarla
-                    )
+            Column(
+                modifier = Modifier
+                    .heightIn(max = 520.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("Альбом: ", color = Color.LightGray, fontFamily = ThemeL.fontFamilyKarla)
+                    if (albumId != null && onAlbumClick != null) {
+                        TextButton(onClick = { onAlbumClick(albumId) }) {
+                            Text(albumId.toString())
+                        }
+                    } else {
+                        Text(item.album ?: "-", color = Color.LightGray, fontFamily = ThemeL.fontFamilyKarla)
+                    }
                 }
+
+                LPictureInfoText(
+                    text = lPictureInfoText(item, position, total),
+                    onUrlClick = { url -> uriHandler.openUri(url) }
+                )
             }
         },
         confirmButton = {
@@ -513,15 +537,70 @@ private fun LPictureInfoDialog(
     )
 }
 
+@Composable
+private fun LPictureInfoText(
+    text: String,
+    onUrlClick: (String) -> Unit
+) {
+    val annotatedText = remember(text) { text.withClickableHttpsLinks() }
+
+    ClickableText(
+        text = annotatedText,
+        style = TextStyle(
+            color = Color.LightGray,
+            fontFamily = ThemeL.fontFamilyKarla
+        ),
+        onClick = { offset ->
+            annotatedText
+                .getStringAnnotations(TAG_URL, offset, offset)
+                .firstOrNull()
+                ?.item
+                ?.let(onUrlClick)
+        }
+    )
+}
+
+private fun String.withClickableHttpsLinks() = buildAnnotatedString {
+    val urlRegex = Regex("""https://\S+""")
+    var lastIndex = 0
+
+    urlRegex.findAll(this@withClickableHttpsLinks).forEach { match ->
+        val rawUrl = match.value
+        val url = rawUrl.trimEnd('.', ',', ';', ')', ']', '}')
+        val start = match.range.first
+        val end = start + url.length
+
+        append(this@withClickableHttpsLinks.substring(lastIndex, start))
+
+        val annotatedStart = length
+        append(url)
+        addStringAnnotation(TAG_URL, url, annotatedStart, annotatedStart + url.length)
+        addStyle(
+            SpanStyle(
+                color = Color(0xFF8AB4F8),
+                textDecoration = TextDecoration.Underline
+            ),
+            annotatedStart,
+            annotatedStart + url.length
+        )
+
+        append(rawUrl.substring(url.length))
+        lastIndex = match.range.last + 1
+        if (end < start) lastIndex = match.range.last + 1
+    }
+
+    if (lastIndex < this@withClickableHttpsLinks.length) {
+        append(this@withClickableHttpsLinks.substring(lastIndex))
+    }
+}
+
 private fun lPictureInfoText(
     item: PicsDetails,
     position: Int,
     total: Int
 ): String = buildString {
     appendLine("Позиция: ${position + 1} / $total")
-    appendLine("Альбом: ${item.album ?: "-"}")
     appendLine("Размер: ${item.width} x ${item.height}")
-    appendLine("Соотношение: ${item.width}:${item.height}")
     appendLine("Анимация: ${item.is_animated}")
     appendLine()
 

@@ -24,10 +24,13 @@ import io.ktor.client.request.get
 import io.ktor.client.request.headers
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsChannel
+import io.ktor.http.HttpHeaders
 import io.ktor.http.isSuccess
 import io.ktor.utils.io.jvm.javaio.toInputStream
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -42,6 +45,14 @@ class SavedL_Likes(
 ) {
 
     val listUrl = mutableStateListOf<PicsDetails>()
+    val percentDownload = MutableStateFlow(DOWNLOAD_HIDDEN)
+
+    private val progressLock = Any()
+    private val activeFileProgress = mutableMapOf<Int, Float>()
+    private var activeLikeDownloads = 0
+    private var totalFiles = 0
+    private var finishedFiles = 0
+    private var nextFileProgressId = 0
 
     init {
         refresh()
@@ -111,81 +122,94 @@ class SavedL_Likes(
         }
     }
 
-    private suspend fun saveLike(item: PicsDetails): Result<Unit> = runCatching {
-        val previewSources = item.previewSources()
-        val mediaUrl = item.lDownloadUrl()
-            ?: previewSources.maxByOrNull { it.width * it.height }?.url
-            ?: error("Missing media url")
-        val albumId = item.album?.takeIf { it.isNotBlank() && it != "null" }
-        val albumDetails = albumId?.toIntOrNull()?.let { fetchAlbumDetails(it) }
-
-        val folderName = buildFolderName(item, mediaUrl)
-        val folder = File(AppPath.l_likes, folderName)
-        folder.mkdirs()
-
-        val mediaExtension = if (item.is_animated) mediaUrl.videoExtension() else mediaUrl.imageExtension()
-        val mediaFile = File(folder, "media.$mediaExtension")
-        val savedPreviews = mutableListOf<LSavedLikePreview>()
-
-        val client = createClient()
-        try {
-            val mediaSaved = if (item.is_animated) {
-                downloadToFile(client, mediaUrl, mediaFile)
-                true
+    private suspend fun saveLike(item: PicsDetails): Result<Unit> {
+        var progressStarted = false
+        return runCatching {
+            val previewSources = item.previewSources()
+            val mediaUrl = item.lDownloadUrl()
+                ?: previewSources.maxByOrNull { it.width * it.height }?.url
+                ?: error("Missing media url")
+            val expectedFileCount = if (item.is_animated) {
+                1 + if (previewSources.isNotEmpty()) 1 else 0
             } else {
-                runCatching { downloadToFile(client, mediaUrl, mediaFile) }
-                    .onFailure { error ->
-                        mediaFile.delete()
-                        Timber.w(error, "!!! L like original media download failed, fallback to previews: $mediaUrl")
+                1 + previewSources.size
+            }
+            beginLikeDownload(expectedFileCount)
+            progressStarted = true
+
+            val albumId = item.album?.takeIf { it.isNotBlank() && it != "null" }
+            val albumDetails = albumId?.toIntOrNull()?.let { fetchAlbumDetails(it) }
+
+            val folderName = buildFolderName(item, mediaUrl)
+            val folder = File(AppPath.l_likes, folderName)
+            folder.mkdirs()
+
+            val mediaExtension = if (item.is_animated) mediaUrl.videoExtension() else mediaUrl.imageExtension()
+            val mediaFile = File(folder, "media.$mediaExtension")
+            val savedPreviews = mutableListOf<LSavedLikePreview>()
+
+            val client = createClient()
+            try {
+                val mediaSaved = if (item.is_animated) {
+                    downloadToFileTracked(client, mediaUrl, mediaFile)
+                    true
+                } else {
+                    runCatching { downloadToFileTracked(client, mediaUrl, mediaFile) }
+                        .onFailure { error ->
+                            mediaFile.delete()
+                            Timber.w(error, "!!! L like original media download failed, fallback to previews: $mediaUrl")
+                        }
+                        .isSuccess
+                }
+
+                if (item.is_animated) {
+                    previewSources.minByOrNull { it.width * it.height }?.let { preview ->
+                        val previewFile = File(folder, "preview.${preview.extension}")
+                        runCatching { downloadToFileTracked(client, preview.url, previewFile) }
+                            .onSuccess { savedPreviews.add(preview.toSavedPreview(previewFile.name)) }
+                            .onFailure { Timber.w(it, "!!! L like video preview download failed: ${preview.url}") }
                     }
-                    .isSuccess
-            }
-
-            if (item.is_animated) {
-                previewSources.minByOrNull { it.width * it.height }?.let { preview ->
-                    val previewFile = File(folder, "preview.${preview.extension}")
-                    runCatching { downloadToFile(client, preview.url, previewFile) }
-                        .onSuccess { savedPreviews.add(preview.toSavedPreview(previewFile.name)) }
-                        .onFailure { Timber.w(it, "!!! L like video preview download failed: ${preview.url}") }
+                } else {
+                    previewSources.forEach { preview ->
+                        val previewFile = File(folder, "preview.${preview.sizeMarker}.${preview.extension}")
+                        runCatching { downloadToFileTracked(client, preview.url, previewFile) }
+                            .onSuccess { savedPreviews.add(preview.toSavedPreview(previewFile.name)) }
+                            .onFailure { Timber.w(it, "!!! L like preview download failed: ${preview.url}") }
+                    }
                 }
-            } else {
-                previewSources.forEach { preview ->
-                    val previewFile = File(folder, "preview.${preview.sizeMarker}.${preview.extension}")
-                    runCatching { downloadToFile(client, preview.url, previewFile) }
-                        .onSuccess { savedPreviews.add(preview.toSavedPreview(previewFile.name)) }
-                        .onFailure { Timber.w(it, "!!! L like preview download failed: ${preview.url}") }
+
+                if (!mediaSaved && savedPreviews.isEmpty()) {
+                    error("Missing downloaded media and previews")
                 }
-            }
 
-            if (!mediaSaved && savedPreviews.isEmpty()) {
-                error("Missing downloaded media and previews")
+                val metadata = LSavedLikeMetadata(
+                    folderName = folder.name,
+                    mediaFileName = mediaFile.name,
+                    previewFileName = savedPreviews.minByOrNull { it.width * it.height }?.fileName,
+                    previewFiles = savedPreviews,
+                    sourceMediaUrl = mediaUrl,
+                    sourcePreviewUrl = savedPreviews.minByOrNull { it.width * it.height }?.sourceUrl,
+                    sourceOriginalUrl = item.url_to_original,
+                    sourceVideoUrl = item.url_to_video,
+                    albumId = albumId,
+                    albumTitle = albumDetails?.title,
+                    albumDescription = albumDetails?.description,
+                    albumUrl = albumDetails?.url?.let { Luscious.HOME + it },
+                    albumDownloadUrl = albumDetails?.download_url?.let { Luscious.HOME + it },
+                    albumDetails = albumDetails,
+                    picture = item
+                )
+                writeLSavedLikeMetadata(File(folder, METADATA_FILE_NAME), metadata)
+            } catch (e: Exception) {
+                if (folder.listFiles().isNullOrEmpty() || !File(folder, METADATA_FILE_NAME).exists()) {
+                    folder.deleteRecursively()
+                }
+                throw e
+            } finally {
+                client.close()
             }
-
-            val metadata = LSavedLikeMetadata(
-                folderName = folder.name,
-                mediaFileName = mediaFile.name,
-                previewFileName = savedPreviews.minByOrNull { it.width * it.height }?.fileName,
-                previewFiles = savedPreviews,
-                sourceMediaUrl = mediaUrl,
-                sourcePreviewUrl = savedPreviews.minByOrNull { it.width * it.height }?.sourceUrl,
-                sourceOriginalUrl = item.url_to_original,
-                sourceVideoUrl = item.url_to_video,
-                albumId = albumId,
-                albumTitle = albumDetails?.title,
-                albumDescription = albumDetails?.description,
-                albumUrl = albumDetails?.url?.let { Luscious.HOME + it },
-                albumDownloadUrl = albumDetails?.download_url?.let { Luscious.HOME + it },
-                albumDetails = albumDetails,
-                picture = item
-            )
-            writeLSavedLikeMetadata(File(folder, METADATA_FILE_NAME), metadata)
-        } catch (e: Exception) {
-            if (folder.listFiles().isNullOrEmpty() || !File(folder, METADATA_FILE_NAME).exists()) {
-                folder.deleteRecursively()
-            }
-            throw e
-        } finally {
-            client.close()
+        }.also {
+            if (progressStarted) finishLikeDownload()
         }
     }
 
@@ -204,7 +228,39 @@ class SavedL_Likes(
         }
     }
 
+    private suspend fun downloadToFileTracked(client: HttpClient, url: String, file: File) {
+        val progressId = startFileDownload()
+        try {
+            downloadToFile(
+                client = client,
+                url = url,
+                file = file,
+                onProgress = { downloadedBytes, totalBytes ->
+                    updateFileDownload(
+                        progressId = progressId,
+                        fraction = when {
+                            totalBytes != null && totalBytes > 0L -> downloadedBytes.toFloat() / totalBytes.toFloat()
+                            downloadedBytes > 0L -> 0.05f
+                            else -> 0f
+                        }
+                    )
+                }
+            )
+        } finally {
+            finishFileDownload(progressId)
+        }
+    }
+
     private suspend fun downloadToFile(client: HttpClient, url: String, file: File) {
+        downloadToFile(client, url, file) { _, _ -> }
+    }
+
+    private suspend fun downloadToFile(
+        client: HttpClient,
+        url: String,
+        file: File,
+        onProgress: (downloadedBytes: Long, totalBytes: Long?) -> Unit
+    ) {
         if (file.exists() && file.length() > 0L) return
         file.parentFile?.mkdirs()
 
@@ -214,9 +270,18 @@ class SavedL_Likes(
             if (!response.status.isSuccess()) {
                 throw IOException("HTTP error: ${response.status.value}")
             }
+            val totalBytes = response.headers[HttpHeaders.ContentLength]?.toLongOrNull()
+            var downloadedBytes = 0L
             response.bodyAsChannel().toInputStream().use { input ->
                 FileOutputStream(tempFile).use { output ->
-                    input.copyTo(output, bufferSize = 8192)
+                    val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+                    while (true) {
+                        val count = input.read(buffer)
+                        if (count < 0) break
+                        output.write(buffer, 0, count)
+                        downloadedBytes += count
+                        onProgress(downloadedBytes, totalBytes)
+                    }
                 }
             }
             if (file.exists() && !file.delete()) {
@@ -230,6 +295,79 @@ class SavedL_Likes(
             tempFile.delete()
             throw e
         }
+    }
+
+    private fun beginLikeDownload(fileCount: Int) {
+        synchronized(progressLock) {
+            activeLikeDownloads += 1
+            totalFiles += fileCount.coerceAtLeast(1)
+            updateDownloadPercentLocked()
+        }
+    }
+
+    private fun finishLikeDownload() {
+        val shouldHide: Boolean
+        synchronized(progressLock) {
+            activeLikeDownloads = (activeLikeDownloads - 1).coerceAtLeast(0)
+            shouldHide = activeLikeDownloads == 0
+            if (shouldHide) {
+                activeFileProgress.clear()
+                finishedFiles = totalFiles
+                percentDownload.value = DOWNLOAD_DONE
+                totalFiles = 0
+                finishedFiles = 0
+            } else {
+                updateDownloadPercentLocked()
+            }
+        }
+
+        if (shouldHide) {
+            scope.launch {
+                delay(DOWNLOAD_DONE_VISIBLE_MS)
+                synchronized(progressLock) {
+                    if (activeLikeDownloads == 0) {
+                        percentDownload.value = DOWNLOAD_HIDDEN
+                    }
+                }
+            }
+        }
+    }
+
+    private fun startFileDownload(): Int {
+        return synchronized(progressLock) {
+            val progressId = nextFileProgressId++
+            activeFileProgress[progressId] = 0f
+            updateDownloadPercentLocked()
+            progressId
+        }
+    }
+
+    private fun updateFileDownload(progressId: Int, fraction: Float) {
+        synchronized(progressLock) {
+            if (progressId in activeFileProgress) {
+                activeFileProgress[progressId] = fraction.coerceIn(0f, 1f)
+                updateDownloadPercentLocked()
+            }
+        }
+    }
+
+    private fun finishFileDownload(progressId: Int) {
+        synchronized(progressLock) {
+            if (activeFileProgress.remove(progressId) != null) {
+                finishedFiles = (finishedFiles + 1).coerceAtMost(totalFiles)
+                updateDownloadPercentLocked()
+            }
+        }
+    }
+
+    private fun updateDownloadPercentLocked() {
+        if (totalFiles <= 0 || activeLikeDownloads <= 0) {
+            percentDownload.value = DOWNLOAD_HIDDEN
+            return
+        }
+
+        val activeProgress = activeFileProgress.values.sum()
+        percentDownload.value = ((finishedFiles + activeProgress) / totalFiles.toFloat()).coerceIn(0f, 1f)
     }
 
     private suspend fun fetchAlbumDetails(albumId: Int): AlbumDetails? {
@@ -377,5 +515,8 @@ class SavedL_Likes(
 
     private companion object {
         const val METADATA_FILE_NAME = "metadata.json"
+        const val DOWNLOAD_HIDDEN = -2f
+        const val DOWNLOAD_DONE = 1f
+        const val DOWNLOAD_DONE_VISIBLE_MS = 400L
     }
 }

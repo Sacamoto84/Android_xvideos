@@ -43,13 +43,16 @@ import com.client.xvideos.common.eventBus.Event
 import com.client.xvideos.common.eventBus.EventBus
 import com.client.xvideos.common.snackbar.show
 import com.client.xvideos.common.traficStatistic.AppNetworkSpeedMonitorLite
+import com.client.xvideos.l.featured.saved.SavedL
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.ui.screens.explorer.L_ScreenExplorer
+import com.redgifs.common.downloader.ui.DownloadIndicator
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.filterIsInstance
 import net.engawapg.lib.zoomable.ExperimentalZoomableApi
 import javax.inject.Inject
@@ -73,6 +76,8 @@ object ScreenRoot : Screen {
     override fun Content() {
         val haptic = LocalHapticFeedback.current
         val vm: ScreenRootSM = getScreenModel()
+        val lDownloadsVm: ScreenRootLDownloadsSM = getScreenModel()
+        val lPercentDownload = lDownloadsVm.savedL.likes.percentDownload.collectAsStateWithLifecycle().value
         val snackBarHostState = remember { SnackbarHostState() }
 
         var mainNavigator by remember { mutableStateOf<Navigator?>(null) }
@@ -96,6 +101,9 @@ object ScreenRoot : Screen {
                     HomeFloatingActionButton(mainNavigator)
                 },
                 containerColor = ThemeL.greyBackground,
+                bottomBar = {
+                    DownloadIndicator(lPercentDownload)
+                },
                 snackbarHost = {
                     RootSnackbarHost(snackBarHostState)
                 }
@@ -177,6 +185,10 @@ class ScreenRootSM @Inject constructor() : ScreenModel {
     }
 }
 
+class ScreenRootLDownloadsSM @Inject constructor(
+    val savedL: SavedL
+) : ScreenModel
+
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class ScreenRootModule {
@@ -184,4 +196,9 @@ abstract class ScreenRootModule {
     @IntoMap
     @ScreenModelKey(ScreenRootSM::class)
     abstract fun bindScreenRootSM(sm: ScreenRootSM): ScreenModel
+
+    @Binds
+    @IntoMap
+    @ScreenModelKey(ScreenRootLDownloadsSM::class)
+    abstract fun bindScreenRootLDownloadsSM(sm: ScreenRootLDownloadsSM): ScreenModel
 }
