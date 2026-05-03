@@ -71,6 +71,7 @@ import com.client.xvideos.common.videoplayer.model.ScreenResize
 import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.model.isLVideoFileUrl
 import com.client.xvideos.l.model.lAnimationVideoUrl
+import com.client.xvideos.l.model.lFullScreenImageUrls
 import com.client.xvideos.l.model.lMediaRequestHeaders
 import com.client.xvideos.l.model.lPreviewImageUrl
 import com.client.xvideos.l.theme.ThemeL
@@ -250,32 +251,53 @@ class L_FullScreenImage(
                                 onTap = { isFullScreen = isFullScreen.not() }
                             )
                         } else {
-                            UrlImage(
-                                rotate = rotate, contentScale = ContentScale.Fit, url = pageItem.url_to_original ?: "", modifier = Modifier.fillMaxSize()
-                                    .zoomable(
-                                        zoomState = zoomState,
-                                        enableOneFingerZoom = false,
-                                        onDoubleTap = { position ->
-                                            coroutineScope.launch {
-                                                if (zoomState.scale > 1.0f) {
-                                                    zoomState.changeScale(1.0f, Offset.Zero)
-                                                } else {
-                                                    zoomState.changeScale(2.5f, position)
-                                                }
-                                            }
-                                        },
-                                        onTap = {
-                                            isFullScreen = isFullScreen.not()
-                                        }
+                            val imageUrls = remember(pageItem.url_to_original, pageItem.thumbnails) {
+                                pageItem.lFullScreenImageUrls()
+                            }
+                            var imageUrlIndex by remember(imageUrls) { mutableIntStateOf(0) }
+                            val imageUrl = imageUrls.getOrNull(imageUrlIndex).orEmpty()
 
-                                    ),
-                                onSuccess = { },
-                                albumName = albumName,
-                                autoPlay = autoPlay,
-                                isAnimated = pageItem.is_animated,
-                                isVisible = currentIndex == page,
-                                isFullScreen = true
-                            )
+                            if (imageUrl.isNotBlank()) {
+                                UrlImage(
+                                    rotate = rotate, contentScale = ContentScale.Fit, url = imageUrl, modifier = Modifier.fillMaxSize()
+                                        .zoomable(
+                                            zoomState = zoomState,
+                                            enableOneFingerZoom = false,
+                                            onDoubleTap = { position ->
+                                                coroutineScope.launch {
+                                                    if (zoomState.scale > 1.0f) {
+                                                        zoomState.changeScale(1.0f, Offset.Zero)
+                                                    } else {
+                                                        zoomState.changeScale(2.5f, position)
+                                                    }
+                                                }
+                                            },
+                                            onTap = {
+                                                isFullScreen = isFullScreen.not()
+                                            }
+
+                                        ),
+                                    onSuccess = { },
+                                    onFailure = {
+                                        if (imageUrlIndex < imageUrls.lastIndex) {
+                                            imageUrlIndex += 1
+                                            timber.log.Timber.w("!!! L fullscreen image fallback ${imageUrlIndex}/${imageUrls.lastIndex}: ${imageUrls[imageUrlIndex]}")
+                                        }
+                                    },
+                                    albumName = albumName,
+                                    autoPlay = autoPlay,
+                                    isAnimated = pageItem.is_animated,
+                                    isVisible = currentIndex == page,
+                                    isFullScreen = true
+                                )
+                            } else {
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text("Нет ссылки на изображение", color = Color.Gray)
+                                }
+                            }
                         }
 
                     }

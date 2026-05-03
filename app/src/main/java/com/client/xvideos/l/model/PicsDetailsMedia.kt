@@ -25,6 +25,28 @@ fun PicsDetails.lPreviewImageUrl(thumbnailsSize: String): String {
         ?: url_to_original.orEmpty()
 }
 
+fun PicsDetails.lFullScreenImageUrls(): List<String> {
+    val original = url_to_original
+        ?.takeIf { it.isNotBlank() && !it.isLVideoFileUrl() }
+
+    val previews = thumbnails
+        .orEmpty()
+        .asSequence()
+        .filter {
+            val url = it.url
+            !url.isNullOrBlank() && !url.isLVideoFileUrl()
+        }
+        .sortedWith(compareByDescending<Thumbnails> {
+            it.width.coerceAtLeast(0).toLong() * it.height.coerceAtLeast(0).toLong()
+        }.thenByDescending {
+            if (it.size == ThumbnailsSize.XMAX.value) 1 else 0
+        })
+        .mapNotNull { it.url }
+        .toList()
+
+    return (listOfNotNull(original) + previews).distinct()
+}
+
 fun PicsDetails.lSavedFileName(): String? {
     val sourceName = lDownloadUrl()?.lUrlFileName()?.takeIf { it.isNotBlank() } ?: return null
     return "${width}_${height}_${is_animated}_${album}_$sourceName"

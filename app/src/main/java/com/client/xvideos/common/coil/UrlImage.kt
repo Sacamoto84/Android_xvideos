@@ -25,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -183,6 +184,16 @@ fun UrlImage(
     }
 
     var state by remember { mutableStateOf<AsyncImagePainter.State>(AsyncImagePainter.State.Empty) }
+    val currentOnSuccess by rememberUpdatedState(onSuccess)
+    val currentOnFailure by rememberUpdatedState(onFailure)
+
+    LaunchedEffect(state) {
+        when (state) {
+            is AsyncImagePainter.State.Success -> currentOnSuccess()
+            is AsyncImagePainter.State.Error -> currentOnFailure()
+            else -> Unit
+        }
+    }
 
     //// Управление воспроизведением анимации
     LaunchedEffect(state, isPlaying, isAnimated) {
