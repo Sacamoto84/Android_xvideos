@@ -70,6 +70,7 @@ import com.client.xvideos.common.videoplayer.model.ScreenResize
 import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.model.isLVideoFileUrl
 import com.client.xvideos.l.model.lAnimationVideoUrl
+import com.client.xvideos.l.model.lMediaRequestHeaders
 import com.client.xvideos.l.model.lPreviewImageUrl
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.ui.element.expandMenu.ExpandMenuType
@@ -363,7 +364,8 @@ private fun LFullScreenVideo(
         MediaPlayerHost(
             mediaUrl = url,
             isPaused = !autoPlay || !isCurrentPage,
-            isMuted = true
+            isMuted = true,
+            headers = lMediaRequestHeaders()
         )
     }
 

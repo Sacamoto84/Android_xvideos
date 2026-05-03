@@ -27,6 +27,27 @@ fun PicsDetails.lSavedFileName(): String? {
     return "${width}_${height}_${is_animated}_${album}_$sourceName"
 }
 
+fun lMediaRequestHeaders(): Map<String, String> {
+    return mapOf(
+        "User-Agent" to L_MEDIA_USER_AGENT,
+        "Referer" to "https://www.luscious.net/",
+        "Origin" to "https://www.luscious.net",
+        "Accept" to "*/*",
+        "Accept-Encoding" to "identity",
+        "Accept-Language" to "ru,en;q=0.9"
+    )
+}
+
+fun lMediaDownloadHeaders(): HashMap<String, List<String>> {
+    return HashMap<String, List<String>>().apply {
+        lMediaRequestHeaders()
+            .filterKeys { it != "User-Agent" }
+            .forEach { (key, value) -> put(key, listOf(value)) }
+    }
+}
+
+fun lMediaUserAgent(): String = L_MEDIA_USER_AGENT
+
 fun String.isLVideoFileUrl(): Boolean {
     val path = substringBefore('?').substringBefore('#')
     return path.endsWith(".mp4", ignoreCase = true) ||
@@ -43,3 +64,6 @@ fun String.lUrlFileName(): String {
 fun String.lUrlExtension(): String {
     return lUrlFileName().substringAfterLast('.', missingDelimiterValue = "")
 }
+
+private const val L_MEDIA_USER_AGENT =
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 YaBrowser/25.6.0.0 Safari/537.36"

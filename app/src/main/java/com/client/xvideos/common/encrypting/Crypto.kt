@@ -153,7 +153,8 @@ object Crypto {
     suspend fun downloadAndEncryptFile(
         url: String,
         file: File,
-        key: SecretKeySpec
+        key: SecretKeySpec,
+        requestHeaders: Map<String, String> = emptyMap()
     ): Result<Unit> {
 
         val client = HttpClient(OkHttp) {
@@ -172,7 +173,10 @@ object Crypto {
             }
 
             defaultRequest {
-                headers.append("User-Agent", Faker().internet().userAgentAny())
+                requestHeaders.forEach { (key, value) -> headers.append(key, value) }
+                if (!requestHeaders.containsKey("User-Agent")) {
+                    headers.append("User-Agent", Faker().internet().userAgentAny())
+                }
             }
 
         }

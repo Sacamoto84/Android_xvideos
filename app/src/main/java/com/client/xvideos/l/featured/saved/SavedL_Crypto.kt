@@ -8,6 +8,7 @@ import com.client.xvideos.common.kdownloader.KDownloader
 import com.client.xvideos.common.snackbar.SnackBar
 import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.model.lDownloadUrl
+import com.client.xvideos.l.model.lMediaRequestHeaders
 import com.client.xvideos.l.model.lSavedFileName
 import timber.log.Timber
 import java.io.File
@@ -40,7 +41,8 @@ class SavedL_Crypto(val kDownloader: KDownloader) {
         Crypto.downloadAndEncryptFile(
             downloadUrl,
             File(AppPath.l_likesCrypto, fileName),
-            Password.key!!
+            Password.key!!,
+            lMediaRequestHeaders()
         )
             .onSuccess {
                 SnackBar.success("Сохранен в сейф")

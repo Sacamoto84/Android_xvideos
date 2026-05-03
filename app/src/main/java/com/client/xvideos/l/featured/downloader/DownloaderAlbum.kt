@@ -5,6 +5,8 @@ import com.client.xvideos.common.kdownloader.KDownloader
 import com.client.xvideos.common.kdownloader.Status
 import com.client.xvideos.common.util.getFolderSize
 import com.client.xvideos.common.util.toPrettyCount3
+import com.client.xvideos.l.model.lMediaDownloadHeaders
+import com.client.xvideos.l.model.lMediaUserAgent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
@@ -199,6 +201,8 @@ class DownloaderAlbum(
 
                     val request = kDownloader
                         .newRequestBuilder(item, dir.absolutePath, fileName)
+                        .headers(lMediaDownloadHeaders())
+                        .userAgent(lMediaUserAgent())
                         .tag(albumName)
                         .build()
 

@@ -6,6 +6,8 @@ import com.client.xvideos.common.kdownloader.KDownloader
 import com.client.xvideos.common.snackbar.SnackBar
 import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.model.lDownloadUrl
+import com.client.xvideos.l.model.lMediaDownloadHeaders
+import com.client.xvideos.l.model.lMediaUserAgent
 import com.client.xvideos.l.model.lSavedFileName
 import timber.log.Timber
 import java.io.File
@@ -85,6 +87,8 @@ private fun downloadLikes(
 
     val request = kDownloader
         .newRequestBuilder(downloadUrl, dir.absolutePath, fileName)
+        .headers(lMediaDownloadHeaders())
+        .userAgent(lMediaUserAgent())
         .tag("likes")
         .build()
 

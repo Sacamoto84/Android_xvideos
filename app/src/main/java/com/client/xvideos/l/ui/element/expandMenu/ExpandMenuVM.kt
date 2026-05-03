@@ -15,12 +15,14 @@ import com.client.xvideos.l.featured.saved.SavedL
 import com.client.xvideos.l.featured.share.useCaseShareFile
 import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.model.lDownloadUrl
+import com.client.xvideos.l.model.lMediaRequestHeaders
 import com.client.xvideos.l.model.lSavedFileName
 import com.client.xvideos.l.net.Luscious
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
+import io.ktor.client.request.headers
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.readBytes
 import kotlinx.coroutines.CoroutineScope
@@ -132,7 +134,11 @@ class ExpandMenuViewModel @Inject constructor(
             val downloadsDir = AppPath.l_cacheDownload
             val file = File(downloadsDir, fileName)
             try {
-                val response: HttpResponse = client.get(url)
+                val response: HttpResponse = client.get(url) {
+                    headers {
+                        lMediaRequestHeaders().forEach { (key, value) -> append(key, value) }
+                    }
+                }
                 val bytes: ByteArray = response.readBytes()
                 file.writeBytes(bytes)
                 println("!!! Файл сохранен: ${file.absolutePath}")
