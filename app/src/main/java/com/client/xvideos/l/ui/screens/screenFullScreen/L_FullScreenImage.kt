@@ -29,6 +29,7 @@ import androidx.compose.foundation.lazy.layout.LazyLayoutCacheWindow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.rememberScrollState
@@ -39,6 +40,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.ScreenRotation
+import androidx.compose.material.icons.filled.SwapHoriz
+import androidx.compose.material.icons.filled.SwapVert
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -72,6 +75,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
@@ -79,6 +83,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.common.coil.UrlImage
 import com.client.xvideos.common.noRippleClickable
+import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.common.videoplayer.host.MediaPlayerHost
 import com.client.xvideos.common.videoplayer.model.ScreenResize
 import com.client.xvideos.l.model.PicsDetails
@@ -173,6 +178,7 @@ class L_FullScreenImage(
 
         var rotate by remember { mutableStateOf(false) }
         var showInfoDialog by remember { mutableStateOf(false) }
+        val verticalPager = Settings.l_fullscreen_vertical_pager.field.collectAsStateWithLifecycle().value
 
         val pagerState = rememberPagerState( filteredPic.indexOf(item).coerceIn(0, filteredPic.lastIndex), pageCount = { filteredPic.size } )
 
@@ -245,6 +251,26 @@ class L_FullScreenImage(
                 )
             }
 
+            if (verticalPager) {
+                VerticalPager(
+                    state = pagerState,
+                    modifier = Modifier.fillMaxSize(),
+                    pageSpacing = 0.dp,
+                    beyondViewportPageCount = 1,
+                    key = { page -> filteredPic.getOrNull(page)?.url_to_original ?: page }
+                ) { page ->
+                    LFullScreenPage(
+                        pageItem = filteredPic[page],
+                        page = page,
+                        currentIndex = currentIndex,
+                        pagerState = pagerState,
+                        rotate = rotate,
+                        albumName = albumName,
+                        autoPlay = autoPlay,
+                        onToggleFullScreen = { isFullScreen = isFullScreen.not() }
+                    )
+                }
+            } else {
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier.fillMaxSize(),
@@ -335,6 +361,7 @@ class L_FullScreenImage(
                     }
                 }
             }
+            }
 
             Box(modifier = Modifier.align(Alignment.TopStart)) { Text( currentIndex.toString(), color = Color.Gray, modifier = Modifier.padding(start = 8.dp), fontFamily = ThemeL.fontFamilyKarla )}
 
@@ -345,6 +372,13 @@ class L_FullScreenImage(
                 {
                     Row {
                         IconButton(onClick = { rotate = rotate.not() }) { Icon(Icons.Default.ScreenRotation, contentDescription = null, tint = Color.White) }
+                        IconButton(onClick = { Settings.l_fullscreen_vertical_pager.setValue(!verticalPager) }) {
+                            Icon(
+                                if (verticalPager) Icons.Default.SwapVert else Icons.Default.SwapHoriz,
+                                contentDescription = null,
+                                tint = Color.White
+                            )
+                        }
                         IconButton(onClick = { showInfoDialog = true }) { Icon( Icons.Default.Info, contentDescription = null, tint = Color.White ) }
                     }
 
@@ -404,6 +438,97 @@ class L_FullScreenImage(
                 }
             }
 
+        }
+    }
+}
+
+@Composable
+private fun LFullScreenPage(
+    pageItem: PicsDetails,
+    page: Int,
+    currentIndex: Int,
+    pagerState: PagerState,
+    rotate: Boolean,
+    albumName: String,
+    autoPlay: Boolean,
+    onToggleFullScreen: () -> Unit
+) {
+    val zoomState = rememberZoomState()
+    val coroutineScope = rememberCoroutineScope()
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .aspectRatio(
+                if (rotate) pageItem.height.toFloat() / pageItem.width
+                else pageItem.width.toFloat() / pageItem.height,
+                matchHeightConstraintsFirst = false
+            )
+            .zIndex(if (pagerState.offsetForPage(page) <= 0) 0f else 100f)
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            val videoUrl = pageItem.lAnimationVideoUrl()
+            if (videoUrl != null) {
+                LFullScreenVideo(
+                    url = videoUrl,
+                    previewUrl = pageItem.lPreviewImageUrl("large_thumbnail"),
+                    albumName = albumName,
+                    autoPlay = autoPlay,
+                    isCurrentPage = currentIndex == page,
+                    rotate = rotate,
+                    modifier = Modifier.fillMaxSize(),
+                    onTap = onToggleFullScreen
+                )
+            } else {
+                val imageUrls = remember(pageItem.url_to_original, pageItem.thumbnails) {
+                    pageItem.lFullScreenImageUrls()
+                }
+                var imageUrlIndex by remember(imageUrls) { mutableIntStateOf(0) }
+                val imageUrl = imageUrls.getOrNull(imageUrlIndex).orEmpty()
+
+                if (imageUrl.isNotBlank()) {
+                    UrlImage(
+                        rotate = rotate,
+                        contentScale = ContentScale.Fit,
+                        url = imageUrl,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .zoomable(
+                                zoomState = zoomState,
+                                enableOneFingerZoom = false,
+                                onDoubleTap = { position ->
+                                    coroutineScope.launch {
+                                        if (zoomState.scale > 1.0f) {
+                                            zoomState.changeScale(1.0f, Offset.Zero)
+                                        } else {
+                                            zoomState.changeScale(2.5f, position)
+                                        }
+                                    }
+                                },
+                                onTap = { onToggleFullScreen() }
+                            ),
+                        onSuccess = { },
+                        onFailure = {
+                            if (imageUrlIndex < imageUrls.lastIndex) {
+                                imageUrlIndex += 1
+                                timber.log.Timber.w("!!! L fullscreen image fallback ${imageUrlIndex}/${imageUrls.lastIndex}: ${imageUrls[imageUrlIndex]}")
+                            }
+                        },
+                        albumName = albumName,
+                        autoPlay = autoPlay,
+                        isAnimated = pageItem.is_animated,
+                        isVisible = currentIndex == page,
+                        isFullScreen = true
+                    )
+                } else {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("Нет ссылки на изображение", color = Color.Gray)
+                    }
+                }
+            }
         }
     }
 }

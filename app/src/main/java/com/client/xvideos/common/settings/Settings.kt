@@ -100,6 +100,8 @@ object Settings {
      */
     val thumbalistSize by lazy { SettingElementString( pref, "thumbalistSize", ThumbnailsSize.SMALL.value ) }
 
+    val l_fullscreen_vertical_pager by lazy { SettingElementBoolean(pref, "l_fullscreen_vertical_pager", false) }
+
 
     /**
      * Количество столбиков в L Gifs Tab T 1 2 3 4
