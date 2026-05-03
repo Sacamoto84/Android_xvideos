@@ -7,6 +7,14 @@ import com.google.gson.GsonBuilder
 import timber.log.Timber
 import java.io.File
 
+data class LSavedLikePreview(
+    val fileName: String,
+    val sourceUrl: String,
+    val width: Int,
+    val height: Int,
+    val size: String?
+)
+
 data class LSavedLikeMetadata(
     val schemaVersion: Int = 1,
     val savedAt: Long = System.currentTimeMillis(),
@@ -14,6 +22,7 @@ data class LSavedLikeMetadata(
     val folderName: String,
     val mediaFileName: String,
     val previewFileName: String?,
+    val previewFiles: List<LSavedLikePreview>?,
     val sourceMediaUrl: String,
     val sourcePreviewUrl: String?,
     val sourceOriginalUrl: String?,
@@ -45,28 +54,52 @@ fun writeLSavedLikeMetadata(file: File, metadata: LSavedLikeMetadata) {
 
 fun LSavedLikeMetadata.toPicsDetails(folder: File): PicsDetails? {
     val mediaFile = File(folder, mediaFileName)
-    if (!mediaFile.exists()) return null
+        .takeIf { it.exists() }
 
-    val previewFile = previewFileName
+    val savedPreviews = previewFiles
+        ?.mapNotNull { preview ->
+            File(folder, preview.fileName)
+                .takeIf { it.exists() }
+                ?.let { preview to it }
+        }
+        ?: emptyList()
+
+    val oldPreviewFile = previewFileName
         ?.let { File(folder, it) }
         ?.takeIf { it.exists() }
 
-    val thumbnails = if (previewFile != null) {
-        listOf("large_thumbnail", "small", "xMax").map { size ->
+    val largestPreviewFile = savedPreviews
+        .maxByOrNull { (preview, _) -> preview.width * preview.height }
+        ?.second
+        ?: oldPreviewFile
+
+    val displayMediaFile = mediaFile ?: largestPreviewFile ?: return null
+
+    val thumbnails = when {
+        savedPreviews.isNotEmpty() -> savedPreviews.map { (preview, file) ->
+            Thumbnails(
+                width = preview.width,
+                height = preview.height,
+                size = preview.size,
+                url = file.absolutePath
+            )
+        }
+        oldPreviewFile != null -> listOf("large_thumbnail", "small", "xMax").map { size ->
             Thumbnails(
                 width = picture.width,
                 height = picture.height,
                 size = size,
-                url = previewFile.absolutePath
+                url = oldPreviewFile.absolutePath
             )
         }
-    } else {
+        else -> {
         picture.thumbnails
+        }
     }
 
     return picture.copy(
-        url_to_original = mediaFile.absolutePath,
-        url_to_video = if (picture.is_animated) mediaFile.absolutePath else null,
+        url_to_original = displayMediaFile.absolutePath,
+        url_to_video = if (picture.is_animated) mediaFile?.absolutePath else null,
         album = albumId ?: picture.album,
         thumbnails = thumbnails
     )

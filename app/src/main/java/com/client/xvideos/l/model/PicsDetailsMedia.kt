@@ -19,6 +19,9 @@ fun PicsDetails.lPreviewImageUrl(thumbnailsSize: String): String {
         ?.firstOrNull { it.size == thumbnailsSize }
         ?.url
         ?.takeIf { it.isNotBlank() }
+        ?: thumbnails
+            ?.firstOrNull { !it.url.isNullOrBlank() && !it.url.isLVideoFileUrl() }
+            ?.url
         ?: url_to_original.orEmpty()
 }
 

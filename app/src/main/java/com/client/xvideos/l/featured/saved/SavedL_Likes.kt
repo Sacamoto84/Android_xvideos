@@ -5,6 +5,7 @@ import com.client.xvideos.common.AppPath
 import com.client.xvideos.common.snackbar.SnackBar
 import com.client.xvideos.l.model.AlbumDetails
 import com.client.xvideos.l.model.PicsDetails
+import com.client.xvideos.l.model.Thumbnails
 import com.client.xvideos.l.model.isLVideoFileUrl
 import com.client.xvideos.l.model.lDownloadUrl
 import com.client.xvideos.l.model.lMediaRequestHeaders
@@ -111,40 +112,62 @@ class SavedL_Likes(
     }
 
     private suspend fun saveLike(item: PicsDetails): Result<Unit> = runCatching {
-        val mediaUrl = item.lDownloadUrl() ?: error("Missing media url")
+        val previewSources = item.previewSources()
+        val mediaUrl = item.lDownloadUrl()
+            ?: previewSources.maxByOrNull { it.width * it.height }?.url
+            ?: error("Missing media url")
         val albumId = item.album?.takeIf { it.isNotBlank() && it != "null" }
         val albumDetails = albumId?.toIntOrNull()?.let { fetchAlbumDetails(it) }
-        val previewUrl = item.selectPreviewUrl()
 
         val folderName = buildFolderName(item, mediaUrl)
         val folder = File(AppPath.l_likes, folderName)
         folder.mkdirs()
 
-        val mediaExtension = mediaUrl.lUrlExtension().ifBlank { if (item.is_animated) "mp4" else "jpg" }
-        val previewExtension = previewUrl?.lUrlExtension()?.ifBlank { "jpg" } ?: "jpg"
-        val mediaFile = File(folder, buildLocalFileName(mediaUrl, "media", mediaExtension))
-        val previewFile = previewUrl?.let { File(folder, buildLocalFileName(it, "preview", previewExtension)) }
+        val mediaExtension = if (item.is_animated) mediaUrl.videoExtension() else mediaUrl.imageExtension()
+        val mediaFile = File(folder, "media.$mediaExtension")
+        val savedPreviews = mutableListOf<LSavedLikePreview>()
 
         val client = createClient()
         try {
-            downloadToFile(client, mediaUrl, mediaFile)
+            val mediaSaved = if (item.is_animated) {
+                downloadToFile(client, mediaUrl, mediaFile)
+                true
+            } else {
+                runCatching { downloadToFile(client, mediaUrl, mediaFile) }
+                    .onFailure { error ->
+                        mediaFile.delete()
+                        Timber.w(error, "!!! L like original media download failed, fallback to previews: $mediaUrl")
+                    }
+                    .isSuccess
+            }
 
-            var savedPreviewFile: File? = null
-            if (previewUrl != null && !sameCleanUrl(previewUrl, mediaUrl)) {
-                savedPreviewFile = previewFile
-                runCatching { downloadToFile(client, previewUrl, previewFile!!) }
-                    .onFailure { Timber.w(it, "!!! L like preview download failed: $previewUrl") }
-                    .onFailure { savedPreviewFile = null }
-            } else if (!item.is_animated) {
-                savedPreviewFile = mediaFile
+            if (item.is_animated) {
+                previewSources.minByOrNull { it.width * it.height }?.let { preview ->
+                    val previewFile = File(folder, "preview.${preview.extension}")
+                    runCatching { downloadToFile(client, preview.url, previewFile) }
+                        .onSuccess { savedPreviews.add(preview.toSavedPreview(previewFile.name)) }
+                        .onFailure { Timber.w(it, "!!! L like video preview download failed: ${preview.url}") }
+                }
+            } else {
+                previewSources.forEach { preview ->
+                    val previewFile = File(folder, "preview.${preview.sizeMarker}.${preview.extension}")
+                    runCatching { downloadToFile(client, preview.url, previewFile) }
+                        .onSuccess { savedPreviews.add(preview.toSavedPreview(previewFile.name)) }
+                        .onFailure { Timber.w(it, "!!! L like preview download failed: ${preview.url}") }
+                }
+            }
+
+            if (!mediaSaved && savedPreviews.isEmpty()) {
+                error("Missing downloaded media and previews")
             }
 
             val metadata = LSavedLikeMetadata(
                 folderName = folder.name,
                 mediaFileName = mediaFile.name,
-                previewFileName = savedPreviewFile?.name,
+                previewFileName = savedPreviews.minByOrNull { it.width * it.height }?.fileName,
+                previewFiles = savedPreviews,
                 sourceMediaUrl = mediaUrl,
-                sourcePreviewUrl = previewUrl,
+                sourcePreviewUrl = savedPreviews.minByOrNull { it.width * it.height }?.sourceUrl,
                 sourceOriginalUrl = item.url_to_original,
                 sourceVideoUrl = item.url_to_video,
                 albumId = albumId,
@@ -239,19 +262,24 @@ class SavedL_Likes(
         }.getOrNull()
     }
 
-    private fun PicsDetails.selectPreviewUrl(): String? {
-        val preferred = listOf("large_thumbnail", "small", "xMax")
-        val bySize = preferred.firstNotNullOfOrNull { size ->
-            thumbnails
-                ?.firstOrNull { it.size == size }
-                ?.url
-                ?.takeIf { it.isNotBlank() && !it.isLVideoFileUrl() }
-        }
-        return bySize
-            ?: thumbnails
-                ?.firstOrNull { !it.url.isNullOrBlank() && !it.url.isLVideoFileUrl() }
-                ?.url
-            ?: url_to_original?.takeIf { !is_animated && it.isNotBlank() && !it.isLVideoFileUrl() }
+    private fun PicsDetails.previewSources(): List<PreviewSource> {
+        return thumbnails
+            ?.mapNotNull { it.toPreviewSource() }
+            ?.distinctBy { it.url.substringBefore('?').substringBefore('#') }
+            ?.sortedBy { it.width * it.height }
+            ?: emptyList()
+    }
+
+    private fun Thumbnails.toPreviewSource(): PreviewSource? {
+        val sourceUrl = url?.takeIf { it.isNotBlank() && !it.isLVideoFileUrl() } ?: return null
+        return PreviewSource(
+            url = sourceUrl,
+            width = width,
+            height = height,
+            size = size,
+            sizeMarker = sourceUrl.previewSizeMarker(width, height),
+            extension = sourceUrl.imageExtension()
+        )
     }
 
     private fun buildFolderName(item: PicsDetails, mediaUrl: String): String {
@@ -262,19 +290,6 @@ class SavedL_Likes(
             .take(60)
             .ifBlank { "media" }
         return "${album.sanitizeFilePart()}_${mediaUrl.sha256().take(12)}_$baseName"
-    }
-
-    private fun buildLocalFileName(url: String, prefix: String, fallbackExtension: String): String {
-        val cleanName = url.lUrlFileName()
-            .sanitizeFilePart()
-            .take(90)
-            .ifBlank { "$prefix.$fallbackExtension" }
-        val nameWithExtension = if (cleanName.substringAfterLast('.', "").isBlank()) {
-            "$cleanName.$fallbackExtension"
-        } else {
-            cleanName
-        }
-        return "${prefix}_$nameWithExtension"
     }
 
     private fun findSavedLikeFolder(root: File, url: String): File? {
@@ -290,8 +305,12 @@ class SavedL_Likes(
                 val metadata = readLSavedLikeMetadata(File(folder, METADATA_FILE_NAME)) ?: return@firstOrNull false
                 val mediaPath = File(folder, metadata.mediaFileName).absolutePath
                 val previewPath = metadata.previewFileName?.let { File(folder, it).absolutePath }
+                val previewPaths = metadata.previewFiles
+                    ?.map { File(folder, it.fileName).absolutePath }
+                    ?: emptyList()
                 url == mediaPath ||
                         url == previewPath ||
+                        url in previewPaths ||
                         url == metadata.sourceMediaUrl ||
                         url == metadata.sourceOriginalUrl ||
                         url == metadata.sourceVideoUrl
@@ -306,8 +325,26 @@ class SavedL_Likes(
         }.getOrDefault(false)
     }
 
-    private fun sameCleanUrl(a: String, b: String): Boolean {
-        return a.substringBefore('?').substringBefore('#') == b.substringBefore('?').substringBefore('#')
+    private fun String.imageExtension(): String {
+        return lUrlExtension()
+            .lowercase()
+            .takeIf { it in setOf("jpg", "jpeg", "png", "webp", "gif") }
+            ?: "jpg"
+    }
+
+    private fun String.videoExtension(): String {
+        return lUrlExtension()
+            .lowercase()
+            .takeIf { it in setOf("mp4", "webm", "m4v", "mov") }
+            ?: "mp4"
+    }
+
+    private fun String.previewSizeMarker(width: Int, height: Int): String {
+        return Regex("\\.(\\d+x\\d+)\\.[^.]+$")
+            .find(lUrlFileName())
+            ?.groupValues
+            ?.getOrNull(1)
+            ?: "${width}x${height}"
     }
 
     private fun String.sanitizeFilePart(): String {
@@ -317,6 +354,25 @@ class SavedL_Likes(
     private fun String.sha256(): String {
         val bytes = MessageDigest.getInstance("SHA-256").digest(toByteArray(Charsets.UTF_8))
         return bytes.joinToString("") { "%02x".format(it) }
+    }
+
+    private data class PreviewSource(
+        val url: String,
+        val width: Int,
+        val height: Int,
+        val size: String?,
+        val sizeMarker: String,
+        val extension: String
+    ) {
+        fun toSavedPreview(fileName: String): LSavedLikePreview {
+            return LSavedLikePreview(
+                fileName = fileName,
+                sourceUrl = url,
+                width = width,
+                height = height,
+                size = size
+            )
+        }
     }
 
     private companion object {
