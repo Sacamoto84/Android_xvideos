@@ -32,6 +32,14 @@ object Settings {
 
     fun init(prefs: SharedPreferences) { pref = prefs }
 
+    //-- app ---
+
+    val image_cache_ram_percent by lazy { SettingElementInt(pref, "image_cache_ram_percent", 10) }
+
+    val image_cache_disk_enabled by lazy { SettingElementBoolean(pref, "image_cache_disk_enabled", true) }
+
+    val image_cache_disk_size_mb by lazy { SettingElementInt(pref, "image_cache_disk_size_mb", 500) }
+
 
     //-- red ---
 

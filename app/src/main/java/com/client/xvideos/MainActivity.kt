@@ -52,6 +52,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.PermissionScreenActivity.PermissionStorage
+import com.client.xvideos.common.settings.ui.AppSettingsScreen
 import com.client.xvideos.common.util.KeepScreenOn
 import com.client.xvideos.l.ui.screens.explorer.L_ScreenExplorer
 import com.client.xvideos.redgifs.ui.root.R_Screen_Root
@@ -157,7 +158,7 @@ object MenuScreen : Screen {
         Scaffold(
             topBar = {
                 Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopEnd) {
-                    IconButton(onClick = {}, modifier = Modifier.displayCutoutPadding().size(48.dp)) {
+                    IconButton(onClick = { navigator.push(AppSettingsScreen) }, modifier = Modifier.displayCutoutPadding().size(48.dp)) {
                         Icon(
                             Icons.Default.MoreVert,
                             contentDescription = null,

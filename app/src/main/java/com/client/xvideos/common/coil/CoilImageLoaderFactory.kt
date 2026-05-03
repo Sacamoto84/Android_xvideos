@@ -10,12 +10,10 @@ import coil3.disk.directory
 import coil3.gif.AnimatedImageDecoder
 import coil3.gif.GifDecoder
 import coil3.memory.MemoryCache
-import coil3.network.cachecontrol.CacheControlCacheStrategy
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.request.allowHardware
-import coil3.request.crossfade
+import com.client.xvideos.common.settings.Settings
 import okhttp3.OkHttpClient
-import okhttp3.ResponseBody
 import timber.log.Timber
 import java.io.File
 import java.security.SecureRandom
@@ -35,6 +33,17 @@ data class CoilProgressItem(
 
 object CoilImageLoaderFactory {
 
+    const val MIN_RAM_CACHE_PERCENT = 1
+    const val MAX_RAM_CACHE_PERCENT = 50
+    const val MIN_DISK_CACHE_SIZE_MB = 50
+    const val MAX_DISK_CACHE_SIZE_MB = 2_000
+
+    private const val DEFAULT_RAM_CACHE_PERCENT = 10
+    private const val DEFAULT_DISK_CACHE_SIZE_MB = 500
+    private const val BYTES_IN_MB = 1024L * 1024L
+    private const val HTTP_CACHE_DIR_NAME = "http_cache"
+    private const val IMAGE_CACHE_DIR_NAME = "image_cache"
+
     @Volatile
     private var instance: ImageLoader? = null
 
@@ -46,14 +55,22 @@ object CoilImageLoaderFactory {
 
     @OptIn(ExperimentalCoilApi::class)
     private fun createImageLoader(context: Context): ImageLoader {
+        val appContext = context.applicationContext
+        val diskCacheEnabled = Settings.image_cache_disk_enabled.field.value
+        val diskCacheMaxBytes = normalizedDiskCacheSizeMb().toLong() * BYTES_IN_MB
+        val ramCachePercent = normalizedRamCachePercent() / 100.0
 
         val okHttpBuilder = OkHttpClient.Builder()
-            .cache(
-                okhttp3.Cache(
-                    directory = File(context.cacheDir, "http_cache"),
-                    maxSize = 500L * 1024L * 1024L // 500 MB
-                )
-            )
+            .apply {
+                if (diskCacheEnabled) {
+                    cache(
+                        okhttp3.Cache(
+                            directory = httpCacheDir(appContext),
+                            maxSize = diskCacheMaxBytes
+                        )
+                    )
+                }
+            }
             .addNetworkInterceptor(
                 ProgressInterceptor { requestUrl, bytes, total, done ->
                     CoilProgressManager.updateProgress(
@@ -109,7 +126,7 @@ object CoilImageLoaderFactory {
             null
         }
 
-        return ImageLoader.Builder(context)
+        return ImageLoader.Builder(appContext)
             .components {
                 if (Build.VERSION.SDK_INT >= 28) {
                     add(AnimatedImageDecoder.Factory())
@@ -122,15 +139,21 @@ object CoilImageLoaderFactory {
                     add(OkHttpNetworkFetcherFactory(callFactory = { it }))
                 }
             }
-            .diskCache {
-                DiskCache.Builder()
-                    .directory(File(context.cacheDir, "image_cache"))
-                    .maxSizeBytes(500L * 1024L * 1024L)
-                    .build()
+            .apply {
+                if (diskCacheEnabled) {
+                    diskCache {
+                        DiskCache.Builder()
+                            .directory(imageCacheDir(appContext))
+                            .maxSizeBytes(diskCacheMaxBytes)
+                            .build()
+                    }
+                } else {
+                    diskCache(null)
+                }
             }
             .memoryCache {
                 MemoryCache.Builder()
-                    .maxSizePercent(context, 0.10)
+                    .maxSizePercent(appContext, ramCachePercent)
                     .strongReferencesEnabled(false)
                     .build()
             }
@@ -139,10 +162,54 @@ object CoilImageLoaderFactory {
             .build()
     }
 
+    fun normalizedRamCachePercent(value: Int = Settings.image_cache_ram_percent.field.value): Int {
+        return value.coerceIn(MIN_RAM_CACHE_PERCENT, MAX_RAM_CACHE_PERCENT)
+            .takeIf { it > 0 }
+            ?: DEFAULT_RAM_CACHE_PERCENT
+    }
+
+    fun normalizedDiskCacheSizeMb(value: Int = Settings.image_cache_disk_size_mb.field.value): Int {
+        return value.coerceIn(MIN_DISK_CACHE_SIZE_MB, MAX_DISK_CACHE_SIZE_MB)
+            .takeIf { it > 0 }
+            ?: DEFAULT_DISK_CACHE_SIZE_MB
+    }
+
+    fun imageDiskCacheSizeBytes(context: Context): Long {
+        val appContext = context.applicationContext
+        return directorySizeBytes(imageCacheDir(appContext)) + directorySizeBytes(httpCacheDir(appContext))
+    }
+
+    fun recreate(context: Context) {
+        synchronized(this) {
+            instance?.memoryCache?.clear()
+            instance = createImageLoader(context.applicationContext)
+        }
+    }
+
     fun clearCache(context: Context) {
-        getImageLoader(context).apply {
+        val appContext = context.applicationContext
+        getImageLoader(appContext).apply {
             memoryCache?.clear()
             diskCache?.clear()
         }
+        clearDirectory(imageCacheDir(appContext))
+        clearDirectory(httpCacheDir(appContext))
+        recreate(appContext)
+    }
+
+    private fun imageCacheDir(context: Context): File = File(context.cacheDir, IMAGE_CACHE_DIR_NAME)
+
+    private fun httpCacheDir(context: Context): File = File(context.cacheDir, HTTP_CACHE_DIR_NAME)
+
+    private fun directorySizeBytes(dir: File): Long {
+        return dir.listFiles()?.sumOf { file ->
+            if (file.isFile) file.length() else directorySizeBytes(file)
+        } ?: 0L
+    }
+
+    private fun clearDirectory(dir: File) {
+        if (!dir.exists()) return
+        runCatching { dir.deleteRecursively() }
+            .onFailure { Timber.w(it, "Failed to delete image cache dir: ${dir.absolutePath}") }
     }
 }
