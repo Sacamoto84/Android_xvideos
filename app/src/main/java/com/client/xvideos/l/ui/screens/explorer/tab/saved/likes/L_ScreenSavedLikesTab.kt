@@ -78,6 +78,10 @@ object L_ScreenSavedLikesTab : Screen {
         var selectedIndex by remember { mutableIntStateOf(0) }
         val options = listOf("All", "Image", "Gif")
 
+        LaunchedEffect(vm.original.size, selectedIndex) {
+            vm.filterSelect(selectedIndex)
+        }
+
         Scaffold(modifier = Modifier.fillMaxSize()) {
             L_LazyRowPictureDetails(
                 vm.host,

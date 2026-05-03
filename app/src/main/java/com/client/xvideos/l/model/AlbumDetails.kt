@@ -16,7 +16,17 @@ data class AlbumDetails(
     @SerializedName("number_of_pictures") val number_of_pictures: Int, //Возвращает количество фотографий в альбоме (в это число входят и gif-файлы).
     @SerializedName("number_of_animated_pictures") val number_of_animated_pictures: Int, //
     @SerializedName("url") val url: String,
-    @SerializedName("download_url") val download_url: String
+    @SerializedName("download_url") val download_url: String,
+    @SerializedName("slug") val slug: String? = null,
+    @SerializedName("like_status") val likeStatus: String? = null,
+    @SerializedName("moderation_status") val moderationStatus: String? = null,
+    @SerializedName("number_of_favorites") val numberOfFavorites: Int? = null,
+    @SerializedName("number_of_dislikes") val numberOfDislikes: Int? = null,
+    @SerializedName("number_of_duplicates") val numberOfDuplicates: Int? = null,
+    @SerializedName("labels") val labels: List<String> = emptyList(),
+    @SerializedName("permissions") val permissions: List<String> = emptyList(),
+    @SerializedName("language") val language: Language? = null,
+    @SerializedName("created_by") val createdBy: User? = null
 )
 
 

@@ -149,7 +149,10 @@ fun UrlImage(
             url.toUri()
         } else {
             val fileName = url.substringAfterLast('/').substringBefore('?')
-            if (albumName == "")
+            val localFile = File(url)
+            if (localFile.isAbsolute || url.contains('/') || url.contains('\\')) {
+                localFile
+            } else if (albumName == "")
                 File(url)
             else {
                 when (albumName) {
