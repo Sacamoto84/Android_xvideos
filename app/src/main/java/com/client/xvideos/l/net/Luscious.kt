@@ -36,7 +36,11 @@ class Luscious(
      *         Or it can be a string, the link itself
      *
      */
-    fun getAlbum(albumInput: Any, download: Boolean = false): AlbumInfo {
+    fun getAlbum(
+        albumInput: Any,
+        download: Boolean = false,
+        requestScope: CoroutineScope = scope
+    ): AlbumInfo {
 
         val id = when (albumInput) {
             is Int -> albumInput.toString()
@@ -45,7 +49,7 @@ class Luscious(
             else -> throw IllegalArgumentException("albumInput must be Int or String")
         }
 
-        return AlbumInfo(id.toInt(), download, repository, scope)
+        return AlbumInfo(id.toInt(), download, repository, requestScope)
     }
 
     // Вспомогательная функция для извлечения ID из URL

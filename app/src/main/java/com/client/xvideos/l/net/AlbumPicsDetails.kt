@@ -13,6 +13,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -26,6 +27,7 @@ class AlbumPicsDetails(
 
     private companion object {
         val gson = Gson()
+        const val PAGE_REQUEST_DELAY_MS = 250L
     }
 
     val pics = mutableStateListOf<PicsDetails>()
@@ -49,7 +51,13 @@ class AlbumPicsDetails(
 
         if (cached.isSuccess) return cached
 
-        Timber.w(cached.exceptionOrNull(), "!!! AlbumPicsDetails $id page $page CACHE_ROM error, retry DIRECT")
+        val cachedError = cached.exceptionOrNull()
+        if (cachedError.isHtmlChallengeResponse()) {
+            Timber.w(cachedError, "!!! AlbumPicsDetails $id page $page HTML challenge response")
+            return Result.failure(cachedError ?: IllegalStateException("Server returned HTML instead of JSON"))
+        }
+
+        Timber.w(cachedError, "!!! AlbumPicsDetails $id page $page CACHE_ROM error, retry DIRECT")
         repository.deleteCache(request, RepositoryUriConfig.CACHE_ROM)
 
         return repository.openURI(
@@ -121,6 +129,7 @@ class AlbumPicsDetails(
                 PageLoadResult(page, pages, emptyList())
             }
             appendPage(pageResult, pages)
+            delay(PAGE_REQUEST_DELAY_MS)
         }
 
         withContext(Dispatchers.Main) {
@@ -153,6 +162,11 @@ class AlbumPicsDetails(
         }.getOrNull()
     }
 
+    private fun Throwable?.isHtmlChallengeResponse(): Boolean {
+        val message = this?.message ?: return false
+        return message.startsWith("Server returned HTML instead of JSON")
+    }
+
     private fun normalizePictureUrls(l: List<PicsDetails>): List<PicsDetails> {
         return l.map { item ->
             val thumbnailUrl = item.lBestThumbnailImageUrl()
@@ -163,6 +177,5 @@ class AlbumPicsDetails(
             }
         }
     }
-
 
 }

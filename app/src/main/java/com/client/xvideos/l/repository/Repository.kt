@@ -13,7 +13,10 @@ import com.client.xvideos.l.net.Luscious
 import com.google.gson.JsonParser
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -35,6 +38,15 @@ class Repository(
 
     @Volatile
     private var handler = createHandler()
+
+    private val authMutex = Mutex()
+    private val requestMutex = Mutex()
+
+    @Volatile
+    private var lastNetworkRequestAtMs = 0L
+
+    @Volatile
+    private var htmlChallengeCooldownUntilMs = 0L
 
     private val cacheUrlStringRomDao = dbCache.cacheUrlStringRomDao()
     private val cacheUrlStringRamDao = dbCache.cacheUrlStringRamDao()
@@ -65,16 +77,18 @@ class Repository(
         //Timber.i("!!! openURI() data:$data type:$type config:$config")
 
         try {
-            val username = Settings.l_login.field.value.trim()
-            val password = Settings.l_pass.field.value
-            if (username.isBlank() || password.isBlank()) {
-                return Result.failure(IllegalStateException("Luscious credentials are not configured"))
-            }
-            handler.setCredentials(username, password)
-            if (!handler.loggedIn) {
-                val loggedIn = handler.login()
-                if (!loggedIn) {
-                    return Result.failure(IllegalStateException("Luscious login failed"))
+            authMutex.withLock {
+                val username = Settings.l_login.field.value.trim()
+                val password = Settings.l_pass.field.value
+                if (username.isBlank() || password.isBlank()) {
+                    return Result.failure(IllegalStateException("Luscious credentials are not configured"))
+                }
+                handler.setCredentials(username, password)
+                if (!handler.loggedIn) {
+                    val loggedIn = handler.login()
+                    if (!loggedIn) {
+                        return Result.failure(IllegalStateException("Luscious login failed"))
+                    }
                 }
             }
         }
@@ -89,12 +103,7 @@ class Repository(
 
                 //Запрос без кеширования
                 RepositoryUriConfig.DIRECT -> {
-                    try {
-                        val res = handler.postJson(apiUrl, data)
-                        return validateJsonResponse(res)
-                    }catch (e: Exception){
-                        return Result.failure(e)
-                    }
+                    return postJsonValidated(data)
                 }
 
                 //Сделать запись в ROOM если нет в базе, иначе прочитать из него
@@ -111,8 +120,7 @@ class Repository(
                             Timber.w("!!! openURI() CACHE_ROM malformed cache: ${cached.exceptionOrNull()?.message}")
                             cacheUrlStringRomDao.delete(cacheKey)
                         }
-                        val response = handler.postJson(apiUrl, data)
-                        val checkedResponse = validateJsonResponse(response)
+                        val checkedResponse = postJsonValidated(data)
                         if (checkedResponse.isFailure) return checkedResponse
 
                         if (checkedResponse.getOrThrow().contains("{\"errors\":")){
@@ -145,8 +153,7 @@ class Repository(
                             Timber.w("!!! openURI() CACHE_RAM malformed cache: ${cached.exceptionOrNull()?.message}")
                             cacheUrlStringRamDao.delete(cacheKey)
                         }
-                        val response = handler.postJson(apiUrl, data)
-                        val checkedResponse = validateJsonResponse(response)
+                        val checkedResponse = postJsonValidated(data)
                         if (checkedResponse.isFailure) {
                             val cachedRom = cacheUrlStringRomDao.get(cacheKey)?.content?.let { validateJsonResponse(it) }
                             if (cachedRom?.isSuccess == true) {
@@ -183,6 +190,60 @@ class Repository(
         }
 
         return Result.failure(Exception("Некорректный тип запроса"))
+    }
+
+    private suspend fun postJsonValidated(data: String): Result<String> {
+        var lastFailure: Result<String>? = null
+
+        for (attempt in 0 until HTML_CHALLENGE_RETRY_ATTEMPTS) {
+            val response = try {
+                postJsonThrottled(data)
+            } catch (e: Exception) {
+                return Result.failure(e)
+            }
+
+            val checkedResponse = validateJsonResponse(response)
+            if (checkedResponse.isSuccess) return checkedResponse
+
+            val error = checkedResponse.exceptionOrNull()
+            if (!error.isHtmlChallengeResponse()) return checkedResponse
+
+            lastFailure = checkedResponse
+            val delayMs = htmlChallengeRetryDelay(attempt)
+            scheduleHtmlChallengeCooldown(delayMs)
+            Timber.w("!!! openURI() HTML challenge response, retry after ${delayMs}ms")
+        }
+
+        return lastFailure ?: Result.failure(IllegalStateException("Server returned HTML instead of JSON"))
+    }
+
+    private suspend fun postJsonThrottled(data: String): String {
+        return requestMutex.withLock {
+            val now = System.currentTimeMillis()
+            val intervalWaitMs = MIN_NETWORK_REQUEST_INTERVAL_MS - (now - lastNetworkRequestAtMs)
+            val challengeWaitMs = htmlChallengeCooldownUntilMs - now
+            val waitMs = maxOf(intervalWaitMs, challengeWaitMs, 0L)
+            if (waitMs > 0) delay(waitMs)
+
+            try {
+                handler.postJson(apiUrl, data)
+            } finally {
+                lastNetworkRequestAtMs = System.currentTimeMillis()
+            }
+        }
+    }
+
+    private fun scheduleHtmlChallengeCooldown(delayMs: Long) {
+        val cooldownUntil = System.currentTimeMillis() + delayMs
+        if (cooldownUntil > htmlChallengeCooldownUntilMs) {
+            htmlChallengeCooldownUntilMs = cooldownUntil
+        }
+    }
+
+    private fun htmlChallengeRetryDelay(attempt: Int): Long {
+        return HTML_CHALLENGE_RETRY_DELAYS_MS.getOrElse(attempt) {
+            HTML_CHALLENGE_RETRY_DELAYS_MS.last()
+        }
     }
 
     private fun validateJsonResponse(response: String): Result<String> {
@@ -224,8 +285,19 @@ class Repository(
         return replace(Regex("\\s+"), " ").take(200)
     }
 
+    private fun Throwable?.isHtmlChallengeResponse(): Boolean {
+        val message = this?.message ?: return false
+        return message.startsWith("Server returned HTML instead of JSON")
+    }
+
     private fun clearRamDao(){
         scope.launch { withContext(Dispatchers.Main) { cacheUrlStringRamDao.deleteAll() } }
+    }
+
+    private companion object {
+        const val MIN_NETWORK_REQUEST_INTERVAL_MS = 300L
+        const val HTML_CHALLENGE_RETRY_ATTEMPTS = 3
+        val HTML_CHALLENGE_RETRY_DELAYS_MS = longArrayOf(5_000L, 10_000L, 15_000L)
     }
 
 }

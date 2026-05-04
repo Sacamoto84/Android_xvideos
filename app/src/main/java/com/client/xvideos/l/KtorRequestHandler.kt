@@ -21,6 +21,7 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.request.url
 import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
 import io.ktor.http.Parameters
 import io.ktor.http.content.TextContent
 import io.ktor.http.contentType
@@ -37,6 +38,7 @@ class KtorRequestHandler(
     password: String? = null
 ) {
     private val faker = Faker()
+    private val userAgent = faker.internet().userAgentAny()
     private var username: String? = username
     private var password: String? = password
 
@@ -64,7 +66,7 @@ class KtorRequestHandler(
             socketTimeoutMillis = timeoutMillis
         }
 
-        defaultRequest { headers.append("User-Agent", faker.internet().userAgentAny()) }
+        defaultRequest { headers.append(HttpHeaders.UserAgent, userAgent) }
         install(Logging) { level = LogLevel.ALL }
     }
 
@@ -187,6 +189,12 @@ class KtorRequestHandler(
             return false
         }
 
+        if (response.isCloudflareChallenge()) {
+            println("Login blocked by Cloudflare challenge")
+            loggedIn = false
+            return false
+        }
+
         if ("The username and/or password you specified are not correct." in response) {
             println("!!! Login failed. Please check your credentials")
             loggedIn = false
@@ -195,6 +203,12 @@ class KtorRequestHandler(
             println("Login successful")
         }
         return loggedIn
+    }
+
+    private fun String.isCloudflareChallenge(): Boolean {
+        return contains("<title>Just a moment", ignoreCase = true) ||
+                contains("challenge-platform", ignoreCase = true) ||
+                contains("cf-chl", ignoreCase = true)
     }
     // ! --- Login --- !
 

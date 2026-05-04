@@ -83,7 +83,9 @@ class ScreenLAlbumSM @AssistedInject constructor(
     }
 
 
-    val albumInfo = MutableStateFlow<AlbumInfo?>(null)
+    val albumInfo = MutableStateFlow<AlbumInfo?>(
+        luscious.getAlbum(idAlbum, requestScope = screenModelScope)
+    )
 
     /**
      * Показ только анимированных картинок
@@ -91,12 +93,6 @@ class ScreenLAlbumSM @AssistedInject constructor(
     var showOnlyAnimated by mutableStateOf(false)
 
     //val downloader = DownloaderAlbum(idAlbum.toString(), kDownloader)
-
-    init {
-        screenModelScope.launch {
-            albumInfo.value = luscious.getAlbum(idAlbum)
-        }
-    }
 
     /**
      * Сохранить альбом

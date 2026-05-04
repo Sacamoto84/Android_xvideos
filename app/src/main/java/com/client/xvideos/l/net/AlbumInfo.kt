@@ -9,6 +9,7 @@ import com.client.xvideos.l.repository.RepositoryUriConfig
 import com.google.gson.Gson
 import com.google.gson.JsonParser
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -46,7 +47,7 @@ class AlbumInfo(
     )
 
     init {
-        scope.launch {
+        scope.launch(Dispatchers.IO) {
             val query = getAlbumInfo(id)
             val result = repository.openURI(query, config = RepositoryUriConfig.CACHE_ROM)
             if (result.isFailure) {
