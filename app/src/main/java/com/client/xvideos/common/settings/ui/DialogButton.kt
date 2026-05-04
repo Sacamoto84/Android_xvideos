@@ -22,12 +22,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.window.Dialog
+import com.client.xvideos.l.theme.ThemeL
 import com.composables.core.HorizontalSeparator
 
 @Composable
@@ -63,17 +61,13 @@ fun DialogButton(
                     Column(Modifier.padding(start = 24.dp, top = 16.dp, end = 24.dp)) {
                         Text(
                             text = title,
-                            style = TextStyle(
-                                color = Color.Black,
-                                fontWeight = FontWeight.Medium,
-                                fontSize = 18.sp
-                            )
+                            style = ThemeL.Type.dialogTitle.copy(color = Color.Black)
                         )
                         if (body.isNotEmpty()) {
                             Spacer(Modifier.height(8.dp))
                             Text(
                                 text = body,
-                                style = TextStyle(color = Color(0xFF474747), fontSize = 14.sp)
+                                style = ThemeL.Type.dialogBody.copy(color = Color(0xFF474747))
                             )
                         }
                     }

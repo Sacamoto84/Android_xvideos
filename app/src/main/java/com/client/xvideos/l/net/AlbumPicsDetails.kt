@@ -3,6 +3,7 @@ package com.client.xvideos.l.net
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.model.lBestThumbnailImageUrl
@@ -13,6 +14,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -36,11 +38,28 @@ class AlbumPicsDetails(
 
     var percentLoad by mutableFloatStateOf(0f)
 
+    var isPageRequestInFlight by mutableStateOf(false)
+        private set
+
     private data class PageLoadResult(
         val page: Int,
         val totalPages: Int,
         val items: List<PicsDetails>
     )
+
+    private suspend fun loadPage(page: Int): Result<PageLoadResult> {
+        withContext(Dispatchers.Main) {
+            isPageRequestInFlight = true
+        }
+
+        return try {
+            openPage(page)
+        } finally {
+            withContext(NonCancellable + Dispatchers.Main) {
+                isPageRequestInFlight = false
+            }
+        }
+    }
 
     private suspend fun openPage(page: Int): Result<PageLoadResult> {
         val request = GraphQlRequest.pictureListInsideAlbum(id, page)
@@ -110,9 +129,10 @@ class AlbumPicsDetails(
             pics.clear()
             totalPages = null
             percentLoad = 0f
+            isPageRequestInFlight = false
         }
 
-        val firstPage = openPage(1).getOrElse {
+        val firstPage = loadPage(1).getOrElse {
             Timber.w(it, "!!! AlbumPicsDetails $id page 1 error")
             withContext(Dispatchers.Main) {
                 percentLoad = 1f
@@ -124,7 +144,7 @@ class AlbumPicsDetails(
         appendPage(firstPage, pages)
 
         for (page in 2..pages) {
-            val pageResult = openPage(page).getOrElse {
+            val pageResult = loadPage(page).getOrElse {
                 Timber.w(it, "!!! AlbumPicsDetails $id page $page error")
                 PageLoadResult(page, pages, emptyList())
             }

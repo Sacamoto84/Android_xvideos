@@ -23,11 +23,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.client.xvideos.common.json.JsonTypes
 import com.client.xvideos.common.settings.element.SettingElementList
-import com.client.xvideos.redgifs.common.ThemeRed
+import com.client.xvideos.l.theme.ThemeL
 import com.composeunstyled.Text
 import com.skydoves.compose.stability.runtime.TraceRecomposition
 
@@ -93,8 +92,7 @@ private fun TabBarPoints(count: Int, screenType: Boolean) {
                 Text(
                     "T",
                     color = if (screenType) Color.White else Color.Gray,
-                    fontFamily = ThemeRed.fontFamilyPopinsSemiBold,
-                    fontSize = 12.sp
+                    style = ThemeL.Type.caption.copy(color = if (screenType) Color.White else Color.Gray)
                 )
             } else {
                 repeat(count) {

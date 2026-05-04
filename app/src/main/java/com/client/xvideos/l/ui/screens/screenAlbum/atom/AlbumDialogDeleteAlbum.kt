@@ -11,12 +11,12 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
 import com.client.xvideos.common.coil.UrlImage
 import com.client.xvideos.l.model.AlbumDetails
 import com.client.xvideos.l.model.Cover
 import com.client.xvideos.l.model.Genre
+import com.client.xvideos.l.theme.ThemeL
 
 @Composable
 fun AlbumDialogDeleteAlbum(pending: AlbumDetails, onDismiss: () -> Unit, onClick: () -> Unit) {
@@ -27,8 +27,7 @@ fun AlbumDialogDeleteAlbum(pending: AlbumDetails, onDismiss: () -> Unit, onClick
         title = {
             com.composeunstyled.Text(
                 "Удалить Альбом?",
-                fontWeight = FontWeight.Bold,
-                fontSize = 20.sp
+                style = ThemeL.Type.dialogTitle.copy(color = Color.Black, fontWeight = FontWeight.Bold)
             )
         },
         text = {
@@ -36,15 +35,15 @@ fun AlbumDialogDeleteAlbum(pending: AlbumDetails, onDismiss: () -> Unit, onClick
                 append("Удалить «")
                 withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) { append(pending.title) }
                 append("» из сохранённых?")
-            }, fontSize = 16.sp)
+            }, style = ThemeL.Type.dialogBody.copy(color = Color(0xFF474747)))
         },
 
         confirmButton = {
             TextButton( onClick = { onClick() } ) {
                 com.composeunstyled.Text(
                     "Удалить",
-                    fontSize = 16.sp,
-                    color = Color(0xFF6552A5)
+                    color = Color(0xFF6552A5),
+                    style = ThemeL.Type.button.copy(color = Color(0xFF6552A5))
                 )
             }
         },
@@ -52,8 +51,8 @@ fun AlbumDialogDeleteAlbum(pending: AlbumDetails, onDismiss: () -> Unit, onClick
             TextButton(onClick = { onDismiss() }) {
                 com.composeunstyled.Text(
                     "Отмена",
-                    fontSize = 16.sp,
-                    color = Color(0xFF6552A5)
+                    color = Color(0xFF6552A5),
+                    style = ThemeL.Type.button.copy(color = Color(0xFF6552A5))
                 )
             }
         },

@@ -28,11 +28,9 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.model.AlbumListFilter
 import com.client.xvideos.l.model.enum.AlbumType
@@ -43,14 +41,6 @@ import com.client.xvideos.l.ui.screens.screenAlbumList.molecule.filter.atom.Albu
 import com.client.xvideos.l.ui.screens.screenAlbumList.molecule.filter.atom.AlbumListFilterGenres
 import com.client.xvideos.l.ui.screens.screenAlbumList.molecule.filter.atom.AlbumListFilterSize
 import com.client.xvideos.l.ui.screens.screenAlbumList.molecule.filter.atom.AlbumListFilterTags
-
-private val style = TextStyle(
-    color = ThemeL.textColor,
-    fontWeight = FontWeight.Bold,
-    fontFamily = ThemeL.fontFamilyKarla,
-    fontSize = 18.sp
-)
-
 
 @Composable
 fun AlbumListFilter(
@@ -72,8 +62,10 @@ fun AlbumListFilter(
         Box( Modifier.fillMaxWidth().height(48.dp) )
         {
 
-            Text("Filters", color = ThemeL.textColor, fontFamily = ThemeL.fontFamilyKarla, fontSize = 22.sp,
-                fontWeight = FontWeight.Bold, modifier = Modifier.align(Alignment.CenterStart).padding(start = 4.dp, top = 2.dp)
+            Text("Filters",
+                color = ThemeL.textColor,
+                style = ThemeL.Type.screenTitle.copy(fontWeight = FontWeight.Bold),
+                modifier = Modifier.align(Alignment.CenterStart).padding(start = 4.dp, top = 2.dp)
             )
 
 //            Row(

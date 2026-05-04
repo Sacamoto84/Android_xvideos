@@ -14,18 +14,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.model.enum.ContentId
 
-private val style = TextStyle(
-    color = ThemeL.textColor,
-    //fontWeight = FontWeight.Bold,
-    fontFamily = ThemeL.fontFamilyKarla,
-    fontSize = 16.sp
-)
+private val style = ThemeL.Type.rowValue
 
 @Composable
 fun AlbumListFilterContentType(onStart: ContentId, onChange: (ContentId) -> Unit) {

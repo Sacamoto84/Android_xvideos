@@ -44,14 +44,11 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.client.xvideos.common.applock.AccessCodeVisualTransformation
 import com.client.xvideos.common.applock.AppLockRepository
 import com.client.xvideos.common.applock.AppLockSession
@@ -155,10 +152,7 @@ internal fun AppLockScreen(
             Text(
                 text = "Введите код доступа",
                 color = ThemeL.textColor,
-                fontSize = 28.sp,
-                fontWeight = FontWeight.SemiBold,
-                fontFamily = ThemeL.fontFamilyKarla,
-                textAlign = TextAlign.Center
+                style = ThemeL.Type.heroTitle.copy(textAlign = TextAlign.Center)
             )
             Spacer(Modifier.height(22.dp))
             OutlinedTextField(
@@ -177,7 +171,7 @@ internal fun AppLockScreen(
                     imeAction = ImeAction.Done
                 ),
                 keyboardActions = KeyboardActions(onDone = { if (password.isNotEmpty()) submit() }),
-                textStyle = TextStyle(color = Color.White),
+                textStyle = ThemeL.Type.body.copy(color = Color.White),
                 trailingIcon = {
                     IconButton(onClick = { showPassword = !showPassword }) {
                         Icon(
@@ -205,11 +199,9 @@ internal fun AppLockScreen(
             Spacer(Modifier.height(28.dp))
             Text(
                 text = "XVIDEOS",
-                color = Color.White,
                 modifier = Modifier.alpha(0.26f),
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Medium,
-                letterSpacing = 0.sp
+                color = Color.White,
+                style = ThemeL.Type.caption.copy(color = Color.White)
             )
         }
     }

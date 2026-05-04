@@ -33,7 +33,6 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.screens.common.bottomKeyboard.KeyboardNumber
@@ -104,9 +103,7 @@ fun AlbumListPageSelector(
             Text(
                 "Page ${page + 1} of $pageMax",
                 color = ThemeL.textColor,
-                fontFamily = ThemeL.fontFamilyKarla,
-                textAlign = TextAlign.Center,
-                fontSize = 18.sp,
+                style = ThemeL.Type.rowTitle.copy(textAlign = TextAlign.Center)
             )
         }
 

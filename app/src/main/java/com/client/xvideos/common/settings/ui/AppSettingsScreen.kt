@@ -53,13 +53,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
@@ -162,12 +159,7 @@ object AppSettingsScreen : Screen {
                         "Настройки",
                         modifier = Modifier.weight(1f),
                         color = ThemeL.textColor,
-                        style = TextStyle(
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 24.sp,
-                            fontFamily = ThemeL.fontFamilyKarla,
-                            textAlign = TextAlign.Center
-                        )
+                        style = ThemeL.Type.screenTitle.copy(textAlign = TextAlign.Center)
                     )
                     Spacer(Modifier.width(48.dp))
                 }
@@ -279,9 +271,7 @@ private fun SettingsSectionTitle(text: String) {
         text = text,
         modifier = Modifier.padding(start = 72.dp, top = 18.dp, bottom = 6.dp),
         color = SettingsRowTextSecondary,
-        fontSize = 13.sp,
-        fontWeight = FontWeight.Medium,
-        fontFamily = styleTextConfig.fontFamily
+        style = ThemeL.Type.sectionTitle.copy(color = SettingsRowTextSecondary)
     )
 }
 
@@ -315,17 +305,14 @@ private fun SettingsListItem(
             Text(
                 text = text,
                 color = ThemeL.textColor,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium,
-                fontFamily = styleTextConfig.fontFamily
+                style = ThemeL.Type.rowTitle
             )
             if (subtitle != null) {
                 Spacer(Modifier.height(2.dp))
                 Text(
                     text = subtitle,
                     color = SettingsRowTextSecondary,
-                    fontSize = 13.sp,
-                    fontFamily = styleTextConfig.fontFamily
+                    style = ThemeL.Type.rowSubtitle.copy(color = SettingsRowTextSecondary)
                 )
             }
         }
@@ -461,15 +448,12 @@ private fun StorageProgressRow(stat: StorageStat, progress: Float) {
                 Text(
                     text = stat.title,
                     color = ThemeL.textColor,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium,
-                    fontFamily = styleTextConfig.fontFamily
+                    style = ThemeL.Type.rowTitle
                 )
                 Text(
                     text = formatBytes(stat.sizeBytes),
                     color = SettingsRowTextSecondary,
-                    fontSize = 13.sp,
-                    fontFamily = styleTextConfig.fontFamily
+                    style = ThemeL.Type.rowSubtitle.copy(color = SettingsRowTextSecondary)
                 )
             }
             Spacer(Modifier.height(6.dp))
@@ -486,8 +470,7 @@ private fun StorageProgressRow(stat: StorageStat, progress: Float) {
             Text(
                 text = "${sectionSubtitle(stat.key)} • файлов: ${stat.fileCount}",
                 color = SettingsRowTextSecondary,
-                fontSize = 12.sp,
-                fontFamily = styleTextConfig.fontFamily
+                style = ThemeL.Type.caption.copy(color = SettingsRowTextSecondary)
             )
         }
     }
@@ -703,7 +686,7 @@ private fun AppLockPasswordDialog(
                 }
 
                 errorText?.let {
-                    Text(it, color = Color(0xFFFF7A7A), fontSize = 14.sp)
+                    Text(it, color = Color(0xFFFF7A7A), style = ThemeL.Type.dialogBody.copy(color = Color(0xFFFF7A7A)))
                 }
             }
         },
@@ -749,7 +732,7 @@ private fun PasswordSettingField(
             imeAction = ImeAction.Done
         ),
         keyboardActions = KeyboardActions(onDone = { onDone() }),
-        textStyle = TextStyle(color = Color.White)
+        textStyle = ThemeL.Type.body.copy(color = Color.White)
     )
 }
 

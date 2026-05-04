@@ -1,14 +1,6 @@
 package com.client.xvideos.common.settings.ui
 
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.unit.sp
-import com.client.xvideos.R
 import com.client.xvideos.l.theme.ThemeL
 
-val styleTextConfig = TextStyle(
-    fontSize = 20.sp,
-    color = ThemeL.textColor,
-    fontFamily = FontFamily(Font(R.font.dm_sans))
-)
+val styleTextConfig: TextStyle = ThemeL.Type.rowTitle

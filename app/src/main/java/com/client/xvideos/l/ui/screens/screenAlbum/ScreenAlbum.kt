@@ -76,6 +76,11 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
 
         val isDownloading = vm.downloader.isDownloading.collectAsStateWithLifecycle().value
 
+        val albumPicsDetails = album?.albumPicsDetails
+        val showInitialItemsLoading =
+            albumPicsDetails?.isPageRequestInFlight == true &&
+                    vm.host.filteredPic.isEmpty()
+
         LaunchedEffect(vm.showOnlyAnimated, parsed, album?.albumPicsDetails?.pics?.size) {
 
             Timber.d("!!! iiii ScreenLAlbum LaunchedEffect animated = ${vm.showOnlyAnimated} size:${album?.albumPicsDetails?.pics?.size}")
@@ -141,6 +146,7 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
             L_LazyRowPictureDetails(
                 host = vm.host,
                 expandMenu = ExpandMenuType.ALBUM,
+                showInitialLoading = showInitialItemsLoading,
                 itemBefore = {
                     Column(modifier = Modifier.padding(horizontal = 4.dp)) {
                         if (parsed != null) {
@@ -149,7 +155,7 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
                                 UrlImage( parsed.cover.url, modifier = Modifier.size(72.dp) )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Column {
-                                    Text( parsed.title, color = ThemeL.textColor, fontFamily = ThemeL.fontFamilyDMsanss )
+                                    Text(parsed.title, color = ThemeL.textColor, style = ThemeL.Type.rowTitle)
                                     Text( "${parsed.number_of_animated_pictures} gifs / ${parsed.number_of_pictures} pictures", color = ThemeL.textColor )
                                 }
                             }

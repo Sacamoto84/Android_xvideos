@@ -11,7 +11,7 @@ import com.client.xvideos.l.model.Audience
 @Composable
 fun AlbumInfoAudiences(parsed: AlbumDetails) {
     FlowRow {
-        Text("Audiences: ", color = ThemeL.textColor, fontFamily = ThemeL.fontFamilyKarla)
+        Text("Audiences: ", color = ThemeL.textColor, style = ThemeL.Type.rowTitle)
         parsed.audiences.forEachIndexed { index, item ->
             Text(
                 text = buildString {
@@ -19,7 +19,7 @@ fun AlbumInfoAudiences(parsed: AlbumDetails) {
                     if (index != parsed.audiences.lastIndex) append(",")
                 },
                 color = ThemeL.primaryColor,
-                fontFamily = ThemeL.fontFamilyKarla,
+                style = ThemeL.Type.rowValue.copy(color = ThemeL.primaryColor),
             )
             if (index != parsed.audiences.lastIndex) {
                 Text(" ", color = ThemeL.primaryColor)

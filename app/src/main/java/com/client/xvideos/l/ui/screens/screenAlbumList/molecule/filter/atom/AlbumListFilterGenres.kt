@@ -29,7 +29,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.model.AlbumListFilter
@@ -78,9 +77,7 @@ fun AlbumListFilterGenres(
                             val filter1 = filter.copy(genresPlus = plus)
                             onChange(filter1)
                         }),
-                    fontFamily = ThemeL.fontFamilyKarla,
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold
+                    style = ThemeL.Type.bodyLarge.copy(color = StyleGenresTags.colorSelectTextItem, fontWeight = FontWeight.Bold)
                 )
             }
 
@@ -102,9 +99,7 @@ fun AlbumListFilterGenres(
                             val filter1 = filter.copy(genresMinus = minus)
                             onChange(filter1)
                         }),
-                    fontFamily = ThemeL.fontFamilyKarla,
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold
+                    style = ThemeL.Type.bodyLarge.copy(color = StyleGenresTags.colorSelectTextItem, fontWeight = FontWeight.Bold)
                 )
             }
         }
@@ -163,9 +158,7 @@ fun AlbumListFilterGenres(
                                     Text(
                                         item.title,
                                         color = ThemeL.textColor,
-                                        fontFamily = ThemeL.fontFamilyKarla,
-                                        fontSize = 20.sp,
-                                        fontWeight = FontWeight.Bold
+                                        style = ThemeL.Type.rowTitle.copy(fontWeight = FontWeight.Bold)
                                     )
 
                                     Icon(
@@ -193,9 +186,7 @@ fun AlbumListFilterGenres(
                                 Text(
                                     count.toString(),
                                     color = ThemeL.textColor,
-                                    fontFamily = ThemeL.fontFamilyKarla,
-                                    fontSize = 22.sp,
-                                    fontWeight = FontWeight.Bold
+                                    style = ThemeL.Type.rowTitle.copy(fontWeight = FontWeight.Bold)
                                 )
                             }
 

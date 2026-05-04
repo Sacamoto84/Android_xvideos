@@ -19,8 +19,7 @@ fun AlbumInfoGreeting(parsed: AlbumDetails) {
         Text(
             "Genres: ",
             color = ThemeL.textColor,
-            fontFamily = ThemeL.fontFamilyKarla,
-            fontWeight = FontWeight.ExtraBold
+            style = ThemeL.Type.rowTitle.copy(fontWeight = FontWeight.ExtraBold)
         )
 
         parsed.genres.forEachIndexed { index, item ->
@@ -31,7 +30,7 @@ fun AlbumInfoGreeting(parsed: AlbumDetails) {
             Text(
                 text = s,
                 color = ThemeL.primaryColor,
-                fontFamily = ThemeL.fontFamilyKarla
+                style = ThemeL.Type.rowValue.copy(color = ThemeL.primaryColor)
             )
 
         }

@@ -24,9 +24,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.sp
 import com.client.xvideos.common.settings.ui.DialogButton
-import com.client.xvideos.common.settings.ui.styleTextConfig
 import com.client.xvideos.l.theme.ThemeL
 
 @Composable
@@ -81,7 +79,7 @@ fun ConfigTextAndButtonWithDialogL(
                     .background(ThemeL.grey4)
                     .clickable(onClick = { visible = true }), contentAlignment = Alignment.Center
             ) {
-                Text(value, style = styleTextConfig.copy(fontSize = 18.sp))
+                Text(value, style = ThemeL.Type.button)
             }
         }
     }

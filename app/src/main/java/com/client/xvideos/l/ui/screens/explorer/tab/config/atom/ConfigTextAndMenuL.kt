@@ -28,8 +28,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.client.xvideos.common.settings.ui.styleTextConfig
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.theme.ThemeL.ExpandMenu.backgroundColor
 import com.client.xvideos.l.theme.ThemeL.ExpandMenu.style
@@ -72,7 +70,7 @@ fun ConfigTextAndMenuL(
                     .menuAnchor(ExposedDropdownMenuAnchorType.SecondaryEditable),
                 onClick = { expanded = true }) {
                 Box(contentAlignment = Alignment.Center) {
-                    Text(value, style = styleTextConfig.copy(fontSize = 18.sp))
+                    Text(value, style = ThemeL.Type.button)
                 }
             }
 

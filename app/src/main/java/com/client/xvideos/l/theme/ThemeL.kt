@@ -4,9 +4,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.client.xvideos.R
-import com.client.xvideos.redgifs.common.ThemeRed
 
 object ThemeL {
 
@@ -55,18 +55,146 @@ object ThemeL {
     val fontFamilyPopinsBold = FontFamily(Font(R.font.poppins_bold))
     val fontFamilyPopinsExtraBold = FontFamily(Font(R.font.poppins_extrabold))
 
-    val fontFamilyDMsanss = FontFamily(Font(R.font.dm_sans))
+    val fontFamilyApp = FontFamily(Font(R.font.dm_sans))
 
-    val fontFamilyKarla = FontFamily(Font(R.font.karla))
+    val fontFamilyDMsanss = fontFamilyApp
+
+    val fontFamilyKarla = fontFamilyApp
+
+    object Type {
+        val screenTitle = TextStyle(
+            fontSize = 24.sp,
+            lineHeight = 30.sp,
+            color = textColor,
+            fontFamily = fontFamilyApp,
+            fontWeight = FontWeight.Medium,
+            letterSpacing = 0.sp
+        )
+
+        val heroTitle = TextStyle(
+            fontSize = 28.sp,
+            lineHeight = 34.sp,
+            color = textColor,
+            fontFamily = fontFamilyApp,
+            fontWeight = FontWeight.SemiBold,
+            letterSpacing = 0.sp
+        )
+
+        val sectionTitle = TextStyle(
+            fontSize = 13.sp,
+            lineHeight = 18.sp,
+            color = grey2,
+            fontFamily = fontFamilyApp,
+            fontWeight = FontWeight.Medium,
+            letterSpacing = 0.sp
+        )
+
+        val rowTitle = TextStyle(
+            fontSize = 16.sp,
+            lineHeight = 22.sp,
+            color = textColor,
+            fontFamily = fontFamilyApp,
+            fontWeight = FontWeight.Medium,
+            letterSpacing = 0.sp
+        )
+
+        val rowValue = TextStyle(
+            fontSize = 16.sp,
+            lineHeight = 22.sp,
+            color = textColor,
+            fontFamily = fontFamilyApp,
+            fontWeight = FontWeight.Normal,
+            letterSpacing = 0.sp
+        )
+
+        val rowSubtitle = TextStyle(
+            fontSize = 13.sp,
+            lineHeight = 18.sp,
+            color = grey2,
+            fontFamily = fontFamilyApp,
+            fontWeight = FontWeight.Normal,
+            letterSpacing = 0.sp
+        )
+
+        val body = TextStyle(
+            fontSize = 16.sp,
+            lineHeight = 22.sp,
+            color = textColor,
+            fontFamily = fontFamilyApp,
+            fontWeight = FontWeight.Normal,
+            letterSpacing = 0.sp
+        )
+
+        val bodyLarge = TextStyle(
+            fontSize = 18.sp,
+            lineHeight = 24.sp,
+            color = textColor,
+            fontFamily = fontFamilyApp,
+            fontWeight = FontWeight.Normal,
+            letterSpacing = 0.sp
+        )
+
+        val button = TextStyle(
+            fontSize = 16.sp,
+            lineHeight = 20.sp,
+            color = textColor,
+            fontFamily = fontFamilyApp,
+            fontWeight = FontWeight.Medium,
+            letterSpacing = 0.sp
+        )
+
+        val caption = TextStyle(
+            fontSize = 12.sp,
+            lineHeight = 16.sp,
+            color = grey2,
+            fontFamily = fontFamilyApp,
+            fontWeight = FontWeight.Normal,
+            letterSpacing = 0.sp
+        )
+
+        val mediaIndex = TextStyle(
+            fontSize = 12.sp,
+            lineHeight = 16.sp,
+            color = textColor,
+            fontFamily = fontFamilyApp,
+            fontWeight = FontWeight.Medium,
+            letterSpacing = 0.sp
+        )
+
+        val menuItem = TextStyle(
+            fontSize = 18.sp,
+            lineHeight = 24.sp,
+            color = textColor,
+            fontFamily = fontFamilyApp,
+            fontWeight = FontWeight.Normal,
+            letterSpacing = 0.sp
+        )
+
+        val dialogTitle = TextStyle(
+            fontSize = 18.sp,
+            lineHeight = 24.sp,
+            fontFamily = fontFamilyApp,
+            fontWeight = FontWeight.Medium,
+            letterSpacing = 0.sp
+        )
+
+        val dialogBody = TextStyle(
+            fontSize = 14.sp,
+            lineHeight = 20.sp,
+            fontFamily = fontFamilyApp,
+            fontWeight = FontWeight.Normal,
+            letterSpacing = 0.sp
+        )
+    }
 
     //--- Screen Config ---
-    val styleTextConfigL = TextStyle(fontSize = 20.sp, color = textColor, fontFamily = fontFamilyKarla)
+    val styleTextConfigL = Type.rowTitle
 
     //--- Expand Menu ---
     object ExpandMenu {
         val tintColor = Color(0xFF1F1F1F)  // Почти черный
         val backgroundColor = Color(0xFFFFFAF5)  // Теплый белый с кремовым оттенком
-        val style = TextStyle(  color = tintColor, fontFamily = ThemeRed.fontFamilyPopinsRegular, fontSize = 20.sp )
+        val style = Type.menuItem.copy(color = tintColor)
     }
 
 }

@@ -21,23 +21,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.client.xvideos.l.theme.ThemeL
 import com.composeunstyled.Disclosure
 import com.composeunstyled.DisclosureHeading
 import com.composeunstyled.DisclosurePanel
 import com.composeunstyled.rememberDisclosureState
 
-private val style = TextStyle(
-    color = ThemeL.textColor,
-    fontWeight = FontWeight.Bold,
-    fontFamily = ThemeL.fontFamilyKarla,
-    fontSize = 18.sp
-)
+private val style = ThemeL.Type.rowTitle.copy(fontWeight = FontWeight.Bold)
 
 @Composable
 fun DisclosureLayout(contentDisclosureHeading: String, contentDisclosurePanel: @Composable () -> Unit ) {

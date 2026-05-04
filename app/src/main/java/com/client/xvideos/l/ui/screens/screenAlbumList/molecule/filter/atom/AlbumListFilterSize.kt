@@ -28,20 +28,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.model.enum.PictureCountRank
 import com.client.xvideos.redgifs.common.ThemeRed
 
-private val style = TextStyle(
-    color = ThemeL.textColor,
-    fontWeight = FontWeight.Bold,
-    fontFamily = ThemeL.fontFamilyKarla,
-    fontSize = 18.sp
-)
+private val style = ThemeL.Type.rowTitle.copy(fontWeight = FontWeight.Bold)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -90,12 +83,7 @@ fun AlbumListFilterSize(value: PictureCountRank, onChanged: (PictureCountRank) -
                     a,
                     modifier = Modifier.padding(start = 8.dp),
                     maxLines = 1,
-                    style = TextStyle(
-                        color = ThemeL.textColor,
-                        fontFamily = ThemeL.fontFamilyKarla,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                    style = ThemeL.Type.rowTitle.copy(fontWeight = FontWeight.Bold)
                 )
                 Icon(
                     Icons.Default.ArrowDropDown,
@@ -116,8 +104,7 @@ fun AlbumListFilterSize(value: PictureCountRank, onChanged: (PictureCountRank) -
                             Text(
                                 item,
                                 color = ThemeL.textColor,
-                                fontFamily = ThemeL.fontFamilyKarla,
-                                fontSize = 16.sp
+                                style = ThemeL.Type.rowValue
                             )
                         },
                         onClick = {

@@ -33,7 +33,7 @@ fun AlbumInfoTags(parsed: AlbumDetails, onClick: (String) -> Unit) {
                     .padding(4.dp)
                     .clickable(onClick = {onClick(it.text) }),
                 color = ThemeL.textColor,
-                fontFamily = ThemeL.fontFamilyKarla
+                style = ThemeL.Type.caption.copy(color = ThemeL.textColor)
             )
         }
     }

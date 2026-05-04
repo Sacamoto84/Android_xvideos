@@ -9,10 +9,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
@@ -42,7 +45,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.model.screenModelScope
@@ -88,7 +90,8 @@ fun L_LazyRowPictureDetails(
     host: LazyRowPictureDetailsHost,
     itemBefore: @Composable () -> Unit = {},
     expandMenu: ExpandMenuType,
-    tag: String = ""
+    tag: String = "",
+    showInitialLoading: Boolean = false
 ) {
     val expandMenuViewModel: ExpandMenuViewModel = hiltViewModel()
     val navigator = LocalNavigator.currentOrThrow
@@ -113,6 +116,12 @@ fun L_LazyRowPictureDetails(
         ) {
 
             item(span = StaggeredGridItemSpan.FullLine) { itemBefore() }
+
+            if (showInitialLoading) {
+                item(span = StaggeredGridItemSpan.FullLine) {
+                    InitialPictureItemsLoading()
+                }
+            }
 
             itemsIndexed( host.filteredPic, key = { index, item -> item.url_to_original ?: index } )
             { index, item ->
@@ -210,7 +219,9 @@ fun L_LazyRowPictureDetails(
 
                         Text(
                             index.toString(),
-                            modifier = Modifier.padding(start = 4.dp).align(Alignment.TopStart), color = ThemeL.textColor, fontFamily = ThemeL.fontFamilyKarla, fontSize = 14.sp
+                            modifier = Modifier.padding(start = 4.dp).align(Alignment.TopStart),
+                            color = ThemeL.textColor,
+                            style = ThemeL.Type.mediaIndex
                         )
 
                         Box(modifier = Modifier.align(Alignment.TopEnd)) { expandMenuViewModel.ExpandMenu( expandMenu, item, host.albumName ) }
@@ -236,6 +247,26 @@ fun L_LazyRowPictureDetails(
             }
         }
 
+    }
+}
+
+@Composable
+private fun InitialPictureItemsLoading() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 44.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            CircularProgressIndicator(color = ThemeL.g0)
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                text = "Загрузка элементов...",
+                color = ThemeL.textColor,
+                style = ThemeL.Type.rowSubtitle
+            )
+        }
     }
 }
 

@@ -31,10 +31,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.model.albumFilterDisplay
 import com.client.xvideos.redgifs.common.ThemeRed
@@ -86,11 +84,7 @@ fun AlbumFilterDisplay(startString: String, onRequestApply: (String) -> Unit) {
                     selected.primary,
                     modifier = Modifier.padding(start = 4.dp),
                     maxLines = 1,
-                    style = TextStyle(
-                        color = ThemeL.textColor,
-                        fontFamily = ThemeL.fontFamilyKarla,
-                        fontSize = 16.sp
-                    )
+                    style = ThemeL.Type.rowValue
                 )
                 Icon(
                     Icons.Default.ArrowDropDown,
@@ -110,8 +104,7 @@ fun AlbumFilterDisplay(startString: String, onRequestApply: (String) -> Unit) {
                             Text(
                                 item,
                                 color = ThemeL.textColor,
-                                fontFamily = ThemeL.fontFamilyKarla,
-                                fontSize = 16.sp
+                                style = ThemeL.Type.rowValue
                             )
                         },
                         onClick = {
@@ -147,11 +140,7 @@ fun AlbumFilterDisplay(startString: String, onRequestApply: (String) -> Unit) {
                     selected.secondary,
                     modifier = Modifier.padding(start = 4.dp),
                     maxLines = 1,
-                    style = TextStyle(
-                        color = ThemeL.textColor,
-                        fontFamily = ThemeL.fontFamilyKarla,
-                        fontSize = 16.sp
-                    )
+                    style = ThemeL.Type.rowValue
                 )
                 Icon(
                     Icons.Default.ArrowDropDown,
@@ -172,8 +161,7 @@ fun AlbumFilterDisplay(startString: String, onRequestApply: (String) -> Unit) {
                             Text(
                                 item.secondary,
                                 color = ThemeL.textColor,
-                                fontFamily = ThemeL.fontFamilyKarla,
-                                fontSize = 16.sp,
+                                style = ThemeL.Type.rowValue,
                                 maxLines = 1
                             )
                         },
@@ -200,7 +188,7 @@ fun AlbumFilterDisplay(startString: String, onRequestApply: (String) -> Unit) {
                 .clickable(onClick = { onRequestApply(selected.request) }),
             contentAlignment = Alignment.Center
         ) {
-            Text("Apply", color = Color.White, fontSize = 20.sp)
+            Text("Apply", color = Color.White, style = ThemeL.Type.button.copy(color = Color.White))
         }
     }
 

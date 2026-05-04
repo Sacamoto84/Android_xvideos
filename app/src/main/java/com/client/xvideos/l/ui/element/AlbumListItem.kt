@@ -20,7 +20,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.client.xvideos.common.coil.UrlImage
 import com.client.xvideos.l.theme.ThemeL
 
@@ -60,10 +59,9 @@ fun AlbumListItem(
                 title.removePrefix(" "),
                 modifier = Modifier.padding(horizontal = 4.dp),
                 color = Color.White,
-                fontFamily = ThemeL.fontFamilyKarla,
+                style = ThemeL.Type.rowTitle.copy(color = Color.White),
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                fontSize = 16.sp
+                overflow = TextOverflow.Ellipsis
             )
 
             Row( Modifier.padding(start = 4.dp).fillMaxWidth() )
@@ -81,8 +79,7 @@ fun AlbumListItem(
                     str.toString(),
                     modifier = Modifier,
                     color = ThemeL.textColor,
-                    fontFamily = ThemeL.fontFamilyKarla,
-                    fontSize = 14.sp
+                    style = ThemeL.Type.rowSubtitle
                 )
             }
         }

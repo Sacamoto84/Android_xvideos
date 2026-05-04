@@ -30,7 +30,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.model.AlbumListFilter
 import com.client.xvideos.l.net.AlbumListFilterGenreCountResponse
@@ -70,9 +69,7 @@ fun AlbumListFilterTags(
                             val filter1 = filter.copy(tagPlus = plus)
                             onChange(filter1)
                         }),
-                    fontFamily = ThemeL.fontFamilyKarla,
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold
+                    style = ThemeL.Type.bodyLarge.copy(color = StyleGenresTags.colorSelectTextItem, fontWeight = FontWeight.Bold)
                 )
             }
 
@@ -95,9 +92,7 @@ fun AlbumListFilterTags(
                             val filter1 = filter.copy(tagMinus = minus)
                             onChange(filter1)
                         }),
-                    fontFamily = ThemeL.fontFamilyKarla,
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold
+                    style = ThemeL.Type.bodyLarge.copy(color = StyleGenresTags.colorSelectTextItem, fontWeight = FontWeight.Bold)
                 )
             }
         }
@@ -149,7 +144,7 @@ fun AlbumListFilterTags(
 
 
 
-                                    Text( item, color = ThemeL.textColor, fontFamily = ThemeL.fontFamilyKarla, fontSize = 20.sp, fontWeight = FontWeight.Bold )
+                                    Text(item, color = ThemeL.textColor, style = ThemeL.Type.rowTitle.copy(fontWeight = FontWeight.Bold))
 
                                     Icon(
                                         Icons.Default.Remove,
@@ -172,7 +167,7 @@ fun AlbumListFilterTags(
                                 }
 
                                 val count = filterTagStateCount.find { it1 -> it1.term == item }?.count ?: -1
-                                Text( count.toString(), color = ThemeL.textColor, fontFamily = ThemeL.fontFamilyKarla,  fontSize = 22.sp, fontWeight = FontWeight.Bold )
+                                Text(count.toString(), color = ThemeL.textColor, style = ThemeL.Type.rowTitle.copy(fontWeight = FontWeight.Bold))
 
                             }
 

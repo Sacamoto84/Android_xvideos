@@ -24,12 +24,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.screen.Screen
@@ -129,12 +126,7 @@ private fun ScreenLConfigTabContent(
         Text(
             "Настройки",
             color = ThemeL.textColor,
-            style = TextStyle(
-                fontWeight = FontWeight.Medium,
-                fontSize = 24.sp,
-                fontFamily = ThemeL.fontFamilyKarla,
-                textAlign = TextAlign.Center
-            ),
+            style = ThemeL.Type.screenTitle.copy(textAlign = TextAlign.Center),
             modifier = Modifier.fillMaxWidth()
         )
         HorizontalDivider(color = Color.DarkGray)
@@ -191,7 +183,7 @@ private fun ScreenLConfigTabContent(
         ) {
             Text(
                 versionText,
-                style = ThemeL.styleTextConfigL.copy(fontSize = 14.sp, color = ThemeL.grey2)
+                style = ThemeL.Type.caption.copy(color = ThemeL.grey2)
             )
         }
     }

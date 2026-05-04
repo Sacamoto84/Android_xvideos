@@ -37,12 +37,12 @@ fun AlbumInfoButtonSaveAlbum(saved: Boolean, onClick : ()->Unit) {
         if (!saved) Text(
             "Save Album",
             color = Color.White,
-            fontFamily = ThemeL.fontFamilyKarla
+            style = ThemeL.Type.button.copy(color = Color.White)
         )
         else Text(
             "Remove Album",
             color = Color.White,
-            fontFamily = ThemeL.fontFamilyKarla
+            style = ThemeL.Type.button.copy(color = Color.White)
         )
     }
 

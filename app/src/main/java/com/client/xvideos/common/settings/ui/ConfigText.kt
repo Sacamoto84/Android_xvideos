@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.client.xvideos.l.theme.ThemeL
 
 /**
  * Отображает строку конфигурации с меткой и значением.
@@ -25,7 +26,7 @@ fun ConfigText(text: String, value: String) {
         horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically
     ) {
         Text(text, style = styleTextConfig)
-        Text(value, style = styleTextConfig)
+        Text(value, style = ThemeL.Type.rowValue)
     }
 }
 

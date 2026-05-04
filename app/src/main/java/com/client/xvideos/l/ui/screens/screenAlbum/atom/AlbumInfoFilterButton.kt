@@ -25,7 +25,7 @@ fun AlbumInfoFilterButton(parsed: AlbumDetails?, checked : Boolean, onCheckedCha
         Text(
             "Show only animated",
             color = ThemeL.textColor,
-            fontFamily = ThemeL.fontFamilyKarla
+            style = ThemeL.Type.rowTitle
         )
         Spacer(modifier = Modifier.width(4.dp))
         Switch(
