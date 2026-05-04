@@ -6,8 +6,10 @@ import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.os.Build
 import android.os.Bundle
+import android.view.View
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -32,6 +34,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,11 +53,14 @@ import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.lifecycle.lifecycleScope
 import cafe.adriel.voyager.core.annotation.ExperimentalVoyagerApi
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.PermissionScreenActivity.PermissionStorage
+import com.client.xvideos.common.applock.AppLockRepository
+import com.client.xvideos.common.applock.AppLockSession
 import com.client.xvideos.common.settings.ui.AppSettingsScreen
 import com.client.xvideos.common.util.KeepScreenOn
 import com.client.xvideos.l.ui.screens.explorer.L_ScreenExplorer
@@ -61,6 +70,8 @@ import com.client.xvideos.screens.dashboards.ScreenXDashBoards
 import com.client.xvideos.screens.videoplayer.video.cache.VideoPlayerCacheManager
 import com.client.xvideos.ui.theme.XvideosTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 /**
  * Базовый URL для стартовой точки работы с основным сайтом.
@@ -79,6 +90,10 @@ const val urlStart = "https://www.xv-ru.com"
 @AndroidEntryPoint
 class MainActivity : ComponentActivity()//, ImageLoaderFactory
 {
+
+    companion object {
+        internal const val EXTRA_REQUIRE_APP_LOCK = "com.client.xvideos.EXTRA_REQUIRE_APP_LOCK"
+    }
 
     /**
      * Инициализирует окно, скрывает системные панели, проверяет разрешения
@@ -109,11 +124,22 @@ class MainActivity : ComponentActivity()//, ImageLoaderFactory
             intent.setFlags(FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
             startActivity(intent)
             finish()
+            return
         }
 
-        VideoPlayerCacheManager.initialize(this, 1024 * 1024 * 1024)    // 1GB
+        val shouldShowAppLock = intent.getBooleanExtra(EXTRA_REQUIRE_APP_LOCK, false) &&
+                AppLockRepository.shouldShowLock(this)
+        if (shouldShowAppLock) {
+            window.decorView.importantForAutofill = View.IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS
+        }
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            VideoPlayerCacheManager.initialize(applicationContext, 1024L * 1024L * 1024L)
+        }
 
         setContent {
+            var isAppLocked by rememberSaveable { mutableStateOf(shouldShowAppLock) }
+
             KeepScreenOn()
             XvideosTheme(darkTheme = true) {
                 //EdgeToEdgeFix()
@@ -133,7 +159,24 @@ class MainActivity : ComponentActivity()//, ImageLoaderFactory
 //                    Navigator(MenuScreen, key = "root_navigator") { navigator ->
 //                        CurrentScreen()
 //                    }
-                    ScreenRoot.Content()
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        ScreenRoot.Content()
+
+                        if (isAppLocked) {
+                            BackHandler { moveTaskToBack(true) }
+                            AppLockScreen(
+                                onUnlock = { password ->
+                                    if (AppLockRepository.verifyPassword(this@MainActivity, password)) {
+                                        AppLockSession.unlock()
+                                        isAppLocked = false
+                                        true
+                                    } else {
+                                        false
+                                    }
+                                }
+                            )
+                        }
+                    }
 
                 }
             }

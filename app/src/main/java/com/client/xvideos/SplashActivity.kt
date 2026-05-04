@@ -6,6 +6,8 @@ import androidx.activity.ComponentActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import com.client.xvideos.PermissionScreenActivity.PermissionStorage
+import com.client.xvideos.common.applock.AppLockRepository
+import com.client.xvideos.common.applock.AppLockSession
 import com.client.xvideos.common.room.AppDatabase
 import com.client.xvideos.redgifs.common.block.BlockRed
 import com.client.xvideos.redgifs.common.saved.SavedRed
@@ -60,8 +62,13 @@ class SplashActivity : ComponentActivity() {
                 initApp()
             }
             isReady = true
-            // когда закончили — запускаем MainActivity
-            startActivity(Intent(this@SplashActivity, MainActivity::class.java))
+            if (AppLockRepository.isEnabled(this@SplashActivity)) {
+                AppLockSession.lock()
+            }
+            val shouldShowLock = AppLockRepository.shouldShowLock(this@SplashActivity)
+            val intent = Intent(this@SplashActivity, MainActivity::class.java)
+                .putExtra(MainActivity.EXTRA_REQUIRE_APP_LOCK, shouldShowLock)
+            startActivity(intent)
             overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
             finish()
         }

@@ -1,5 +1,6 @@
 package com.client.xvideos.common.settings.ui
 
+import android.view.View
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,20 +13,28 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -33,8 +42,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -44,6 +57,7 @@ import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.client.xvideos.common.applock.AppLockRepository
 import com.client.xvideos.common.coil.CoilImageLoaderFactory
 import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.common.snackbar.SnackBar
@@ -53,6 +67,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.roundToInt
+
+private enum class AppLockDialogMode {
+    SET,
+    CHANGE,
+    DISABLE
+}
 
 object AppSettingsScreen : Screen {
 
@@ -117,6 +137,10 @@ object AppSettingsScreen : Screen {
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
             ) {
+                HorizontalDivider(color = Color.DarkGray)
+
+                AppLockSettingsSection()
+
                 HorizontalDivider(color = Color.DarkGray)
 
                 IntSliderSetting(
@@ -187,6 +211,241 @@ object AppSettingsScreen : Screen {
             }
         }
     }
+}
+
+@Composable
+private fun AppLockSettingsSection() {
+    val context = LocalContext.current.applicationContext
+    val appLockEnabled = Settings.app_lock_enabled.field.collectAsStateWithLifecycle().value
+    var passwordSet by remember { mutableStateOf(AppLockRepository.isPasswordSet(context)) }
+    var dialogMode by remember { mutableStateOf<AppLockDialogMode?>(null) }
+    val enabled = appLockEnabled && passwordSet
+
+    LaunchedEffect(appLockEnabled, passwordSet) {
+        if (appLockEnabled && !passwordSet) {
+            Settings.app_lock_enabled.setValue(false)
+        }
+    }
+
+    dialogMode?.let { mode ->
+        AppLockPasswordDialog(
+            mode = mode,
+            onDismiss = { dialogMode = null },
+            onComplete = {
+                passwordSet = AppLockRepository.isPasswordSet(context)
+                dialogMode = null
+            }
+        )
+    }
+
+    Column(
+        modifier = Modifier
+            .padding(horizontal = 8.dp)
+            .padding(vertical = 10.dp)
+            .fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text("Пароль при запуске", style = styleTextConfig.copy(color = ThemeL.textColor))
+                Text(
+                    if (enabled) "Включён" else "Выключен",
+                    style = styleTextConfig.copy(
+                        color = if (enabled) Color(0xFFFFE800) else Color.Gray,
+                        fontSize = 14.sp
+                    )
+                )
+            }
+            Button(
+                onClick = { dialogMode = if (enabled) AppLockDialogMode.CHANGE else AppLockDialogMode.SET }
+            ) {
+                Text(if (enabled) "Изменить" else "Задать")
+            }
+        }
+
+        if (enabled) {
+            TextButton(
+                onClick = { dialogMode = AppLockDialogMode.DISABLE },
+                modifier = Modifier.align(Alignment.End)
+            ) {
+                Text("Отключить", color = Color(0xFFFF7A7A))
+            }
+        }
+    }
+}
+
+@Composable
+private fun AppLockPasswordDialog(
+    mode: AppLockDialogMode,
+    onDismiss: () -> Unit,
+    onComplete: () -> Unit
+) {
+    DisableAutofillForCurrentView()
+
+    val context = LocalContext.current.applicationContext
+    var currentPassword by remember { mutableStateOf("") }
+    var newPassword by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
+    var errorText by remember { mutableStateOf<String?>(null) }
+
+    val needsCurrentPassword = mode == AppLockDialogMode.CHANGE || mode == AppLockDialogMode.DISABLE
+    val needsNewPassword = mode == AppLockDialogMode.SET || mode == AppLockDialogMode.CHANGE
+    val canSubmit = when (mode) {
+        AppLockDialogMode.SET -> newPassword.length >= 4 && confirmPassword.isNotBlank()
+        AppLockDialogMode.CHANGE -> currentPassword.isNotBlank() && newPassword.length >= 4 && confirmPassword.isNotBlank()
+        AppLockDialogMode.DISABLE -> currentPassword.isNotBlank()
+    }
+
+    fun submit() {
+        errorText = null
+
+        if (needsCurrentPassword && !AppLockRepository.verifyPassword(context, currentPassword)) {
+            errorText = "Текущий пароль не подходит"
+            return
+        }
+
+        if (needsNewPassword && newPassword != confirmPassword) {
+            errorText = "Пароли не совпадают"
+            return
+        }
+
+        when (mode) {
+            AppLockDialogMode.SET -> {
+                AppLockRepository.setPassword(context, newPassword).onSuccess {
+                    SnackBar.success("Пароль включён")
+                    onComplete()
+                }.onFailure {
+                    errorText = it.message ?: "Не удалось сохранить пароль"
+                }
+            }
+            AppLockDialogMode.CHANGE -> {
+                AppLockRepository.setPassword(context, newPassword).onSuccess {
+                    SnackBar.success("Пароль изменён")
+                    onComplete()
+                }.onFailure {
+                    errorText = it.message ?: "Не удалось изменить пароль"
+                }
+            }
+            AppLockDialogMode.DISABLE -> {
+                AppLockRepository.clearPassword(context)
+                SnackBar.success("Пароль отключён")
+                onComplete()
+            }
+        }
+    }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = ThemeL.greyBackground,
+        title = {
+            Text(
+                when (mode) {
+                    AppLockDialogMode.SET -> "Задать пароль"
+                    AppLockDialogMode.CHANGE -> "Изменить пароль"
+                    AppLockDialogMode.DISABLE -> "Отключить пароль"
+                },
+                color = ThemeL.textColor
+            )
+        },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                if (needsCurrentPassword) {
+                    PasswordSettingField(
+                        value = currentPassword,
+                        onValueChange = {
+                            currentPassword = it
+                            errorText = null
+                        },
+                        label = "Текущий код доступа",
+                        onDone = { if (canSubmit) submit() }
+                    )
+                }
+
+                if (needsNewPassword) {
+                    PasswordSettingField(
+                        value = newPassword,
+                        onValueChange = {
+                            newPassword = it
+                            errorText = null
+                        },
+                        label = "Новый код доступа",
+                        onDone = { if (canSubmit) submit() }
+                    )
+                    PasswordSettingField(
+                        value = confirmPassword,
+                        onValueChange = {
+                            confirmPassword = it
+                            errorText = null
+                        },
+                        label = "Повтор кода доступа",
+                        onDone = { if (canSubmit) submit() }
+                    )
+                }
+
+                errorText?.let {
+                    Text(it, color = Color(0xFFFF7A7A), fontSize = 14.sp)
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(
+                enabled = canSubmit,
+                onClick = { submit() }
+            ) {
+                Text(
+                    when (mode) {
+                        AppLockDialogMode.DISABLE -> "Отключить"
+                        else -> "Сохранить"
+                    }
+                )
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Отмена")
+            }
+        }
+    )
+}
+
+@Composable
+private fun DisableAutofillForCurrentView() {
+    val view = LocalView.current
+
+    DisposableEffect(view) {
+        val previous = view.importantForAutofill
+        view.importantForAutofill = View.IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS
+
+        onDispose {
+            view.importantForAutofill = previous
+        }
+    }
+}
+
+@Composable
+private fun PasswordSettingField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    onDone: () -> Unit
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        modifier = Modifier.fillMaxWidth(),
+        label = { Text(label) },
+        singleLine = true,
+        visualTransformation = PasswordVisualTransformation(),
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Text,
+            imeAction = ImeAction.Done
+        ),
+        keyboardActions = KeyboardActions(onDone = { onDone() }),
+        textStyle = TextStyle(color = Color.White)
+    )
 }
 
 @Composable

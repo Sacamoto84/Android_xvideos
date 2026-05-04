@@ -28,7 +28,8 @@ import java.io.File
  */
 object VideoPlayerCacheManager {
 
-    private lateinit var cacheInstance: Cache
+    @Volatile
+    private var cacheInstance: Cache? = null
 
     /**
      * Set the cache for video player.
@@ -38,8 +39,9 @@ object VideoPlayerCacheManager {
      * @param maxCacheBytes Sets the maximum cache capacity in bytes. If the cache builds up as much as the set capacity, it is deleted from the oldest cache.
      */
     @SuppressLint("UnsafeOptInUsageError")
+    @Synchronized
     fun initialize(context: Context, maxCacheBytes: Long) {
-        if (VideoPlayerCacheManager::cacheInstance.isInitialized) {
+        if (cacheInstance != null) {
             return
         }
 
@@ -53,10 +55,5 @@ object VideoPlayerCacheManager {
     /**
      * Gets the ExoPlayer cache instance. If null, the cache to be disabled.
      */
-    internal fun getCache(): Cache? =
-        if (VideoPlayerCacheManager::cacheInstance.isInitialized) {
-            cacheInstance
-        } else {
-            null
-        }
+    internal fun getCache(): Cache? = cacheInstance
 }

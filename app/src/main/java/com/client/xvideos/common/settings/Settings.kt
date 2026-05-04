@@ -40,6 +40,8 @@ object Settings {
 
     val image_cache_disk_size_mb by lazy { SettingElementInt(pref, "image_cache_disk_size_mb", 500) }
 
+    val app_lock_enabled by lazy { SettingElementBoolean(pref, "app_lock_enabled", false) }
+
 
     //-- red ---
 
