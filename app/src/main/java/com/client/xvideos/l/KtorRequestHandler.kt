@@ -1,7 +1,7 @@
 package com.client.xvideos.l
 
 import com.client.xvideos.l.net.Luscious.Companion.LOGIN
-import com.github.javafaker.Faker
+import com.client.xvideos.common.net.UserAgentProvider
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.okhttp.OkHttp
@@ -37,8 +37,7 @@ class KtorRequestHandler(
     username: String? = null,
     password: String? = null
 ) {
-    private val faker = Faker()
-    private val userAgent = faker.internet().userAgentAny()
+    private val userAgent = UserAgentProvider.randomDesktopBrowser()
     private var username: String? = username
     private var password: String? = password
 

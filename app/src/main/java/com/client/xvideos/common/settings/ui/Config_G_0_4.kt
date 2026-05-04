@@ -25,10 +25,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.client.xvideos.common.json.JsonTypes
 import com.client.xvideos.common.settings.element.SettingElementList
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.composeunstyled.Text
-import com.google.common.reflect.TypeToken
 import com.skydoves.compose.stability.runtime.TraceRecomposition
 
 @Composable
@@ -123,7 +123,7 @@ fun PreviewConfig_G_0_4() {
         SettingElementList<Boolean>(
             sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context),
             name = "l_likesTab_G_0_4",
-            typeToken = object : TypeToken<List<Boolean>>() {}.type,
+            typeToken = JsonTypes.listOf(Boolean::class.javaObjectType),
             default = listOf(false, true, true, true, true)
         )
     }

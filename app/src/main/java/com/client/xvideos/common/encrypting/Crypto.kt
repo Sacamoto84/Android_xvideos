@@ -1,6 +1,6 @@
 package com.client.xvideos.common.encrypting
 
-import com.github.javafaker.Faker
+import com.client.xvideos.common.net.UserAgentProvider
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.HttpRequestRetry
@@ -175,7 +175,7 @@ object Crypto {
             defaultRequest {
                 requestHeaders.forEach { (key, value) -> headers.append(key, value) }
                 if (!requestHeaders.containsKey("User-Agent")) {
-                    headers.append("User-Agent", Faker().internet().userAgentAny())
+                    headers.append("User-Agent", UserAgentProvider.randomDesktopBrowser())
                 }
             }
 

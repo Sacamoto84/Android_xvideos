@@ -2,12 +2,12 @@ package com.client.xvideos.common.settings
 
 import android.content.SharedPreferences
 import com.client.xvideos.App
+import com.client.xvideos.common.json.JsonTypes
 import com.client.xvideos.common.settings.element.SettingElementBoolean
 import com.client.xvideos.common.settings.element.SettingElementInt
 import com.client.xvideos.common.settings.element.SettingElementList
 import com.client.xvideos.common.settings.element.SettingElementString
 import com.client.xvideos.l.model.ThumbnailsSize
-import com.google.common.reflect.TypeToken
 
 //data class DC_galleryCount(var g0: Boolean, var g1: Boolean, var g2: Boolean, var g3: Boolean, var g4: Boolean )
 
@@ -46,7 +46,7 @@ object Settings {
     //-- red ---
 
 
-    val r_explorerGifsTab_G_0_4 by lazy {  SettingElementList<Boolean>( pref, "r_explorerGifsTab_G_0_4",  typeToken = object : TypeToken<List<Boolean>>() {}.type , default = listOf(false, true, true, true, true))  }
+    val r_explorerGifsTab_G_0_4 by lazy {  SettingElementList<Boolean>( pref, "r_explorerGifsTab_G_0_4",  typeToken = JsonTypes.listOf(Boolean::class.javaObjectType) , default = listOf(false, true, true, true, true))  }
 
 
     /**
@@ -61,7 +61,7 @@ object Settings {
     /**
      * Количество столбиков в R Saved Likes Tab T 1 2 3 4
      */
-    val r_likesTab_G_0_4 by lazy {  SettingElementList( pref, "r_likesTab_G_0_4",  typeToken = object : TypeToken<List<Boolean>>() {}.type , default = listOf(false, true, true, true, true))  }
+    val r_likesTab_G_0_4 by lazy {  SettingElementList( pref, "r_likesTab_G_0_4",  typeToken = JsonTypes.listOf(Boolean::class.javaObjectType) , default = listOf(false, true, true, true, true))  }
 
     /**
      * Текущее количество столбиков в R Saved Likes Tab
@@ -76,7 +76,7 @@ object Settings {
     /**
      * Количество столбиков в R Saved Collection Tab T 1 2 3 4
      */
-    val r_collectionTab_G_0_4 by lazy {  SettingElementList( pref, "r_collectionTab_G_0_4",  typeToken = object : TypeToken<List<Boolean>>() {}.type , default = listOf(false, true, true, true, true))  }
+    val r_collectionTab_G_0_4 by lazy {  SettingElementList( pref, "r_collectionTab_G_0_4",  typeToken = JsonTypes.listOf(Boolean::class.javaObjectType) , default = listOf(false, true, true, true, true))  }
 
     /**
      * Текущее количество столбиков в R Saved Collection Tab
@@ -113,7 +113,7 @@ object Settings {
     /**
      * Количество столбиков в L Gifs Tab T 1 2 3 4
      */
-    val l_gifsTab_G_0_4 by lazy {  SettingElementList<Boolean>( pref, "l_gifsTab_G_0_4",  typeToken = object : TypeToken<List<Boolean>>() {}.type , default = listOf(false, true, true, true, true))  }
+    val l_gifsTab_G_0_4 by lazy {  SettingElementList<Boolean>( pref, "l_gifsTab_G_0_4",  typeToken = JsonTypes.listOf(Boolean::class.javaObjectType) , default = listOf(false, true, true, true, true))  }
 
 
     /**
@@ -126,7 +126,7 @@ object Settings {
     /**
      * Количество столбиков в L Likes Tab T 1 2 3 4
      */
-    val l_likesTab_G_0_4 by lazy {  SettingElementList<Boolean>( pref, "l_likesTab_G_0_4",  typeToken = object : TypeToken<List<Boolean>>() {}.type , default = listOf(false, true, true, true, true))  }
+    val l_likesTab_G_0_4 by lazy {  SettingElementList<Boolean>( pref, "l_likesTab_G_0_4",  typeToken = JsonTypes.listOf(Boolean::class.javaObjectType) , default = listOf(false, true, true, true, true))  }
 
     /**
      * Текущее количество столбиков в L Likes Tab
@@ -136,7 +136,7 @@ object Settings {
     /**
      * Количество столбиков в L Likes Tab T 1 2 3 4
      */
-    val l_cryptoTab_G_0_4 by lazy {  SettingElementList<Boolean>( pref, "l_cryptoTab_G_0_4",  typeToken = object : TypeToken<List<Boolean>>() {}.type , default = listOf(false, true, true, true, true))  }
+    val l_cryptoTab_G_0_4 by lazy {  SettingElementList<Boolean>( pref, "l_cryptoTab_G_0_4",  typeToken = JsonTypes.listOf(Boolean::class.javaObjectType) , default = listOf(false, true, true, true, true))  }
 
     /**
      * Текущее количество столбиков в L Crypto Tab

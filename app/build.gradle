@@ -130,8 +130,6 @@ dependencies {
     implementation(libs.compose.zoom)
     implementation libs.compose.extended.gestures
 
-    implementation(libs.javafaker)
-
     implementation libs.androidx.activity.ktx
     implementation libs.androidx.lifecycle.viewmodel.compose
     implementation libs.androidx.hilt.navigation.compose
