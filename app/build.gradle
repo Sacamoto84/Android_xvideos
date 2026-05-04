@@ -57,8 +57,8 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled = false
-            //shrinkResources true
+            minifyEnabled = true
+            shrinkResources = true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig = signingConfigs.debug
         }
@@ -152,7 +152,6 @@ dependencies {
     implementation libs.androidx.material3
 
     implementation libs.androidx.storage
-    implementation libs.androidx.datastore.core.android
     implementation libs.volley
     implementation libs.androidx.animation.core
     implementation libs.ui
@@ -289,9 +288,6 @@ dependencies {
 
     implementation(libs.core)
 
-    implementation libs.androidx.datastore.preferences
-    implementation libs.androidx.datastore.core
-
 //    implementation("org.seleniumhq.selenium:selenium-java:4.15.0")
 //    implementation("org.seleniumhq.selenium:selenium-chrome-driver:4.15.0")
 
@@ -337,10 +333,6 @@ dependencies {
     //implementation(libs.ksafe)
     //implementation(libs.ksafe.compose)
 
-    // Source: https://mvnrepository.com/artifact/org.cryptomator/cryptofs
-    // https://github.com/cryptomator/cryptofs
-    //noinspection NewerVersionAvailable
-    implementation(libs.cryptofs)
 }
 
 ksp {

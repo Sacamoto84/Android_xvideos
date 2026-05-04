@@ -10,7 +10,6 @@ composeThemeAdapter = "1.2.1"
 composeZoom = "0.5.0"
 core = "1.49.9"
 coreSplashscreen = "1.2.0"
-cryptofs = "2.10.0"
 desugar_jdk_libs = "2.1.5"
 diskLruCache = "1.7"
 
@@ -50,7 +49,6 @@ slf4jAndroid = "1.7.36"
 timber = "5.0.1"
 storage = "1.6.0"
 googleGmsGoogleServices = "4.4.4"
-datastoreCoreAndroid = "1.2.1"
 uiAndroid = "1.11.0"
 volley = "1.2.1"
 voyager = "1.1.0-beta03"
@@ -88,7 +86,6 @@ coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version
 components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "componentsResources" }
 compose-extended-gestures = { module = "com.github.SmartToolFactory:Compose-Extended-Gestures", version.ref = "composeExtendedGestures" }
 compose-zoom = { module = "com.github.SmartToolFactory:Compose-Zoom", version.ref = "composeZoom" }
-cryptofs = { module = "org.cryptomator:cryptofs", version.ref = "cryptofs" }
 desugar_jdk_libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar_jdk_libs" }
 image-loader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "imageLoader" }
 javafaker = { module = "com.github.javafaker:javafaker", version.ref = "javafaker" }
@@ -174,9 +171,6 @@ timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 
 #Storage
 androidx-storage = { group = "androidx.test.services", name = "storage", version.ref = "storage" }
-androidx-datastore-core-android = { group = "androidx.datastore", name = "datastore-core-android", version.ref = "datastoreCoreAndroid" }
-androidx-datastore-core = { module = "androidx.datastore:datastore-core", version.ref = "datastoreCoreAndroid" }
-androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastoreCoreAndroid" }
 disk-lru-cache = { module = "com.github.solkin:disk-lru-cache", version.ref = "diskLruCache" }
 
 volley = { group = "com.android.volley", name = "volley", version.ref = "volley" }

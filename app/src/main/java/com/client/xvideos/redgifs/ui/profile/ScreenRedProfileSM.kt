@@ -11,7 +11,7 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
 import com.client.xvideos.common.connectivityObserver.ConnectivityObserver
-import com.client.xvideos.common.preference.PreferencesRepository
+import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.common.snackbar.SnackBar
 import com.client.xvideos.redgifs.model.GifsInfo
 import com.client.xvideos.redgifs.model.MediaType
@@ -30,9 +30,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -48,7 +46,6 @@ enum class TypeGifs(val value: String) {
 class ScreenRedProfileSM @AssistedInject constructor(
     @Assisted val profileName: String,
     //private val db: AppDatabase,
-    private val pref: PreferencesRepository,
     connectivityObserver: ConnectivityObserver,
     val hostDI: HostDI
 ) : ScreenModel {
@@ -102,10 +99,10 @@ class ScreenRedProfileSM @AssistedInject constructor(
     var isLoading = MutableStateFlow(false) //║ Запрос к серверу п процессе
 
     ///////////////////////////////////////////////
-    val selector = pref.flowRedSelector.stateIn(screenModelScope, SharingStarted.WhileSubscribed(5000), 0)
+    val selector: StateFlow<Int> = Settings.red_profile_selector.field
 
     fun setSelector(value: Int) {
-        screenModelScope.launch { pref.setRedSelector(value) }
+        Settings.red_profile_selector.setValue(value)
     }
     ///////////////////////////////////////////////
 
