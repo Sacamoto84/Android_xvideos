@@ -44,8 +44,22 @@ import com.alexstyl.warden.Warden
 import com.client.xvideos.ui.theme.XvideosTheme
 import kotlinx.coroutines.launch
 
+/**
+ * Экран запроса файловых разрешений.
+ *
+ * Показывается перед `MainActivity`, если приложению ещё нельзя читать и писать
+ * во внешнее хранилище. На Android 11+ ведёт пользователя в системный экран
+ * `MANAGE_EXTERNAL_STORAGE`, на старых версиях запрашивает обычное разрешение
+ * `WRITE_EXTERNAL_STORAGE`.
+ */
 class PermissionScreenActivity : ComponentActivity() {
 
+    /**
+     * Создаёт Compose UI проверки разрешений.
+     *
+     * Если разрешение уже выдано, экран сразу переводит пользователя в
+     * `MainActivity`; иначе показывает кнопку запроса.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -69,6 +83,13 @@ class PermissionScreenActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * UI-состояние экрана разрешений.
+     *
+     * При `hasPermission = false` показывает объясняющий текст и кнопку.
+     * Если разрешение есть, ничего не рисует, потому что переход в главный экран
+     * выполняется через `LaunchedEffect` или `onResume()`.
+     */
     @Composable
     private fun PermissionScreenContent(
         hasPermission: Boolean,
@@ -106,6 +127,12 @@ class PermissionScreenActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Повторно проверяет разрешения после возврата из системных настроек.
+     *
+     * Это основной путь для Android 11+, где пользователь выдаёт доступ
+     * не внутри приложения, а на отдельном системном экране.
+     */
     override fun onResume() {
         super.onResume()
         // Проверка при возврате из настроек
@@ -114,11 +141,17 @@ class PermissionScreenActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Закрывает экран разрешений и открывает основной экран приложения.
+     */
     private fun navigateToMain() {
         startActivity(Intent(this, MainActivity::class.java))
         finish()
     }
 
+    /**
+     * Preview для проверки верстки экрана разрешений в Android Studio.
+     */
     @Preview(showBackground = true)
     @Composable
     private fun PermissionScreenPreview() {
@@ -130,8 +163,21 @@ class PermissionScreenActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Утилита для проверки и запроса файловых разрешений.
+     *
+     * Спрятана внутрь activity, потому что логика тесно связана с Android API
+     * и нужна только на этапе допуска пользователя к основному UI.
+     */
     object PermissionStorage {
 
+        /**
+         * Проверяет, может ли приложение работать с внешним хранилищем.
+         *
+         * На Android R+ используется `Environment.isExternalStorageManager()`,
+         * потому что доступ ко всем файлам выдаётся через отдельный системный
+         * режим. На старых версиях достаточно `WRITE_EXTERNAL_STORAGE`.
+         */
         fun hasPermissions(context: Context): Boolean {
             return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 Environment.isExternalStorageManager()
@@ -143,6 +189,13 @@ class PermissionScreenActivity : ComponentActivity() {
             }
         }
 
+        /**
+         * Запускает системный сценарий выдачи файлового разрешения.
+         *
+         * Для Android R+ открывает настройки доступа ко всем файлам конкретно
+         * для текущего приложения, а при ошибке падает назад на общий экран.
+         * Для старых Android запрашивает runtime permission через Warden.
+         */
         fun requestPermissions(activity: ComponentActivity) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 try {

@@ -57,19 +57,51 @@ import kotlinx.coroutines.flow.filterIsInstance
 import net.engawapg.lib.zoomable.ExperimentalZoomableApi
 import javax.inject.Inject
 
-//Глубина погружения навигации
+/**
+ * Глобальный индикатор глубины навигации.
+ *
+ * Используется корневым экраном, чтобы понимать, нужно ли показывать кнопку
+ * быстрого возврата домой. Значение меняют вложенные экраны, когда пользователь
+ * уходит глубже стартового уровня.
+ */
 var depth by mutableIntStateOf(0)
 
+/**
+ * CompositionLocal для доступа к корневой ScreenModel из дочерних composable.
+ *
+ * Через неё экраны могут показать или скрыть общий overlay, не прокидывая
+ * `ScreenRootSM` через длинную цепочку параметров.
+ */
 val LocalRootScreenModel = staticCompositionLocalOf<ScreenRootSM> { error("No ScreenRootSM provided") }
 
+/**
+ * CompositionLocal с главным Voyager-навигатором.
+ *
+ * Нужен дочерним экранам, которым требуется управлять корневым стеком навигации:
+ * заменить текущий раздел, вернуться домой или проверить текущий экран.
+ */
 val LocalMainNavigator = staticCompositionLocalOf<Navigator?> { null }
 
+/**
+ * Корневой экран приложения.
+ *
+ * Собирает общий каркас UI: Voyager navigation stack, snackbar host,
+ * индикатор загрузок L-раздела, кнопку перехода домой, overlay-слой
+ * и мини-монитор скорости сети.
+ */
 object ScreenRoot : Screen {
 
     private fun readResolve(): Any = ScreenRoot
 
     override val key: ScreenKey = "ScreenRoot"
 
+    /**
+     * Строит корневой Compose UI и связывает глобальные обработчики событий.
+     *
+     * Здесь создаётся `Navigator`, подписка на `Event.ShowSnackBar`,
+     * публикация `CompositionLocal` и вывод overlay-контента поверх текущего
+     * экрана без разрушения навигационного стека.
+     */
     @OptIn(ExperimentalZoomableApi::class)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
@@ -124,6 +156,12 @@ object ScreenRoot : Screen {
     }
 }
 
+/**
+ * Плавающая кнопка возврата к L-разделу.
+ *
+ * Следит за размером основного navigation stack через `snapshotFlow` и показывает
+ * badge с глубиной, если пользователь ушёл дальше первого экрана.
+ */
 @Composable
 private fun HomeFloatingActionButton(mainNavigator: Navigator?) {
     var navigationDepth by remember { mutableIntStateOf(0) }
@@ -171,32 +209,65 @@ private fun HomeFloatingActionButton(mainNavigator: Navigator?) {
     }
 }
 
-
+/**
+ * ScreenModel корневого экрана.
+ *
+ * Хранит общий overlay как composable-лямбду. Это позволяет временно показать
+ * поверх всего приложения диалог, полноэкранный слой или другой UI, не создавая
+ * отдельный route в навигации.
+ */
 class ScreenRootSM @Inject constructor() : ScreenModel {
     private val _overlayContent = mutableStateOf<(@Composable () -> Unit)?>(null)
     val overlayContent: State<(@Composable () -> Unit)?> = _overlayContent
 
+    /**
+     * Показывает overlay поверх текущего экрана.
+     *
+     * Переданная composable-функция будет отрисована внутри полноэкранного `Box`
+     * в `ScreenRoot.Content()`.
+     */
     fun showOverlay(content: @Composable () -> Unit) {
         _overlayContent.value = content
     }
 
+    /**
+     * Убирает текущий overlay и возвращает пользователю обычный экран.
+     */
     fun hideOverlay() {
         _overlayContent.value = null
     }
 }
 
+/**
+ * ScreenModel для данных о загрузках L-раздела.
+ *
+ * Держит `SavedL`, чтобы корневой bottom bar мог наблюдать прогресс скачивания
+ * лайков и показывать общий индикатор загрузки.
+ */
 class ScreenRootLDownloadsSM @Inject constructor(
     val savedL: SavedL
 ) : ScreenModel
 
+/**
+ * Hilt-модуль, регистрирующий корневые ScreenModel в multibinding Voyager.
+ *
+ * Благодаря этим биндингам `getScreenModel()` может создавать `ScreenRootSM`
+ * и `ScreenRootLDownloadsSM` через Hilt.
+ */
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class ScreenRootModule {
+    /**
+     * Привязывает `ScreenRootSM` к базовому типу Voyager `ScreenModel`.
+     */
     @Binds
     @IntoMap
     @ScreenModelKey(ScreenRootSM::class)
     abstract fun bindScreenRootSM(sm: ScreenRootSM): ScreenModel
 
+    /**
+     * Привязывает `ScreenRootLDownloadsSM` к базовому типу Voyager `ScreenModel`.
+     */
     @Binds
     @IntoMap
     @ScreenModelKey(ScreenRootLDownloadsSM::class)

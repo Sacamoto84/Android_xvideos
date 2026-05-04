@@ -28,6 +28,14 @@ import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
 
+/**
+ * Включает доверие ко всем SSL-сертификатам для старых устройств.
+ *
+ * Метод меняет глобальные настройки `HttpsURLConnection`: подменяет `TrustManager`
+ * и отключает проверку имени хоста. Это помогает обходить проблемы со старыми
+ * корневыми сертификатами на Android M и ниже, но снижает безопасность HTTPS,
+ * поэтому вызывается только в `onCreate()` для старых версий Android.
+ */
 fun allowAllSSL() {
     try {
         val trustAllCerts = arrayOf<TrustManager>(
@@ -60,11 +68,24 @@ fun allowAllSSL() {
     }
 }
 
+/**
+ * Главный класс приложения.
+ *
+ * Отвечает за глобальную инициализацию: Hilt, Timber, Coil ImageLoader,
+ * мониторинг сетевого трафика, настройки приложения и фоновые подписки
+ * на общие события из `EventBus`.
+ */
 @HiltAndroidApp
 class App : Application(), SingletonImageLoader.Factory {
 
     //val ksafe = KSafe(applicationContext, lazyLoad = true)
 
+    /**
+     * Возвращает общий Coil `ImageLoader`, который используется всеми экранами.
+     *
+     * Фабрика вынесена отдельно, чтобы кэш, interceptors и прогресс загрузки
+     * картинок настраивались в одном месте.
+     */
     override fun newImageLoader(context: Context): ImageLoader {
         return CoilImageLoaderFactory.getImageLoader(this)
     }
@@ -77,6 +98,17 @@ class App : Application(), SingletonImageLoader.Factory {
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
+    /**
+     * Основная точка старта процесса приложения.
+     *
+     * Последовательно:
+     * 1. сохраняет singleton-ссылку на `Application`;
+     * 2. подключает Timber в debug-сборке;
+     * 3. запускает монитор сетевого трафика;
+     * 4. применяет SSL-совместимость для старых Android;
+     * 5. инициализирует настройки из `SharedPreferences`;
+     * 6. подписывается на события логирования из общего event bus.
+     */
     @OptIn(DelicateCoroutinesApi::class, ExperimentalComposeRuntimeApi::class)
     override fun onCreate() {
         super.onCreate()
@@ -232,12 +264,24 @@ class App : Application(), SingletonImageLoader.Factory {
     }
 
 
+    /**
+     * Освобождает глобальные ресурсы при завершении процесса приложения.
+     *
+     * На реальных устройствах вызывается редко, но полезен для корректной
+     * остановки `NetworkTrafficMonitor` в тестах и эмуляторных сценариях.
+     */
     override fun onTerminate() {
         super.onTerminate()
         networkTrafficMonitor.destroy()
     }
 
     companion object {
+        /**
+         * Singleton-доступ к `Application` там, где пока нет DI-контекста.
+         *
+         * Использовать осторожно: для новых зависимостей предпочтительнее Hilt,
+         * чтобы не разносить глобальное состояние по коду.
+         */
         lateinit var instance: App
             private set
     }

@@ -18,6 +18,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
+/**
+ * Стартовая activity со splash screen.
+ *
+ * Держит заставку на экране, пока подготавливаются локальные данные:
+ * списки сохранённого RedGifs, блокировки, коллекции и временный cache DAO.
+ * После инициализации передаёт управление `MainActivity`.
+ */
 @AndroidEntryPoint
 class SplashActivity : ComponentActivity() {
 
@@ -32,6 +39,12 @@ class SplashActivity : ComponentActivity() {
 
     private var isReady = false
 
+    /**
+     * Запускает splash screen и фоновую инициализацию приложения.
+     *
+     * `setKeepOnScreenCondition` привязан к `isReady`, поэтому системная заставка
+     * остаётся видимой до завершения `initApp()`.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         // включаем API
         val splashScreen = installSplashScreen()
@@ -54,6 +67,13 @@ class SplashActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Подготавливает данные, которые нужны сразу после старта.
+     *
+     * Работа выполняется только при наличии файловых разрешений. Все операции
+     * запускаются параллельно через `async`, после чего `awaitAll()` гарантирует,
+     * что главный экран откроется уже с обновлёнными saved/block/cache данными.
+     */
     suspend fun initApp() = coroutineScope {
         if (PermissionStorage.hasPermissions(this@SplashActivity)) {
 
