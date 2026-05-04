@@ -36,7 +36,7 @@ object AppLockRepository {
 
     fun setPassword(context: Context, password: String): Result<Unit> = runCatching {
         require(password.length >= MIN_PASSWORD_LENGTH) {
-            "Пароль должен быть не короче $MIN_PASSWORD_LENGTH символов"
+            "Код доступа должен быть не короче $MIN_PASSWORD_LENGTH символов"
         }
 
         val salt = ByteArray(SALT_BYTES).also { SecureRandom().nextBytes(it) }

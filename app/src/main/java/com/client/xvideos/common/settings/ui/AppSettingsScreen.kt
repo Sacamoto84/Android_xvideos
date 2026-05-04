@@ -1,6 +1,5 @@
 package com.client.xvideos.common.settings.ui
 
-import android.view.View
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -29,7 +28,6 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -42,12 +40,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -57,7 +53,9 @@ import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.client.xvideos.common.applock.AccessCodeVisualTransformation
 import com.client.xvideos.common.applock.AppLockRepository
+import com.client.xvideos.common.applock.DisableAppLockAutofill
 import com.client.xvideos.common.coil.CoilImageLoaderFactory
 import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.common.snackbar.SnackBar
@@ -250,7 +248,7 @@ private fun AppLockSettingsSection() {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text("Пароль при запуске", style = styleTextConfig.copy(color = ThemeL.textColor))
+                Text("Блокировка при запуске", style = styleTextConfig.copy(color = ThemeL.textColor))
                 Text(
                     if (enabled) "Включён" else "Выключен",
                     style = styleTextConfig.copy(
@@ -283,7 +281,7 @@ private fun AppLockPasswordDialog(
     onDismiss: () -> Unit,
     onComplete: () -> Unit
 ) {
-    DisableAutofillForCurrentView()
+    DisableAppLockAutofill()
 
     val context = LocalContext.current.applicationContext
     var currentPassword by remember { mutableStateOf("") }
@@ -303,35 +301,35 @@ private fun AppLockPasswordDialog(
         errorText = null
 
         if (needsCurrentPassword && !AppLockRepository.verifyPassword(context, currentPassword)) {
-            errorText = "Текущий пароль не подходит"
+            errorText = "Текущий код доступа не подходит"
             return
         }
 
         if (needsNewPassword && newPassword != confirmPassword) {
-            errorText = "Пароли не совпадают"
+            errorText = "Коды доступа не совпадают"
             return
         }
 
         when (mode) {
             AppLockDialogMode.SET -> {
                 AppLockRepository.setPassword(context, newPassword).onSuccess {
-                    SnackBar.success("Пароль включён")
+                    SnackBar.success("Код доступа включён")
                     onComplete()
                 }.onFailure {
-                    errorText = it.message ?: "Не удалось сохранить пароль"
+                    errorText = it.message ?: "Не удалось сохранить код доступа"
                 }
             }
             AppLockDialogMode.CHANGE -> {
                 AppLockRepository.setPassword(context, newPassword).onSuccess {
-                    SnackBar.success("Пароль изменён")
+                    SnackBar.success("Код доступа изменён")
                     onComplete()
                 }.onFailure {
-                    errorText = it.message ?: "Не удалось изменить пароль"
+                    errorText = it.message ?: "Не удалось изменить код доступа"
                 }
             }
             AppLockDialogMode.DISABLE -> {
                 AppLockRepository.clearPassword(context)
-                SnackBar.success("Пароль отключён")
+                SnackBar.success("Код доступа отключён")
                 onComplete()
             }
         }
@@ -343,14 +341,15 @@ private fun AppLockPasswordDialog(
         title = {
             Text(
                 when (mode) {
-                    AppLockDialogMode.SET -> "Задать пароль"
-                    AppLockDialogMode.CHANGE -> "Изменить пароль"
-                    AppLockDialogMode.DISABLE -> "Отключить пароль"
+                    AppLockDialogMode.SET -> "Задать код доступа"
+                    AppLockDialogMode.CHANGE -> "Изменить код доступа"
+                    AppLockDialogMode.DISABLE -> "Отключить код доступа"
                 },
                 color = ThemeL.textColor
             )
         },
         text = {
+            DisableAppLockAutofill()
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 if (needsCurrentPassword) {
                     PasswordSettingField(
@@ -412,33 +411,21 @@ private fun AppLockPasswordDialog(
 }
 
 @Composable
-private fun DisableAutofillForCurrentView() {
-    val view = LocalView.current
-
-    DisposableEffect(view) {
-        val previous = view.importantForAutofill
-        view.importantForAutofill = View.IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS
-
-        onDispose {
-            view.importantForAutofill = previous
-        }
-    }
-}
-
-@Composable
 private fun PasswordSettingField(
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
     onDone: () -> Unit
 ) {
+    DisableAppLockAutofill()
+
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
         modifier = Modifier.fillMaxWidth(),
         label = { Text(label) },
         singleLine = true,
-        visualTransformation = PasswordVisualTransformation(),
+        visualTransformation = AccessCodeVisualTransformation,
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Text,
             imeAction = ImeAction.Done

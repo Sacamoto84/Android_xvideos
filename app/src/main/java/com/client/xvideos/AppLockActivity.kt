@@ -48,13 +48,14 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.client.xvideos.common.applock.AccessCodeVisualTransformation
 import com.client.xvideos.common.applock.AppLockRepository
 import com.client.xvideos.common.applock.AppLockSession
+import com.client.xvideos.common.applock.DisableAppLockAutofill
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.ui.theme.XvideosTheme
 
@@ -98,6 +99,8 @@ class AppLockActivity : ComponentActivity() {
 internal fun AppLockScreen(
     onUnlock: (String) -> Boolean
 ) {
+    DisableAppLockAutofill()
+
     var password by rememberSaveable { mutableStateOf("") }
     var showPassword by rememberSaveable { mutableStateOf(false) }
     var errorText by rememberSaveable { mutableStateOf<String?>(null) }
@@ -111,9 +114,9 @@ internal fun AppLockScreen(
             failedAttempts += 1
             password = ""
             errorText = if (failedAttempts >= 2) {
-                "Пароль не подходит"
+                "Код доступа не подходит"
             } else {
-                "Неверный пароль"
+                "Неверный код доступа"
             }
         }
     }
@@ -168,7 +171,7 @@ internal fun AppLockScreen(
                 singleLine = true,
                 label = { Text("Код доступа") },
                 isError = errorText != null,
-                visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
+                visualTransformation = if (showPassword) VisualTransformation.None else AccessCodeVisualTransformation,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Done
