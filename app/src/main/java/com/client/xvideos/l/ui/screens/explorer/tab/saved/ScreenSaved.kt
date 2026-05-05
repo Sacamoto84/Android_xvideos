@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Apps
 import androidx.compose.material.icons.outlined.Folder
+import androidx.compose.material.icons.outlined.Group
 import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
@@ -24,8 +25,10 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.l.ui.screens.TabRow
 import com.client.xvideos.l.ui.screens.explorer.tab.saved.albums.L_ScreenSavedAlbumsTab
+import com.client.xvideos.l.ui.screens.explorer.tab.saved.collection.L_Screen_CollectionTab
 import com.client.xvideos.l.ui.screens.explorer.tab.saved.likes.L_ScreenSavedLikesTab
 import com.client.xvideos.l.ui.screens.explorer.tab.saved.likes.L_ScreenSavedLikesTab_AddColumn
+import com.client.xvideos.redgifs.ui.explorer.tab.gifs.ColumnSelect_AddColumn
 import com.client.xvideos.redgifs.ui.ui.atom.TabBarPoints
 import com.client.xvideos.redgifs.common.ThemeRed
 import kotlinx.collections.immutable.persistentListOf
@@ -40,6 +43,7 @@ object L_SavedTab : Screen {
         //Icons.Outlined.FavoriteBorder,
         Icons.Outlined.Save,
         Icons.Outlined.Folder,
+        Icons.Outlined.Group,
         Icons.Outlined.Apps,
         //Icons.Outlined.LockOpen,
     )
@@ -51,6 +55,8 @@ object L_SavedTab : Screen {
         var screenType by rememberSaveable{mutableIntStateOf(0)}
 
         val columnLikes = Settings.l_likesTab_column_current_count.field.collectAsStateWithLifecycle().value
+
+        val columnCollection = Settings.l_collectionTab_column_current_count.field.collectAsStateWithLifecycle().value
 
         Scaffold(
             bottomBar = {
@@ -65,11 +71,13 @@ object L_SavedTab : Screen {
                             if (it == screenType) {
                                 when (it) {
                                     0 -> L_ScreenSavedLikesTab_AddColumn()
+                                    3 -> { ColumnSelect_AddColumn(Settings.l_collectionTab_column_current_count, Settings.l_collectionTab_G_0_4) }
                                 }
                             }
                             screenType = it
                         },
-                        overlay0 = { TabBarPoints(columnLikes, screenType == 0) }
+                        overlay0 = { TabBarPoints(columnLikes, screenType == 0) },
+                        overlay3 = { TabBarPoints(columnCollection, screenType == 3) }
                     )
                 }
             },
@@ -83,6 +91,7 @@ object L_SavedTab : Screen {
                     0 -> L_ScreenSavedLikesTab.Content()
                     1 -> L_ScreenSavedAlbumsTab.Content()
                     2 -> {}
+                    3 -> L_Screen_CollectionTab.Content()
                     else -> {}
                 }
             }

@@ -133,6 +133,16 @@ object Settings {
      */
     val l_likesTab_column_current_count by lazy { SettingElementInt(pref, "l_likesTab_column_current_count", 2) }
 
+    /**
+     * Количество столбиков в L Collection Tab T 1 2 3 4
+     */
+    val l_collectionTab_G_0_4 by lazy {  SettingElementList<Boolean>( pref, "l_collectionTab_G_0_4",  typeToken = JsonTypes.listOf(Boolean::class.javaObjectType) , default = listOf(false, true, true, true, true))  }
+
+    /**
+     * Текущее количество столбиков в L Collection Tab
+     */
+    val l_collectionTab_column_current_count by lazy { SettingElementInt(pref, "l_collectionTab_column_current_count", 2) }
+
 
 
 

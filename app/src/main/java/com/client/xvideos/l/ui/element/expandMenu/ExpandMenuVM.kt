@@ -58,11 +58,11 @@ class ExpandMenuViewModel @Inject constructor(
 
 
     @Composable
-    fun ExpandMenu(type: ExpandMenuType, item: PicsDetails, idAlbum: String) {
+    fun ExpandMenu(type: ExpandMenuType, item: PicsDetails, idAlbum: String, isCollection: Boolean = false) {
         when (type) {
             ExpandMenuType.NONE -> {}
-            ExpandMenuType.ALBUM -> ExpandMenuAlbum(item, idAlbum)
-            ExpandMenuType.LIKES -> ExpandMenuLikes(item)
+            ExpandMenuType.ALBUM -> ExpandMenuAlbum(item, idAlbum, isCollection)
+            ExpandMenuType.LIKES -> ExpandMenuLikes(item, isCollection)
         }
     }
 
@@ -70,7 +70,7 @@ class ExpandMenuViewModel @Inject constructor(
 
 
     @Composable
-    fun ExpandMenuAlbum(item: PicsDetails, idAlbum: String) {
+    fun ExpandMenuAlbum(item: PicsDetails, idAlbum: String, isCollection: Boolean = false) {
 
         val album = when(idAlbum){
             "likes" -> 0
@@ -79,18 +79,29 @@ class ExpandMenuViewModel @Inject constructor(
 
         AlbumItemExpandMenu(
             item = item, onDownload = { it1 -> downloadLike(it1, album) },
-            onShare = { it1 -> share(it1) })
+            onShare = { it1 -> share(it1) },
+            isCollection = isCollection,
+            savedL = saved,
+            onRemoveFromCollection = { it ->
+                // Refresh will be handled by the collection screen
+            }
+        )
     }
 
 
     @Composable
-    fun ExpandMenuLikes(item: PicsDetails) {
+    fun ExpandMenuLikes(item: PicsDetails, isCollection: Boolean = false) {
         val haptic = LocalHapticFeedback.current
         SavedLikesItemExpandMenu(
             item,
             onDelete = { it ->
                 saved.likes.remove(item.url_to_original!!)
                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+            },
+            isCollection = isCollection,
+            savedL = saved,
+            onRemoveFromCollection = { it ->
+                // Refresh will be handled by the collection screen
             }
         )
     }
