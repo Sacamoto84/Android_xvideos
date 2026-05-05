@@ -8,30 +8,23 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.model.ScreenModel
-import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
 import cafe.adriel.voyager.hilt.getScreenModel
-import com.client.xvideos.common.collectionDB.ui.DaialogNewCollection
 import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.l.featured.saved.SavedL
 import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.theme.ThemeL
-import kotlinx.coroutines.launch
 import com.client.xvideos.l.ui.element.expandMenu.ExpandMenuType
 import com.client.xvideos.l.ui.element.lazyRowPictureDetails.L_LazyRowPictureDetails
 import com.client.xvideos.l.ui.element.lazyRowPictureDetails.LazyRowPictureDetailsHost
@@ -44,6 +37,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
 
 class ScreenCollectionName(val collectionName: String) : Screen {
@@ -62,6 +56,11 @@ class ScreenCollectionName(val collectionName: String) : Screen {
         // Set the current collection for the collection manager
         LaunchedEffect(collectionName) {
             savedL.collection.setCollection(collectionName)
+        }
+
+        LaunchedEffect(Unit) {
+            snapshotFlow { savedL.collection.listUrl.toList() }
+                .collectLatest { items -> vm.syncItems(items) }
         }
 
         val selectedCollection = savedL.collection.currentCollectionName
@@ -111,19 +110,17 @@ class ScreenLCollectionNameSM @AssistedInject constructor(
     val host = LazyRowPictureDetailsHost(collectionName)
 
     init {
-        loadCollectionItems()
+        syncItems(savedL.collection.listUrl.toList())
     }
 
-    private fun loadCollectionItems() {
-        screenModelScope.launch {
-            host.filteredPic.clear()
-            host.filteredPic.addAll(savedL.collection.listUrl)
-        }
+    fun syncItems(items: List<PicsDetails>) {
+        host.filteredPic.clear()
+        host.filteredPic.addAll(items)
     }
 
     fun delete(item: PicsDetails) {
         savedL.collection.remove(item.url_to_original ?: "", collectionName)
-        loadCollectionItems()
+        syncItems(savedL.collection.listUrl.toList())
     }
 
 }

@@ -341,7 +341,7 @@ private fun L_DialogCollection(savedL: () -> SavedL) {
             ) {
                 LazyColumn(state = rememberLazyListState()) {
                     items(savedL().collection.collectionList.size) { index ->
-                        val collectionName = savedL().collection.collectionList[index]
+                        val collectionItem = savedL().collection.collectionList[index]
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -350,22 +350,31 @@ private fun L_DialogCollection(savedL: () -> SavedL) {
                                 .clickable(onClick = {
                                     val item = savedL().collection.collectionItemGifInfo as? PicsDetails
                                     if (item != null) {
-                                        savedL().collection.add(item, collectionName)
+                                        savedL().collection.add(item, collectionItem.collection)
                                         savedL().collection.visibleDialog = false
                                         haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                                     }
                                 }),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(25))
-                                    .size(72.dp)
-                                    .background(Color.Gray)
-                            )
+                            if (collectionItem.previewUrl != null) {
+                                UrlImage(
+                                    url = collectionItem.previewUrl,
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(25))
+                                        .size(72.dp)
+                                )
+                            } else {
+                                Box(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(25))
+                                        .size(72.dp)
+                                        .background(Color.Gray)
+                                )
+                            }
                             Spacer(Modifier.width(8.dp))
                             Text(
-                                collectionName,
+                                collectionItem.collection,
                                 color = Color.White,
                                 fontFamily = ThemeL.fontFamilyDMsanss
                             )

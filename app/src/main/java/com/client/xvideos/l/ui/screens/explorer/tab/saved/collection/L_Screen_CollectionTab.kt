@@ -25,10 +25,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,21 +41,17 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.launch
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
-import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import com.client.xvideos.common.coil.UrlImage
+import com.client.xvideos.l.featured.saved.LCollectionEntity
 import com.client.xvideos.l.featured.saved.SavedL
-import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.theme.ThemeL
-import com.client.xvideos.ui.theme.XvideosTheme
 import com.composeunstyled.Text
 import dagger.Binds
 import dagger.Module
@@ -82,8 +78,6 @@ object L_Screen_CollectionTab : Screen {
         val savedL = vm.savedL
 
         val selectedCollection = savedL.collection.currentCollectionName
-
-        val navigator = LocalNavigator.current
 
         BackHandler {
             Timber.i("iii BackHandler SavedCollectionTab")
@@ -132,13 +126,6 @@ object L_Screen_CollectionTab : Screen {
             )
         }
 
-        // Navigate to collection screen when selected
-        LaunchedEffect(selectedCollection) {
-            if (selectedCollection != null) {
-                navigator?.push(ScreenCollectionName(selectedCollection))
-            }
-        }
-
         L_SavedCollectionTabContent(
             selectedCollection = selectedCollection,
             collectionList = savedL.collection.collectionList,
@@ -146,7 +133,11 @@ object L_Screen_CollectionTab : Screen {
             onCollectionClick = { savedL.collection.setCollection(it) },
             onCollectionLongClick = { itemPendingDelete = it },
             onCreateNewCollectionClick = { savedL.collection.visibleDialogCreateNew = true },
-            navigationContent = {}
+            navigationContent = {
+                if (selectedCollection != null) {
+                    Navigator(ScreenCollectionName(selectedCollection))
+                }
+            }
         )
     }
 }
@@ -154,7 +145,7 @@ object L_Screen_CollectionTab : Screen {
 @Composable
 fun L_SavedCollectionTabContent(
     selectedCollection: String?,
-    collectionList: List<String>,
+    collectionList: List<LCollectionEntity>,
     gridState: LazyGridState,
     onCollectionClick: (String) -> Unit,
     onCollectionLongClick: (String) -> Unit,
@@ -176,20 +167,27 @@ fun L_SavedCollectionTabContent(
 
             LazyVerticalGrid( modifier = Modifier.padding(padding), state = gridState, columns = GridCells.Fixed(2) )
             {
-                items(collectionList) {
+                items(collectionList) { collection ->
                     Row(
                         modifier = Modifier.fillMaxWidth()
                             .padding(horizontal = 8.dp).padding(vertical = 4.dp)
                             .combinedClickable(
-                                onClick = { onCollectionClick(it) },
-                                onLongClick = { onCollectionLongClick(it) }),
+                                onClick = { onCollectionClick(collection.collection) },
+                                onLongClick = { onCollectionLongClick(collection.collection) }),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Box(
-                            modifier = Modifier.clip(RoundedCornerShape(8.dp)).size(72.dp).background(Color.Gray)
-                        )
+                        if (collection.previewUrl != null) {
+                            UrlImage(
+                                url = collection.previewUrl,
+                                modifier = Modifier.clip(RoundedCornerShape(8.dp)).size(72.dp)
+                            )
+                        } else {
+                            Box(
+                                modifier = Modifier.clip(RoundedCornerShape(8.dp)).size(72.dp).background(Color.Gray)
+                            )
+                        }
                         Spacer(Modifier.width(8.dp))
-                        Text( it,  color = Color.White, fontFamily = ThemeL.fontFamilyDMsanss )
+                        Text(collection.collection, color = Color.White, fontFamily = ThemeL.fontFamilyDMsanss)
                     }
                 }
 

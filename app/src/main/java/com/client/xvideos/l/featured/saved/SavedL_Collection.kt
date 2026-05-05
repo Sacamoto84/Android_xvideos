@@ -1,4 +1,4 @@
-package com.client.xvideos.l.featured.saved
+﻿package com.client.xvideos.l.featured.saved
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -42,13 +42,18 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.security.MessageDigest
 
+data class LCollectionEntity(
+    val collection: String,
+    val previewUrl: String?
+)
+
 class SavedL_Collection(
     private val scope: CoroutineScope,
     private val luscious: Luscious
 ) {
 
     val listUrl = mutableStateListOf<PicsDetails>()
-    val collectionList = mutableStateListOf<String>()
+    val collectionList = mutableStateListOf<LCollectionEntity>()
     val percentDownload = MutableStateFlow(DOWNLOAD_HIDDEN)
 
     private val progressLock = Any()
@@ -58,7 +63,7 @@ class SavedL_Collection(
     private var finishedFiles = 0
     private var nextFileProgressId = 0
 
-    var currentCollectionName: String? = null
+    var currentCollectionName by mutableStateOf<String?>(null)
 
     //----- Dialogs -----
     var visibleDialog by mutableStateOf(false)
@@ -78,28 +83,73 @@ class SavedL_Collection(
 
             val collections = collectionRoot.listFiles()
                 ?.filter { it.isDirectory }
-                ?.map { it.name }
-                ?.sorted()
+                ?.sortedBy { it.name.lowercase() }
+                ?.map { folder ->
+                    LCollectionEntity(
+                        collection = folder.name,
+                        previewUrl = resolveCollectionPreviewUrl(folder)
+                    )
+                }
                 ?: emptyList()
 
             collectionList.clear()
             collectionList.addAll(collections)
             println("!!! SavedL_Collection refreshCollectionList() collections:${collectionList.size}")
         } catch (e: Exception) {
-            Timber.e(e, "!!! eee SavedL_Collection refreshCollectionList() Ошибка получения списка коллекций")
-            SnackBar.error("Ошибка получения списка коллекций")
+            Timber.e(e, "!!! eee SavedL_Collection refreshCollectionList() РћС€РёР±РєР° РїРѕР»СѓС‡РµРЅРёСЏ СЃРїРёСЃРєР° РєРѕР»Р»РµРєС†РёР№")
+            SnackBar.error("РћС€РёР±РєР° РїРѕР»СѓС‡РµРЅРёСЏ СЃРїРёСЃРєР° РєРѕР»Р»РµРєС†РёР№")
         }
+    }
+
+    private fun resolveCollectionPreviewUrl(collectionFolder: File): String? {
+        val itemFolders = collectionFolder.listFiles()
+            ?.filter { it.isDirectory }
+            ?.sortedByDescending { it.lastModified() }
+            ?: return null
+
+        for (folder in itemFolders) {
+            val metadata = readCollectionMetadata(File(folder, METADATA_FILE_NAME))
+            if (metadata != null) {
+                metadata.previewFiles
+                    ?.sortedByDescending { it.width * it.height }
+                    ?.forEach { preview ->
+                        val candidate = File(folder, preview.fileName)
+                        if (candidate.exists() && !candidate.absolutePath.isLVideoFileUrl()) {
+                            return candidate.absolutePath
+                        }
+                    }
+
+                metadata.previewFileName?.let { previewFileName ->
+                    val candidate = File(folder, previewFileName)
+                    if (candidate.exists() && !candidate.absolutePath.isLVideoFileUrl()) {
+                        return candidate.absolutePath
+                    }
+                }
+
+                val mediaFile = File(folder, metadata.mediaFileName)
+                if (mediaFile.exists() && !mediaFile.absolutePath.isLVideoFileUrl()) {
+                    return mediaFile.absolutePath
+                }
+            }
+
+            val fallback = folder.listFiles()
+                ?.firstOrNull { it.isFile && it.name != METADATA_FILE_NAME && !it.absolutePath.isLVideoFileUrl() }
+            if (fallback != null) {
+                return fallback.absolutePath
+            }
+        }
+        return null
     }
 
     fun createCollection(collectionName: String) {
         println("!!! SavedL_Collection createCollection() collectionName:$collectionName")
         val collectionRoot = File(AppPath.l_collection, collectionName)
         if (collectionRoot.exists()) {
-            SnackBar.error("Коллекция уже существует")
+            SnackBar.error("РљРѕР»Р»РµРєС†РёСЏ СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚")
             return
         }
         collectionRoot.mkdirs()
-        SnackBar.success("Коллекция $collectionName создана")
+        SnackBar.success("РљРѕР»Р»РµРєС†РёСЏ $collectionName СЃРѕР·РґР°РЅР°")
         refreshCollectionList()
     }
 
@@ -107,10 +157,14 @@ class SavedL_Collection(
         println("!!! SavedL_Collection deleteCollection() collectionName:$collectionName")
         val collectionRoot = File(AppPath.l_collection, collectionName)
         if (collectionRoot.deleteRecursively()) {
-            SnackBar.success("Коллекция $collectionName удалена")
+            if (currentCollectionName == collectionName) {
+                currentCollectionName = null
+                listUrl.clear()
+            }
+            SnackBar.success("РљРѕР»Р»РµРєС†РёСЏ $collectionName СѓРґР°Р»РµРЅР°")
             refreshCollectionList()
         } else {
-            SnackBar.error("Ошибка удаления коллекции $collectionName")
+            SnackBar.error("РћС€РёР±РєР° СѓРґР°Р»РµРЅРёСЏ РєРѕР»Р»РµРєС†РёРё $collectionName")
         }
     }
 
@@ -128,13 +182,14 @@ class SavedL_Collection(
                 result
                     .onSuccess {
                         SnackBar.success("Added to collection")
+                        refreshCollectionList()
                         if (currentCollectionName == collectionName) {
                             refresh()
                         }
                     }
                     .onFailure {
                         Timber.e(it, ">>> Collection add error")
-                        SnackBar.error("Ошибка добавления в коллекцию")
+                        SnackBar.error("РћС€РёР±РєР° РґРѕР±Р°РІР»РµРЅРёСЏ РІ РєРѕР»Р»РµРєС†РёСЋ")
                     }
             }
         }
@@ -155,7 +210,7 @@ class SavedL_Collection(
         if (removed) {
             SnackBar.info("Removed from collection")
         } else {
-            SnackBar.error("Файл не найден: $url")
+            SnackBar.error("Р¤Р°Р№Р» РЅРµ РЅР°Р№РґРµРЅ: $url")
         }
         if (currentCollectionName == collectionName) {
             refresh()
@@ -183,8 +238,8 @@ class SavedL_Collection(
             listUrl.addAll(metadataItems)
             println("!!! SavedL_Collection refresh() files:${listUrl.size}")
         } catch (e: Exception) {
-            Timber.e(e, "!!! eee SavedL_Collection refresh() Ошибка получения списка коллекции")
-            SnackBar.error("Ошибка получения списка коллекции")
+            Timber.e(e, "!!! eee SavedL_Collection refresh() РћС€РёР±РєР° РїРѕР»СѓС‡РµРЅРёСЏ СЃРїРёСЃРєР° РєРѕР»Р»РµРєС†РёРё")
+            SnackBar.error("РћС€РёР±РєР° РїРѕР»СѓС‡РµРЅРёСЏ СЃРїРёСЃРєР° РєРѕР»Р»РµРєС†РёРё")
         }
     }
 
@@ -585,3 +640,4 @@ class SavedL_Collection(
         const val DEFAULT_BUFFER_SIZE = 8 * 1024
     }
 }
+
