@@ -91,7 +91,7 @@ fun SavedLikesItemExpandMenu(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DropdownMenuItem_AddCollection(item: PicsDetails? = null, savedL: SavedL? = null, onDismiss: () -> Unit){
+fun DropdownMenuItem_AddCollection(item: PicsDetails? = null, savedL: SavedL? = null, idAlbum: String = "", onDismiss: () -> Unit){
     DropdownMenuItem(
         leadingIcon = {
             Icon(
@@ -103,7 +103,13 @@ fun DropdownMenuItem_AddCollection(item: PicsDetails? = null, savedL: SavedL? = 
         text = { Text("Add to Collection", style = style) },
         onClick = {
             if (item == null || savedL == null) return@DropdownMenuItem
-            savedL.collection.collectionItemGifInfo = item
+            // Update item with album info if provided
+            val itemWithAlbum = if (idAlbum.isNotEmpty()) {
+                item.copy(album = idAlbum)
+            } else {
+                item
+            }
+            savedL.collection.collectionItemGifInfo = itemWithAlbum
             savedL.collection.visibleDialog = true
             onDismiss.invoke()
         }
@@ -114,7 +120,7 @@ fun DropdownMenuItem_AddCollection(item: PicsDetails? = null, savedL: SavedL? = 
 @Composable
 fun DropdownMenuItem_RemoveFromCollection(item: PicsDetails? = null, onRefresh: (PicsDetails) -> Unit = {}, savedL: SavedL? = null, onDismiss: () -> Unit){
 
-    val selectedCollection = savedL?.collection?.selectedCollection?.collectAsStateWithLifecycle()?.value
+    val selectedCollection = savedL?.collection?.currentCollectionName
 
     DropdownMenuItem(
         leadingIcon = {
@@ -131,7 +137,7 @@ fun DropdownMenuItem_RemoveFromCollection(item: PicsDetails? = null, onRefresh: 
                 onDismiss.invoke()
                 return@DropdownMenuItem
             }
-            savedL.collection.deleteItemFromCollection(item.url_to_original ?: "", selectedCollection)
+            savedL.collection.remove(item.url_to_original ?: "", selectedCollection)
             onRefresh(item)
 
             onDismiss.invoke()

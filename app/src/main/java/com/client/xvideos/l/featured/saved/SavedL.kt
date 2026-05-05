@@ -14,7 +14,7 @@ class SavedL @Inject constructor(
     luscious: Luscious
 ) {
 
-    val collection = R_Saved_Collection()
+    val collection = SavedL_Collection(scope, luscious)
 
     val albums = SavedL_Albums(db, scope)
     val likes = SavedL_Likes(luscious, scope)

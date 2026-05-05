@@ -84,7 +84,8 @@ class ExpandMenuViewModel @Inject constructor(
             savedL = saved,
             onRemoveFromCollection = { it ->
                 // Refresh will be handled by the collection screen
-            }
+            },
+            idAlbum = idAlbum
         )
     }
 

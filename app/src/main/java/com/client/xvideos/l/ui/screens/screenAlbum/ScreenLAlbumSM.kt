@@ -58,7 +58,7 @@ class ScreenLAlbumSM @AssistedInject constructor(
         fun create(idAlbum: Long): ScreenLAlbumSM
     }
 
-    val host = LazyRowPictureDetailsHost(idAlbum.toString())
+    val host = LazyRowPictureDetailsHost(idAlbum.toString(), idAlbum.toString())
 
     val downloader: DownloaderAlbum
 

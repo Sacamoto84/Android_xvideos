@@ -104,3 +104,11 @@ fun LSavedLikeMetadata.toPicsDetails(folder: File): PicsDetails? {
         thumbnails = thumbnails
     )
 }
+
+fun readCollectionMetadata(file: File): LSavedLikeMetadata? {
+    return readLSavedLikeMetadata(file)
+}
+
+fun writeCollectionMetadata(file: File, metadata: LSavedLikeMetadata) {
+    writeLSavedLikeMetadata(file, metadata)
+}

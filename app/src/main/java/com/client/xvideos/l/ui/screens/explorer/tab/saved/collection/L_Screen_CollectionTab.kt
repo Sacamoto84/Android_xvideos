@@ -25,6 +25,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,9 +49,9 @@ import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
+import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import com.client.xvideos.common.coil.UrlImage
-import com.client.xvideos.common.collectionDB.model.CollectionEntity
 import com.client.xvideos.l.featured.saved.SavedL
 import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.theme.ThemeL
@@ -80,11 +81,13 @@ object L_Screen_CollectionTab : Screen {
 
         val savedL = vm.savedL
 
-        val selectedCollection = savedL.collection.selectedCollection.collectAsStateWithLifecycle().value
+        val selectedCollection = savedL.collection.currentCollectionName
+
+        val navigator = LocalNavigator.current
 
         BackHandler {
             Timber.i("iii BackHandler SavedCollectionTab")
-            savedL.collection.selectedCollection.value = null
+            savedL.collection.currentCollectionName = null
         }
 
         /**  ➜ сюда запоминаем элемент, который пользователь хочет удалить  */
@@ -129,18 +132,21 @@ object L_Screen_CollectionTab : Screen {
             )
         }
 
+        // Navigate to collection screen when selected
+        LaunchedEffect(selectedCollection) {
+            if (selectedCollection != null) {
+                navigator?.push(ScreenCollectionName(selectedCollection))
+            }
+        }
+
         L_SavedCollectionTabContent(
             selectedCollection = selectedCollection,
             collectionList = savedL.collection.collectionList,
             gridState = vm.gridState,
-            onCollectionClick = { savedL.collection.selectedCollection.value = it },
+            onCollectionClick = { savedL.collection.setCollection(it) },
             onCollectionLongClick = { itemPendingDelete = it },
             onCreateNewCollectionClick = { savedL.collection.visibleDialogCreateNew = true },
-            navigationContent = {
-                if (selectedCollection != null) {
-                    Navigator(ScreenCollectionName(selectedCollection))
-                }
-            }
+            navigationContent = {}
         )
     }
 }
@@ -148,7 +154,7 @@ object L_Screen_CollectionTab : Screen {
 @Composable
 fun L_SavedCollectionTabContent(
     selectedCollection: String?,
-    collectionList: List<CollectionEntity<PicsDetails>>,
+    collectionList: List<String>,
     gridState: LazyGridState,
     onCollectionClick: (String) -> Unit,
     onCollectionLongClick: (String) -> Unit,
@@ -175,22 +181,15 @@ fun L_SavedCollectionTabContent(
                         modifier = Modifier.fillMaxWidth()
                             .padding(horizontal = 8.dp).padding(vertical = 4.dp)
                             .combinedClickable(
-                                onClick = { onCollectionClick(it.collection) },
-                                onLongClick = { onCollectionLongClick(it.collection) }),
+                                onClick = { onCollectionClick(it) },
+                                onLongClick = { onCollectionLongClick(it) }),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        if (it.items.isNotEmpty()) {
-                            UrlImage(
-                                url = it.items.last().url_to_original ?: "",
-                                modifier = Modifier.clip(RoundedCornerShape(8.dp)).size(72.dp)
-                            )
-                        } else {
-                            Box(
-                                modifier = Modifier.clip(RoundedCornerShape(8.dp)).size(72.dp).background(Color.Gray)
-                            )
-                        }
+                        Box(
+                            modifier = Modifier.clip(RoundedCornerShape(8.dp)).size(72.dp).background(Color.Gray)
+                        )
                         Spacer(Modifier.width(8.dp))
-                        Text( it.collection,  color = Color.White, fontFamily = ThemeL.fontFamilyDMsanss )
+                        Text( it,  color = Color.White, fontFamily = ThemeL.fontFamilyDMsanss )
                     }
                 }
 

@@ -59,11 +59,16 @@ class ScreenCollectionName(val collectionName: String) : Screen {
 
         val savedL = vm.savedL
 
-        val selectedCollection = savedL.collection.selectedCollection.collectAsStateWithLifecycle().value
+        // Set the current collection for the collection manager
+        LaunchedEffect(collectionName) {
+            savedL.collection.setCollection(collectionName)
+        }
+
+        val selectedCollection = savedL.collection.currentCollectionName
 
         BackHandler {
             Timber.i("iii BackHandler SavedCollectionTab")
-            savedL.collection.selectedCollection.value = null
+            savedL.collection.currentCollectionName = null
         }
 
         val columnSelect = Settings.l_collectionTab_column_current_count.field.collectAsStateWithLifecycle().value
@@ -111,16 +116,13 @@ class ScreenLCollectionNameSM @AssistedInject constructor(
 
     private fun loadCollectionItems() {
         screenModelScope.launch {
-            val collection = savedL.collection.collectionList.find { it.collection == collectionName }
-            if (collection != null) {
-                host.filteredPic.clear()
-                host.filteredPic.addAll(collection.items)
-            }
+            host.filteredPic.clear()
+            host.filteredPic.addAll(savedL.collection.listUrl)
         }
     }
 
     fun delete(item: PicsDetails) {
-        savedL.collection.deleteItemFromCollection(item.url_to_original ?: "", collectionName)
+        savedL.collection.remove(item.url_to_original ?: "", collectionName)
         loadCollectionItems()
     }
 

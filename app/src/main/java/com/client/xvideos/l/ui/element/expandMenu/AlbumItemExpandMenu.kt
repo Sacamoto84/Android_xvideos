@@ -47,7 +47,8 @@ fun AlbumItemExpandMenu(
     isCollection: Boolean = false,
     savedL: SavedL? = null,
     onRemoveFromCollection: (PicsDetails) -> Unit = {},
-    haptic : ()->Unit = {}
+    haptic : ()->Unit = {},
+    idAlbum: String = ""
 ) {
 
     var expanded by remember { mutableStateOf(false) }
@@ -80,7 +81,7 @@ fun AlbumItemExpandMenu(
             DropdownMenuItem_Share(item, onClick = {onShare(it)}
             ){ expanded = false }
 
-            DropdownMenuItem_AddCollection(item, savedL) { expanded = false }
+            DropdownMenuItem_AddCollection(item, savedL, idAlbum) { expanded = false }
 
             // Show RemoveFromCollection only when in collection view
             if (isCollection) {

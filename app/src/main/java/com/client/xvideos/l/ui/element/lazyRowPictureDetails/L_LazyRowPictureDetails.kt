@@ -224,7 +224,7 @@ fun L_LazyRowPictureDetails(
                             style = ThemeL.Type.mediaIndex
                         )
 
-                        Box(modifier = Modifier.align(Alignment.TopEnd)) { expandMenuViewModel.ExpandMenu( expandMenu, item, host.albumName ) }
+                        Box(modifier = Modifier.align(Alignment.TopEnd)) { expandMenuViewModel.ExpandMenu( expandMenu, item, host.idAlbum ) }
                     }
                 //}
             }

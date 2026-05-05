@@ -67,6 +67,7 @@ import com.client.xvideos.common.traficStatistic.AppNetworkSpeedMonitorLite
 import com.client.xvideos.common.collectionDB.ui.DaialogNewCollection
 import com.client.xvideos.common.coil.UrlImage
 import com.client.xvideos.l.featured.saved.SavedL
+import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.ui.screens.explorer.L_ScreenExplorer
 import com.redgifs.common.downloader.ui.DownloadIndicator
@@ -340,40 +341,31 @@ private fun L_DialogCollection(savedL: () -> SavedL) {
             ) {
                 LazyColumn(state = rememberLazyListState()) {
                     items(savedL().collection.collectionList.size) { index ->
-                        val collection = savedL().collection.collectionList[index]
+                        val collectionName = savedL().collection.collectionList[index]
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 8.dp)
                                 .padding(vertical = 4.dp)
                                 .clickable(onClick = {
-                                    val item = savedL().collection.collectionItemGifInfo
+                                    val item = savedL().collection.collectionItemGifInfo as? PicsDetails
                                     if (item != null) {
-                                        savedL().collection.addCollection(item, collection.collection)
+                                        savedL().collection.add(item, collectionName)
+                                        savedL().collection.visibleDialog = false
+                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                                     }
-                                    savedL().collection.visibleDialog = false
-                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                                 }),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            if (collection.items.isNotEmpty()) {
-                                UrlImage(
-                                    url = collection.items.last().url_to_original ?: "",
-                                    modifier = Modifier
-                                        .clip(RoundedCornerShape(25))
-                                        .size(72.dp)
-                                )
-                            } else {
-                                Box(
-                                    modifier = Modifier
-                                        .clip(RoundedCornerShape(25))
-                                        .size(72.dp)
-                                        .background(Color.Gray)
-                                )
-                            }
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(25))
+                                    .size(72.dp)
+                                    .background(Color.Gray)
+                            )
                             Spacer(Modifier.width(8.dp))
                             Text(
-                                collection.collection,
+                                collectionName,
                                 color = Color.White,
                                 fontFamily = ThemeL.fontFamilyDMsanss
                             )

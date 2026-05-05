@@ -15,6 +15,7 @@ import com.client.xvideos.l.model.PicsDetails
 @OptIn(ExperimentalFoundationApi::class)
 class LazyRowPictureDetailsHost(
     val albumName: String,
+    val idAlbum: String = ""
 ) {
 
     val dpCacheWindow = LazyLayoutCacheWindow(ahead = 150.dp, behind = 100.dp)
