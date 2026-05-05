@@ -55,7 +55,6 @@ object AppPath {
     //--- L ---
     val l_likes: String = "${main}/${Folder.L.value}/Saved/Downloaded/Likes"
     val l_cacheDownload: String = "${main}/${Folder.L.value}/Saved/Downloaded/Cache"
-    val l_likesCrypto: String = "${main}/${Folder.L.value}/Saved/Downloaded/LikesCrypto"
     val l_albums: String = "${main}/${Folder.L.value}/Saved/Album"
     val l_downloaded_albums: String = "${main}/${Folder.L.value}/Saved/Downloaded/Album"
     val l_collection: String = "${main}/${Folder.L.value}/Saved/Collection"
@@ -107,7 +106,6 @@ object AppPath {
         File(l_collection).mkdirs()
 
         File(l_downloaded_albums).mkdirs()
-        File(l_likesCrypto).mkdirs()
 
         File(l_cacheDownload).mkdirs()
 

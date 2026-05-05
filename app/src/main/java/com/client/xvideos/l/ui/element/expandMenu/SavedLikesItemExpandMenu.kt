@@ -23,7 +23,6 @@ import androidx.compose.ui.unit.dp
 import com.client.xvideos.l.theme.ThemeL.ExpandMenu.backgroundColor
 import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.ui.element.expandMenu.atom.DropdownMenuItem_Delete
-import com.client.xvideos.l.ui.element.expandMenu.atom.DropdownMenuItem_DownloadCrypto
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -31,7 +30,6 @@ fun SavedLikesItemExpandMenu(
     item: PicsDetails? = null,
     onClick: () -> Unit = {},
     onDelete: (PicsDetails) -> Unit = {},
-    onDownloadCrypto : (PicsDetails) -> Unit = {},
     haptic : ()->Unit = {}
 ) {
 
@@ -59,9 +57,6 @@ fun SavedLikesItemExpandMenu(
         ) {
 
             DropdownMenuItem_Delete(item, onClick = {onDelete(it)}
-            ){ expanded = false }
-
-            DropdownMenuItem_DownloadCrypto(item, onClick = {onDownloadCrypto(it)}
             ){ expanded = false }
 
         }

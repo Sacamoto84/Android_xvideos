@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Apps
 import androidx.compose.material.icons.outlined.Folder
-import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
@@ -25,8 +24,6 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.l.ui.screens.TabRow
 import com.client.xvideos.l.ui.screens.explorer.tab.saved.albums.L_ScreenSavedAlbumsTab
-import com.client.xvideos.l.ui.screens.explorer.tab.saved.crypto.L_ScreenSavedCryptoTab
-import com.client.xvideos.l.ui.screens.explorer.tab.saved.crypto.L_ScreenSavedCryptoTab_AddColumn
 import com.client.xvideos.l.ui.screens.explorer.tab.saved.likes.L_ScreenSavedLikesTab
 import com.client.xvideos.l.ui.screens.explorer.tab.saved.likes.L_ScreenSavedLikesTab_AddColumn
 import com.client.xvideos.redgifs.ui.ui.atom.TabBarPoints
@@ -44,7 +41,6 @@ object L_SavedTab : Screen {
         Icons.Outlined.Save,
         Icons.Outlined.Folder,
         Icons.Outlined.Apps,
-        Icons.Outlined.Lock,
         //Icons.Outlined.LockOpen,
     )
 
@@ -55,7 +51,6 @@ object L_SavedTab : Screen {
         var screenType by rememberSaveable{mutableIntStateOf(0)}
 
         val columnLikes = Settings.l_likesTab_column_current_count.field.collectAsStateWithLifecycle().value
-        val columnCrypto = Settings.l_likesTab_column_current_count.field.collectAsStateWithLifecycle().value
 
         Scaffold(
             bottomBar = {
@@ -70,13 +65,11 @@ object L_SavedTab : Screen {
                             if (it == screenType) {
                                 when (it) {
                                     0 -> L_ScreenSavedLikesTab_AddColumn()
-                                    4 -> L_ScreenSavedCryptoTab_AddColumn()
                                 }
                             }
                             screenType = it
                         },
-                        overlay0 = { TabBarPoints(columnLikes, screenType == 0) },
-                        overlay4 = { TabBarPoints(columnCrypto, screenType == 0)}
+                        overlay0 = { TabBarPoints(columnLikes, screenType == 0) }
                     )
                 }
             },
@@ -90,7 +83,6 @@ object L_SavedTab : Screen {
                     0 -> L_ScreenSavedLikesTab.Content()
                     1 -> L_ScreenSavedAlbumsTab.Content()
                     2 -> {}
-                    3 -> L_ScreenSavedCryptoTab.Content()
                     else -> {}
                 }
             }

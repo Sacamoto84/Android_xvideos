@@ -118,12 +118,6 @@ class ScreenLAlbumSM @AssistedInject constructor(
         saved.likes.add(item.copy(album = idAlbum.toString()))
     }
 
-    fun downloadLikeCrypto(item: PicsDetails) {
-        scope.launch {
-            saved.crypto.add(item.copy(album = idAlbum.toString()))
-        }
-    }
-
     init {
         Timber.e("!!! ScreenLAlbumSM init")
     }

@@ -36,7 +36,6 @@ import javax.inject.Inject
 enum class ExpandMenuType {
     NONE,
     ALBUM,
-    CRYPTO,
     LIKES
 }
 
@@ -63,7 +62,6 @@ class ExpandMenuViewModel @Inject constructor(
         when (type) {
             ExpandMenuType.NONE -> {}
             ExpandMenuType.ALBUM -> ExpandMenuAlbum(item, idAlbum)
-            ExpandMenuType.CRYPTO -> ExpandMenuCrypto(item)
             ExpandMenuType.LIKES -> ExpandMenuLikes(item)
         }
     }
@@ -76,21 +74,14 @@ class ExpandMenuViewModel @Inject constructor(
 
         val album = when(idAlbum){
             "likes" -> 0
-            "crypto" -> 0
             else -> idAlbum.toLong()
         }
 
         AlbumItemExpandMenu(
             item = item, onDownload = { it1 -> downloadLike(it1, album) },
-            onDownloadCrypto = { it1 -> downloadLikeCrypto(it1, album) },
             onShare = { it1 -> share(it1) })
     }
 
-
-    @Composable
-    fun ExpandMenuCrypto(item: PicsDetails) {
-        SavedCryptoItemExpandMenu( item = item, onDelete = { cryptoDelete(item) },  onDownloadToLikes = { })
-    }
 
     @Composable
     fun ExpandMenuLikes(item: PicsDetails) {
@@ -99,9 +90,6 @@ class ExpandMenuViewModel @Inject constructor(
             item,
             onDelete = { it ->
                 saved.likes.remove(item.url_to_original!!)
-                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-            },
-            onDownloadCrypto = { it ->  saveCrypto(it)
                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
             }
         )
@@ -113,12 +101,6 @@ class ExpandMenuViewModel @Inject constructor(
     ///////
     fun downloadLike(item: PicsDetails, idAlbum: Long) {
         saved.likes.add(item.copy(album = idAlbum.toString()))
-    }
-
-    fun downloadLikeCrypto(item: PicsDetails, idAlbum: Long) {
-        scope.launch {
-            saved.crypto.add(item.copy(album = idAlbum.toString()))
-        }
     }
 
     fun share(item: PicsDetails) {
@@ -156,19 +138,6 @@ class ExpandMenuViewModel @Inject constructor(
                 client.close()
             }
 
-        }
-    }
-
-
-    fun cryptoDelete(item: PicsDetails) {
-        scope.launch {
-            saved.crypto.remove(item.url_to_original!!)
-        }
-    }
-
-    fun saveCrypto(item: PicsDetails){
-        scope.launch {
-            saved.crypto.addFromLike(item)
         }
     }
 

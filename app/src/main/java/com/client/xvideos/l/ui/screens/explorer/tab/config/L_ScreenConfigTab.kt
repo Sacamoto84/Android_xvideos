@@ -49,7 +49,6 @@ import com.client.xvideos.l.ui.screens.explorer.tab.config.atom.ConfigTextAndBut
 import com.client.xvideos.l.ui.screens.explorer.tab.config.atom.ConfigTextAndCheckBoxL
 import com.client.xvideos.l.ui.screens.explorer.tab.config.atom.ConfigTextAndMenuL
 import com.client.xvideos.l.ui.screens.explorer.tab.config.atom.ConfigTextL
-import com.client.xvideos.l.ui.screens.explorer.tab.config.atom.ScreenLConfig_Encrypt
 import com.client.xvideos.ui.theme.XvideosTheme
 import dagger.Binds
 import dagger.Module
@@ -136,8 +135,6 @@ private fun ScreenLConfigTabContent(
             ConfigTextAndCheckBoxL(it.title, true, { })
         }
         Spacer(Modifier.height(4.dp))
-        HorizontalDivider(color = Color.DarkGray)
-        ScreenLConfig_Encrypt()
         HorizontalDivider(color = Color.DarkGray)
 
         ConfigTextAndButtonWithDialogL(

@@ -133,17 +133,6 @@ object Settings {
      */
     val l_likesTab_column_current_count by lazy { SettingElementInt(pref, "l_likesTab_column_current_count", 2) }
 
-    /**
-     * Количество столбиков в L Likes Tab T 1 2 3 4
-     */
-    val l_cryptoTab_G_0_4 by lazy {  SettingElementList<Boolean>( pref, "l_cryptoTab_G_0_4",  typeToken = JsonTypes.listOf(Boolean::class.javaObjectType) , default = listOf(false, true, true, true, true))  }
-
-    /**
-     * Текущее количество столбиков в L Crypto Tab
-     */
-    val l_cryptoTab_column_current_count by lazy { SettingElementInt(pref, "l_cryptoTab_column_current_count", 2) }
-
-
 
 
 

@@ -18,6 +18,5 @@ class SavedX @Inject constructor(
 
     //val albums = SavedL_Albums(snackBarEvent, db, scope)
     //val likes = SavedL_Likes(snackBarEvent, kDownloader)
-    //val crypto = SavedL_Crypto(snackBarEvent, kDownloader)
 }
 

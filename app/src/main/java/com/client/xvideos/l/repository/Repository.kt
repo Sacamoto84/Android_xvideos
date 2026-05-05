@@ -1,7 +1,6 @@
 package com.client.xvideos.l.repository
 
 import android.content.Context
-import com.client.xvideos.common.encrypting.Password
 import com.client.xvideos.common.room.AppDatabase
 import com.client.xvideos.common.room.entity.CacheUrlStringRamEntity
 import com.client.xvideos.common.room.entity.CacheUrlStringRomEntity
@@ -33,7 +32,6 @@ class Repository(
 
     init {
         clearRamDao()
-        Password.loadPassword(context)
     }
 
     @Volatile
