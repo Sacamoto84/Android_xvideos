@@ -103,7 +103,8 @@ object R_Screen_CollectionTab : Screen {
                     Text(
                         "Удалить коллекцию?",
                         fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
+                        fontSize = 20.sp,
+                        color = Color.White
                     )
                 },
 
@@ -112,7 +113,7 @@ object R_Screen_CollectionTab : Screen {
                         append("Удалить «")
                         withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) { append(pending) }
                         append("» из коллекции")
-                    }, fontSize = 16.sp)
+                    }, fontSize = 16.sp, color = Color.White)
                 },
 
                 confirmButton = {
@@ -121,16 +122,17 @@ object R_Screen_CollectionTab : Screen {
                             savedRed.collections.deleteCollection(pending)
                             itemPendingDelete = null
                         }
-                    ) { Text("Удалить", fontSize = 16.sp, color = Color(0xFF6552A5)) }
+                    ) { Text("Удалить", fontSize = 16.sp, color = ThemeRed.colorRed) }
                 },
                 dismissButton = {
                     TextButton(
                         onClick = { itemPendingDelete = null }
-                    ) { Text("Отмена", fontSize = 16.sp, color = Color(0xFF6552A5)) }
+                    ) { Text("Отмена", fontSize = 16.sp, color = ThemeRed.colorYellow) }
                 },
 
-                /* Доп. стили при желании */
-                containerColor = Color(0xFFEBE6EE)
+                containerColor = ThemeRed.colorTabLevel1,
+                titleContentColor = Color.White,
+                textContentColor = Color.White
             )
         }
 

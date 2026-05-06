@@ -12,6 +12,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class SavedL_Albums(val db: AppDatabase, val scope: CoroutineScope) {
 
@@ -19,7 +20,7 @@ class SavedL_Albums(val db: AppDatabase, val scope: CoroutineScope) {
     val list = albumDb.list
 
     fun add(item: AlbumDetails) {
-        println("!!! addAlbum() id:${item.id} name:${item.title}")
+        Timber.i("addAlbum() id:${item.id} name:${item.title}")
         albumDb.insert(item.id, item)
             .onSuccess {
                 SnackBar.info("Альбом сохранен")
@@ -31,7 +32,7 @@ class SavedL_Albums(val db: AppDatabase, val scope: CoroutineScope) {
     }
 
     fun addAndPicsDetails(item: AlbumDetails, picsDetails: List<PicsDetails>) {
-        println("!!! addAndPicsDetails() id:${item.id} name:${item.title} picsDetails:${picsDetails.size}")
+        Timber.i("addAndPicsDetails() id:${item.id} name:${item.title} picsDetails:${picsDetails.size}")
         albumDb.insert(item.id, item)
             .onSuccess {
                 SnackBar.info("Альбом сохранен")
@@ -54,7 +55,7 @@ class SavedL_Albums(val db: AppDatabase, val scope: CoroutineScope) {
     }
 
     fun remove(item: AlbumDetails) {
-        println("!!! removeAlbum() id:${item.id} name:${item.title}")
+        Timber.i("removeAlbum() id:${item.id} name:${item.title}")
         albumDb.delete(item.id)
             .onSuccess {
                 SnackBar.info("Альбом удален")

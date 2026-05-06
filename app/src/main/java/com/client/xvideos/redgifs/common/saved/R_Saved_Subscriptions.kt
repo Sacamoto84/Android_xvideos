@@ -48,7 +48,7 @@ class R_Saved_Subscriptions(
     }
 
     fun add(item: UserInfo) {
-        println("!!! add subscriptions() id:${item}")
+        Timber.i("R_Saved_Subscriptions add() id:$item")
         creatorDb.insert(item.username, item)
             .onSuccess {
                 SnackBar.success("Автор добавлен")
@@ -61,7 +61,7 @@ class R_Saved_Subscriptions(
     }
 
     fun remove(username: String) {
-        println("!!! remove subscriptions() id:${username} ")
+        Timber.i("R_Saved_Subscriptions remove() id:$username")
         creatorDb.delete(username)
             .onSuccess {
                 SnackBar.info("Автор удален")

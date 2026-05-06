@@ -5,6 +5,7 @@ import com.client.xvideos.common.AppPath
 import com.client.xvideos.common.snackbar.SnackBar
 import com.client.xvideos.redgifs.model.NichesInfo
 import kotlinx.coroutines.DelicateCoroutinesApi
+import timber.log.Timber
 import kotlin.onSuccess
 
 class R_Saved_Niches {
@@ -13,7 +14,7 @@ class R_Saved_Niches {
     val list = nichesDb.list
 
     fun add(item: NichesInfo) {
-        println("!!! addNiches() id:${item.id} name:${item.name}")
+        Timber.i("R_Saved_Niches add() id:${item.id} name:${item.name}")
         nichesDb.insert(item.id, item)
             .onSuccess {
                 SnackBar.info("Группа добавлена")
@@ -25,7 +26,7 @@ class R_Saved_Niches {
     }
 
     fun remove(item: NichesInfo) {
-        println("!!! removeNiches() id:${item.id} name:${item.name}")
+        Timber.i("R_Saved_Niches remove() id:${item.id} name:${item.name}")
         nichesDb.delete(item.id)
             .onSuccess {
                 SnackBar.info("Группа удалена")

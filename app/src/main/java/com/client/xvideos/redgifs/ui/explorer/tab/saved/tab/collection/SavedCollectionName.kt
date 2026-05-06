@@ -83,10 +83,9 @@ class ScreenCollectionName(val collectionName: String) : Screen {
                 fontFamily = ThemeRed.fontFamilyPopinsRegular
             )
         }) { padding ->
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+            Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center){
                 LazyRow123(
                     host = vm.likedHost,
-                    modifier = Modifier.padding(padding),
                     onClickOpenProfile = {})
             }
         }

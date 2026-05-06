@@ -78,7 +78,7 @@ class SavedL_Collection(
 
     fun refreshCollectionList() {
         try {
-            println("!!! SavedL_Collection refreshCollectionList()")
+            Timber.i("SavedL_Collection refreshCollectionList()")
             val collectionRoot = File(AppPath.l_collection)
             collectionRoot.mkdirs()
 
@@ -96,10 +96,10 @@ class SavedL_Collection(
 
             collectionList.clear()
             collectionList.addAll(collections)
-            println("!!! SavedL_Collection refreshCollectionList() collections:${collectionList.size}")
+            Timber.i("SavedL_Collection refreshCollectionList() collections:${collectionList.size}")
         } catch (e: Exception) {
-            Timber.e(e, "!!! eee SavedL_Collection refreshCollectionList() РћС€РёР±РєР° РїРѕР»СѓС‡РµРЅРёСЏ СЃРїРёСЃРєР° РєРѕР»Р»РµРєС†РёР№")
-            SnackBar.error("РћС€РёР±РєР° РїРѕР»СѓС‡РµРЅРёСЏ СЃРїРёСЃРєР° РєРѕР»Р»РµРєС†РёР№")
+            Timber.e(e, "SavedL_Collection refreshCollectionList() Ошибка получения списка коллекций")
+            SnackBar.error("Ошибка получения списка коллекций")
         }
     }
 
@@ -150,34 +150,34 @@ class SavedL_Collection(
     }
 
     fun createCollection(collectionName: String) {
-        println("!!! SavedL_Collection createCollection() collectionName:$collectionName")
+        Timber.i("SavedL_Collection createCollection() collectionName:$collectionName")
         val collectionRoot = File(AppPath.l_collection, collectionName)
         if (collectionRoot.exists()) {
-            SnackBar.error("РљРѕР»Р»РµРєС†РёСЏ СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚")
+            SnackBar.error("Коллекция уже существует")
             return
         }
         collectionRoot.mkdirs()
-        SnackBar.success("РљРѕР»Р»РµРєС†РёСЏ $collectionName СЃРѕР·РґР°РЅР°")
+        SnackBar.success("Коллекция $collectionName создана")
         refreshCollectionList()
     }
 
     fun deleteCollection(collectionName: String) {
-        println("!!! SavedL_Collection deleteCollection() collectionName:$collectionName")
+        Timber.i("SavedL_Collection deleteCollection() collectionName:$collectionName")
         val collectionRoot = File(AppPath.l_collection, collectionName)
         if (collectionRoot.deleteRecursively()) {
             if (currentCollectionName == collectionName) {
                 currentCollectionName = null
                 listUrl.clear()
             }
-            SnackBar.success("РљРѕР»Р»РµРєС†РёСЏ $collectionName СѓРґР°Р»РµРЅР°")
+            SnackBar.success("Коллекция $collectionName удалена")
             refreshCollectionList()
         } else {
-            SnackBar.error("РћС€РёР±РєР° СѓРґР°Р»РµРЅРёСЏ РєРѕР»Р»РµРєС†РёРё $collectionName")
+            SnackBar.error("Ошибка удаления коллекции $collectionName")
         }
     }
 
     fun renameCollection(oldName: String, newName: String): Boolean {
-        println("!!! SavedL_Collection renameCollection() oldName:$oldName newName:$newName")
+        Timber.i("SavedL_Collection renameCollection() oldName:$oldName newName:$newName")
         val trimmedNewName = newName.trim()
         if (trimmedNewName.isBlank()) {
             SnackBar.error("Название коллекции не может быть пустым")
@@ -218,7 +218,7 @@ class SavedL_Collection(
     }
 
     fun add(item: PicsDetails, collectionName: String) {
-        println("!!! SavedL_Collection add() item:${item.url_to_original} collection:$collectionName")
+        Timber.i("SavedL_Collection add() item:${item.url_to_original} collection:$collectionName")
 
         scope.launch(Dispatchers.IO) {
             val result = saveToCollection(item, collectionName)
@@ -232,8 +232,8 @@ class SavedL_Collection(
                         }
                     }
                     .onFailure {
-                        Timber.e(it, ">>> Collection add error")
-                        SnackBar.error("РћС€РёР±РєР° РґРѕР±Р°РІР»РµРЅРёСЏ РІ РєРѕР»Р»РµРєС†РёСЋ")
+                        Timber.e(it, "Collection add error")
+                        SnackBar.error("Ошибка добавления в коллекцию")
                     }
             }
         }
@@ -255,7 +255,7 @@ class SavedL_Collection(
     }
 
     private fun remove(identifiers: List<String>, collectionName: String) {
-        println("!!! SavedL_Collection remove() identifiers:$identifiers collection:$collectionName")
+        Timber.i("SavedL_Collection remove() identifiers:$identifiers collection:$collectionName")
         val collectionRoot = File(AppPath.l_collection, collectionName)
         val folder = findCollectionItemFolder(collectionRoot, identifiers)
         val file = identifiers.firstOrNull()?.toFilePath()?.let { File(it) }
@@ -280,7 +280,7 @@ class SavedL_Collection(
     fun refresh() {
         val collectionName = currentCollectionName ?: return
         try {
-            println("!!! SavedL_Collection refresh() collection:$collectionName")
+            Timber.i("SavedL_Collection refresh() collection:$collectionName")
             val collectionRoot = File(AppPath.l_collection, collectionName)
             collectionRoot.mkdirs()
 
@@ -296,10 +296,10 @@ class SavedL_Collection(
 
             listUrl.clear()
             listUrl.addAll(metadataItems)
-            println("!!! SavedL_Collection refresh() files:${listUrl.size}")
+            Timber.i("SavedL_Collection refresh() files:${listUrl.size}")
         } catch (e: Exception) {
-            Timber.e(e, "!!! eee SavedL_Collection refresh() РћС€РёР±РєР° РїРѕР»СѓС‡РµРЅРёСЏ СЃРїРёСЃРєР° РєРѕР»Р»РµРєС†РёРё")
-            SnackBar.error("РћС€РёР±РєР° РїРѕР»СѓС‡РµРЅРёСЏ СЃРїРёСЃРєР° РєРѕР»Р»РµРєС†РёРё")
+            Timber.e(e, "SavedL_Collection refresh() Ошибка получения списка коллекции")
+            SnackBar.error("Ошибка получения списка коллекции")
         }
     }
 

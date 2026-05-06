@@ -59,7 +59,7 @@ class SavedL_Likes(
     }
 
     fun add(item: PicsDetails) {
-        println("!!! SavedL_Likes addLikes() item:${item.url_to_original}")
+        Timber.i("SavedL_Likes addLikes() item:${item.url_to_original}")
 
         scope.launch(Dispatchers.IO) {
             val result = saveLike(item)
@@ -78,7 +78,7 @@ class SavedL_Likes(
     }
 
     fun remove(url: String) {
-        println("!!! SavedL_Likes removeLikes() url:$url")
+        Timber.i("SavedL_Likes removeLikes() url:$url")
         val root = File(AppPath.l_likes)
         val folder = findSavedLikeFolder(root, url)
         val file = File(url)
@@ -99,7 +99,7 @@ class SavedL_Likes(
 
     fun refresh() {
         try {
-            println("!!! SavedL_Likes refresh()")
+            Timber.i("SavedL_Likes refresh()")
             val root = File(AppPath.l_likes)
             root.mkdirs()
 
@@ -115,9 +115,9 @@ class SavedL_Likes(
 
             listUrl.clear()
             listUrl.addAll(metadataItems)
-            println("!!! SavedL_Likes refresh() files:${listUrl.size}")
+            Timber.i("SavedL_Likes refresh() files:${listUrl.size}")
         } catch (e: Exception) {
-            Timber.e(e, "!!! eee SavedL_Likes refresh() Ошибка получения списка likes")
+            Timber.e(e, "SavedL_Likes refresh() Ошибка получения списка likes")
             SnackBar.error("Ошибка получения списка likes")
         }
     }

@@ -5,6 +5,7 @@ import com.client.xvideos.common.collectionDB.model.ISavedLCollection
 import com.client.xvideos.common.snackbar.SnackBar
 import com.client.xvideos.redgifs.model.GifsInfo
 import kotlinx.coroutines.DelicateCoroutinesApi
+import timber.log.Timber
 
 class R_Saved_Collection : ISavedLCollection<GifsInfo>(
     AppPath.r_collection,
@@ -13,13 +14,13 @@ class R_Saved_Collection : ISavedLCollection<GifsInfo>(
 {
 
     override fun addCollection(item: GifsInfo, collectionName: String) {
-        println("!!! addCollection() item:${item.id} collectionName:$collectionName")
+        Timber.i("R_Saved_Collection addCollection() item:${item.id} collectionName:$collectionName")
         collectionDb.insert(item.id, collectionName, item)
         refreshCollectionList()
     }
 
     override fun deleteItemFromCollection(itemId: String, collectionName: String) {
-        println("!!! deleteItemFromCollection() item:${itemId} collectionName:$collectionName")
+        Timber.i("R_Saved_Collection deleteItemFromCollection() item:${itemId} collectionName:$collectionName")
         collectionDb.deleteItem(itemId, collectionName)
             .onSuccess {
                 SnackBar.success("GIF удален из коллекции $collectionName")
@@ -38,7 +39,7 @@ class R_Saved_Collection : ISavedLCollection<GifsInfo>(
     }
 
     override fun createCollection(collectionName: String) {
-        println("!!! createCollection() collectionName:$collectionName")
+        Timber.i("R_Saved_Collection createCollection() collectionName:$collectionName")
             collectionDb.create(collectionName)
             .onSuccess {
                 SnackBar.success("Коллекция $collectionName создана")

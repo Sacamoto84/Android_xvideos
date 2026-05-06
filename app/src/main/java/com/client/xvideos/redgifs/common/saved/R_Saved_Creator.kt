@@ -5,6 +5,7 @@ import com.client.xvideos.common.AppPath
 import com.client.xvideos.common.snackbar.SnackBar
 import com.client.xvideos.redgifs.model.UserInfo
 import kotlinx.coroutines.DelicateCoroutinesApi
+import timber.log.Timber
 import kotlin.onSuccess
 
 class R_Saved_Creator {
@@ -14,7 +15,7 @@ class R_Saved_Creator {
     var list = creatorDb.list
 
     fun add(item: UserInfo) {
-        println("!!! addCreator() id:${item.username}")
+        Timber.i("R_Saved_Creator add() id:${item.username}")
         creatorDb.insert(item.username, item)
             .onSuccess {
                 SnackBar.success("Автор добавлен")
@@ -26,7 +27,7 @@ class R_Saved_Creator {
     }
 
     fun remove(username: String) {
-        println("!!! removeCreator() id:${username} ")
+        Timber.i("R_Saved_Creator remove() id:${username}")
         creatorDb.delete(username)
             .onSuccess {
                 SnackBar.info("Автор удален")
