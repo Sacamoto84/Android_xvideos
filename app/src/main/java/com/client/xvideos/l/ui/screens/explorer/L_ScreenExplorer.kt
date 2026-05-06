@@ -141,16 +141,16 @@ class L_ScreenExplorer : Screen {
                 TabRow(
                     containerColor = ThemeRed.colorTabLevel0,
                     titlesIcon = l,
-                    value = screenType,
+                    value = vm.screenType,
                     onChangeState = {
-                        if (it == screenType) {
+                        if (it == vm.screenType) {
                             when (it) {
                                 0 -> { ColumnSelect_AddColumn(Settings.l_gifsTab_column_current_count, Settings.l_gifsTab_G_0_4) }
                             }
                         }
-                        screenType = it
+                        vm.screenType = it
                     },
-                    overlay0 = { TabBarPoints(columnR_ScreenGifsTab, screenType == 0) },
+                    overlay0 = { TabBarPoints(columnR_ScreenGifsTab, vm.screenType == 0) },
                     tags = tags
                 )
             }
@@ -159,7 +159,7 @@ class L_ScreenExplorer : Screen {
 
 
                 //Navigator(
-                when (screenType) {
+                when (vm.screenType) {
                     0 -> L_ScreenAlbumList.Content()
                     1 -> L_ScreenAlbumTopHits.Content()
                     2 -> L_SavedTab.Content()
@@ -181,7 +181,10 @@ class L_ScreenExplorer : Screen {
  */
 class L_ScreenExplorerSM @Inject constructor(
     val savedL: SavedL
-) : ScreenModel
+) : ScreenModel {
+    /** Текущая вкладка верхнего уровня L-раздела (раньше — статика в Companion). */
+    var screenType by mutableIntStateOf(0)
+}
 
 @Module
 @InstallIn(SingletonComponent::class)
