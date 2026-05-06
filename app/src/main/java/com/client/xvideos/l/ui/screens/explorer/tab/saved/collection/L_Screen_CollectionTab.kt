@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,14 +22,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,7 +49,6 @@ import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
-import cafe.adriel.voyager.navigator.Navigator
 import com.client.xvideos.common.coil.UrlImage
 import com.client.xvideos.l.featured.saved.LCollectionEntity
 import com.client.xvideos.l.featured.saved.SavedL
@@ -84,8 +85,93 @@ object L_Screen_CollectionTab : Screen {
             savedL.collection.currentCollectionName = null
         }
 
-        /**  ➜ сюда запоминаем элемент, который пользователь хочет удалить  */
+        var itemPendingAction by remember { mutableStateOf<String?>(null) }
+        var itemPendingRename by remember { mutableStateOf<String?>(null) }
         var itemPendingDelete by remember { mutableStateOf<String?>(null) }
+        var renameValue by remember { mutableStateOf("") }
+
+        itemPendingAction?.let { pending ->
+            AlertDialog(
+                onDismissRequest = { itemPendingAction = null },
+                title = {
+                    Text(
+                        "Действие с коллекцией",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp,
+                        color = ThemeL.textColor
+                    )
+                },
+                text = {
+                    Column {
+                        Text(pending, fontSize = 16.sp, color = ThemeL.grey2)
+                        DropdownMenuItem(
+                            text = { Text("Переименовать", style = ThemeL.Type.menuItem) },
+                            onClick = {
+                                renameValue = pending
+                                itemPendingRename = pending
+                                itemPendingAction = null
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Удалить коллекцию", style = ThemeL.Type.menuItem.copy(color = ThemeL.red)) },
+                            onClick = {
+                                itemPendingDelete = pending
+                                itemPendingAction = null
+                            }
+                        )
+                    }
+                },
+                confirmButton = {},
+                dismissButton = {
+                    TextButton(
+                        onClick = { itemPendingAction = null }
+                    ) { Text("Отмена", style = ThemeL.Type.button.copy(color = ThemeL.primaryColor)) }
+                },
+                containerColor = ThemeL.grey5,
+                titleContentColor = ThemeL.textColor,
+                textContentColor = ThemeL.textColor
+            )
+        }
+
+        itemPendingRename?.let { pending ->
+            AlertDialog(
+                onDismissRequest = { itemPendingRename = null },
+                title = {
+                    Text(
+                        "Переименовать коллекцию",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp,
+                        color = ThemeL.textColor
+                    )
+                },
+                text = {
+                    OutlinedTextField(
+                        value = renameValue,
+                        onValueChange = { renameValue = it },
+                        singleLine = true,
+                        textStyle = ThemeL.Type.body
+                    )
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            if (savedL.collection.renameCollection(pending, renameValue)) {
+                                itemPendingRename = null
+                            }
+                        }
+                    ) { Text("Сохранить", style = ThemeL.Type.button.copy(color = ThemeL.primaryColor)) }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = { itemPendingRename = null }
+                    ) { Text("Отмена", style = ThemeL.Type.button.copy(color = ThemeL.primaryColor)) }
+                },
+                containerColor = ThemeL.grey5,
+                titleContentColor = ThemeL.textColor,
+                textContentColor = ThemeL.textColor
+            )
+        }
+
         /* ---------- Диалог подтверждения ---------- */
         itemPendingDelete?.let { pending ->
             AlertDialog(
@@ -96,7 +182,8 @@ object L_Screen_CollectionTab : Screen {
                     Text(
                         "Удалить коллекцию?",
                         fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
+                        fontSize = 20.sp,
+                        color = ThemeL.textColor
                     )
                 },
 
@@ -105,7 +192,7 @@ object L_Screen_CollectionTab : Screen {
                         append("Удалить «")
                         withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) { append(pending) }
                         append("» из коллекции")
-                    }, fontSize = 16.sp)
+                    }, fontSize = 16.sp, color = ThemeL.textColor)
                 },
 
                 confirmButton = {
@@ -114,15 +201,17 @@ object L_Screen_CollectionTab : Screen {
                             savedL.collection.deleteCollection(pending)
                             itemPendingDelete = null
                         }
-                    ) { Text("Удалить", fontSize = 16.sp, color = Color(0xFF6552A5)) }
+                    ) { Text("Удалить", style = ThemeL.Type.button.copy(color = ThemeL.red)) }
                 },
                 dismissButton = {
                     TextButton(
                         onClick = { itemPendingDelete = null }
-                    ) { Text("Отмена", fontSize = 16.sp, color = Color(0xFF6552A5)) }
+                    ) { Text("Отмена", style = ThemeL.Type.button.copy(color = ThemeL.primaryColor)) }
                 },
 
-                containerColor = Color(0xFFEBE6EE)
+                containerColor = ThemeL.grey5,
+                titleContentColor = ThemeL.textColor,
+                textContentColor = ThemeL.textColor
             )
         }
 
@@ -131,11 +220,14 @@ object L_Screen_CollectionTab : Screen {
             collectionList = savedL.collection.collectionList,
             gridState = vm.gridState,
             onCollectionClick = { savedL.collection.setCollection(it) },
-            onCollectionLongClick = { itemPendingDelete = it },
+            onCollectionLongClick = { itemPendingAction = it },
             onCreateNewCollectionClick = { savedL.collection.visibleDialogCreateNew = true },
             navigationContent = {
                 if (selectedCollection != null) {
-                    Navigator(ScreenCollectionName(selectedCollection))
+                    L_CollectionNameContent(
+                        collectionName = selectedCollection,
+                        savedL = savedL
+                    )
                 }
             }
         )
@@ -187,7 +279,15 @@ fun L_SavedCollectionTabContent(
                             )
                         }
                         Spacer(Modifier.width(8.dp))
-                        Text(collection.collection, color = Color.White, fontFamily = ThemeL.fontFamilyDMsanss)
+                        Column {
+                            Text(collection.collection, color = Color.White, fontFamily = ThemeL.fontFamilyDMsanss)
+                            Text(
+                                "Элементов: ${collection.itemsCount}",
+                                color = Color.LightGray,
+                                fontSize = 12.sp,
+                                fontFamily = ThemeL.fontFamilyDMsanss
+                            )
+                        }
                     }
                 }
 

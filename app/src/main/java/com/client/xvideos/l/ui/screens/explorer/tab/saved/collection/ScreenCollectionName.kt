@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,49 +52,78 @@ class ScreenCollectionName(val collectionName: String) : Screen {
 
         val vm = getScreenModel<ScreenLCollectionNameSM, ScreenLCollectionNameSM.Factory> { factory -> factory.create(collectionName) }
 
-        val savedL = vm.savedL
+        L_CollectionNameContent(
+            collectionName = collectionName,
+            savedL = vm.savedL,
+            host = vm.host
+        )
 
-        // Set the current collection for the collection manager
-        LaunchedEffect(collectionName) {
-            savedL.collection.setCollection(collectionName)
-        }
+    }
+}
 
-        LaunchedEffect(Unit) {
-            snapshotFlow { savedL.collection.listUrl.toList() }
-                .collectLatest { items -> vm.syncItems(items) }
-        }
+@Composable
+fun L_CollectionNameContent(
+    collectionName: String,
+    savedL: SavedL
+) {
+    val host = remember(collectionName) { LazyRowPictureDetailsHost(collectionName) }
+    L_CollectionNameContent(
+        collectionName = collectionName,
+        savedL = savedL,
+        host = host
+    )
+}
 
-        val selectedCollection = savedL.collection.currentCollectionName
+@OptIn(DelicateCoroutinesApi::class)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@Composable
+fun L_CollectionNameContent(
+    collectionName: String,
+    savedL: SavedL,
+    host: LazyRowPictureDetailsHost
+) {
+    // Set the current collection for the collection manager
+    LaunchedEffect(collectionName) {
+        savedL.collection.setCollection(collectionName)
+    }
 
-        BackHandler {
-            Timber.i("iii BackHandler SavedCollectionTab")
-            savedL.collection.currentCollectionName = null
-        }
-
-        val columnSelect = Settings.l_collectionTab_column_current_count.field.collectAsStateWithLifecycle().value
-
-        //Изменение количества отображаемых элементов
-        LaunchedEffect(columnSelect) { vm.host.columns = columnSelect }
-
-        Scaffold(topBar = {
-            androidx.compose.material3.Text(
-                ">Коллекция>$selectedCollection",
-                modifier = Modifier.padding(start = 8.dp),
-                color = ThemeL.primaryColor,
-                fontSize = 18.sp,
-                fontFamily = ThemeL.fontFamilyPopinsRegular
-            )
-        }) { padding ->
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
-                L_LazyRowPictureDetails(
-                    host = vm.host,
-                    expandMenu = ExpandMenuType.LIKES,
-                    tag = "lCollection",
-                    isCollection = true
-                )
+    LaunchedEffect(Unit) {
+        snapshotFlow { savedL.collection.listUrl.toList() }
+            .collectLatest { items ->
+                host.filteredPic.clear()
+                host.filteredPic.addAll(items)
             }
-        }
+    }
 
+    val selectedCollection = savedL.collection.currentCollectionName
+
+    BackHandler {
+        Timber.i("iii BackHandler SavedCollectionTab")
+        savedL.collection.currentCollectionName = null
+    }
+
+    val columnSelect = Settings.l_collectionTab_column_current_count.field.collectAsStateWithLifecycle().value
+
+    //Изменение количества отображаемых элементов
+    LaunchedEffect(columnSelect) { host.columns = columnSelect }
+
+    Scaffold(topBar = {
+        androidx.compose.material3.Text(
+            ">Коллекция>$selectedCollection",
+            modifier = Modifier.padding(start = 8.dp),
+            color = ThemeL.primaryColor,
+            fontSize = 18.sp,
+            fontFamily = ThemeL.fontFamilyPopinsRegular
+        )
+    }) { padding ->
+        Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center){
+            L_LazyRowPictureDetails(
+                host = host,
+                expandMenu = ExpandMenuType.LIKES,
+                tag = "lCollection",
+                isCollection = true
+            )
+        }
     }
 }
 

@@ -43,7 +43,6 @@ object L_SavedTab : Screen {
         //Icons.Outlined.FavoriteBorder,
         Icons.Outlined.Save,
         Icons.Outlined.Folder,
-        Icons.Outlined.Group,
         Icons.Outlined.Apps,
         //Icons.Outlined.LockOpen,
     )
@@ -71,13 +70,13 @@ object L_SavedTab : Screen {
                             if (it == screenType) {
                                 when (it) {
                                     0 -> L_ScreenSavedLikesTab_AddColumn()
-                                    3 -> { ColumnSelect_AddColumn(Settings.l_collectionTab_column_current_count, Settings.l_collectionTab_G_0_4) }
+                                    2 -> { ColumnSelect_AddColumn(Settings.l_collectionTab_column_current_count, Settings.l_collectionTab_G_0_4) }
                                 }
                             }
                             screenType = it
                         },
                         overlay0 = { TabBarPoints(columnLikes, screenType == 0) },
-                        overlay3 = { TabBarPoints(columnCollection, screenType == 3) }
+                        overlay2 = { TabBarPoints(columnCollection, screenType == 2) }
                     )
                 }
             },
@@ -90,8 +89,7 @@ object L_SavedTab : Screen {
                 when (screenType) {
                     0 -> L_ScreenSavedLikesTab.Content()
                     1 -> L_ScreenSavedAlbumsTab.Content()
-                    2 -> {}
-                    3 -> L_Screen_CollectionTab.Content()
+                    2 -> L_Screen_CollectionTab.Content()
                     else -> {}
                 }
             }

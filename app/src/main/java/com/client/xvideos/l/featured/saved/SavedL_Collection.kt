@@ -44,7 +44,8 @@ import java.security.MessageDigest
 
 data class LCollectionEntity(
     val collection: String,
-    val previewUrl: String?
+    val previewUrl: String?,
+    val itemsCount: Int
 )
 
 class SavedL_Collection(
@@ -87,7 +88,8 @@ class SavedL_Collection(
                 ?.map { folder ->
                     LCollectionEntity(
                         collection = folder.name,
-                        previewUrl = resolveCollectionPreviewUrl(folder)
+                        previewUrl = resolveCollectionPreviewUrl(folder),
+                        itemsCount = resolveCollectionItemsCount(folder)
                     )
                 }
                 ?: emptyList()
@@ -141,6 +143,12 @@ class SavedL_Collection(
         return null
     }
 
+    private fun resolveCollectionItemsCount(collectionFolder: File): Int {
+        return collectionFolder.listFiles()
+            ?.count { it.isDirectory && File(it, METADATA_FILE_NAME).exists() }
+            ?: 0
+    }
+
     fun createCollection(collectionName: String) {
         println("!!! SavedL_Collection createCollection() collectionName:$collectionName")
         val collectionRoot = File(AppPath.l_collection, collectionName)
@@ -166,6 +174,42 @@ class SavedL_Collection(
         } else {
             SnackBar.error("РћС€РёР±РєР° СѓРґР°Р»РµРЅРёСЏ РєРѕР»Р»РµРєС†РёРё $collectionName")
         }
+    }
+
+    fun renameCollection(oldName: String, newName: String): Boolean {
+        println("!!! SavedL_Collection renameCollection() oldName:$oldName newName:$newName")
+        val trimmedNewName = newName.trim()
+        if (trimmedNewName.isBlank()) {
+            SnackBar.error("Название коллекции не может быть пустым")
+            return false
+        }
+        if (oldName == trimmedNewName) {
+            return true
+        }
+
+        val oldRoot = File(AppPath.l_collection, oldName)
+        val newRoot = File(AppPath.l_collection, trimmedNewName)
+        if (!oldRoot.exists()) {
+            SnackBar.error("Коллекция не найдена")
+            return false
+        }
+        if (newRoot.exists()) {
+            SnackBar.error("Коллекция уже существует")
+            return false
+        }
+
+        val renamed = oldRoot.renameTo(newRoot)
+        if (renamed) {
+            if (currentCollectionName == oldName) {
+                currentCollectionName = trimmedNewName
+                refresh()
+            }
+            SnackBar.success("Коллекция переименована")
+            refreshCollectionList()
+        } else {
+            SnackBar.error("Ошибка переименования коллекции")
+        }
+        return renamed
     }
 
     fun setCollection(collectionName: String) {
@@ -224,6 +268,7 @@ class SavedL_Collection(
 
         if (removed) {
             SnackBar.info("Removed from collection")
+            refreshCollectionList()
         } else {
             SnackBar.error("Файл не найден")
         }
@@ -289,10 +334,10 @@ class SavedL_Collection(
             val client = createClient()
             try {
                 val mediaSaved = if (item.is_animated) {
-                    downloadToFileTracked(client, mediaUrl, mediaFile)
+                    saveMediaSourceTracked(client, mediaUrl, mediaFile)
                     true
                 } else {
-                    runCatching { downloadToFileTracked(client, mediaUrl, mediaFile) }
+                    runCatching { saveMediaSourceTracked(client, mediaUrl, mediaFile) }
                         .onFailure { error ->
                             mediaFile.delete()
                             Timber.w(error, "!!! Collection item original media download failed, fallback to previews: $mediaUrl")
@@ -303,14 +348,14 @@ class SavedL_Collection(
                 if (item.is_animated) {
                     previewSources.minByOrNull { it.width * it.height }?.let { preview ->
                         val previewFile = File(folder, "preview.${preview.extension}")
-                        runCatching { downloadToFileTracked(client, preview.url, previewFile) }
+                        runCatching { saveMediaSourceTracked(client, preview.url, previewFile) }
                             .onSuccess { savedPreviews.add(preview.toSavedPreview(previewFile.name)) }
                             .onFailure { Timber.w(it, "!!! Collection item video preview download failed: ${preview.url}") }
                     }
                 } else {
                     previewSources.forEach { preview ->
                         val previewFile = File(folder, "preview.${preview.sizeMarker}.${preview.extension}")
-                        runCatching { downloadToFileTracked(client, preview.url, previewFile) }
+                        runCatching { saveMediaSourceTracked(client, preview.url, previewFile) }
                             .onSuccess { savedPreviews.add(preview.toSavedPreview(previewFile.name)) }
                             .onFailure { Timber.w(it, "!!! Collection item preview download failed: ${preview.url}") }
                     }
@@ -348,6 +393,26 @@ class SavedL_Collection(
             }
         }.also {
             if (progressStarted) finishCollectionDownload()
+        }
+    }
+
+    private suspend fun saveMediaSourceTracked(client: HttpClient, source: String, file: File) {
+        val localFile = source.toLocalFileOrNull()
+        if (localFile != null) {
+            copyToFileTracked(localFile, file)
+        } else {
+            downloadToFileTracked(client, source, file)
+        }
+    }
+
+    private fun copyToFileTracked(source: File, file: File) {
+        val progressId = startFileDownload()
+        try {
+            file.parentFile?.mkdirs()
+            source.copyTo(file, overwrite = true)
+            updateFileDownload(progressId, 1f)
+        } finally {
+            finishFileDownload(progressId)
         }
     }
 
@@ -640,6 +705,13 @@ class SavedL_Collection(
 
     private fun String.toFilePath(): String {
         return removePrefix("file://")
+    }
+
+    private fun String.toLocalFileOrNull(): File? {
+        if (startsWith("http://", ignoreCase = true) || startsWith("https://", ignoreCase = true)) {
+            return null
+        }
+        return File(toFilePath()).takeIf { it.exists() && it.isFile }
     }
 
     private fun String.sha256(): String {
