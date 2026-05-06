@@ -137,6 +137,7 @@ class L_FullScreenImage(
     val autoPlay: Boolean = false,
     val isAnimated: Boolean = false,
     val expandMenu: ExpandMenuType,
+    val isCollection: Boolean = false,
     @IgnoredOnParcel val onClose: (Int) -> Unit = {},
 
     ) : Screen, Parcelable {
@@ -382,7 +383,7 @@ class L_FullScreenImage(
                         IconButton(onClick = { showInfoDialog = true }) { Icon( Icons.Default.Info, contentDescription = null, tint = Color.White ) }
                     }
 
-                    Box( modifier = Modifier) { expandMenuViewModel.ExpandMenu( expandMenu, filteredPic[pagerState.currentPage], albumName ) }
+                    Box( modifier = Modifier) { expandMenuViewModel.ExpandMenu( expandMenu, filteredPic[pagerState.currentPage], albumName, isCollection ) }
                 }
             }
 

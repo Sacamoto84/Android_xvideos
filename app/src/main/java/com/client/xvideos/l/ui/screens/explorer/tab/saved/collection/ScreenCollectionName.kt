@@ -88,7 +88,8 @@ class ScreenCollectionName(val collectionName: String) : Screen {
                 L_LazyRowPictureDetails(
                     host = vm.host,
                     expandMenu = ExpandMenuType.LIKES,
-                    tag = "lCollection"
+                    tag = "lCollection",
+                    isCollection = true
                 )
             }
         }
@@ -119,7 +120,7 @@ class ScreenLCollectionNameSM @AssistedInject constructor(
     }
 
     fun delete(item: PicsDetails) {
-        savedL.collection.remove(item.url_to_original ?: "", collectionName)
+        savedL.collection.remove(item, collectionName)
         syncItems(savedL.collection.listUrl.toList())
     }
 

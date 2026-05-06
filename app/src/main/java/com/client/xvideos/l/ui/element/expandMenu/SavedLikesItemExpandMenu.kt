@@ -137,7 +137,7 @@ fun DropdownMenuItem_RemoveFromCollection(item: PicsDetails? = null, onRefresh: 
                 onDismiss.invoke()
                 return@DropdownMenuItem
             }
-            savedL.collection.remove(item.url_to_original ?: "", selectedCollection)
+            savedL.collection.remove(item, selectedCollection)
             onRefresh(item)
 
             onDismiss.invoke()

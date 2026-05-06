@@ -91,7 +91,8 @@ fun L_LazyRowPictureDetails(
     itemBefore: @Composable () -> Unit = {},
     expandMenu: ExpandMenuType,
     tag: String = "",
-    showInitialLoading: Boolean = false
+    showInitialLoading: Boolean = false,
+    isCollection: Boolean = false
 ) {
     val expandMenuViewModel: ExpandMenuViewModel = hiltViewModel()
     val navigator = LocalNavigator.currentOrThrow
@@ -152,6 +153,7 @@ fun L_LazyRowPictureDetails(
                                     },
                                     albumName = host.albumName,
                                     expandMenu = expandMenu,
+                                    isCollection = isCollection,
                                     autoPlay = true,
                                     isAnimated = item.is_animated,
                                 )
@@ -224,7 +226,7 @@ fun L_LazyRowPictureDetails(
                             style = ThemeL.Type.mediaIndex
                         )
 
-                        Box(modifier = Modifier.align(Alignment.TopEnd)) { expandMenuViewModel.ExpandMenu( expandMenu, item, host.idAlbum ) }
+                        Box(modifier = Modifier.align(Alignment.TopEnd)) { expandMenuViewModel.ExpandMenu( expandMenu, item, host.idAlbum, isCollection ) }
                     }
                 //}
             }

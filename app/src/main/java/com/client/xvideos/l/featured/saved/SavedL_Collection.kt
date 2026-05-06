@@ -195,22 +195,37 @@ class SavedL_Collection(
         }
     }
 
+    fun remove(item: PicsDetails, collectionName: String) {
+        remove(
+            identifiers = listOfNotNull(
+                item.url_to_original,
+                item.url_to_video,
+                item.lDownloadUrl()
+            ) + (item.thumbnails?.mapNotNull { it.url } ?: emptyList()),
+            collectionName = collectionName
+        )
+    }
+
     fun remove(url: String, collectionName: String) {
-        println("!!! SavedL_Collection remove() url:$url collection:$collectionName")
+        remove(listOf(url), collectionName)
+    }
+
+    private fun remove(identifiers: List<String>, collectionName: String) {
+        println("!!! SavedL_Collection remove() identifiers:$identifiers collection:$collectionName")
         val collectionRoot = File(AppPath.l_collection, collectionName)
-        val folder = findCollectionItemFolder(collectionRoot, url)
-        val file = File(url)
+        val folder = findCollectionItemFolder(collectionRoot, identifiers)
+        val file = identifiers.firstOrNull()?.toFilePath()?.let { File(it) }
 
         val removed = when {
             folder != null -> folder.deleteRecursively()
-            isInside(collectionRoot, file) && file.exists() -> file.delete()
+            file != null && isInside(collectionRoot, file) && file.exists() -> file.delete()
             else -> false
         }
 
         if (removed) {
             SnackBar.info("Removed from collection")
         } else {
-            SnackBar.error("Р¤Р°Р№Р» РЅРµ РЅР°Р№РґРµРЅ: $url")
+            SnackBar.error("Файл не найден")
         }
         if (currentCollectionName == collectionName) {
             refresh()
@@ -549,28 +564,43 @@ class SavedL_Collection(
         return "${album.sanitizeFilePart()}_${mediaUrl.sha256().take(12)}_$baseName"
     }
 
-    private fun findCollectionItemFolder(root: File, url: String): File? {
-        val target = File(url)
-        if (isInside(root, target)) {
-            val parent = target.parentFile
-            if (parent != null && File(parent, METADATA_FILE_NAME).exists()) return parent
+    private fun findCollectionItemFolder(root: File, identifiers: List<String>): File? {
+        val normalizedIdentifiers = identifiers
+            .filter { it.isNotBlank() }
+            .flatMap { listOf(it, it.toFilePath()) }
+            .toSet()
+
+        normalizedIdentifiers.forEach { identifier ->
+            val target = File(identifier)
+            if (isInside(root, target)) {
+                val parent = target.parentFile
+                if (parent != null && File(parent, METADATA_FILE_NAME).exists()) return parent
+            }
         }
 
         return root.listFiles()
             ?.filter { it.isDirectory }
             ?.firstOrNull { folder ->
                 val metadata = readCollectionMetadata(File(folder, METADATA_FILE_NAME)) ?: return@firstOrNull false
-                val mediaPath = File(folder, metadata.mediaFileName).absolutePath
-                val previewPath = metadata.previewFileName?.let { File(folder, it).absolutePath }
-                val previewPaths = metadata.previewFiles
-                    ?.map { File(folder, it.fileName).absolutePath }
-                    ?: emptyList()
-                url == mediaPath ||
-                        url == previewPath ||
-                        url in previewPaths ||
-                        url == metadata.sourceMediaUrl ||
-                        url == metadata.sourceOriginalUrl ||
-                        url == metadata.sourceVideoUrl
+                val metadataIdentifiers = buildSet {
+                    add(File(folder, metadata.mediaFileName).absolutePath)
+                    metadata.previewFileName?.let { add(File(folder, it).absolutePath) }
+                    metadata.previewFiles?.forEach {
+                        add(File(folder, it.fileName).absolutePath)
+                        add(it.sourceUrl)
+                    }
+                    add(metadata.sourceMediaUrl)
+                    metadata.sourcePreviewUrl?.let { add(it) }
+                    metadata.sourceOriginalUrl?.let { add(it) }
+                    metadata.sourceVideoUrl?.let { add(it) }
+                    metadata.picture.url_to_original?.let { add(it) }
+                    metadata.picture.url_to_video?.let { add(it) }
+                    metadata.picture.thumbnails?.forEach { thumbnail ->
+                        thumbnail.url?.let { add(it) }
+                    }
+                }.flatMap { listOf(it, it.toFilePath()) }.toSet()
+
+                normalizedIdentifiers.any { it in metadataIdentifiers }
             }
     }
 
@@ -606,6 +636,10 @@ class SavedL_Collection(
 
     private fun String.sanitizeFilePart(): String {
         return replace(Regex("[^A-Za-z0-9._-]"), "_").trim('_')
+    }
+
+    private fun String.toFilePath(): String {
+        return removePrefix("file://")
     }
 
     private fun String.sha256(): String {
