@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
@@ -32,7 +33,8 @@ import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import com.client.xvideos.common.collectionDB.ui.DaialogNewCollection
 import com.client.xvideos.common.settings.Settings
-import com.client.xvideos.screenRoot.depth
+import com.client.xvideos.l.featured.saved.SavedL
+import com.client.xvideos.screenRoot.LocalRootScreenModel
 import com.client.xvideos.l.ui.screens.LLoginContent
 import com.client.xvideos.l.ui.screens.explorer.tab.albumTopHits.L_ScreenAlbumTopHits
 import com.client.xvideos.l.ui.screens.explorer.tab.config.L_ScreenConfigTab
@@ -42,7 +44,14 @@ import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.ui.explorer.tab.gifs.ColumnSelect_AddColumn
 import com.client.xvideos.redgifs.ui.explorer.top.TabRow
 import com.client.xvideos.redgifs.ui.ui.atom.TabBarPoints
+import com.redgifs.common.downloader.ui.DownloadIndicator
+import dagger.Binds
+import dagger.Module
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+import dagger.multibindings.IntoMap
 import kotlinx.collections.immutable.persistentListOf
+import javax.inject.Inject
 
 @Composable
 private fun RowScope.TabNavigationItem(tab: Tab) {
@@ -59,30 +68,17 @@ class L_ScreenExplorer : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
 
-    companion object {
-        var screenType by mutableIntStateOf(0)
-    }
-
     @OptIn(ExperimentalMaterial3Api::class)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
     override fun Content() {
 
-//        val rootVm = LocalRootScreenModel.current
-
-//        DisposableEffect(Unit) {
-//            rootVm.showOverlay({
-//                Image(painterResource(R.drawable.logo), contentDescription = null, modifier = Modifier.size(32.dp))
-//            }
-//            )
-//            onDispose {
-//                rootVm.hideOverlay()
-//            }
-//        }
-
         val navigator = LocalNavigator.currentOrThrow
+        val vm = getScreenModel<L_ScreenExplorerSM>()
+        val savedL = vm.savedL
+        val rootVm = LocalRootScreenModel.current
 
-        LaunchedEffect(Unit) { depth = 0 }
+        LaunchedEffect(Unit) { rootVm.depthState.depth = 0 }
 
         val savedLogin = Settings.l_login.field.collectAsStateWithLifecycle().value
         val savedPassword = Settings.l_pass.field.collectAsStateWithLifecycle().value
@@ -96,6 +92,27 @@ class L_ScreenExplorer : Screen {
             )
             return
         }
+
+        // Диалог создания новой коллекции (общий для всех L-экранов)
+        if (savedL.collection.visibleDialogCreateNew) {
+            DaialogNewCollection(
+                visible = savedL.collection.visibleDialogCreateNew,
+                onDismiss = { savedL.collection.visibleDialogCreateNew = false },
+                onBlockConfirmed = { collection ->
+                    if (collection.isNotEmpty()) {
+                        savedL.collection.createCollection(collection)
+                        savedL.collection.visibleDialogCreateNew = false
+                    }
+                }
+            )
+        }
+
+        // Диалог добавления элемента в коллекцию
+        if (savedL.collection.visibleDialog) {
+            L_DialogCollection(savedL = savedL)
+        }
+
+        val percentDownload = savedL.likes.percentDownload.collectAsStateWithLifecycle().value
 
         // ПЕРЕНЕСЕНО СЮДА: Теперь эти списки создаются внутри Composable
         val l = remember {
@@ -119,24 +136,24 @@ class L_ScreenExplorer : Screen {
         val columnR_ScreenGifsTab = Settings.l_gifsTab_column_current_count.field.collectAsStateWithLifecycle().value
 
         Scaffold(bottomBar = {
-
-            TabRow(
-                containerColor = ThemeRed.colorTabLevel0,
-                titlesIcon = l,
-                value = screenType,
-                onChangeState = {
-                    if (it == screenType) {
-                        when (it) {
-                             0 -> { ColumnSelect_AddColumn(Settings.l_gifsTab_column_current_count, Settings.l_gifsTab_G_0_4) }
+            androidx.compose.foundation.layout.Column {
+                DownloadIndicator(percentDownload)
+                TabRow(
+                    containerColor = ThemeRed.colorTabLevel0,
+                    titlesIcon = l,
+                    value = screenType,
+                    onChangeState = {
+                        if (it == screenType) {
+                            when (it) {
+                                0 -> { ColumnSelect_AddColumn(Settings.l_gifsTab_column_current_count, Settings.l_gifsTab_G_0_4) }
+                            }
                         }
-                    }
-                    screenType = it
-                },
-                overlay0 = { TabBarPoints(columnR_ScreenGifsTab, screenType == 0) },
-                tags = tags
-            )
-
-
+                        screenType = it
+                    },
+                    overlay0 = { TabBarPoints(columnR_ScreenGifsTab, screenType == 0) },
+                    tags = tags
+                )
+            }
         }, containerColor = ThemeRed.colorCommonBackground2) { paddingValues ->
             Box(modifier = Modifier.padding(bottom = paddingValues.calculateBottomPadding())) {
 
@@ -156,3 +173,22 @@ class L_ScreenExplorer : Screen {
 
     }
 }
+
+/**
+ * ScreenModel L-раздела. Держит ссылку на singleton [SavedL], чтобы
+ * корневой L-экран мог показывать общие диалоги (создание/добавление коллекции)
+ * и индикатор загрузок без обращения к глобальному состоянию.
+ */
+class L_ScreenExplorerSM @Inject constructor(
+    val savedL: SavedL
+) : ScreenModel
+
+@Module
+@InstallIn(SingletonComponent::class)
+abstract class L_ScreenExplorerModule {
+    @Binds
+    @IntoMap
+    @ScreenModelKey(L_ScreenExplorerSM::class)
+    abstract fun bindL_ScreenExplorerSM(sm: L_ScreenExplorerSM): ScreenModel
+}
+

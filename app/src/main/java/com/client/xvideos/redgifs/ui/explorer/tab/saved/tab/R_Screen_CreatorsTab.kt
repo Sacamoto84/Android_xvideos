@@ -268,10 +268,8 @@ private fun DeleteCreatorDialog(
 
 class ScreenSavedCreatorSM @Inject constructor(
     connectivityObserver: ConnectivityObserver,
-    hostDIin: javax.inject.Provider<HostDI>
+    val hostDI: HostDI,
 ) : ScreenModel {
-
-    val hostDI = hostDIin.get()
 
     val gridState = LazyGridState()
 

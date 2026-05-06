@@ -162,69 +162,37 @@ fun R_SavedCollectionTabContent(
     onCreateNewCollectionClick: () -> Unit,
     navigationContent: @Composable () -> Unit
 ) {
-    Scaffold(topBar = {
-        Text(
-            ">Коллекция>$selectedCollection",
-            modifier = Modifier.padding(start = 8.dp),
-            color = ThemeRed.colorYellow,
-            fontSize = 18.sp,
-            fontFamily = ThemeRed.fontFamilyPopinsRegular
-        )
-    }) { padding ->
-
-
-        if (selectedCollection == null) {
-
-            LazyVerticalGrid( modifier = Modifier.padding(padding), state = gridState, columns = GridCells.Fixed(2) )
-            {
-                items(collectionList) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth()
-                            .padding(horizontal = 8.dp).padding(vertical = 4.dp)
-                            .combinedClickable(
-                                onClick = { onCollectionClick(it.collection) },
-                                onLongClick = { onCollectionLongClick(it.collection) }),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        if (it.items.isNotEmpty()) {
-                            UrlImage(
-                                url = it.items.last().urls.thumbnail,
-                                modifier = Modifier.clip(RoundedCornerShape(8.dp)).size(72.dp)
-                            )
-                        } else {
-                            Box(
-                                modifier = Modifier.clip(RoundedCornerShape(8.dp)).size(72.dp).background(Color.Gray)
-                            )
-                        }
-                        Spacer(Modifier.width(8.dp))
-                        Text( it.collection,  color = Color.White, fontFamily = ThemeRed.fontFamilyDMsanss )
-                    }
-                }
-
-                items(listOf(Unit)) {
-                    Box(modifier = Modifier.fillMaxWidth()) {
-                        Box(
-                            modifier = Modifier.padding(start = 8.dp, top = 4.dp).size(72.dp).clip(RoundedCornerShape(8.dp)).background(ThemeRed.colorYellow)
-                                .clickable(onClick = { onCreateNewCollectionClick() }), contentAlignment = Alignment.Center )
-                        {
-                            Icon(Icons.Default.Add, contentDescription = null, tint = Color.Black, modifier = Modifier.size(24.dp) )
-                        }
-                    }
-                }
-            }
-        } else {
-            navigationContent()
-        }
-    }
+    com.client.xvideos.common.collectionDB.ui.CollectionsGrid(
+        selectedCollection = selectedCollection,
+        collections = collectionList.map {
+            com.client.xvideos.common.collectionDB.ui.CollectionGridItem(
+                name = it.collection,
+                previewUrl = it.items.lastOrNull()?.urls?.thumbnail,
+                itemsCount = null
+            )
+        },
+        gridState = gridState,
+        style = com.client.xvideos.common.collectionDB.ui.CollectionsGridStyle(
+            backgroundColor = Color.Transparent,
+            titleColor = ThemeRed.colorYellow,
+            titleFontFamily = ThemeRed.fontFamilyPopinsRegular,
+            itemNameColor = Color.White,
+            itemSecondaryColor = Color.LightGray,
+            itemFontFamily = ThemeRed.fontFamilyDMsanss,
+            addButtonBackground = ThemeRed.colorYellow
+        ),
+        onCollectionClick = onCollectionClick,
+        onCollectionLongClick = onCollectionLongClick,
+        onCreateNewCollectionClick = onCreateNewCollectionClick,
+        navigationContent = navigationContent
+    )
 }
 
 
 class ScreenSavedCollectionSM @Inject constructor(
     val block: BlockRed,
-    hostDIin : javax.inject.Provider<HostDI>,
+    val hostDI: HostDI,
 ) : ScreenModel {
-
-    val hostDI = hostDIin.get()
 
     val gridState = LazyGridState()
 }

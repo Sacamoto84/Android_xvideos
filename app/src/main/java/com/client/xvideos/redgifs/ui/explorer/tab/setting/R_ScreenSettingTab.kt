@@ -52,7 +52,6 @@ import com.client.xvideos.common.settings.ui.Config_G_0_4
 import com.client.xvideos.common.util.getFolderSize
 import com.client.xvideos.common.util.toPrettyCount3
 import com.client.xvideos.redgifs.common.ThemeRed
-import com.client.xvideos.redgifs.common.di.HostDI
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -87,16 +86,16 @@ object R_ScreenSettingTab : Screen {
             sizeRedDownload = vm.sizeRedDownload,
             onClearDownloadClick = {
                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                vm.hostDI.downloadRed.deleteAll {
+                vm.downloadRed.deleteAll {
                     vm.sizeXvideos = getFolderSize(File(AppPath.main))
                     vm.sizeRedDownload = getFolderSize(File(AppPath.r_cache_download))
                 }
             },
-            isNichesCacheDownloading = vm.hostDI.savedRed.nichesCache.isDownloading,
-            onRefreshNichesCacheClick = { vm.hostDI.savedRed.nichesCache.refresh() },
-            nichesCacheProgress = vm.hostDI.savedRed.nichesCache.progress,
-            nichesCacheSize = vm.hostDI.savedRed.nichesCache.size,
-            nichesCacheLastModifiedHour = vm.hostDI.savedRed.nichesCache.lastModifiedHour
+            isNichesCacheDownloading = vm.savedRed.nichesCache.isDownloading,
+            onRefreshNichesCacheClick = { vm.savedRed.nichesCache.refresh() },
+            nichesCacheProgress = vm.savedRed.nichesCache.progress,
+            nichesCacheSize = vm.savedRed.nichesCache.size,
+            nichesCacheLastModifiedHour = vm.savedRed.nichesCache.lastModifiedHour
         )
     }
 }
@@ -242,7 +241,8 @@ val styleTest = TextStyle(
 )
 
 class ScreenRedExplorerSettingSM @Inject constructor(
-    val hostDI: HostDI,
+    val downloadRed: com.client.xvideos.redgifs.common.downloader.DownloadRed,
+    val savedRed: com.client.xvideos.redgifs.common.saved.SavedRed,
 ) : ScreenModel {
 
     var sizeXvideos by mutableLongStateOf(0L)

@@ -7,33 +7,34 @@ import androidx.compose.runtime.setValue
 import com.client.xvideos.common.collectionDB.CollectionDB
 import kotlinx.coroutines.flow.MutableStateFlow
 
-abstract class ISavedLCollection<T>(
+/**
+ * Базовое хранилище коллекций «по ссылке».
+ *
+ * Каждый элемент сериализуется как JSON-файл `<id>.collection` внутри папки
+ * `<path>/<collectionName>/`. В отличие от L-стороны, медиа-файлы здесь не
+ * скачиваются — хранятся только ссылки на удалённый ресурс.
+ *
+ * Этот контракт сейчас используется только в R-разделе (для GifsInfo);
+ * раньше класс назывался `ISavedLCollection`, что вводило в заблуждение.
+ */
+abstract class LinkCollectionStore<T>(
     path: String,
     clazz: Class<T>
-){
-    //private val type = TypeToken.getParameterized(List::class.java, clazz).type
+) {
 
     val collectionDb = CollectionDB<T>(path, clazz)
 
     var collectionList = mutableStateListOf<CollectionEntity<T>>()
 
-
     //----- Диалоги -----
-    /**
-     * Отобразить диалог коллекции
-     */
+    /** Отобразить диалог коллекции (выбор куда положить элемент) */
     var visibleDialog by mutableStateOf(false)
 
-    /**
-     * Отобразить диалог создания новой коллекции
-     */
+    /** Отобразить диалог создания новой коллекции */
     var visibleDialogCreateNew by mutableStateOf(false)
     //-------------------
 
-
     var collectionItemGifInfo by mutableStateOf<T?>(null)
-
-
 
     var selectedCollection = MutableStateFlow<String?>(null)
 

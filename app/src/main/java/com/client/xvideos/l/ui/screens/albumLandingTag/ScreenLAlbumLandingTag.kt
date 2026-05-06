@@ -36,7 +36,7 @@ import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.client.xvideos.screenRoot.depth
+import com.client.xvideos.screenRoot.NavigationDepthState
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.model.AlbumListFilter
 import com.client.xvideos.l.model.Landing_page_albumSection
@@ -181,7 +181,8 @@ class ScreenLAlbumLandingTag(val tag: String) : Screen {
 
 class ScreenLAlbumLandingTagSM @AssistedInject constructor(
     @Assisted val tag: String,
-    val luscious: Luscious
+    val luscious: Luscious,
+    depthState: NavigationDepthState
 ) : ScreenModel {
 
     @AssistedFactory
@@ -199,7 +200,7 @@ class ScreenLAlbumLandingTagSM @AssistedInject constructor(
             albumTopHits.value = luscious.getLandingPageAlbumTag(tag).getOrThrow()
         }
 
-        depth = 100
+        depthState.depth = 100
     }
 
     override fun onDispose() {

@@ -1,13 +1,13 @@
 package com.client.xvideos.redgifs.common.saved
 
 import com.client.xvideos.common.AppPath
-import com.client.xvideos.common.collectionDB.model.ISavedLCollection
+import com.client.xvideos.common.collectionDB.model.LinkCollectionStore
 import com.client.xvideos.common.snackbar.SnackBar
 import com.client.xvideos.redgifs.model.GifsInfo
 import kotlinx.coroutines.DelicateCoroutinesApi
 import timber.log.Timber
 
-class R_Saved_Collection : ISavedLCollection<GifsInfo>(
+class R_Saved_Collection : LinkCollectionStore<GifsInfo>(
     AppPath.r_collection,
     GifsInfo::class.java
 )

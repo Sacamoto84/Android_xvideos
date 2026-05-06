@@ -84,7 +84,7 @@ class R_Screen_Root : Screen {
 
 
 
-        CompositionLocalProvider(LocalRootScreenModel provides ScreenRootSM()) {
+        CompositionLocalProvider(LocalRootScreenModel provides getScreenModel<ScreenRootSM>()) {
             Scaffold(
                 modifier = Modifier.imePadding(),
                 bottomBar = { DownloadIndicator(percentDownload) }) {
