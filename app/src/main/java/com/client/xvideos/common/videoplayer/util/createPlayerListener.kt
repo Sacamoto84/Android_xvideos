@@ -2,6 +2,7 @@ package com.client.xvideos.common.videoplayer.util
 
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
+import com.client.xvideos.common.diagnostics.AppDiagnostics
 import com.client.xvideos.common.videoplayer.host.MediaPlayerError
 import java.util.concurrent.TimeUnit
 
@@ -11,8 +12,9 @@ internal fun createPlayerListener(
     currentTime: (Float) -> Unit,
     loadingState: (Boolean) -> Unit,
     didEndVideo: () -> Unit,
-    error: (MediaPlayerError) -> Unit,
-    poster: (Boolean) -> Unit
+    onError: (MediaPlayerError) -> Unit,
+    poster: (Boolean) -> Unit,
+    sourceUrl: String? = null
 ): Player.Listener {
 
     return object : Player.Listener {
@@ -55,8 +57,14 @@ internal fun createPlayerListener(
         }
 
         //
-        override fun onPlayerError(error: PlaybackException) {
-            error(MediaPlayerError.PlaybackError(error.message ?: "Unknown playback error"))
+        override fun onPlayerError(playbackException: PlaybackException) {
+            val message = playbackException.message ?: "Unknown playback error"
+            AppDiagnostics.recordPlayerError(
+                source = "Media3 player",
+                url = sourceUrl,
+                message = message
+            )
+            onError(MediaPlayerError.PlaybackError(message))
         }
 
     }

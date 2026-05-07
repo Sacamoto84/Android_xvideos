@@ -128,7 +128,8 @@ fun CMPPlayer2(
                 loadingState = { isBuffering = it },
                 didEndVideo,
                 error,
-                poster
+                poster,
+                sourceUrl = url
             )
 
             exoPlayer.addListener(listener)

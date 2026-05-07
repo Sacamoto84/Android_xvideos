@@ -158,6 +158,7 @@ object AppSettingsScreen : Screen {
 
         AppSettingsScreenContent(
             onBack = { navigator.pop() },
+            onOpenDiagnostics = { navigator.push(AppDiagnosticsScreen) },
             imageCacheSizeBytes = imageCacheSizeBytes,
             videoCacheSizeBytes = videoCacheSizeBytes,
             storageStats = storageStats,
@@ -196,6 +197,7 @@ object AppSettingsScreen : Screen {
 @Composable
 private fun AppSettingsScreenContent(
     onBack: () -> Unit,
+    onOpenDiagnostics: () -> Unit,
     imageCacheSizeBytes: Long,
     videoCacheSizeBytes: Long,
     storageStats: List<StorageStat>,
@@ -233,6 +235,7 @@ private fun AppSettingsScreenContent(
     ) { paddingValues ->
         AppSettingsScreenBody(
             modifier = Modifier.padding(paddingValues),
+            onOpenDiagnostics = onOpenDiagnostics,
             imageCacheSizeBytes = imageCacheSizeBytes,
             videoCacheSizeBytes = videoCacheSizeBytes,
             storageStats = storageStats,
@@ -250,6 +253,7 @@ private fun AppSettingsScreenContent(
 @Composable
 private fun AppSettingsScreenBody(
     modifier: Modifier = Modifier,
+    onOpenDiagnostics: () -> Unit,
     imageCacheSizeBytes: Long,
     videoCacheSizeBytes: Long,
     storageStats: List<StorageStat>,
@@ -323,7 +327,8 @@ private fun AppSettingsScreenBody(
                 isNichesCacheDownloading = isNichesCacheDownloading,
                 nichesCacheProgress = nichesCacheProgress,
                 nichesCacheSize = nichesCacheSize,
-                nichesCacheLastModifiedHour = nichesCacheLastModifiedHour
+                nichesCacheLastModifiedHour = nichesCacheLastModifiedHour,
+                onOpenDiagnostics = onOpenDiagnostics
             )
         }
 
@@ -381,7 +386,7 @@ private val XSettingsGroup = SettingsGroup(
 
 private val DiagnosticsSettingsGroup = SettingsGroup(
     title = "Диагностика",
-    keywords = listOf("niches", "прогресс", "обновить", "возраст", "состояние")
+    keywords = listOf("niches", "прогресс", "обновить", "возраст", "состояние", "отчет", "отчёт", "logcat", "html", "cloudflare", "ошибки")
 )
 
 private val StorageSettingsGroup = SettingsGroup(
@@ -665,10 +670,23 @@ private fun DiagnosticsSettingsSection(
     isNichesCacheDownloading: Boolean,
     nichesCacheProgress: Float,
     nichesCacheSize: Int,
-    nichesCacheLastModifiedHour: Long
+    nichesCacheLastModifiedHour: Long,
+    onOpenDiagnostics: () -> Unit
 ) {
+    SettingsListItem(
+        icon = R.drawable.memory_24,
+        text = "Открыть диагностику",
+        subtitle = "L ошибки, HTML challenge, страницы альбомов, плеер и кэш",
+        trailing = {
+            Button(onClick = onOpenDiagnostics) {
+                Text("Открыть")
+            }
+        }
+    )
+    SettingsDivider()
+
     SettingsValueRow(
-        icon = R.drawable.data,
+        icon = R.drawable.memory_24,
         text = "Кэш Niches R",
         value = "$nichesCacheSize \u2022 ${nichesCacheLastModifiedHour}h"
     )
@@ -688,7 +706,7 @@ private fun DiagnosticsSettingsSection(
     SettingsDivider()
 
     SettingsListItem(
-        icon = R.drawable.data,
+        icon = R.drawable.memory_24,
         text = "Обновить кэш Niches",
         subtitle = if (isNichesCacheDownloading) "Идёт обновление" else "Данные для поиска и фильтров R",
         trailing = {
@@ -705,7 +723,7 @@ private fun DiagnosticsSettingsSection(
 @Composable
 private fun EmptySettingsSearchResult(query: String) {
     SettingsListItem(
-        icon = R.drawable.data,
+        icon = R.drawable.memory_24,
         text = "Ничего не найдено",
         subtitle = "Запрос: $query"
     )
@@ -741,6 +759,7 @@ private fun AppSettingsScreenPreview() {
                 Spacer(Modifier.width(48.dp))
             }
             AppSettingsScreenBody(
+                onOpenDiagnostics = {},
                 imageCacheSizeBytes = 128_000_000L,
                 videoCacheSizeBytes = 256_000_000L,
                 storageStats = EmptyStorageStats,

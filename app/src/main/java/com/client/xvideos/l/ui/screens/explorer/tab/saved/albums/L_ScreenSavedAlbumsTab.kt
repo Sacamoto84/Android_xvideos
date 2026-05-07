@@ -20,6 +20,7 @@ import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.client.xvideos.common.snackbar.SnackBar
 import com.client.xvideos.l.featured.saved.SavedL
 import com.client.xvideos.l.ui.element.AlbumListItem
 import com.client.xvideos.l.ui.screens.screenAlbum.ScreenLAlbum
@@ -64,13 +65,20 @@ object L_ScreenSavedAlbumsTab : Screen {
                         horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
                         items(vm.albums) {
+                            val albumId = it.id.toLongOrNull()
                             AlbumListItem(
                                 title = it.title,
                                 coverUrl = it.cover.url,
                                 numberOfAnimatedPictures = it.number_of_animated_pictures,
                                 numberOfPictures = it.number_of_pictures,
                                 modifier = Modifier.padding(horizontal = 2.dp, vertical = 2.dp)
-                            ) { navigator.push(ScreenLAlbum(it.id.toLong())) }
+                            ) {
+                                if (albumId != null) {
+                                    navigator.push(ScreenLAlbum(albumId))
+                                } else {
+                                    SnackBar.error("Не удалось открыть альбом: пустой id")
+                                }
+                            }
                         }
                     }
 
@@ -89,7 +97,8 @@ class ScreenLSavedAlbumsSM @Inject constructor(
 
     val state = LazyGridState()
 
-    val albums = saved.albums.list
+    val albums: List<com.client.xvideos.l.model.AlbumDetails>
+        get() = saved.albums.list.filter { it.id.toLongOrNull() != null }
 
     init {
         Timber.i("iii ScreenLSavedAlbumsSM init")

@@ -20,6 +20,12 @@ class SavedL_Albums(val db: AppDatabase, val scope: CoroutineScope) {
     val list = albumDb.list
 
     fun add(item: AlbumDetails) {
+        if (item.id.toLongOrNull() == null) {
+            Timber.w("Skip saving L album with invalid id:${item.id} name:${item.title}")
+            SnackBar.error("Альбом не сохранён: пустой id")
+            return
+        }
+
         Timber.i("addAlbum() id:${item.id} name:${item.title}")
         albumDb.insert(item.id, item)
             .onSuccess {
@@ -32,6 +38,13 @@ class SavedL_Albums(val db: AppDatabase, val scope: CoroutineScope) {
     }
 
     fun addAndPicsDetails(item: AlbumDetails, picsDetails: List<PicsDetails>) {
+        val albumId = item.id.toLongOrNull()
+        if (albumId == null) {
+            Timber.w("Skip saving L album with invalid id:${item.id} name:${item.title}")
+            SnackBar.error("Альбом не сохранён: пустой id")
+            return
+        }
+
         Timber.i("addAndPicsDetails() id:${item.id} name:${item.title} picsDetails:${picsDetails.size}")
         albumDb.insert(item.id, item)
             .onSuccess {
@@ -42,7 +55,7 @@ class SavedL_Albums(val db: AppDatabase, val scope: CoroutineScope) {
                     val gson = Gson()
                     db.albumPictureCacheDao().insert(
                         L_AlbumPictureCacheEntity(
-                            item.id.toLong(),
+                            albumId,
                             gson.toJson(picsDetails)
                         )
                     )

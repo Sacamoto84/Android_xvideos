@@ -1,6 +1,7 @@
 package com.client.xvideos.l.repository
 
 import android.content.Context
+import com.client.xvideos.common.diagnostics.AppDiagnostics
 import com.client.xvideos.common.room.AppDatabase
 import com.client.xvideos.common.room.entity.CacheUrlStringRamEntity
 import com.client.xvideos.common.room.entity.CacheUrlStringRomEntity
@@ -79,12 +80,20 @@ class Repository(
                 val username = Settings.l_login.field.value.trim()
                 val password = Settings.l_pass.field.value
                 if (username.isBlank() || password.isBlank()) {
+                    AppDiagnostics.recordLNetworkError(
+                        operation = "openURI login",
+                        message = "Luscious credentials are not configured"
+                    )
                     return Result.failure(IllegalStateException("Luscious credentials are not configured"))
                 }
                 handler.setCredentials(username, password)
                 if (!handler.loggedIn) {
                     val loggedIn = handler.login()
                     if (!loggedIn) {
+                        AppDiagnostics.recordLNetworkError(
+                            operation = "openURI login",
+                            message = "Luscious login failed"
+                        )
                         return Result.failure(IllegalStateException("Luscious login failed"))
                     }
                 }
@@ -92,6 +101,11 @@ class Repository(
         }
         catch (e: Exception){
             Timber.e(e, "!!! openURI() login error")
+            AppDiagnostics.recordLNetworkError(
+                operation = "openURI login",
+                message = e.message ?: "openURI() login error",
+                details = e.stackTraceToString()
+            )
             return Result.failure(e)
         }
 
@@ -116,6 +130,11 @@ class Repository(
                                 return cached
                             }
                             Timber.w("!!! openURI() CACHE_ROM malformed cache: ${cached.exceptionOrNull()?.message}")
+                            AppDiagnostics.recordLNetworkError(
+                                operation = "openURI CACHE_ROM cache",
+                                message = cached.exceptionOrNull()?.message ?: "Malformed CACHE_ROM entry",
+                                requestHash = cacheKey
+                            )
                             cacheUrlStringRomDao.delete(cacheKey)
                         }
                         val checkedResponse = postJsonValidated(data)
@@ -133,6 +152,12 @@ class Repository(
                     }
                     catch (e: Exception){
                         Timber.e(e, "!!! openURI() CACHE_ROM error")
+                        AppDiagnostics.recordLNetworkError(
+                            operation = "openURI CACHE_ROM",
+                            message = e.message ?: "CACHE_ROM error",
+                            details = e.stackTraceToString(),
+                            requestHash = data.toMD5()
+                        )
                         return Result.failure(e)
                     }
                 }
@@ -149,6 +174,11 @@ class Repository(
                                 return cached
                             }
                             Timber.w("!!! openURI() CACHE_RAM malformed cache: ${cached.exceptionOrNull()?.message}")
+                            AppDiagnostics.recordLNetworkError(
+                                operation = "openURI CACHE_RAM cache",
+                                message = cached.exceptionOrNull()?.message ?: "Malformed CACHE_RAM entry",
+                                requestHash = cacheKey
+                            )
                             cacheUrlStringRamDao.delete(cacheKey)
                         }
                         val checkedResponse = postJsonValidated(data)
@@ -179,6 +209,12 @@ class Repository(
                     }
                     catch (e: Exception){
                         Timber.e(e, "!!! openURI() CACHE_RAM error")
+                        AppDiagnostics.recordLNetworkError(
+                            operation = "openURI CACHE_RAM",
+                            message = e.message ?: "CACHE_RAM error",
+                            details = e.stackTraceToString(),
+                            requestHash = data.toMD5()
+                        )
                         SnackBar.error(e.message?: "openURI() CACHE_RAM error")
                         return Result.failure(e)
                     }
@@ -192,11 +228,18 @@ class Repository(
 
     private suspend fun postJsonValidated(data: String): Result<String> {
         var lastFailure: Result<String>? = null
+        val requestHash = data.toMD5()
 
         for (attempt in 0 until HTML_CHALLENGE_RETRY_ATTEMPTS) {
             val response = try {
                 postJsonThrottled(data)
             } catch (e: Exception) {
+                AppDiagnostics.recordLNetworkError(
+                    operation = "postJson",
+                    message = e.message ?: "L request failed",
+                    details = e.stackTraceToString(),
+                    requestHash = requestHash
+                )
                 return Result.failure(e)
             }
 
@@ -204,12 +247,25 @@ class Repository(
             if (checkedResponse.isSuccess) return checkedResponse
 
             val error = checkedResponse.exceptionOrNull()
-            if (!error.isHtmlChallengeResponse()) return checkedResponse
+            if (!error.isHtmlChallengeResponse()) {
+                AppDiagnostics.recordLNetworkError(
+                    operation = "postJson validate",
+                    message = error?.message ?: "Invalid JSON response",
+                    requestHash = requestHash
+                )
+                return checkedResponse
+            }
 
             lastFailure = checkedResponse
             val delayMs = htmlChallengeRetryDelay(attempt)
             scheduleHtmlChallengeCooldown(delayMs)
             Timber.w("!!! openURI() HTML challenge response, retry after ${delayMs}ms")
+            AppDiagnostics.recordLHtmlChallenge(
+                operation = "postJson validate attempt ${attempt + 1}",
+                message = error?.message ?: "Server returned HTML instead of JSON",
+                requestHash = requestHash,
+                retryDelayMs = delayMs
+            )
         }
 
         return lastFailure ?: Result.failure(IllegalStateException("Server returned HTML instead of JSON"))
@@ -311,5 +367,4 @@ enum class RepositoryUriConfig {
     CACHE_RAM, //Временный кеш в DB, после перезагрузки удаляется
     CACHE_ROM  //Постоянный кеш в DB
 }
-
 

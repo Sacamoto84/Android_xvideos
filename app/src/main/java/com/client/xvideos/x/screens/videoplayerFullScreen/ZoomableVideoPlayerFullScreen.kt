@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.MimeTypes
+import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.common.Tracks
 import androidx.media3.common.util.UnstableApi
@@ -15,6 +16,7 @@ import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.client.xvideos.common.diagnostics.AppDiagnostics
 import com.client.xvideos.common.eventBus.Event
 import com.client.xvideos.common.eventBus.EventBus
 import com.client.xvideos.screens.videoplayer.video.RepeatMode
@@ -108,6 +110,14 @@ fun ZoomableVideoPlayerFullScreen(
                                 vm.playerE?.seekTo(temp)
                             }
                         }
+                    }
+
+                    override fun onPlayerError(error: PlaybackException) {
+                        AppDiagnostics.recordPlayerError(
+                            source = "X fullscreen player",
+                            url = videoUri,
+                            message = error.message ?: "Unknown playback error"
+                        )
                     }
 
                     override fun onTracksChanged(tracks: Tracks) {
