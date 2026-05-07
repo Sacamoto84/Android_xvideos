@@ -36,10 +36,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.client.xvideos.common.coil.UrlImage
 import com.client.xvideos.common.collectionDB.model.CollectionEntity
-import com.client.xvideos.redgifs.common.ThemeRed
-import com.client.xvideos.redgifs.common.saved.SavedRed
-import com.client.xvideos.redgifs.model.GifsInfo
-import com.client.xvideos.redgifs.model.URL1
+import com.client.xvideos.r.common.ThemeRed
+import com.client.xvideos.r.common.saved.SavedRed
+import com.client.xvideos.r.model.GifsInfo
+import com.client.xvideos.r.model.URL1
 import com.client.xvideos.ui.theme.XvideosTheme
 import com.composables.core.HorizontalSeparator
 

@@ -99,36 +99,36 @@
 -dontwarn com.client.common.util.KeepScreenOnKt
 -dontwarn com.client.common.videoplayer.util.PlaybackPreference$Companion
 -dontwarn com.client.common.videoplayer.util.PlaybackPreference
--dontwarn com.client.xvideos.redgifs.ui.ScreenRedRoot
--dontwarn com.client.xvideos.redgifs.ui.root.ScreenRedRootSM
--dontwarn com.client.xvideos.redgifs.ui.explorer.tab.gifs.ScreenRedExplorerGifsSM
--dontwarn com.client.xvideos.redgifs.ui.explorer.tab.niches.ScreenRedExplorerNichesSM
--dontwarn com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.ScreenSavedCollectionSM
--dontwarn com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.ScreenSavedCreatorSM
--dontwarn com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.ScreenSavedDownloadSM
--dontwarn com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.ScreenSavedLikesSM
--dontwarn com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.savedNiche.ScreenSavedNichesSM
--dontwarn com.client.xvideos.redgifs.ui.explorer.tab.search.ScreenRedExplorerSearchSM
--dontwarn com.client.xvideos.redgifs.ui.explorer.tab.setting.ScreenRedExplorerSettingSM
--dontwarn com.client.xvideos.redgifs.ui.fullscreen.ScreenRedFullScreenSM
--dontwarn com.client.xvideos.redgifs.ui.manager_block.ScreenRedManageBlockSM
+-dontwarn com.client.xvideos.r.ui.ScreenRedRoot
+-dontwarn com.client.xvideos.r.ui.root.ScreenRedRootSM
+-dontwarn com.client.xvideos.r.ui.explorer.tab.gifs.ScreenRedExplorerGifsSM
+-dontwarn com.client.xvideos.r.ui.explorer.tab.niches.ScreenRedExplorerNichesSM
+-dontwarn com.client.xvideos.r.ui.explorer.tab.saved.tab.ScreenSavedCollectionSM
+-dontwarn com.client.xvideos.r.ui.explorer.tab.saved.tab.ScreenSavedCreatorSM
+-dontwarn com.client.xvideos.r.ui.explorer.tab.saved.tab.ScreenSavedDownloadSM
+-dontwarn com.client.xvideos.r.ui.explorer.tab.saved.tab.ScreenSavedLikesSM
+-dontwarn com.client.xvideos.r.ui.explorer.tab.saved.tab.savedNiche.ScreenSavedNichesSM
+-dontwarn com.client.xvideos.r.ui.explorer.tab.search.ScreenRedExplorerSearchSM
+-dontwarn com.client.xvideos.r.ui.explorer.tab.setting.ScreenRedExplorerSettingSM
+-dontwarn com.client.xvideos.r.ui.fullscreen.ScreenRedFullScreenSM
+-dontwarn com.client.xvideos.r.ui.manager_block.ScreenRedManageBlockSM
 -dontwarn com.example.ui.screens.niche.ScreenNicheSM$Factory
 -dontwarn com.example.ui.screens.profile.ScreenRedProfileSM$Factory
--dontwarn com.client.xvideos.redgifs.ui.top_this_week.ScreenRedTopThisWeekSM
--dontwarn com.client.xvideos.redgifs.common.block.BlockRed
--dontwarn com.client.xvideos.redgifs.common.di.HostDI
--dontwarn com.client.xvideos.redgifs.common.downloader.DownloadRed
--dontwarn com.client.xvideos.redgifs.common.downloader.Downloader
+-dontwarn com.client.xvideos.r.ui.top_this_week.ScreenRedTopThisWeekSM
+-dontwarn com.client.xvideos.r.common.block.BlockRed
+-dontwarn com.client.xvideos.r.common.di.HostDI
+-dontwarn com.client.xvideos.r.common.downloader.DownloadRed
+-dontwarn com.client.xvideos.r.common.downloader.Downloader
 -dontwarn com.redgifs.common.downloader.di.moduleKDownloader_ProvideKDownloaderFactory
--dontwarn com.client.xvideos.redgifs.common.saved.SavedRed
--dontwarn com.client.xvideos.redgifs.common.saved.SavedRed_Collection
--dontwarn com.client.xvideos.redgifs.common.saved.SavedRed_Creator
--dontwarn com.client.xvideos.redgifs.common.saved.SavedRed_Likes
--dontwarn com.client.xvideos.redgifs.common.saved.SavedRed_Niches
--dontwarn com.client.xvideos.redgifs.common.search.SearchNichesRed
--dontwarn com.client.xvideos.redgifs.common.search.SearchRed
+-dontwarn com.client.xvideos.r.common.saved.SavedRed
+-dontwarn com.client.xvideos.r.common.saved.SavedRed_Collection
+-dontwarn com.client.xvideos.r.common.saved.SavedRed_Creator
+-dontwarn com.client.xvideos.r.common.saved.SavedRed_Likes
+-dontwarn com.client.xvideos.r.common.saved.SavedRed_Niches
+-dontwarn com.client.xvideos.r.common.search.SearchNichesRed
+-dontwarn com.client.xvideos.r.common.search.SearchRed
 -dontwarn com.client.xvideos.common.snackBar.SnackBarEvent
--dontwarn com.client.xvideos.redgifs.network.api.RedApi
+-dontwarn com.client.xvideos.r.network.api.RedApi
 
 -keep class com.client.common.videoplayer.util.PlaybackPreference { *; }
 -keepclassmembers class com.client.common.videoplayer.util.PlaybackPreference$* { *; }
@@ -136,6 +136,6 @@
 -keep class com.client.common.** { *; }
 
 # Сохраняем SavedRed и всё, что внутри пакета common.saved
--keep class com.client.xvideos.redgifs.common.saved.SavedRed { *; }
--keep class com.client.xvideos.redgifs.common.saved.SavedRed$* { *; }
+-keep class com.client.xvideos.r.common.saved.SavedRed { *; }
+-keep class com.client.xvideos.r.common.saved.SavedRed$* { *; }
 -keep class com.redgifs.common.saved.** { *; }

@@ -61,10 +61,9 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.PermissionScreenActivity.PermissionStorage
 import com.client.xvideos.common.applock.AppLockRepository
 import com.client.xvideos.common.applock.AppLockSession
-import com.client.xvideos.common.settings.ui.AppSettingsScreen
 import com.client.xvideos.common.util.KeepScreenOn
 import com.client.xvideos.l.ui.screens.explorer.L_ScreenExplorer
-import com.client.xvideos.redgifs.ui.root.R_Screen_Root
+import com.client.xvideos.r.ui.root.R_Screen_Root
 import com.client.xvideos.screenRoot.ScreenRoot
 import com.client.xvideos.screens.dashboards.ScreenXDashBoards
 import com.client.xvideos.screens.videoplayer.video.cache.VideoPlayerCacheManager

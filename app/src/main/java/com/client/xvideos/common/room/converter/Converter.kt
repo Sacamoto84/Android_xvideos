@@ -1,7 +1,7 @@
 package com.client.xvideos.common.room.converter
 
 import androidx.room.TypeConverter
-import com.client.xvideos.redgifs.model.URL1
+import com.client.xvideos.r.model.URL1
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 

@@ -11,7 +11,6 @@ import androidx.compose.runtime.Composable
 import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.theme.ThemeL.ExpandMenu.style
 import com.client.xvideos.l.theme.ThemeL.ExpandMenu.tintColor
-import com.client.xvideos.redgifs.model.GifsInfo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

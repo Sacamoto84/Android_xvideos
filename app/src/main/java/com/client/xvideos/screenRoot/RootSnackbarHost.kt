@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.client.xvideos.common.snackbar.UiMessage
 import com.client.xvideos.common.snackbar.UiSnackbarVisuals
-import com.client.xvideos.redgifs.common.ThemeRed
+import com.client.xvideos.r.common.ThemeRed
 import com.client.xvideos.ui.theme.XvideosTheme
 import kotlinx.coroutines.delay
 

@@ -64,8 +64,8 @@ import com.client.xvideos.l.ui.element.expandMenu.ExpandMenuType
 import com.client.xvideos.l.ui.element.expandMenu.ExpandMenuViewModel
 import com.client.xvideos.l.ui.screens.screenFullScreen.L_FullScreenImage
 import com.client.xvideos.l.ui.screens.screenFullScreen.fullScreenImageFilteredPicArray
-import com.client.xvideos.redgifs.ui.profile.atom.VerticalScrollbar
-import com.client.xvideos.redgifs.ui.profile.rememberVisibleRangePercentIgnoringFirstNForLazyStaggeredGrid
+import com.client.xvideos.r.ui.profile.atom.VerticalScrollbar
+import com.client.xvideos.r.ui.profile.rememberVisibleRangePercentIgnoringFirstNForLazyStaggeredGrid
 import com.redgifs.common.video.player_with_menu.atom.VideoPlayerWithMenuContent
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.delay

@@ -8,7 +8,6 @@ import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.FormatListBulleted
 import androidx.compose.material.icons.outlined.BookmarkBorder
-import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Topic
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -39,10 +38,10 @@ import com.client.xvideos.l.ui.screens.LLoginContent
 import com.client.xvideos.l.ui.screens.explorer.tab.albumTopHits.L_ScreenAlbumTopHits
 import com.client.xvideos.l.ui.screens.explorer.tab.saved.L_SavedTab
 import com.client.xvideos.l.ui.screens.screenAlbumList.L_ScreenAlbumList
-import com.client.xvideos.redgifs.common.ThemeRed
-import com.client.xvideos.redgifs.ui.explorer.tab.gifs.ColumnSelect_AddColumn
-import com.client.xvideos.redgifs.ui.explorer.top.TabRow
-import com.client.xvideos.redgifs.ui.ui.atom.TabBarPoints
+import com.client.xvideos.r.common.ThemeRed
+import com.client.xvideos.r.ui.explorer.tab.gifs.ColumnSelect_AddColumn
+import com.client.xvideos.r.ui.explorer.top.TabRow
+import com.client.xvideos.r.ui.ui.atom.TabBarPoints
 import com.redgifs.common.downloader.ui.DownloadIndicator
 import dagger.Binds
 import dagger.Module

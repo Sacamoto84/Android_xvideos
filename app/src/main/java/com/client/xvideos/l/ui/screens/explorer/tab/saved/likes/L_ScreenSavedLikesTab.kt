@@ -1,7 +1,6 @@
 package com.client.xvideos.l.ui.screens.explorer.tab.saved.likes
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -34,7 +33,7 @@ import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.ui.element.expandMenu.ExpandMenuType
 import com.client.xvideos.l.ui.element.lazyRowPictureDetails.L_LazyRowPictureDetails
 import com.client.xvideos.l.ui.element.lazyRowPictureDetails.LazyRowPictureDetailsHost
-import com.client.xvideos.redgifs.ui.explorer.tab.gifs.ColumnSelect_AddColumn
+import com.client.xvideos.r.ui.explorer.tab.gifs.ColumnSelect_AddColumn
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

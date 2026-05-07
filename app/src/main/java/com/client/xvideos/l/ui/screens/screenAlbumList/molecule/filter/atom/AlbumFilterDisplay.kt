@@ -35,7 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.model.albumFilterDisplay
-import com.client.xvideos.redgifs.common.ThemeRed
+import com.client.xvideos.r.common.ThemeRed
 
 
 @Preview(showSystemUi = false, showBackground = false)

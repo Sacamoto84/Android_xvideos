@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.client.xvideos.common.eventBus.Event
 import com.client.xvideos.common.eventBus.EventBus
-import com.client.xvideos.redgifs.common.ThemeRed
+import com.client.xvideos.r.common.ThemeRed
 
 object SnackBar{
     //------------------------------------------------------------------------------

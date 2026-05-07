@@ -6,7 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import com.client.xvideos.common.room.entity.r.R_SearchHistoryNichesEntity
-import com.client.xvideos.redgifs.common.search.IDaoSearchTemplate
+import com.client.xvideos.r.common.search.IDaoSearchTemplate
 import kotlinx.coroutines.flow.Flow
 
 @Dao

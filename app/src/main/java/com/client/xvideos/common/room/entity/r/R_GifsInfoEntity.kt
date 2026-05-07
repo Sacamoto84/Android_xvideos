@@ -2,8 +2,8 @@ package com.client.xvideos.common.room.entity.r
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.client.xvideos.redgifs.model.GifsInfo
-import com.client.xvideos.redgifs.model.URL1
+import com.client.xvideos.r.model.GifsInfo
+import com.client.xvideos.r.model.URL1
 
 @Entity(tableName = "gifs_info")
 data class R_GifsInfoEntity(

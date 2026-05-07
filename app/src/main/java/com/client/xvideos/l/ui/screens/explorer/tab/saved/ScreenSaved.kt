@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Apps
 import androidx.compose.material.icons.outlined.Folder
-import androidx.compose.material.icons.outlined.Group
 import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
@@ -28,9 +27,9 @@ import com.client.xvideos.l.ui.screens.explorer.tab.saved.albums.L_ScreenSavedAl
 import com.client.xvideos.l.ui.screens.explorer.tab.saved.collection.L_Screen_CollectionTab
 import com.client.xvideos.l.ui.screens.explorer.tab.saved.likes.L_ScreenSavedLikesTab
 import com.client.xvideos.l.ui.screens.explorer.tab.saved.likes.L_ScreenSavedLikesTab_AddColumn
-import com.client.xvideos.redgifs.ui.explorer.tab.gifs.ColumnSelect_AddColumn
-import com.client.xvideos.redgifs.ui.ui.atom.TabBarPoints
-import com.client.xvideos.redgifs.common.ThemeRed
+import com.client.xvideos.r.ui.explorer.tab.gifs.ColumnSelect_AddColumn
+import com.client.xvideos.r.ui.ui.atom.TabBarPoints
+import com.client.xvideos.r.common.ThemeRed
 import kotlinx.collections.immutable.persistentListOf
 
 object L_SavedTab : Screen {

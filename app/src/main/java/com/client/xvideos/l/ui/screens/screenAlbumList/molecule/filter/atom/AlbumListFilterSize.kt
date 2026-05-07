@@ -32,7 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.model.enum.PictureCountRank
-import com.client.xvideos.redgifs.common.ThemeRed
+import com.client.xvideos.r.common.ThemeRed
 
 private val style = ThemeL.Type.rowTitle.copy(fontWeight = FontWeight.Bold)
 

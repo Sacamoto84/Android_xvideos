@@ -16,8 +16,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import com.client.xvideos.common.coil.UrlImage
 import com.client.xvideos.common.vibrate.vibrateWithPatternAndAmplitude
-import com.client.xvideos.xvideos.model.ItemsX
-import com.client.xvideos.xvideos.parcer.parserVideoPreviewFromImageUrl
+import com.client.xvideos.x.model.ItemsX
+import com.client.xvideos.x.parcer.parserVideoPreviewFromImageUrl
 import timber.log.Timber
 
 @OptIn(ExperimentalFoundationApi::class)

@@ -24,7 +24,7 @@ import com.client.xvideos.common.room.entity.r.R_CacheMediaResponseEntity
 import com.client.xvideos.common.room.entity.r.R_GifsInfoEntity
 import com.client.xvideos.common.room.entity.r.R_SearchHistoryExplorerEntity
 import com.client.xvideos.common.room.entity.r.R_SearchHistoryNichesEntity
-import com.client.xvideos.xvideos.model.ItemsX
+import com.client.xvideos.x.model.ItemsX
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

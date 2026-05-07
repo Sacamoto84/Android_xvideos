@@ -9,8 +9,8 @@ import com.client.xvideos.PermissionScreenActivity.PermissionStorage
 import com.client.xvideos.common.applock.AppLockRepository
 import com.client.xvideos.common.applock.AppLockSession
 import com.client.xvideos.common.room.AppDatabase
-import com.client.xvideos.redgifs.common.block.BlockRed
-import com.client.xvideos.redgifs.common.saved.SavedRed
+import com.client.xvideos.r.common.block.BlockRed
+import com.client.xvideos.r.common.saved.SavedRed
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
