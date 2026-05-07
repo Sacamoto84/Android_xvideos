@@ -35,6 +35,7 @@ fun rememberExoPlayerWithLifecycle(
     context: Context,
     isPause: Boolean,
     isLiveStream: Boolean,
+    isLooping: Boolean,
     headers: Map<String, String>?,
     drmConfig: DrmConfig?,
     error: (MediaPlayerError) -> Unit,
@@ -58,9 +59,16 @@ fun rememberExoPlayerWithLifecycle(
             .setSeekBackIncrementMs(1000L)    // Опционально: Устанавливаем приращение для перемотки назад на 1000 мс
             .build().apply {
                 videoScalingMode = C.VIDEO_SCALING_MODE_SCALE_TO_FIT
-                repeatMode = Player.REPEAT_MODE_OFF
                 setHandleAudioBecomingNoisy(true)
             }
+    }
+
+    LaunchedEffect(isLooping) {
+        exoPlayer.repeatMode = if (isLooping) {
+            Player.REPEAT_MODE_ONE
+        } else {
+            Player.REPEAT_MODE_OFF
+        }
     }
 
     LaunchedEffect(selectedQuality) {

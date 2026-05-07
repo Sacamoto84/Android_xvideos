@@ -61,6 +61,7 @@ fun CMPPlayer2(
         context,
         isPause,
         isLiveStream,
+        loop,
         headers,
         drmConfig,
         error,
@@ -126,8 +127,6 @@ fun CMPPlayer2(
                 currentTime = {},
                 loadingState = { isBuffering = it },
                 didEndVideo,
-                loop,
-                exoPlayer,
                 error,
                 poster
             )

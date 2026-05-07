@@ -10,6 +10,7 @@ import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.datasource.cache.Cache
 import androidx.media3.datasource.cache.CacheDataSource
+import androidx.media3.datasource.cache.CacheDataSink
 import androidx.media3.exoplayer.drm.DefaultDrmSessionManager
 import androidx.media3.exoplayer.drm.FrameworkMediaDrm
 import androidx.media3.exoplayer.drm.LocalMediaDrmCallback
@@ -94,11 +95,10 @@ fun createProgressiveMediaSource(
     val dataSourceFactory = CacheDataSource.Factory()
         .setCache(cache)
         .setUpstreamDataSourceFactory(DefaultDataSource.Factory(context, httpDataSourceFactory))
-        .setCacheWriteDataSinkFactory(null)
+        .setCacheWriteDataSinkFactory(CacheDataSink.Factory().setCache(cache))
         .setFlags(
             CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR or
-                    CacheDataSource.FLAG_BLOCK_ON_CACHE or
-                    CacheDataSource.FLAG_IGNORE_CACHE_FOR_UNSET_LENGTH_REQUESTS
+                    CacheDataSource.FLAG_BLOCK_ON_CACHE
         )
 
     return ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(mediaItem)

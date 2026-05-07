@@ -2,7 +2,6 @@ package com.client.xvideos.common.videoplayer.util
 
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
-import androidx.media3.exoplayer.ExoPlayer
 import com.client.xvideos.common.videoplayer.host.MediaPlayerError
 import java.util.concurrent.TimeUnit
 
@@ -12,8 +11,6 @@ internal fun createPlayerListener(
     currentTime: (Float) -> Unit,
     loadingState: (Boolean) -> Unit,
     didEndVideo: () -> Unit,
-    loop: Boolean,
-    exoPlayer: ExoPlayer,
     error: (MediaPlayerError) -> Unit,
     poster: (Boolean) -> Unit
 ): Player.Listener {
@@ -49,8 +46,6 @@ internal fun createPlayerListener(
                 Player.STATE_ENDED -> {
                     loadingState(false)
                     didEndVideo()
-                    exoPlayer.seekTo(0)
-                    if (loop) exoPlayer.play()
                 }
 
                 Player.STATE_IDLE -> {
