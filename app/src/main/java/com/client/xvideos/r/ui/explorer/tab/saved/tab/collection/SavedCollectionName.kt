@@ -21,10 +21,11 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
-import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
 import cafe.adriel.voyager.hilt.getScreenModel
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.common.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.r.common.ThemeRed
@@ -51,9 +52,12 @@ import dagger.multibindings.IntoMap
 import kotlinx.coroutines.DelicateCoroutinesApi
 import timber.log.Timber
 
-class ScreenCollectionName(val collectionName: String) : Screen {
+class ScreenCollectionName(
+    val collectionName: String,
+    private val popOnBack: Boolean = false
+) : Screen {
 
-    override val key: ScreenKey = uniqueScreenKey
+    override val key: ScreenKey = "RCollection:$collectionName:$popOnBack"
 
     @OptIn(DelicateCoroutinesApi::class)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -61,6 +65,7 @@ class ScreenCollectionName(val collectionName: String) : Screen {
     override fun Content() {
 
         val vm = getScreenModel<ScreenRedCollectionNameSM, ScreenRedCollectionNameSM.Factory> { factory -> factory.create(collectionName) }
+        val navigator = LocalNavigator.currentOrThrow
         var blockItem by rememberSaveable { mutableStateOf<GifsInfo?>(null) }
         val savedRed = vm.savedRed
 
@@ -69,6 +74,9 @@ class ScreenCollectionName(val collectionName: String) : Screen {
         BackHandler {
             Timber.i("iii BackHandler SavedCollectionTab")
             savedRed.collections.selectedCollection.value = null
+            if (popOnBack) {
+                navigator.pop()
+            }
         }
 
         val columnSelect  = Settings.r_collectionTab_column_current_count.field.collectAsStateWithLifecycle().value
@@ -78,7 +86,7 @@ class ScreenCollectionName(val collectionName: String) : Screen {
 
         Scaffold(topBar = {
             Text(
-                ">Коллекция>$selectedCollection",
+                ">Коллекция>${selectedCollection ?: collectionName}",
                 modifier = Modifier.padding(start = 8.dp),
                 color = ThemeRed.colorYellow,
                 fontSize = 18.sp,

@@ -46,10 +46,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
-import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
 import cafe.adriel.voyager.hilt.getScreenModel
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.l.featured.saved.LCollectionDuplicateGroup
 import com.client.xvideos.l.featured.saved.SavedL
@@ -72,9 +73,12 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
 
-class ScreenCollectionName(val collectionName: String) : Screen {
+class ScreenCollectionName(
+    val collectionName: String,
+    private val popOnBack: Boolean = false
+) : Screen {
 
-    override val key: ScreenKey = uniqueScreenKey
+    override val key: ScreenKey = "LCollection:$collectionName:$popOnBack"
 
     @OptIn(DelicateCoroutinesApi::class)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -82,11 +86,18 @@ class ScreenCollectionName(val collectionName: String) : Screen {
     override fun Content() {
 
         val vm = getScreenModel<ScreenLCollectionNameSM, ScreenLCollectionNameSM.Factory> { factory -> factory.create(collectionName) }
+        val navigator = LocalNavigator.currentOrThrow
 
         L_CollectionNameContent(
             collectionName = collectionName,
             savedL = vm.savedL,
-            host = vm.host
+            host = vm.host,
+            onExitCollection = {
+                vm.savedL.collection.currentCollectionName = null
+                if (popOnBack) {
+                    navigator.pop()
+                }
+            }
         )
 
     }
@@ -111,21 +122,16 @@ fun L_CollectionNameContent(
 fun L_CollectionNameContent(
     collectionName: String,
     savedL: SavedL,
-    host: LazyRowPictureDetailsHost
+    host: LazyRowPictureDetailsHost,
+    onExitCollection: (() -> Unit)? = null
 ) {
-    // Set the current collection for the collection manager
-    LaunchedEffect(collectionName) {
-        savedL.collection.setCollection(collectionName)
-    }
+    val searchQuery = host.collectionSearchQuery
+    val duplicateDialogVisible = host.collectionDuplicateDialogVisible
 
-    var searchQuery by rememberSaveable(collectionName) { mutableStateOf("") }
-    var duplicateDialogVisible by remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit, searchQuery) {
+    LaunchedEffect(host, searchQuery) {
         snapshotFlow { savedL.collection.listUrl.toList() }
             .collectLatest { items ->
-                host.filteredPic.clear()
-                host.filteredPic.addAll(items.filter { it.matchesCollectionSearch(searchQuery) })
+                host.replaceFilteredPictures(items.filter { it.matchesCollectionSearch(searchQuery) })
             }
     }
 
@@ -136,10 +142,10 @@ fun L_CollectionNameContent(
     if (duplicateDialogVisible) {
         LCollectionDuplicatesDialog(
             groups = duplicateGroups,
-            onDismiss = { duplicateDialogVisible = false },
+            onDismiss = { host.collectionDuplicateDialogVisible = false },
             onRemoveDuplicates = {
                 savedL.collection.removeDuplicateItems(collectionName)
-                duplicateDialogVisible = false
+                host.collectionDuplicateDialogVisible = false
             }
         )
     }
@@ -149,7 +155,9 @@ fun L_CollectionNameContent(
             host.selection.clear()
         } else {
             Timber.i("iii BackHandler SavedCollectionTab")
-            savedL.collection.currentCollectionName = null
+            onExitCollection?.invoke() ?: run {
+                savedL.collection.currentCollectionName = null
+            }
         }
     }
 
@@ -162,9 +170,9 @@ fun L_CollectionNameContent(
         LCollectionDetailTopBar(
             collectionName = selectedCollection ?: collectionName,
             searchQuery = searchQuery,
-            onSearchChange = { searchQuery = it },
+            onSearchChange = { host.collectionSearchQuery = it },
             duplicateCount = duplicateGroups.sumOf { it.items.size - 1 },
-            onDuplicatesClick = { duplicateDialogVisible = true }
+            onDuplicatesClick = { host.collectionDuplicateDialogVisible = true }
         )
     }) { padding ->
         Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center){
@@ -392,12 +400,18 @@ class ScreenLCollectionNameSM @AssistedInject constructor(
     val host = LazyRowPictureDetailsHost(collectionName)
 
     init {
+        ensureCollectionLoaded()
+    }
+
+    fun ensureCollectionLoaded() {
+        if (savedL.collection.currentCollectionName != collectionName || savedL.collection.listUrl.isEmpty()) {
+            savedL.collection.setCollection(collectionName)
+        }
         syncItems(savedL.collection.listUrl.toList())
     }
 
     fun syncItems(items: List<PicsDetails>) {
-        host.filteredPic.clear()
-        host.filteredPic.addAll(items)
+        host.replaceFilteredPictures(items)
     }
 
     fun delete(item: PicsDetails) {

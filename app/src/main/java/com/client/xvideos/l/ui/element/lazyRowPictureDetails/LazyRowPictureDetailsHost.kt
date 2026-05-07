@@ -36,6 +36,17 @@ class LazyRowPictureDetailsHost(
 
     val selection = LPictureSelectionState()
 
+    var collectionSearchQuery by mutableStateOf("")
+
+    var collectionDuplicateDialogVisible by mutableStateOf(false)
+
+    fun replaceFilteredPictures(items: List<PicsDetails>) {
+        if (filteredPic.hasSameItems(items)) return
+
+        filteredPic.clear()
+        filteredPic.addAll(items)
+    }
+
 }
 
 class LPictureSelectionState {
@@ -74,5 +85,10 @@ fun PicsDetails.selectionKey(): String {
         ?: url_to_video
         ?: thumbnails?.firstOrNull { !it.url.isNullOrBlank() }?.url
         ?: "${album.orEmpty()}-$width-$height-${is_animated}"
+}
+
+private fun List<PicsDetails>.hasSameItems(items: List<PicsDetails>): Boolean {
+    if (size != items.size) return false
+    return indices.all { index -> this[index].selectionKey() == items[index].selectionKey() }
 }
 

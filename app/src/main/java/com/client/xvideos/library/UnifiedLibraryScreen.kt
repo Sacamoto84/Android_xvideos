@@ -192,8 +192,18 @@ object UnifiedLibraryScreen : Screen {
                     items(snapshot.collections, key = { it.key }) { item ->
                         LibraryCollectionRow(item) {
                             when (item.target) {
-                                is LibraryCollectionTarget.LCollection -> navigator.push(LCollectionScreen(item.target.name))
-                                is LibraryCollectionTarget.RCollection -> navigator.push(RCollectionScreen(item.target.name))
+                                is LibraryCollectionTarget.LCollection -> navigator.push(
+                                    LCollectionScreen(
+                                        collectionName = item.target.name,
+                                        popOnBack = true
+                                    )
+                                )
+                                is LibraryCollectionTarget.RCollection -> navigator.push(
+                                    RCollectionScreen(
+                                        collectionName = item.target.name,
+                                        popOnBack = true
+                                    )
+                                )
                             }
                         }
                     }

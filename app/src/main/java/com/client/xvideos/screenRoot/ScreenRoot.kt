@@ -44,7 +44,6 @@ import com.client.xvideos.common.eventBus.EventBus
 import com.client.xvideos.common.snackbar.show
 import com.client.xvideos.common.traficStatistic.AppNetworkSpeedMonitorLite
 import com.client.xvideos.l.theme.ThemeL
-import com.client.xvideos.l.ui.screens.explorer.L_ScreenExplorer
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -159,13 +158,13 @@ private fun HomeFloatingActionButton(mainNavigator: Navigator?) {
         }
     }
 
-    if (rootVm.depthState.depth > 0) {
+    if (navigationDepth > 0 || rootVm.depthState.depth > 0) {
         Box {
             SmallFloatingActionButton(
                 onClick = {
                     mainNavigator?.let { nav ->
-                        if (nav.lastItem !is L_ScreenExplorer) {
-                            nav.replaceAll(L_ScreenExplorer())
+                        if (nav.lastItem !is MenuScreen) {
+                            nav.replaceAll(MenuScreen)
                         }
                     }
                 },

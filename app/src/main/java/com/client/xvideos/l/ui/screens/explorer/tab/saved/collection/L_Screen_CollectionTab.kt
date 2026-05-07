@@ -60,6 +60,7 @@ import com.client.xvideos.l.featured.saved.LCollectionSortOrder
 import com.client.xvideos.l.featured.saved.LSmartCollectionCandidate
 import com.client.xvideos.l.featured.saved.SavedL
 import com.client.xvideos.l.theme.ThemeL
+import com.client.xvideos.l.ui.element.lazyRowPictureDetails.LazyRowPictureDetailsHost
 import com.composeunstyled.Text
 import dagger.Binds
 import dagger.Module
@@ -254,7 +255,8 @@ object L_Screen_CollectionTab : Screen {
                 if (selectedCollection != null) {
                     L_CollectionNameContent(
                         collectionName = selectedCollection,
-                        savedL = savedL
+                        savedL = savedL,
+                        host = vm.hostFor(selectedCollection)
                     )
                 }
             }
@@ -454,6 +456,13 @@ class ScreenSavedCollectionSM @Inject constructor(
 ) : ScreenModel {
 
     val gridState = LazyGridState()
+    private val collectionHosts = mutableMapOf<String, LazyRowPictureDetailsHost>()
+
+    fun hostFor(collectionName: String): LazyRowPictureDetailsHost {
+        return collectionHosts.getOrPut(collectionName) {
+            LazyRowPictureDetailsHost(collectionName)
+        }
+    }
 }
 
 @Module

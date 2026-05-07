@@ -102,12 +102,18 @@ class LazyRow123Host(
             //.debounce(2000)                                       // ② ждём паузу ввода
             .distinctUntilChanged()                                 // ③ игнорируем дубли
             .flatMapLatest { params ->                              // ④ НОВЫЙ Pager при каждом изменении
+                val shouldResetScroll = lastPagerParams?.let { it != params } == true
+                lastPagerParams = params
+                var resetScrollConsumed = false
                 Pager(
                     config = PagingConfig( pageSize = 100, prefetchDistance = 10, initialLoadSize = 100 ),
                     pagingSourceFactory = {
                         Timber.d("!!! >>>pagingSourceFactory{...}")
-                        gotoUp()
-                        gotoUpColumn()
+                        if (shouldResetScroll && !resetScrollConsumed) {
+                            resetScrollConsumed = true
+                            gotoUp()
+                            gotoUpColumn()
+                        }
                         createPager(
                             typePager = typePager,  sort = params.sort,
                             extraString = extraString, searchText = params.query,
@@ -124,6 +130,7 @@ class LazyRow123Host(
     var columns by mutableIntStateOf(startColumns)             //Количество колонок
     var currentIndex by mutableIntStateOf(0)
     var currentIndexGoto by mutableIntStateOf(0)
+    private var lastPagerParams: SearchParams? = null
 
     fun gotoUp() { scope.launch { state.scrollToItem(0) } }
 
