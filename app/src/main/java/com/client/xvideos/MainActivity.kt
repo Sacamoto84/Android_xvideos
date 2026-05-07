@@ -32,6 +32,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -48,8 +49,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -62,6 +65,7 @@ import com.client.xvideos.PermissionScreenActivity.PermissionStorage
 import com.client.xvideos.common.applock.AppLockRepository
 import com.client.xvideos.common.applock.AppLockSession
 import com.client.xvideos.common.util.KeepScreenOn
+import com.client.xvideos.library.UnifiedLibraryScreen
 import com.client.xvideos.l.ui.screens.explorer.L_ScreenExplorer
 import com.client.xvideos.r.common.saved.SavedRed
 import com.client.xvideos.r.ui.root.R_Screen_Root
@@ -221,6 +225,10 @@ object MenuScreen : Screen {
                 verticalArrangement = Arrangement.Bottom
             ) {
 
+                ButtonSelectText("Библиотека") {
+                    navigator.push(UnifiedLibraryScreen)
+                }
+
                 ButtonSelect(R.drawable.icon_xvideos_white) {
                     navigator.push(ScreenXDashBoards())
                 }
@@ -275,6 +283,28 @@ private fun ButtonSelect(iconId: Int, tag : String= "", onClick: () -> Unit) {
         )
     }
 
+}
+
+@Composable
+private fun ButtonSelectText(text: String, onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .border(2.dp, Color(0xFF565656), RoundedCornerShape(16.dp))
+            .background(Color(0xFF212121))
+            .clickable { onClick() }
+            .padding(vertical = 22.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = text,
+            color = Color.White,
+            fontSize = 28.sp,
+            fontWeight = FontWeight.SemiBold
+        )
+    }
 }
 
 /**

@@ -39,6 +39,11 @@ data class LSavedLikeMetadata(
 private val lSavedLikeGson = GsonBuilder().setPrettyPrinting().create()
 
 fun readLSavedLikeMetadata(file: File): LSavedLikeMetadata? {
+    if (!file.exists()) {
+        Timber.w("L saved metadata missing, skip folder: ${file.parentFile?.absolutePath ?: file.absolutePath}")
+        return null
+    }
+
     return try {
         lSavedLikeGson.fromJson(file.readText(Charsets.UTF_8), LSavedLikeMetadata::class.java)
     } catch (e: Exception) {
