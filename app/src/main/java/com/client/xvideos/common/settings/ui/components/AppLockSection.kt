@@ -3,8 +3,6 @@ package com.client.xvideos.common.settings.ui.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
@@ -26,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.client.xvideos.common.applock.AccessCodeVisualTransformation
 import com.client.xvideos.common.applock.AppLockRepository
+import com.client.xvideos.R
 import com.client.xvideos.common.applock.DisableAppLockAutofill
 import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.common.snackbar.SnackBar
@@ -60,7 +59,7 @@ fun AppLockSettingsSection() {
 
     Column(modifier = Modifier.fillMaxWidth()) {
         SettingsListItem(
-            icon = Icons.Outlined.Lock,
+            icon = R.drawable.key_24,
             text = "Блокировка при запуске",
             subtitle = if (enabled) "Включена" else "Выключена",
             trailing = {
@@ -74,7 +73,7 @@ fun AppLockSettingsSection() {
 
         if (enabled) {
             SettingsListItem(
-                icon = Icons.Outlined.Lock,
+                icon = R.drawable.icon_red,
                 text = "Код доступа",
                 subtitle = "Отключить блокировку приложения",
                 trailing = {

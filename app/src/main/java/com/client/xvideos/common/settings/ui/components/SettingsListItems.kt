@@ -1,5 +1,6 @@
 package com.client.xvideos.common.settings.ui.components
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,8 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Slider
@@ -30,11 +29,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.client.xvideos.R
 import com.client.xvideos.common.settings.ui.DialogButton
 import com.client.xvideos.l.theme.ThemeL
 import kotlin.math.roundToInt
@@ -48,9 +46,9 @@ internal val SettingsDividerColor = Color(0xFF555555)
 fun SettingsSectionTitle(text: String) {
     Text(
         text = text,
-        modifier = Modifier.padding(start = 16.dp, top = 18.dp, bottom = 6.dp),
+        modifier = Modifier.padding(start = 72.dp, top = 18.dp, bottom = 6.dp),
         color = SettingsRowTextSecondary,
-        style = ThemeL.Type.sectionTitle.copy(color = SettingsRowTextSecondary, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+        style = ThemeL.Type.sectionTitle.copy(color = SettingsRowTextSecondary)
     )
 }
 
@@ -63,7 +61,7 @@ private fun SettingsSectionTitlePreview() = SettingsPreview {
 @Composable
 fun SettingsDivider() {
     HorizontalDivider(
-        modifier = Modifier,
+        modifier = Modifier.padding(start = 72.dp),
         color = SettingsDividerColor
     )
 }
@@ -76,7 +74,7 @@ private fun SettingsDividerPreview() = SettingsPreview {
 
 @Composable
 fun SettingsListItem(
-    icon: ImageVector,
+    @DrawableRes icon: Int,
     text: String,
     subtitle: String? = null,
     trailing: @Composable (() -> Unit)? = null
@@ -118,23 +116,24 @@ fun SettingsListItem(
 @Composable
 private fun SettingsListItemPreview() = SettingsPreview {
     SettingsListItem(
-        icon = Icons.Outlined.Image,
+        icon = R.drawable.icon_red,
         text = "Название",
         subtitle = "Подзаголовок"
     )
 }
 
 @Composable
-fun SettingsIcon(icon: ImageVector) {
+fun SettingsIcon(@DrawableRes icon: Int) {
     Box(
         modifier = Modifier
             .size(40.dp)
             .clip(RoundedCornerShape(20.dp))
-            .background(SettingsRowIconBackground),
+            //.background(SettingsRowIconBackground),
+                ,
         contentAlignment = Alignment.Center
     ) {
         Icon(
-            imageVector = icon,
+            painter = painterResource(icon),
             contentDescription = null,
             tint = SettingsRowTextSecondary,
             modifier = Modifier.size(24.dp)
@@ -145,12 +144,12 @@ fun SettingsIcon(icon: ImageVector) {
 @Preview(showBackground = true, backgroundColor = 0xFF353535)
 @Composable
 private fun SettingsIconPreview() = SettingsPreview {
-    SettingsIcon(Icons.Outlined.Image)
+    SettingsIcon(R.drawable.icon_red)
 }
 
 @Composable
 fun SettingsValueRow(
-    icon: ImageVector,
+    @DrawableRes icon: Int,
     text: String,
     value: String
 ) {
@@ -165,7 +164,7 @@ fun SettingsValueRow(
 @Composable
 private fun SettingsValueRowPreview() = SettingsPreview {
     SettingsValueRow(
-        icon = Icons.Outlined.Image,
+        icon = R.drawable.icon_red,
         text = "RAM кеш",
         value = "128 MB"
     )
@@ -173,7 +172,7 @@ private fun SettingsValueRowPreview() = SettingsPreview {
 
 @Composable
 fun SettingsSwitchRow(
-    icon: ImageVector,
+    @DrawableRes icon: Int,
     text: String,
     subtitle: String,
     value: Boolean,
@@ -197,7 +196,7 @@ fun SettingsSwitchRow(
 private fun SettingsSwitchRowPreview() = SettingsPreview {
     var checked by remember { mutableStateOf(true) }
     SettingsSwitchRow(
-        icon = Icons.Outlined.Image,
+        icon = R.drawable.icon_red,
         text = "Переключатель",
         subtitle = if (checked) "Вкл" else "Выкл",
         value = checked,
@@ -207,7 +206,7 @@ private fun SettingsSwitchRowPreview() = SettingsPreview {
 
 @Composable
 fun SettingsButtonRowWithDialog(
-    icon: ImageVector,
+    @DrawableRes icon: Int,
     text: String,
     value: String,
     textDialogTitle: String,
@@ -244,7 +243,7 @@ fun SettingsButtonRowWithDialog(
 @Composable
 private fun SettingsButtonRowWithDialogPreview() = SettingsPreview {
     SettingsButtonRowWithDialog(
-        icon = Icons.Outlined.Image,
+        icon = R.drawable.icon_red,
         text = "Очистить",
         value = "Сброс",
         textDialogTitle = "Подтвердить",
@@ -262,7 +261,7 @@ fun IntSliderSetting(
     max: Int,
     step: Int,
     suffix: String,
-    icon: ImageVector = Icons.Outlined.Image,
+    @DrawableRes icon: Int = R.drawable.icon_red,
     enabled: Boolean = true,
     onValueChangeFinished: (Int) -> Unit
 ) {

@@ -12,13 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.outlined.Apps
-import androidx.compose.material.icons.outlined.Folder
-import androidx.compose.material.icons.outlined.Image
-import androidx.compose.material.icons.outlined.Movie
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -38,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -187,7 +181,7 @@ private fun AppSettingsScreenContent(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = onBack) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null, tint = Color.White)
+                    Icon(painterResource(R.drawable.arrow_down), contentDescription = null, tint = Color.White)
                 }
                 Text(
                     "Настройки",
@@ -269,7 +263,7 @@ private fun AppSettingsScreenBody(
         SettingsDivider()
 
         SettingsSwitchRow(
-            icon = Icons.Outlined.Image,
+            icon = R.drawable.icon_luscious,
             text = "Дисковый кеш картинок",
             subtitle = if (diskCacheEnabled) "Включён" else "Выключен",
             value = diskCacheEnabled,
@@ -288,7 +282,7 @@ private fun AppSettingsScreenBody(
             max = CoilImageLoaderFactory.MAX_DISK_CACHE_SIZE_MB,
             step = 50,
             suffix = " MB",
-            icon = Icons.Outlined.Folder,
+            icon = R.drawable.icon_red,
             enabled = diskCacheEnabled,
             onValueChangeFinished = { value ->
                 Settings.image_cache_disk_size_mb.setValue(value)
@@ -299,14 +293,14 @@ private fun AppSettingsScreenBody(
         SettingsDivider()
 
         SettingsValueRow(
-            icon = Icons.Outlined.Folder,
+            icon = R.drawable.icon_red,
             text = "Кеш на диске",
             value = com.client.xvideos.common.util.formatBytes(diskCacheSizeBytes)
         )
         SettingsDivider()
 
         SettingsButtonRowWithDialog(
-            icon = Icons.Filled.Delete,
+            icon = R.drawable.icon_red,
             text = "Сброс кеша картинок",
             value = "Сброс",
             textDialogTitle = "Очистить кеш картинок",
@@ -320,7 +314,7 @@ private fun AppSettingsScreenBody(
         SettingsSectionTitle("XVideos")
         val xvideosRow2 = Settings.xvideos_row2.field.collectAsStateWithLifecycle().value
         SettingsSwitchRow(
-            icon = Icons.Outlined.Movie,
+            icon = R.drawable.icon_xvideos_white,
             text = "2 столбика",
             subtitle = if (xvideosRow2) "Включено" else "Выключено",
             value = xvideosRow2,
@@ -330,7 +324,7 @@ private fun AppSettingsScreenBody(
 
         val xvideosShemale = Settings.xvideos_shemale.field.collectAsStateWithLifecycle().value
         SettingsSwitchRow(
-            icon = Icons.Outlined.Movie,
+            icon = R.drawable.icon_xvideos_white,
             text = "Shemale",
             subtitle = if (xvideosShemale) "Включено" else "Выключено",
             value = xvideosShemale,
@@ -341,7 +335,7 @@ private fun AppSettingsScreenBody(
         // Luscious
         SettingsSectionTitle("Luscious")
         SettingsButtonRowWithDialog(
-            icon = Icons.Outlined.Image,
+            icon = R.drawable.icon_luscious,
             text = "Профиль L",
             value = if (l_login.isBlank()) "Нет" else "Выйти",
             textDialogTitle = "Выйти из профиля L",
@@ -362,7 +356,7 @@ private fun AppSettingsScreenBody(
         val thumbnailSize = Settings.thumbalistSize.field.collectAsStateWithLifecycle().value
         val currentDisplayName = ThumbnailsSize.fromValue(thumbnailSize)?.displayName ?: "?"
         SettingsValueRow(
-            icon = Icons.Outlined.Image,
+            icon = R.drawable.icon_luscious,
             text = "Размер миниатюры",
             value = currentDisplayName
         )
@@ -385,21 +379,21 @@ private fun AppSettingsScreenBody(
         // RedGifs
         SettingsSectionTitle("RedGifs")
         SettingsValueRow(
-            icon = Icons.Outlined.Folder,
+            icon = R.drawable.icon_red,
             text = "Размер всех папок Red",
             value = sizeRedTotal.toPrettyCount3()
         )
         SettingsDivider()
 
         SettingsValueRow(
-            icon = Icons.Outlined.Folder,
+            icon = R.drawable.icon_red,
             text = "Размер папки Download",
             value = sizeRedDownload.toPrettyCount3()
         )
         SettingsDivider()
 
         SettingsButtonRowWithDialog(
-            icon = Icons.Filled.Delete,
+            icon = R.drawable.icon_red,
             text = "Очистить папку Download",
             value = "Очистить",
             textDialogTitle = "Очистка папки Download",
@@ -410,7 +404,7 @@ private fun AppSettingsScreenBody(
         SettingsDivider()
 
         SettingsValueRow(
-            icon = Icons.Outlined.Apps,
+            icon = R.drawable.icon_red,
             text = "Кеш Niches",
             value = "$nichesCacheSize \u2022 ${nichesCacheLastModifiedHour}h"
         )
@@ -428,7 +422,7 @@ private fun AppSettingsScreenBody(
         }
 
         SettingsListItem(
-            icon = Icons.Outlined.Apps,
+            icon = R.drawable.icon_red,
             text = "Обновить кеш Niches",
             trailing = {
                 Button(onClick = { savedRed?.nichesCache?.refresh() }) {

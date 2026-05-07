@@ -1,5 +1,6 @@
 package com.client.xvideos.common.settings.ui.components
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,10 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Apps
-import androidx.compose.material.icons.outlined.Image
-import androidx.compose.material.icons.outlined.Movie
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,9 +18,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.client.xvideos.R
 import com.client.xvideos.common.AppPath
 import com.client.xvideos.common.util.formatBytes
 import com.client.xvideos.l.theme.ThemeL
@@ -51,7 +48,7 @@ internal val EmptyStorageStats = listOf(
 internal fun StorageStatisticsSection(stats: List<StorageStat>) {
     val totalBytes = stats.sumOf { it.sizeBytes }
     SettingsValueRow(
-        icon = Icons.Outlined.Apps,
+        icon = R.drawable.icon_red,
         text = "Всего данных",
         value = formatBytes(totalBytes)
     )
@@ -134,11 +131,12 @@ private fun StorageProgressRowPreview() = SettingsPreview {
     )
 }
 
-private fun storageIcon(key: String): ImageVector {
+@DrawableRes
+private fun storageIcon(key: String): Int {
     return when (key) {
-        "X" -> Icons.Outlined.Movie
-        "L" -> Icons.Outlined.Image
-        else -> Icons.Outlined.Apps
+        "X" -> R.drawable.icon_xvideos_mini
+        "L" -> R.drawable.icon_luscious
+        else -> R.drawable.icon_red
     }
 }
 
