@@ -1,6 +1,9 @@
 package com.client.xvideos.l.repository
 
 import android.content.Context
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import com.client.xvideos.common.diagnostics.AppDiagnostics
 import com.client.xvideos.common.room.AppDatabase
 import com.client.xvideos.common.room.entity.CacheUrlStringRamEntity
@@ -19,6 +22,19 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+
+data class LRepositoryProtectionUiState(
+    val active: Boolean = false,
+    val message: String = "",
+    val retryAtMs: Long = 0L,
+    val retryDelayMs: Long = 0L,
+    val requestHash: String? = null,
+    val updatedAtMs: Long = 0L
+) {
+    fun remainingMs(nowMs: Long = System.currentTimeMillis()): Long {
+        return (retryAtMs - nowMs).coerceAtLeast(0L)
+    }
+}
 
 class Repository(
     dbCache: AppDatabase,
@@ -47,6 +63,9 @@ class Repository(
     @Volatile
     private var htmlChallengeCooldownUntilMs = 0L
 
+    var protectionUiState by mutableStateOf(LRepositoryProtectionUiState())
+        private set
+
     private val cacheUrlStringRomDao = dbCache.cacheUrlStringRomDao()
     private val cacheUrlStringRamDao = dbCache.cacheUrlStringRamDao()
 
@@ -65,6 +84,7 @@ class Repository(
         val oldHandler = handler
         handler = createHandler()
         oldHandler.close()
+        clearHtmlChallengeUiState()
     }
 
     suspend fun openURI(
@@ -244,7 +264,10 @@ class Repository(
             }
 
             val checkedResponse = validateJsonResponse(response)
-            if (checkedResponse.isSuccess) return checkedResponse
+            if (checkedResponse.isSuccess) {
+                clearHtmlChallengeUiState()
+                return checkedResponse
+            }
 
             val error = checkedResponse.exceptionOrNull()
             if (!error.isHtmlChallengeResponse()) {
@@ -258,7 +281,11 @@ class Repository(
 
             lastFailure = checkedResponse
             val delayMs = htmlChallengeRetryDelay(attempt)
-            scheduleHtmlChallengeCooldown(delayMs)
+            scheduleHtmlChallengeCooldown(
+                delayMs = delayMs,
+                requestHash = requestHash,
+                message = error?.message ?: "Server returned HTML instead of JSON"
+            )
             Timber.w("!!! openURI() HTML challenge response, retry after ${delayMs}ms")
             AppDiagnostics.recordLHtmlChallenge(
                 operation = "postJson validate attempt ${attempt + 1}",
@@ -287,11 +314,31 @@ class Repository(
         }
     }
 
-    private fun scheduleHtmlChallengeCooldown(delayMs: Long) {
+    private fun scheduleHtmlChallengeCooldown(
+        delayMs: Long,
+        requestHash: String,
+        message: String
+    ) {
         val cooldownUntil = System.currentTimeMillis() + delayMs
         if (cooldownUntil > htmlChallengeCooldownUntilMs) {
             htmlChallengeCooldownUntilMs = cooldownUntil
         }
+        protectionUiState = LRepositoryProtectionUiState(
+            active = true,
+            message = message,
+            retryAtMs = htmlChallengeCooldownUntilMs,
+            retryDelayMs = delayMs,
+            requestHash = requestHash,
+            updatedAtMs = System.currentTimeMillis()
+        )
+    }
+
+    private fun clearHtmlChallengeUiState() {
+        if (!protectionUiState.active) return
+        protectionUiState = LRepositoryProtectionUiState(
+            active = false,
+            updatedAtMs = System.currentTimeMillis()
+        )
     }
 
     private fun htmlChallengeRetryDelay(attempt: Int): Long {
@@ -367,4 +414,3 @@ enum class RepositoryUriConfig {
     CACHE_RAM, //Временный кеш в DB, после перезагрузки удаляется
     CACHE_ROM  //Постоянный кеш в DB
 }
-

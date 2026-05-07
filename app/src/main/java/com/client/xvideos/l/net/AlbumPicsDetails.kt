@@ -9,6 +9,7 @@ import com.client.xvideos.common.diagnostics.AppDiagnostics
 import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.model.lBestThumbnailImageUrl
 import com.client.xvideos.l.net.graphQl.GraphQlRequest
+import com.client.xvideos.l.repository.LRepositoryProtectionUiState
 import com.client.xvideos.l.repository.Repository
 import com.client.xvideos.l.repository.RepositoryUriConfig
 import com.google.gson.Gson
@@ -19,6 +20,13 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+
+data class LAlbumPageLoadIssue(
+    val page: Int,
+    val message: String,
+    val htmlChallenge: Boolean,
+    val failedAtMs: Long = System.currentTimeMillis()
+)
 
 /**
  * Информация о картинках по id альбома
@@ -42,6 +50,16 @@ class AlbumPicsDetails(
     var isPageRequestInFlight by mutableStateOf(false)
         private set
 
+    var isRetryingFailedPages by mutableStateOf(false)
+        private set
+
+    val failedPages = mutableStateListOf<LAlbumPageLoadIssue>()
+
+    val protectionUiState: LRepositoryProtectionUiState
+        get() = repository.protectionUiState
+
+    private val loadedPages = mutableMapOf<Int, List<PicsDetails>>()
+
     private data class PageLoadResult(
         val page: Int,
         val totalPages: Int,
@@ -64,13 +82,14 @@ class AlbumPicsDetails(
 
     private suspend fun openPage(page: Int): Result<PageLoadResult> {
         val request = GraphQlRequest.pictureListInsideAlbum(id, page)
-        val cached = repository.openURI(
+        val pageResponse = repository.openURI(
             request,
-            config = RepositoryUriConfig.CACHE_ROM
+            config = RepositoryUriConfig.CACHE_RAM
         ).mapCatching { parsePage(page, it) }
 
-        if (cached.isSuccess) {
-            val pageResult = cached.getOrThrow()
+        if (pageResponse.isSuccess) {
+            val pageResult = pageResponse.getOrThrow()
+            clearPageIssue(page)
             AppDiagnostics.recordLAlbumPage(
                 albumId = id,
                 page = page,
@@ -80,49 +99,27 @@ class AlbumPicsDetails(
             return Result.success(pageResult)
         }
 
-        val cachedError = cached.exceptionOrNull()
-        if (cachedError.isHtmlChallengeResponse()) {
-            Timber.w(cachedError, "!!! AlbumPicsDetails $id page $page HTML challenge response")
+        val pageError = pageResponse.exceptionOrNull()
+        recordPageIssue(page, pageError)
+        if (pageError.isHtmlChallengeResponse()) {
+            Timber.w(pageError, "!!! AlbumPicsDetails $id page $page HTML challenge response")
             AppDiagnostics.recordLAlbumPage(
                 albumId = id,
                 page = page,
                 message = "HTML challenge response",
-                details = cachedError?.message
+                details = pageError?.message
             )
-            return Result.failure(cachedError ?: IllegalStateException("Server returned HTML instead of JSON"))
+            return Result.failure(pageError ?: IllegalStateException("Server returned HTML instead of JSON"))
         }
 
-        Timber.w(cachedError, "!!! AlbumPicsDetails $id page $page CACHE_ROM error, retry DIRECT")
+        Timber.w(pageError, "!!! AlbumPicsDetails $id page $page CACHE_RAM/ROM fallback error")
         AppDiagnostics.recordLAlbumPage(
             albumId = id,
             page = page,
-            message = "CACHE_ROM error, retry DIRECT",
-            details = cachedError?.message
+            message = "CACHE_RAM/ROM fallback error",
+            details = pageError?.message
         )
-        repository.deleteCache(request, RepositoryUriConfig.CACHE_ROM)
-
-        val direct = repository.openURI(
-            request,
-            config = RepositoryUriConfig.DIRECT
-        ).mapCatching { parsePage(page, it) }
-
-        direct.onSuccess {
-            AppDiagnostics.recordLAlbumPage(
-                albumId = id,
-                page = page,
-                message = "Loaded album page DIRECT",
-                details = "items=${it.items.size} totalPages=${it.totalPages}"
-            )
-        }.onFailure {
-            AppDiagnostics.recordLAlbumPage(
-                albumId = id,
-                page = page,
-                message = "DIRECT page error",
-                details = it.message
-            )
-        }
-
-        return direct
+        return pageResponse
     }
 
     private fun parsePage(page: Int, response: String): PageLoadResult {
@@ -167,9 +164,12 @@ class AlbumPicsDetails(
     suspend fun contentUrls() = withContext(Dispatchers.Default) {
         withContext(Dispatchers.Main) {
             pics.clear()
+            failedPages.clear()
+            loadedPages.clear()
             totalPages = null
             percentLoad = 0f
             isPageRequestInFlight = false
+            isRetryingFailedPages = false
         }
 
         val firstPage = loadPage(1).getOrElse {
@@ -180,6 +180,7 @@ class AlbumPicsDetails(
                 message = "First page error",
                 details = it.message
             )
+            recordPageIssue(1, it)
             withContext(Dispatchers.Main) {
                 percentLoad = 1f
             }
@@ -198,6 +199,7 @@ class AlbumPicsDetails(
                     message = "Page error",
                     details = it.message
                 )
+                recordPageIssue(page, it)
                 PageLoadResult(page, pages, emptyList())
             }
             appendPage(pageResult, pages)
@@ -214,7 +216,67 @@ class AlbumPicsDetails(
         withContext(Dispatchers.Main) {
             totalPages = pages
             percentLoad = page.page.toFloat() / pages
-            pics.addAll(corrected)
+            loadedPages[page.page] = corrected
+            pics.clear()
+            for (loadedPage in 1..pages) {
+                pics.addAll(loadedPages[loadedPage].orEmpty())
+            }
+        }
+    }
+
+    suspend fun retryFailedPages() = withContext(Dispatchers.Default) {
+        val pagesToRetry = withContext(Dispatchers.Main) {
+            failedPages.map { it.page }.distinct().sorted()
+        }
+        if (pagesToRetry.isEmpty()) return@withContext
+
+        withContext(Dispatchers.Main) {
+            isRetryingFailedPages = true
+        }
+
+        try {
+            val knownTotalPages = totalPages ?: pagesToRetry.maxOrNull() ?: 1
+            pagesToRetry.forEach { page ->
+                val pageResult = loadPage(page).getOrElse {
+                    Timber.w(it, "!!! AlbumPicsDetails $id page $page retry error")
+                    AppDiagnostics.recordLAlbumPage(
+                        albumId = id,
+                        page = page,
+                        message = "Retry failed page error",
+                        details = it.message
+                    )
+                    recordPageIssue(page, it)
+                    delay(PAGE_REQUEST_DELAY_MS)
+                    return@forEach
+                }
+                appendPage(pageResult, pageResult.totalPages.coerceAtLeast(knownTotalPages))
+                delay(PAGE_REQUEST_DELAY_MS)
+            }
+        } finally {
+            withContext(NonCancellable + Dispatchers.Main) {
+                percentLoad = 1f
+                isRetryingFailedPages = false
+            }
+        }
+    }
+
+    private suspend fun recordPageIssue(page: Int, error: Throwable?) {
+        val message = error?.message ?: "Unknown L album page error"
+        val issue = LAlbumPageLoadIssue(
+            page = page,
+            message = message,
+            htmlChallenge = error.isHtmlChallengeResponse()
+        )
+        withContext(Dispatchers.Main) {
+            failedPages.removeAll { it.page == page }
+            failedPages.add(issue)
+            failedPages.sortBy { it.page }
+        }
+    }
+
+    private suspend fun clearPageIssue(page: Int) {
+        withContext(Dispatchers.Main) {
+            failedPages.removeAll { it.page == page }
         }
     }
 

@@ -162,6 +162,12 @@ class ScreenLAlbumSM @AssistedInject constructor(
         }
     }
 
+    fun retryFailedAlbumPages() {
+        screenModelScope.launch {
+            albumInfo.value?.albumPicsDetails?.retryFailedPages()
+        }
+    }
+
 }
 
 @Module
