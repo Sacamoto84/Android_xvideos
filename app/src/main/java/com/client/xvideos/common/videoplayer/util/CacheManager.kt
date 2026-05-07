@@ -11,6 +11,9 @@ import java.io.File
 
 @UnstableApi
 internal object CacheManager {
+    private const val VIDEO_CACHE_DIR_NAME = "video_cache"
+    private const val MAX_CACHE_SIZE_BYTES = 512L * 1024L * 1024L
+
     private var cache: SimpleCache? = null
     private var databaseProvider: DefaultDatabaseProvider? = null
     private var databaseHelper: SQLiteOpenHelper? = null
@@ -21,9 +24,7 @@ internal object CacheManager {
 
         if (cache == null) {
 
-            val cacheSize = 512 * 1024 * 1024 // 100 MB
-
-            val cacheDir = File(context.applicationContext.cacheDir, "video_cache").apply {
+            val cacheDir = videoCacheDir(context).apply {
                 if (!exists()) mkdirs()
             }
 
@@ -37,7 +38,7 @@ internal object CacheManager {
 
             cache = SimpleCache(
                 cacheDir,
-                LeastRecentlyUsedCacheEvictor(cacheSize.toLong()),
+                LeastRecentlyUsedCacheEvictor(MAX_CACHE_SIZE_BYTES),
                 databaseProvider!!
             )
 
@@ -46,20 +47,35 @@ internal object CacheManager {
         return cache!!
     }
 
+    fun cacheSizeBytes(context: Context): Long {
+        return directorySizeBytes(videoCacheDir(context))
+    }
+
+    @Synchronized
+    fun clearCache(context: Context) {
+        releaseCache()
+        activePlayers = 0
+        videoCacheDir(context).deleteRecursively()
+    }
+
     @Synchronized
     fun release() {
         activePlayers--
         if (activePlayers <= 0) {
-            try {
-                cache?.release()
-            } catch (_: Exception) {
+            releaseCache()
+        }
+    }
 
-            } finally {
-                cache = null // Allow garbage collection
-                databaseHelper?.close()
-                databaseHelper = null
-                databaseProvider = null // Allow garbage collection
-            }
+    private fun releaseCache() {
+        try {
+            cache?.release()
+        } catch (_: Exception) {
+
+        } finally {
+            cache = null // Allow garbage collection
+            databaseHelper?.close()
+            databaseHelper = null
+            databaseProvider = null // Allow garbage collection
         }
     }
 
@@ -79,6 +95,16 @@ internal object CacheManager {
                 onCreate(db)
             }
         }
+    }
+
+    private fun videoCacheDir(context: Context): File {
+        return File(context.applicationContext.cacheDir, VIDEO_CACHE_DIR_NAME)
+    }
+
+    private fun directorySizeBytes(dir: File): Long {
+        return dir.listFiles()?.sumOf { file ->
+            if (file.isFile) file.length() else directorySizeBytes(file)
+        } ?: 0L
     }
 
 }

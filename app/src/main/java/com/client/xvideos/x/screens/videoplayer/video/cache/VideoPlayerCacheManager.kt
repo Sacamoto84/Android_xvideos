@@ -27,9 +27,11 @@ import java.io.File
  * Manage video player cache.
  */
 object VideoPlayerCacheManager {
+    private const val VIDEO_CACHE_DIR_NAME = "video"
 
     @Volatile
     private var cacheInstance: Cache? = null
+    private var configuredMaxCacheBytes: Long? = null
 
     /**
      * Set the cache for video player.
@@ -44,9 +46,10 @@ object VideoPlayerCacheManager {
         if (cacheInstance != null) {
             return
         }
+        configuredMaxCacheBytes = maxCacheBytes
 
         cacheInstance = SimpleCache(
-            File(context.cacheDir, "video"),
+            videoCacheDir(context),
             LeastRecentlyUsedCacheEvictor(maxCacheBytes),
             StandaloneDatabaseProvider(context),
         )
@@ -56,4 +59,30 @@ object VideoPlayerCacheManager {
      * Gets the ExoPlayer cache instance. If null, the cache to be disabled.
      */
     internal fun getCache(): Cache? = cacheInstance
+
+    fun cacheSizeBytes(context: Context): Long {
+        return directorySizeBytes(videoCacheDir(context))
+    }
+
+    @SuppressLint("UnsafeOptInUsageError")
+    @Synchronized
+    fun clearCache(context: Context) {
+        val maxCacheBytes = configuredMaxCacheBytes
+        (cacheInstance as? SimpleCache)?.release()
+        cacheInstance = null
+        videoCacheDir(context).deleteRecursively()
+        if (maxCacheBytes != null) {
+            initialize(context, maxCacheBytes)
+        }
+    }
+
+    private fun videoCacheDir(context: Context): File {
+        return File(context.applicationContext.cacheDir, VIDEO_CACHE_DIR_NAME)
+    }
+
+    private fun directorySizeBytes(dir: File): Long {
+        return dir.listFiles()?.sumOf { file ->
+            if (file.isFile) file.length() else directorySizeBytes(file)
+        } ?: 0L
+    }
 }
