@@ -36,6 +36,7 @@ class SavedRed @Inject constructor(
 
     init {
         collections.refreshCollectionList()
+        nichesCache.refreshIfStale()
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////

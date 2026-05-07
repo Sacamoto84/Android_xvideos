@@ -15,12 +15,18 @@ import com.client.xvideos.r.network.api.RedApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.io.File
 
 class R_Saved_NichesCaches(
     val scope: CoroutineScope,
     val redApi: RedApi,
 ) {
+
+    private companion object {
+        const val CACHE_FILE_NAME = "niches.json"
+        const val AUTO_REFRESH_MAX_AGE_HOURS = 24L
+    }
 
     val list = mutableListOf<Niche>()
 
@@ -39,15 +45,17 @@ class R_Saved_NichesCaches(
         readFromDisk()
     }
 
-    fun refresh() {
+    fun refresh(showSnackBar: Boolean = true) {
+        if (isDownloading) return
+        isDownloading = true
+        progress = 0f
+
         scope.launch {
             try {
-                isDownloading = true
-                progress = 0f
                 val niches = mutableListOf<Niche>()
                 val res = redApi.explorer.getExplorerNiches(page = 1, count = 100).getOrNull()
-                val pages = res!!.pages
-                val step = 1f / (pages - 1)
+                val pages = res!!.pages.coerceAtLeast(1)
+                val step = if (pages > 1) 1f / (pages - 1) else 1f
                 niches.addAll(res.niches)
                 for (i in 2..pages) {
                     delay(200)
@@ -59,40 +67,68 @@ class R_Saved_NichesCaches(
                 list.addAll(niches)
                 val gson = GsonBuilder().setPrettyPrinting().create()
                 val json = gson.toJson(niches)
-                val file = File(AppPath.r_nichesCache, "niches.json")
+                val file = cacheFile()
                 if (file.exists()) {
                     file.delete()
                 }
                 file.writeText(json)
                 size = list.size
                 timeRefresh()
-                SnackBar.success("Обновление завершено")
+                if (showSnackBar) {
+                    SnackBar.success("Обновление завершено")
+                }
                 isDownloading = false
                 isDownloaded = true
             } catch (e: Exception) {
-                SnackBar.error("Ошибка обновления ${e.toString()}")
+                Timber.e(e, "R niches cache refresh error")
+                if (showSnackBar) {
+                    SnackBar.error("Ошибка обновления ${e}")
+                }
                 isDownloading = false
             }
         }
     }
 
+    fun refreshIfStale(maxAgeHours: Long = AUTO_REFRESH_MAX_AGE_HOURS) {
+        timeRefresh()
+        val file = cacheFile()
+        val shouldRefresh = !file.exists() || list.isEmpty() || lastModifiedHour >= maxAgeHours
+
+        if (!shouldRefresh || isDownloading) {
+            return
+        }
+
+        Timber.i("R niches cache auto refresh: exists=${file.exists()} size=$size ageHours=$lastModifiedHour")
+        refresh(showSnackBar = false)
+    }
+
     fun readFromDisk() {
-        val file = File(AppPath.r_nichesCache, "niches.json")
+        val file = cacheFile()
         if (!file.exists()) {
             return
         }
-        val json = file.readText()
-        val gson = GsonBuilder().setPrettyPrinting().create()
-        val niches = gson.fromJson<List<Niche>>(json, object : TypeToken<List<Niche>>() {}.type)
-        list.clear()
-        list.addAll(niches)
-        size = list.size
-        timeRefresh()
+        runCatching {
+            val json = file.readText()
+            val gson = GsonBuilder().setPrettyPrinting().create()
+            val niches = gson.fromJson<List<Niche>>(json, object : TypeToken<List<Niche>>() {}.type)
+            list.clear()
+            list.addAll(niches)
+            size = list.size
+            timeRefresh()
+            isDownloaded = list.isNotEmpty()
+        }.onFailure {
+            Timber.e(it, "R niches cache read error")
+            list.clear()
+            size = 0
+            isDownloaded = false
+        }
     }
 
     private fun timeRefresh() {
-        val file = File(AppPath.r_nichesCache, "niches.json")
+        val file = cacheFile()
         if (!file.exists()) {
+            lastModifiedHour = -1
+            lastModifiedMinute = -1
             return
         }
         // Получаем время последней модификации
@@ -103,6 +139,10 @@ class R_Saved_NichesCaches(
         lastModifiedHour = diffMillis / (60 * 60 * 1000)
         lastModifiedMinute
         lastModifiedMinute
+    }
+
+    private fun cacheFile(): File {
+        return File(AppPath.r_nichesCache, CACHE_FILE_NAME)
     }
 
 }

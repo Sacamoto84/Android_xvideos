@@ -63,6 +63,7 @@ import com.client.xvideos.common.applock.AppLockRepository
 import com.client.xvideos.common.applock.AppLockSession
 import com.client.xvideos.common.util.KeepScreenOn
 import com.client.xvideos.l.ui.screens.explorer.L_ScreenExplorer
+import com.client.xvideos.r.common.saved.SavedRed
 import com.client.xvideos.r.ui.root.R_Screen_Root
 import com.client.xvideos.screenRoot.ScreenRoot
 import com.client.xvideos.screens.dashboards.ScreenXDashBoards
@@ -71,6 +72,7 @@ import com.client.xvideos.ui.theme.XvideosTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * Базовый URL для стартовой точки работы с основным сайтом.
@@ -89,6 +91,8 @@ const val urlStart = "https://www.xv-ru.com"
 @AndroidEntryPoint
 class MainActivity : ComponentActivity()//, ImageLoaderFactory
 {
+    @Inject
+    lateinit var savedRed: SavedRed
 
     companion object {
         internal const val EXTRA_REQUIRE_APP_LOCK = "com.client.xvideos.EXTRA_REQUIRE_APP_LOCK"
@@ -134,6 +138,7 @@ class MainActivity : ComponentActivity()//, ImageLoaderFactory
 
         lifecycleScope.launch(Dispatchers.IO) {
             VideoPlayerCacheManager.initialize(applicationContext, 1024L * 1024L * 1024L)
+            savedRed.nichesCache.refreshIfStale()
         }
 
         setContent {
