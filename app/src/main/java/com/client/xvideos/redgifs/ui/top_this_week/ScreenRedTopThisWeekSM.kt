@@ -6,7 +6,12 @@ import cafe.adriel.voyager.hilt.ScreenModelKey
 import com.client.xvideos.common.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.redgifs.ui.top_this_week.model.VisibleType
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.LazyRow123Host
-import com.client.xvideos.redgifs.common.di.HostDI
+import com.client.xvideos.redgifs.common.block.BlockRed
+import com.client.xvideos.redgifs.common.downloader.DownloadRed
+import com.client.xvideos.redgifs.common.saved.SavedRed
+import com.client.xvideos.redgifs.common.search.R_SearchExplorer
+import com.client.xvideos.redgifs.common.search.R_SearchNiches
+import com.client.xvideos.redgifs.network.api.RedApi
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.model.TypePager
 import dagger.Binds
 import dagger.Module
@@ -22,14 +27,24 @@ import javax.inject.Inject
 
 class ScreenRedTopThisWeekSM @Inject constructor(
     connectivityObserver: ConnectivityObserver,
-    val hostDI : HostDI
+    val block: BlockRed,
+    val redApi: RedApi,
+    val savedRed: SavedRed,
+    val downloadRed: DownloadRed,
+    val search: R_SearchExplorer,
+    val searchNiches: R_SearchNiches,
 ) : ScreenModel {
 
     val lazyHost =
         LazyRow123Host(
             connectivityObserver = connectivityObserver, scope = screenModelScope,
             typePager = TypePager.TOP,
-            hostDI = hostDI
+            block = block,
+            redApi = redApi,
+            savedRed = savedRed,
+            downloadRed = downloadRed,
+            search = search,
+            searchNiches = searchNiches
         )
 
     val isConnected = connectivityObserver

@@ -36,7 +36,7 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import com.client.xvideos.common.coil.UrlImage
 import com.client.xvideos.common.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.common.snackbar.SnackBar
-import com.client.xvideos.redgifs.common.di.HostDI
+import com.client.xvideos.redgifs.network.api.RedApi
 import com.client.xvideos.redgifs.model.search.SearchItemCreatorsResponse
 import com.client.xvideos.redgifs.model.search.SearchItemNichesResponse
 import com.client.xvideos.redgifs.model.search.SearchItemTagsResponse
@@ -153,7 +153,7 @@ fun SearchTabPreview() {
 
 class ScreenRedExplorerSearchSM @Inject constructor(
     connectivityObserver: ConnectivityObserver,
-    val hostDI: HostDI
+    val redApi: RedApi
 ) : ScreenModel {
 
     val searchText = MutableStateFlow<String>("Ana")
@@ -176,7 +176,7 @@ class ScreenRedExplorerSearchSM @Inject constructor(
                     return@collect
                 }
 
-                val creator = hostDI.redApi.search.searchCreatorsShort(text).getOrThrow()
+                val creator = redApi.search.searchCreatorsShort(text).getOrThrow()
 
                 creatorsList.clear()
                 creatorsList.addAll(creator.items)

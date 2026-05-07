@@ -17,7 +17,12 @@ import com.client.xvideos.redgifs.model.GifsInfo
 import com.client.xvideos.redgifs.model.MediaType
 import com.client.xvideos.redgifs.model.Order
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.LazyRow123Host
-import com.client.xvideos.redgifs.common.di.HostDI
+import com.client.xvideos.redgifs.common.block.BlockRed
+import com.client.xvideos.redgifs.common.downloader.DownloadRed
+import com.client.xvideos.redgifs.common.saved.SavedRed
+import com.client.xvideos.redgifs.common.search.R_SearchExplorer
+import com.client.xvideos.redgifs.common.search.R_SearchNiches
+import com.client.xvideos.redgifs.network.api.RedApi
 import com.client.xvideos.redgifs.common.network.loadGifs
 import com.client.xvideos.redgifs.common.share.useCaseShareGifs
 import com.redgifs.common.video.PlayerControls
@@ -45,9 +50,13 @@ enum class TypeGifs(val value: String) {
 
 class ScreenRedProfileSM @AssistedInject constructor(
     @Assisted val profileName: String,
-    //private val db: AppDatabase,
     connectivityObserver: ConnectivityObserver,
-    val hostDI: HostDI
+    val block: BlockRed,
+    val redApi: RedApi,
+    val savedRed: SavedRed,
+    val downloadRed: DownloadRed,
+    val search: R_SearchExplorer,
+    val searchNiches: R_SearchNiches,
 ) : ScreenModel {
 
     @AssistedFactory
@@ -58,19 +67,12 @@ class ScreenRedProfileSM @AssistedInject constructor(
     val _list = MutableStateFlow<List<GifsInfo>>(emptyList())
     val list: StateFlow<List<GifsInfo>> = _list
 
-    //var selector by mutableIntStateOf(0) // 0- 1 елемент  1-2 елемента показывать
-
     var creator: UserInfo? by mutableStateOf(null)
 
-    //═════════════════════════════════════════════════════════════════════════════════════════════════════╗
-    //* Список тегов                                                                                       ║
-    //══════════════════════════════════════════════════════════════╦══════════════════════════════════════╣
-    private val _tags =
-        MutableStateFlow<Set<String>>(emptySet()) //║                                      ║
-    val tags: StateFlow<Set<String>> = _tags                      //║
+    private val _tags = MutableStateFlow<Set<String>>(emptySet())
+    val tags: StateFlow<Set<String>> = _tags
     val tagsSelect = MutableStateFlow<Set<String>>(emptySet())
 
-    //                                   ║
     fun tagsAdd(l: List<String>) {
         _tags.update { it + l }
     }
@@ -81,30 +83,20 @@ class ScreenRedProfileSM @AssistedInject constructor(
         }
     }
 
-    //══════════════════════════════════════════════════════════════╩══════════════════════════════════════╝
-
-    //═════════════════════════════════════════════════════════════════════════════════════════════════════╗
-    //* Выбор сортировки                                                                                   ║
-    //═════════════════════════════════════════════════════════════════════════════════════════════════════╣
-    val orderList =
-        listOf(Order.TOP, Order.LATEST, Order.OLDEST, Order.TOP28, Order.TRENDING)           //║
-    var order by mutableStateOf(Order.LATEST)                         //║ Текущий вид сортировки              ║
-    //═══════════════════════════════════════════════════════════════╩═════════════════════════════════════╝
+    val orderList = listOf(Order.TOP, Order.LATEST, Order.OLDEST, Order.TOP28, Order.TRENDING)
+    var order by mutableStateOf(Order.LATEST)
 
     val typeGifsList = listOf(TypeGifs.GIFS, TypeGifs.IMAGES)
     var typeGifs by mutableStateOf(TypeGifs.GIFS)
 
-    var maxCreatorGifs =
-        0                  //║ Общее количество Gif у профиля не важно Gif или Images
-    var isLoading = MutableStateFlow(false) //║ Запрос к серверу п процессе
+    var maxCreatorGifs = 0
+    var isLoading = MutableStateFlow(false)
 
-    ///////////////////////////////////////////////
     val selector: StateFlow<Int> = Settings.red_profile_selector.field
 
     fun setSelector(value: Int) {
         Settings.red_profile_selector.setValue(value)
     }
-    ///////////////////////////////////////////////
 
     val likedHost = LazyRow123Host(
         connectivityObserver = connectivityObserver,
@@ -112,91 +104,57 @@ class ScreenRedProfileSM @AssistedInject constructor(
         typePager = TypePager.PROFILE,
         extraString = profileName,
         visibleProfileInfo = false,
-        hostDI = hostDI,
+        block = block,
+        redApi = redApi,
+        savedRed = savedRed,
+        downloadRed = downloadRed,
+        search = search,
+        searchNiches = searchNiches,
         tags = tagsSelect,
     )
 
-
     init {
-
         screenModelScope.launch {
             clear()
             setSelector(2)
 
             try {
-                creator = hostDI.redApi.readCreator(profileName).getOrNull()
+                creator = redApi.readCreator(profileName).getOrNull()
             } catch (e: Exception) {
                 creator = null
                 Timber.e(e)
                 SnackBar.error(e.message.toString())
             }
 
-            //Фильтруем список тегов убрав из списка блокируемые gif
-            hostDI.block.refreshListAndBlock(_list)
+            block.refreshListAndBlock(_list)
         }
-
     }
 
+    var play by mutableStateOf(true)
+    var mute by mutableStateOf(true)
+    var autoRotate by mutableStateOf(false)
 
-    //═════════════════════════════════════════════════════════════════════════════════════════════════════╗
-    // Управление плеером                                                                                  ║
-    //══════════════════════════════════════════════════╦══════════════════════════════════════════════════╣
-    var play by mutableStateOf(true)                  //║                                                  ║
-    var mute by mutableStateOf(true)                  //║                                                  ║
-    var autoRotate by mutableStateOf(false)           //║ Включить автоматический поворот                  ║
+    var enableAB by mutableStateOf(false)
+    var timeA by mutableFloatStateOf(3f)
+    var timeB by mutableFloatStateOf(6f)
 
-    //══════════════════════════════════════════════════╬══════════════════════════════════════════════════╣
-    var enableAB by mutableStateOf(false)             //║                                                  ║
-    var timeA by mutableFloatStateOf(3f)              //║                                                  ║
-    var timeB by mutableFloatStateOf(6f)              //║                                                  ║
+    var currentPlayerControls by mutableStateOf<PlayerControls?>(null)
 
-    //══════════════════════════════════════════════════╩══════════════════════════════════════════════════╣
-    var currentPlayerControls by mutableStateOf<PlayerControls?>(null)                                   //║
+    var currentPlayerTime by mutableFloatStateOf(0f)
+    var currentPlayerDuration by mutableIntStateOf(0)
 
-    //═════════════════════════════════════════════════════════════════════════════════════════════════════╝
-    //═══ Состояния плеера ═════════════════════════════╦══════════════════════════════════════════════════╗
-    var currentPlayerTime by mutableFloatStateOf(0f)  //║ Текущее время                                    ║
-    var currentPlayerDuration by mutableIntStateOf(0) //║ Продолжительность видео                          ║
-    //══════════════════════════════════════════════════╩══════════════════════════════════════════════════╝
+    var currentTikTokPage by mutableIntStateOf(0)
 
-    //═══ Тикток ═════════════════════════════════════════╦═════════════════════════════════════════════════════════════════════════════════════╗
-    var currentTikTokPage by mutableIntStateOf(0)       //║ Индекс текущей страницы которая выводит видео на тикток                             ║
+    val currentTikTokGifInfo: GifsInfo?
+        get() = list.value.getOrNull(currentTikTokPage)
 
-    //════════════════════════════════════════════════════╬═════════════════════════════════════════════════════════════════════════════════════╣
-    val currentTikTokGifInfo: GifsInfo?                 //║ Возвращает текущий GIF из списка `list` по индексу `currentTikTokPage               ║
-        get() = list.value.getOrNull(currentTikTokPage) //║ @return Объект [GifsInfo] для текущей страницы или `null`, если индекс некорректен. ║
+    var menuCenter by mutableStateOf(false)
 
-    //════════════════════════════════════════════════════╬═════════════════════════════════════════════════════════════════════════════════════╣
-    var menuCenter by mutableStateOf(false)             //║ Отобразить в центре меню контент                                                    ║
-
-    //════════════════════════════════════════════════════╩═════════════════════════════════════════════════════════════════════════════════════╝
     var tictikStartIndex by mutableIntStateOf(0)
 
-
-    //---- Downloader ----
-    //Загрузить текущую отображаемую страницу
-//    fun downloadCurrentItem() {
-//        screenModelScope.launch {
-//            val item = list.value[currentTikTokPage]
-//            //val hiName = extractNameFromUrl(item.urls.hd.toString()) //https://media.redgifs.com/HealthyPettyRedhead.mp4 > HealthyPettyRedhead
-//            Timber.i("!!! downloadItem() id:${item.id} userName:${item.userName} url:${item.urls.hd}")
-//            hostDI.downloadRed.downloader.downloadRedName(item.id, item.userName, item.urls.hd.toString())
-//            Timber.i("!!! downloadItem() ... завершено")
-//        }
-//    }
-
-//    fun scanCacheDowmload() {
-//        screenModelScope.launch {
-//            hostDI.downloadRed.downloader.scanRedCacheDownloadAndUpdate()
-//        }
-//    }
-
-    // Методы
-    //════════════════ Поделиться ═══════════════════════════════════════════════════════╗
     fun shareGifs(context: Context, item: GifsInfo) {
         useCaseShareGifs(context, item)
-    }  //║
-    //═══════════════════════════════════════════════════════════════════════════════════╝
+    }
 
     suspend fun loadNextPage(userName: String, items: Int = 100, page: Int = 1) {
         Timber.d("!!! loadNextPage isLoading.value ${isLoading.value}")
@@ -210,7 +168,7 @@ class ScreenRedProfileSM @AssistedInject constructor(
                 page = page,
                 ord = order,
                 type = if (typeGifs == TypeGifs.GIFS) MediaType.GIF else MediaType.IMAGE,
-                hostDI.redApi
+                redApi
             ).getOrThrow()
             _tags.update { it + r.tags }
             val resp = r.gifs
@@ -220,7 +178,6 @@ class ScreenRedProfileSM @AssistedInject constructor(
         } finally {
             isLoading.value = false
         }
-
     }
 
     fun clear() {
@@ -230,7 +187,6 @@ class ScreenRedProfileSM @AssistedInject constructor(
         _list.update { emptyList() }
         _tags.update { emptySet() }
     }
-
 }
 
 @Module

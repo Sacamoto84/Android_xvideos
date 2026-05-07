@@ -16,7 +16,12 @@ import androidx.paging.PagingSource
 import androidx.paging.cachedIn
 import com.client.xvideos.common.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.redgifs.model.Order
-import com.client.xvideos.redgifs.common.di.HostDI
+import com.client.xvideos.redgifs.common.block.BlockRed
+import com.client.xvideos.redgifs.common.downloader.DownloadRed
+import com.client.xvideos.redgifs.common.saved.SavedRed
+import com.client.xvideos.redgifs.common.search.R_SearchExplorer
+import com.client.xvideos.redgifs.common.search.R_SearchNiches
+import com.client.xvideos.redgifs.network.api.RedApi
 import com.client.xvideos.redgifs.common.pagin.ItemCollectionPagingSource
 import com.redgifs.common.pagin.ItemEmptyPagingSource
 import com.client.xvideos.redgifs.common.pagin.ItemExplorerNailsPagingSource
@@ -59,7 +64,12 @@ class LazyRow123Host(
     val startColumns: Int = 2,
     val visibleProfileInfo: Boolean = true,
     val tags: StateFlow<Set<String>> = MutableStateFlow(emptySet()),
-    val hostDI: HostDI,
+    val block: BlockRed,
+    val redApi: RedApi,
+    val savedRed: SavedRed,
+    val downloadRed: DownloadRed,
+    val search: R_SearchExplorer,
+    val searchNiches: R_SearchNiches,
     val isCollection: Boolean = false
 ) {
 
@@ -85,7 +95,7 @@ class LazyRow123Host(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val pager: Flow<PagingData<Any>> =
-        combine( hostDI.search.searchTextDone, sortType, tags, hostDI.searchNiches.searchTextDone )
+        combine( search.searchTextDone, sortType, tags, searchNiches.searchTextDone )
         { text, sort, tags, textNiches ->
             SearchParams(text.trim(), sort, tags.joinToString(","), textNiches)
         }
@@ -101,7 +111,9 @@ class LazyRow123Host(
                         createPager(
                             typePager = typePager,  sort = params.sort,
                             extraString = extraString, searchText = params.query,
-                            tags = tags.value.toList(), hostDI = hostDI, textNiches = params.queryNiches
+                            tags = tags.value.toList(),
+                            block = block, redApi = redApi, savedRed = savedRed, searchNiches = searchNiches,
+                            textNiches = params.queryNiches
                         )
                     }
                 ).flow
@@ -125,21 +137,24 @@ fun createPager(
     extraString: String,
     searchText: String,
     tags: List<String> = emptyList(),
-    hostDI: HostDI,
+    block: BlockRed,
+    redApi: RedApi,
+    savedRed: SavedRed,
+    searchNiches: R_SearchNiches,
     textNiches: String,
 ): PagingSource<Int, Any> {
     val pagingSourceFactory = when (typePager) {
 
-        TypePager.NICHES -> { ItemNailsPagingSource( order = sort, nichesName = extraString, block = hostDI.block, redApi = hostDI.redApi ) }
-        TypePager.TOP -> { ItemTopPagingSource( sort = sort, searchText = searchText, block = hostDI.block, redApi = hostDI.redApi ) }
-        TypePager.R_SAVED_LIKES -> { ItemSavedLikesPagingSource(sort, hostDI.savedRed) }
-        TypePager.SUBSCRIPTIONS -> { ItemSubscriptionsPagingSource(hostDI.savedRed) }
+        TypePager.NICHES -> { ItemNailsPagingSource( order = sort, nichesName = extraString, block = block, redApi = redApi ) }
+        TypePager.TOP -> { ItemTopPagingSource( sort = sort, searchText = searchText, block = block, redApi = redApi ) }
+        TypePager.R_SAVED_LIKES -> { ItemSavedLikesPagingSource(sort, savedRed) }
+        TypePager.SUBSCRIPTIONS -> { ItemSubscriptionsPagingSource(savedRed) }
 
         //Поиск и отображение списка Niches в Explorer
-        TypePager.EXPLORER_NICHES -> { ItemExplorerNailsPagingSource( order = sort, textNiches = textNiches, cache = hostDI.savedRed.nichesCache ) }
-        TypePager.PROFILE -> { ItemProfilePagingSource( profileName = extraString, sort = sort, block = hostDI.block, redApi = hostDI.redApi, tags = tags ) }
+        TypePager.EXPLORER_NICHES -> { ItemExplorerNailsPagingSource( order = sort, textNiches = textNiches, cache = savedRed.nichesCache ) }
+        TypePager.PROFILE -> { ItemProfilePagingSource( profileName = extraString, sort = sort, block = block, redApi = redApi, tags = tags ) }
         TypePager.EMPTY -> { ItemEmptyPagingSource() }
-        TypePager.SAVED_COLLECTION -> { ItemCollectionPagingSource( collection = extraString, savedRed = hostDI.savedRed ) }
+        TypePager.SAVED_COLLECTION -> { ItemCollectionPagingSource( collection = extraString, savedRed = savedRed ) }
 
     }
     return pagingSourceFactory as PagingSource<Int, Any>

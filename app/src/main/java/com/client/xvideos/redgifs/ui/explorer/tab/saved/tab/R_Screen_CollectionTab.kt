@@ -52,7 +52,7 @@ import com.client.xvideos.common.coil.UrlImage
 import com.client.xvideos.common.collectionDB.model.CollectionEntity
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.common.block.BlockRed
-import com.client.xvideos.redgifs.common.di.HostDI
+import com.client.xvideos.redgifs.common.saved.SavedRed
 import com.client.xvideos.redgifs.model.GifsInfo
 import com.client.xvideos.redgifs.model.URL1
 import com.client.xvideos.redgifs.ui.explorer.tab.saved.tab.collection.ScreenCollectionName
@@ -80,7 +80,7 @@ object R_Screen_CollectionTab : Screen {
 
         val vm = getScreenModel<ScreenSavedCollectionSM>()
 
-        val savedRed = vm.hostDI.savedRed
+        val savedRed = vm.savedRed
 
         val selectedCollection = savedRed.collections.selectedCollection.collectAsStateWithLifecycle().value
 
@@ -191,7 +191,7 @@ fun R_SavedCollectionTabContent(
 
 class ScreenSavedCollectionSM @Inject constructor(
     val block: BlockRed,
-    val hostDI: HostDI,
+    val savedRed: SavedRed,
 ) : ScreenModel {
 
     val gridState = LazyGridState()

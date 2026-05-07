@@ -46,8 +46,13 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.common.coil.UrlImage
 import com.client.xvideos.common.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.redgifs.common.ThemeRed
-import com.client.xvideos.redgifs.common.di.HostDI
+import com.client.xvideos.redgifs.common.block.BlockRed
+import com.client.xvideos.redgifs.common.downloader.DownloadRed
+import com.client.xvideos.redgifs.common.saved.SavedRed
 import com.client.xvideos.redgifs.common.saved.SelectedCreator
+import com.client.xvideos.redgifs.common.search.R_SearchExplorer
+import com.client.xvideos.redgifs.common.search.R_SearchNiches
+import com.client.xvideos.redgifs.network.api.RedApi
 import com.client.xvideos.redgifs.ui.profile.ScreenRedProfile
 import com.client.xvideos.redgifs.ui.profile.rememberVisibleRangePercentIgnoringFirstNForGrid
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.LazyRow123
@@ -84,7 +89,7 @@ object R_Screen_Saved_SubscriptionsTab : Screen {
         var userToDelete by remember { mutableStateOf<SelectedCreator?>(null) }
 
         // Используем SnapshotStateList напрямую для реактивности UI
-        val selectedListCreator = vm.hostDI.savedRed.subscriptions.selectedListCreator
+        val selectedListCreator = vm.savedRed.subscriptions.selectedListCreator
 
         // Обработка нажатия: переключаем флаг и обновляем пейджер
         if (selectCreatorName != null) {
@@ -115,7 +120,7 @@ object R_Screen_Saved_SubscriptionsTab : Screen {
             user = { userToDelete },
             onDismiss = { userToDelete = null },
             onConfirm = {
-                vm.hostDI.savedRed.subscriptions.remove(it)
+                vm.savedRed.subscriptions.remove(it)
                 userToDelete = null
                 pager.refresh()
             }
@@ -266,14 +271,24 @@ fun SubscriptionsTabPreview() {
 
 class ScreenSavedSubscriptionsSM @Inject constructor(
     connectivityObserver: ConnectivityObserver,
-    val hostDI: HostDI
+    val block: BlockRed,
+    val redApi: RedApi,
+    val savedRed: SavedRed,
+    val downloadRed: DownloadRed,
+    val search: R_SearchExplorer,
+    val searchNiches: R_SearchNiches,
 ) : ScreenModel {
 
     val likedHost = LazyRow123Host(
         connectivityObserver = connectivityObserver,
         scope = screenModelScope,
         typePager = TypePager.SUBSCRIPTIONS,
-        hostDI = hostDI
+        block = block,
+        redApi = redApi,
+        savedRed = savedRed,
+        downloadRed = downloadRed,
+        search = search,
+        searchNiches = searchNiches
     )
 }
 

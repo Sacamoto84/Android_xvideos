@@ -85,7 +85,7 @@ class ScreenRedProfile(val profileName: String) : Screen {
                     }
                 }
             },
-            savedRedProvider = { vm.hostDI.savedRed }
+            savedRedProvider = { vm.savedRed }
         )
     }
 

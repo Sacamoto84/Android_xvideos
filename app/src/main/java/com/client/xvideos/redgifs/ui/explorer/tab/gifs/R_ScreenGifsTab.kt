@@ -52,7 +52,12 @@ import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.common.settings.element.SettingElementInt
 import com.client.xvideos.common.settings.element.SettingElementList
 import com.client.xvideos.redgifs.common.ThemeRed
-import com.client.xvideos.redgifs.common.di.HostDI
+import com.client.xvideos.redgifs.common.block.BlockRed
+import com.client.xvideos.redgifs.common.downloader.DownloadRed
+import com.client.xvideos.redgifs.common.saved.SavedRed
+import com.client.xvideos.redgifs.common.search.R_SearchExplorer
+import com.client.xvideos.redgifs.common.search.R_SearchNiches
+import com.client.xvideos.redgifs.network.api.RedApi
 import com.client.xvideos.redgifs.model.Order
 import com.client.xvideos.redgifs.ui.profile.ScreenRedProfile
 import com.client.xvideos.redgifs.ui.profile.rememberVisibleRangePercentIgnoringFirstNForGrid
@@ -102,7 +107,7 @@ private fun R_ScreenGifsTabContent(vm: ScreenRedExplorerGifsSM) {
 
     val columnSelect by Settings.r_explorerGifsTab_column_current_count.field.collectAsStateWithLifecycle()
 
-    val search = vm.hostDI.search
+    val search = vm.search
     val searchR by search.searchText.collectAsStateWithLifecycle()
     val isFocused by search.focused.collectAsStateWithLifecycle()
     val sortType by vm.lazyHost.sortType.collectAsStateWithLifecycle()
@@ -203,7 +208,12 @@ private fun StatelessGifsTabBottomBar(
 
 class ScreenRedExplorerGifsSM @Inject constructor(
     connectivityObserver: ConnectivityObserver,
-    val hostDI: HostDI
+    val block: BlockRed,
+    val redApi: RedApi,
+    val savedRed: SavedRed,
+    val downloadRed: DownloadRed,
+    val search: R_SearchExplorer,
+    val searchNiches: R_SearchNiches,
 ) : ScreenModel {
 
     val lazyHost = LazyRow123Host(
@@ -211,7 +221,12 @@ class ScreenRedExplorerGifsSM @Inject constructor(
         scope = screenModelScope,
         extraString = "",
         typePager = TypePager.TOP,
-        hostDI = hostDI
+        block = block,
+        redApi = redApi,
+        savedRed = savedRed,
+        downloadRed = downloadRed,
+        search = search,
+        searchNiches = searchNiches
     )
 }
 

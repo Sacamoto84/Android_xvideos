@@ -68,9 +68,12 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.common.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.redgifs.common.ThemeRed
-import com.client.xvideos.redgifs.common.di.HostDI
+import com.client.xvideos.redgifs.common.block.BlockRed
+import com.client.xvideos.redgifs.common.downloader.DownloadRed
 import com.client.xvideos.redgifs.common.saved.SavedRed
+import com.client.xvideos.redgifs.common.search.R_SearchExplorer
 import com.client.xvideos.redgifs.common.search.R_SearchNiches
+import com.client.xvideos.redgifs.network.api.RedApi
 import com.client.xvideos.redgifs.model.Niche
 import com.client.xvideos.redgifs.model.Order
 import com.client.xvideos.redgifs.ui.explorer.tab.setting.styleTest
@@ -120,12 +123,12 @@ object R_ScreenNichesTab : Screen {
         /**
          * Количество элементов в кэше
          */
-        val countNichesInCache = vm.hostDI.savedRed.nichesCache.list.size
+        val countNichesInCache = vm.savedRed.nichesCache.list.size
 
         /**
          * Флаг загрузки кэша
          */
-        val isNichesCacheDownloaded = vm.hostDI.savedRed.nichesCache.isDownloaded
+        val isNichesCacheDownloaded = vm.savedRed.nichesCache.isDownloaded
 
         NichesTabContent(
             items =  listNiche ,
@@ -134,17 +137,17 @@ object R_ScreenNichesTab : Screen {
             isSearchFocused = isSearchFocused,
             onUpClick = onUpClick,
             onNicheClick = onNicheClick,
-            savedRed = { vm.hostDI.savedRed },
+            savedRed = { vm.savedRed },
             searchWidget = { modifier ->
                 vm.search.CustomBasicTextField( modifier = modifier )
             },
             onRefreshNichesCacheClick = {
-                vm.hostDI.savedRed.nichesCache.refresh()
+                vm.savedRed.nichesCache.refresh()
             },
-            nichesCacheProgress = vm.hostDI.savedRed.nichesCache.progress,
+            nichesCacheProgress = vm.savedRed.nichesCache.progress,
             countNichesInCache = countNichesInCache,
             isNichesCacheDownloaded = isNichesCacheDownloaded,
-            cacheHour = vm.hostDI.savedRed.nichesCache.lastModifiedHour
+            cacheHour = vm.savedRed.nichesCache.lastModifiedHour
         )
     }
 }
@@ -401,8 +404,12 @@ fun R_ScreenNichesTabPreview() {
 
 class ScreenRedExplorerNichesSM @Inject constructor(
     connectivityObserver: ConnectivityObserver,
-    val hostDI: HostDI,
-    val search: R_SearchNiches
+    val savedRed: SavedRed,
+    val search: R_SearchNiches,
+    val block: BlockRed,
+    val redApi: RedApi,
+    val downloadRed: DownloadRed,
+    val searchExplorer: R_SearchExplorer,
 ) : ScreenModel {
 
     val lazyHost = LazyRow123Host(
@@ -412,7 +419,12 @@ class ScreenRedExplorerNichesSM @Inject constructor(
         typePager = TypePager.EXPLORER_NICHES,
         startOrder = Order.NICHES_SUBSCRIBERS_D,
         startColumns = 1,
-        hostDI = hostDI
+        block = block,
+        redApi = redApi,
+        savedRed = savedRed,
+        downloadRed = downloadRed,
+        search = searchExplorer,
+        searchNiches = search
     )
 
     @Suppress("UNCHECKED_CAST")

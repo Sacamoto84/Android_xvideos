@@ -23,7 +23,12 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.common.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.common.settings.Settings
-import com.client.xvideos.redgifs.common.di.HostDI
+import com.client.xvideos.redgifs.common.block.BlockRed
+import com.client.xvideos.redgifs.common.downloader.DownloadRed
+import com.client.xvideos.redgifs.common.saved.SavedRed
+import com.client.xvideos.redgifs.common.search.R_SearchExplorer
+import com.client.xvideos.redgifs.common.search.R_SearchNiches
+import com.client.xvideos.redgifs.network.api.RedApi
 import com.client.xvideos.redgifs.ui.profile.ScreenRedProfile
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.LazyRow123
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.LazyRow123Host
@@ -57,7 +62,7 @@ object R_Screen_Saved_LikesTab : Screen {
         //Изменение количества отображаемых элементов
         LaunchedEffect(columnSelect) { vm.likedHost.columns = columnSelect }
 
-        LaunchedEffect(vm.hostDI.savedRed.likes.list){ pager.refresh() }
+        LaunchedEffect(vm.savedRed.likes.list){ pager.refresh() }
 
         Box(modifier = Modifier.fillMaxSize().background(Color(0xFF303030))) {
 
@@ -85,7 +90,12 @@ object R_Screen_Saved_LikesTab : Screen {
 
 class ScreenSavedLikesSM @Inject constructor(
     connectivityObserver: ConnectivityObserver,
-    val hostDI : HostDI
+    val block: BlockRed,
+    val redApi: RedApi,
+    val savedRed: SavedRed,
+    val downloadRed: DownloadRed,
+    val search: R_SearchExplorer,
+    val searchNiches: R_SearchNiches,
 
 ) : ScreenModel {
 
@@ -93,7 +103,12 @@ class ScreenSavedLikesSM @Inject constructor(
         connectivityObserver = connectivityObserver,
         scope = screenModelScope,
         typePager = TypePager.R_SAVED_LIKES,
-        hostDI = hostDI
+        block = block,
+        redApi = redApi,
+        savedRed = savedRed,
+        downloadRed = downloadRed,
+        search = search,
+        searchNiches = searchNiches
     )
 
 }

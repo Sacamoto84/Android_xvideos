@@ -55,7 +55,7 @@ import com.client.xvideos.common.AppPath
 import com.client.xvideos.common.coil.UrlImage
 import com.client.xvideos.common.util.toPrettyCount3
 import com.client.xvideos.redgifs.common.ThemeRed
-import com.client.xvideos.redgifs.common.di.HostDI
+import com.client.xvideos.redgifs.common.downloader.DownloadRed
 import com.client.xvideos.redgifs.common.share.useCaseShareGifs
 import com.client.xvideos.redgifs.model.GifsInfo
 import com.client.xvideos.redgifs.ui.fullscreen.ScreenRedFullScreen
@@ -83,7 +83,7 @@ object R_Screen_Saved_DownloadTab : Screen {
         val vm = getScreenModel<ScreenSavedDownloadSM>()
         val context = LocalContext.current
 
-        val downloadRed by vm.hostDI.downloadRed.downloadList.collectAsState()
+        val downloadRed by vm.downloadRed.downloadList.collectAsState()
         val state = rememberLazyListState()
 
         val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForLazyColumn(
@@ -254,10 +254,10 @@ private fun DownloadListItem(
 }
 
 class ScreenSavedDownloadSM @Inject constructor(
-    val hostDI: HostDI
+    val downloadRed: DownloadRed
 ) : ScreenModel {
     fun delete(item: GifsInfo) {
-        hostDI.downloadRed.delete(item)
+        downloadRed.delete(item)
     }
 }
 

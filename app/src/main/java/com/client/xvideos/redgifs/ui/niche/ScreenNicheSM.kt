@@ -12,7 +12,12 @@ import com.client.xvideos.redgifs.model.NichesInfo
 import com.client.xvideos.redgifs.model.NichesResponse
 import com.client.xvideos.redgifs.model.TopCreatorsResponse
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.LazyRow123Host
-import com.client.xvideos.redgifs.common.di.HostDI
+import com.client.xvideos.redgifs.common.block.BlockRed
+import com.client.xvideos.redgifs.common.downloader.DownloadRed
+import com.client.xvideos.redgifs.common.saved.SavedRed
+import com.client.xvideos.redgifs.common.search.R_SearchExplorer
+import com.client.xvideos.redgifs.common.search.R_SearchNiches
+import com.client.xvideos.redgifs.network.api.RedApi
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.model.TypePager
 import dagger.Binds
 import dagger.Module
@@ -28,7 +33,12 @@ import timber.log.Timber
 class ScreenNicheSM @AssistedInject constructor(
     @Assisted val nicheName: String,
     connectivityObserver: ConnectivityObserver,
-    val hostDI: HostDI
+    val block: BlockRed,
+    val redApi: RedApi,
+    val savedRed: SavedRed,
+    val downloadRed: DownloadRed,
+    val search: R_SearchExplorer,
+    val searchNiches: R_SearchNiches,
 ) : ScreenModel {
 
     @AssistedFactory
@@ -45,21 +55,25 @@ class ScreenNicheSM @AssistedInject constructor(
             connectivityObserver = connectivityObserver, scope = screenModelScope,
             extraString = nicheName,
             typePager = TypePager.NICHES,
-            hostDI = hostDI
+            block = block,
+            redApi = redApi,
+            savedRed = savedRed,
+            downloadRed = downloadRed,
+            search = search,
+            searchNiches = searchNiches
         )
 
     init {
-        Timber.d("!!!  ⚠\uFE0F ScreenNicheSM init {...} ")
+        Timber.d("!!!  ⚠️ ScreenNicheSM init {...} ")
 
         lazyHost.columns = 2
 
         screenModelScope.launch {
-            niche = hostDI.redApi.getNiche(nicheName).getOrThrow() .niche            // Нужно кешировать
-            related = hostDI.redApi.getNichesRelated(nicheName).getOrThrow()      // Нужно кешировать
-            topCreator = hostDI.redApi.getNichesTopCreators(nicheName).getOrThrow()  // Нужно кешировать
+            niche = redApi.getNiche(nicheName).getOrThrow() .niche            // Нужно кешировать
+            related = redApi.getNichesRelated(nicheName).getOrThrow()      // Нужно кешировать
+            topCreator = redApi.getNichesTopCreators(nicheName).getOrThrow()  // Нужно кешировать
         }
     }
-
 
 //    val expandMenuVideoList =
 //        listOf(

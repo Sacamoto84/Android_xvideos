@@ -145,8 +145,8 @@ fun LazyRow123Content(
     val state = host.state
 
     val navigator = LocalNavigator.current
-    val block = host.hostDI.block
-    val downloadList by host.hostDI.downloadRed.downloadList.collectAsState()
+    val block = host.block
+    val downloadList by host.downloadRed.downloadList.collectAsState()
     val loadState = listGifs.loadState
     var wasAppendLoading by remember { mutableStateOf(false) }
 
@@ -198,14 +198,14 @@ fun LazyRow123Content(
                             isDownloaded = isDownloaded,
                             isRunLike = isRunLike,
                             onItemClick = {
-                                host.hostDI.block.blockItem = item
+                                host.block.blockItem = item
                                 navigator?.push(ScreenRedFullScreen(item))
                             },
                             onRefresh = { listGifs.refresh() },
                             onClickOpenProfile = onClickOpenProfile,
                             onTagClick = { tag ->
-                                host.hostDI.search.searchText.value = TextFieldValue(tag, TextRange(tag.length))
-                                host.hostDI.search.searchTextDone.value = tag
+                                host.search.searchText.value = TextFieldValue(tag, TextRange(tag.length))
+                                host.search.searchTextDone.value = tag
                                 ScreenRedExplorer.screenType = 0
                                 navigator?.popAll()
                             }
@@ -260,7 +260,7 @@ fun LazyRow123Content(
                                 play = true,
                                 isNetConnected = isConnected,
                                 onFullScreen = { navigator?.push(ScreenRedFullScreen(item)) },
-                                downloadRed = { host.hostDI.downloadRed },
+                                downloadRed = { host.downloadRed },
                             )
                         }
                     } ?: Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }

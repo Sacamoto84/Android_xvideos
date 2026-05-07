@@ -31,7 +31,11 @@ import com.client.xvideos.common.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.common.block.BlockRed
-import com.client.xvideos.redgifs.common.di.HostDI
+import com.client.xvideos.redgifs.common.downloader.DownloadRed
+import com.client.xvideos.redgifs.common.saved.SavedRed
+import com.client.xvideos.redgifs.common.search.R_SearchExplorer
+import com.client.xvideos.redgifs.common.search.R_SearchNiches
+import com.client.xvideos.redgifs.network.api.RedApi
 import com.client.xvideos.redgifs.model.GifsInfo
 import com.client.xvideos.redgifs.model.Order
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.LazyRow123
@@ -60,7 +64,7 @@ class ScreenCollectionName(val collectionName: String) : Screen {
 
         val vm = getScreenModel<ScreenRedCollectionNameSM, ScreenRedCollectionNameSM.Factory> { factory -> factory.create(collectionName) }
         var blockItem by rememberSaveable { mutableStateOf<GifsInfo?>(null) }
-        val savedRed = vm.hostDI.savedRed
+        val savedRed = vm.savedRed
 
         val selectedCollection = savedRed.collections.selectedCollection.collectAsStateWithLifecycle().value
 
@@ -96,9 +100,13 @@ class ScreenCollectionName(val collectionName: String) : Screen {
 
 class ScreenRedCollectionNameSM @AssistedInject constructor(
     @Assisted val collectionName: String,
-    val hostDI: HostDI,
     connectivityObserver: ConnectivityObserver,
     val block: BlockRed,
+    val redApi: RedApi,
+    val savedRed: SavedRed,
+    val downloadRed: DownloadRed,
+    val search: R_SearchExplorer,
+    val searchNiches: R_SearchNiches,
 ) : ScreenModel {
 
     @AssistedFactory
@@ -112,7 +120,12 @@ class ScreenRedCollectionNameSM @AssistedInject constructor(
         typePager = TypePager.SAVED_COLLECTION,
         extraString = collectionName,
         startOrder = Order.LATEST,
-        hostDI = hostDI,
+        block = block,
+        redApi = redApi,
+        savedRed = savedRed,
+        downloadRed = downloadRed,
+        search = search,
+        searchNiches = searchNiches,
         isCollection = true
     )
 

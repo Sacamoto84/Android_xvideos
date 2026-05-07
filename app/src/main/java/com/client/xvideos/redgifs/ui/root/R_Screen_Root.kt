@@ -26,7 +26,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.ScreenTransition
 import com.client.xvideos.common.collectionDB.ui.DaialogNewCollection
 import com.client.xvideos.redgifs.common.block.BlockRed
-import com.client.xvideos.redgifs.common.di.HostDI
+import com.client.xvideos.redgifs.common.downloader.DownloadRed
 import com.client.xvideos.common.collectionDB.ui.DialogCollection
 import com.client.xvideos.redgifs.common.saved.SavedRed
 import com.client.xvideos.redgifs.ui.explorer.ScreenRedExplorer
@@ -53,9 +53,9 @@ class R_Screen_Root : Screen {
 
         val vm: ScreenRedRootSM = getScreenModel()
 
-        val savedRed = vm.hostDI.savedRed
+        val savedRed = vm.savedRed
 
-        val percentDownload = vm.hostDI.downloadRed.downloader.percent.collectAsStateWithLifecycle().value
+        val percentDownload = vm.downloadRed.downloader.percent.collectAsStateWithLifecycle().value
 
         BackHandler { Timber.i("iii BackHandler Root") }
 
@@ -79,7 +79,7 @@ class R_Screen_Root : Screen {
 
 
         //Диалог для блокировки
-        if (vm.hostDI.block.blockVisibleDialog) { R_DialogBlock(block = {vm.hostDI.block}) }
+        if (vm.block.blockVisibleDialog) { R_DialogBlock(block = {vm.block}) }
 
 
 
@@ -152,7 +152,11 @@ private fun R_DialogCollection(savedRed: () -> SavedRed){
 
 }
 
-class ScreenRedRootSM @Inject constructor( val hostDI: HostDI ) : ScreenModel
+class ScreenRedRootSM @Inject constructor(
+    val savedRed: SavedRed,
+    val downloadRed: DownloadRed,
+    val block: BlockRed
+) : ScreenModel
 
 @Module
 @InstallIn(SingletonComponent::class)

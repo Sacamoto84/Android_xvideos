@@ -64,7 +64,10 @@ import com.client.xvideos.redgifs.ui.explorer.ScreenRedExplorer
 import com.client.xvideos.redgifs.ui.fullscreen.bottom_bar.FeedControls_Container_Line0
 import com.client.xvideos.redgifs.ui.profile.ScreenRedProfile
 import com.client.xvideos.redgifs.common.ThemeRed
-import com.client.xvideos.redgifs.common.di.HostDI
+import com.client.xvideos.redgifs.common.block.BlockRed
+import com.client.xvideos.redgifs.common.saved.SavedRed
+import com.client.xvideos.redgifs.common.search.R_SearchExplorer
+import com.client.xvideos.redgifs.network.api.RedApi
 import com.client.xvideos.redgifs.model.GifsInfo
 import com.client.xvideos.redgifs.common.UsersRed
 import com.redgifs.common.block.ui.DialogBlock
@@ -100,7 +103,7 @@ class ScreenRedFullScreen(val item: GifsInfo) : Screen, ScreenTransition {
 
         var blockItem by remember { mutableStateOf<GifsInfo?>(null) }
 
-        val downloadList = vm.hostDI.downloadRed.downloadList.collectAsState().value
+        val downloadList = vm.downloadRed.downloadList.collectAsState().value
 
         var isVideoBuffering by remember { mutableStateOf(false) }
 
@@ -224,7 +227,7 @@ class ScreenRedFullScreen(val item: GifsInfo) : Screen, ScreenTransition {
                     }
 
 
-                    if (vm.hostDI.savedRed.collections.collectionList.any { it.items.any { it2 -> it2.id == item.id } }) {
+                    if (vm.savedRed.collections.collectionList.any { it.items.any { it2 -> it2.id == item.id } }) {
                         Icon(
                             painter = painterResource(R.drawable.collection_multi_input_svgrepo_com),
                             contentDescription = null,
@@ -232,11 +235,11 @@ class ScreenRedFullScreen(val item: GifsInfo) : Screen, ScreenTransition {
                         )
                     }
 
-                    if (vm.hostDI.savedRed.creators.list.any { it.username == item.userName }) {
+                    if (vm.savedRed.creators.list.any { it.username == item.userName }) {
                         Icon( Icons.Outlined.Person, contentDescription = null, tint = Color.White,  modifier = Modifier.padding(bottom = 6.dp, end = 6.dp).size(22.dp) )
                     }
 
-                    if (vm.hostDI.savedRed.likes.list.any { it.id == item.id }) {
+                    if (vm.savedRed.likes.list.any { it.id == item.id }) {
                         Icon(
                             Icons.Filled.FavoriteBorder,
                             contentDescription = null,
@@ -279,8 +282,8 @@ class ScreenRedFullScreen(val item: GifsInfo) : Screen, ScreenTransition {
                         item = item,
                         modifier = Modifier,
                         onClick = { it1 ->
-                            vm.hostDI.search.searchText.value = TextFieldValue(text = it1, selection = TextRange(it1.length))
-                            vm.hostDI.search.searchTextDone.value = it1
+                            vm.search.searchText.value = TextFieldValue(text = it1, selection = TextRange(it1.length))
+                            vm.search.searchTextDone.value = it1
                             ScreenRedExplorer.Companion.screenType = 0
                             navigator.pop()
                         },
@@ -297,10 +300,10 @@ class ScreenRedFullScreen(val item: GifsInfo) : Screen, ScreenTransition {
                         },
                         onRefresh = {},
                         isCollection = false,
-                        block = {vm.hostDI.block},
-                        redApi = {vm.hostDI.redApi},
-                        savedRed = {vm.hostDI.savedRed},
-                        downloadRed = {vm.hostDI.downloadRed}
+                        block = {vm.block},
+                        redApi = {vm.redApi},
+                        savedRed = {vm.savedRed},
+                        downloadRed = {vm.downloadRed}
                     )
                 }
 
@@ -339,7 +342,10 @@ class ScreenRedFullScreen(val item: GifsInfo) : Screen, ScreenTransition {
 class ScreenRedFullScreenSM @Inject constructor(
     val connectivityObserver: ConnectivityObserver,
     val downloadRed: DownloadRed,
-    val hostDI: HostDI
+    val block: BlockRed,
+    val redApi: RedApi,
+    val savedRed: SavedRed,
+    val search: R_SearchExplorer,
 ) : ScreenModel {
 
 

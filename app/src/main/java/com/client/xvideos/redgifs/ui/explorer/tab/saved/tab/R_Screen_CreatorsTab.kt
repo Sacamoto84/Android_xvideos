@@ -65,7 +65,12 @@ import com.composeunstyled.Text
 import com.client.xvideos.redgifs.common.ThemeRed
 import com.client.xvideos.redgifs.model.Order
 import com.client.xvideos.redgifs.model.UserInfo
-import com.client.xvideos.redgifs.common.di.HostDI
+import com.client.xvideos.redgifs.common.block.BlockRed
+import com.client.xvideos.redgifs.common.downloader.DownloadRed
+import com.client.xvideos.redgifs.common.saved.SavedRed
+import com.client.xvideos.redgifs.common.search.R_SearchExplorer
+import com.client.xvideos.redgifs.common.search.R_SearchNiches
+import com.client.xvideos.redgifs.network.api.RedApi
 import com.client.xvideos.redgifs.ui.ui.lazyrow123.model.TypePager
 import com.client.xvideos.ui.theme.XvideosTheme
 import dagger.Binds
@@ -87,7 +92,7 @@ object R_Screen_CreatorsTab : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val vm = getScreenModel<ScreenSavedCreatorSM>()
         val state = rememberLazyListState()
-        val savedRed = vm.hostDI.savedRed
+        val savedRed = vm.savedRed
 
         var itemPendingDelete by remember { mutableStateOf<UserInfo?>(null) }
 
@@ -268,7 +273,12 @@ private fun DeleteCreatorDialog(
 
 class ScreenSavedCreatorSM @Inject constructor(
     connectivityObserver: ConnectivityObserver,
-    val hostDI: HostDI,
+    val savedRed: SavedRed,
+    val block: BlockRed,
+    val redApi: RedApi,
+    val downloadRed: DownloadRed,
+    val search: R_SearchExplorer,
+    val searchNiches: R_SearchNiches,
 ) : ScreenModel {
 
     val gridState = LazyGridState()
@@ -279,7 +289,12 @@ class ScreenSavedCreatorSM @Inject constructor(
         typePager = TypePager.SAVED_COLLECTION,
         extraString = "",
         startOrder = Order.LATEST,
-        hostDI = hostDI
+        block = block,
+        redApi = redApi,
+        savedRed = savedRed,
+        downloadRed = downloadRed,
+        search = search,
+        searchNiches = searchNiches
     )
 }
 

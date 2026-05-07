@@ -81,7 +81,7 @@ class R_ScreenNiche(val nicheName: String = "pumped-pussy") : Screen {
         val vm = getScreenModel<ScreenNicheSM, ScreenNicheSM.Factory> { factory -> factory.create(nicheName) }
         val columnSelect by Settings.r_current_count_niches.field.collectAsStateWithLifecycle()
         val sort by vm.lazyHost.sortType.collectAsStateWithLifecycle()
-        val savedRed = vm.hostDI.savedRed
+        val savedRed = vm.savedRed
 
         val followedList = savedRed.niches.list
 
