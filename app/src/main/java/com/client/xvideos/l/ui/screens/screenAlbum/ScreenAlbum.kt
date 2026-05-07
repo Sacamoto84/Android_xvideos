@@ -4,13 +4,21 @@ import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Scaffold
@@ -23,6 +31,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -38,6 +47,7 @@ import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.model.AlbumDetails
 import com.client.xvideos.l.ui.element.expandMenu.ExpandMenuType
 import com.client.xvideos.l.ui.element.lazyRowPictureDetails.L_LazyRowPictureDetails
+import com.client.xvideos.l.ui.element.lazyRowPictureDetails.LPictureSelectionState
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumDialogDeleteAlbum
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoAudiences
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoButtonSaveAlbum
@@ -143,38 +153,86 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
             containerColor = ThemeL.greyBackground
         ) { padding ->
 
-            L_LazyRowPictureDetails(
-                host = vm.host,
-                expandMenu = ExpandMenuType.ALBUM,
-                showInitialLoading = showInitialItemsLoading,
-                itemBefore = {
-                    Column(modifier = Modifier.padding(horizontal = 4.dp)) {
-                        if (parsed != null) {
+            Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+                L_LazyRowPictureDetails(
+                    host = vm.host,
+                    expandMenu = ExpandMenuType.ALBUM,
+                    showInitialLoading = showInitialItemsLoading,
+                    selectionState = vm.host.selection,
+                    itemBefore = {
+                        Column(modifier = Modifier.padding(horizontal = 4.dp)) {
+                            if (parsed != null) {
 
-                            Row {
-                                UrlImage( parsed.cover.url, modifier = Modifier.size(72.dp) )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Column {
-                                    Text(parsed.title, color = ThemeL.textColor, style = ThemeL.Type.rowTitle)
-                                    Text( "${parsed.number_of_animated_pictures} gifs / ${parsed.number_of_pictures} pictures", color = ThemeL.textColor )
+                                Row {
+                                    UrlImage( parsed.cover.url, modifier = Modifier.size(72.dp) )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Column {
+                                        Text(parsed.title, color = ThemeL.textColor, style = ThemeL.Type.rowTitle)
+                                        Text( "${parsed.number_of_animated_pictures} gifs / ${parsed.number_of_pictures} pictures", color = ThemeL.textColor )
+                                    }
                                 }
-                            }
 
-                            AlbumInfoGreeting(parsed)
-                            AlbumInfoAudiences(parsed)
-                            AlbumInfoTags(parsed) { navigator.push(ScreenLAlbumLandingTag(it)) }
-                            AlbumInfoButtonSaveAlbum(saved, onClick = { if (!saved) { vm.saveAlbum() } else { itemPendingDelete = parsed } })
-                            AlbumInfoDownloadButton( folderSize, album, fileCountDownloaded, fileCountError, vm, isDownloading, isDeletingFiles, deletionState, isDeletingChange = { isDeletingFiles = it })
-                            AlbumInfoFilterButton( parsed, vm.showOnlyAnimated, { vm.showOnlyAnimated = it })
+                                AlbumInfoGreeting(parsed)
+                                AlbumInfoAudiences(parsed)
+                                AlbumInfoTags(parsed) { navigator.push(ScreenLAlbumLandingTag(it)) }
+                                AlbumInfoButtonSaveAlbum(saved, onClick = { if (!saved) { vm.saveAlbum() } else { itemPendingDelete = parsed } })
+                                AlbumInfoDownloadButton( folderSize, album, fileCountDownloaded, fileCountError, vm, isDownloading, isDeletingFiles, deletionState, isDeletingChange = { isDeletingFiles = it })
+                                AlbumInfoFilterButton( parsed, vm.showOnlyAnimated, { vm.showOnlyAnimated = it })
+                            }
                         }
                     }
+                )
+
+                AnimatedVisibility(
+                    visible = vm.host.selection.active,
+                    modifier = Modifier.align(Alignment.TopCenter),
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) {
+                    LAlbumSelectionBar(
+                        selectedCount = vm.host.selection.selectedKeys.size,
+                        selectionState = vm.host.selection,
+                        onAddToCollection = {
+                            val selectedItems = vm.host.selection.selectedItems(vm.host.filteredPic.toList())
+                            vm.saved.collection.beginAddManyToCollection(selectedItems)
+                            vm.host.selection.clear()
+                        }
+                    )
                 }
-            )
+            }
 
         }
 
     }
 
+}
+
+@Composable
+private fun LAlbumSelectionBar(
+    selectedCount: Int,
+    selectionState: LPictureSelectionState,
+    onAddToCollection: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(ThemeL.grey5.copy(alpha = 0.96f))
+            .padding(horizontal = 8.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IconButton(onClick = { selectionState.clear() }) {
+            Icon(Icons.Default.Close, contentDescription = null, tint = ThemeL.textColor)
+        }
+        Text(
+            "Выбрано: $selectedCount",
+            color = ThemeL.textColor,
+            style = ThemeL.Type.rowTitle,
+            modifier = Modifier.weight(1f)
+        )
+        IconButton(onClick = onAddToCollection, enabled = selectedCount > 0) {
+            Icon(Icons.Default.Add, contentDescription = null, tint = ThemeL.primaryColor)
+        }
+    }
 }
 
 

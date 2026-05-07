@@ -109,8 +109,7 @@ fun DropdownMenuItem_AddCollection(item: PicsDetails? = null, savedL: SavedL? = 
             } else {
                 item
             }
-            savedL.collection.collectionItemGifInfo = itemWithAlbum
-            savedL.collection.visibleDialog = true
+            savedL.collection.beginAddToCollection(itemWithAlbum)
             onDismiss.invoke()
         }
     )

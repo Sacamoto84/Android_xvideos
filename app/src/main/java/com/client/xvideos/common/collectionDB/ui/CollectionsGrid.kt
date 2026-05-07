@@ -76,17 +76,22 @@ fun CollectionsGrid(
     onCollectionClick: (String) -> Unit,
     onCollectionLongClick: (String) -> Unit,
     onCreateNewCollectionClick: () -> Unit,
+    topBar: @Composable (() -> Unit)? = null,
     navigationContent: @Composable () -> Unit
 ) {
     Scaffold(
         topBar = {
-            Text(
-                ">Коллекция>$selectedCollection",
-                modifier = Modifier.padding(start = 8.dp),
-                color = style.titleColor,
-                fontSize = 18.sp,
-                fontFamily = style.titleFontFamily
-            )
+            if (topBar != null) {
+                topBar()
+            } else {
+                Text(
+                    ">Коллекция>$selectedCollection",
+                    modifier = Modifier.padding(start = 8.dp),
+                    color = style.titleColor,
+                    fontSize = 18.sp,
+                    fontFamily = style.titleFontFamily
+                )
+            }
         },
         containerColor = style.backgroundColor
     ) { padding ->

@@ -31,16 +31,20 @@ class SavedL_Collection(
 
     val listUrl = mutableStateListOf<PicsDetails>()
     val collectionList = mutableStateListOf<LCollectionEntity>()
+    val duplicateGroups = mutableStateListOf<LCollectionDuplicateGroup>()
+    val smartCollectionCandidates = mutableStateListOf<LSmartCollectionCandidate>()
 
     private val progress = LDownloadProgress(scope)
     val percentDownload: StateFlow<Float> = progress.percentDownload
 
     var currentCollectionName by mutableStateOf<String?>(null)
+    var sortOrder by mutableStateOf(LCollectionSortOrder.RECENT)
 
     //----- Dialogs -----
     var visibleDialog by mutableStateOf(false)
     var visibleDialogCreateNew by mutableStateOf(false)
     var collectionItemGifInfo by mutableStateOf<PicsDetails?>(null)
+    val collectionItemsPendingAdd = mutableStateListOf<PicsDetails>()
     //-------------------
 
     init {
@@ -52,7 +56,7 @@ class SavedL_Collection(
     fun refreshCollectionList() {
         try {
             Timber.i("SavedL_Collection refreshCollectionList()")
-            val items = lReadCollections(File(AppPath.l_collection))
+            val items = lReadCollections(File(AppPath.l_collection), sortOrder)
             collectionList.clear()
             collectionList.addAll(items)
             Timber.i("SavedL_Collection refreshCollectionList() collections:${collectionList.size}")
@@ -60,6 +64,11 @@ class SavedL_Collection(
             Timber.e(e, "SavedL_Collection refreshCollectionList() Ошибка получения списка коллекций")
             SnackBar.error("Ошибка получения списка коллекций")
         }
+    }
+
+    fun applySortOrder(order: LCollectionSortOrder) {
+        sortOrder = order
+        refreshCollectionList()
     }
 
     fun createCollection(collectionName: String) {
@@ -140,6 +149,7 @@ class SavedL_Collection(
             val items = lReadCollectionItems(collectionRoot)
             listUrl.clear()
             listUrl.addAll(items)
+            refreshDuplicates(collectionName)
             Timber.i("SavedL_Collection refresh() files:${listUrl.size}")
         } catch (e: Exception) {
             Timber.e(e, "SavedL_Collection refresh() Ошибка получения списка коллекции")
@@ -147,31 +157,80 @@ class SavedL_Collection(
         }
     }
 
+    fun refreshDuplicates(collectionName: String? = currentCollectionName) {
+        val name = collectionName ?: return
+        val collectionRoot = File(AppPath.l_collection, name)
+        duplicateGroups.clear()
+        duplicateGroups.addAll(lReadCollectionDuplicateGroups(collectionRoot))
+    }
+
     /* ---------- Элементы ---------- */
 
+    fun beginAddToCollection(item: PicsDetails) {
+        collectionItemsPendingAdd.clear()
+        collectionItemsPendingAdd.add(item)
+        collectionItemGifInfo = item
+        visibleDialog = true
+    }
+
+    fun beginAddManyToCollection(items: List<PicsDetails>) {
+        collectionItemsPendingAdd.clear()
+        collectionItemsPendingAdd.addAll(items.distinctBy { lPicsDetailsIdentityKey(it) })
+        collectionItemGifInfo = collectionItemsPendingAdd.firstOrNull()
+        visibleDialog = collectionItemsPendingAdd.isNotEmpty()
+    }
+
+    fun addPendingToCollection(collectionName: String) {
+        val items = collectionItemsPendingAdd.toList()
+            .ifEmpty { listOfNotNull(collectionItemGifInfo) }
+        addAll(items, collectionName)
+        visibleDialog = false
+        collectionItemsPendingAdd.clear()
+        collectionItemGifInfo = null
+    }
+
     fun add(item: PicsDetails, collectionName: String) {
-        Timber.i("SavedL_Collection add() item:${item.url_to_original} collection:$collectionName")
+        addAll(listOf(item), collectionName)
+    }
+
+    fun addAll(items: List<PicsDetails>, collectionName: String) {
+        val uniqueItems = items.distinctBy { lPicsDetailsIdentityKey(it) }
+        if (uniqueItems.isEmpty()) return
+
+        Timber.i("SavedL_Collection addAll() count:${uniqueItems.size} collection:$collectionName")
 
         scope.launch(Dispatchers.IO) {
-            val result = lPersistPicsDetailsToFolder(
-                item = item,
-                root = File(AppPath.l_collection, collectionName),
-                luscious = luscious,
-                progress = progress
-            )
+            var successCount = 0
+            var errorCount = 0
+
+            uniqueItems.forEach { item ->
+                lPersistPicsDetailsToFolder(
+                    item = item,
+                    root = File(AppPath.l_collection, collectionName),
+                    luscious = luscious,
+                    progress = progress
+                ).onSuccess {
+                    successCount++
+                }.onFailure {
+                    errorCount++
+                    Timber.e(it, "SavedL_Collection addAll() error")
+                }
+            }
+
             withContext(Dispatchers.Main) {
-                result
-                    .onSuccess {
-                        SnackBar.success("Added to collection")
-                        refreshCollectionList()
-                        if (currentCollectionName == collectionName) {
-                            refresh()
-                        }
-                    }
-                    .onFailure {
-                        Timber.e(it, "SavedL_Collection add() error")
+                when {
+                    successCount > 0 && errorCount == 0 ->
+                        SnackBar.success("Добавлено в коллекцию: $successCount")
+                    successCount > 0 ->
+                        SnackBar.info("Добавлено: $successCount, ошибок: $errorCount")
+                    else ->
                         SnackBar.error("Ошибка добавления в коллекцию")
-                    }
+                }
+
+                refreshCollectionList()
+                if (currentCollectionName == collectionName) {
+                    refresh()
+                }
             }
         }
     }
@@ -189,6 +248,83 @@ class SavedL_Collection(
 
     fun remove(url: String, collectionName: String) {
         remove(listOf(url), collectionName)
+    }
+
+    fun removeAll(items: List<PicsDetails>, collectionName: String) {
+        val collectionRoot = File(AppPath.l_collection, collectionName)
+        val removedCount = items
+            .distinctBy { lPicsDetailsIdentityKey(it) }
+            .count { item ->
+                val folder = lFindCollectionItemFolder(collectionRoot, lCollectionItemIdentifiers(item))
+                folder?.deleteRecursively() == true
+            }
+
+        if (removedCount > 0) {
+            SnackBar.info("Удалено из коллекции: $removedCount")
+            refreshCollectionList()
+            if (currentCollectionName == collectionName) {
+                refresh()
+            }
+        } else {
+            SnackBar.error("Файлы не найдены")
+        }
+    }
+
+    fun setManualCover(item: PicsDetails, collectionName: String? = currentCollectionName) {
+        val name = collectionName ?: return
+        val collectionRoot = File(AppPath.l_collection, name)
+        val folder = lFindCollectionItemFolder(collectionRoot, lCollectionItemIdentifiers(item))
+        if (folder == null) {
+            SnackBar.error("Не удалось найти файл для обложки")
+            return
+        }
+
+        val config = lReadCollectionConfig(collectionRoot).copy(coverFolderName = folder.name)
+        lWriteCollectionConfig(collectionRoot, config)
+        SnackBar.success("Обложка коллекции обновлена")
+        refreshCollectionList()
+    }
+
+    fun removeDuplicateItems(collectionName: String? = currentCollectionName) {
+        val name = collectionName ?: return
+        val collectionRoot = File(AppPath.l_collection, name)
+        val duplicateGroups = lFindCollectionDuplicateFolders(collectionRoot)
+        val foldersToDelete = duplicateGroups.flatMap { group -> group.drop(1).map { it.second } }
+
+        if (foldersToDelete.isEmpty()) {
+            SnackBar.info("Дубли не найдены")
+            refreshDuplicates(name)
+            return
+        }
+
+        val removedCount = foldersToDelete.count { it.deleteRecursively() }
+        SnackBar.info("Удалено дублей: $removedCount")
+        refreshCollectionList()
+        if (currentCollectionName == name) {
+            refresh()
+        }
+    }
+
+    fun refreshSmartCollectionCandidates() {
+        smartCollectionCandidates.clear()
+        smartCollectionCandidates.addAll(lReadSmartCollectionCandidates())
+    }
+
+    fun createSmartCollection(candidate: LSmartCollectionCandidate) {
+        scope.launch(Dispatchers.IO) {
+            val result = lCreateSmartCollection(candidate)
+            withContext(Dispatchers.Main) {
+                result
+                    .onSuccess { count ->
+                        SnackBar.success("Создана коллекция ${candidate.collectionName}: $count")
+                        refreshCollectionList()
+                    }
+                    .onFailure {
+                        Timber.e(it, "SavedL_Collection createSmartCollection() error")
+                        SnackBar.error("Ошибка создания smart-коллекции")
+                    }
+            }
+        }
     }
 
     private fun remove(identifiers: List<String>, collectionName: String) {

@@ -1,8 +1,53 @@
 package com.client.xvideos.l.featured.saved
 
+import com.client.xvideos.common.AppPath
 import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.model.isLVideoFileUrl
+import com.google.gson.GsonBuilder
 import java.io.File
+
+private const val L_COLLECTION_CONFIG_FILE_NAME = "collection.json"
+
+enum class LCollectionSortOrder(val title: String) {
+    RECENT("Сначала новые"),
+    NAME("По названию"),
+    SIZE("Больше элементов"),
+    DUPLICATES("Сначала дубли")
+}
+
+enum class LSmartCollectionKind(val title: String, val prefix: String) {
+    TAG("Тег", "Tag"),
+    AUTHOR("Автор", "Author"),
+    ALBUM("Альбом", "Album")
+}
+
+data class LCollectionDuplicateGroup(
+    val key: String,
+    val items: List<PicsDetails>
+)
+
+data class LSmartCollectionCandidate(
+    val kind: LSmartCollectionKind,
+    val key: String,
+    val title: String,
+    val subtitle: String,
+    val count: Int
+) {
+    val collectionName: String
+        get() = "${kind.prefix} - $title".sanitizeCollectionName()
+}
+
+internal data class LCollectionConfig(
+    val schemaVersion: Int = 1,
+    val coverFolderName: String? = null
+)
+
+internal data class LStoredCollectionItem(
+    val folder: File,
+    val metadata: LSavedLikeMetadata
+) {
+    fun toPicsDetails(): PicsDetails? = metadata.toPicsDetails(folder)
+}
 
 /**
  * Список коллекций L: имя, превью (если найдено) и количество элементов.
@@ -10,7 +55,10 @@ import java.io.File
 data class LCollectionEntity(
     val collection: String,
     val previewUrl: String?,
-    val itemsCount: Int
+    val itemsCount: Int,
+    val lastModifiedAt: Long,
+    val duplicateCount: Int,
+    val hasManualCover: Boolean
 )
 
 /**
@@ -18,19 +66,37 @@ data class LCollectionEntity(
  * директория первого уровня. Превью берётся из метаданных первого подходящего
  * элемента, размер — это число элементов с валидным `metadata.json`.
  */
-internal fun lReadCollections(collectionsRoot: File): List<LCollectionEntity> {
+internal fun lReadCollections(
+    collectionsRoot: File,
+    sortOrder: LCollectionSortOrder = LCollectionSortOrder.RECENT
+): List<LCollectionEntity> {
     collectionsRoot.mkdirs()
-    return collectionsRoot.listFiles()
+    val collections = collectionsRoot.listFiles()
         ?.filter { it.isDirectory }
-        ?.sortedBy { it.name.lowercase() }
         ?.map { folder ->
             LCollectionEntity(
                 collection = folder.name,
                 previewUrl = lResolveCollectionPreviewUrl(folder),
-                itemsCount = lResolveCollectionItemsCount(folder)
+                itemsCount = lResolveCollectionItemsCount(folder),
+                lastModifiedAt = lResolveCollectionLastModified(folder),
+                duplicateCount = lFindCollectionDuplicateFolders(folder).sumOf { it.size - 1 },
+                hasManualCover = lReadCollectionConfig(folder).coverFolderName != null
             )
         }
         ?: emptyList()
+
+    return when (sortOrder) {
+        LCollectionSortOrder.RECENT -> collections.sortedByDescending { it.lastModifiedAt }
+        LCollectionSortOrder.NAME -> collections.sortedBy { it.collection.lowercase() }
+        LCollectionSortOrder.SIZE -> collections.sortedWith(
+            compareByDescending<LCollectionEntity> { it.itemsCount }
+                .thenBy { it.collection.lowercase() }
+        )
+        LCollectionSortOrder.DUPLICATES -> collections.sortedWith(
+            compareByDescending<LCollectionEntity> { it.duplicateCount }
+                .thenBy { it.collection.lowercase() }
+        )
+    }
 }
 
 /**
@@ -38,6 +104,12 @@ internal fun lReadCollections(collectionsRoot: File): List<LCollectionEntity> {
  * убыванию даты сохранения.
  */
 internal fun lReadCollectionItems(collectionFolder: File): List<PicsDetails> {
+    return lReadStoredCollectionItems(collectionFolder)
+        .sortedByDescending { it.first.savedAt }
+        .mapNotNull { (metadata, folder) -> metadata.toPicsDetails(folder) }
+}
+
+internal fun lReadStoredCollectionItems(collectionFolder: File): List<Pair<LSavedLikeMetadata, File>> {
     collectionFolder.mkdirs()
     return collectionFolder.listFiles()
         ?.filter { it.isDirectory }
@@ -45,8 +117,6 @@ internal fun lReadCollectionItems(collectionFolder: File): List<PicsDetails> {
             val metadata = readCollectionMetadata(File(folder, L_METADATA_FILE_NAME))
             if (metadata != null) metadata to folder else null
         }
-        ?.sortedByDescending { it.first.savedAt }
-        ?.mapNotNull { (metadata, folder) -> metadata.toPicsDetails(folder) }
         ?: emptyList()
 }
 
@@ -55,6 +125,18 @@ internal fun lReadCollectionItems(collectionFolder: File): List<PicsDetails> {
  * (не URL), либо `null`, если ни в одном элементе нет валидного изображения.
  */
 private fun lResolveCollectionPreviewUrl(collectionFolder: File): String? {
+    val config = lReadCollectionConfig(collectionFolder)
+    config.coverFolderName
+        ?.takeIf { it.isNotBlank() }
+        ?.let { File(collectionFolder, it) }
+        ?.takeIf { it.exists() && it.isDirectory }
+        ?.let { coverFolder ->
+            val metadata = readCollectionMetadata(File(coverFolder, L_METADATA_FILE_NAME))
+            if (metadata != null) {
+                lResolveItemPreviewUrl(coverFolder, metadata)?.let { return it }
+            }
+        }
+
     val itemFolders = collectionFolder.listFiles()
         ?.filter { it.isDirectory }
         ?.sortedByDescending { it.lastModified() }
@@ -63,26 +145,7 @@ private fun lResolveCollectionPreviewUrl(collectionFolder: File): String? {
     for (folder in itemFolders) {
         val metadata = readCollectionMetadata(File(folder, L_METADATA_FILE_NAME))
         if (metadata != null) {
-            metadata.previewFiles
-                ?.sortedByDescending { it.width * it.height }
-                ?.forEach { preview ->
-                    val candidate = File(folder, preview.fileName)
-                    if (candidate.exists() && !candidate.absolutePath.isLVideoFileUrl()) {
-                        return candidate.absolutePath
-                    }
-                }
-
-            metadata.previewFileName?.let { previewFileName ->
-                val candidate = File(folder, previewFileName)
-                if (candidate.exists() && !candidate.absolutePath.isLVideoFileUrl()) {
-                    return candidate.absolutePath
-                }
-            }
-
-            val mediaFile = File(folder, metadata.mediaFileName)
-            if (mediaFile.exists() && !mediaFile.absolutePath.isLVideoFileUrl()) {
-                return mediaFile.absolutePath
-            }
+            lResolveItemPreviewUrl(folder, metadata)?.let { return it }
         }
 
         val fallback = folder.listFiles()
@@ -94,10 +157,220 @@ private fun lResolveCollectionPreviewUrl(collectionFolder: File): String? {
     return null
 }
 
+private fun lResolveItemPreviewUrl(folder: File, metadata: LSavedLikeMetadata): String? {
+    metadata.previewFiles
+        ?.sortedByDescending { it.width * it.height }
+        ?.forEach { preview ->
+            val candidate = File(folder, preview.fileName)
+            if (candidate.exists() && !candidate.absolutePath.isLVideoFileUrl()) {
+                return candidate.absolutePath
+            }
+        }
+
+    metadata.previewFileName?.let { previewFileName ->
+        val candidate = File(folder, previewFileName)
+        if (candidate.exists() && !candidate.absolutePath.isLVideoFileUrl()) {
+            return candidate.absolutePath
+        }
+    }
+
+    val mediaFile = File(folder, metadata.mediaFileName)
+    if (mediaFile.exists() && !mediaFile.absolutePath.isLVideoFileUrl()) {
+        return mediaFile.absolutePath
+    }
+
+    return null
+}
+
 private fun lResolveCollectionItemsCount(collectionFolder: File): Int {
     return collectionFolder.listFiles()
         ?.count { it.isDirectory && File(it, L_METADATA_FILE_NAME).exists() }
         ?: 0
+}
+
+private fun lResolveCollectionLastModified(collectionFolder: File): Long {
+    val newestItem = collectionFolder.listFiles()
+        ?.filter { it.isDirectory }
+        ?.maxOfOrNull { it.lastModified() }
+    return newestItem ?: collectionFolder.lastModified()
+}
+
+private val lCollectionConfigGson = GsonBuilder().setPrettyPrinting().create()
+
+internal fun lReadCollectionConfig(collectionFolder: File): LCollectionConfig {
+    val file = File(collectionFolder, L_COLLECTION_CONFIG_FILE_NAME)
+    if (!file.exists()) return LCollectionConfig()
+    return runCatching {
+        lCollectionConfigGson.fromJson(file.readText(Charsets.UTF_8), LCollectionConfig::class.java)
+            ?: LCollectionConfig()
+    }.getOrDefault(LCollectionConfig())
+}
+
+internal fun lWriteCollectionConfig(collectionFolder: File, config: LCollectionConfig) {
+    collectionFolder.mkdirs()
+    File(collectionFolder, L_COLLECTION_CONFIG_FILE_NAME)
+        .writeText(lCollectionConfigGson.toJson(config), Charsets.UTF_8)
+}
+
+internal fun lCollectionItemIdentifiers(item: PicsDetails): List<String> {
+    return listOfNotNull(
+        item.url_to_original,
+        item.url_to_video,
+        item.thumbnails?.firstOrNull { !it.url.isNullOrBlank() }?.url
+    ) + (item.thumbnails?.mapNotNull { it.url } ?: emptyList())
+}
+
+internal fun lPicsDetailsIdentityKey(item: PicsDetails): String {
+    return lCollectionItemIdentifiers(item)
+        .firstOrNull { it.isNotBlank() }
+        ?.substringBefore('?')
+        ?.substringBefore('#')
+        ?: "${item.album.orEmpty()}-${item.width}-${item.height}-${item.is_animated}"
+}
+
+internal fun lMetadataIdentityKey(metadata: LSavedLikeMetadata): String {
+    return listOfNotNull(
+        metadata.sourceOriginalUrl,
+        metadata.sourceVideoUrl,
+        metadata.sourceMediaUrl,
+        metadata.picture.url_to_original,
+        metadata.picture.url_to_video
+    )
+        .firstOrNull { it.isNotBlank() }
+        ?.substringBefore('?')
+        ?.substringBefore('#')
+        ?: "${metadata.albumId.orEmpty()}-${metadata.picture.width}-${metadata.picture.height}-${metadata.picture.is_animated}"
+}
+
+internal fun lReadCollectionDuplicateGroups(collectionFolder: File): List<LCollectionDuplicateGroup> {
+    return lReadStoredCollectionItems(collectionFolder)
+        .groupBy { (metadata, _) -> lMetadataIdentityKey(metadata) }
+        .filterValues { it.size > 1 }
+        .mapNotNull { (key, items) ->
+            val pics = items
+                .sortedByDescending { (metadata, _) -> metadata.savedAt }
+                .mapNotNull { (metadata, folder) -> metadata.toPicsDetails(folder) }
+            if (pics.size > 1) LCollectionDuplicateGroup(key, pics) else null
+        }
+        .sortedByDescending { it.items.size }
+}
+
+internal fun lFindCollectionDuplicateFolders(collectionFolder: File): List<List<Pair<LSavedLikeMetadata, File>>> {
+    return lReadStoredCollectionItems(collectionFolder)
+        .groupBy { (metadata, _) -> lMetadataIdentityKey(metadata) }
+        .values
+        .filter { it.size > 1 }
+        .map { it.sortedByDescending { (metadata, _) -> metadata.savedAt } }
+}
+
+internal fun lReadSmartCollectionCandidates(): List<LSmartCollectionCandidate> {
+    val items = lReadAllSavedLCollectionSources()
+
+    val albumCandidates = items
+        .filter { it.metadata.albumId?.isNotBlank() == true }
+        .groupBy { it.metadata.albumId.orEmpty() }
+        .toSmartCandidates(LSmartCollectionKind.ALBUM) { key, group ->
+            val metadata = group.first().metadata
+            metadata.albumTitle?.takeIf { it.isNotBlank() } ?: "Album $key"
+        }
+
+    val tagCandidates = items
+        .flatMap { item ->
+            item.metadata.albumDetails?.tags
+                ?.map { tag -> tag.text to item }
+                ?: emptyList()
+        }
+        .groupBy({ it.first }, { it.second })
+        .toSmartCandidates(LSmartCollectionKind.TAG) { key, _ -> key }
+
+    val authorCandidates = items
+        .mapNotNull { item ->
+            val author = item.metadata.albumDetails?.createdBy ?: return@mapNotNull null
+            val name = author.displayName.takeIf { it.isNotBlank() }
+                ?: author.name.takeIf { it.isNotBlank() }
+                ?: author.id
+            name to item
+        }
+        .groupBy({ it.first }, { it.second })
+        .toSmartCandidates(LSmartCollectionKind.AUTHOR) { key, _ -> key }
+
+    return (albumCandidates + tagCandidates + authorCandidates)
+        .filter { it.count > 1 }
+        .sortedWith(
+            compareByDescending<LSmartCollectionCandidate> { it.count }
+                .thenBy { it.kind.ordinal }
+                .thenBy { it.title.lowercase() }
+        )
+}
+
+private fun Map<String, List<LStoredCollectionItem>>.toSmartCandidates(
+    kind: LSmartCollectionKind,
+    titleResolver: (String, List<LStoredCollectionItem>) -> String
+): List<LSmartCollectionCandidate> {
+    return map { (key, group) ->
+        LSmartCollectionCandidate(
+            kind = kind,
+            key = key,
+            title = titleResolver(key, group),
+            subtitle = kind.title,
+            count = group.distinctBy { lMetadataIdentityKey(it.metadata) }.size
+        )
+    }
+}
+
+internal fun lCreateSmartCollection(candidate: LSmartCollectionCandidate): Result<Int> = runCatching {
+    val targetRoot = File(AppPath.l_collection, candidate.collectionName)
+    targetRoot.mkdirs()
+
+    val selectedSources = lReadAllSavedLCollectionSources()
+        .filter { it.matches(candidate) }
+        .distinctBy { lMetadataIdentityKey(it.metadata) }
+
+    selectedSources.forEach { source ->
+        val target = File(targetRoot, source.folder.name)
+        if (source.folder.canonicalFile != target.canonicalFile) {
+            source.folder.copyRecursively(target, overwrite = true)
+        }
+    }
+
+    selectedSources.size
+}
+
+private fun LStoredCollectionItem.matches(candidate: LSmartCollectionCandidate): Boolean {
+    return when (candidate.kind) {
+        LSmartCollectionKind.ALBUM -> metadata.albumId == candidate.key
+        LSmartCollectionKind.TAG -> metadata.albumDetails?.tags?.any { it.text == candidate.key } == true
+        LSmartCollectionKind.AUTHOR -> {
+            val author = metadata.albumDetails?.createdBy ?: return false
+            candidate.key == author.displayName ||
+                    candidate.key == author.name ||
+                    candidate.key == author.id
+        }
+    }
+}
+
+private fun lReadAllSavedLCollectionSources(): List<LStoredCollectionItem> {
+    val likes = lReadStoredCollectionItems(File(AppPath.l_likes))
+        .map { (metadata, folder) -> LStoredCollectionItem(folder, metadata) }
+
+    val collections = File(AppPath.l_collection)
+        .listFiles()
+        ?.filter { it.isDirectory }
+        ?.flatMap { collectionFolder ->
+            lReadStoredCollectionItems(collectionFolder)
+                .map { (metadata, folder) -> LStoredCollectionItem(folder, metadata) }
+        }
+        ?: emptyList()
+
+    return (likes + collections).distinctBy { lMetadataIdentityKey(it.metadata) }
+}
+
+private fun String.sanitizeCollectionName(): String {
+    return replace(Regex("[\\\\/:*?\"<>|]"), "_")
+        .replace(Regex("\\s+"), " ")
+        .trim()
+        .take(80)
+        .ifBlank { "Smart collection" }
 }
 
 /**

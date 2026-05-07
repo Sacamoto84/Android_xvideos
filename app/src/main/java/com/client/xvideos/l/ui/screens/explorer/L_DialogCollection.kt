@@ -60,7 +60,11 @@ fun L_DialogCollection(savedL: SavedL) {
                 .background(Color(0xFF090909))
         ) {
             Text(
-                text = "Добавить в коллекцию",
+                text = if (savedL.collection.collectionItemsPendingAdd.size > 1) {
+                    "Добавить в коллекцию (${savedL.collection.collectionItemsPendingAdd.size})"
+                } else {
+                    "Добавить в коллекцию"
+                },
                 style = TextStyle(
                     fontWeight = FontWeight.Medium,
                     fontSize = 16.sp,
@@ -79,12 +83,8 @@ fun L_DialogCollection(savedL: SavedL) {
                                 .padding(horizontal = 8.dp)
                                 .padding(vertical = 4.dp)
                                 .clickable(onClick = {
-                                    val item = savedL.collection.collectionItemGifInfo as? PicsDetails
-                                    if (item != null) {
-                                        savedL.collection.add(item, collectionItem.collection)
-                                        savedL.collection.visibleDialog = false
-                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                    }
+                                    savedL.collection.addPendingToCollection(collectionItem.collection)
+                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                                 }),
                             verticalAlignment = Alignment.CenterVertically
                         ) {

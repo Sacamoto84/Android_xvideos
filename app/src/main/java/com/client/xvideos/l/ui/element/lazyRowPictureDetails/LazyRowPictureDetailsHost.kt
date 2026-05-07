@@ -34,5 +34,45 @@ class LazyRowPictureDetailsHost(
 
     var filteredPic =  mutableStateListOf<PicsDetails>()
 
+    val selection = LPictureSelectionState()
+
+}
+
+class LPictureSelectionState {
+    var active by mutableStateOf(false)
+        private set
+
+    val selectedKeys = mutableStateListOf<String>()
+
+    fun isSelected(item: PicsDetails): Boolean {
+        return item.selectionKey() in selectedKeys
+    }
+
+    fun toggle(item: PicsDetails) {
+        val key = item.selectionKey()
+        if (key in selectedKeys) {
+            selectedKeys.remove(key)
+        } else {
+            selectedKeys.add(key)
+        }
+        active = selectedKeys.isNotEmpty()
+    }
+
+    fun selectedItems(items: List<PicsDetails>): List<PicsDetails> {
+        val keys = selectedKeys.toSet()
+        return items.filter { it.selectionKey() in keys }
+    }
+
+    fun clear() {
+        selectedKeys.clear()
+        active = false
+    }
+}
+
+fun PicsDetails.selectionKey(): String {
+    return url_to_original
+        ?: url_to_video
+        ?: thumbnails?.firstOrNull { !it.url.isNullOrBlank() }?.url
+        ?: "${album.orEmpty()}-$width-$height-${is_animated}"
 }
 
