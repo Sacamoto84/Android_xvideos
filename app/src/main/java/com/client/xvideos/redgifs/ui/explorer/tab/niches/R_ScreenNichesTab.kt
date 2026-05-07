@@ -76,7 +76,7 @@ import com.client.xvideos.redgifs.common.search.R_SearchNiches
 import com.client.xvideos.redgifs.network.api.RedApi
 import com.client.xvideos.redgifs.model.Niche
 import com.client.xvideos.redgifs.model.Order
-import com.client.xvideos.redgifs.ui.explorer.tab.setting.styleTest
+
 import com.client.xvideos.redgifs.ui.niche.R_ScreenNiche
 import com.client.xvideos.redgifs.ui.profile.atom.VerticalScrollbar
 import com.client.xvideos.redgifs.ui.profile.rememberVisibleRangePercentIgnoringFirstNForLazyColumn
@@ -462,3 +462,9 @@ fun RefreshPreview() {
         }
     }
 }
+
+private val styleTest = androidx.compose.ui.text.TextStyle(
+    fontSize = 20.sp,
+    color = Color.White,
+    fontFamily = com.client.xvideos.redgifs.common.ThemeRed.fontFamilyDMsanss
+)

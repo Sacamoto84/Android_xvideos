@@ -20,8 +20,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.client.xvideos.common.noRippleClickable
-import com.client.xvideos.xvideos.screens.config.ScreenConfig
 import com.client.xvideos.xvideos.screens.favorites.ScreenFavorites
 import com.client.xvideos.ui.theme.grayColor
 import com.client.xvideos.xvideos.feature.country.ComposeCountry
@@ -49,22 +47,6 @@ fun TopBarDashboard(){
                 modifier = Modifier.size(32.dp)
             )
         }
-
-        //////////// Настройка ////////////
-        Box(
-            modifier = Modifier.padding(start = 8.dp, end = 8.dp).size(48.dp)
-                .noRippleClickable(onClick = { navigator.push(ScreenConfig()) }),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = Icons.Filled.Settings,
-                contentDescription = "Настройки",
-                tint = Color.LightGray,
-                modifier = Modifier.size(32.dp)
-            )
-        }
-        /////////// END Настройка ////////////
-
 
     }
 }

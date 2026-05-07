@@ -33,6 +33,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
@@ -58,11 +59,25 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
+import cafe.adriel.voyager.hilt.ScreenModelKey
+import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.client.xvideos.common.settings.ui.Config_G_0_4
+import com.client.xvideos.common.util.getFolderSize
+import com.client.xvideos.common.util.toPrettyCount3
+import com.client.xvideos.l.model.ThumbnailsSize
+import com.client.xvideos.redgifs.common.saved.SavedRed
+import dagger.Binds
+import dagger.Module
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+import dagger.multibindings.IntoMap
+import javax.inject.Inject
 import com.client.xvideos.common.applock.AccessCodeVisualTransformation
 import com.client.xvideos.common.applock.AppLockRepository
 import com.client.xvideos.common.applock.DisableAppLockAutofill
@@ -107,6 +122,19 @@ private val SettingsRowIconBackground = Color(0xFF1F2C34)
 private val SettingsRowTextSecondary = Color(0xFF9AA7AE)
 private val SettingsDividerColor = Color(0xFF263238)
 
+class AppSettingsSM @Inject constructor(
+    val savedRed: SavedRed
+) : ScreenModel
+
+@Module
+@InstallIn(SingletonComponent::class)
+abstract class AppSettingsModule {
+    @Binds
+    @IntoMap
+    @ScreenModelKey(AppSettingsSM::class)
+    abstract fun bindAppSettingsSM(sm: AppSettingsSM): ScreenModel
+}
+
 object AppSettingsScreen : Screen {
 
     private fun readResolve(): Any = AppSettingsScreen
@@ -118,12 +146,17 @@ object AppSettingsScreen : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val context = LocalContext.current.applicationContext
         val scope = rememberCoroutineScope()
+        val vm: AppSettingsSM = getScreenModel()
 
         val ramCachePercent = Settings.image_cache_ram_percent.field.collectAsStateWithLifecycle().value
         val diskCacheEnabled = Settings.image_cache_disk_enabled.field.collectAsStateWithLifecycle().value
         val diskCacheSizeMb = Settings.image_cache_disk_size_mb.field.collectAsStateWithLifecycle().value
         var diskCacheSizeBytes by remember { mutableLongStateOf(0L) }
         var storageStats by remember { mutableStateOf(EmptyStorageStats) }
+
+        // RedGifs folder sizes
+        var sizeRedTotal by remember { mutableLongStateOf(0L) }
+        var sizeRedDownload by remember { mutableLongStateOf(0L) }
 
         suspend fun refreshDiskCacheSize() {
             diskCacheSizeBytes = withContext(Dispatchers.IO) {
@@ -137,10 +170,22 @@ object AppSettingsScreen : Screen {
             }
         }
 
+        suspend fun refreshRedSizes() {
+            sizeRedTotal = withContext(Dispatchers.IO) {
+                getFolderSize(File(AppPath.main))
+            }
+            sizeRedDownload = withContext(Dispatchers.IO) {
+                getFolderSize(File(AppPath.r_cache_download))
+            }
+        }
+
         LaunchedEffect(Unit) {
             refreshDiskCacheSize()
             refreshStorageStats()
+            refreshRedSizes()
         }
+
+        val l_login = Settings.l_login.field.collectAsStateWithLifecycle().value
 
         Scaffold(
             topBar = {
@@ -258,6 +303,196 @@ object AppSettingsScreen : Screen {
                             refreshDiskCacheSize()
                             SnackBar.success("Кеш картинок очищен")
                         }
+                    }
+                )
+
+                SettingsDivider()
+
+                // ═════════════════════════════════════════════════════════════════
+                // XVideos
+                // ═════════════════════════════════════════════════════════════════
+                SettingsSectionTitle("XVideos")
+
+                val xvideosRow2 = Settings.xvideos_row2.field.collectAsStateWithLifecycle().value
+                SettingsSwitchRow(
+                    icon = Icons.Outlined.Movie,
+                    text = "2 столбика",
+                    subtitle = if (xvideosRow2) "Включено" else "Выключено",
+                    value = xvideosRow2,
+                    onValueChange = { Settings.xvideos_row2.setValue(it) }
+                )
+
+                SettingsDivider()
+
+                val xvideosShemale = Settings.xvideos_shemale.field.collectAsStateWithLifecycle().value
+                SettingsSwitchRow(
+                    icon = Icons.Outlined.Movie,
+                    text = "Shemale",
+                    subtitle = if (xvideosShemale) "Включено" else "Выключено",
+                    value = xvideosShemale,
+                    onValueChange = { Settings.xvideos_shemale.setValue(it) }
+                )
+
+                SettingsDivider()
+
+                // ═════════════════════════════════════════════════════════════════
+                // Luscious
+                // ═════════════════════════════════════════════════════════════════
+                SettingsSectionTitle("Luscious")
+
+                SettingsButtonRowWithDialog(
+                    icon = Icons.Outlined.Image,
+                    text = "Профиль L",
+                    value = if (l_login.isBlank()) "Нет" else "Выйти",
+                    textDialogTitle = "Выйти из профиля L",
+                    textDialogBody = if (l_login.isBlank()) {
+                        "Вы не авторизованы в L."
+                    } else {
+                        "При следующем открытии L нужно будет снова ввести логин и пароль: $l_login"
+                    },
+                    textDialogButton = "Выйти",
+                    onClick = {
+                        Settings.l_login.setValue("")
+                        Settings.l_pass.setValue("")
+                        SnackBar.success("Профиль L закрыт")
+                    }
+                )
+
+                SettingsDivider()
+
+                val thumbnailSize = Settings.thumbalistSize.field.collectAsStateWithLifecycle().value
+                val currentDisplayName = ThumbnailsSize.fromValue(thumbnailSize)?.displayName ?: "?"
+                SettingsValueRow(
+                    icon = Icons.Outlined.Image,
+                    text = "Размер миниатюры",
+                    value = currentDisplayName
+                )
+                // Dropdown for thumbnail size
+                ThumbnailSizeSelector(
+                    currentValue = currentDisplayName,
+                    onSelected = { selectedDisplayName ->
+                        ThumbnailsSize.fromDisplayName(selectedDisplayName)?.apply {
+                            Settings.thumbalistSize.setValue(value)
+                            SnackBar.success("Размер миниатюры: $displayName")
+                        }
+                    }
+                )
+
+                SettingsDivider()
+
+                Config_G_0_4("L Gifs", Settings.l_gifsTab_G_0_4)
+                Config_G_0_4("L Likes", Settings.l_likesTab_G_0_4)
+                Config_G_0_4("L Collection", Settings.l_collectionTab_G_0_4)
+
+                SettingsDivider()
+
+                // ═════════════════════════════════════════════════════════════════
+                // RedGifs
+                // ═════════════════════════════════════════════════════════════════
+                SettingsSectionTitle("RedGifs")
+
+                SettingsValueRow(
+                    icon = Icons.Outlined.Folder,
+                    text = "Размер всех папок Red",
+                    value = sizeRedTotal.toPrettyCount3()
+                )
+
+                SettingsDivider()
+
+                SettingsValueRow(
+                    icon = Icons.Outlined.Folder,
+                    text = "Размер папки Download",
+                    value = sizeRedDownload.toPrettyCount3()
+                )
+
+                SettingsDivider()
+
+                SettingsButtonRowWithDialog(
+                    icon = Icons.Filled.Delete,
+                    text = "Очистить папку Download",
+                    value = "Очистить",
+                    textDialogTitle = "Очистка папки Download",
+                    textDialogBody = "Подтвердить очистку: ${sizeRedDownload.toPrettyCount3()}",
+                    textDialogButton = "Очистить",
+                    onClick = {
+                        scope.launch {
+                            withContext(Dispatchers.IO) {
+                                File(AppPath.r_cache_download).deleteRecursively()
+                            }
+                            refreshRedSizes()
+                            SnackBar.success("Папка Download очищена")
+                        }
+                    }
+                )
+
+                SettingsDivider()
+
+                // Niches cache
+                val isNichesCacheDownloading = vm.savedRed.nichesCache.isDownloading
+                val nichesCacheProgress = vm.savedRed.nichesCache.progress
+                val nichesCacheSize = vm.savedRed.nichesCache.size
+                val nichesCacheLastModifiedHour = vm.savedRed.nichesCache.lastModifiedHour
+
+                SettingsValueRow(
+                    icon = Icons.Outlined.Apps,
+                    text = "Кеш Niches",
+                    value = "$nichesCacheSize • ${nichesCacheLastModifiedHour}h"
+                )
+
+                if (isNichesCacheDownloading) {
+                    LinearProgressIndicator(
+                        progress = { nichesCacheProgress },
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .fillMaxWidth(),
+                        color = ProgressIndicatorDefaults.linearColor,
+                        trackColor = ProgressIndicatorDefaults.linearTrackColor,
+                        strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
+                    )
+                }
+
+                SettingsListItem(
+                    icon = Icons.Outlined.Apps,
+                    text = "Обновить кеш Niches",
+                    trailing = {
+                        Button(onClick = { vm.savedRed.nichesCache.refresh() }) {
+                            Text("Обновить")
+                        }
+                    }
+                )
+
+                SettingsDivider()
+
+                Config_G_0_4("R Explorer", Settings.r_explorerGifsTab_G_0_4)
+                Config_G_0_4("R Лайки", Settings.r_likesTab_G_0_4)
+                Config_G_0_4("R Коллекция", Settings.r_collectionTab_G_0_4)
+            }
+        }
+    }
+}
+
+@Composable
+private fun ThumbnailSizeSelector(
+    currentValue: String,
+    onSelected: (String) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val items = ThumbnailsSize.displayNames
+
+    Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 72.dp, vertical = 4.dp)) {
+        Button(onClick = { expanded = true }) {
+            Text(currentValue)
+        }
+        androidx.compose.material3.DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            items.forEach { name ->
+                androidx.compose.material3.DropdownMenuItem(
+                    text = { Text(name) },
+                    onClick = {
+                        onSelected(name)
+                        expanded = false
                     }
                 )
             }

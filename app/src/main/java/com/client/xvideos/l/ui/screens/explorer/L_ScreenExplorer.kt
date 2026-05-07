@@ -37,7 +37,6 @@ import com.client.xvideos.l.featured.saved.SavedL
 import com.client.xvideos.screenRoot.LocalRootScreenModel
 import com.client.xvideos.l.ui.screens.LLoginContent
 import com.client.xvideos.l.ui.screens.explorer.tab.albumTopHits.L_ScreenAlbumTopHits
-import com.client.xvideos.l.ui.screens.explorer.tab.config.L_ScreenConfigTab
 import com.client.xvideos.l.ui.screens.explorer.tab.saved.L_SavedTab
 import com.client.xvideos.l.ui.screens.screenAlbumList.L_ScreenAlbumList
 import com.client.xvideos.redgifs.common.ThemeRed
@@ -119,8 +118,7 @@ class L_ScreenExplorer : Screen {
             persistentListOf(
                 Icons.AutoMirrored.Outlined.FormatListBulleted,
                 Icons.Outlined.Topic,
-                Icons.Outlined.BookmarkBorder,
-                Icons.Outlined.Settings
+                Icons.Outlined.BookmarkBorder
             )
         }
 
@@ -128,8 +126,7 @@ class L_ScreenExplorer : Screen {
             persistentListOf(
                 "",
                 "",
-                "bBookMark",
-                ""
+                "bBookMark"
             )
         }
 
@@ -163,8 +160,7 @@ class L_ScreenExplorer : Screen {
                     0 -> L_ScreenAlbumList.Content()
                     1 -> L_ScreenAlbumTopHits.Content()
                     2 -> L_SavedTab.Content()
-                    3 -> L_ScreenConfigTab().Content()
-                    else -> L_SavedTab
+                    else -> L_SavedTab.Content()
                 }
                 //)
 

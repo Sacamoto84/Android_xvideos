@@ -29,15 +29,14 @@ import com.client.xvideos.redgifs.ui.explorer.tab.gifs.R_ScreenGifsTab
 import com.client.xvideos.redgifs.ui.explorer.tab.niches.R_ScreenNichesTab
 import com.client.xvideos.redgifs.ui.explorer.tab.saved.R_ScreenSavedTab
 import com.client.xvideos.redgifs.ui.explorer.tab.search.SearchTab
-import com.client.xvideos.redgifs.ui.explorer.tab.setting.R_ScreenSettingTab
+
 import com.client.xvideos.redgifs.ui.ui.atom.TabBarPoints
 
 private val l = listOf(
     Icons.Outlined.Movie,
     Icons.Outlined.Group,
     Icons.Outlined.BookmarkBorder,
-    Icons.Outlined.Search,
-    Icons.Outlined.Settings
+    Icons.Outlined.Search
 )
 
 class ScreenRedExplorer : Screen {
@@ -80,8 +79,7 @@ class ScreenRedExplorer : Screen {
                     1 -> R_ScreenNichesTab.Content()
                     2 -> R_ScreenSavedTab.Content()
                     3 -> SearchTab.Content()
-                    4 -> R_ScreenSettingTab.Content()
-                    else -> FavoritesTab.Content()
+                    else -> R_ScreenGifsTab.Content()
                 }
             }
         }
