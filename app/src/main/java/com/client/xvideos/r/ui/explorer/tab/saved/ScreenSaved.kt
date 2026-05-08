@@ -32,9 +32,10 @@ import com.client.xvideos.r.ui.explorer.tab.saved.tab.R_Screen_Saved_DownloadTab
 import com.client.xvideos.r.ui.explorer.tab.saved.tab.R_Screen_Saved_LikesTab
 import com.client.xvideos.r.ui.explorer.tab.saved.tab.savedNiche.SavedNichesTab
 import com.client.xvideos.r.common.ThemeRed
-import com.client.xvideos.r.ui.explorer.tab.gifs.ColumnSelect_AddColumn
+import com.client.xvideos.r.ui.explorer.tab.gifs.ColumnSelect_AddRColumn
 import com.client.xvideos.r.ui.explorer.tab.saved.tab.R_Screen_Saved_SubscriptionsTab
 import com.client.xvideos.r.ui.ui.atom.TabBarPoints
+import com.client.xvideos.r.ui.explorer.tab.gifs.normalizeRColumnCount
 import kotlinx.collections.immutable.persistentListOf
 
 object R_ScreenSavedTab : Screen {
@@ -61,9 +62,13 @@ object R_ScreenSavedTab : Screen {
     @Composable
     override fun Content() {
 
-        val overlay0 = Settings.r_likesTab_column_current_count.field.collectAsStateWithLifecycle().value
+        val overlay0 = normalizeRColumnCount(
+            Settings.r_likesTab_column_current_count.field.collectAsStateWithLifecycle().value
+        )
 
-        val overlay4 = Settings.r_collectionTab_column_current_count.field.collectAsStateWithLifecycle().value
+        val overlay4 = normalizeRColumnCount(
+            Settings.r_collectionTab_column_current_count.field.collectAsStateWithLifecycle().value
+        )
 
         Scaffold(
             bottomBar = {
@@ -77,8 +82,8 @@ object R_ScreenSavedTab : Screen {
                         onChangeState = {
                             if (it == screenType) {
                                 when (it) {
-                                    0 -> { ColumnSelect_AddColumn(Settings.r_likesTab_column_current_count, Settings.r_likesTab_G_0_4) }
-                                    4 -> { ColumnSelect_AddColumn(Settings.r_collectionTab_column_current_count, Settings.r_collectionTab_G_0_4) }
+                                    0 -> { ColumnSelect_AddRColumn(Settings.r_likesTab_column_current_count) }
+                                    4 -> { ColumnSelect_AddRColumn(Settings.r_collectionTab_column_current_count) }
                                 }
                             }
                             screenType = it

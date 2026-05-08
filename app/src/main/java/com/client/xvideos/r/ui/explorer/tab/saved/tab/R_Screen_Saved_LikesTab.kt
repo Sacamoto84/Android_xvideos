@@ -29,6 +29,7 @@ import com.client.xvideos.r.common.saved.SavedRed
 import com.client.xvideos.r.common.search.R_SearchExplorer
 import com.client.xvideos.r.common.search.R_SearchNiches
 import com.client.xvideos.r.network.api.RedApi
+import com.client.xvideos.r.ui.explorer.tab.gifs.normalizeRColumnCount
 import com.client.xvideos.r.ui.profile.ScreenRedProfile
 import com.client.xvideos.r.ui.ui.lazyrow123.LazyRow123
 import com.client.xvideos.r.ui.ui.lazyrow123.LazyRow123Host
@@ -55,7 +56,9 @@ object R_Screen_Saved_LikesTab : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val vm: ScreenSavedLikesSM = getScreenModel()
 
-        val columnSelect = Settings.r_likesTab_column_current_count.field.collectAsStateWithLifecycle().value
+        val columnSelect = normalizeRColumnCount(
+            Settings.r_likesTab_column_current_count.field.collectAsStateWithLifecycle().value
+        )
 
         val pager = vm.likedHost.pager.collectAsLazyPagingItems()
 

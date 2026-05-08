@@ -22,8 +22,9 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.l.ui.screens.TabRow
 import com.client.xvideos.r.common.ThemeRed
-import com.client.xvideos.r.ui.explorer.tab.gifs.ColumnSelect_AddColumn
+import com.client.xvideos.r.ui.explorer.tab.gifs.ColumnSelect_AddRColumn
 import com.client.xvideos.r.ui.explorer.tab.gifs.R_ScreenGifsTab
+import com.client.xvideos.r.ui.explorer.tab.gifs.normalizeRColumnCount
 import com.client.xvideos.r.ui.explorer.tab.niches.R_ScreenNichesTab
 import com.client.xvideos.r.ui.explorer.tab.saved.R_ScreenSavedTab
 import com.client.xvideos.r.ui.explorer.tab.search.SearchTab
@@ -50,7 +51,9 @@ class ScreenRedExplorer : Screen {
     @Composable
     override fun Content() {
 
-        val overlay0 = Settings.r_explorerGifsTab_column_current_count.field.collectAsStateWithLifecycle().value
+        val overlay0 = normalizeRColumnCount(
+            Settings.r_explorerGifsTab_column_current_count.field.collectAsStateWithLifecycle().value
+        )
 
         Scaffold(bottomBar = {
 
@@ -61,7 +64,7 @@ class ScreenRedExplorer : Screen {
                 onChangeState = {
                     if (it == screenType) {
                         when (it) {
-                            0 -> { ColumnSelect_AddColumn(Settings.r_explorerGifsTab_column_current_count, Settings.r_explorerGifsTab_G_0_4) }
+                            0 -> { ColumnSelect_AddRColumn(Settings.r_explorerGifsTab_column_current_count) }
                         }
                     }
                     screenType = it

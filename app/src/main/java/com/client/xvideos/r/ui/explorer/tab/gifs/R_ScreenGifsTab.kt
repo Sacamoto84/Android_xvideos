@@ -79,6 +79,19 @@ fun ColumnSelect_AddColumn(pref: SettingElementInt, list: SettingElementList<Boo
     pref.setValue(enabledIndices[nextPos])
 }
 
+private val rColumnOptions = listOf(2, 3, 4)
+
+fun normalizeRColumnCount(value: Int): Int {
+    return value.takeIf { it in rColumnOptions } ?: rColumnOptions.first()
+}
+
+fun ColumnSelect_AddRColumn(pref: SettingElementInt) {
+    val currentIndex = normalizeRColumnCount(pref.field.value)
+    val currentPos = rColumnOptions.indexOf(currentIndex)
+    val nextPos = (currentPos + 1) % rColumnOptions.size
+    pref.setValue(rColumnOptions[nextPos])
+}
+
 object R_ScreenGifsTab : Screen {
 
     private fun readResolve(): Any = R_ScreenGifsTab
@@ -99,7 +112,8 @@ private fun R_ScreenGifsTabContent(vm: ScreenRedExplorerGifsSM) {
 
     val haptic = LocalHapticFeedback.current
 
-    val columnSelect by Settings.r_explorerGifsTab_column_current_count.field.collectAsStateWithLifecycle()
+    val columnSelectRaw by Settings.r_explorerGifsTab_column_current_count.field.collectAsStateWithLifecycle()
+    val columnSelect = normalizeRColumnCount(columnSelectRaw)
 
     val search = vm.search
     val searchR by search.searchText.collectAsStateWithLifecycle()

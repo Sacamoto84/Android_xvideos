@@ -37,6 +37,7 @@ import com.client.xvideos.r.common.search.R_SearchNiches
 import com.client.xvideos.r.network.api.RedApi
 import com.client.xvideos.r.model.GifsInfo
 import com.client.xvideos.r.model.Order
+import com.client.xvideos.r.ui.explorer.tab.gifs.normalizeRColumnCount
 import com.client.xvideos.r.ui.ui.lazyrow123.LazyRow123
 import com.client.xvideos.r.ui.ui.lazyrow123.LazyRow123Host
 import com.client.xvideos.r.ui.ui.lazyrow123.model.TypePager
@@ -79,7 +80,9 @@ class ScreenCollectionName(
             }
         }
 
-        val columnSelect  = Settings.r_collectionTab_column_current_count.field.collectAsStateWithLifecycle().value
+        val columnSelect = normalizeRColumnCount(
+            Settings.r_collectionTab_column_current_count.field.collectAsStateWithLifecycle().value
+        )
 
         //Изменение количества отображаемых елементов
         LaunchedEffect(columnSelect) { vm.likedHost.columns = columnSelect }

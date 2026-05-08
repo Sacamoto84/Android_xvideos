@@ -670,11 +670,6 @@ private fun RSettingsSection(
         textDialogButton = "Очистить",
         onClick = onClearDownload
     )
-    SettingsDivider()
-
-    Config_G_0_4("R Explorer", Settings.r_explorerGifsTab_G_0_4)
-    Config_G_0_4("R Лайки", Settings.r_likesTab_G_0_4)
-    Config_G_0_4("R Коллекция", Settings.r_collectionTab_G_0_4)
 }
 
 @Composable

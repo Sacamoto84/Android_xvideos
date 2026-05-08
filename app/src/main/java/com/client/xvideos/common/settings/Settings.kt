@@ -51,11 +51,10 @@ object Settings {
     //-- red ---
 
 
-    val r_explorerGifsTab_G_0_4 by lazy {  SettingElementList<Boolean>( pref, "r_explorerGifsTab_G_0_4",  typeToken = JsonTypes.listOf(Boolean::class.javaObjectType) , default = listOf(false, true, true, true, true))  }
 
 
     /**
-     * Текущее количество столбиков в L Gifs Tab
+     * Текущее количество столбиков в R Gifs Tab: 2, 3 или 4.
      */
     val r_explorerGifsTab_column_current_count by lazy { SettingElementInt(pref, "r_explorerGifsTab_column_current_count", 2) }
 
@@ -64,12 +63,7 @@ object Settings {
 
 
     /**
-     * Количество столбиков в R Saved Likes Tab T 1 2 3 4
-     */
-    val r_likesTab_G_0_4 by lazy {  SettingElementList( pref, "r_likesTab_G_0_4",  typeToken = JsonTypes.listOf(Boolean::class.javaObjectType) , default = listOf(false, true, true, true, true))  }
-
-    /**
-     * Текущее количество столбиков в R Saved Likes Tab
+     * Текущее количество столбиков в R Saved Likes Tab: 2, 3 или 4.
      */
     val r_likesTab_column_current_count by lazy { SettingElementInt(pref, "r_likesTab_column_current_count", 2) }
 
@@ -79,12 +73,7 @@ object Settings {
 
 
     /**
-     * Количество столбиков в R Saved Collection Tab T 1 2 3 4
-     */
-    val r_collectionTab_G_0_4 by lazy {  SettingElementList( pref, "r_collectionTab_G_0_4",  typeToken = JsonTypes.listOf(Boolean::class.javaObjectType) , default = listOf(false, true, true, true, true))  }
-
-    /**
-     * Текущее количество столбиков в R Saved Collection Tab
+     * Текущее количество столбиков в R Saved Collection Tab: 2, 3 или 4.
      */
     val r_collectionTab_column_current_count by lazy { SettingElementInt( pref, "r_collectionTab_column_current_count", 2 ) }
 

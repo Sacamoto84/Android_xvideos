@@ -77,7 +77,7 @@ class LazyRow123Host(
         private val nextFeedId = AtomicInteger(0)
 
         fun normalizeColumns(value: Int): Int {
-            return value.takeIf { it in 1..4 } ?: 2
+            return value.takeIf { it in 2..4 } ?: 2
         }
     }
 
