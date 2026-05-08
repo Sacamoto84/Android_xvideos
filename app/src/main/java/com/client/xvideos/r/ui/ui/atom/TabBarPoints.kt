@@ -13,35 +13,24 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.composeunstyled.Text
-import com.client.xvideos.r.common.ThemeRed
 import com.client.xvideos.ui.theme.XvideosTheme
 
 @Composable
 fun TabBarPoints(count: Int, screenType: Boolean) {
+    val safeCount = count.takeIf { it in 1..4 } ?: 2
     Box(
         modifier = Modifier.size(24.dp),
         contentAlignment = Alignment.CenterStart
     ) {
         Row {
-            if (count == 0) {
-                Text(
-                    "T",
-                    color = if (screenType) Color.White else Color.Gray,
-                    fontFamily = ThemeRed.fontFamilyPopinsSemiBold,
-                    fontSize = 12.sp
+            repeat(safeCount) {
+                Box(
+                    modifier = Modifier
+                        .padding(end = 2.dp)
+                        .clip(CircleShape)
+                        .size(4.dp)
+                        .background(if (screenType) Color.White else Color.Gray)
                 )
-            } else {
-                repeat(count) {
-                    Box(
-                        modifier = Modifier
-                            .padding(end = 2.dp)
-                            .clip(CircleShape)
-                            .size(4.dp)
-                            .background(if (screenType) Color.White else Color.Gray)
-                    )
-                }
             }
         }
     }

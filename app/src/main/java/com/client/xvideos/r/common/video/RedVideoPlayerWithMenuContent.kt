@@ -63,7 +63,7 @@ fun RedVideoPlayerWithMenu(
 
     LaunchedEffect(isCurrentPage) { snapshotFlow { currentTime to duration }.distinctUntilChanged().collectLatest {if (isCurrentPage) onChangeTime(it)}}
 
-    val playerHost = remember { MediaPlayerHost(mediaUrl = url, isPaused = true) }
+    val playerHost = remember(url) { MediaPlayerHost(mediaUrl = url, isPaused = true) }
 
     LaunchedEffect(url) {
         delay(100)
@@ -100,7 +100,7 @@ fun RedVideoPlayerWithMenu(
         }
     }
 
-    LaunchedEffect(playerHost, onPlayerControlsReady) {
+    LaunchedEffect(playerHost, onPlayerControlsReady, isCurrentPage) {
 
         val controls = object : PlayerControls {
             override fun forward(seconds: Float) { val currentPosition = (currentTime + seconds).coerceAtMost(duration.toFloat()); playerHost.seekTo(currentPosition) }
@@ -110,7 +110,9 @@ fun RedVideoPlayerWithMenu(
             override fun pause() { playerHost.pause() }
             override fun play()  { playerHost.play() }
         }
-        onPlayerControlsReady(controls)
+        if (isCurrentPage) {
+            onPlayerControlsReady(controls)
+        }
 
     }
 

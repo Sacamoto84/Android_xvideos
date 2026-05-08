@@ -26,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.client.xvideos.common.json.JsonTypes
 import com.client.xvideos.common.settings.element.SettingElementList
-import com.client.xvideos.l.theme.ThemeL
 import com.composeunstyled.Text
 import com.skydoves.compose.stability.runtime.TraceRecomposition
 
@@ -34,6 +33,7 @@ import com.skydoves.compose.stability.runtime.TraceRecomposition
 fun Config_G_0_4(text: String = "123453232", setting : SettingElementList<Boolean>) {
 
     val list =  setting.field.collectAsStateWithLifecycle().value
+    val visibleIndices = remember(list) { list.indices.filter { it in 1..4 } }
 
     //val selectedOptions = remember { mutableStateListOf(false, false, true, true, false) }
 
@@ -47,29 +47,23 @@ fun Config_G_0_4(text: String = "123453232", setting : SettingElementList<Boolea
         MultiChoiceSegmentedButtonRow(
             modifier = Modifier.padding(start = 16.dp).fillMaxWidth()
         ) {
-            list.forEachIndexed { index, label ->
+            visibleIndices.forEachIndexed { buttonIndex, settingIndex ->
                 SegmentedButton(
                     shape = SegmentedButtonDefaults.itemShape(
-                        index = index,
-                        count = list.size
+                        index = buttonIndex,
+                        count = visibleIndices.size
                     ),
-                    checked = list[index],
+                    checked = list[settingIndex],
                     onCheckedChange = {
                         val a = list.toMutableList()
-                        a[index] = a[index].not()
+                        a[settingIndex] = a[settingIndex].not()
                         setting.setValue(a)
                     },
 
                     //icon = { SegmentedButtonDefaults.Icon(selectedOptions[index]) },
 
                     label = {
-                        when (index) {
-                            0 -> TabBarPoints(0, list[index])
-                            1 -> TabBarPoints(1, list[index])
-                            2 -> TabBarPoints(2, list[index])
-                            3 -> TabBarPoints(3, list[index])
-                            4 -> TabBarPoints(4, list[index])
-                        }
+                        TabBarPoints(settingIndex, list[settingIndex])
                     }
                 )
             }
@@ -83,27 +77,20 @@ fun Config_G_0_4(text: String = "123453232", setting : SettingElementList<Boolea
 
 @Composable
 private fun TabBarPoints(count: Int, screenType: Boolean) {
+    val safeCount = count.takeIf { it in 1..4 } ?: 2
     Box(
         modifier = Modifier.size(24.dp),
         contentAlignment = Alignment.Center
     ) {
         Row {
-            if (count == 0) {
-                Text(
-                    "T",
-                    color = if (screenType) Color.White else Color.Gray,
-                    style = ThemeL.Type.caption.copy(color = if (screenType) Color.White else Color.Gray)
+            repeat(safeCount) {
+                Box(
+                    modifier = Modifier
+                        .padding(end = 2.dp)
+                        .clip(CircleShape)
+                        .size(4.dp)
+                        .background(if (screenType) Color.White else Color.Gray)
                 )
-            } else {
-                repeat(count) {
-                    Box(
-                        modifier = Modifier
-                            .padding(end = 2.dp)
-                            .clip(CircleShape)
-                            .size(4.dp)
-                            .background(if (screenType) Color.White else Color.Gray)
-                    )
-                }
             }
         }
     }

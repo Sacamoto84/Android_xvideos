@@ -15,6 +15,7 @@ import androidx.paging.PagingData
 import androidx.paging.PagingSource
 import androidx.paging.cachedIn
 import com.client.xvideos.common.connectivityObserver.ConnectivityObserver
+import com.client.xvideos.r.model.GifsInfo
 import com.client.xvideos.r.model.Order
 import com.client.xvideos.r.common.block.BlockRed
 import com.client.xvideos.r.common.downloader.DownloadRed
@@ -44,6 +45,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.util.concurrent.atomic.AtomicInteger
 
 private data class SearchParams(
     val query: String,
@@ -71,6 +73,15 @@ class LazyRow123Host(
     val searchNiches: R_SearchNiches,
     val isCollection: Boolean = false
 ) {
+    companion object {
+        private val nextFeedId = AtomicInteger(0)
+
+        fun normalizeColumns(value: Int): Int {
+            return value.takeIf { it in 1..4 } ?: 2
+        }
+    }
+
+    val feedKey: String = "RFeed:${typePager.name}:${extraString}:${nextFeedId.incrementAndGet()}"
 
     @OptIn(ExperimentalFoundationApi::class)
     val dpCacheWindow = LazyLayoutCacheWindow(ahead = 100.dp, behind = 0.dp)
@@ -93,7 +104,7 @@ class LazyRow123Host(
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val pager: Flow<PagingData<Any>> =
+    val pager: Flow<PagingData<GifsInfo>> =
         combine( search.searchTextDone, sortType, tags, searchNiches.searchTextDone )
         { text, sort, tags, textNiches ->
             SearchParams(text.trim(), sort, tags.joinToString(","), textNiches)
@@ -126,14 +137,25 @@ class LazyRow123Host(
             .cachedIn(scope)
 
 
-    var columns by mutableIntStateOf(startColumns)             //Количество колонок
+    private var _columns by mutableIntStateOf(normalizeColumns(startColumns))
+    var columns: Int
+        get() = _columns
+        set(value) {
+            _columns = normalizeColumns(value)
+        }
+
     var currentIndex by mutableIntStateOf(0)
     var currentIndexGoto by mutableIntStateOf(0)
+    var returnToIndex by mutableIntStateOf(-1)
     private var lastPagerParams: SearchParams? = null
 
     fun gotoUp() { scope.launch { state.scrollToItem(0) } }
 
     fun gotoUpColumn() { scope.launch { stateColumn.scrollToItem(0) } }
+
+    init {
+        RFeedSessionStore.register(this)
+    }
 
 }
 
@@ -148,7 +170,7 @@ fun createPager(
     savedRed: SavedRed,
     searchNiches: R_SearchNiches,
     textNiches: String,
-): PagingSource<Int, Any> {
+): PagingSource<Int, GifsInfo> {
     val pagingSourceFactory = when (typePager) {
 
         TypePager.NICHES -> { ItemNailsPagingSource( order = sort, nichesName = extraString, block = block, redApi = redApi ) }
@@ -161,5 +183,5 @@ fun createPager(
         TypePager.SAVED_COLLECTION -> { ItemCollectionPagingSource( collection = extraString, savedRed = savedRed ) }
 
     }
-    return pagingSourceFactory as PagingSource<Int, Any>
+    return pagingSourceFactory
 }

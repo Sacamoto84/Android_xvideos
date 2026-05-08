@@ -15,8 +15,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.pager.VerticalPager
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.LinearProgressIndicator
@@ -47,7 +45,6 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import cafe.adriel.voyager.navigator.LocalNavigator
-import com.client.xvideos.r.common.video.player_row_mini.RedUrlVideoImageAndLongClick
 import com.client.xvideos.r.model.GifsInfo
 import com.client.xvideos.r.ui.explorer.ScreenRedExplorer
 import com.client.xvideos.r.ui.fullscreen.ScreenRedFullScreen
@@ -69,7 +66,7 @@ fun LazyRow123(
     onAppendLoaded: (LazyPagingItems<GifsInfo>) -> Unit = {},
 ) {
 
-    val listGifs = host.pager.collectAsLazyPagingItems() as LazyPagingItems<GifsInfo>
+    val listGifs = host.pager.collectAsLazyPagingItems()
 
     val scope = rememberCoroutineScope()
     val haptic = LocalHapticFeedback.current
@@ -170,105 +167,78 @@ fun LazyRow123Content(
         }
     }
 
+    LaunchedEffect(host.returnToIndex, listGifs.itemCount, host.columns) {
+        val targetIndex = host.returnToIndex
+        if (targetIndex >= 0 && listGifs.itemCount > targetIndex) {
+            state.scrollToItem(targetIndex + 1)
+            host.returnToIndex = -1
+        }
+    }
+
     Box(modifier.fillMaxSize()) {
-        if (host.columns in 1..4) {
-            LazyVerticalGrid(
-                state = state,
-                columns = GridCells.Fixed(host.columns),
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = contentPadding,
-            ) {
-                item(key = "before", span = { GridItemSpan(maxLineSpan) }) { contentBeforeList() }
+        LazyVerticalGrid(
+            state = state,
+            columns = GridCells.Fixed(host.columns),
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = contentPadding,
+        ) {
+            item(key = "before", span = { GridItemSpan(maxLineSpan) }) { contentBeforeList() }
 
-                items(
-                    count = listGifs.itemCount,
-                    key = listGifs.itemKey { it.id },
-                    contentType = { "video_grid_item" }
-                ) { index ->
-                    listGifs[index]?.let { item ->
-                        val isDownloaded = remember(item.id, downloadList) {
-                            downloadList.any { it.id == item.id }
-                        }
-                        
-                        LazyRow123GridItem(
-                            item = item,
-                            index = index,
-                            host = host,
-                            isConnected = isConnected,
-                            isDownloaded = isDownloaded,
-                            isRunLike = isRunLike,
-                            onItemClick = {
-                                host.block.blockItem = item
-                                navigator?.push(ScreenRedFullScreen(item))
-                            },
-                            onRefresh = { listGifs.refresh() },
-                            onClickOpenProfile = onClickOpenProfile,
-                            onTagClick = { tag ->
-                                host.search.searchText.value = TextFieldValue(tag, TextRange(tag.length))
-                                host.search.searchTextDone.value = tag
-                                ScreenRedExplorer.screenType = 0
-                                navigator?.popAll()
-                            }
-                        )
-                    } ?: Box(
-                        modifier = Modifier
-                            .padding(1.dp)
-                            .fillMaxWidth()
-                            .aspectRatio(0.7f)
-                            .clip(RoundedCornerShape(8.dp))
-                            .border(1.dp, Color.DarkGray, RoundedCornerShape(8.dp)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(modifier = Modifier.size(24.dp))
+            items(
+                count = listGifs.itemCount,
+                key = listGifs.itemKey { it.id },
+                contentType = { "video_grid_item" }
+            ) { index ->
+                listGifs[index]?.let { item ->
+                    val isDownloaded = remember(item.id, downloadList) {
+                        downloadList.any { it.id == item.id }
                     }
-                }
 
-                if (loadState.append is LoadState.Loading) {
-                    item(span = { GridItemSpan(maxLineSpan) }) {
-                        Box(
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator()
+                    LazyRow123GridItem(
+                        item = item,
+                        index = index,
+                        host = host,
+                        isConnected = isConnected,
+                        isDownloaded = isDownloaded,
+                        isRunLike = isRunLike,
+                        onItemClick = {
+                            host.currentIndex = index
+                            host.returnToIndex = index
+                            host.block.blockItem = item
+                            navigator?.push(ScreenRedFullScreen(item, host.feedKey, index))
+                        },
+                        onRefresh = { listGifs.refresh() },
+                        onClickOpenProfile = onClickOpenProfile,
+                        onTagClick = { tag ->
+                            host.search.searchText.value = TextFieldValue(tag, TextRange(tag.length))
+                            host.search.searchTextDone.value = tag
+                            ScreenRedExplorer.screenType = 0
+                            navigator?.popAll()
                         }
-                    }
+                    )
+                } ?: Box(
+                    modifier = Modifier
+                        .padding(1.dp)
+                        .fillMaxWidth()
+                        .aspectRatio(0.7f)
+                        .clip(RoundedCornerShape(8.dp))
+                        .border(1.dp, Color.DarkGray, RoundedCornerShape(8.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(modifier = Modifier.size(24.dp))
                 }
             }
-        } else {
-            val pagerCount = if (loadState.append is LoadState.Loading && listGifs.itemCount > 0) listGifs.itemCount + 1 else listGifs.itemCount
-            val statePager = rememberPagerState { pagerCount }
-            VerticalPager(state = statePager, modifier = Modifier.fillMaxSize(), beyondViewportPageCount = 2) { index ->
-                if (index < listGifs.itemCount) {
-                    listGifs[index]?.let { item ->
-                        val isCurrentPage = statePager.currentPage == index
-                        val shouldPreload = index in statePager.currentPage..(statePager.currentPage + 2)
-                         Box(
-                            modifier = Modifier
-                                .padding(vertical = 2.dp)
-                                .padding(horizontal = 2.dp)
-                                .fillMaxSize()
-                                .clip(RoundedCornerShape(12.dp))
-                                .border(1.dp, Color.DarkGray, RoundedCornerShape(12.dp)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            RedUrlVideoImageAndLongClick(
-                                item = item,
-                                index = index,
-                                onLongClick = { navigator?.push(ScreenRedFullScreen(item)) },
-                                isVisibleView = false,
-                                isVisibleDuration = false,
-                                play = isCurrentPage,
-                                preload = shouldPreload,
-                                isNetConnected = isConnected,
-                                onFullScreen = { navigator?.push(ScreenRedFullScreen(item)) },
-                                downloadRed = { host.downloadRed },
-                            )
-                        }
-                    } ?: Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
-                } else {
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
+
+            if (loadState.append is LoadState.Loading) {
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    Box(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
                 }
             }
         }
