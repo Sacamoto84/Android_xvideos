@@ -2,11 +2,11 @@ package com.client.xvideos.r.ui.explorer.tab.saved.tab
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -23,9 +23,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -57,6 +59,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.common.coil.UrlImage
 import com.client.xvideos.common.connectivityObserver.ConnectivityObserver
+import com.client.xvideos.common.util.toPrettyCount
 import com.client.xvideos.r.ui.profile.ScreenRedProfile
 import com.client.xvideos.r.ui.profile.atom.VerticalScrollbar
 import com.client.xvideos.r.ui.profile.rememberVisibleRangePercentIgnoringFirstNForLazyColumn
@@ -169,6 +172,8 @@ private fun CreatorListItem(
     onClick: (String) -> Unit,
     onDelete: (UserInfo) -> Unit
 ) {
+    val displayName = item.name.ifBlank { item.username }
+
     Row(
         modifier = Modifier
             .padding(vertical = 2.dp, horizontal = 6.dp)
@@ -203,34 +208,99 @@ private fun CreatorListItem(
 
         Spacer(modifier = Modifier.width(8.dp))
         
-        Text(
-            item.name,
-            color = Color.White,
-            fontSize = 20.sp,
-            fontFamily = ThemeRed.fontFamilyDMsanss,
-            maxLines = 3,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.weight(1f)
-        )
-
-        Box(
+        Column(
             modifier = Modifier
-                .width(96.dp)
-                .height(48.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .border(1.dp, Color.White, RoundedCornerShape(8.dp))
-                .background(Color.Black)
-                .clickable { onDelete(item) },
-            contentAlignment = Alignment.Center
+                .weight(1f)
+                .padding(vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             Text(
-                "Выйти",
+                displayName,
+                color = Color.White,
+                fontSize = 20.sp,
                 fontFamily = ThemeRed.fontFamilyDMsanss,
-                fontSize = 18.sp,
-                color = Color.White
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            if (displayName != item.username) {
+                Text(
+                    "@${item.username}",
+                    color = Color(0xFF9E9DA9),
+                    fontSize = 12.sp,
+                    fontFamily = ThemeRed.fontFamilyDMsanss,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                CreatorMetric(
+                    label = "Подписчики",
+                    value = item.followers,
+                    modifier = Modifier.weight(1f)
+                )
+                CreatorMetric(
+                    label = "Просмотры",
+                    value = item.views,
+                    modifier = Modifier.weight(1f)
+                )
+                CreatorMetric(
+                    label = "Посты",
+                    value = item.publishedGifs,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+
+        IconButton(
+            onClick = { onDelete(item) },
+            modifier = Modifier
+                .padding(horizontal = 4.dp)
+                .size(48.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Delete,
+                contentDescription = "Удалить автора",
+                tint = Color(0xFFAAAAAA),
+                modifier = Modifier.size(24.dp)
             )
         }
-        Spacer(modifier = Modifier.width(8.dp))
+        //Spacer(modifier = Modifier.width(8.dp))
+    }
+}
+
+@Composable
+private fun CreatorMetric(
+    label: String,
+    value: Long,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(6.dp))
+            .background(Color(0xFF242424))
+            .padding(horizontal = 6.dp, vertical = 4.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            value.toPrettyCount(),
+            color = Color.White,
+            fontSize = 12.sp,
+            fontFamily = ThemeRed.fontFamilyPopinsRegular,
+            maxLines = 1
+        )
+        Text(
+            label,
+            color = Color(0xFF9E9DA9),
+            fontSize = 9.sp,
+            fontFamily = ThemeRed.fontFamilyDMsanss,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
     }
 }
 
@@ -314,6 +384,9 @@ private fun CreatorListItemPreview() {
         name = "Sample Creator",
         username = "samplecreator",
         profileImageUrl = "https://via.placeholder.com/96",
+        followers = 21_193,
+        views = 32_986_108,
+        publishedGifs = 2_176,
         url = "https://example.com/samplecreator"
     )
     CreatorListItem(
@@ -331,6 +404,9 @@ private fun DeleteCreatorDialogPreview() {
             name = "Sample Creator",
             username = "samplecreator",
             profileImageUrl = "https://via.placeholder.com/96",
+            followers = 21_193,
+            views = 32_986_108,
+            publishedGifs = 2_176,
             url = "https://example.com/samplecreator"
         )
         DeleteCreatorDialog(

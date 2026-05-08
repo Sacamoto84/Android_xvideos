@@ -119,7 +119,9 @@ class ScreenRedProfileSM @AssistedInject constructor(
             setSelector(2)
 
             try {
-                creator = redApi.readCreator(profileName).getOrNull()
+                val loadedCreator = redApi.readCreator(profileName).getOrNull()
+                creator = loadedCreator
+                loadedCreator?.let { savedRed.creators.updateIfSaved(it) }
             } catch (e: Exception) {
                 creator = null
                 Timber.e(e)

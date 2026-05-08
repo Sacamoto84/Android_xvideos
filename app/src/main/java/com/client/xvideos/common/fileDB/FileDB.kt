@@ -38,6 +38,25 @@ class FileDB<T>(val dirPath: String, val extension: String, private val clazz: C
         }
     }
 
+    fun update(nameFile: String, value: T): Result<Boolean> {
+        return try {
+            val file = File(dirPath, "$nameFile.$extension")
+            if (!file.exists()) {
+                return Result.failure(FileNotFoundException("File not found: ${file.absolutePath}"))
+            }
+
+            gson.toJson(value).also { json ->
+                require(json != "null") { "Serialization returned null" }
+                file.writeText(json, Charsets.UTF_8)
+            }
+
+            Result.success(true)
+        } catch (e: Exception) {
+            Timber.e(e, "!!! FileDB update error $nameFile")
+            Result.failure(e)
+        }
+    }
+
     fun delete(name: String): Result<Boolean> {
         return try {
             val file = File(dirPath, "$name.$extension")

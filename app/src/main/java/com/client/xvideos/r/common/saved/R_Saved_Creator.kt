@@ -37,6 +37,22 @@ class R_Saved_Creator {
             .onFailure { e -> SnackBar.error("Ошибка удаления Автора ${e.message}") }
     }
 
+    fun updateIfSaved(item: UserInfo): Boolean {
+        val index = list.indexOfFirst { it.username == item.username }
+        if (index == -1) return false
+        if (list[index] == item) return false
+
+        return creatorDb.update(item.username, item)
+            .onSuccess {
+                Timber.i("R_Saved_Creator updateIfSaved() id:${item.username}")
+                list[index] = item
+            }
+            .onFailure { e ->
+                Timber.e(e, "R_Saved_Creator updateIfSaved() error id:${item.username}")
+            }
+            .isSuccess
+    }
+
     @OptIn(DelicateCoroutinesApi::class)
     fun refresh() {
         creatorDb.refresh()

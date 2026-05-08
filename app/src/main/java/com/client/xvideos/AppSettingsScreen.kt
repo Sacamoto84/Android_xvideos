@@ -14,18 +14,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Close
-import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -44,7 +37,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -66,10 +58,8 @@ import com.client.xvideos.common.settings.ui.components.EmptyStorageStats
 import com.client.xvideos.common.settings.ui.components.IntSliderSetting
 import com.client.xvideos.common.settings.ui.components.SettingsButtonRowWithDialog
 import com.client.xvideos.common.settings.ui.components.SettingsDivider
-import com.client.xvideos.common.settings.ui.components.SettingsDividerColor
 import com.client.xvideos.common.settings.ui.components.SettingsListItem
 import com.client.xvideos.common.settings.ui.components.SettingsPreview
-import com.client.xvideos.common.settings.ui.components.SettingsRowTextSecondary
 import com.client.xvideos.common.settings.ui.components.SettingsSwitchRow
 import com.client.xvideos.common.settings.ui.components.SettingsValueRow
 import com.client.xvideos.common.settings.ui.components.StorageStatisticsSection
@@ -94,7 +84,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.util.Locale
 import javax.inject.Inject
 
 class AppSettingsSM @Inject constructor(
@@ -262,13 +251,11 @@ private fun AppSettingsScreenBody(
     val diskCacheEnabled = Settings.image_cache_disk_enabled.field.collectAsStateWithLifecycle().value
     val diskCacheSizeMb = Settings.image_cache_disk_size_mb.field.collectAsStateWithLifecycle().value
     val l_login = Settings.l_login.field.collectAsStateWithLifecycle().value
-    var searchQuery by rememberSaveable { mutableStateOf("") }
 
     val isNichesCacheDownloading = savedRed?.nichesCache?.isDownloading ?: false
     val nichesCacheProgress = savedRed?.nichesCache?.progress ?: 0f
     val nichesCacheSize = savedRed?.nichesCache?.size ?: 0
     val nichesCacheLastModifiedHour = savedRed?.nichesCache?.lastModifiedHour ?: 0L
-    val visiblePages = SettingsPage.detailPages.filter { it.group.matches(searchQuery) }
 
     Column(
         modifier = modifier
@@ -277,22 +264,12 @@ private fun AppSettingsScreenBody(
             .verticalScroll(rememberScrollState())
     ) {
         if (currentPage == SettingsPage.Main) {
-            SettingsSearchField(
-                query = searchQuery,
-                onQueryChange = { searchQuery = it }
-            )
-
-            visiblePages.forEachIndexed { index, page ->
+            SettingsPage.detailPages.forEachIndexed { index, page ->
                 if (index > 0) SettingsDivider()
                 SettingsNavigationRow(
                     page = page,
                     onClick = { onOpenPage(page) }
                 )
-            }
-
-            if (visiblePages.isEmpty()) {
-                SettingsDivider()
-                EmptySettingsSearchResult(searchQuery)
             }
         } else {
             SettingsDivider()
@@ -328,113 +305,48 @@ private fun AppSettingsScreenBody(
     }
 }
 
-private data class SettingsGroup(
-    val title: String,
-    val keywords: List<String>
-) {
-    fun matches(query: String): Boolean {
-        val normalizedQuery = query.normalizedForSearch()
-        if (normalizedQuery.isBlank()) return true
-
-        val searchableText = (listOf(title) + keywords)
-            .joinToString(separator = " ")
-            .normalizedForSearch()
-
-        return searchableText.contains(normalizedQuery)
-    }
-}
-
-private val PrivacySettingsGroup = SettingsGroup(
-    title = "Приватность",
-    keywords = listOf("защита", "блокировка", "пароль", "код доступа", "запуск")
-)
-
-private val CacheSettingsGroup = SettingsGroup(
-    title = "Кэш",
-    keywords = listOf("кеш", "cache", "ram", "картинки", "диск", "очистить", "сброс")
-)
-
-private val LSettingsGroup = SettingsGroup(
-    title = "L",
-    keywords = listOf("luscious", "профиль", "логин", "миниатюра", "gifs", "likes", "collection", "коллекция")
-)
-
-private val RSettingsGroup = SettingsGroup(
-    title = "R",
-    keywords = listOf("redgifs", "red", "download", "папка", "explorer", "лайки", "коллекция")
-)
-
-private val XSettingsGroup = SettingsGroup(
-    title = "X",
-    keywords = listOf("xvideos", "2 столбика", "shemale")
-)
-
-private val DiagnosticsSettingsGroup = SettingsGroup(
-    title = "Диагностика",
-    keywords = listOf("niches", "прогресс", "обновить", "возраст", "состояние", "отчет", "отчёт", "logcat", "html", "cloudflare", "ошибки")
-)
-
-private val StorageSettingsGroup = SettingsGroup(
-    title = "Хранилище",
-    keywords = listOf("статистика", "данные", "размер", "файлы")
-)
-
-private val MainSettingsGroup = SettingsGroup(
-    title = "Настройки",
-    keywords = emptyList()
-)
-
 private enum class SettingsPage(
     val title: String,
-    val group: SettingsGroup,
     @DrawableRes val icon: Int,
     val subtitle: String
 ) {
     Main(
         title = "Настройки",
-        group = MainSettingsGroup,
         icon = R.drawable.memory_24,
         subtitle = ""
     ),
     Privacy(
         title = "Приватность",
-        group = PrivacySettingsGroup,
         icon = R.drawable.icon_red,
         subtitle = "Пароль и блокировка приложения"
     ),
     Cache(
         title = "Кэш",
-        group = CacheSettingsGroup,
         icon = R.drawable.hard_disk_24,
         subtitle = "RAM, изображения и очистка"
     ),
     L(
         title = "L",
-        group = LSettingsGroup,
         icon = R.drawable.icon_luscious,
         subtitle = "Профиль, миниатюры и колонки"
     ),
     Red(
         title = "R",
-        group = RSettingsGroup,
         icon = R.drawable.icon_red,
         subtitle = "Размеры папок и Downloads"
     ),
     X(
         title = "X",
-        group = XSettingsGroup,
         icon = R.drawable.icon_xvideos_white,
         subtitle = "Отображение и фильтры X"
     ),
     Diagnostics(
         title = "Диагностика",
-        group = DiagnosticsSettingsGroup,
         icon = R.drawable.memory_24,
         subtitle = "Ошибки, Niches cache и отчёт"
     ),
     Storage(
         title = "Хранилище",
-        group = StorageSettingsGroup,
         icon = R.drawable.hard_drive_2_24,
         subtitle = "Статистика по X, L и R"
     );
@@ -443,58 +355,6 @@ private enum class SettingsPage(
         val detailPages: List<SettingsPage>
             get() = values().filter { it != Main }
     }
-}
-
-@Composable
-private fun SettingsSearchField(
-    query: String,
-    onQueryChange: (String) -> Unit
-) {
-    OutlinedTextField(
-        value = query,
-        onValueChange = onQueryChange,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-        singleLine = true,
-        textStyle = ThemeL.Type.body.copy(color = ThemeL.textColor),
-        placeholder = {
-            Text(
-                text = "Поиск по настройкам",
-                color = SettingsRowTextSecondary,
-                style = ThemeL.Type.rowSubtitle.copy(color = SettingsRowTextSecondary)
-            )
-        },
-        leadingIcon = {
-            Icon(
-                imageVector = Icons.Rounded.Search,
-                contentDescription = null,
-                tint = SettingsRowTextSecondary
-            )
-        },
-        trailingIcon = {
-            if (query.isNotBlank()) {
-                IconButton(onClick = { onQueryChange("") }) {
-                    Icon(
-                        imageVector = Icons.Rounded.Close,
-                        contentDescription = null,
-                        tint = SettingsRowTextSecondary
-                    )
-                }
-            }
-        },
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-        shape = RoundedCornerShape(16.dp),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedTextColor = ThemeL.textColor,
-            unfocusedTextColor = ThemeL.textColor,
-            focusedBorderColor = WhatsAppGreen,
-            unfocusedBorderColor = SettingsDividerColor,
-            focusedContainerColor = Color(0xFF2B2B2B),
-            unfocusedContainerColor = Color(0xFF2B2B2B),
-            cursorColor = WhatsAppGreen
-        )
-    )
 }
 
 @Composable
@@ -739,19 +599,6 @@ private fun DiagnosticsSettingsSection(
             }
         }
     )
-}
-
-@Composable
-private fun EmptySettingsSearchResult(query: String) {
-    SettingsListItem(
-        icon = R.drawable.memory_24,
-        text = "Ничего не найдено",
-        subtitle = "Запрос: $query"
-    )
-}
-
-private fun String.normalizedForSearch(): String {
-    return lowercase(Locale.getDefault()).replace('ё', 'е')
 }
 
 @Preview(showBackground = true, backgroundColor = 0xFF353535,
