@@ -38,17 +38,12 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.util.RepeatModeUtil.REPEAT_TOGGLE_MODE_ALL
 import androidx.media3.common.util.RepeatModeUtil.REPEAT_TOGGLE_MODE_NONE
 import androidx.media3.common.util.RepeatModeUtil.REPEAT_TOGGLE_MODE_ONE
-import androidx.media3.datasource.DefaultDataSource
-import androidx.media3.datasource.DefaultHttpDataSource
-import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.session.MediaSession
 import androidx.media3.ui.PlayerView
 import androidx.media3.ui.R
 import com.client.xvideos.x.screens.videoplayer.ScreenX_VideoPlayerSM
-import com.client.xvideos.screens.videoplayer.video.cache.VideoPlayerCacheManager
 import com.client.xvideos.x.screens.videoplayer.video.controller.VideoPlayerControllerConfig
 import com.client.xvideos.x.screens.videoplayer.video.controller.applyToExoPlayerView
 import com.client.xvideos.screens.videoplayer.video.uri.VideoPlayerMediaItem
@@ -126,8 +121,6 @@ fun VideoPlayer(
     var mediaSession = remember<MediaSession?> { null }
 
     val player = remember {
-        val httpDataSourceFactory = DefaultHttpDataSource.Factory()
-
         ExoPlayer.Builder(context)
             .setSeekBackIncrementMs(seekBeforeMilliSeconds)
             .setSeekForwardIncrementMs(seekAfterMilliSeconds)
@@ -139,20 +132,6 @@ fun VideoPlayer(
                     .build(),
                 handleAudioFocus,
             )
-            .apply {
-                val cache = VideoPlayerCacheManager.getCache()
-                if (cache != null) {
-                    val cacheDataSourceFactory = CacheDataSource.Factory()
-                        .setCache(cache)
-                        .setUpstreamDataSourceFactory(
-                            DefaultDataSource.Factory(
-                                context,
-                                httpDataSourceFactory
-                            )
-                        )
-                    setMediaSourceFactory(DefaultMediaSourceFactory(cacheDataSourceFactory))
-                }
-            }
             .playerBuilder()
             .build()
             .also(playerInstance)

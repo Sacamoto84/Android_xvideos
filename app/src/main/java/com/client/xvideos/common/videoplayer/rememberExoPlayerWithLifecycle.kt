@@ -21,15 +21,12 @@ import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import com.client.xvideos.common.diagnostics.AppDiagnostics
 import com.client.xvideos.common.videoplayer.host.DrmConfig
 import com.client.xvideos.common.videoplayer.host.MediaPlayerError
-import com.client.xvideos.common.videoplayer.util.CacheManager
 import com.client.xvideos.common.videoplayer.util.VideoQuality
 import com.client.xvideos.common.videoplayer.util.applyQualitySelection
 import com.client.xvideos.common.videoplayer.util.createHlsMediaSource
 import com.client.xvideos.common.videoplayer.util.createHlsMediaSourceWithDrm
 import com.client.xvideos.common.videoplayer.util.createProgressiveMediaSource
-import com.client.xvideos.common.videoplayer.util.createProgressiveMediaSourceWithoutDiskCache
 import com.client.xvideos.common.videoplayer.util.getExoPlayerLifecycleObserver
-import com.client.xvideos.common.videoplayer.util.shouldUseDiskCacheForMedia
 
 @OptIn(UnstableApi::class)
 @Composable
@@ -47,14 +44,9 @@ fun rememberExoPlayerWithLifecycle(
     maxBufferMs: Int = 30000,
     bufferForPlaybackMs: Int = 500,
     bufferForPlaybackAfterRebufferM: Int = 1000,
-    useDiskCache: Boolean = true,
 ): ExoPlayer {
     val lifecycleOwner = LocalLifecycleOwner.current
     val trackSelector = remember { DefaultTrackSelector(context) }
-    val useDiskCacheForMedia = shouldUseDiskCacheForMedia(url, isLiveStream, drmConfig, useDiskCache)
-    val cache = remember(context, url, useDiskCacheForMedia) {
-        if (useDiskCacheForMedia) CacheManager.getCache(context) else null
-    }
 
     val loadControl = DefaultLoadControl.Builder().setBufferDurationsMs(minBufferMs, maxBufferMs, bufferForPlaybackMs, bufferForPlaybackAfterRebufferM).build()
 
@@ -82,15 +74,7 @@ fun rememberExoPlayerWithLifecycle(
         applyQualitySelection(trackSelector, selectedQuality)
     }
 
-    DisposableEffect(url, useDiskCacheForMedia) {
-        onDispose {
-            if (useDiskCacheForMedia) {
-                CacheManager.release()
-            }
-        }
-    }
-
-    LaunchedEffect(url, useDiskCacheForMedia) {
+    LaunchedEffect(url) {
         try {
             val mediaItem = MediaItem.fromUri(url.toUri())
 
@@ -100,8 +84,7 @@ fun rememberExoPlayerWithLifecycle(
                     mediaItem,
                     headers
                 )
-                useDiskCacheForMedia && cache != null -> createProgressiveMediaSource(mediaItem, cache, context, headers)
-                else -> createProgressiveMediaSourceWithoutDiskCache(mediaItem, context, headers)
+                else -> createProgressiveMediaSource(mediaItem, context, headers)
             }
 
             exoPlayer.apply {

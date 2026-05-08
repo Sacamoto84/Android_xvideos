@@ -7,8 +7,6 @@ import com.client.xvideos.common.coil.CoilImageLoaderFactory
 import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.common.util.formatBytes
 import com.client.xvideos.common.util.getFolderSize
-import com.client.xvideos.common.videoplayer.util.CacheManager
-import com.client.xvideos.screens.videoplayer.video.cache.VideoPlayerCacheManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -33,7 +31,7 @@ data class DiagnosticsStatus(
     val lPasswordConfigured: Boolean,
     val lLoginMasked: String,
     val imageCacheBytes: Long,
-    val videoCacheBytes: Long,
+    val videoCacheStatus: String,
     val redDownloadBytes: Long,
     val totalEvents: Int
 )
@@ -124,7 +122,6 @@ object AppDiagnostics {
         val login = Settings.l_login.field.value.trim()
         val password = Settings.l_pass.field.value
         val imageCache = CoilImageLoaderFactory.imageDiskCacheSizeBytes(appContext)
-        val videoCache = CacheManager.cacheSizeBytes(appContext) + VideoPlayerCacheManager.cacheSizeBytes(appContext)
         val redDownload = getFolderSize(File(AppPath.r_cache_download))
 
         DiagnosticsStatus(
@@ -132,7 +129,7 @@ object AppDiagnostics {
             lPasswordConfigured = password.isNotBlank(),
             lLoginMasked = login.maskLogin(),
             imageCacheBytes = imageCache,
-            videoCacheBytes = videoCache,
+            videoCacheStatus = "Отключен, только RAM buffer",
             redDownloadBytes = redDownload,
             totalEvents = events.value.size
         )
@@ -151,7 +148,7 @@ object AppDiagnostics {
             appendLine("- L login: ${if (status.lLoginConfigured) "configured (${status.lLoginMasked})" else "empty"}")
             appendLine("- L password: ${if (status.lPasswordConfigured) "configured" else "empty"}")
             appendLine("- Image cache: ${formatBytes(status.imageCacheBytes)}")
-            appendLine("- Video cache: ${formatBytes(status.videoCacheBytes)}")
+            appendLine("- Video disk cache: ${status.videoCacheStatus}")
             appendLine("- R Download folder: ${formatBytes(status.redDownloadBytes)}")
             appendLine("- Events: ${status.totalEvents}")
             appendLine()

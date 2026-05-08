@@ -27,7 +27,6 @@ class MediaPlayerHost(
     isFullScreen: Boolean = false,
     headers: Map<String, String>? = null,
     drmConfig: DrmConfig? = null,
-    useDiskCache: Boolean = true,
 ) {
     var poster by mutableStateOf(true)
 
@@ -48,7 +47,6 @@ class MediaPlayerHost(
     internal var isFullScreen by mutableStateOf(isFullScreen)
     var headers by mutableStateOf(headers)
     var drmConfig by mutableStateOf(drmConfig)
-    var useDiskCache by mutableStateOf(useDiskCache)
     var qualityOptions by mutableStateOf(emptyList<VideoQuality>())
     var selectedQuality by mutableStateOf<VideoQuality?>(null)
     var audioTrackOptions by mutableStateOf(emptyList<AudioTrack>())

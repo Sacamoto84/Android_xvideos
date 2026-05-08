@@ -215,7 +215,7 @@ private fun DiagnosticsStatusSection(status: DiagnosticsStatus?) {
     SettingsValueRow(
         icon = R.drawable.play_circle,
         text = "Кэш видео",
-        value = formatBytes(status.videoCacheBytes)
+        value = status.videoCacheStatus
     )
     SettingsDivider()
 

@@ -48,7 +48,6 @@ fun RedVideoPlayerWithMenu(
     autoRotate: Boolean,
     isCurrentPage : Boolean,
     modifier : Modifier = Modifier,
-    useDiskCache: Boolean = true,
 
     isBuferring: (Boolean) -> Unit
 
@@ -64,8 +63,8 @@ fun RedVideoPlayerWithMenu(
 
     LaunchedEffect(isCurrentPage) { snapshotFlow { currentTime to duration }.distinctUntilChanged().collectLatest {if (isCurrentPage) onChangeTime(it)}}
 
-    val playerHost = remember(url, useDiskCache) {
-        MediaPlayerHost(mediaUrl = url, isPaused = true, useDiskCache = useDiskCache)
+    val playerHost = remember(url) {
+        MediaPlayerHost(mediaUrl = url, isPaused = true)
     }
 
     LaunchedEffect(url) {

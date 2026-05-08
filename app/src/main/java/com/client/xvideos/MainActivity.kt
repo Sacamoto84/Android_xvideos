@@ -62,12 +62,12 @@ import com.client.xvideos.PermissionScreenActivity.PermissionStorage
 import com.client.xvideos.common.applock.AppLockRepository
 import com.client.xvideos.common.applock.AppLockSession
 import com.client.xvideos.common.util.KeepScreenOn
+import com.client.xvideos.common.videoplayer.util.VideoDiskCacheCleaner
 import com.client.xvideos.l.ui.screens.explorer.L_ScreenExplorer
 import com.client.xvideos.r.common.saved.SavedRed
 import com.client.xvideos.r.ui.root.R_Screen_Root
 import com.client.xvideos.screenRoot.ScreenRoot
 import com.client.xvideos.screens.dashboards.ScreenXDashBoards
-import com.client.xvideos.screens.videoplayer.video.cache.VideoPlayerCacheManager
 import com.client.xvideos.ui.theme.XvideosTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -137,7 +137,7 @@ class MainActivity : ComponentActivity()//, ImageLoaderFactory
         }
 
         lifecycleScope.launch(Dispatchers.IO) {
-            VideoPlayerCacheManager.initialize(applicationContext)
+            VideoDiskCacheCleaner.clearLegacyCaches(applicationContext)
             savedRed.nichesCache.refreshIfStale()
         }
 

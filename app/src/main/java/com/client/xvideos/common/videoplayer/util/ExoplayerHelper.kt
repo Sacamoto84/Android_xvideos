@@ -8,9 +8,6 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.DefaultHttpDataSource
-import androidx.media3.datasource.cache.Cache
-import androidx.media3.datasource.cache.CacheDataSource
-import androidx.media3.datasource.cache.CacheDataSink
 import androidx.media3.exoplayer.drm.DefaultDrmSessionManager
 import androidx.media3.exoplayer.drm.FrameworkMediaDrm
 import androidx.media3.exoplayer.drm.LocalMediaDrmCallback
@@ -81,32 +78,6 @@ fun createHlsMediaSource(mediaItem: MediaItem, headers: Map<String, String>?): M
 @OptIn(UnstableApi::class)
 fun createProgressiveMediaSource(
     mediaItem: MediaItem,
-    cache: Cache,
-    context: Context,
-    headers: Map<String, String>?
-): MediaSource {
-    val headersMap = headers ?: emptyMap()
-    val httpDataSourceFactory = DefaultHttpDataSource.Factory()
-        .setAllowCrossProtocolRedirects(true)
-        .setConnectTimeoutMs(15_000)
-        .setReadTimeoutMs(15_000)
-        .setDefaultRequestProperties(headersMap)
-
-    val dataSourceFactory = CacheDataSource.Factory()
-        .setCache(cache)
-        .setUpstreamDataSourceFactory(DefaultDataSource.Factory(context, httpDataSourceFactory))
-        .setCacheWriteDataSinkFactory(CacheDataSink.Factory().setCache(cache))
-        .setFlags(
-            CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR or
-                    CacheDataSource.FLAG_BLOCK_ON_CACHE
-        )
-
-    return ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(mediaItem)
-}
-
-@OptIn(UnstableApi::class)
-fun createProgressiveMediaSourceWithoutDiskCache(
-    mediaItem: MediaItem,
     context: Context,
     headers: Map<String, String>?
 ): MediaSource {
@@ -119,23 +90,6 @@ fun createProgressiveMediaSourceWithoutDiskCache(
 
     return ProgressiveMediaSource.Factory(DefaultDataSource.Factory(context, httpDataSourceFactory))
         .createMediaSource(mediaItem)
-}
-
-fun shouldUseDiskCacheForMedia(
-    url: String,
-    isLiveStream: Boolean,
-    drmConfig: DrmConfig?,
-    useDiskCache: Boolean
-): Boolean {
-    val normalizedUrl = url.substringBefore('?')
-    val isRemote = normalizedUrl.startsWith("http://", ignoreCase = true) ||
-            normalizedUrl.startsWith("https://", ignoreCase = true)
-
-    return useDiskCache &&
-            isRemote &&
-            !isLiveStream &&
-            drmConfig == null &&
-            !normalizedUrl.endsWith(".m3u8", ignoreCase = true)
 }
 
 @OptIn(UnstableApi::class)

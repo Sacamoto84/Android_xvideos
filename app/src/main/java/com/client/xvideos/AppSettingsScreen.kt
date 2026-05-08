@@ -1,6 +1,8 @@
 package com.client.xvideos
 
 import android.content.Context
+import androidx.activity.compose.BackHandler
+import androidx.annotation.DrawableRes
 import androidx.annotation.OptIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -27,6 +29,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -46,7 +49,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.media3.common.util.UnstableApi
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
@@ -68,7 +70,6 @@ import com.client.xvideos.common.settings.ui.components.SettingsDividerColor
 import com.client.xvideos.common.settings.ui.components.SettingsListItem
 import com.client.xvideos.common.settings.ui.components.SettingsPreview
 import com.client.xvideos.common.settings.ui.components.SettingsRowTextSecondary
-import com.client.xvideos.common.settings.ui.components.SettingsSectionTitle
 import com.client.xvideos.common.settings.ui.components.SettingsSwitchRow
 import com.client.xvideos.common.settings.ui.components.SettingsValueRow
 import com.client.xvideos.common.settings.ui.components.StorageStatisticsSection
@@ -80,12 +81,9 @@ import com.client.xvideos.common.snackbar.SnackBar
 import com.client.xvideos.common.util.formatBytes
 import com.client.xvideos.common.util.getFolderSize
 import com.client.xvideos.common.util.toPrettyCount3
-import com.client.xvideos.common.videoplayer.util.CacheManager
-import com.client.xvideos.common.videoplayer.util.VideoCacheSettings
 import com.client.xvideos.l.model.ThumbnailsSize
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.r.common.saved.SavedRed
-import com.client.xvideos.screens.videoplayer.video.cache.VideoPlayerCacheManager
 import com.client.xvideos.ui.theme.XvideosTheme
 import dagger.Binds
 import dagger.Module
@@ -118,7 +116,6 @@ object AppSettingsScreen : Screen {
 
     override val key: ScreenKey = uniqueScreenKey
 
-    @OptIn(UnstableApi::class)
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -127,7 +124,6 @@ object AppSettingsScreen : Screen {
         val vm: AppSettingsSM = getScreenModel()
 
         var imageCacheSizeBytes by remember { mutableLongStateOf(0L) }
-        var videoCacheSizeBytes by remember { mutableLongStateOf(0L) }
         var storageStats by remember { mutableStateOf(EmptyStorageStats) }
         var sizeRedTotal by remember { mutableLongStateOf(0L) }
         var sizeRedDownload by remember { mutableLongStateOf(0L) }
@@ -135,12 +131,6 @@ object AppSettingsScreen : Screen {
         suspend fun refreshImageCacheSize() {
             imageCacheSizeBytes = withContext(Dispatchers.IO) {
                 CoilImageLoaderFactory.imageDiskCacheSizeBytes(context)
-            }
-        }
-
-        suspend fun refreshVideoCacheSize() {
-            videoCacheSizeBytes = withContext(Dispatchers.IO) {
-                CacheManager.cacheSizeBytes(context) + VideoPlayerCacheManager.cacheSizeBytes(context)
             }
         }
 
@@ -155,7 +145,6 @@ object AppSettingsScreen : Screen {
 
         LaunchedEffect(Unit) {
             refreshImageCacheSize()
-            refreshVideoCacheSize()
             refreshStorageStats()
             refreshRedSizes()
         }
@@ -164,7 +153,6 @@ object AppSettingsScreen : Screen {
             onBack = { navigator.pop() },
             onOpenDiagnostics = { navigator.push(AppDiagnosticsScreen) },
             imageCacheSizeBytes = imageCacheSizeBytes,
-            videoCacheSizeBytes = videoCacheSizeBytes,
             storageStats = storageStats,
             sizeRedTotal = sizeRedTotal,
             sizeRedDownload = sizeRedDownload,
@@ -173,27 +161,6 @@ object AppSettingsScreen : Screen {
                     withContext(Dispatchers.IO) { CoilImageLoaderFactory.clearCache(context) }
                     refreshImageCacheSize()
                     SnackBar.success("Кэш картинок очищен")
-                }
-            },
-            onClearVideoCache = {
-                scope.launch {
-                    withContext(Dispatchers.IO) {
-                        CacheManager.clearCache(context)
-                        VideoPlayerCacheManager.clearCache(context)
-                    }
-                    refreshVideoCacheSize()
-                    SnackBar.success("Кэш видео очищен")
-                }
-            },
-            onVideoCacheLimitChange = { value ->
-                scope.launch {
-                    Settings.video_cache_disk_size_mb.setValue(value)
-                    withContext(Dispatchers.IO) {
-                        CacheManager.applyConfiguredSize()
-                        VideoPlayerCacheManager.applyConfiguredSize(context)
-                    }
-                    refreshVideoCacheSize()
-                    SnackBar.success("Лимит видео-кэша R: $value MB")
                 }
             },
             onClearDownload = {
@@ -214,17 +181,27 @@ private fun AppSettingsScreenContent(
     onBack: () -> Unit,
     onOpenDiagnostics: () -> Unit,
     imageCacheSizeBytes: Long,
-    videoCacheSizeBytes: Long,
     storageStats: List<StorageStat>,
     sizeRedTotal: Long,
     sizeRedDownload: Long,
     onClearImageCache: () -> Unit,
-    onClearVideoCache: () -> Unit,
-    onVideoCacheLimitChange: (Int) -> Unit,
     onClearDownload: () -> Unit,
     savedRed: SavedRed?,
     context: Context
 ) {
+    var currentPage by rememberSaveable { mutableStateOf(SettingsPage.Main) }
+    val closeCurrentPage = {
+        if (currentPage == SettingsPage.Main) {
+            onBack()
+        } else {
+            currentPage = SettingsPage.Main
+        }
+    }
+
+    BackHandler(enabled = currentPage != SettingsPage.Main) {
+        currentPage = SettingsPage.Main
+    }
+
     Scaffold(
         topBar = {
             Row(
@@ -235,11 +212,11 @@ private fun AppSettingsScreenContent(
                     .background(ThemeL.greyBackground),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = onBack) {
+                IconButton(onClick = closeCurrentPage) {
                     Icon(painterResource(R.drawable.arrow_down), contentDescription = null, tint = Color.White)
                 }
                 Text(
-                    "Настройки",
+                    currentPage.title,
                     modifier = Modifier.weight(1f),
                     color = ThemeL.textColor,
                     style = ThemeL.Type.screenTitle.copy(textAlign = TextAlign.Center)
@@ -251,15 +228,14 @@ private fun AppSettingsScreenContent(
     ) { paddingValues ->
         AppSettingsScreenBody(
             modifier = Modifier.padding(paddingValues),
+            currentPage = currentPage,
+            onOpenPage = { currentPage = it },
             onOpenDiagnostics = onOpenDiagnostics,
             imageCacheSizeBytes = imageCacheSizeBytes,
-            videoCacheSizeBytes = videoCacheSizeBytes,
             storageStats = storageStats,
             sizeRedTotal = sizeRedTotal,
             sizeRedDownload = sizeRedDownload,
             onClearImageCache = onClearImageCache,
-            onClearVideoCache = onClearVideoCache,
-            onVideoCacheLimitChange = onVideoCacheLimitChange,
             onClearDownload = onClearDownload,
             savedRed = savedRed,
             context = context
@@ -270,15 +246,14 @@ private fun AppSettingsScreenContent(
 @Composable
 private fun AppSettingsScreenBody(
     modifier: Modifier = Modifier,
+    currentPage: SettingsPage = SettingsPage.Main,
+    onOpenPage: (SettingsPage) -> Unit = {},
     onOpenDiagnostics: () -> Unit,
     imageCacheSizeBytes: Long,
-    videoCacheSizeBytes: Long,
     storageStats: List<StorageStat>,
     sizeRedTotal: Long,
     sizeRedDownload: Long,
     onClearImageCache: () -> Unit,
-    onClearVideoCache: () -> Unit,
-    onVideoCacheLimitChange: (Int) -> Unit,
     onClearDownload: () -> Unit,
     savedRed: SavedRed?,
     context: Context
@@ -286,7 +261,6 @@ private fun AppSettingsScreenBody(
     val ramCachePercent = Settings.image_cache_ram_percent.field.collectAsStateWithLifecycle().value
     val diskCacheEnabled = Settings.image_cache_disk_enabled.field.collectAsStateWithLifecycle().value
     val diskCacheSizeMb = Settings.image_cache_disk_size_mb.field.collectAsStateWithLifecycle().value
-    val videoCacheSizeMb = Settings.video_cache_disk_size_mb.field.collectAsStateWithLifecycle().value
     val l_login = Settings.l_login.field.collectAsStateWithLifecycle().value
     var searchQuery by rememberSaveable { mutableStateOf("") }
 
@@ -294,7 +268,7 @@ private fun AppSettingsScreenBody(
     val nichesCacheProgress = savedRed?.nichesCache?.progress ?: 0f
     val nichesCacheSize = savedRed?.nichesCache?.size ?: 0
     val nichesCacheLastModifiedHour = savedRed?.nichesCache?.lastModifiedHour ?: 0L
-    val hasVisibleGroups = SettingsGroups.any { it.matches(searchQuery) }
+    val visiblePages = SettingsPage.detailPages.filter { it.group.matches(searchQuery) }
 
     Column(
         modifier = modifier
@@ -302,64 +276,54 @@ private fun AppSettingsScreenBody(
             .fillMaxWidth()
             .verticalScroll(rememberScrollState())
     ) {
-        SettingsSearchField(
-            query = searchQuery,
-            onQueryChange = { searchQuery = it }
-        )
-
-        SettingsGroupBlock(PrivacySettingsGroup, searchQuery) {
-            AppLockSettingsSection()
-        }
-
-        SettingsGroupBlock(CacheSettingsGroup, searchQuery) {
-            CacheSettingsSection(
-                ramCachePercent = ramCachePercent,
-                diskCacheEnabled = diskCacheEnabled,
-                diskCacheSizeMb = diskCacheSizeMb,
-                videoCacheSizeMb = videoCacheSizeMb,
-                imageCacheSizeBytes = imageCacheSizeBytes,
-                videoCacheSizeBytes = videoCacheSizeBytes,
-                onClearImageCache = onClearImageCache,
-                onClearVideoCache = onClearVideoCache,
-                onVideoCacheLimitChange = onVideoCacheLimitChange,
-                context = context
+        if (currentPage == SettingsPage.Main) {
+            SettingsSearchField(
+                query = searchQuery,
+                onQueryChange = { searchQuery = it }
             )
-        }
 
-        SettingsGroupBlock(LSettingsGroup, searchQuery) {
-            LSettingsSection(lLogin = l_login)
-        }
+            visiblePages.forEachIndexed { index, page ->
+                if (index > 0) SettingsDivider()
+                SettingsNavigationRow(
+                    page = page,
+                    onClick = { onOpenPage(page) }
+                )
+            }
 
-        SettingsGroupBlock(RSettingsGroup, searchQuery) {
-            RSettingsSection(
-                sizeRedTotal = sizeRedTotal,
-                sizeRedDownload = sizeRedDownload,
-                onClearDownload = onClearDownload
-            )
-        }
-
-        SettingsGroupBlock(XSettingsGroup, searchQuery) {
-            XSettingsSection()
-        }
-
-        SettingsGroupBlock(DiagnosticsSettingsGroup, searchQuery) {
-            DiagnosticsSettingsSection(
-                savedRed = savedRed,
-                isNichesCacheDownloading = isNichesCacheDownloading,
-                nichesCacheProgress = nichesCacheProgress,
-                nichesCacheSize = nichesCacheSize,
-                nichesCacheLastModifiedHour = nichesCacheLastModifiedHour,
-                onOpenDiagnostics = onOpenDiagnostics
-            )
-        }
-
-        SettingsGroupBlock(StorageSettingsGroup, searchQuery) {
-            StorageStatisticsSection(storageStats)
-        }
-
-        if (!hasVisibleGroups) {
+            if (visiblePages.isEmpty()) {
+                SettingsDivider()
+                EmptySettingsSearchResult(searchQuery)
+            }
+        } else {
             SettingsDivider()
-            EmptySettingsSearchResult(searchQuery)
+            when (currentPage) {
+                SettingsPage.Main -> Unit
+                SettingsPage.Privacy -> AppLockSettingsSection()
+                SettingsPage.Cache -> CacheSettingsSection(
+                    ramCachePercent = ramCachePercent,
+                    diskCacheEnabled = diskCacheEnabled,
+                    diskCacheSizeMb = diskCacheSizeMb,
+                    imageCacheSizeBytes = imageCacheSizeBytes,
+                    onClearImageCache = onClearImageCache,
+                    context = context
+                )
+                SettingsPage.L -> LSettingsSection(lLogin = l_login)
+                SettingsPage.Red -> RSettingsSection(
+                    sizeRedTotal = sizeRedTotal,
+                    sizeRedDownload = sizeRedDownload,
+                    onClearDownload = onClearDownload
+                )
+                SettingsPage.X -> XSettingsSection()
+                SettingsPage.Diagnostics -> DiagnosticsSettingsSection(
+                    savedRed = savedRed,
+                    isNichesCacheDownloading = isNichesCacheDownloading,
+                    nichesCacheProgress = nichesCacheProgress,
+                    nichesCacheSize = nichesCacheSize,
+                    nichesCacheLastModifiedHour = nichesCacheLastModifiedHour,
+                    onOpenDiagnostics = onOpenDiagnostics
+                )
+                SettingsPage.Storage -> StorageStatisticsSection(storageStats)
+            }
         }
     }
 }
@@ -387,7 +351,7 @@ private val PrivacySettingsGroup = SettingsGroup(
 
 private val CacheSettingsGroup = SettingsGroup(
     title = "Кэш",
-    keywords = listOf("кеш", "cache", "ram", "картинки", "диск", "видео", "video", "очистить", "сброс")
+    keywords = listOf("кеш", "cache", "ram", "картинки", "диск", "очистить", "сброс")
 )
 
 private val LSettingsGroup = SettingsGroup(
@@ -415,15 +379,71 @@ private val StorageSettingsGroup = SettingsGroup(
     keywords = listOf("статистика", "данные", "размер", "файлы")
 )
 
-private val SettingsGroups = listOf(
-    PrivacySettingsGroup,
-    CacheSettingsGroup,
-    LSettingsGroup,
-    RSettingsGroup,
-    XSettingsGroup,
-    DiagnosticsSettingsGroup,
-    StorageSettingsGroup
+private val MainSettingsGroup = SettingsGroup(
+    title = "Настройки",
+    keywords = emptyList()
 )
+
+private enum class SettingsPage(
+    val title: String,
+    val group: SettingsGroup,
+    @DrawableRes val icon: Int,
+    val subtitle: String
+) {
+    Main(
+        title = "Настройки",
+        group = MainSettingsGroup,
+        icon = R.drawable.memory_24,
+        subtitle = ""
+    ),
+    Privacy(
+        title = "Приватность",
+        group = PrivacySettingsGroup,
+        icon = R.drawable.icon_red,
+        subtitle = "Пароль и блокировка приложения"
+    ),
+    Cache(
+        title = "Кэш",
+        group = CacheSettingsGroup,
+        icon = R.drawable.hard_disk_24,
+        subtitle = "RAM, изображения и очистка"
+    ),
+    L(
+        title = "L",
+        group = LSettingsGroup,
+        icon = R.drawable.icon_luscious,
+        subtitle = "Профиль, миниатюры и колонки"
+    ),
+    Red(
+        title = "R",
+        group = RSettingsGroup,
+        icon = R.drawable.icon_red,
+        subtitle = "Размеры папок и Downloads"
+    ),
+    X(
+        title = "X",
+        group = XSettingsGroup,
+        icon = R.drawable.icon_xvideos_white,
+        subtitle = "Отображение и фильтры X"
+    ),
+    Diagnostics(
+        title = "Диагностика",
+        group = DiagnosticsSettingsGroup,
+        icon = R.drawable.memory_24,
+        subtitle = "Ошибки, Niches cache и отчёт"
+    ),
+    Storage(
+        title = "Хранилище",
+        group = StorageSettingsGroup,
+        icon = R.drawable.hard_drive_2_24,
+        subtitle = "Статистика по X, L и R"
+    );
+
+    companion object {
+        val detailPages: List<SettingsPage>
+            get() = values().filter { it != Main }
+    }
+}
 
 @Composable
 private fun SettingsSearchField(
@@ -478,16 +498,21 @@ private fun SettingsSearchField(
 }
 
 @Composable
-private fun SettingsGroupBlock(
-    group: SettingsGroup,
-    query: String,
-    content: @Composable () -> Unit
+private fun SettingsNavigationRow(
+    page: SettingsPage,
+    onClick: () -> Unit
 ) {
-    if (!group.matches(query)) return
-
-    SettingsDivider()
-    SettingsSectionTitle(group.title)
-    content()
+    SettingsListItem(
+        icon = page.icon,
+        text = page.title,
+        subtitle = page.subtitle,
+        onClick = onClick,
+        trailing = {
+            TextButton(onClick = onClick) {
+                Text("Открыть", color = WhatsAppGreen)
+            }
+        }
+    )
 }
 
 @Composable
@@ -495,12 +520,8 @@ private fun CacheSettingsSection(
     ramCachePercent: Int,
     diskCacheEnabled: Boolean,
     diskCacheSizeMb: Int,
-    videoCacheSizeMb: Int,
     imageCacheSizeBytes: Long,
-    videoCacheSizeBytes: Long,
     onClearImageCache: () -> Unit,
-    onClearVideoCache: () -> Unit,
-    onVideoCacheLimitChange: (Int) -> Unit,
     context: Context
 ) {
     IntSliderSetting(
@@ -564,36 +585,6 @@ private fun CacheSettingsSection(
         textDialogBody = "Размер на диске: ${formatBytes(imageCacheSizeBytes)}",
         textDialogButton = "Очистить",
         onClick = onClearImageCache
-    )
-    SettingsDivider()
-
-    IntSliderSetting(
-        text = "Лимит видео-кэша R",
-        value = VideoCacheSettings.normalizedSizeMb(videoCacheSizeMb),
-        min = VideoCacheSettings.MIN_SIZE_MB,
-        max = VideoCacheSettings.MAX_SIZE_MB,
-        step = VideoCacheSettings.STEP_SIZE_MB,
-        suffix = " MB",
-        icon = R.drawable.play_circle,
-        onValueChangeFinished = onVideoCacheLimitChange
-    )
-    SettingsDivider()
-
-    SettingsValueRow(
-        icon = R.drawable.play_circle,
-        text = "Кэш видео на диске",
-        value = formatBytes(videoCacheSizeBytes)
-    )
-    SettingsDivider()
-
-    SettingsButtonRowWithDialog(
-        icon = R.drawable.play_circle,
-        text = "Очистить кэш видео",
-        value = "Очистить",
-        textDialogTitle = "Очистить кэш видео",
-        textDialogBody = "Размер на диске: ${formatBytes(videoCacheSizeBytes)}",
-        textDialogButton = "Очистить",
-        onClick = onClearVideoCache
     )
 }
 
@@ -791,13 +782,10 @@ private fun AppSettingsScreenPreview() {
             AppSettingsScreenBody(
                 onOpenDiagnostics = {},
                 imageCacheSizeBytes = 128_000_000L,
-                videoCacheSizeBytes = 256_000_000L,
                 storageStats = EmptyStorageStats,
                 sizeRedTotal = 512_000_000L,
                 sizeRedDownload = 64_000_000L,
                 onClearImageCache = {},
-                onClearVideoCache = {},
-                onVideoCacheLimitChange = {},
                 onClearDownload = {},
                 savedRed = null,
                 context = context.applicationContext
