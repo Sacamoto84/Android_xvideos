@@ -57,6 +57,8 @@ fun RedUrlVideoImageAndLongClick(
     onLongClick: () -> Unit = {},
     onDoubleClick: () -> Unit = {},
 
+    preload: Boolean = false,
+
     onVideo: (Boolean) -> Unit = {},       //true - видео, false - картинка
 
     downloadRed: () -> DownloadRed
@@ -69,13 +71,12 @@ fun RedUrlVideoImageAndLongClick(
     val interactionSource = remember { MutableInteractionSource() }
 
     LaunchedEffect(isVideo) { onVideo(isVideo) }
-    LaunchedEffect(play) { isVideo = play }
+    LaunchedEffect(item.id, play) { isVideo = play }
 
     var poster by remember { mutableStateOf(true) }
+    val shouldPlayVideo = isVideo && (play || !preload)
 
     // Сбрасываем состояние видео при смене ID
-    LaunchedEffect(item.id) { isVideo = false }
-
     val videoUri = remember(item.id, item.userName, isNetConnected) {
         if (downloadRed().downloader.findVideoInDownload(item.id, item.userName)) {
             "${AppPath.r_cache_download}/${item.userName}/${item.id}.mp4"
@@ -120,14 +121,19 @@ fun RedUrlVideoImageAndLongClick(
         contentAlignment = Alignment.Center
     ) {
         AnimatedVisibility(
-            visible = isVideo,
+            visible = isVideo || preload,
             enter = fadeIn(animationSpec = tween(100)),
             exit = fadeOut(animationSpec = tween(200))
         ) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .alpha(if (isVideo) 1f else 0f),
+                contentAlignment = Alignment.Center
+            ) {
                 Red_Video_Lite_Row2(
                     url = videoUri,
-                    play = true,
+                    play = shouldPlayVideo,
                     onClick = { isVideo = !isVideo },
                     onLongClick = { onFullScreen() },
                     poster = { poster = it }

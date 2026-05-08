@@ -239,9 +239,11 @@ fun LazyRow123Content(
         } else {
             val pagerCount = if (loadState.append is LoadState.Loading && listGifs.itemCount > 0) listGifs.itemCount + 1 else listGifs.itemCount
             val statePager = rememberPagerState { pagerCount }
-            VerticalPager(state = statePager, modifier = Modifier.fillMaxSize(), beyondViewportPageCount = 1) { index ->
+            VerticalPager(state = statePager, modifier = Modifier.fillMaxSize(), beyondViewportPageCount = 2) { index ->
                 if (index < listGifs.itemCount) {
                     listGifs[index]?.let { item ->
+                        val isCurrentPage = statePager.currentPage == index
+                        val shouldPreload = index in statePager.currentPage..(statePager.currentPage + 2)
                          Box(
                             modifier = Modifier
                                 .padding(vertical = 2.dp)
@@ -257,7 +259,8 @@ fun LazyRow123Content(
                                 onLongClick = { navigator?.push(ScreenRedFullScreen(item)) },
                                 isVisibleView = false,
                                 isVisibleDuration = false,
-                                play = true,
+                                play = isCurrentPage,
+                                preload = shouldPreload,
                                 isNetConnected = isConnected,
                                 onFullScreen = { navigator?.push(ScreenRedFullScreen(item)) },
                                 downloadRed = { host.downloadRed },
