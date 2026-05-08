@@ -6,7 +6,6 @@ enum class TypePager {
     R_SAVED_LIKES,
     SAVED_COLLECTION,
     PROFILE,
-    EXPLORER_NICHES,
     EMPTY,
 
     SUBSCRIPTIONS

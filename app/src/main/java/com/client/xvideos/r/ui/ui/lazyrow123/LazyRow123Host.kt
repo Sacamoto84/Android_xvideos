@@ -24,7 +24,6 @@ import com.client.xvideos.r.common.search.R_SearchNiches
 import com.client.xvideos.r.network.api.RedApi
 import com.client.xvideos.r.common.pagin.ItemCollectionPagingSource
 import com.redgifs.common.pagin.ItemEmptyPagingSource
-import com.client.xvideos.r.common.pagin.ItemExplorerNailsPagingSource
 import com.client.xvideos.r.common.pagin.ItemNailsPagingSource
 import com.client.xvideos.r.common.pagin.ItemProfilePagingSource
 import com.client.xvideos.r.common.pagin.ItemSavedLikesPagingSource
@@ -157,8 +156,6 @@ fun createPager(
         TypePager.R_SAVED_LIKES -> { ItemSavedLikesPagingSource(sort, savedRed) }
         TypePager.SUBSCRIPTIONS -> { ItemSubscriptionsPagingSource(savedRed) }
 
-        //Поиск и отображение списка Niches в Explorer
-        TypePager.EXPLORER_NICHES -> { ItemExplorerNailsPagingSource( order = sort, textNiches = textNiches, cache = savedRed.nichesCache ) }
         TypePager.PROFILE -> { ItemProfilePagingSource( profileName = extraString, sort = sort, block = block, redApi = redApi, tags = tags ) }
         TypePager.EMPTY -> { ItemEmptyPagingSource() }
         TypePager.SAVED_COLLECTION -> { ItemCollectionPagingSource( collection = extraString, savedRed = savedRed ) }

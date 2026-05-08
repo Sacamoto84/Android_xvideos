@@ -32,6 +32,9 @@ class R_Saved_NichesCaches(
 
     var size by mutableIntStateOf(-1)
 
+    var version by mutableIntStateOf(0)
+        private set
+
     var isDownloading by mutableStateOf(false)
 
     var progress by mutableFloatStateOf(0f)
@@ -73,6 +76,7 @@ class R_Saved_NichesCaches(
                 }
                 file.writeText(json)
                 size = list.size
+                version++
                 timeRefresh()
                 if (showSnackBar) {
                     SnackBar.success("Обновление завершено")
@@ -114,12 +118,14 @@ class R_Saved_NichesCaches(
             list.clear()
             list.addAll(niches)
             size = list.size
+            version++
             timeRefresh()
             isDownloaded = list.isNotEmpty()
         }.onFailure {
             Timber.e(it, "R niches cache read error")
             list.clear()
             size = 0
+            version++
             isDownloaded = false
         }
     }

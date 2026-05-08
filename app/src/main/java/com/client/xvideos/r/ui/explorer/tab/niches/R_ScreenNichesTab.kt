@@ -21,6 +21,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -38,7 +40,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -47,13 +53,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.paging.PagingData
-import androidx.paging.compose.LazyPagingItems
-import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.itemContentType
-import androidx.paging.compose.itemKey
 import cafe.adriel.voyager.core.model.ScreenModel
-import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
@@ -61,22 +61,16 @@ import cafe.adriel.voyager.hilt.ScreenModelKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.client.xvideos.common.connectivityObserver.ConnectivityObserver
 import com.client.xvideos.r.common.ThemeRed
-import com.client.xvideos.r.common.block.BlockRed
-import com.client.xvideos.r.common.downloader.DownloadRed
 import com.client.xvideos.r.common.saved.SavedRed
-import com.client.xvideos.r.common.search.R_SearchExplorer
 import com.client.xvideos.r.common.search.R_SearchNiches
-import com.client.xvideos.r.network.api.RedApi
 import com.client.xvideos.r.model.Niche
 import com.client.xvideos.r.model.Order
+import com.client.xvideos.r.ui.explorer.RNavigationState
 
 import com.client.xvideos.r.ui.niche.R_ScreenNiche
 import com.client.xvideos.r.ui.profile.atom.VerticalScrollbar
 import com.client.xvideos.r.ui.profile.rememberVisibleRangePercentIgnoringFirstNForLazyColumn
-import com.client.xvideos.r.ui.ui.lazyrow123.LazyRow123Host
-import com.client.xvideos.r.ui.ui.lazyrow123.model.TypePager
 import com.client.xvideos.ui.theme.XvideosTheme
 import dagger.Binds
 import dagger.Module
@@ -84,10 +78,39 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+private data class NicheScrollSnapshot(
+    val itemCount: Int,
+    val index: Int,
+    val offset: Int
+)
+
+private fun filterAndSortNiches(
+    niches: List<Niche>,
+    query: String,
+    order: Order
+): List<Niche> {
+    val filtered = if (query.isBlank()) {
+        niches
+    } else {
+        niches.filter { it.name.contains(query, ignoreCase = true) }
+    }
+
+    return when (order) {
+        Order.NICHES_SUBSCRIBERS_D -> filtered.sortedByDescending { it.subscribers }
+        Order.NICHES_POST_D -> filtered.sortedByDescending { it.gifs }
+        Order.NICHES_SUBSCRIBERS_A -> filtered.sortedBy { it.subscribers }
+        Order.NICHES_POST_A -> filtered.sortedBy { it.gifs }
+        Order.NICHES_NAME_A_Z -> filtered.sortedBy { it.name }
+        Order.NICHES_NAME_Z_A -> filtered.sortedByDescending { it.name }
+        else -> filtered.sortedBy { it.subscribers }
+    }
+}
 
 object R_ScreenNichesTab : Screen {
 
@@ -99,17 +122,68 @@ object R_ScreenNichesTab : Screen {
     override fun Content() {
         val vm: ScreenRedExplorerNichesSM = getScreenModel()
         val navigator = LocalNavigator.currentOrThrow
+        val navigationState = vm.navigationState
+        val coroutineScope = rememberCoroutineScope()
+        val sortType by vm.sortType.collectAsStateWithLifecycle()
+        val searchTextDone by vm.search.searchTextDone.collectAsStateWithLifecycle()
+        val cacheVersion = vm.savedRed.nichesCache.version
+        val nicheItems = remember(cacheVersion, searchTextDone, sortType) {
+            filterAndSortNiches(
+                niches = vm.savedRed.nichesCache.list.toList(),
+                query = searchTextDone,
+                order = sortType
+            )
+        }
+        val savedIndex = navigationState.nichesFirstVisibleItemIndex
+        val initialIndex = if (nicheItems.isNotEmpty()) {
+            savedIndex.coerceIn(0, nicheItems.lastIndex)
+        } else {
+            0
+        }
+        val listState = rememberLazyListState(
+            initialFirstVisibleItemIndex = initialIndex,
+            initialFirstVisibleItemScrollOffset = if (initialIndex == savedIndex) {
+                navigationState.nichesFirstVisibleItemScrollOffset
+            } else {
+                0
+            }
+        )
+        var lastListParams by remember { mutableStateOf(searchTextDone to sortType) }
 
-        val listNiche = vm.nichesPager.collectAsLazyPagingItems()
+        LaunchedEffect(searchTextDone, sortType) {
+            val params = searchTextDone to sortType
+            if (params != lastListParams) {
+                navigationState.resetNichesScrollPosition()
+                listState.scrollToItem(0)
+                lastListParams = params
+            }
+        }
 
-        val sortType by vm.lazyHost.sortType.collectAsStateWithLifecycle()
+        LaunchedEffect(listState, nicheItems.size, navigationState) {
+            snapshotFlow {
+                NicheScrollSnapshot(
+                    itemCount = nicheItems.size,
+                    index = listState.firstVisibleItemIndex,
+                    offset = listState.firstVisibleItemScrollOffset
+                )
+            }
+                .distinctUntilChanged()
+                .collect { snapshot ->
+                    if (snapshot.itemCount > 0) {
+                        navigationState.updateNichesScrollPosition(snapshot.index, snapshot.offset)
+                    }
+                }
+        }
 
         val isSearchFocused by vm.search.focused.collectAsStateWithLifecycle()
 
-        val onSortTypeChange: (Order) -> Unit = remember { { vm.lazyHost.changeSortType(it) } }
+        val onSortTypeChange: (Order) -> Unit = remember { { vm.changeSortType(it) } }
 
-        val onUpClick: () -> Unit = remember { {
-            vm.lazyHost.gotoUpColumn()
+        val onUpClick: () -> Unit = remember(listState, coroutineScope, navigationState) { {
+            coroutineScope.launch {
+                listState.scrollToItem(0)
+                navigationState.resetNichesScrollPosition()
+            }
         } }
 
         val onNicheClick: (String) -> Unit = remember(navigator) { { id -> navigator.push(R_ScreenNiche(id)) } }
@@ -119,13 +193,9 @@ object R_ScreenNichesTab : Screen {
          */
         val countNichesInCache = vm.savedRed.nichesCache.list.size
 
-        /**
-         * Флаг загрузки кэша
-         */
-        val isNichesCacheDownloaded = vm.savedRed.nichesCache.isDownloaded
-
         NichesTabContent(
-            items =  listNiche ,
+            listState = listState,
+            niches = nicheItems,
             sortType = sortType,
             onSortTypeChange = onSortTypeChange,
             isSearchFocused = isSearchFocused,
@@ -140,7 +210,6 @@ object R_ScreenNichesTab : Screen {
             },
             nichesCacheProgress = vm.savedRed.nichesCache.progress,
             countNichesInCache = countNichesInCache,
-            isNichesCacheDownloaded = isNichesCacheDownloaded,
             cacheHour = vm.savedRed.nichesCache.lastModifiedHour
         )
     }
@@ -150,7 +219,8 @@ object R_ScreenNichesTab : Screen {
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun NichesTabContent(
-    items: LazyPagingItems<Niche>,
+    listState: LazyListState,
+    niches: List<Niche>,
     sortType: Order,
     onSortTypeChange: (Order) -> Unit,
     isSearchFocused: Boolean,
@@ -161,26 +231,15 @@ fun NichesTabContent(
     onRefreshNichesCacheClick: () -> Unit,
     nichesCacheProgress: Float,
     countNichesInCache : Int,
-    isNichesCacheDownloaded : Boolean = false,
     cacheHour : Long
 ) {
 
-    val state = rememberLazyListState()
-
-    val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForLazyColumn(gridState = state)
-
-   LaunchedEffect(isNichesCacheDownloaded) {
-       if (isNichesCacheDownloaded) {
-           delay(100)
-           items.refresh()
-       }
-   }
+    val scrollPercent by rememberVisibleRangePercentIgnoringFirstNForLazyColumn(gridState = listState)
 
     if (countNichesInCache == 0) {
         Refresh(
             onRefreshNichesCacheClick = onRefreshNichesCacheClick,
             nichesCacheProgress = nichesCacheProgress,
-            refreshList = { items.refresh() },
         )
     } else {
         Scaffold(
@@ -200,7 +259,7 @@ fun NichesTabContent(
                 modifier = Modifier.padding(bottom = paddingValues.calculateBottomPadding()).fillMaxSize()
             )
             {
-                LazyColumn( state = state, modifier = Modifier.fillMaxSize(), contentPadding = WindowInsets.displayCutout.asPaddingValues() )
+                LazyColumn( state = listState, modifier = Modifier.fillMaxSize(), contentPadding = WindowInsets.displayCutout.asPaddingValues() )
                 {
 
                     item{
@@ -214,10 +273,23 @@ fun NichesTabContent(
                         }
                     }
 
-                    items( count = items.itemCount, key = items.itemKey { it.id }, contentType = items.itemContentType { "niche" } )
-                    { index ->
-                        val item = items[index]
-                        if (item != null) {
+                    if (niches.isEmpty()) {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(24.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "No results",
+                                    color = Color.Gray,
+                                    fontFamily = ThemeRed.fontFamilyDMsanss
+                                )
+                            }
+                        }
+                    } else {
+                        items(items = niches, key = { it.id }, contentType = { "niche" }) { item ->
                             Box(modifier = Modifier.padding(vertical = 2.dp)) {
                                 if (savedRed() != null) {
                                     NichePreview2( niches = { item }, onClick = { onNicheClick(item.id) }, savedRed = { savedRed()!! } )
@@ -364,11 +436,10 @@ fun R_ScreenNichesTabPreview() {
             Niche("5", "Creampie", 1800, 9000, "", null)
         )
     }
-    val pagingData = PagingData.from(items)
-    val listNiche = flowOf(pagingData).collectAsLazyPagingItems()
-    
+
     NichesTabContent(
-        items = listNiche,
+        listState = rememberLazyListState(),
+        niches = items,
         sortType = Order.NICHES_SUBSCRIBERS_D,
         onSortTypeChange = {},
         isSearchFocused = false,
@@ -391,39 +462,23 @@ fun R_ScreenNichesTabPreview() {
         onRefreshNichesCacheClick = {},
         nichesCacheProgress = 1f,
         countNichesInCache = 10,
-        isNichesCacheDownloaded = true,
         cacheHour = 1
     )
 }
 
 class ScreenRedExplorerNichesSM @Inject constructor(
-    connectivityObserver: ConnectivityObserver,
+    val navigationState: RNavigationState,
     val savedRed: SavedRed,
     val search: R_SearchNiches,
-    val block: BlockRed,
-    val redApi: RedApi,
-    val downloadRed: DownloadRed,
-    val searchExplorer: R_SearchExplorer,
 ) : ScreenModel {
 
-    val lazyHost = LazyRow123Host(
-        connectivityObserver = connectivityObserver,
-        scope = screenModelScope,
-        extraString = "",
-        typePager = TypePager.EXPLORER_NICHES,
-        startOrder = Order.NICHES_SUBSCRIBERS_D,
-        startColumns = 1,
-        block = block,
-        redApi = redApi,
-        savedRed = savedRed,
-        downloadRed = downloadRed,
-        search = searchExplorer,
-        searchNiches = search
-    )
+    private val _sortType = MutableStateFlow(navigationState.nichesSort)
+    val sortType = _sortType.asStateFlow()
 
-    @Suppress("UNCHECKED_CAST")
-    val nichesPager: Flow<PagingData<Niche>> = lazyHost.pager
-        .map { it as PagingData<Niche> }
+    fun changeSortType(order: Order) {
+        navigationState.updateNichesSort(order)
+        _sortType.value = order
+    }
 }
 
 @Module
