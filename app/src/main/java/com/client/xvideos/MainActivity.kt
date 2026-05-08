@@ -137,7 +137,7 @@ class MainActivity : ComponentActivity()//, ImageLoaderFactory
         }
 
         lifecycleScope.launch(Dispatchers.IO) {
-            VideoPlayerCacheManager.initialize(applicationContext, 1024L * 1024L * 1024L)
+            VideoPlayerCacheManager.initialize(applicationContext)
             savedRed.nichesCache.refreshIfStale()
         }
 

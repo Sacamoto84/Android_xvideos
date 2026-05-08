@@ -7,6 +7,7 @@ import com.client.xvideos.common.settings.element.SettingElementBoolean
 import com.client.xvideos.common.settings.element.SettingElementInt
 import com.client.xvideos.common.settings.element.SettingElementList
 import com.client.xvideos.common.settings.element.SettingElementString
+import com.client.xvideos.common.videoplayer.util.VideoCacheSettings
 import com.client.xvideos.l.model.ThumbnailsSize
 
 //data class DC_galleryCount(var g0: Boolean, var g1: Boolean, var g2: Boolean, var g3: Boolean, var g4: Boolean )
@@ -39,6 +40,10 @@ object Settings {
     val image_cache_disk_enabled by lazy { SettingElementBoolean(pref, "image_cache_disk_enabled", true) }
 
     val image_cache_disk_size_mb by lazy { SettingElementInt(pref, "image_cache_disk_size_mb", 500) }
+
+    val video_cache_disk_size_mb by lazy {
+        SettingElementInt(pref, "video_cache_disk_size_mb", VideoCacheSettings.DEFAULT_SIZE_MB)
+    }
 
     val app_lock_enabled by lazy { SettingElementBoolean(pref, "app_lock_enabled", false) }
 

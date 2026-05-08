@@ -21,6 +21,8 @@ import androidx.media3.database.StandaloneDatabaseProvider
 import androidx.media3.datasource.cache.Cache
 import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor
 import androidx.media3.datasource.cache.SimpleCache
+import com.client.xvideos.common.settings.Settings
+import com.client.xvideos.common.videoplayer.util.VideoCacheSettings
 import java.io.File
 
 /**
@@ -42,9 +44,13 @@ object VideoPlayerCacheManager {
      */
     @SuppressLint("UnsafeOptInUsageError")
     @Synchronized
-    fun initialize(context: Context, maxCacheBytes: Long) {
+    fun initialize(
+        context: Context,
+        maxCacheBytes: Long = VideoCacheSettings.maxSizeBytes(Settings.video_cache_disk_size_mb.field.value)
+    ) {
         if (cacheInstance != null) {
-            return
+            if (configuredMaxCacheBytes == maxCacheBytes) return
+            releaseCacheInstance()
         }
         configuredMaxCacheBytes = maxCacheBytes
 
@@ -68,12 +74,21 @@ object VideoPlayerCacheManager {
     @Synchronized
     fun clearCache(context: Context) {
         val maxCacheBytes = configuredMaxCacheBytes
+            ?: VideoCacheSettings.maxSizeBytes(Settings.video_cache_disk_size_mb.field.value)
+        releaseCacheInstance()
+        videoCacheDir(context).deleteRecursively()
+        initialize(context, maxCacheBytes)
+    }
+
+    @SuppressLint("UnsafeOptInUsageError")
+    @Synchronized
+    fun applyConfiguredSize(context: Context) {
+        initialize(context, VideoCacheSettings.maxSizeBytes(Settings.video_cache_disk_size_mb.field.value))
+    }
+
+    private fun releaseCacheInstance() {
         (cacheInstance as? SimpleCache)?.release()
         cacheInstance = null
-        videoCacheDir(context).deleteRecursively()
-        if (maxCacheBytes != null) {
-            initialize(context, maxCacheBytes)
-        }
     }
 
     private fun videoCacheDir(context: Context): File {

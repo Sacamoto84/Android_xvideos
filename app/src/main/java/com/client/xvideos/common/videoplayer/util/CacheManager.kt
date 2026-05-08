@@ -7,22 +7,24 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.database.DefaultDatabaseProvider
 import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor
 import androidx.media3.datasource.cache.SimpleCache
+import com.client.xvideos.common.settings.Settings
 import java.io.File
 
 @UnstableApi
 internal object CacheManager {
     private const val VIDEO_CACHE_DIR_NAME = "video_cache"
-    private const val MAX_CACHE_SIZE_BYTES = 512L * 1024L * 1024L
 
     private var cache: SimpleCache? = null
     private var databaseProvider: DefaultDatabaseProvider? = null
     private var databaseHelper: SQLiteOpenHelper? = null
     private var activePlayers = 0
+    private var configuredMaxCacheBytes: Long? = null
 
     @Synchronized
     fun getCache(context: Context): SimpleCache {
 
         if (cache == null) {
+            val maxCacheSizeBytes = VideoCacheSettings.maxSizeBytes(Settings.video_cache_disk_size_mb.field.value)
 
             val cacheDir = videoCacheDir(context).apply {
                 if (!exists()) mkdirs()
@@ -38,9 +40,10 @@ internal object CacheManager {
 
             cache = SimpleCache(
                 cacheDir,
-                LeastRecentlyUsedCacheEvictor(MAX_CACHE_SIZE_BYTES),
+                LeastRecentlyUsedCacheEvictor(maxCacheSizeBytes),
                 databaseProvider!!
             )
+            configuredMaxCacheBytes = maxCacheSizeBytes
 
         }
         activePlayers++
@@ -56,6 +59,17 @@ internal object CacheManager {
         releaseCache()
         activePlayers = 0
         videoCacheDir(context).deleteRecursively()
+    }
+
+    @Synchronized
+    fun applyConfiguredSize() {
+        val maxCacheSizeBytes = VideoCacheSettings.maxSizeBytes(Settings.video_cache_disk_size_mb.field.value)
+        if (configuredMaxCacheBytes == maxCacheSizeBytes) return
+
+        configuredMaxCacheBytes = maxCacheSizeBytes
+        if (activePlayers <= 0) {
+            releaseCache()
+        }
     }
 
     @Synchronized

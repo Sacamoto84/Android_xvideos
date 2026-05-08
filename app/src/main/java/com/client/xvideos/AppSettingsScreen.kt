@@ -81,6 +81,7 @@ import com.client.xvideos.common.util.formatBytes
 import com.client.xvideos.common.util.getFolderSize
 import com.client.xvideos.common.util.toPrettyCount3
 import com.client.xvideos.common.videoplayer.util.CacheManager
+import com.client.xvideos.common.videoplayer.util.VideoCacheSettings
 import com.client.xvideos.l.model.ThumbnailsSize
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.r.common.saved.SavedRed
@@ -184,6 +185,17 @@ object AppSettingsScreen : Screen {
                     SnackBar.success("Кэш видео очищен")
                 }
             },
+            onVideoCacheLimitChange = { value ->
+                scope.launch {
+                    Settings.video_cache_disk_size_mb.setValue(value)
+                    withContext(Dispatchers.IO) {
+                        CacheManager.applyConfiguredSize()
+                        VideoPlayerCacheManager.applyConfiguredSize(context)
+                    }
+                    refreshVideoCacheSize()
+                    SnackBar.success("Лимит видео-кэша R: $value MB")
+                }
+            },
             onClearDownload = {
                 scope.launch {
                     withContext(Dispatchers.IO) { File(AppPath.r_cache_download).deleteRecursively() }
@@ -208,6 +220,7 @@ private fun AppSettingsScreenContent(
     sizeRedDownload: Long,
     onClearImageCache: () -> Unit,
     onClearVideoCache: () -> Unit,
+    onVideoCacheLimitChange: (Int) -> Unit,
     onClearDownload: () -> Unit,
     savedRed: SavedRed?,
     context: Context
@@ -246,6 +259,7 @@ private fun AppSettingsScreenContent(
             sizeRedDownload = sizeRedDownload,
             onClearImageCache = onClearImageCache,
             onClearVideoCache = onClearVideoCache,
+            onVideoCacheLimitChange = onVideoCacheLimitChange,
             onClearDownload = onClearDownload,
             savedRed = savedRed,
             context = context
@@ -264,6 +278,7 @@ private fun AppSettingsScreenBody(
     sizeRedDownload: Long,
     onClearImageCache: () -> Unit,
     onClearVideoCache: () -> Unit,
+    onVideoCacheLimitChange: (Int) -> Unit,
     onClearDownload: () -> Unit,
     savedRed: SavedRed?,
     context: Context
@@ -271,6 +286,7 @@ private fun AppSettingsScreenBody(
     val ramCachePercent = Settings.image_cache_ram_percent.field.collectAsStateWithLifecycle().value
     val diskCacheEnabled = Settings.image_cache_disk_enabled.field.collectAsStateWithLifecycle().value
     val diskCacheSizeMb = Settings.image_cache_disk_size_mb.field.collectAsStateWithLifecycle().value
+    val videoCacheSizeMb = Settings.video_cache_disk_size_mb.field.collectAsStateWithLifecycle().value
     val l_login = Settings.l_login.field.collectAsStateWithLifecycle().value
     var searchQuery by rememberSaveable { mutableStateOf("") }
 
@@ -300,10 +316,12 @@ private fun AppSettingsScreenBody(
                 ramCachePercent = ramCachePercent,
                 diskCacheEnabled = diskCacheEnabled,
                 diskCacheSizeMb = diskCacheSizeMb,
+                videoCacheSizeMb = videoCacheSizeMb,
                 imageCacheSizeBytes = imageCacheSizeBytes,
                 videoCacheSizeBytes = videoCacheSizeBytes,
                 onClearImageCache = onClearImageCache,
                 onClearVideoCache = onClearVideoCache,
+                onVideoCacheLimitChange = onVideoCacheLimitChange,
                 context = context
             )
         }
@@ -477,10 +495,12 @@ private fun CacheSettingsSection(
     ramCachePercent: Int,
     diskCacheEnabled: Boolean,
     diskCacheSizeMb: Int,
+    videoCacheSizeMb: Int,
     imageCacheSizeBytes: Long,
     videoCacheSizeBytes: Long,
     onClearImageCache: () -> Unit,
     onClearVideoCache: () -> Unit,
+    onVideoCacheLimitChange: (Int) -> Unit,
     context: Context
 ) {
     IntSliderSetting(
@@ -544,6 +564,18 @@ private fun CacheSettingsSection(
         textDialogBody = "Размер на диске: ${formatBytes(imageCacheSizeBytes)}",
         textDialogButton = "Очистить",
         onClick = onClearImageCache
+    )
+    SettingsDivider()
+
+    IntSliderSetting(
+        text = "Лимит видео-кэша R",
+        value = VideoCacheSettings.normalizedSizeMb(videoCacheSizeMb),
+        min = VideoCacheSettings.MIN_SIZE_MB,
+        max = VideoCacheSettings.MAX_SIZE_MB,
+        step = VideoCacheSettings.STEP_SIZE_MB,
+        suffix = " MB",
+        icon = R.drawable.play_circle,
+        onValueChangeFinished = onVideoCacheLimitChange
     )
     SettingsDivider()
 
@@ -770,6 +802,7 @@ private fun AppSettingsScreenPreview() {
                 sizeRedDownload = 64_000_000L,
                 onClearImageCache = {},
                 onClearVideoCache = {},
+                onVideoCacheLimitChange = {},
                 onClearDownload = {},
                 savedRed = null,
                 context = context.applicationContext
