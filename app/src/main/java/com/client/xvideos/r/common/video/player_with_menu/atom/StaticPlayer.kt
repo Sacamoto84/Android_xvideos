@@ -43,6 +43,7 @@ fun StaticPlayer(
         drmConfig = playerHost.drmConfig,
         selectedQuality = playerHost.selectedQuality,
         autoRotate = autoRotate,
+        useDiskCache = playerHost.useDiskCache,
         poster = {
             playerHost.poster = it
         }

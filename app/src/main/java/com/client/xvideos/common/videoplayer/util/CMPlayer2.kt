@@ -52,9 +52,12 @@ fun CMPPlayer2(
     drmConfig: DrmConfig?,
     selectedQuality: VideoQuality?,
     autoRotate: Boolean, // можно менять как нужно
+    useDiskCache: Boolean = true,
     poster : (Boolean) -> Unit
 ) {
     val context = LocalContext.current
+    val minBufferMs = if (useDiskCache) 50_000 else 12_000
+    val maxBufferMs = if (useDiskCache) 150_000 else 45_000
 
     val exoPlayer = rememberExoPlayerWithLifecycle(
         url,
@@ -66,10 +69,11 @@ fun CMPPlayer2(
         drmConfig,
         error,
         selectedQuality,
-        minBufferMs = 50000,
-        maxBufferMs = 150000,
+        minBufferMs = minBufferMs,
+        maxBufferMs = maxBufferMs,
         bufferForPlaybackMs = 50,
         bufferForPlaybackAfterRebufferM = 100,
+        useDiskCache = useDiskCache,
     )
 
     var currentRotate by remember { mutableFloatStateOf(0f) }
@@ -139,7 +143,6 @@ fun CMPPlayer2(
                 exoPlayer.clearMediaItems()
                 exoPlayer.removeListener(listener)
                 exoPlayer.release()
-                CacheManager.release()
             }
         }
 

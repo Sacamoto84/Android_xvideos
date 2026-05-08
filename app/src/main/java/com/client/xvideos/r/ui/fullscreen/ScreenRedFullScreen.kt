@@ -127,7 +127,8 @@ class ScreenRedFullScreen(
             RedFullScreenSingle(
                 item = item,
                 vm = vm,
-                navigator = navigator
+                navigator = navigator,
+                useDiskCache = feedKey == null
             )
         }
     }
@@ -186,6 +187,7 @@ private fun RedFullScreenFeed(
                     play = vm.play && isCurrentPage,
                     isCurrentPage = isCurrentPage,
                     showOverlay = isCurrentPage,
+                    useDiskCache = false,
                     onBuffering = { buffering ->
                         if (isCurrentPage) {
                             isVideoBuffering = buffering
@@ -203,6 +205,7 @@ private fun RedFullScreenFeed(
                             play = vm.play,
                             isCurrentPage = true,
                             showOverlay = true,
+                            useDiskCache = false,
                             onBuffering = { isVideoBuffering = it }
                         )
                     } else {
@@ -218,7 +221,8 @@ private fun RedFullScreenFeed(
 private fun RedFullScreenSingle(
     item: GifsInfo,
     vm: ScreenRedFullScreenSM,
-    navigator: Navigator
+    navigator: Navigator,
+    useDiskCache: Boolean
 ) {
     var isVideoBuffering by remember { mutableStateOf(false) }
 
@@ -231,6 +235,7 @@ private fun RedFullScreenSingle(
             play = vm.play,
             isCurrentPage = true,
             showOverlay = true,
+            useDiskCache = useDiskCache,
             onBuffering = { isVideoBuffering = it }
         )
     }
@@ -290,6 +295,7 @@ private fun RedFullScreenPage(
     play: Boolean,
     isCurrentPage: Boolean,
     showOverlay: Boolean,
+    useDiskCache: Boolean,
     onBuffering: (Boolean) -> Unit
 ) {
     val videoUri = remember(item.id, item.userName) {
@@ -324,6 +330,7 @@ private fun RedFullScreenPage(
             onClick = { if (isCurrentPage) vm.play = !vm.play },
             autoRotate = vm.autoRotate,
             isCurrentPage = isCurrentPage,
+            useDiskCache = useDiskCache,
             isBuferring = { buffering ->
                 if (isCurrentPage) {
                     onBuffering(buffering)

@@ -105,6 +105,40 @@ fun createProgressiveMediaSource(
 }
 
 @OptIn(UnstableApi::class)
+fun createProgressiveMediaSourceWithoutDiskCache(
+    mediaItem: MediaItem,
+    context: Context,
+    headers: Map<String, String>?
+): MediaSource {
+    val headersMap = headers ?: emptyMap()
+    val httpDataSourceFactory = DefaultHttpDataSource.Factory()
+        .setAllowCrossProtocolRedirects(true)
+        .setConnectTimeoutMs(15_000)
+        .setReadTimeoutMs(15_000)
+        .setDefaultRequestProperties(headersMap)
+
+    return ProgressiveMediaSource.Factory(DefaultDataSource.Factory(context, httpDataSourceFactory))
+        .createMediaSource(mediaItem)
+}
+
+fun shouldUseDiskCacheForMedia(
+    url: String,
+    isLiveStream: Boolean,
+    drmConfig: DrmConfig?,
+    useDiskCache: Boolean
+): Boolean {
+    val normalizedUrl = url.substringBefore('?')
+    val isRemote = normalizedUrl.startsWith("http://", ignoreCase = true) ||
+            normalizedUrl.startsWith("https://", ignoreCase = true)
+
+    return useDiskCache &&
+            isRemote &&
+            !isLiveStream &&
+            drmConfig == null &&
+            !normalizedUrl.endsWith(".m3u8", ignoreCase = true)
+}
+
+@OptIn(UnstableApi::class)
 fun createHlsMediaSourceWithDrm(
     mediaItem: MediaItem,
     headers: Map<String, String>?,

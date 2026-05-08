@@ -27,7 +27,9 @@ import com.client.xvideos.common.videoplayer.util.applyQualitySelection
 import com.client.xvideos.common.videoplayer.util.createHlsMediaSource
 import com.client.xvideos.common.videoplayer.util.createHlsMediaSourceWithDrm
 import com.client.xvideos.common.videoplayer.util.createProgressiveMediaSource
+import com.client.xvideos.common.videoplayer.util.createProgressiveMediaSourceWithoutDiskCache
 import com.client.xvideos.common.videoplayer.util.getExoPlayerLifecycleObserver
+import com.client.xvideos.common.videoplayer.util.shouldUseDiskCacheForMedia
 
 @OptIn(UnstableApi::class)
 @Composable
@@ -45,10 +47,14 @@ fun rememberExoPlayerWithLifecycle(
     maxBufferMs: Int = 30000,
     bufferForPlaybackMs: Int = 500,
     bufferForPlaybackAfterRebufferM: Int = 1000,
+    useDiskCache: Boolean = true,
 ): ExoPlayer {
     val lifecycleOwner = LocalLifecycleOwner.current
-    val cache = remember(context) { CacheManager.getCache(context) }
     val trackSelector = remember { DefaultTrackSelector(context) }
+    val useDiskCacheForMedia = shouldUseDiskCacheForMedia(url, isLiveStream, drmConfig, useDiskCache)
+    val cache = remember(context, url, useDiskCacheForMedia) {
+        if (useDiskCacheForMedia) CacheManager.getCache(context) else null
+    }
 
     val loadControl = DefaultLoadControl.Builder().setBufferDurationsMs(minBufferMs, maxBufferMs, bufferForPlaybackMs, bufferForPlaybackAfterRebufferM).build()
 
@@ -76,7 +82,15 @@ fun rememberExoPlayerWithLifecycle(
         applyQualitySelection(trackSelector, selectedQuality)
     }
 
-    LaunchedEffect(url) {
+    DisposableEffect(url, useDiskCacheForMedia) {
+        onDispose {
+            if (useDiskCacheForMedia) {
+                CacheManager.release()
+            }
+        }
+    }
+
+    LaunchedEffect(url, useDiskCacheForMedia) {
         try {
             val mediaItem = MediaItem.fromUri(url.toUri())
 
@@ -86,7 +100,8 @@ fun rememberExoPlayerWithLifecycle(
                     mediaItem,
                     headers
                 )
-                else -> createProgressiveMediaSource(mediaItem, cache, context, headers)
+                useDiskCacheForMedia && cache != null -> createProgressiveMediaSource(mediaItem, cache, context, headers)
+                else -> createProgressiveMediaSourceWithoutDiskCache(mediaItem, context, headers)
             }
 
             exoPlayer.apply {

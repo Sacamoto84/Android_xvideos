@@ -51,7 +51,8 @@ fun RedVideoPlayerWithMenuContent(
     menuDefaultOpen: Boolean = false,
     menuOpenChanged: (Boolean) -> Unit = {},
     autoRotate: Boolean,
-    isCurrentPage : Boolean
+    isCurrentPage : Boolean,
+    useDiskCache: Boolean = true
 ) {
 
     if (BuildConfig.DEBUG) { SideEffect {
@@ -64,7 +65,9 @@ fun RedVideoPlayerWithMenuContent(
 
     LaunchedEffect(isCurrentPage) { snapshotFlow { currentTime to duration }.distinctUntilChanged().collectLatest {if (isCurrentPage) onChangeTime(it)}}
 
-    val playerHost = remember(url) { MediaPlayerHost(mediaUrl = url, isPaused = true) }
+    val playerHost = remember(url, useDiskCache) {
+        MediaPlayerHost(mediaUrl = url, isPaused = true, useDiskCache = useDiskCache)
+    }
 
     LaunchedEffect(url) {
         delay(100)

@@ -74,6 +74,8 @@ internal object CacheManager {
 
     @Synchronized
     fun release() {
+        if (activePlayers <= 0) return
+
         activePlayers--
         if (activePlayers <= 0) {
             releaseCache()
