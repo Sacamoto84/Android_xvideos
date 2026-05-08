@@ -6,7 +6,7 @@ import java.io.File
 
 private enum class Folder(val value: String) {
     CACHE_DOWNLOAD_RED("Download"),
-    RED("Red"),
+    RED("R"),
     L("L"),
     X("X")
 }
@@ -40,10 +40,7 @@ object AppPath {
     val r_cache_download : String = "${main}/${Folder.RED.value}/${Folder.CACHE_DOWNLOAD_RED.value}"
     val r_offline : String = "${main}/${Folder.RED.value}/Offline"
     val r_block : String = "${main}/${Folder.RED.value}/Block"
-    val r_favorite : String = "${main}/${Folder.RED.value}/Favorite"
 
-    val r_users : String = "${main}/${Folder.RED.value}/Users"
-    val r_db : String = "${main}/${Folder.RED.value}/db"
     val r_likes : String = "${main}/${Folder.RED.value}/Saved/Likes"
     val r_collection : String = "${main}/${Folder.RED.value}/Saved/Collection"
     val r_niches : String = "${main}/${Folder.RED.value}/Saved/Niches"
@@ -87,9 +84,6 @@ object AppPath {
         File(r_cache_download).mkdirs()
         File(r_offline).mkdirs()
         File(r_block).mkdirs()
-        File(r_favorite).mkdirs()
-        File(r_users).mkdirs()
-        File(r_db).mkdirs()
 
         File(r_likes).mkdirs()
         File(r_collection).mkdirs()
