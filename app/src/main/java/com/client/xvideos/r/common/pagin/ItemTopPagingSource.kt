@@ -8,6 +8,7 @@ import com.client.xvideos.r.network.api.RedApi
 import com.client.xvideos.r.model.GifsInfo
 import com.client.xvideos.r.model.Order
 import com.client.xvideos.r.common.block.BlockRed
+import com.client.xvideos.r.model.sanitizeGifsInfoList
 import timber.log.Timber
 
 class ItemTopPagingSource(
@@ -38,13 +39,14 @@ class ItemTopPagingSource(
 
             val nextKey = if (page < response.pages) page + 1 else null
 
-            Timber.d("!!! load() a.gif.size = ${response.gifs.size} page:$page pages:${response.pages}")
+            val gifs: List<GifsInfo> = response.gifs.sanitizeGifsInfoList()
+            Timber.d("!!! load() a.gif.size = ${gifs.size} page:$page pages:${response.pages}")
 
-            val gifs: List<GifsInfo> = response.gifs.distinctBy { it.id }
             val blockedSet = block.blockList.value.map { it.id }.toSet()
             val gifs1 = gifs.filterNot { it.id in blockedSet }
 
-            val user = response.users.distinctBy { it.username }
+            val responseUsers = response.users
+            val user = responseUsers.orEmpty().distinctBy { it.username }
             for (info in user) {
                 UsersRed.addUser(info)
             }

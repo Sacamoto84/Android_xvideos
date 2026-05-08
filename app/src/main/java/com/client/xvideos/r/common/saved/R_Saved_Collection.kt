@@ -4,6 +4,8 @@ import com.client.xvideos.common.AppPath
 import com.client.xvideos.common.collectionDB.model.LinkCollectionStore
 import com.client.xvideos.common.snackbar.SnackBar
 import com.client.xvideos.r.model.GifsInfo
+import com.client.xvideos.r.model.sanitizeGifsInfoList
+import com.client.xvideos.r.model.sanitizeOrNull
 import kotlinx.coroutines.DelicateCoroutinesApi
 import timber.log.Timber
 
@@ -14,8 +16,12 @@ class R_Saved_Collection : LinkCollectionStore<GifsInfo>(
 {
 
     override fun addCollection(item: GifsInfo, collectionName: String) {
-        Timber.i("R_Saved_Collection addCollection() item:${item.id} collectionName:$collectionName")
-        collectionDb.insert(item.id, collectionName, item)
+        val safeItem = item.sanitizeOrNull() ?: run {
+            SnackBar.error("Collection add error: empty id")
+            return
+        }
+        Timber.i("R_Saved_Collection addCollection() item:${safeItem.id} collectionName:$collectionName")
+        collectionDb.insert(safeItem.id, collectionName, safeItem)
         refreshCollectionList()
     }
 
@@ -55,7 +61,11 @@ class R_Saved_Collection : LinkCollectionStore<GifsInfo>(
         val a = collectionDb.readAllCollections()
         if (a.isSuccess) {
             collectionList.clear()
-            collectionList.addAll(a.getOrThrow())
+            collectionList.addAll(
+                a.getOrThrow().map { collection ->
+                    collection.copy(items = collection.items.sanitizeGifsInfoList())
+                }
+            )
         } else {
             SnackBar.error("Ошибка чтения коллекций ${a.exceptionOrNull()?.message}")
         }

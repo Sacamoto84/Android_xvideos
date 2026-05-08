@@ -21,3 +21,35 @@ data class GifsInfo(
     @SerializedName("hls") val hls: Boolean? = null,
     @SerializedName("niches") val niches: List<String>? = null,
 )
+
+fun GifsInfo.sanitizeOrNull(): GifsInfo? {
+    val safeId: String? = id
+    if (safeId.isNullOrBlank()) return null
+
+    val safeContentType: String? = contentType
+    val safeTags: List<String>? = tags
+    val safeDescription: String? = description
+    val safeUserName: String? = userName
+    val safeUrls: URL1? = urls
+
+    return copy(
+        id = safeId,
+        contentType = safeContentType ?: "Solo Female",
+        tags = safeTags.orEmpty().mapNotNull { tag ->
+            val safeTag: String? = tag
+            safeTag?.takeIf { it.isNotBlank() }
+        },
+        description = safeDescription.orEmpty(),
+        userName = safeUserName.orEmpty(),
+        urls = safeUrls?.sanitize() ?: URL1()
+    )
+}
+
+fun List<GifsInfo>?.sanitizeGifsInfoList(): List<GifsInfo> {
+    return orEmpty()
+        .mapNotNull { item ->
+            val safeItem: GifsInfo? = item
+            safeItem?.sanitizeOrNull()
+        }
+        .distinctBy { it.id }
+}

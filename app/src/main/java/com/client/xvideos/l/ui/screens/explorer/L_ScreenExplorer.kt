@@ -113,8 +113,8 @@ class L_ScreenExplorer : Screen {
         val l = remember {
             persistentListOf(
                 Icons.AutoMirrored.Outlined.FormatListBulleted,
+                Icons.Outlined.BookmarkBorder,
                 Icons.Outlined.Topic,
-                Icons.Outlined.BookmarkBorder
             )
         }
 
@@ -154,8 +154,8 @@ class L_ScreenExplorer : Screen {
                 //Navigator(
                 when (vm.screenType) {
                     0 -> L_ScreenAlbumList.Content()
-                    1 -> L_ScreenAlbumTopHits.Content()
-                    2 -> L_SavedTab.Content()
+                    1 -> L_SavedTab.Content()
+                    2 -> L_ScreenAlbumTopHits.Content()
                     else -> L_SavedTab.Content()
                 }
                 //)

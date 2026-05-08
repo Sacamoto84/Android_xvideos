@@ -11,6 +11,16 @@ data class URL1(
     @SerializedName("hd") val hd: String? = null,         // * HD-ссылка на медиафайл (может отсутствовать). Со звуком 21MB
 )
 
+fun URL1.sanitize(): URL1 {
+    val safeThumbnail: String? = thumbnail
+    val safeSd: String? = sd
+
+    return copy(
+        thumbnail = safeThumbnail.orEmpty(),
+        sd = safeSd.orEmpty()
+    )
+}
+
 //"urls": {
 //    "thumbnail": "https://media.redgifs.com/UnusualAttachedHorseshoecrab-mobile.jpg",
 //    "silent": "https://media.redgifs.com/UnusualAttachedHorseshoecrab-silent.mp4",

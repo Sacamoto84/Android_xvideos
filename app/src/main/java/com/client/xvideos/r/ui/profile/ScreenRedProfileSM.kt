@@ -40,6 +40,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import com.client.xvideos.r.model.UserInfo
+import com.client.xvideos.r.model.sanitizeGifsInfoList
 import com.client.xvideos.r.ui.ui.lazyrow123.model.TypePager
 
 enum class TypeGifs(val value: String) {
@@ -173,7 +174,7 @@ class ScreenRedProfileSM @AssistedInject constructor(
                 redApi
             ).getOrThrow()
             _tags.update { it + r.tags }
-            val resp = r.gifs
+            val resp = r.gifs.sanitizeGifsInfoList()
             _list.update { it + resp }
         } catch (e: Exception) {
 

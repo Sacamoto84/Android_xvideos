@@ -7,6 +7,7 @@ import com.client.xvideos.r.network.api.RedApi
 import com.client.xvideos.r.model.GifsInfo
 import com.client.xvideos.r.model.Order
 import com.client.xvideos.r.common.block.BlockRed
+import com.client.xvideos.r.model.sanitizeGifsInfoList
 import timber.log.Timber
 
 class ItemNailsPagingSource (val order : Order, val nichesName : String, val block: BlockRed, val redApi: RedApi): PagingSource<Int, GifsInfo>() {
@@ -28,17 +29,17 @@ class ItemNailsPagingSource (val order : Order, val nichesName : String, val blo
 
             val response = redApi.getNiches(niches = nichesName, page = page, order = order)
 
-            val isEndReached = response.gifs.isEmpty() // или, если ты знаешь, что сервер вернул всё
+            val gifs : List<GifsInfo> = response.gifs.sanitizeGifsInfoList()
+            val isEndReached = gifs.isEmpty() // или, если ты знаешь, что сервер вернул всё
 
             val nextKey = if (isEndReached) { null } else { page + 1 }
 
-            Timber.d("!!! load() a.gif.size = ${response.gifs.size}")
+            Timber.d("!!! load() a.gif.size = ${gifs.size}")
 
-            val gifs : List<GifsInfo> = response.gifs.distinctBy { it.id }
             val blockedSet = block.blockList.value.map{it.id}.toSet()
             val gifs1 = gifs.filterNot { it.id in blockedSet }
 
-            val user = response.users.distinctBy { it.username }
+            val user = response.users.orEmpty().distinctBy { it.username }
 
             for (info in user) {
                 UsersRed.addUser(info)

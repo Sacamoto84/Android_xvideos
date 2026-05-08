@@ -9,6 +9,7 @@ import com.client.xvideos.r.model.GifsInfo
 import com.client.xvideos.r.model.MediaType
 import com.client.xvideos.r.model.Order
 import com.client.xvideos.r.common.block.BlockRed
+import com.client.xvideos.r.model.sanitizeGifsInfoList
 import timber.log.Timber
 
 class ItemProfilePagingSource (val profileName : String, val sort : Order, val block: BlockRed, val redApi: RedApi, val tags : List<String> = emptyList()): PagingSource<Int, GifsInfo>() {
@@ -33,17 +34,18 @@ class ItemProfilePagingSource (val profileName : String, val sort : Order, val b
             else
                 redApi.searchCreator(userName = profileName, page = page,  count = 100, type = MediaType.GIF,  order = sort , tags = tags)
 
-            val isEndReached = response.getOrThrow().gifs.isEmpty() // или, если ты знаешь, что сервер вернул всё
+            val responseBody = response.getOrThrow()
+            val gifs : List<GifsInfo> = responseBody.gifs.sanitizeGifsInfoList()
+            val isEndReached = gifs.isEmpty() // или, если ты знаешь, что сервер вернул всё
 
             val nextKey = if (isEndReached) { null } else { page + 1 }
 
-            Timber.d("!!! load() a.gif.size = ${response.getOrThrow().gifs.size}")
+            Timber.d("!!! load() a.gif.size = ${gifs.size}")
 
-            val gifs : List<GifsInfo> = response.getOrThrow().gifs.distinctBy { it.id }
             val blockedSet = block.blockList.value.map{it.id}.toSet()
             val gifs1 = gifs.filterNot { it.id in blockedSet }
 
-            val user = response.getOrThrow().users.distinctBy { it.username }
+            val user = responseBody.users.orEmpty().distinctBy { it.username }
 
             for (info in user) {
                 UsersRed.addUser(info)

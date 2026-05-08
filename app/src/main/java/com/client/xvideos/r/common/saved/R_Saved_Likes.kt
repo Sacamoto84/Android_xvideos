@@ -4,6 +4,8 @@ import com.client.xvideos.common.fileDB.FileDB
 import com.client.xvideos.common.AppPath
 import com.client.xvideos.common.snackbar.SnackBar
 import com.client.xvideos.r.model.GifsInfo
+import com.client.xvideos.r.model.sanitizeGifsInfoList
+import com.client.xvideos.r.model.sanitizeOrNull
 import kotlinx.coroutines.DelicateCoroutinesApi
 import timber.log.Timber
 import kotlin.onSuccess
@@ -15,11 +17,15 @@ class R_Saved_Likes {
     var list = likesDb.list
 
     fun add(item: GifsInfo) {
-        Timber.i("R_Saved_Likes add() id:${item.id} userName:${item.userName} url:${item.urls.hd}")
-        likesDb.insert(item.id, item)
+        val safeItem = item.sanitizeOrNull() ?: run {
+            SnackBar.error("Like add error: empty id")
+            return
+        }
+        Timber.i("R_Saved_Likes add() id:${safeItem.id} userName:${safeItem.userName} url:${safeItem.urls.hd}")
+        likesDb.insert(safeItem.id, safeItem)
             .onSuccess {
                 SnackBar.success("Like")
-                list.add(item)
+                list.add(safeItem)
             }
             .onFailure { e ->
                 SnackBar.error("Ошибка добавления лайка ${e.message}")
@@ -37,6 +43,9 @@ class R_Saved_Likes {
     @OptIn(DelicateCoroutinesApi::class)
     fun refresh() {
         likesDb.refresh()
+        val sanitized = list.toList().sanitizeGifsInfoList()
+        list.clear()
+        list.addAll(sanitized)
     }
 
 }

@@ -7,6 +7,7 @@ import com.client.xvideos.common.snackbar.SnackBar
 import com.client.xvideos.r.model.GifsInfo
 import com.client.xvideos.r.model.MediaType
 import com.client.xvideos.r.model.UserInfo
+import com.client.xvideos.r.model.sanitizeGifsInfoList
 import com.client.xvideos.r.network.api.RedApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -77,7 +78,7 @@ class R_Saved_Subscriptions(
 
 
     private suspend fun read50LastItem(name: String): List<GifsInfo> {
-        return redApi.searchCreator(userName = name, count = 50, type = MediaType.ALL).getOrThrow().gifs
+        return redApi.searchCreator(userName = name, count = 50, type = MediaType.ALL).getOrThrow().gifs.sanitizeGifsInfoList()
     }
 
 

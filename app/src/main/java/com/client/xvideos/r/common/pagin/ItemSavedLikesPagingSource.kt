@@ -5,6 +5,7 @@ import androidx.paging.PagingState
 import com.client.xvideos.r.model.GifsInfo
 import com.client.xvideos.r.model.Order
 import com.client.xvideos.r.common.saved.SavedRed
+import com.client.xvideos.r.model.sanitizeGifsInfoList
 import timber.log.Timber
 
 class ItemSavedLikesPagingSource (val order : Order, val savedRed: SavedRed): PagingSource<Int, GifsInfo>() {
@@ -12,7 +13,7 @@ class ItemSavedLikesPagingSource (val order : Order, val savedRed: SavedRed): Pa
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int,  GifsInfo> {
         return try {
             Timber.i("!!! >>>ItemSavedLikesPagingSource::load() sortTop:$order")
-            LoadResult.Page( data = savedRed.likes.list.toList(), prevKey = null, nextKey = null )
+            LoadResult.Page( data = savedRed.likes.list.toList().sanitizeGifsInfoList(), prevKey = null, nextKey = null )
         } catch (e: Exception) {
             Timber.e("!!! >>>ItemSavedLikesPagingSource load() Ошибка = ${e.message}")
             LoadResult.Error(e)
