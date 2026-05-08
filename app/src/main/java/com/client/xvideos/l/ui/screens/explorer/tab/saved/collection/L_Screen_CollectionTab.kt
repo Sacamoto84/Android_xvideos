@@ -88,7 +88,7 @@ object L_Screen_CollectionTab : Screen {
 
         val selectedCollection = savedL.collection.currentCollectionName
 
-        BackHandler {
+        BackHandler(enabled = selectedCollection != null) {
             Timber.i("iii BackHandler SavedCollectionTab")
             savedL.collection.currentCollectionName = null
         }

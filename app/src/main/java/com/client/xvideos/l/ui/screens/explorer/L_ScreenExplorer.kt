@@ -14,10 +14,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.model.ScreenModel
@@ -175,10 +172,15 @@ class L_ScreenExplorer : Screen {
  * и индикатор загрузок без обращения к глобальному состоянию.
  */
 class L_ScreenExplorerSM @Inject constructor(
-    val savedL: SavedL
+    val savedL: SavedL,
+    private val navigationState: LNavigationState
 ) : ScreenModel {
     /** Текущая вкладка верхнего уровня L-раздела (раньше — статика в Companion). */
-    var screenType by mutableIntStateOf(0)
+    var screenType: Int
+        get() = navigationState.rootTab
+        set(value) {
+            navigationState.rootTab = value
+        }
 }
 
 @Module
