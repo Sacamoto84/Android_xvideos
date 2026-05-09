@@ -29,13 +29,6 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments += ["room.schemaLocation": "$projectDir/schemas".toString()]
-            }
-        }
-
-
         multiDexEnabled = true
     }
 
@@ -277,11 +270,6 @@ dependencies {
     //implementation ("androidx.credentials:credentials-play-services-auth")
     //implementation ("com.google.android.libraries.identity.googleid:googleid")
 
-    // Room
-    implementation(libs.androidx.room.runtime)
-    ksp(libs.androidx.room.compiler)
-    implementation(libs.androidx.room.ktx)
-
     implementation(libs.core)
 
 //    implementation("org.seleniumhq.selenium:selenium-java:4.15.0")
@@ -329,8 +317,4 @@ dependencies {
     //implementation(libs.ksafe)
     //implementation(libs.ksafe.compose)
 
-}
-
-ksp {
-    arg("room.schemaLocation", "$projectDir/schemas")
 }

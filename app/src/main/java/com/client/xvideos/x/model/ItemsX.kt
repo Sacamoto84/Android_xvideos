@@ -1,11 +1,6 @@
 package com.client.xvideos.x.model
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-
-@Entity(tableName = "items")
 data class ItemsX(
-    @PrimaryKey
     val id : Long,                    //   Номер 234234233 берется из сайта
     val title : String,               // - Название видео(Зависит от выбранного языка)
     val duration : String,            // * Длинна видео (11 мин.)

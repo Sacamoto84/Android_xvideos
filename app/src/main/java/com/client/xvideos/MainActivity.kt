@@ -61,6 +61,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.PermissionScreenActivity.PermissionStorage
 import com.client.xvideos.common.applock.AppLockRepository
 import com.client.xvideos.common.applock.AppLockSession
+import com.client.xvideos.common.fileDB.folder.AppFileDatabase
 import com.client.xvideos.common.util.KeepScreenOn
 import com.client.xvideos.common.videoplayer.util.VideoDiskCacheCleaner
 import com.client.xvideos.l.ui.screens.explorer.L_ScreenExplorer
@@ -93,6 +94,9 @@ class MainActivity : ComponentActivity()//, ImageLoaderFactory
 {
     @Inject
     lateinit var savedRed: SavedRed
+
+    @Inject
+    lateinit var appFileDatabase: javax.inject.Provider<AppFileDatabase>
 
     companion object {
         internal const val EXTRA_REQUIRE_APP_LOCK = "com.client.xvideos.EXTRA_REQUIRE_APP_LOCK"
@@ -137,6 +141,7 @@ class MainActivity : ComponentActivity()//, ImageLoaderFactory
         }
 
         lifecycleScope.launch(Dispatchers.IO) {
+            appFileDatabase.get().clearVolatileCachesOnProcessStart()
             VideoDiskCacheCleaner.clearLegacyCaches(applicationContext)
             savedRed.nichesCache.refreshIfStale()
         }

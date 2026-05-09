@@ -23,8 +23,7 @@ import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
 import cafe.adriel.voyager.navigator.Navigator
 import com.client.xvideos.common.eventBus.Event
 import com.client.xvideos.common.eventBus.EventBus
-import com.client.xvideos.common.room.AppDatabase
-import com.client.xvideos.common.room.entity.CacheUrlStringRomEntity
+import com.client.xvideos.common.fileDB.folder.AppFileDatabase
 import com.client.xvideos.x.model.HTML5PlayerConfig
 import com.client.xvideos.x.parcer.parseHTML5Player
 import com.client.xvideos.x.parcer.parserItemVideo
@@ -59,7 +58,7 @@ data class FORMAT(
 class ScreenX_VideoPlayerSM @AssistedInject constructor(
     @Assisted val url: String,
     @ApplicationContext context: Context,
-    val db: AppDatabase
+    val db: AppFileDatabase
 ) : ScreenModel {
 
     @AssistedFactory
@@ -89,15 +88,10 @@ class ScreenX_VideoPlayerSM @AssistedInject constructor(
 
             Timber.e("!!! ScreenVideoPlayerSM init()")
 
-            val res = db.cacheUrlStringRomDao().get(url)
+            val res = db.cacheUrlStringRom.get(url)
             val s = if (res == null) {
                 val content = readHtmlFromURLDirect(url)
-                db.cacheUrlStringRomDao().insert(
-                    CacheUrlStringRomEntity(
-                        url = url,
-                        content = content
-                    )
-                )
+                db.cacheUrlStringRom.put(url, content)
                 content
             } else
                 res.content

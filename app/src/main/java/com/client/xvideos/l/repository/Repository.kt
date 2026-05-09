@@ -5,9 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.client.xvideos.common.diagnostics.AppDiagnostics
-import com.client.xvideos.common.room.AppDatabase
-import com.client.xvideos.common.room.entity.CacheUrlStringRamEntity
-import com.client.xvideos.common.room.entity.CacheUrlStringRomEntity
+import com.client.xvideos.common.fileDB.folder.AppFileDatabase
 import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.common.snackbar.SnackBar
 import com.client.xvideos.common.util.toMD5
@@ -20,8 +18,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.util.LinkedHashMap
 
 data class LRepositoryProtectionUiState(
     val active: Boolean = false,
@@ -37,7 +35,7 @@ data class LRepositoryProtectionUiState(
 }
 
 class Repository(
-    dbCache: AppDatabase,
+    fileDb: AppFileDatabase,
     //private val luscious: Luscious,
     private val scope: CoroutineScope,
     //private val saved: SavedL
@@ -47,15 +45,17 @@ class Repository(
     //Точка входа для GraphQL
     val apiUrl = Luscious.Companion.API
 
-    init {
-        clearRamDao()
-    }
-
     @Volatile
     private var handler = createHandler()
 
     private val authMutex = Mutex()
     private val requestMutex = Mutex()
+    private val ramCacheMutex = Mutex()
+    private val ramCache = object : LinkedHashMap<String, String>(64, 0.75f, true) {
+        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, String>?): Boolean {
+            return size > RAM_CACHE_MAX_ENTRIES
+        }
+    }
 
     @Volatile
     private var lastNetworkRequestAtMs = 0L
@@ -66,8 +66,12 @@ class Repository(
     var protectionUiState by mutableStateOf(LRepositoryProtectionUiState())
         private set
 
-    private val cacheUrlStringRomDao = dbCache.cacheUrlStringRomDao()
-    private val cacheUrlStringRamDao = dbCache.cacheUrlStringRamDao()
+    private val cacheUrlStringRomDao = fileDb.cacheUrlStringRom
+    private val cacheUrlStringRamDao = fileDb.cacheUrlStringRam
+
+    init {
+        clearRamDao()
+    }
 
     private fun createHandler(): KtorRequestHandler {
         return KtorRequestHandler(
@@ -138,7 +142,7 @@ class Repository(
                     return postJsonValidated(data)
                 }
 
-                //Сделать запись в ROOM если нет в базе, иначе прочитать из него
+                // Read from persistent file cache, or request and store it.
                 RepositoryUriConfig.CACHE_ROM -> {
                     try {
                         val cacheKey = data.toMD5()
@@ -165,7 +169,7 @@ class Repository(
                             return Result.failure(Exception(checkedResponse.getOrThrow()))
                         }
 
-                        cacheUrlStringRomDao.insert( CacheUrlStringRomEntity( url = cacheKey, content = checkedResponse.getOrThrow() ) )
+                        cacheUrlStringRomDao.put(cacheKey, checkedResponse.getOrThrow())
 
                         //Timber.i("!!! openURI() CACHE_ROM net response:$response")
                         return checkedResponse
@@ -182,13 +186,13 @@ class Repository(
                     }
                 }
 
-                //Сделать запись в ROOM RAM если нет в базе, иначе прочитать из него
+                // Read from temporary memory cache, or request and store it.
                 RepositoryUriConfig.CACHE_RAM -> {
                     try {
                         val cacheKey = data.toMD5()
-                        val res = cacheUrlStringRamDao.get(cacheKey)
+                        val res = getRamCache(cacheKey)
                         if (res != null) {
-                            val cached = validateJsonResponse(res.content)
+                            val cached = validateJsonResponse(res)
                             if (cached.isSuccess) {
                                 //Timber.i("!!! openURI() CACHE_RAM res != null response:${res.content}")
                                 return cached
@@ -199,7 +203,7 @@ class Repository(
                                 message = cached.exceptionOrNull()?.message ?: "Malformed CACHE_RAM entry",
                                 requestHash = cacheKey
                             )
-                            cacheUrlStringRamDao.delete(cacheKey)
+                            deleteRamCache(cacheKey)
                         }
                         val checkedResponse = postJsonValidated(data)
                         if (checkedResponse.isFailure) {
@@ -207,7 +211,7 @@ class Repository(
                             if (cachedRom?.isSuccess == true) {
                                 Timber.w("!!! openURI() CACHE_RAM network error, fallback CACHE_ROM")
                                 val cachedContent = cachedRom.getOrThrow()
-                                cacheUrlStringRamDao.insert(CacheUrlStringRamEntity(url = cacheKey, content = cachedContent))
+                                putRamCache(cacheKey, cachedContent)
                                 return cachedRom
                             }
                             return checkedResponse
@@ -219,8 +223,8 @@ class Repository(
                             return Result.failure(Exception(checkedContent))
                         }
 
-                        cacheUrlStringRamDao.insert( CacheUrlStringRamEntity(url = cacheKey, content = checkedContent) )
-                        cacheUrlStringRomDao.insert( CacheUrlStringRomEntity(url = cacheKey, content = checkedContent) )
+                        putRamCache(cacheKey, checkedContent)
+                        cacheUrlStringRomDao.put(cacheKey, checkedContent)
 
                         //Timber.i("!!! openURI() CACHE_RAM net response:$response")
 
@@ -376,10 +380,25 @@ class Repository(
     suspend fun deleteCache(data: String, config: RepositoryUriConfig) {
         val cacheKey = data.toMD5()
         when (config) {
-            RepositoryUriConfig.CACHE_RAM -> cacheUrlStringRamDao.delete(cacheKey)
+            RepositoryUriConfig.CACHE_RAM -> {
+                deleteRamCache(cacheKey)
+                cacheUrlStringRamDao.delete(cacheKey)
+            }
             RepositoryUriConfig.CACHE_ROM -> cacheUrlStringRomDao.delete(cacheKey)
             RepositoryUriConfig.DIRECT -> Unit
         }
+    }
+
+    private suspend fun getRamCache(cacheKey: String): String? {
+        return ramCacheMutex.withLock { ramCache[cacheKey] }
+    }
+
+    private suspend fun putRamCache(cacheKey: String, content: String) {
+        ramCacheMutex.withLock { ramCache[cacheKey] = content }
+    }
+
+    private suspend fun deleteRamCache(cacheKey: String) {
+        ramCacheMutex.withLock { ramCache.remove(cacheKey) }
     }
 
     private fun String.previewForLog(): String {
@@ -392,12 +411,16 @@ class Repository(
     }
 
     private fun clearRamDao(){
-        scope.launch { withContext(Dispatchers.Main) { cacheUrlStringRamDao.deleteAll() } }
+        scope.launch(Dispatchers.IO) {
+            ramCacheMutex.withLock { ramCache.clear() }
+            cacheUrlStringRamDao.deleteAll()
+        }
     }
 
     private companion object {
         const val MIN_NETWORK_REQUEST_INTERVAL_MS = 300L
         const val HTML_CHALLENGE_RETRY_ATTEMPTS = 3
+        const val RAM_CACHE_MAX_ENTRIES = 120
         val HTML_CHALLENGE_RETRY_DELAYS_MS = longArrayOf(5_000L, 10_000L, 15_000L)
     }
 

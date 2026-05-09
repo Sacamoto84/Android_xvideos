@@ -8,7 +8,7 @@ import androidx.lifecycle.lifecycleScope
 import com.client.xvideos.PermissionScreenActivity.PermissionStorage
 import com.client.xvideos.common.applock.AppLockRepository
 import com.client.xvideos.common.applock.AppLockSession
-import com.client.xvideos.common.room.AppDatabase
+import com.client.xvideos.common.fileDB.folder.AppFileDatabase
 import com.client.xvideos.r.common.block.BlockRed
 import com.client.xvideos.r.common.saved.SavedRed
 import dagger.hilt.android.AndroidEntryPoint
@@ -31,7 +31,7 @@ import javax.inject.Inject
 class SplashActivity : ComponentActivity() {
 
     @Inject
-    lateinit var db: javax.inject.Provider<AppDatabase>
+    lateinit var db: javax.inject.Provider<AppFileDatabase>
 
     @Inject
     lateinit var blockRed: javax.inject.Provider<BlockRed>
@@ -88,14 +88,16 @@ class SplashActivity : ComponentActivity() {
             val blockRedInstance = blockRed.get()
             val dbInstance = db.get()
 
+            dbInstance.clearVolatileCachesOnProcessStart()
+            dbInstance.migrateLegacySqliteIfNeeded(this@SplashActivity)
+
             val jobs = listOf(
                 async { savedRedInstance.refreshTagList() },
                 async { blockRedInstance.refresh() },
                 async { savedRedInstance.likes.refresh() },
                 async { savedRedInstance.niches.refresh() },
                 async { savedRedInstance.creators.refresh() },
-                async { savedRedInstance.collections.refreshCollectionList() },
-                async { dbInstance.cacheUrlStringRamDao().deleteAll() }
+                async { savedRedInstance.collections.refreshCollectionList() }
             )
 
             // ждём все задачи

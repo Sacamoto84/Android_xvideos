@@ -30,6 +30,8 @@ object AppPath {
 
     val main : String = "$sdcard/$appMain"
 
+    val file_db: String = "${main}/DB"
+
     //--- X ---
     val x_favorites : String = "${main}/${Folder.X.value}/Saved/Favorites"
 
@@ -70,6 +72,7 @@ object AppPath {
         println("sdcard: $sdcard")
 
         File(main).mkdirs()
+        File(file_db).mkdirs()
 
         // Создание .nomedia
         val nomedia = File(main, ".nomedia")

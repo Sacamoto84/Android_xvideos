@@ -1,7 +1,6 @@
 package com.client.xvideos.r.common.search
 
 import com.client.xvideos.common.di.ApplicationScope
-import com.client.xvideos.common.room.dao.r.R_SearchHistoryNichesDao
 import com.client.xvideos.common.snackbar.SnackBar
 import com.client.xvideos.r.common.saved.SavedRed
 import com.client.xvideos.r.network.api.RedApi
@@ -13,7 +12,7 @@ import kotlin.text.contains
 
 @Singleton
 class R_SearchNiches @Inject constructor(
-    dao: R_SearchHistoryNichesDao,
+    dao: RSearchHistoryNichesFileStore,
     val savedRed: SavedRed,
     val redApi: RedApi,
     @ApplicationScope scope: CoroutineScope

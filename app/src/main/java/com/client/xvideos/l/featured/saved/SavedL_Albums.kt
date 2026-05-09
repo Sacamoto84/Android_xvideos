@@ -2,8 +2,7 @@ package com.client.xvideos.l.featured.saved
 
 import com.client.xvideos.common.AppPath
 import com.client.xvideos.common.fileDB.FileDB
-import com.client.xvideos.common.room.AppDatabase
-import com.client.xvideos.common.room.entity.l.L_AlbumPictureCacheEntity
+import com.client.xvideos.common.fileDB.folder.AppFileDatabase
 import com.client.xvideos.common.snackbar.SnackBar
 import com.client.xvideos.l.model.AlbumDetails
 import com.client.xvideos.l.model.PicsDetails
@@ -14,7 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class SavedL_Albums(val db: AppDatabase, val scope: CoroutineScope) {
+class SavedL_Albums(val db: AppFileDatabase, val scope: CoroutineScope) {
 
     val albumDb = FileDB(AppPath.l_albums, "album", AlbumDetails::class.java)
     val list = albumDb.list
@@ -53,12 +52,7 @@ class SavedL_Albums(val db: AppDatabase, val scope: CoroutineScope) {
 
                 scope.launch(Dispatchers.IO) {
                     val gson = Gson()
-                    db.albumPictureCacheDao().insert(
-                        L_AlbumPictureCacheEntity(
-                            albumId,
-                            gson.toJson(picsDetails)
-                        )
-                    )
+                    db.lAlbumPictureCache.put(albumId.toString(), gson.toJson(picsDetails))
                 }
 
             }

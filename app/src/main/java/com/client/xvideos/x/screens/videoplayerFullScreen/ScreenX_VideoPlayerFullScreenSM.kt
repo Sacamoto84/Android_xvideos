@@ -18,8 +18,7 @@ import androidx.media3.ui.AspectRatioFrameLayout
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
-import com.client.xvideos.common.room.AppDatabase
-import com.client.xvideos.common.room.entity.CacheUrlStringRomEntity
+import com.client.xvideos.common.fileDB.folder.AppFileDatabase
 import com.client.xvideos.x.feature.net.readHtmlFromURLDirect
 import com.client.xvideos.x.model.HTML5PlayerConfig
 import com.client.xvideos.x.parcer.parseHTML5Player
@@ -42,7 +41,7 @@ class ScreenX_VideoPlayerFullScreenSM @AssistedInject constructor(
     @Assisted val url: String,
     @Assisted val position : Long,
     @ApplicationContext context: Context,
-    val db : AppDatabase
+    val db : AppFileDatabase
 ) : ScreenModel {
 
     @AssistedFactory
@@ -67,15 +66,10 @@ class ScreenX_VideoPlayerFullScreenSM @AssistedInject constructor(
         runBlocking {
             Timber.e("!!! ScreenVideoPlayerSM init()")
 
-            val res = db.cacheUrlStringRomDao().get(url)
+            val res = db.cacheUrlStringRom.get(url)
             val s = if (res == null) {
                 val content = readHtmlFromURLDirect(url)
-                db.cacheUrlStringRomDao().insert(
-                    CacheUrlStringRomEntity(
-                        url = url,
-                        content = content
-                    )
-                )
+                db.cacheUrlStringRom.put(url, content)
                 content
             }
             else

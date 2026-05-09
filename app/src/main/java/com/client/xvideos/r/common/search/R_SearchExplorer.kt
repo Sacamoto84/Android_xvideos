@@ -1,7 +1,6 @@
 package com.client.xvideos.r.common.search
 
 import com.client.xvideos.common.di.ApplicationScope
-import com.client.xvideos.common.room.dao.r.R_SearchHistoryExplorerDao
 import com.client.xvideos.r.network.api.RedApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -13,7 +12,7 @@ import javax.inject.Singleton
 @Singleton
 class R_SearchExplorer @Inject constructor(
     @ApplicationScope scope: CoroutineScope,
-    dao: R_SearchHistoryExplorerDao,
+    dao: RSearchHistoryExplorerFileStore,
     redApiIn: Provider<RedApi>,
 ) : ISearchTemplate(scope, dao) {
 

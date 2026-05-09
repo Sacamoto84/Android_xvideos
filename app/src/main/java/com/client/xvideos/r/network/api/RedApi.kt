@@ -1,8 +1,7 @@
 package com.client.xvideos.r.network.api
 
-import com.client.xvideos.common.room.dao.r.R_CacheMediaResponseDao
-import com.client.xvideos.common.room.entity.r.R_CacheMediaResponseEntity
-import com.client.xvideos.common.room.entity.r.getCurrentTimeText
+import com.client.xvideos.common.fileDB.folder.AppFileDatabase
+import com.client.xvideos.common.fileDB.folder.FileStringCacheTable
 import com.client.xvideos.r.model.CreatorResponse
 import com.client.xvideos.r.model.CreatorsResponse
 import com.client.xvideos.r.model.MediaResponse
@@ -28,10 +27,11 @@ import javax.inject.Singleton
 
 @Singleton
 class RedApi @Inject constructor(
-   val dao: R_CacheMediaResponseDao
+   db: AppFileDatabase
 ) {
 
     val api = ApiClient
+    private val mediaCache = db.rCacheMediaResponse
 
     val explorer = RedApi_Explorer(api)
     val search = RedApi_Search(api)
@@ -40,7 +40,7 @@ class RedApi @Inject constructor(
     //--------------------------- GIF methods ---------------------------
     suspend fun getGif(id: String): MediaResponse {
         val route = Route("GET", "/v2/gifs/{id}", "id" to id)
-        return cacheMediaResponse(route, this, dao)
+        return cacheMediaResponse(route, this, mediaCache)
     }
 
 
@@ -60,7 +60,7 @@ class RedApi @Inject constructor(
             "page" to page,
             "type" to type.value,
         )
-        return cacheMediaResponse(route, this, dao)
+        return cacheMediaResponse(route, this, mediaCache)
     }
 
 
@@ -76,7 +76,7 @@ class RedApi @Inject constructor(
             "page" to page,
             "type" to type.value
         )
-        return cacheMediaResponse(route, this, dao)
+        return cacheMediaResponse(route, this, mediaCache)
     }
 
 
@@ -92,7 +92,7 @@ class RedApi @Inject constructor(
             "page" to page,
             "type" to type.value
         )
-        return cacheMediaResponse(route, this, dao)
+        return cacheMediaResponse(route, this, mediaCache)
     }
 
     //Последние, новые посты, не нужно кешировать
@@ -214,7 +214,7 @@ class RedApi @Inject constructor(
 
     suspend fun getTrendingGifs(): MediaResponse {
         val route = Route(method = "GET", path = "/v2/explore/trending-gifs")
-        return cacheMediaResponse(route, this, dao)
+        return cacheMediaResponse(route, this, mediaCache)
     }
 
 
@@ -229,7 +229,7 @@ class RedApi @Inject constructor(
             "count" to count,
             "page" to page
         )
-        return cacheMediaResponse(route, this, dao)
+        return cacheMediaResponse(route, this, mediaCache)
     }
 
     /**
@@ -239,7 +239,7 @@ class RedApi @Inject constructor(
 
     suspend fun getTrendingImages(): MediaResponse {
         val route = Route(method = "GET", path = "/v2/explore/trending-images")
-        return cacheMediaResponse(route, this, dao)
+        return cacheMediaResponse(route, this, mediaCache)
     }
 
     //--------------------------- Tag methods ---------------------------
@@ -267,7 +267,7 @@ class RedApi @Inject constructor(
             "count" to count,
             "order" to order.value
         )
-        return cacheMediaResponse(route, this, dao)
+        return cacheMediaResponse(route, this, mediaCache)
     }
 
     //Похожее
@@ -406,10 +406,10 @@ class RedApi @Inject constructor(
 private suspend fun cacheMediaResponse(
     route: Route,
     redApi: RedApi,
-    dao: R_CacheMediaResponseDao
+    cache: FileStringCacheTable
 ): MediaResponse {
 
-    val cachedEntity = dao.get(route.url)
+    val cachedEntity = cache.get(route.url)
 
     val gson = GsonBuilder()
         //.registerTypeAdapter(Trace::class.java, TraceInstanceCreator())
@@ -429,13 +429,7 @@ private suspend fun cacheMediaResponse(
         val res = redApi.api.request<MediaResponse>(route)
         // Сохраняем в кеш (с текущим временем)
         val jsonContent = gson.toJson(res.getOrNull())
-        val entity = R_CacheMediaResponseEntity(
-            url = route.url,
-            content = jsonContent,
-            timeCreate = System.currentTimeMillis(),
-            timeCreateText = getCurrentTimeText()
-        )
-        dao.insert(entity)
+        cache.put(route.url, jsonContent)
         return res.getOrNull()!!
     }
 
