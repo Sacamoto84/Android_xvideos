@@ -57,7 +57,7 @@ fun AppLockSettingsSection() {
         )
     }
 
-    Column(modifier = Modifier.fillMaxWidth()) {
+    SettingsGroup {
         SettingsListItem(
             icon = R.drawable.key_24,
             text = "Блокировка при запуске",
@@ -154,7 +154,7 @@ internal fun AppLockPasswordDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = ThemeL.greyBackground,
+        containerColor = SettingsCardColor,
         title = {
             Text(
                 when (mode) {
@@ -162,7 +162,7 @@ internal fun AppLockPasswordDialog(
                     AppLockDialogMode.CHANGE -> "Изменить код доступа"
                     AppLockDialogMode.DISABLE -> "Отключить код доступа"
                 },
-                color = ThemeL.textColor
+                color = SettingsRowTextPrimary
             )
         },
         text = {

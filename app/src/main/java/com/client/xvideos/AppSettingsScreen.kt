@@ -7,6 +7,9 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
 import androidx.annotation.OptIn
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,15 +21,22 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TriStateCheckbox
+
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -41,7 +51,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.style.TextAlign
+
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -63,12 +75,18 @@ import com.client.xvideos.common.settings.ui.Config_G_0_4
 import com.client.xvideos.common.settings.ui.components.AppLockSettingsSection
 import com.client.xvideos.common.settings.ui.components.EmptyStorageStats
 import com.client.xvideos.common.settings.ui.components.IntSliderSetting
+import com.client.xvideos.common.settings.ui.components.SettingsAccentBlue
+import com.client.xvideos.common.settings.ui.components.SettingsCardColor
 import com.client.xvideos.common.settings.ui.components.SettingsButtonRowWithDialog
 import com.client.xvideos.common.settings.ui.components.SettingsDivider
+import com.client.xvideos.common.settings.ui.components.SettingsGroup
 import com.client.xvideos.common.settings.ui.components.SettingsListItem
 import com.client.xvideos.common.settings.ui.components.SettingsPreview
+import com.client.xvideos.common.settings.ui.components.SettingsRowTextPrimary
+import com.client.xvideos.common.settings.ui.components.SettingsScreenBackground
 import com.client.xvideos.common.settings.ui.components.SettingsSectionTitle
 import com.client.xvideos.common.settings.ui.components.SettingsSwitchRow
+import com.client.xvideos.common.settings.ui.components.SettingsTopBarColor
 import com.client.xvideos.common.settings.ui.components.SettingsValueRow
 import com.client.xvideos.common.settings.ui.components.StorageStatisticsSection
 import com.client.xvideos.common.settings.ui.components.StorageStat
@@ -211,22 +229,29 @@ private fun AppSettingsScreenContent(
                     .displayCutoutPadding()
                     .height(52.dp)
                     .fillMaxWidth()
-                    .background(ThemeL.greyBackground),
+                    .background(SettingsTopBarColor),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = closeCurrentPage) {
-                    Icon(painterResource(R.drawable.arrow_down), contentDescription = null, tint = Color.White)
+                    Icon(
+                        painterResource(R.drawable.exo_ic_chevron_left),
+                        contentDescription = null,
+                        tint = SettingsAccentBlue
+                    )
                 }
                 Text(
                     currentPage.title,
                     modifier = Modifier.weight(1f),
-                    color = ThemeL.textColor,
-                    style = ThemeL.Type.screenTitle.copy(textAlign = TextAlign.Center)
+                    color = SettingsRowTextPrimary,
+                    style = ThemeL.Type.rowTitle.copy(
+                        color = SettingsRowTextPrimary,
+                        textAlign = TextAlign.Center
+                    )
                 )
                 Spacer(Modifier.width(48.dp))
             }
         },
-        containerColor = ThemeL.greyBackground
+        containerColor = SettingsScreenBackground
     ) { paddingValues ->
         AppSettingsScreenBody(
             modifier = Modifier.padding(paddingValues),
@@ -272,20 +297,34 @@ private fun AppSettingsScreenBody(
 
     Column(
         modifier = modifier
-            .background(ThemeL.greyBackground)
+            .background(SettingsScreenBackground)
             .fillMaxWidth()
             .verticalScroll(rememberScrollState())
+            .padding(vertical = 8.dp)
     ) {
         if (currentPage == SettingsPage.Main) {
-            SettingsPage.detailPages.forEachIndexed { index, page ->
-                if (index > 0) SettingsDivider()
-                SettingsNavigationRow(
-                    page = page,
-                    onClick = { onOpenPage(page) }
-                )
+            SettingsSectionTitle("Основное")
+            SettingsGroup {
+                SettingsPage.primaryPages.forEachIndexed { index, page ->
+                    if (index > 0) SettingsDivider()
+                    SettingsNavigationRow(
+                        page = page,
+                        onClick = { onOpenPage(page) }
+                    )
+                }
+            }
+            SettingsSectionTitle("Разделы")
+            SettingsGroup {
+                SettingsPage.contentPages.forEachIndexed { index, page ->
+                    if (index > 0) SettingsDivider()
+                    SettingsNavigationRow(
+                        page = page,
+                        onClick = { onOpenPage(page) }
+                    )
+                }
             }
         } else {
-            SettingsDivider()
+            Spacer(Modifier.height(4.dp))
             when (currentPage) {
                 SettingsPage.Main -> Unit
                 SettingsPage.Privacy -> AppLockSettingsSection()
@@ -366,8 +405,10 @@ private enum class SettingsPage(
     );
 
     companion object {
+        val primaryPages: List<SettingsPage> = listOf(Privacy, Cache, Storage, Backup)
+        val contentPages: List<SettingsPage> = listOf(X, L, Red)
         val detailPages: List<SettingsPage>
-            get() = values().filter { it != Main }
+            get() = primaryPages + contentPages
     }
 }
 
@@ -382,9 +423,11 @@ private fun SettingsNavigationRow(
         subtitle = page.subtitle,
         onClick = onClick,
         trailing = {
-            TextButton(onClick = onClick) {
-                Text("Открыть", color = WhatsAppGreen)
-            }
+            Icon(
+                painter = painterResource(R.drawable.exo_ic_chevron_right),
+                contentDescription = null,
+                tint = SettingsAccentBlue
+            )
         }
     )
 }
@@ -398,112 +441,116 @@ private fun CacheSettingsSection(
     onClearImageCache: () -> Unit,
     context: Context
 ) {
-    IntSliderSetting(
-        text = "RAM кэш картинок",
-        value = CoilImageLoaderFactory.normalizedRamCachePercent(ramCachePercent),
-        min = CoilImageLoaderFactory.MIN_RAM_CACHE_PERCENT,
-        max = CoilImageLoaderFactory.MAX_RAM_CACHE_PERCENT,
-        step = 1,
-        suffix = "%",
-        icon = R.drawable.memory_24,
-        onValueChangeFinished = { value ->
-            Settings.image_cache_ram_percent.setValue(value)
-            CoilImageLoaderFactory.recreate(context)
-            SnackBar.success("RAM кэш картинок: $value%")
-        }
-    )
-    SettingsDivider()
+    SettingsGroup {
+        IntSliderSetting(
+            text = "RAM кэш картинок",
+            value = CoilImageLoaderFactory.normalizedRamCachePercent(ramCachePercent),
+            min = CoilImageLoaderFactory.MIN_RAM_CACHE_PERCENT,
+            max = CoilImageLoaderFactory.MAX_RAM_CACHE_PERCENT,
+            step = 1,
+            suffix = "%",
+            icon = R.drawable.memory_24,
+            onValueChangeFinished = { value ->
+                Settings.image_cache_ram_percent.setValue(value)
+                CoilImageLoaderFactory.recreate(context)
+                SnackBar.success("RAM кэш картинок: $value%")
+            }
+        )
+        SettingsDivider()
 
-    SettingsSwitchRow(
-        icon = R.drawable.hard_disk_24,
-        text = "Дисковый кэш картинок",
-        subtitle = if (diskCacheEnabled) "Включён" else "Выключен",
-        value = diskCacheEnabled,
-        onValueChange = { enabled ->
-            Settings.image_cache_disk_enabled.setValue(enabled)
-            CoilImageLoaderFactory.recreate(context)
-            SnackBar.success(if (enabled) "Дисковый кэш включен" else "Дисковый кэш выключен")
-        }
-    )
-    SettingsDivider()
+        SettingsSwitchRow(
+            icon = R.drawable.hard_disk_24,
+            text = "Дисковый кэш картинок",
+            subtitle = if (diskCacheEnabled) "Включён" else "Выключен",
+            value = diskCacheEnabled,
+            onValueChange = { enabled ->
+                Settings.image_cache_disk_enabled.setValue(enabled)
+                CoilImageLoaderFactory.recreate(context)
+                SnackBar.success(if (enabled) "Дисковый кэш включен" else "Дисковый кэш выключен")
+            }
+        )
+        SettingsDivider()
 
-    IntSliderSetting(
-        text = "Лимит кэша картинок",
-        value = CoilImageLoaderFactory.normalizedDiskCacheSizeMb(diskCacheSizeMb),
-        min = CoilImageLoaderFactory.MIN_DISK_CACHE_SIZE_MB,
-        max = CoilImageLoaderFactory.MAX_DISK_CACHE_SIZE_MB,
-        step = 50,
-        suffix = " MB",
-        icon = R.drawable.hard_drive_2_24,
-        enabled = diskCacheEnabled,
-        onValueChangeFinished = { value ->
-            Settings.image_cache_disk_size_mb.setValue(value)
-            CoilImageLoaderFactory.recreate(context)
-            SnackBar.success("Размер кэша картинок: $value MB")
-        }
-    )
-    SettingsDivider()
+        IntSliderSetting(
+            text = "Лимит кэша картинок",
+            value = CoilImageLoaderFactory.normalizedDiskCacheSizeMb(diskCacheSizeMb),
+            min = CoilImageLoaderFactory.MIN_DISK_CACHE_SIZE_MB,
+            max = CoilImageLoaderFactory.MAX_DISK_CACHE_SIZE_MB,
+            step = 50,
+            suffix = " MB",
+            icon = R.drawable.hard_drive_2_24,
+            enabled = diskCacheEnabled,
+            onValueChangeFinished = { value ->
+                Settings.image_cache_disk_size_mb.setValue(value)
+                CoilImageLoaderFactory.recreate(context)
+                SnackBar.success("Размер кэша картинок: $value MB")
+            }
+        )
+        SettingsDivider()
 
-    SettingsValueRow(
-        icon = R.drawable.icon_luscious,
-        text = "Кэш картинок на диске",
-        value = formatBytes(imageCacheSizeBytes)
-    )
-    SettingsDivider()
+        SettingsValueRow(
+            icon = R.drawable.icon_luscious,
+            text = "Кэш картинок на диске",
+            value = formatBytes(imageCacheSizeBytes)
+        )
+        SettingsDivider()
 
-    SettingsButtonRowWithDialog(
-        icon = R.drawable.icon_luscious,
-        text = "Очистить кэш картинок",
-        value = "Очистить",
-        textDialogTitle = "Очистить кэш картинок",
-        textDialogBody = "Размер на диске: ${formatBytes(imageCacheSizeBytes)}",
-        textDialogButton = "Очистить",
-        onClick = onClearImageCache
-    )
+        SettingsButtonRowWithDialog(
+            icon = R.drawable.icon_luscious,
+            text = "Очистить кэш картинок",
+            value = "Очистить",
+            textDialogTitle = "Очистить кэш картинок",
+            textDialogBody = "Размер на диске: ${formatBytes(imageCacheSizeBytes)}",
+            textDialogButton = "Очистить",
+            onClick = onClearImageCache
+        )
+    }
 }
 
 @Composable
 private fun LSettingsSection(lLogin: String) {
-    SettingsButtonRowWithDialog(
-        icon = R.drawable.icon_luscious,
-        text = "Профиль L",
-        value = if (lLogin.isBlank()) "Нет" else "Выйти",
-        textDialogTitle = "Выйти из профиля L",
-        textDialogBody = if (lLogin.isBlank()) {
-            "Вы не авторизованы в L."
-        } else {
-            "При следующем открытии L нужно будет снова ввести логин и пароль: $lLogin"
-        },
-        textDialogButton = "Выйти",
-        onClick = {
-            Settings.l_login.setValue("")
-            Settings.l_pass.setValue("")
-            SnackBar.success("Профиль L закрыт")
-        }
-    )
-    SettingsDivider()
-
-    val thumbnailSize = Settings.thumbalistSize.field.collectAsStateWithLifecycle().value
-    val currentDisplayName = ThumbnailsSize.fromValue(thumbnailSize)?.displayName ?: "?"
-    SettingsValueRow(
-        icon = R.drawable.icon_luscious,
-        text = "Размер миниатюры",
-        value = currentDisplayName
-    )
-    ThumbnailSizeSelector(
-        currentValue = currentDisplayName,
-        onSelected = { selectedDisplayName ->
-            ThumbnailsSize.fromDisplayName(selectedDisplayName)?.apply {
-                Settings.thumbalistSize.setValue(value)
-                SnackBar.success("Размер миниатюры: $displayName")
+    SettingsGroup {
+        SettingsButtonRowWithDialog(
+            icon = R.drawable.icon_luscious,
+            text = "Профиль L",
+            value = if (lLogin.isBlank()) "Нет" else "Выйти",
+            textDialogTitle = "Выйти из профиля L",
+            textDialogBody = if (lLogin.isBlank()) {
+                "Вы не авторизованы в L."
+            } else {
+                "При следующем открытии L нужно будет снова ввести логин и пароль: $lLogin"
+            },
+            textDialogButton = "Выйти",
+            onClick = {
+                Settings.l_login.setValue("")
+                Settings.l_pass.setValue("")
+                SnackBar.success("Профиль L закрыт")
             }
-        }
-    )
-    SettingsDivider()
+        )
+        SettingsDivider()
 
-    Config_G_0_4("L Gifs", Settings.l_gifsTab_G_0_4)
-    Config_G_0_4("L Likes", Settings.l_likesTab_G_0_4)
-    Config_G_0_4("L Collection", Settings.l_collectionTab_G_0_4)
+        val thumbnailSize = Settings.thumbalistSize.field.collectAsStateWithLifecycle().value
+        val currentDisplayName = ThumbnailsSize.fromValue(thumbnailSize)?.displayName ?: "?"
+        SettingsValueRow(
+            icon = R.drawable.icon_luscious,
+            text = "Размер миниатюры",
+            value = currentDisplayName
+        )
+        ThumbnailSizeSelector(
+            currentValue = currentDisplayName,
+            onSelected = { selectedDisplayName ->
+                ThumbnailsSize.fromDisplayName(selectedDisplayName)?.apply {
+                    Settings.thumbalistSize.setValue(value)
+                    SnackBar.success("Размер миниатюры: $displayName")
+                }
+            }
+        )
+        SettingsDivider()
+
+        Config_G_0_4("L Gifs", Settings.l_gifsTab_G_0_4)
+        Config_G_0_4("L Likes", Settings.l_likesTab_G_0_4)
+        Config_G_0_4("L Collection", Settings.l_collectionTab_G_0_4)
+    }
 }
 
 @Composable
@@ -517,85 +564,94 @@ private fun RSettingsSection(
     nichesCacheSize: Int,
     nichesCacheLastModifiedHour: Long
 ) {
-    SettingsValueRow(
-        icon = R.drawable.icon_red,
-        text = "Размер всех папок Red",
-        value = sizeRedTotal.toPrettyCount3()
-    )
-    SettingsDivider()
+    SettingsGroup {
+        SettingsValueRow(
+            icon = R.drawable.icon_red,
+            text = "Размер всех папок Red",
+            value = sizeRedTotal.toPrettyCount3()
+        )
+        SettingsDivider()
 
-    SettingsValueRow(
-        icon = R.drawable.icon_red,
-        text = "Размер папки Download",
-        value = sizeRedDownload.toPrettyCount3()
-    )
-    SettingsDivider()
+        SettingsValueRow(
+            icon = R.drawable.icon_red,
+            text = "Размер папки Download",
+            value = sizeRedDownload.toPrettyCount3()
+        )
+        SettingsDivider()
 
-    SettingsButtonRowWithDialog(
-        icon = R.drawable.icon_red,
-        text = "Очистить папку Download",
-        value = "Очистить",
-        textDialogTitle = "Очистка папки Download",
-        textDialogBody = "Подтвердить очистку: ${sizeRedDownload.toPrettyCount3()}",
-        textDialogButton = "Очистить",
-        onClick = onClearDownload
-    )
-    SettingsDivider()
+        SettingsButtonRowWithDialog(
+            icon = R.drawable.icon_red,
+            text = "Очистить папку Download",
+            value = "Очистить",
+            textDialogTitle = "Очистка папки Download",
+            textDialogBody = "Подтвердить очистку: ${sizeRedDownload.toPrettyCount3()}",
+            textDialogButton = "Очистить",
+            onClick = onClearDownload
+        )
+        SettingsDivider()
 
-    SettingsValueRow(
-        icon = R.drawable.icon_red,
-        text = "Кэш Niches",
-        value = "$nichesCacheSize \u2022 ${nichesCacheLastModifiedHour}h"
-    )
+        SettingsValueRow(
+            icon = R.drawable.icon_red,
+            text = "Кэш Niches",
+            value = "$nichesCacheSize \u2022 ${nichesCacheLastModifiedHour}h"
+        )
 
-    if (isNichesCacheDownloading) {
-        LinearProgressIndicator(
-            progress = { nichesCacheProgress },
-            modifier = Modifier
-                .padding(horizontal = 16.dp)
-                .fillMaxWidth(),
-            color = WhatsAppGreen,
-            trackColor = Color(0xFF1E3B32),
-            strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
+        if (isNichesCacheDownloading) {
+            LinearProgressIndicator(
+                progress = { nichesCacheProgress },
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .fillMaxWidth(),
+                color = WhatsAppGreen,
+                trackColor = Color(0xFF1E3B32),
+                strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
+            )
+        }
+        SettingsDivider()
+
+        SettingsListItem(
+            icon = R.drawable.icon_red,
+            text = "Обновить кэш Niches",
+            subtitle = if (isNichesCacheDownloading) "Идёт обновление" else "Данные для поиска и фильтров R",
+            trailing = {
+                Button(
+                    enabled = savedRed != null && !isNichesCacheDownloading,
+                    onClick = { savedRed?.nichesCache?.refresh() }
+                ) {
+                    Text("Обновить")
+                }
+            }
         )
     }
-    SettingsDivider()
-
-    SettingsListItem(
-        icon = R.drawable.icon_red,
-        text = "Обновить кэш Niches",
-        subtitle = if (isNichesCacheDownloading) "Идёт обновление" else "Данные для поиска и фильтров R",
-        trailing = {
-            Button(
-                enabled = savedRed != null && !isNichesCacheDownloading,
-                onClick = { savedRed?.nichesCache?.refresh() }
-            ) {
-                Text("Обновить")
-            }
-        }
-    )
 }
 
 @Composable
 private fun XSettingsSection() {
     val xvideosRow2 = Settings.xvideos_row2.field.collectAsStateWithLifecycle().value
-    SettingsSwitchRow(
-        icon = R.drawable.icon_xvideos_white,
-        text = "2 столбика",
-        subtitle = if (xvideosRow2) "Включено" else "Выключено",
-        value = xvideosRow2,
-        onValueChange = { Settings.xvideos_row2.setValue(it) }
-    )
-    SettingsDivider()
+    SettingsGroup {
+        SettingsSwitchRow(
+            icon = R.drawable.icon_xvideos_white,
+            text = "2 столбика",
+            subtitle = if (xvideosRow2) "Включено" else "Выключено",
+            value = xvideosRow2,
+            onValueChange = { Settings.xvideos_row2.setValue(it) }
+        )
+        SettingsDivider()
 
-    val xvideosShemale = Settings.xvideos_shemale.field.collectAsStateWithLifecycle().value
-    SettingsSwitchRow(
-        icon = R.drawable.icon_xvideos_white,
-        text = "Shemale",
-        subtitle = if (xvideosShemale) "Включено" else "Выключено",
-        value = xvideosShemale,
-        onValueChange = { Settings.xvideos_shemale.setValue(it) }
-    )
+        val xvideosShemale = Settings.xvideos_shemale.field.collectAsStateWithLifecycle().value
+        SettingsSwitchRow(
+            icon = R.drawable.icon_xvideos_white,
+            text = "Shemale",
+            subtitle = if (xvideosShemale) "Включено" else "Выключено",
+            value = xvideosShemale,
+            onValueChange = { Settings.xvideos_shemale.setValue(it) }
+        )
+    }
+}
+
+private enum class BackupFlowScreen(val title: String) {
+    CREATE("Создать"),
+    RESTORE("Восстановить")
 }
 
 @Composable
@@ -604,6 +660,7 @@ private fun BackupSettingsSection(
     onDataChanged: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
+    var screen by rememberSaveable { mutableStateOf(BackupFlowScreen.CREATE) }
     var isWorking by rememberSaveable { mutableStateOf(false) }
     var backupItems by remember { mutableStateOf<List<XlrBackupItem>>(emptyList()) }
     var selectedBackupPaths by remember { mutableStateOf<Set<String>>(emptySet()) }
@@ -636,6 +693,7 @@ private fun BackupSettingsSection(
             XlrBackupManager.createBackup(context, uri, selectedBackupPaths)
                 .onSuccess { report ->
                     SnackBar.success("Backup создан: ${report.files} файлов, ${formatBytes(report.bytes)}")
+                    refreshBackupItems()
                 }
                 .onFailure { error ->
                     SnackBar.error(error.message ?: "Ошибка создания backup")
@@ -670,111 +728,192 @@ private fun BackupSettingsSection(
     val backupReport = XlrBackupManager.reportForSelection(backupItems, selectedBackupPaths)
     val restoreReport = XlrBackupManager.reportForSelection(restoreItems, selectedRestorePaths)
 
-    SettingsValueRow(
-        icon = R.drawable.hard_drive_2_24,
-        text = "Состав backup",
-        value = "Можно выбрать X, L, R целиком или отдельные папки. DB не входит, временные папки можно снять галочкой."
-    )
-    SettingsDivider()
-
-    SettingsSectionTitle("Создание")
-    BackupSelectionActions(
-        enabled = !isWorking,
-        onSelectAll = { selectedBackupPaths = initialSectionSelection(backupItems) },
-        onSelectNone = { selectedBackupPaths = emptySet() }
-    )
-    BackupFolderList(
-        items = backupItems,
-        selectedPaths = selectedBackupPaths,
-        enabled = !isWorking,
-        onToggle = { path -> selectedBackupPaths = toggleBackupPath(backupItems, selectedBackupPaths, path) }
-    )
-    SettingsDivider()
-
-    SettingsListItem(
-        icon = R.drawable.hard_drive_2_24,
-        text = "Создать backup",
-        subtitle = if (isWorking) "Идет операция" else selectionSummaryText(backupReport),
-        trailing = {
-            Button(
-                enabled = !isWorking && selectedBackupPaths.isNotEmpty(),
-                onClick = { createBackupLauncher.launch(XlrBackupManager.defaultFileName()) }
-            ) {
-                Text("Создать")
+    SettingsGroup {
+        SettingsValueRow(
+            icon = R.drawable.hard_drive_2_24,
+            text = "Backup X/L/R",
+            value = if (screen == BackupFlowScreen.CREATE) {
+                "Создание архива выбранных папок. DB, настройки и кеши не входят в ZIP."
+            } else {
+                "Восстановление заменяет только выбранные папки из ZIP. Остальные данные не трогаются."
             }
-        }
-    )
-    SettingsDivider()
+        )
+        BackupModeSelector(
+            selected = screen,
+            enabled = !isWorking,
+            onSelected = { screen = it }
+        )
+        SettingsDivider()
 
-    SettingsSectionTitle("Восстановление")
-    SettingsListItem(
-        icon = R.drawable.hard_drive_2_24,
-        text = "Открыть backup",
-        subtitle = restoreUri?.lastPathSegment ?: "ZIP не выбран",
-        trailing = {
-            Button(
-                enabled = !isWorking,
-                onClick = {
-                    restoreBackupLauncher.launch(
-                        arrayOf("application/zip", "application/octet-stream", "application/x-zip-compressed")
+        when (screen) {
+            BackupFlowScreen.CREATE -> {
+                SettingsValueRow(
+                    icon = R.drawable.hard_drive_2_24,
+                    text = "Выбрано для архива",
+                    value = if (isWorking) "Идет операция" else selectionSummaryText(backupReport)
+                )
+                BackupSelectionActions(
+                    enabled = !isWorking,
+                    onSelectAll = { selectedBackupPaths = initialSectionSelection(backupItems) },
+                    onSelectNone = { selectedBackupPaths = emptySet() }
+                )
+                BackupFolderList(
+                    items = backupItems,
+                    selectedPaths = selectedBackupPaths,
+                    enabled = !isWorking,
+                    onToggle = { path -> selectedBackupPaths = toggleBackupPath(backupItems, selectedBackupPaths, path) }
+                )
+                SettingsDivider()
+                SettingsListItem(
+                    icon = R.drawable.hard_drive_2_24,
+                    text = "Создать ZIP",
+                    subtitle = selectionSummaryText(backupReport),
+                    trailing = {
+                        Button(
+                            enabled = !isWorking && selectedBackupPaths.isNotEmpty(),
+                            onClick = { createBackupLauncher.launch(XlrBackupManager.defaultFileName()) },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = SettingsAccentBlue,
+                                contentColor = Color.Black
+                            )
+                        ) {
+                            Text("Создать")
+                        }
+                    }
+                )
+            }
+
+            BackupFlowScreen.RESTORE -> {
+                SettingsListItem(
+                    icon = R.drawable.hard_drive_2_24,
+                    text = "Открыть ZIP",
+                    subtitle = restoreUri?.lastPathSegment ?: "Сначала выберите архив",
+                    trailing = {
+                        Button(
+                            enabled = !isWorking,
+                            onClick = {
+                                restoreBackupLauncher.launch(
+                                    arrayOf("application/zip", "application/octet-stream", "application/x-zip-compressed")
+                                )
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = SettingsAccentBlue,
+                                contentColor = Color.Black
+                            )
+                        ) {
+                            Text("Выбрать")
+                        }
+                    }
+                )
+
+                if (restoreItems.isEmpty()) {
+                    SettingsDivider()
+                    SettingsValueRow(
+                        icon = R.drawable.hard_drive_2_24,
+                        text = "Что восстановить",
+                        value = "Выберите ZIP-файл, после этого появятся папки X, L и R из архива."
+                    )
+                } else {
+                    SettingsDivider()
+                    SettingsValueRow(
+                        icon = R.drawable.hard_drive_2_24,
+                        text = "Выбрано для восстановления",
+                        value = if (isWorking) "Идет операция" else selectionSummaryText(restoreReport)
+                    )
+                    BackupSelectionActions(
+                        enabled = !isWorking,
+                        onSelectAll = { selectedRestorePaths = initialSectionSelection(restoreItems) },
+                        onSelectNone = { selectedRestorePaths = emptySet() }
+                    )
+                    BackupFolderList(
+                        items = restoreItems,
+                        selectedPaths = selectedRestorePaths,
+                        enabled = !isWorking,
+                        onToggle = { path ->
+                            selectedRestorePaths = toggleBackupPath(restoreItems, selectedRestorePaths, path)
+                        }
+                    )
+                    SettingsDivider()
+                    SettingsButtonRowWithDialog(
+                        icon = R.drawable.hard_drive_2_24,
+                        text = "Восстановить выбранное",
+                        value = if (isWorking) "Идет..." else "Восстановить",
+                        textDialogTitle = "Восстановить backup",
+                        textDialogBody = "Выбранные папки будут заменены данными из ZIP: ${selectionSummaryText(restoreReport)}. DB, настройки и кеши не трогаются.",
+                        textDialogButton = "Восстановить",
+                        onClick = {
+                            val uri = restoreUri
+                            if (uri == null) {
+                                SnackBar.error("Сначала выберите ZIP")
+                                return@SettingsButtonRowWithDialog
+                            }
+                            if (selectedRestorePaths.isEmpty()) {
+                                SnackBar.error("Выберите хотя бы одну папку")
+                                return@SettingsButtonRowWithDialog
+                            }
+                            if (!isWorking) {
+                                scope.launch {
+                                    isWorking = true
+                                    XlrBackupManager.restoreBackup(context, uri, selectedRestorePaths)
+                                        .onSuccess { report ->
+                                            refreshBackupItems()
+                                            onDataChanged()
+                                            SnackBar.success("Backup восстановлен: ${report.files} файлов. Перезапустите приложение.")
+                                        }
+                                        .onFailure { error ->
+                                            SnackBar.error(error.message ?: "Ошибка восстановления backup")
+                                        }
+                                    isWorking = false
+                                }
+                            }
+                        }
                     )
                 }
-            ) {
-                Text("Выбрать")
             }
         }
-    )
-
-    if (restoreItems.isNotEmpty()) {
-        SettingsDivider()
-        BackupSelectionActions(
-            enabled = !isWorking,
-            onSelectAll = { selectedRestorePaths = initialSectionSelection(restoreItems) },
-            onSelectNone = { selectedRestorePaths = emptySet() }
-        )
-        BackupFolderList(
-            items = restoreItems,
-            selectedPaths = selectedRestorePaths,
-            enabled = !isWorking,
-            onToggle = { path -> selectedRestorePaths = toggleBackupPath(restoreItems, selectedRestorePaths, path) }
-        )
-        SettingsDivider()
     }
+}
 
-    SettingsButtonRowWithDialog(
-        icon = R.drawable.hard_drive_2_24,
-        text = "Восстановить выбранное",
-        value = if (isWorking) "Идет..." else "Восстановить",
-        textDialogTitle = "Восстановить backup",
-        textDialogBody = "Выбранные папки будут заменены данными из ZIP: ${selectionSummaryText(restoreReport)}. DB, настройки и кеши не трогаются.",
-        textDialogButton = "Восстановить",
-        onClick = {
-            val uri = restoreUri
-            if (uri == null) {
-                SnackBar.error("Сначала выберите ZIP")
-                return@SettingsButtonRowWithDialog
-            }
-            if (selectedRestorePaths.isEmpty()) {
-                SnackBar.error("Выберите хотя бы одну папку")
-                return@SettingsButtonRowWithDialog
-            }
-            if (!isWorking) {
-                scope.launch {
-                    isWorking = true
-                    XlrBackupManager.restoreBackup(context, uri, selectedRestorePaths)
-                        .onSuccess { report ->
-                            refreshBackupItems()
-                            onDataChanged()
-                            SnackBar.success("Backup восстановлен: ${report.files} файлов. Перезапустите приложение.")
-                        }
-                        .onFailure { error ->
-                            SnackBar.error(error.message ?: "Ошибка восстановления backup")
-                        }
-                    isWorking = false
+@Composable
+private fun BackupModeSelector(
+    selected: BackupFlowScreen,
+    enabled: Boolean,
+    onSelected: (BackupFlowScreen) -> Unit
+) {
+    SingleChoiceSegmentedButtonRow(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(56.dp)
+            .padding(horizontal = 16.dp, vertical = 6.dp)
+    ) {
+        BackupFlowScreen.entries.forEachIndexed { index, item ->
+            SegmentedButton(
+                enabled = enabled,
+                selected = selected == item,
+                onClick = { onSelected(item) },
+                shape = SegmentedButtonDefaults.itemShape(
+                    index = index,
+                    count = BackupFlowScreen.entries.size,
+                    baseShape = RoundedCornerShape(8.dp)
+                ),
+                colors = SegmentedButtonDefaults.colors(
+                    activeContainerColor = SettingsAccentBlue,
+                    activeContentColor = Color.Black,
+                    activeBorderColor = SettingsAccentBlue,
+                    inactiveContainerColor = SettingsCardColor,
+                    inactiveContentColor = ThemeL.textColor,
+                    inactiveBorderColor = ThemeL.grey3
+                ),
+                label = {
+                    Text(
+                        text = item.title,
+                        color = if (selected == item) Color.Black else SettingsRowTextPrimary,
+                        style = ThemeL.Type.button
+                    )
                 }
-            }
+            )
         }
-    )
+    }
 }
 
 @Composable
@@ -800,7 +939,7 @@ private fun BackupSelectionActions(
             enabled = enabled,
             onClick = onSelectNone
         ) {
-            Text("Снять", color = WhatsAppGreen)
+            Text("Снять", color = SettingsAccentBlue)
         }
     }
 }
@@ -821,21 +960,98 @@ private fun BackupFolderList(
         return
     }
 
-    items.forEachIndexed { index, item ->
-        if (index > 0) SettingsDivider()
-        SettingsListItem(
-            icon = backupItemIcon(item.section),
-            text = backupItemTitle(item),
-            subtitle = "${item.path} • ${item.files} файлов • ${formatBytes(item.bytes)}",
-            trailing = {
-                Checkbox(
-                    checked = isBackupPathChecked(items, selectedPaths, item),
+    var expandedSections by rememberSaveable { mutableStateOf(emptyList<String>()) }
+
+    items
+        .filter { it.parentPath == null }
+        .forEachIndexed { index, section ->
+            val children = items.filter { it.parentPath == section.path }
+            if (index > 0) SettingsDivider()
+            BackupSectionGroup(
+                section = section,
+                children = children,
+                items = items,
+                selectedPaths = selectedPaths,
+                expanded = section.path in expandedSections,
+                enabled = enabled,
+                onToggleExpanded = {
+                    expandedSections = if (section.path in expandedSections) {
+                        expandedSections - section.path
+                    } else {
+                        expandedSections + section.path
+                    }
+                },
+                onToggle = onToggle
+            )
+        }
+}
+
+@Composable
+private fun BackupSectionGroup(
+    section: XlrBackupItem,
+    children: List<XlrBackupItem>,
+    items: List<XlrBackupItem>,
+    selectedPaths: Set<String>,
+    expanded: Boolean,
+    enabled: Boolean,
+    onToggleExpanded: () -> Unit,
+    onToggle: (String) -> Unit
+) {
+    val state = backupSectionToggleState(items, selectedPaths, section)
+
+    SettingsListItem(
+        icon = backupItemIcon(section.section),
+        text = section.title,
+        subtitle = "${section.files} файлов • ${formatBytes(section.bytes)}",
+        trailing = {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                TriStateCheckbox(
+                    state = state,
                     enabled = enabled,
-                    onCheckedChange = { onToggle(item.path) }
+                    onClick = { onToggle(section.path) }
                 )
-            },
-            onClick = { if (enabled) onToggle(item.path) }
-        )
+                TextButton(
+                    enabled = enabled,
+                    onClick = onToggleExpanded
+                ) {
+                    Text(if (expanded) "Свернуть" else "Развернуть", color = SettingsAccentBlue)
+                }
+            }
+        },
+        onClick = { if (enabled) onToggleExpanded() }
+    )
+
+    AnimatedVisibility(
+        visible = expanded,
+        enter = expandVertically(expandFrom = Alignment.Top),
+        exit = shrinkVertically(shrinkTowards = Alignment.Top)
+    ) {
+        Column {
+            if (children.isEmpty()) {
+                SettingsValueRow(
+                    icon = backupItemIcon(section.section),
+                    text = section.title,
+                    value = "Нет вложенных папок"
+                )
+            } else {
+                children.forEach { child ->
+                    SettingsDivider()
+                    SettingsListItem(
+                        icon = backupItemIcon(child.section),
+                        text = backupItemTitle(child),
+                        subtitle = "${child.path} • ${child.files} файлов • ${formatBytes(child.bytes)}",
+                        trailing = {
+                            Checkbox(
+                                checked = isBackupPathChecked(items, selectedPaths, child),
+                                enabled = enabled,
+                                onCheckedChange = { onToggle(child.path) }
+                            )
+                        },
+                        onClick = { if (enabled) onToggle(child.path) }
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -897,6 +1113,22 @@ private fun isBackupPathChecked(
     return false
 }
 
+private fun backupSectionToggleState(
+    items: List<XlrBackupItem>,
+    selectedPaths: Set<String>,
+    section: XlrBackupItem
+): ToggleableState {
+    if (section.path in selectedPaths) return ToggleableState.On
+    val children = items.filter { it.parentPath == section.path }
+    if (children.isEmpty()) return ToggleableState.Off
+    val selectedChildren = children.count { it.path in selectedPaths }
+    return when {
+        selectedChildren == 0 -> ToggleableState.Off
+        selectedChildren == children.size -> ToggleableState.On
+        else -> ToggleableState.Indeterminate
+    }
+}
+
 private fun selectionSummaryText(report: XlrBackupReport): String {
     return "${report.files} файлов • ${formatBytes(report.bytes)}"
 }
@@ -928,15 +1160,18 @@ private fun AppSettingsScreenPreview() {
                 modifier = Modifier
                     .height(52.dp)
                     .fillMaxWidth()
-                    .background(ThemeL.greyBackground),
+                    .background(SettingsTopBarColor),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Spacer(Modifier.width(48.dp))
                 Text(
                     "Настройки",
                     modifier = Modifier.weight(1f),
-                    color = ThemeL.textColor,
-                    style = ThemeL.Type.screenTitle.copy(textAlign = TextAlign.Center)
+                    color = SettingsRowTextPrimary,
+                    style = ThemeL.Type.rowTitle.copy(
+                        color = SettingsRowTextPrimary,
+                        textAlign = TextAlign.Center
+                    )
                 )
                 Spacer(Modifier.width(48.dp))
             }

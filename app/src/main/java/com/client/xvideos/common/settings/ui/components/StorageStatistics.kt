@@ -47,19 +47,22 @@ internal val EmptyStorageStats = listOf(
 @Composable
 internal fun StorageStatisticsSection(stats: List<StorageStat>) {
     val totalBytes = stats.sumOf { it.sizeBytes }
-    SettingsValueRow(
-        icon = R.drawable.icon_red,
-        text = "Всего данных",
-        value = formatBytes(totalBytes)
-    )
+    SettingsGroup {
+        SettingsValueRow(
+            icon = R.drawable.icon_red,
+            text = "Всего данных",
+            value = formatBytes(totalBytes)
+        )
 
-    stats.forEach { stat ->
-        val progress = if (totalBytes > 0L) {
-            (stat.sizeBytes.toFloat() / totalBytes.toFloat()).coerceIn(0f, 1f)
-        } else {
-            0f
+        stats.forEach { stat ->
+            SettingsDivider()
+            val progress = if (totalBytes > 0L) {
+                (stat.sizeBytes.toFloat() / totalBytes.toFloat()).coerceIn(0f, 1f)
+            } else {
+                0f
+            }
+            StorageProgressRow(stat = stat, progress = progress)
         }
-        StorageProgressRow(stat = stat, progress = progress)
     }
 }
 
@@ -80,7 +83,8 @@ internal fun StorageProgressRow(stat: StorageStat, progress: Float) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 10.dp),
+            .background(SettingsCardColor)
+            .padding(horizontal = 12.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         SettingsIcon(storageIcon(stat.key))
@@ -93,8 +97,8 @@ internal fun StorageProgressRow(stat: StorageStat, progress: Float) {
             ) {
                 Text(
                     text = stat.title,
-                    color = ThemeL.textColor,
-                    style = ThemeL.Type.rowTitle
+                    color = SettingsRowTextPrimary,
+                    style = ThemeL.Type.rowTitle.copy(color = SettingsRowTextPrimary)
                 )
                 Text(
                     text = formatBytes(stat.sizeBytes),
