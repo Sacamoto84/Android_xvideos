@@ -27,7 +27,6 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
-import com.client.xvideos.common.collectionDB.ui.DaialogNewCollection
 import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.l.featured.saved.SavedL
 import com.client.xvideos.screenRoot.LocalRootScreenModel
@@ -86,25 +85,6 @@ class L_ScreenExplorer : Screen {
                 onBack = { navigator.pop() }
             )
             return
-        }
-
-        // Диалог создания новой коллекции (общий для всех L-экранов)
-        if (savedL.collection.visibleDialogCreateNew) {
-            DaialogNewCollection(
-                visible = savedL.collection.visibleDialogCreateNew,
-                onDismiss = { savedL.collection.visibleDialogCreateNew = false },
-                onBlockConfirmed = { collection ->
-                    if (collection.isNotEmpty()) {
-                        savedL.collection.createCollection(collection)
-                        savedL.collection.visibleDialogCreateNew = false
-                    }
-                }
-            )
-        }
-
-        // Диалог добавления элемента в коллекцию
-        if (savedL.collection.visibleDialog) {
-            L_DialogCollection(savedL = savedL)
         }
 
         val percentDownload = savedL.likes.percentDownload.collectAsStateWithLifecycle().value

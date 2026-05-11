@@ -36,7 +36,7 @@ object AppPath {
     val file_db: String = "${main}/DB"
 
     //--- X ---
-    val x_favorites : String = "${main}/${Folder.X.value}/Saved/Favorites"
+    val x_favorites : String = "${main}/${Folder.X.value}/Favorites"
 
     //--- R ---
     /**
@@ -56,7 +56,7 @@ object AppPath {
     val r_subscriptions: String = "${main}/${Folder.RED.value}/Subscriptions"
 
     //--- L ---
-    val l_likes: String = "${main}/${Folder.L.value}/Downloaded/Likes"
+    val l_likes: String = "${main}/${Folder.L.value}/Likes"
     lateinit var l_cacheDownload: String
         private set
     val l_albums: String = "${main}/${Folder.L.value}/Album"

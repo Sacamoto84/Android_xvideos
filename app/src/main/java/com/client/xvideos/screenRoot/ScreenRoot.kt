@@ -43,7 +43,9 @@ import com.client.xvideos.common.eventBus.Event
 import com.client.xvideos.common.eventBus.EventBus
 import com.client.xvideos.common.snackbar.show
 import com.client.xvideos.common.traficStatistic.AppNetworkSpeedMonitorLite
+import com.client.xvideos.l.featured.saved.SavedL
 import com.client.xvideos.l.theme.ThemeL
+import com.client.xvideos.l.ui.screens.explorer.LCollectionDialogs
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -127,6 +129,8 @@ object ScreenRoot : Screen {
                     nav.lastItem.Content()
                 }
 
+                LCollectionDialogs(vm.savedL)
+
                 vm.overlayContent.value?.let { content ->
                     Box(modifier = Modifier.fillMaxSize()) {
                         content()
@@ -200,7 +204,8 @@ private fun HomeFloatingActionButton(mainNavigator: Navigator?) {
  * отдельный route в навигации.
  */
 class ScreenRootSM @Inject constructor(
-    val depthState: NavigationDepthState
+    val depthState: NavigationDepthState,
+    val savedL: SavedL
 ) : ScreenModel {
     private val _overlayContent = mutableStateOf<(@Composable () -> Unit)?>(null)
     val overlayContent: State<(@Composable () -> Unit)?> = _overlayContent

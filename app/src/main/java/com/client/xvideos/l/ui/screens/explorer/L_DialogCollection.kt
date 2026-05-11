@@ -33,10 +33,30 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.client.xvideos.common.collectionDB.ui.DaialogNewCollection
 import com.client.xvideos.common.coil.UrlImage
 import com.client.xvideos.l.featured.saved.SavedL
-import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.theme.ThemeL
+
+@Composable
+fun LCollectionDialogs(savedL: SavedL) {
+    if (savedL.collection.visibleDialogCreateNew) {
+        DaialogNewCollection(
+            visible = savedL.collection.visibleDialogCreateNew,
+            onDismiss = { savedL.collection.visibleDialogCreateNew = false },
+            onBlockConfirmed = { collection ->
+                if (collection.isNotEmpty()) {
+                    savedL.collection.createCollection(collection)
+                    savedL.collection.visibleDialogCreateNew = false
+                }
+            }
+        )
+    }
+
+    if (savedL.collection.visibleDialog) {
+        L_DialogCollection(savedL = savedL)
+    }
+}
 
 /**
  * Диалог «Добавить в коллекцию» для L-раздела.
