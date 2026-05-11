@@ -155,7 +155,7 @@ internal fun loadStorageStats(): List<StorageStat> {
     return listOf(
         "X" to File(AppPath.main, "X"),
         "L" to File(AppPath.main, "L"),
-        "R" to File(AppPath.main, "Red")
+        "R" to File(AppPath.main, "R")
     ).map { (key, folder) ->
         val snapshot = folder.collectSnapshot()
         StorageStat(

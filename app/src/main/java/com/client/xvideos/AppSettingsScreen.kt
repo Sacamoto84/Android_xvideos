@@ -155,7 +155,7 @@ object AppSettingsScreen : Screen {
         }
 
         suspend fun refreshRedSizes() {
-            sizeRedTotal = withContext(Dispatchers.IO) { getFolderSize(File(AppPath.main)) }
+            sizeRedTotal = withContext(Dispatchers.IO) { getFolderSize(File(AppPath.main, "R")) }
             sizeRedDownload = withContext(Dispatchers.IO) { getFolderSize(File(AppPath.r_cache_download)) }
         }
 
@@ -163,6 +163,13 @@ object AppSettingsScreen : Screen {
             refreshImageCacheSize()
             refreshStorageStats()
             refreshRedSizes()
+        }
+
+        val refreshFileStats: () -> Unit = {
+            scope.launch {
+                refreshStorageStats()
+                refreshRedSizes()
+            }
         }
 
         AppSettingsScreenContent(
@@ -187,12 +194,8 @@ object AppSettingsScreen : Screen {
             },
             savedRed = vm.savedRed,
             context = context,
-            onBackupDataChanged = {
-                scope.launch {
-                    refreshStorageStats()
-                    refreshRedSizes()
-                }
-            }
+            onBackupDataChanged = refreshFileStats,
+            onRefreshFileStats = refreshFileStats
         )
     }
 }
@@ -208,7 +211,8 @@ private fun AppSettingsScreenContent(
     onClearDownload: () -> Unit,
     savedRed: SavedRed?,
     context: Context,
-    onBackupDataChanged: () -> Unit
+    onBackupDataChanged: () -> Unit,
+    onRefreshFileStats: () -> Unit
 ) {
     var currentPage by rememberSaveable { mutableStateOf(SettingsPage.Main) }
     val closeCurrentPage = {
@@ -221,6 +225,12 @@ private fun AppSettingsScreenContent(
 
     BackHandler(enabled = currentPage != SettingsPage.Main) {
         currentPage = SettingsPage.Main
+    }
+
+    LaunchedEffect(currentPage) {
+        if (currentPage == SettingsPage.Storage) {
+            onRefreshFileStats()
+        }
     }
 
     Scaffold(
@@ -395,7 +405,7 @@ private enum class SettingsPage(
         subtitle = "Отображение и фильтры X"
     ),
     Storage(
-        title = "Хранилище",
+        title = "Статистика",
         icon = R.drawable.hard_drive_2_24,
         subtitle = "Статистика по X, L и R"
     ),
