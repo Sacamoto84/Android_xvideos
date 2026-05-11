@@ -158,7 +158,7 @@ fun UrlImage(
             else {
                 when (albumName) {
                     "l_likes" -> File(AppPath.l_likes, fileName)
-                    else -> File(AppPath.l_downloaded_albums, "$albumName/$fileName")
+                    else -> File(url)
                 }
 
             }

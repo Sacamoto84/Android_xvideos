@@ -8,9 +8,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.lifecycle.ViewModel
 import com.client.xvideos.common.AppPath
 import com.client.xvideos.common.di.ApplicationScope
-import com.client.xvideos.common.kdownloader.KDownloader
 import com.client.xvideos.common.snackbar.SnackBar
-import com.client.xvideos.l.featured.downloader.DownloaderL
 import com.client.xvideos.l.featured.saved.SavedL
 import com.client.xvideos.l.featured.share.useCaseShareFile
 import com.client.xvideos.l.model.PicsDetails
@@ -48,9 +46,6 @@ class ExpandMenuViewModel @Inject constructor(
     val luscious: Luscious,
     val saved: SavedL,
     @ApplicationScope val scope: CoroutineScope,
-    //val repository: Repository
-    val kDownloader: KDownloader,
-    val dowloaderL: DownloaderL,
     @ApplicationContext val context: Context
 ) : ViewModel() {
 

@@ -12,7 +12,6 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
-import com.client.xvideos.common.diagnostics.AppDiagnostics
 import com.client.xvideos.common.snackbar.SnackBar
 import com.client.xvideos.l.model.AlbumListFilter
 import com.client.xvideos.l.model.FacetCollectionInfo
@@ -99,10 +98,6 @@ class ScreenLAlbumListSM @AssistedInject constructor(
 
                 val agr = luscious.getAlbumListAggregations(1, filter.value)
                 if (agr.isFailure) {
-                    AppDiagnostics.recordLNetworkError(
-                        operation = "L album list aggregations",
-                        message = agr.exceptionOrNull()?.message ?: "Aggregation request failed"
-                    )
                     return@launch
                 }
 
@@ -114,11 +109,6 @@ class ScreenLAlbumListSM @AssistedInject constructor(
                 }
             } catch (e: Exception) {
                 Timber.e(e, "Error loading initial data")
-                AppDiagnostics.recordLNetworkError(
-                    operation = "L album list init",
-                    message = e.message ?: "Error loading initial data",
-                    details = e.stackTraceToString()
-                )
             } finally {
                 // _isRefreshing.value = false
             }
@@ -130,15 +120,11 @@ class ScreenLAlbumListSM @AssistedInject constructor(
     fun loadInitialData() {
         screenModelScope.launch {
             //_isRefreshing.value = true
-            try {
-                val a = luscious.getAlbumList(1, filter.value)
-                if (a.isFailure) {
-                    AppDiagnostics.recordLNetworkError(
-                        operation = "L album list page 1",
-                        message = a.exceptionOrNull()?.message ?: "Album list request failed"
-                    )
-                    return@launch
-                }
+                try {
+                    val a = luscious.getAlbumList(1, filter.value)
+                    if (a.isFailure) {
+                        return@launch
+                    }
 
                 withContext(Dispatchers.Main) {
                     val res = a.getOrThrow()
@@ -153,10 +139,6 @@ class ScreenLAlbumListSM @AssistedInject constructor(
 
                 val agr = luscious.getAlbumListAggregations(1, filter.value)
                 if (agr.isFailure) {
-                    AppDiagnostics.recordLNetworkError(
-                        operation = "L album list aggregations",
-                        message = agr.exceptionOrNull()?.message ?: "Aggregation request failed"
-                    )
                     return@launch
                 }
 
@@ -171,11 +153,6 @@ class ScreenLAlbumListSM @AssistedInject constructor(
                 //albumList.value?.getAlbumListAggregations(1)
             } catch (e: Exception) {
                 Timber.e(e, "Error loading initial data")
-                AppDiagnostics.recordLNetworkError(
-                    operation = "L album list initial",
-                    message = e.message ?: "Error loading initial data",
-                    details = e.stackTraceToString()
-                )
                 SnackBar.error(e.message ?: "Error loading initial data")
             } finally {
                 //_isRefreshing.value = false
@@ -214,10 +191,6 @@ class ScreenLAlbumListSM @AssistedInject constructor(
                 bigList.put(  page, AlbumListImplInfoAndListAndStatus(null, StatusAlbumList.DOWNLOADING) )
                 val a = luscious.getAlbumList(page + 1, filter.value)
                 if (a.isFailure) {
-                    AppDiagnostics.recordLNetworkError(
-                        operation = "L album list page ${page + 1}",
-                        message = a.exceptionOrNull()?.message ?: "Album list request failed"
-                    )
                     bigList.put(page, AlbumListImplInfoAndListAndStatus(null, StatusAlbumList.BUSY))
                     return@launch
                 }
@@ -228,11 +201,6 @@ class ScreenLAlbumListSM @AssistedInject constructor(
 
             } catch (e: Exception) {
                 Timber.e(e, "!!! eee Error loading page $page")
-                AppDiagnostics.recordLNetworkError(
-                    operation = "L album list page ${page + 1}",
-                    message = e.message ?: "Error loading page ${page + 1}",
-                    details = e.stackTraceToString()
-                )
                 SnackBar.error(e.message ?: "Error loading page $page")
                 bigList.put(page, AlbumListImplInfoAndListAndStatus(null, StatusAlbumList.BUSY))
             } finally {

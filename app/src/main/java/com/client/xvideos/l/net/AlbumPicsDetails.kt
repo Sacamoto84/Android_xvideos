@@ -5,7 +5,6 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.client.xvideos.common.diagnostics.AppDiagnostics
 import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.model.lBestThumbnailImageUrl
 import com.client.xvideos.l.net.graphQl.GraphQlRequest
@@ -90,12 +89,6 @@ class AlbumPicsDetails(
         if (pageResponse.isSuccess) {
             val pageResult = pageResponse.getOrThrow()
             clearPageIssue(page)
-            AppDiagnostics.recordLAlbumPage(
-                albumId = id,
-                page = page,
-                message = "Loaded album page",
-                details = "items=${pageResult.items.size} totalPages=${pageResult.totalPages}"
-            )
             return Result.success(pageResult)
         }
 
@@ -103,22 +96,10 @@ class AlbumPicsDetails(
         recordPageIssue(page, pageError)
         if (pageError.isHtmlChallengeResponse()) {
             Timber.w(pageError, "!!! AlbumPicsDetails $id page $page HTML challenge response")
-            AppDiagnostics.recordLAlbumPage(
-                albumId = id,
-                page = page,
-                message = "HTML challenge response",
-                details = pageError?.message
-            )
             return Result.failure(pageError ?: IllegalStateException("Server returned HTML instead of JSON"))
         }
 
         Timber.w(pageError, "!!! AlbumPicsDetails $id page $page CACHE_RAM/ROM fallback error")
-        AppDiagnostics.recordLAlbumPage(
-            albumId = id,
-            page = page,
-            message = "CACHE_RAM/ROM fallback error",
-            details = pageError?.message
-        )
         return pageResponse
     }
 
@@ -174,12 +155,6 @@ class AlbumPicsDetails(
 
         val firstPage = loadPage(1).getOrElse {
             Timber.w(it, "!!! AlbumPicsDetails $id page 1 error")
-            AppDiagnostics.recordLAlbumPage(
-                albumId = id,
-                page = 1,
-                message = "First page error",
-                details = it.message
-            )
             recordPageIssue(1, it)
             withContext(Dispatchers.Main) {
                 percentLoad = 1f
@@ -193,12 +168,6 @@ class AlbumPicsDetails(
         for (page in 2..pages) {
             val pageResult = loadPage(page).getOrElse {
                 Timber.w(it, "!!! AlbumPicsDetails $id page $page error")
-                AppDiagnostics.recordLAlbumPage(
-                    albumId = id,
-                    page = page,
-                    message = "Page error",
-                    details = it.message
-                )
                 recordPageIssue(page, it)
                 PageLoadResult(page, pages, emptyList())
             }
@@ -239,12 +208,6 @@ class AlbumPicsDetails(
             pagesToRetry.forEach { page ->
                 val pageResult = loadPage(page).getOrElse {
                     Timber.w(it, "!!! AlbumPicsDetails $id page $page retry error")
-                    AppDiagnostics.recordLAlbumPage(
-                        albumId = id,
-                        page = page,
-                        message = "Retry failed page error",
-                        details = it.message
-                    )
                     recordPageIssue(page, it)
                     delay(PAGE_REQUEST_DELAY_MS)
                     return@forEach

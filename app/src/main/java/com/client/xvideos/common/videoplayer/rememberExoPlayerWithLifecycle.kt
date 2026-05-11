@@ -18,7 +18,6 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
-import com.client.xvideos.common.diagnostics.AppDiagnostics
 import com.client.xvideos.common.videoplayer.host.DrmConfig
 import com.client.xvideos.common.videoplayer.host.MediaPlayerError
 import com.client.xvideos.common.videoplayer.util.VideoQuality
@@ -96,11 +95,6 @@ fun rememberExoPlayerWithLifecycle(
             }
 
         } catch (e: Exception) {
-            AppDiagnostics.recordPlayerError(
-                source = "Media3 prepare",
-                url = url,
-                message = e.message ?: "Failed to load media"
-            )
             error(MediaPlayerError.PlaybackError(e.message ?: "Failed to load media"))
         }
     }

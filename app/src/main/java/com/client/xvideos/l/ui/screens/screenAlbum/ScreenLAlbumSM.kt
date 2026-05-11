@@ -10,10 +10,7 @@ import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
 import com.client.xvideos.common.AppPath
 import com.client.xvideos.common.di.ApplicationScope
-import com.client.xvideos.common.kdownloader.KDownloader
 import com.client.xvideos.common.snackbar.SnackBar
-import com.client.xvideos.l.featured.downloader.DownloaderAlbum
-import com.client.xvideos.l.featured.downloader.DownloaderL
 import com.client.xvideos.l.featured.saved.SavedL
 import com.client.xvideos.l.featured.share.useCaseShareFile
 import com.client.xvideos.l.model.PicsDetails
@@ -47,9 +44,6 @@ class ScreenLAlbumSM @AssistedInject constructor(
     val luscious: Luscious,
     val saved: SavedL,
     @ApplicationScope val scope: CoroutineScope,
-    //val repository: Repository
-    val kDownloader: KDownloader,
-    val dowloaderL: DownloaderL,
     @ApplicationContext val context: Context
 ) : ScreenModel {
 
@@ -60,29 +54,6 @@ class ScreenLAlbumSM @AssistedInject constructor(
 
     val host = LazyRowPictureDetailsHost(idAlbum.toString(), idAlbum.toString())
 
-    val downloader: DownloaderAlbum
-
-    init {
-
-        Timber.i("!!!! ScreenLAlbumSM init")
-
-        //Поиск экземпляра DownloaderAlbum в dowloaderL
-        val f = dowloaderL.listDownloaderAlbum.find { it.albumName == idAlbum.toString() }
-        if (f == null) {
-            dowloaderL.listDownloaderAlbum.add(
-                DownloaderAlbum(
-                    idAlbum.toString(),
-                    kDownloader,
-                    dowloaderL.scope
-                )
-            )
-        }
-        downloader = dowloaderL.listDownloaderAlbum.first { it.albumName == idAlbum.toString() }
-
-
-    }
-
-
     val albumInfo = MutableStateFlow<AlbumInfo?>(
         luscious.getAlbum(idAlbum, requestScope = screenModelScope)
     )
@@ -92,8 +63,6 @@ class ScreenLAlbumSM @AssistedInject constructor(
      */
     var showOnlyAnimated by mutableStateOf(false)
 
-    //val downloader = DownloaderAlbum(idAlbum.toString(), kDownloader)
-
     /**
      * Сохранить альбом
      */
@@ -102,15 +71,6 @@ class ScreenLAlbumSM @AssistedInject constructor(
             if (albumInfo.value != null) {
                 saved.albums.add(albumInfo.value!!.albumInfo.value)
             }
-        }
-    }
-
-    fun saveFullAlbum() {
-        scope.launch {
-            val pic = albumInfo.value?.albumPicsDetails?.pics?.toList()
-                ?.mapNotNull { it.lDownloadUrl() }
-                ?: emptyList()
-            downloader.saveAlbums(pic, albumInfo.value!!.id.toString())
         }
     }
 

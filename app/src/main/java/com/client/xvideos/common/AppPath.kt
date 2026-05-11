@@ -43,20 +43,19 @@ object AppPath {
     val r_offline : String = "${main}/${Folder.RED.value}/Offline"
     val r_block : String = "${main}/${Folder.RED.value}/Block"
 
-    val r_likes : String = "${main}/${Folder.RED.value}/Saved/Likes"
-    val r_collection : String = "${main}/${Folder.RED.value}/Saved/Collection"
-    val r_niches : String = "${main}/${Folder.RED.value}/Saved/Niches"
-    val r_nichesCache : String = "${main}/${Folder.RED.value}/Saved/NichesCache"
-    val r_creators : String = "${main}/${Folder.RED.value}/Saved/Creators"
+    val r_likes : String = "${main}/${Folder.RED.value}/Likes"
+    val r_collection : String = "${main}/${Folder.RED.value}/Collection"
+    val r_niches : String = "${main}/${Folder.RED.value}/Niches"
+    val r_nichesCache : String = "${main}/${Folder.RED.value}/NichesCache"
+    val r_creators : String = "${main}/${Folder.RED.value}/Creators"
 
-    val r_subscriptions: String = "${main}/${Folder.RED.value}/Saved/Subscriptions"
+    val r_subscriptions: String = "${main}/${Folder.RED.value}/Subscriptions"
 
     //--- L ---
-    val l_likes: String = "${main}/${Folder.L.value}/Saved/Downloaded/Likes"
-    val l_cacheDownload: String = "${main}/${Folder.L.value}/Saved/Downloaded/Cache"
-    val l_albums: String = "${main}/${Folder.L.value}/Saved/Album"
-    val l_downloaded_albums: String = "${main}/${Folder.L.value}/Saved/Downloaded/Album"
-    val l_collection: String = "${main}/${Folder.L.value}/Saved/Collection"
+    val l_likes: String = "${main}/${Folder.L.value}/Downloaded/Likes"
+    val l_cacheDownload: String = "${main}/${Folder.L.value}/Downloaded/Cache"
+    val l_albums: String = "${main}/${Folder.L.value}/Album"
+    val l_collection: String = "${main}/${Folder.L.value}/Collection"
     val l_db: String = "${main}/${Folder.L.value}/db"
 
 
@@ -101,8 +100,6 @@ object AppPath {
 
         File(l_albums).mkdirs()
         File(l_collection).mkdirs()
-
-        File(l_downloaded_albums).mkdirs()
 
         File(l_cacheDownload).mkdirs()
 

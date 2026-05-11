@@ -31,12 +31,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,7 +58,6 @@ import com.client.xvideos.l.ui.element.lazyRowPictureDetails.LPictureSelectionSt
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumDialogDeleteAlbum
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoAudiences
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoButtonSaveAlbum
-import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoDownloadButton
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoFilterButton
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoGreeting
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoTags
@@ -92,11 +89,6 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
 
         val saved = vm.saved.albums.list.any { it.id == parsed?.id }
 
-        var isDeletingFiles by rememberSaveable { mutableStateOf(false) }
-        val deletionState by vm.downloader.deletionProgress.collectAsState()
-
-        val isDownloading = vm.downloader.isDownloading.collectAsStateWithLifecycle().value
-
         val albumPicsDetails = album?.albumPicsDetails
         val showInitialItemsLoading =
             albumPicsDetails?.isPageRequestInFlight == true &&
@@ -124,11 +116,6 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
             }
 
         }
-
-        val folderSize = vm.downloader.folderSize.collectAsStateWithLifecycle().value
-        val fileCountDownloaded =
-            vm.downloader.fileCountDownloaded.collectAsStateWithLifecycle().value
-        val fileCountError = vm.downloader.fileCountError.collectAsStateWithLifecycle().value
 
         /**  ➜ сюда запоминаем элемент, который пользователь хочет удалить  */
         var itemPendingDelete by remember { mutableStateOf<AlbumDetails?>(null) }
@@ -187,7 +174,6 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
                                 AlbumInfoAudiences(parsed)
                                 AlbumInfoTags(parsed) { navigator.push(ScreenLAlbumLandingTag(it)) }
                                 AlbumInfoButtonSaveAlbum(saved, onClick = { if (!saved) { vm.saveAlbum() } else { itemPendingDelete = parsed } })
-                                AlbumInfoDownloadButton( folderSize, album, fileCountDownloaded, fileCountError, vm, isDownloading, isDeletingFiles, deletionState, isDeletingChange = { isDeletingFiles = it })
                                 AlbumInfoFilterButton( parsed, vm.showOnlyAnimated, { vm.showOnlyAnimated = it })
                                 LAlbumNetworkIssuePanel(
                                     albumPicsDetails = albumPicsDetails,

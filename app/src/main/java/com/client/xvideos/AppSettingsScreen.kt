@@ -140,7 +140,6 @@ object AppSettingsScreen : Screen {
 
         AppSettingsScreenContent(
             onBack = { navigator.pop() },
-            onOpenDiagnostics = { navigator.push(AppDiagnosticsScreen) },
             imageCacheSizeBytes = imageCacheSizeBytes,
             storageStats = storageStats,
             sizeRedTotal = sizeRedTotal,
@@ -168,7 +167,6 @@ object AppSettingsScreen : Screen {
 @Composable
 private fun AppSettingsScreenContent(
     onBack: () -> Unit,
-    onOpenDiagnostics: () -> Unit,
     imageCacheSizeBytes: Long,
     storageStats: List<StorageStat>,
     sizeRedTotal: Long,
@@ -219,7 +217,6 @@ private fun AppSettingsScreenContent(
             modifier = Modifier.padding(paddingValues),
             currentPage = currentPage,
             onOpenPage = { currentPage = it },
-            onOpenDiagnostics = onOpenDiagnostics,
             imageCacheSizeBytes = imageCacheSizeBytes,
             storageStats = storageStats,
             sizeRedTotal = sizeRedTotal,
@@ -237,7 +234,6 @@ private fun AppSettingsScreenBody(
     modifier: Modifier = Modifier,
     currentPage: SettingsPage = SettingsPage.Main,
     onOpenPage: (SettingsPage) -> Unit = {},
-    onOpenDiagnostics: () -> Unit,
     imageCacheSizeBytes: Long,
     storageStats: List<StorageStat>,
     sizeRedTotal: Long,
@@ -288,17 +284,14 @@ private fun AppSettingsScreenBody(
                 SettingsPage.Red -> RSettingsSection(
                     sizeRedTotal = sizeRedTotal,
                     sizeRedDownload = sizeRedDownload,
-                    onClearDownload = onClearDownload
-                )
-                SettingsPage.X -> XSettingsSection()
-                SettingsPage.Diagnostics -> DiagnosticsSettingsSection(
+                    onClearDownload = onClearDownload,
                     savedRed = savedRed,
                     isNichesCacheDownloading = isNichesCacheDownloading,
                     nichesCacheProgress = nichesCacheProgress,
                     nichesCacheSize = nichesCacheSize,
-                    nichesCacheLastModifiedHour = nichesCacheLastModifiedHour,
-                    onOpenDiagnostics = onOpenDiagnostics
+                    nichesCacheLastModifiedHour = nichesCacheLastModifiedHour
                 )
+                SettingsPage.X -> XSettingsSection()
                 SettingsPage.Storage -> StorageStatisticsSection(storageStats)
             }
         }
@@ -333,17 +326,12 @@ private enum class SettingsPage(
     Red(
         title = "R",
         icon = R.drawable.icon_red,
-        subtitle = "Размеры папок и Downloads"
+        subtitle = "Размеры папок, Downloads и Niches cache"
     ),
     X(
         title = "X",
         icon = R.drawable.icon_xvideos_white,
         subtitle = "Отображение и фильтры X"
-    ),
-    Diagnostics(
-        title = "Диагностика",
-        icon = R.drawable.memory_24,
-        subtitle = "Ошибки, Niches cache и отчёт"
     ),
     Storage(
         title = "Хранилище",
@@ -496,7 +484,12 @@ private fun LSettingsSection(lLogin: String) {
 private fun RSettingsSection(
     sizeRedTotal: Long,
     sizeRedDownload: Long,
-    onClearDownload: () -> Unit
+    onClearDownload: () -> Unit,
+    savedRed: SavedRed?,
+    isNichesCacheDownloading: Boolean,
+    nichesCacheProgress: Float,
+    nichesCacheSize: Int,
+    nichesCacheLastModifiedHour: Long
 ) {
     SettingsValueRow(
         icon = R.drawable.icon_red,
@@ -521,6 +514,40 @@ private fun RSettingsSection(
         textDialogButton = "Очистить",
         onClick = onClearDownload
     )
+    SettingsDivider()
+
+    SettingsValueRow(
+        icon = R.drawable.icon_red,
+        text = "Кэш Niches",
+        value = "$nichesCacheSize \u2022 ${nichesCacheLastModifiedHour}h"
+    )
+
+    if (isNichesCacheDownloading) {
+        LinearProgressIndicator(
+            progress = { nichesCacheProgress },
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .fillMaxWidth(),
+            color = WhatsAppGreen,
+            trackColor = Color(0xFF1E3B32),
+            strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
+        )
+    }
+    SettingsDivider()
+
+    SettingsListItem(
+        icon = R.drawable.icon_red,
+        text = "Обновить кэш Niches",
+        subtitle = if (isNichesCacheDownloading) "Идёт обновление" else "Данные для поиска и фильтров R",
+        trailing = {
+            Button(
+                enabled = savedRed != null && !isNichesCacheDownloading,
+                onClick = { savedRed?.nichesCache?.refresh() }
+            ) {
+                Text("Обновить")
+            }
+        }
+    )
 }
 
 @Composable
@@ -542,62 +569,6 @@ private fun XSettingsSection() {
         subtitle = if (xvideosShemale) "Включено" else "Выключено",
         value = xvideosShemale,
         onValueChange = { Settings.xvideos_shemale.setValue(it) }
-    )
-}
-
-@Composable
-private fun DiagnosticsSettingsSection(
-    savedRed: SavedRed?,
-    isNichesCacheDownloading: Boolean,
-    nichesCacheProgress: Float,
-    nichesCacheSize: Int,
-    nichesCacheLastModifiedHour: Long,
-    onOpenDiagnostics: () -> Unit
-) {
-    SettingsListItem(
-        icon = R.drawable.memory_24,
-        text = "Открыть диагностику",
-        subtitle = "L ошибки, HTML challenge, страницы альбомов, плеер и кэш",
-        trailing = {
-            Button(onClick = onOpenDiagnostics) {
-                Text("Открыть")
-            }
-        }
-    )
-    SettingsDivider()
-
-    SettingsValueRow(
-        icon = R.drawable.memory_24,
-        text = "Кэш Niches R",
-        value = "$nichesCacheSize \u2022 ${nichesCacheLastModifiedHour}h"
-    )
-
-    if (isNichesCacheDownloading) {
-        LinearProgressIndicator(
-            progress = { nichesCacheProgress },
-            modifier = Modifier
-                .padding(horizontal = 16.dp)
-                .fillMaxWidth(),
-            color = WhatsAppGreen,
-            trackColor = Color(0xFF1E3B32),
-            strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
-        )
-    }
-
-    SettingsDivider()
-
-    SettingsListItem(
-        icon = R.drawable.memory_24,
-        text = "Обновить кэш Niches",
-        subtitle = if (isNichesCacheDownloading) "Идёт обновление" else "Данные для поиска и фильтров R",
-        trailing = {
-            Button(
-                enabled = savedRed != null && !isNichesCacheDownloading,
-                onClick = { savedRed?.nichesCache?.refresh() }
-            ) {
-                Text("Обновить")
-            }
-        }
     )
 }
 
@@ -627,7 +598,6 @@ private fun AppSettingsScreenPreview() {
                 Spacer(Modifier.width(48.dp))
             }
             AppSettingsScreenBody(
-                onOpenDiagnostics = {},
                 imageCacheSizeBytes = 128_000_000L,
                 storageStats = EmptyStorageStats,
                 sizeRedTotal = 512_000_000L,
