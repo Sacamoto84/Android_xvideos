@@ -89,7 +89,6 @@ class SplashActivity : ComponentActivity() {
             val dbInstance = db.get()
 
             dbInstance.clearVolatileCachesOnProcessStart()
-            dbInstance.migrateLegacySqliteIfNeeded(this@SplashActivity)
 
             val jobs = listOf(
                 async { savedRedInstance.refreshTagList() },

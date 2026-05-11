@@ -1,6 +1,5 @@
 package com.client.xvideos.common.fileDB.folder
 
-import android.content.Context
 import com.client.xvideos.common.AppPath
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -21,10 +20,6 @@ class AppFileDatabase @Inject constructor() {
 
     val rSearchHistoryExplorerTable = FolderTable("$root/r_search_history_explorer")
     val rSearchHistoryNichesTable = FolderTable("$root/r_search_history_niches")
-
-    suspend fun migrateLegacySqliteIfNeeded(context: Context) {
-        LegacySqliteFileMigration.migrateIfNeeded(context.applicationContext, this)
-    }
 
     suspend fun clearVolatileCachesOnProcessStart() {
         volatileCacheMutex.withLock {
