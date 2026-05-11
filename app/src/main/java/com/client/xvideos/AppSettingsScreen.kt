@@ -48,6 +48,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.state.ToggleableState
@@ -74,7 +75,7 @@ import com.client.xvideos.common.settings.ui.Config_G_0_4
 import com.client.xvideos.common.settings.ui.components.AppLockSettingsSection
 import com.client.xvideos.common.settings.ui.components.EmptyStorageStats
 import com.client.xvideos.common.settings.ui.components.IntSliderSetting
-import com.client.xvideos.common.settings.ui.components.SettingsAccentBlue
+import com.client.xvideos.common.settings.ui.components.SettingsAccentColor
 import com.client.xvideos.common.settings.ui.components.SettingsCardColor
 import com.client.xvideos.common.settings.ui.components.SettingsButtonRowWithDialog
 import com.client.xvideos.common.settings.ui.components.SettingsDivider
@@ -236,7 +237,7 @@ private fun AppSettingsScreenContent(
                     Icon(
                         painterResource(R.drawable.exo_ic_chevron_left),
                         contentDescription = null,
-                        tint = SettingsAccentBlue
+                        tint = SettingsAccentColor
                     )
                 }
                 Text(
@@ -426,7 +427,7 @@ private fun SettingsNavigationRow(
             Icon(
                 painter = painterResource(R.drawable.exo_ic_chevron_right),
                 contentDescription = null,
-                tint = SettingsAccentBlue
+                tint = SettingsAccentColor
             )
         }
     )
@@ -773,7 +774,7 @@ private fun BackupSettingsSection(
                             enabled = !isWorking && selectedBackupPaths.isNotEmpty(),
                             onClick = { createBackupLauncher.launch(XlrBackupManager.defaultFileName()) },
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = SettingsAccentBlue,
+                                containerColor = SettingsAccentColor,
                                 contentColor = SettingsScreenBackground
                             )
                         ) {
@@ -797,7 +798,7 @@ private fun BackupSettingsSection(
                                 )
                             },
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = SettingsAccentBlue,
+                                containerColor = SettingsAccentColor,
                                 contentColor = SettingsScreenBackground
                             )
                         ) {
@@ -897,9 +898,9 @@ private fun BackupModeSelector(
                     baseShape = RoundedCornerShape(8.dp)
                 ),
                 colors = SegmentedButtonDefaults.colors(
-                    activeContainerColor = SettingsAccentBlue,
+                    activeContainerColor = SettingsAccentColor,
                     activeContentColor = SettingsScreenBackground,
-                    activeBorderColor = SettingsAccentBlue,
+                    activeBorderColor = SettingsAccentColor,
                     inactiveContainerColor = SettingsCardColor,
                     inactiveContentColor = ThemeL.textColor,
                     inactiveBorderColor = SettingsDividerColor
@@ -939,7 +940,7 @@ private fun BackupSelectionActions(
             enabled = enabled,
             onClick = onSelectNone
         ) {
-            Text("Снять", color = SettingsAccentBlue)
+            Text("Снять", color = SettingsAccentColor)
         }
     }
 }
@@ -1014,7 +1015,12 @@ private fun BackupSectionGroup(
                     enabled = enabled,
                     onClick = onToggleExpanded
                 ) {
-                    Text(if (expanded) "Свернуть" else "Развернуть", color = SettingsAccentBlue)
+                    Icon(
+                        painter = painterResource(R.drawable.exo_ic_chevron_right),
+                        contentDescription = if (expanded) "Свернуть" else "Развернуть",
+                        tint = SettingsAccentColor,
+                        modifier = Modifier.rotate(if (expanded) 90f else 0f)
+                    )
                 }
             }
         },

@@ -41,14 +41,14 @@ import com.client.xvideos.common.settings.ui.DialogButton
 import com.client.xvideos.l.theme.ThemeL
 import kotlin.math.roundToInt
 
-internal val SettingsScreenBackground = Color(0xFF20272B)
-internal val SettingsTopBarColor = Color(0xFF2B2D30)
-internal val SettingsCardColor = Color(0xFF293136)
-internal val SettingsAccentBlue = Color(0xFF72B8E8)
-internal val SettingsRowTextPrimary = Color(0xFFDCE3E6)
-internal val SettingsRowTextSecondary = Color(0xFFAEB7BC)
-internal val SettingsDividerColor = Color(0xFF394248)
-internal val WhatsAppGreen = SettingsAccentBlue
+internal val SettingsScreenBackground = ThemeL.grey6
+internal val SettingsTopBarColor = ThemeL.grey5
+internal val SettingsCardColor = ThemeL.grey4
+internal val SettingsAccentColor = ThemeL.primaryColor
+internal val SettingsRowTextPrimary = ThemeL.grey0
+internal val SettingsRowTextSecondary = ThemeL.grey1
+internal val SettingsDividerColor = ThemeL.grey3
+internal val WhatsAppGreen = SettingsAccentColor
 
 private val LocalSettingsInGroup = staticCompositionLocalOf { false }
 
@@ -185,7 +185,7 @@ fun SettingsIcon(@DrawableRes icon: Int) {
         Icon(
             painter = painterResource(icon),
             contentDescription = null,
-            tint = SettingsAccentBlue,
+            tint = SettingsRowTextPrimary,
             modifier = Modifier.size(22.dp)
         )
     }
