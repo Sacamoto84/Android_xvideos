@@ -8,7 +8,10 @@ import com.client.xvideos.l.model.lDownloadUrl
 import com.client.xvideos.l.model.lMediaRequestHeaders
 import com.client.xvideos.l.model.lUrlExtension
 import com.client.xvideos.l.model.lUrlFileName
+import com.client.xvideos.l.net.LAlbumBundleCache
 import com.client.xvideos.l.net.Luscious
+import com.client.xvideos.l.net.L_ALBUM_BUNDLE_CACHE_MAX_AGE_MS
+import com.client.xvideos.l.net.L_ALBUM_BUNDLE_CACHE_SCHEMA_VERSION
 import com.client.xvideos.l.net.graphQl.getAlbumInfo
 import com.client.xvideos.l.repository.RepositoryUriConfig
 import com.google.gson.Gson
@@ -237,19 +240,33 @@ internal suspend fun lSaveMediaSourceTracked(
 /* ---------- Album info ---------- */
 
 internal suspend fun lFetchAlbumDetails(luscious: Luscious, albumId: Int): AlbumDetails? {
-    val query = getAlbumInfo(albumId)
-    val cached = luscious.repository.openURI(query, config = RepositoryUriConfig.CACHE_ROM)
-    val cachedAlbum = cached.getOrNull()?.parseAlbumDetails()
-    if (cachedAlbum != null) return cachedAlbum
-
-    if (cached.isSuccess) {
-        luscious.repository.deleteCache(query, RepositoryUriConfig.CACHE_ROM)
+    val cachedBundle = luscious.repository.getAlbumBundleCache(
+        albumId = albumId,
+        maxAgeMs = L_ALBUM_BUNDLE_CACHE_MAX_AGE_MS
+    )
+    if (cachedBundle != null) {
+        val bundle = cachedBundle.parseAlbumBundleCache()
+        if (
+            bundle != null &&
+            bundle.schemaVersion == L_ALBUM_BUNDLE_CACHE_SCHEMA_VERSION &&
+            bundle.album.id.isNotBlank()
+        ) {
+            return bundle.album
+        }
+        luscious.repository.deleteAlbumBundleCache(albumId)
     }
 
+    val query = getAlbumInfo(albumId)
     return luscious.repository.openURI(query, config = RepositoryUriConfig.DIRECT)
         .getOrNull()
         ?.parseAlbumDetails()
 }
+
+private fun String.parseAlbumBundleCache(): LAlbumBundleCache? = runCatching {
+    Gson().fromJson(this, LAlbumBundleCache::class.java)
+}.onFailure {
+    Timber.w(it, "L album bundle cache parse failed")
+}.getOrNull()
 
 private fun String.parseAlbumDetails(): AlbumDetails? = runCatching {
     val get = JsonParser.parseString(this).asJsonObject["data"]

@@ -3,7 +3,6 @@ package com.client.xvideos.l.net
 import com.client.xvideos.l.model.AlbumDetails
 import com.client.xvideos.l.model.Content
 import com.client.xvideos.l.model.Cover
-import com.client.xvideos.l.model.PicsDetails
 import com.client.xvideos.l.net.graphQl.getAlbumInfo
 import com.client.xvideos.l.repository.Repository
 import com.client.xvideos.l.repository.RepositoryUriConfig
@@ -24,17 +23,7 @@ class AlbumInfo(
 
     private companion object {
         val gson = Gson()
-        const val BUNDLE_CACHE_SCHEMA_VERSION = 1
-        const val BUNDLE_CACHE_MAX_AGE_MS = 7L * 24 * 60 * 60 * 1000
     }
-
-    private data class LAlbumBundleCache(
-        val schemaVersion: Int,
-        val cachedAtMs: Long,
-        val album: AlbumDetails,
-        val totalPages: Int?,
-        val pics: List<PicsDetails>
-    )
 
     val albumPicsDetails = AlbumPicsDetails(id,  repository)
 
@@ -83,14 +72,14 @@ class AlbumInfo(
     }
 
     private suspend fun restoreBundleIfFresh(repository: Repository): Boolean {
-        val cachedJson = repository.getAlbumBundleCache(id, BUNDLE_CACHE_MAX_AGE_MS) ?: return false
+        val cachedJson = repository.getAlbumBundleCache(id, L_ALBUM_BUNDLE_CACHE_MAX_AGE_MS) ?: return false
         val bundle = runCatching {
             gson.fromJson(cachedJson, LAlbumBundleCache::class.java)
         }.getOrNull()
 
         if (
             bundle == null ||
-            bundle.schemaVersion != BUNDLE_CACHE_SCHEMA_VERSION ||
+            bundle.schemaVersion != L_ALBUM_BUNDLE_CACHE_SCHEMA_VERSION ||
             bundle.pics.isEmpty()
         ) {
             repository.deleteAlbumBundleCache(id)
@@ -112,7 +101,7 @@ class AlbumInfo(
     ) {
         val snapshot = albumPicsDetails.bundleSnapshotOrNull() ?: return
         val bundle = LAlbumBundleCache(
-            schemaVersion = BUNDLE_CACHE_SCHEMA_VERSION,
+            schemaVersion = L_ALBUM_BUNDLE_CACHE_SCHEMA_VERSION,
             cachedAtMs = System.currentTimeMillis(),
             album = albumDetails,
             totalPages = snapshot.totalPages,
