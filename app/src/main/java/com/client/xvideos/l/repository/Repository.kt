@@ -50,7 +50,7 @@ class Repository(
     private val authMutex = Mutex()
     private val requestMutex = Mutex()
     private val ramCacheMutex = Mutex()
-    private val ramCache = object : LinkedHashMap<String, String>(64, 0.75f, true) {
+    private val ramCache = object : LinkedHashMap<String, String>(RAM_CACHE_MAX_ENTRIES, 0.75f, true) {
         override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, String>?): Boolean {
             return size > RAM_CACHE_MAX_ENTRIES
         }
@@ -66,7 +66,7 @@ class Repository(
         private set
 
     private val cacheUrlStringRomDao = fileDb.cacheUrlStringRom
-    private val cacheUrlStringRamDao = fileDb.cacheUrlStringRam
+    private val legacyCacheUrlStringRamDao = fileDb.cacheUrlStringRam
     private val lAlbumBundleCacheDao = fileDb.lAlbumBundleCache
 
     init {
@@ -162,7 +162,7 @@ class Repository(
                     }
                 }
 
-                // Read from temporary memory cache, or request and store it.
+                // Read from temporary in-memory LRU cache, or request and store it in RAM only.
                 RepositoryUriConfig.CACHE_RAM -> {
                     try {
                         val cacheKey = data.toMD5()
@@ -177,16 +177,7 @@ class Repository(
                             deleteRamCache(cacheKey)
                         }
                         val checkedResponse = postJsonValidated(data)
-                        if (checkedResponse.isFailure) {
-                            val cachedRom = cacheUrlStringRomDao.get(cacheKey)?.content?.let { validateJsonResponse(it) }
-                            if (cachedRom?.isSuccess == true) {
-                                Timber.w("!!! openURI() CACHE_RAM network error, fallback CACHE_ROM")
-                                val cachedContent = cachedRom.getOrThrow()
-                                putRamCache(cacheKey, cachedContent)
-                                return cachedRom
-                            }
-                            return checkedResponse
-                        }
+                        if (checkedResponse.isFailure) return checkedResponse
 
                         val checkedContent = checkedResponse.getOrThrow()
                         if (checkedContent.contains("{\"errors\":")){
@@ -195,7 +186,6 @@ class Repository(
                         }
 
                         putRamCache(cacheKey, checkedContent)
-                        cacheUrlStringRomDao.put(cacheKey, checkedContent)
 
                         //Timber.i("!!! openURI() CACHE_RAM net response:$response")
 
@@ -328,10 +318,7 @@ class Repository(
     suspend fun deleteCache(data: String, config: RepositoryUriConfig) {
         val cacheKey = data.toMD5()
         when (config) {
-            RepositoryUriConfig.CACHE_RAM -> {
-                deleteRamCache(cacheKey)
-                cacheUrlStringRamDao.delete(cacheKey)
-            }
+            RepositoryUriConfig.CACHE_RAM -> deleteRamCache(cacheKey)
             RepositoryUriConfig.CACHE_ROM -> cacheUrlStringRomDao.delete(cacheKey)
             RepositoryUriConfig.DIRECT -> Unit
         }
@@ -380,14 +367,14 @@ class Repository(
     private fun clearRamDao(){
         scope.launch(Dispatchers.IO) {
             ramCacheMutex.withLock { ramCache.clear() }
-            cacheUrlStringRamDao.deleteAll()
+            legacyCacheUrlStringRamDao.deleteAll()
         }
     }
 
     private companion object {
         const val MIN_NETWORK_REQUEST_INTERVAL_MS = 300L
         const val HTML_CHALLENGE_RETRY_ATTEMPTS = 3
-        const val RAM_CACHE_MAX_ENTRIES = 120
+        const val RAM_CACHE_MAX_ENTRIES = 256
         val HTML_CHALLENGE_RETRY_DELAYS_MS = longArrayOf(5_000L, 10_000L, 15_000L)
     }
 
@@ -400,7 +387,7 @@ enum class RepositoryUriType {
 }
 
 enum class RepositoryUriConfig {
-    DIRECT,    //Прямой запрос в сеть
-    CACHE_RAM, //Временный кеш в DB, после перезагрузки удаляется
-    CACHE_ROM  //Постоянный кеш в DB
+    DIRECT,    // Direct network request
+    CACHE_RAM, // Temporary in-memory LRU cache, cleared with the process
+    CACHE_ROM  // Persistent file cache
 }
