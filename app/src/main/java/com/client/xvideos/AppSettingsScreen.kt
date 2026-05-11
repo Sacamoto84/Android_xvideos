@@ -1,7 +1,10 @@
 package com.client.xvideos
 
 import android.content.Context
+import android.net.Uri
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
 import androidx.annotation.OptIn
 import androidx.compose.foundation.background
@@ -16,6 +19,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -50,6 +54,9 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.common.AppPath
+import com.client.xvideos.common.backup.XlrBackupItem
+import com.client.xvideos.common.backup.XlrBackupManager
+import com.client.xvideos.common.backup.XlrBackupReport
 import com.client.xvideos.common.coil.CoilImageLoaderFactory
 import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.common.settings.ui.Config_G_0_4
@@ -60,6 +67,7 @@ import com.client.xvideos.common.settings.ui.components.SettingsButtonRowWithDia
 import com.client.xvideos.common.settings.ui.components.SettingsDivider
 import com.client.xvideos.common.settings.ui.components.SettingsListItem
 import com.client.xvideos.common.settings.ui.components.SettingsPreview
+import com.client.xvideos.common.settings.ui.components.SettingsSectionTitle
 import com.client.xvideos.common.settings.ui.components.SettingsSwitchRow
 import com.client.xvideos.common.settings.ui.components.SettingsValueRow
 import com.client.xvideos.common.settings.ui.components.StorageStatisticsSection
@@ -159,7 +167,13 @@ object AppSettingsScreen : Screen {
                 }
             },
             savedRed = vm.savedRed,
-            context = context
+            context = context,
+            onBackupDataChanged = {
+                scope.launch {
+                    refreshStorageStats()
+                    refreshRedSizes()
+                }
+            }
         )
     }
 }
@@ -174,7 +188,8 @@ private fun AppSettingsScreenContent(
     onClearImageCache: () -> Unit,
     onClearDownload: () -> Unit,
     savedRed: SavedRed?,
-    context: Context
+    context: Context,
+    onBackupDataChanged: () -> Unit
 ) {
     var currentPage by rememberSaveable { mutableStateOf(SettingsPage.Main) }
     val closeCurrentPage = {
@@ -224,7 +239,8 @@ private fun AppSettingsScreenContent(
             onClearImageCache = onClearImageCache,
             onClearDownload = onClearDownload,
             savedRed = savedRed,
-            context = context
+            context = context,
+            onBackupDataChanged = onBackupDataChanged
         )
     }
 }
@@ -241,7 +257,8 @@ private fun AppSettingsScreenBody(
     onClearImageCache: () -> Unit,
     onClearDownload: () -> Unit,
     savedRed: SavedRed?,
-    context: Context
+    context: Context,
+    onBackupDataChanged: () -> Unit
 ) {
     val ramCachePercent = Settings.image_cache_ram_percent.field.collectAsStateWithLifecycle().value
     val diskCacheEnabled = Settings.image_cache_disk_enabled.field.collectAsStateWithLifecycle().value
@@ -293,6 +310,10 @@ private fun AppSettingsScreenBody(
                 )
                 SettingsPage.X -> XSettingsSection()
                 SettingsPage.Storage -> StorageStatisticsSection(storageStats)
+                SettingsPage.Backup -> BackupSettingsSection(
+                    context = context,
+                    onDataChanged = onBackupDataChanged
+                )
             }
         }
     }
@@ -337,6 +358,11 @@ private enum class SettingsPage(
         title = "Хранилище",
         icon = R.drawable.hard_drive_2_24,
         subtitle = "Статистика по X, L и R"
+    ),
+    Backup(
+        title = "Backup",
+        icon = R.drawable.hard_drive_2_24,
+        subtitle = "X, L, R в ZIP"
     );
 
     companion object {
@@ -572,6 +598,323 @@ private fun XSettingsSection() {
     )
 }
 
+@Composable
+private fun BackupSettingsSection(
+    context: Context,
+    onDataChanged: () -> Unit
+) {
+    val scope = rememberCoroutineScope()
+    var isWorking by rememberSaveable { mutableStateOf(false) }
+    var backupItems by remember { mutableStateOf<List<XlrBackupItem>>(emptyList()) }
+    var selectedBackupPaths by remember { mutableStateOf<Set<String>>(emptySet()) }
+    var restoreUri by remember { mutableStateOf<Uri?>(null) }
+    var restoreItems by remember { mutableStateOf<List<XlrBackupItem>>(emptyList()) }
+    var selectedRestorePaths by remember { mutableStateOf<Set<String>>(emptySet()) }
+
+    suspend fun refreshBackupItems() {
+        val items = XlrBackupManager.currentBackupItems()
+        backupItems = items
+        if (selectedBackupPaths.isEmpty()) {
+            selectedBackupPaths = initialSectionSelection(items)
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        refreshBackupItems()
+    }
+
+    val createBackupLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("application/zip")
+    ) { uri ->
+        if (uri == null || isWorking) return@rememberLauncherForActivityResult
+        if (selectedBackupPaths.isEmpty()) {
+            SnackBar.error("Выберите хотя бы одну папку")
+            return@rememberLauncherForActivityResult
+        }
+        scope.launch {
+            isWorking = true
+            XlrBackupManager.createBackup(context, uri, selectedBackupPaths)
+                .onSuccess { report ->
+                    SnackBar.success("Backup создан: ${report.files} файлов, ${formatBytes(report.bytes)}")
+                }
+                .onFailure { error ->
+                    SnackBar.error(error.message ?: "Ошибка создания backup")
+                }
+            isWorking = false
+        }
+    }
+
+    val restoreBackupLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri == null || isWorking) return@rememberLauncherForActivityResult
+        scope.launch {
+            isWorking = true
+            XlrBackupManager.inspectBackup(context, uri)
+                .onSuccess { items ->
+                    restoreUri = uri
+                    restoreItems = items
+                    selectedRestorePaths = initialSectionSelection(items)
+                    SnackBar.success("Backup открыт: ${items.size} папок")
+                }
+                .onFailure { error ->
+                    restoreUri = null
+                    restoreItems = emptyList()
+                    selectedRestorePaths = emptySet()
+                    SnackBar.error(error.message ?: "Ошибка чтения backup")
+                }
+            isWorking = false
+        }
+    }
+
+    val backupReport = XlrBackupManager.reportForSelection(backupItems, selectedBackupPaths)
+    val restoreReport = XlrBackupManager.reportForSelection(restoreItems, selectedRestorePaths)
+
+    SettingsValueRow(
+        icon = R.drawable.hard_drive_2_24,
+        text = "Состав backup",
+        value = "Можно выбрать X, L, R целиком или отдельные папки. DB не входит, временные папки можно снять галочкой."
+    )
+    SettingsDivider()
+
+    SettingsSectionTitle("Создание")
+    BackupSelectionActions(
+        enabled = !isWorking,
+        onSelectAll = { selectedBackupPaths = initialSectionSelection(backupItems) },
+        onSelectNone = { selectedBackupPaths = emptySet() }
+    )
+    BackupFolderList(
+        items = backupItems,
+        selectedPaths = selectedBackupPaths,
+        enabled = !isWorking,
+        onToggle = { path -> selectedBackupPaths = toggleBackupPath(backupItems, selectedBackupPaths, path) }
+    )
+    SettingsDivider()
+
+    SettingsListItem(
+        icon = R.drawable.hard_drive_2_24,
+        text = "Создать backup",
+        subtitle = if (isWorking) "Идет операция" else selectionSummaryText(backupReport),
+        trailing = {
+            Button(
+                enabled = !isWorking && selectedBackupPaths.isNotEmpty(),
+                onClick = { createBackupLauncher.launch(XlrBackupManager.defaultFileName()) }
+            ) {
+                Text("Создать")
+            }
+        }
+    )
+    SettingsDivider()
+
+    SettingsSectionTitle("Восстановление")
+    SettingsListItem(
+        icon = R.drawable.hard_drive_2_24,
+        text = "Открыть backup",
+        subtitle = restoreUri?.lastPathSegment ?: "ZIP не выбран",
+        trailing = {
+            Button(
+                enabled = !isWorking,
+                onClick = {
+                    restoreBackupLauncher.launch(
+                        arrayOf("application/zip", "application/octet-stream", "application/x-zip-compressed")
+                    )
+                }
+            ) {
+                Text("Выбрать")
+            }
+        }
+    )
+
+    if (restoreItems.isNotEmpty()) {
+        SettingsDivider()
+        BackupSelectionActions(
+            enabled = !isWorking,
+            onSelectAll = { selectedRestorePaths = initialSectionSelection(restoreItems) },
+            onSelectNone = { selectedRestorePaths = emptySet() }
+        )
+        BackupFolderList(
+            items = restoreItems,
+            selectedPaths = selectedRestorePaths,
+            enabled = !isWorking,
+            onToggle = { path -> selectedRestorePaths = toggleBackupPath(restoreItems, selectedRestorePaths, path) }
+        )
+        SettingsDivider()
+    }
+
+    SettingsButtonRowWithDialog(
+        icon = R.drawable.hard_drive_2_24,
+        text = "Восстановить выбранное",
+        value = if (isWorking) "Идет..." else "Восстановить",
+        textDialogTitle = "Восстановить backup",
+        textDialogBody = "Выбранные папки будут заменены данными из ZIP: ${selectionSummaryText(restoreReport)}. DB, настройки и кеши не трогаются.",
+        textDialogButton = "Восстановить",
+        onClick = {
+            val uri = restoreUri
+            if (uri == null) {
+                SnackBar.error("Сначала выберите ZIP")
+                return@SettingsButtonRowWithDialog
+            }
+            if (selectedRestorePaths.isEmpty()) {
+                SnackBar.error("Выберите хотя бы одну папку")
+                return@SettingsButtonRowWithDialog
+            }
+            if (!isWorking) {
+                scope.launch {
+                    isWorking = true
+                    XlrBackupManager.restoreBackup(context, uri, selectedRestorePaths)
+                        .onSuccess { report ->
+                            refreshBackupItems()
+                            onDataChanged()
+                            SnackBar.success("Backup восстановлен: ${report.files} файлов. Перезапустите приложение.")
+                        }
+                        .onFailure { error ->
+                            SnackBar.error(error.message ?: "Ошибка восстановления backup")
+                        }
+                    isWorking = false
+                }
+            }
+        }
+    )
+}
+
+@Composable
+private fun BackupSelectionActions(
+    enabled: Boolean,
+    onSelectAll: () -> Unit,
+    onSelectNone: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 72.dp, end = 16.dp, top = 4.dp, bottom = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Button(
+            enabled = enabled,
+            onClick = onSelectAll
+        ) {
+            Text("Все X/L/R")
+        }
+        Spacer(Modifier.width(8.dp))
+        TextButton(
+            enabled = enabled,
+            onClick = onSelectNone
+        ) {
+            Text("Снять", color = WhatsAppGreen)
+        }
+    }
+}
+
+@Composable
+private fun BackupFolderList(
+    items: List<XlrBackupItem>,
+    selectedPaths: Set<String>,
+    enabled: Boolean,
+    onToggle: (String) -> Unit
+) {
+    if (items.isEmpty()) {
+        SettingsValueRow(
+            icon = R.drawable.hard_drive_2_24,
+            text = "Папки",
+            value = "Нет данных для backup"
+        )
+        return
+    }
+
+    items.forEachIndexed { index, item ->
+        if (index > 0) SettingsDivider()
+        SettingsListItem(
+            icon = backupItemIcon(item.section),
+            text = backupItemTitle(item),
+            subtitle = "${item.path} • ${item.files} файлов • ${formatBytes(item.bytes)}",
+            trailing = {
+                Checkbox(
+                    checked = isBackupPathChecked(items, selectedPaths, item),
+                    enabled = enabled,
+                    onCheckedChange = { onToggle(item.path) }
+                )
+            },
+            onClick = { if (enabled) onToggle(item.path) }
+        )
+    }
+}
+
+private fun initialSectionSelection(items: List<XlrBackupItem>): Set<String> {
+    return items
+        .filter { item -> item.parentPath == null && (item.files > 0 || item.bytes > 0L) }
+        .mapTo(mutableSetOf()) { it.path }
+}
+
+private fun toggleBackupPath(
+    items: List<XlrBackupItem>,
+    selectedPaths: Set<String>,
+    path: String
+): Set<String> {
+    val item = items.firstOrNull { it.path == path } ?: return selectedPaths
+    val selected = selectedPaths.toMutableSet()
+    val checked = isBackupPathChecked(items, selectedPaths, item)
+
+    if (item.parentPath == null) {
+        val children = items.filter { it.parentPath == item.path }.map { it.path }
+        selected.remove(item.path)
+        selected.removeAll(children)
+        if (!checked) selected.add(item.path)
+        return selected
+    }
+
+    val parentPath = item.parentPath
+    val siblings = items.filter { it.parentPath == parentPath }.map { it.path }
+    if (parentPath in selected) {
+        selected.remove(parentPath)
+        selected.addAll(siblings)
+    }
+
+    if (checked) {
+        selected.remove(item.path)
+    } else {
+        selected.add(item.path)
+    }
+
+    if (siblings.isNotEmpty() && siblings.all { it in selected }) {
+        selected.removeAll(siblings)
+        selected.add(parentPath)
+    }
+
+    return selected
+}
+
+private fun isBackupPathChecked(
+    items: List<XlrBackupItem>,
+    selectedPaths: Set<String>,
+    item: XlrBackupItem
+): Boolean {
+    if (item.path in selectedPaths) return true
+    if (item.parentPath != null && item.parentPath in selectedPaths) return true
+    if (item.parentPath == null) {
+        val children = items.filter { it.parentPath == item.path }
+        return children.isNotEmpty() && children.all { it.path in selectedPaths }
+    }
+    return false
+}
+
+private fun selectionSummaryText(report: XlrBackupReport): String {
+    return "${report.files} файлов • ${formatBytes(report.bytes)}"
+}
+
+private fun backupItemTitle(item: XlrBackupItem): String {
+    return if (item.parentPath == null) item.title else "  ${item.title}"
+}
+
+@DrawableRes
+private fun backupItemIcon(section: String): Int {
+    return when (section) {
+        "X" -> R.drawable.icon_xvideos_white
+        "L" -> R.drawable.icon_luscious
+        "R" -> R.drawable.icon_red
+        else -> R.drawable.hard_drive_2_24
+    }
+}
+
 @Preview(showBackground = true, backgroundColor = 0xFF353535,
     device = "spec:width=1080px,height=23400px,dpi=440"
 )
@@ -605,7 +948,8 @@ private fun AppSettingsScreenPreview() {
                 onClearImageCache = {},
                 onClearDownload = {},
                 savedRed = null,
-                context = context.applicationContext
+                context = context.applicationContext,
+                onBackupDataChanged = {}
             )
         }
     }
