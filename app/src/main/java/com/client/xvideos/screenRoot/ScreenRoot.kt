@@ -117,7 +117,7 @@ object ScreenRoot : Screen {
             Scaffold(
                 floatingActionButtonPosition = FabPosition.Start,
                 floatingActionButton = {
-                    HomeFloatingActionButton(mainNavigator)
+                    //HomeFloatingActionButton(mainNavigator)
                 },
                 containerColor = ThemeL.greyBackground,
                 snackbarHost = {

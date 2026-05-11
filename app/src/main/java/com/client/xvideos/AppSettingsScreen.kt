@@ -48,7 +48,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.state.ToggleableState
@@ -79,6 +78,7 @@ import com.client.xvideos.common.settings.ui.components.SettingsAccentBlue
 import com.client.xvideos.common.settings.ui.components.SettingsCardColor
 import com.client.xvideos.common.settings.ui.components.SettingsButtonRowWithDialog
 import com.client.xvideos.common.settings.ui.components.SettingsDivider
+import com.client.xvideos.common.settings.ui.components.SettingsDividerColor
 import com.client.xvideos.common.settings.ui.components.SettingsGroup
 import com.client.xvideos.common.settings.ui.components.SettingsListItem
 import com.client.xvideos.common.settings.ui.components.SettingsPreview
@@ -599,13 +599,13 @@ private fun RSettingsSection(
         if (isNichesCacheDownloading) {
             LinearProgressIndicator(
                 progress = { nichesCacheProgress },
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .fillMaxWidth(),
-                color = WhatsAppGreen,
-                trackColor = Color(0xFF1E3B32),
-                strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
-            )
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .fillMaxWidth(),
+            color = WhatsAppGreen,
+            trackColor = SettingsDividerColor,
+            strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
+        )
         }
         SettingsDivider()
 
@@ -774,7 +774,7 @@ private fun BackupSettingsSection(
                             onClick = { createBackupLauncher.launch(XlrBackupManager.defaultFileName()) },
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = SettingsAccentBlue,
-                                contentColor = Color.Black
+                                contentColor = SettingsScreenBackground
                             )
                         ) {
                             Text("Создать")
@@ -798,7 +798,7 @@ private fun BackupSettingsSection(
                             },
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = SettingsAccentBlue,
-                                contentColor = Color.Black
+                                contentColor = SettingsScreenBackground
                             )
                         ) {
                             Text("Выбрать")
@@ -898,16 +898,16 @@ private fun BackupModeSelector(
                 ),
                 colors = SegmentedButtonDefaults.colors(
                     activeContainerColor = SettingsAccentBlue,
-                    activeContentColor = Color.Black,
+                    activeContentColor = SettingsScreenBackground,
                     activeBorderColor = SettingsAccentBlue,
                     inactiveContainerColor = SettingsCardColor,
                     inactiveContentColor = ThemeL.textColor,
-                    inactiveBorderColor = ThemeL.grey3
+                    inactiveBorderColor = SettingsDividerColor
                 ),
                 label = {
                     Text(
                         text = item.title,
-                        color = if (selected == item) Color.Black else SettingsRowTextPrimary,
+                        color = if (selected == item) SettingsScreenBackground else SettingsRowTextPrimary,
                         style = ThemeL.Type.button
                     )
                 }

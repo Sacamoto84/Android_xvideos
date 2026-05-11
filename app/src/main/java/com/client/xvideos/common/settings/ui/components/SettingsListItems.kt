@@ -41,13 +41,13 @@ import com.client.xvideos.common.settings.ui.DialogButton
 import com.client.xvideos.l.theme.ThemeL
 import kotlin.math.roundToInt
 
-internal val SettingsScreenBackground = Color(0xFF0D0E10)
-internal val SettingsTopBarColor = Color(0xFF24272D)
-internal val SettingsCardColor = Color(0xFF1B1D20)
-internal val SettingsAccentBlue = Color(0xFF63D8FF)
-internal val SettingsRowTextPrimary = Color(0xFFEDEEF2)
-internal val SettingsRowTextSecondary = Color(0xFFA6ABB4)
-internal val SettingsDividerColor = Color(0xFF2B2F34)
+internal val SettingsScreenBackground = Color(0xFF20272B)
+internal val SettingsTopBarColor = Color(0xFF2B2D30)
+internal val SettingsCardColor = Color(0xFF293136)
+internal val SettingsAccentBlue = Color(0xFF72B8E8)
+internal val SettingsRowTextPrimary = Color(0xFFDCE3E6)
+internal val SettingsRowTextSecondary = Color(0xFFAEB7BC)
+internal val SettingsDividerColor = Color(0xFF394248)
 internal val WhatsAppGreen = SettingsAccentBlue
 
 private val LocalSettingsInGroup = staticCompositionLocalOf { false }

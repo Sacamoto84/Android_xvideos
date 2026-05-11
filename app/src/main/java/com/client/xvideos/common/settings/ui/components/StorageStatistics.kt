@@ -17,7 +17,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.client.xvideos.R
@@ -114,7 +113,7 @@ internal fun StorageProgressRow(stat: StorageStat, progress: Float) {
                     .height(6.dp)
                     .clip(RoundedCornerShape(6.dp)),
                 color = WhatsAppGreen,
-                trackColor = Color(0xFF1E3B32)
+                trackColor = SettingsDividerColor
             )
             Spacer(Modifier.height(4.dp))
             Text(
