@@ -8,6 +8,7 @@ import android.preference.PreferenceManager
 import androidx.compose.runtime.ExperimentalComposeRuntimeApi
 import coil3.ImageLoader
 import coil3.SingletonImageLoader
+import com.client.xvideos.common.AppPath
 import com.client.xvideos.common.coil.CoilImageLoaderFactory
 import com.client.xvideos.common.eventBus.Event
 import com.client.xvideos.common.eventBus.EventBus
@@ -114,6 +115,7 @@ class App : Application(), SingletonImageLoader.Factory {
         super.onCreate()
 
         instance = this
+        AppPath.initInternalStorage(this)
 
         if (BuildConfig.DEBUG) Timber.plant(DebugTree())
 
