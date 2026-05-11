@@ -27,6 +27,11 @@ data class LAlbumPageLoadIssue(
     val failedAtMs: Long = System.currentTimeMillis()
 )
 
+data class LAlbumPicsBundleSnapshot(
+    val pics: List<PicsDetails>,
+    val totalPages: Int?
+)
+
 /**
  * Информация о картинках по id альбома
  */
@@ -65,13 +70,16 @@ class AlbumPicsDetails(
         val items: List<PicsDetails>
     )
 
-    private suspend fun loadPage(page: Int): Result<PageLoadResult> {
+    private suspend fun loadPage(
+        page: Int,
+        config: RepositoryUriConfig = RepositoryUriConfig.CACHE_RAM
+    ): Result<PageLoadResult> {
         withContext(Dispatchers.Main) {
             isPageRequestInFlight = true
         }
 
         return try {
-            openPage(page)
+            openPage(page, config)
         } finally {
             withContext(NonCancellable + Dispatchers.Main) {
                 isPageRequestInFlight = false
@@ -79,11 +87,14 @@ class AlbumPicsDetails(
         }
     }
 
-    private suspend fun openPage(page: Int): Result<PageLoadResult> {
+    private suspend fun openPage(
+        page: Int,
+        config: RepositoryUriConfig
+    ): Result<PageLoadResult> {
         val request = GraphQlRequest.pictureListInsideAlbum(id, page)
         val pageResponse = repository.openURI(
             request,
-            config = RepositoryUriConfig.CACHE_RAM
+            config = config
         ).mapCatching { parsePage(page, it) }
 
         if (pageResponse.isSuccess) {
@@ -99,7 +110,7 @@ class AlbumPicsDetails(
             return Result.failure(pageError ?: IllegalStateException("Server returned HTML instead of JSON"))
         }
 
-        Timber.w(pageError, "!!! AlbumPicsDetails $id page $page CACHE_RAM/ROM fallback error")
+        Timber.w(pageError, "!!! AlbumPicsDetails $id page $page load error")
         return pageResponse
     }
 
@@ -142,7 +153,9 @@ class AlbumPicsDetails(
         return PageLoadResult(page, pages, list)
     }
 
-    suspend fun contentUrls() = withContext(Dispatchers.Default) {
+    suspend fun contentUrls(
+        pageCacheConfig: RepositoryUriConfig = RepositoryUriConfig.CACHE_RAM
+    ) = withContext(Dispatchers.Default) {
         withContext(Dispatchers.Main) {
             pics.clear()
             failedPages.clear()
@@ -153,7 +166,7 @@ class AlbumPicsDetails(
             isRetryingFailedPages = false
         }
 
-        val firstPage = loadPage(1).getOrElse {
+        val firstPage = loadPage(1, pageCacheConfig).getOrElse {
             Timber.w(it, "!!! AlbumPicsDetails $id page 1 error")
             recordPageIssue(1, it)
             withContext(Dispatchers.Main) {
@@ -166,7 +179,7 @@ class AlbumPicsDetails(
         appendPage(firstPage, pages)
 
         for (page in 2..pages) {
-            val pageResult = loadPage(page).getOrElse {
+            val pageResult = loadPage(page, pageCacheConfig).getOrElse {
                 Timber.w(it, "!!! AlbumPicsDetails $id page $page error")
                 recordPageIssue(page, it)
                 PageLoadResult(page, pages, emptyList())
@@ -178,6 +191,35 @@ class AlbumPicsDetails(
         withContext(Dispatchers.Main) {
             percentLoad = 1f
         }
+    }
+
+    suspend fun restoreFromBundleCache(
+        items: List<PicsDetails>,
+        cachedTotalPages: Int?
+    ) = withContext(Dispatchers.Default) {
+        val corrected = normalizePictureUrls(items)
+        withContext(Dispatchers.Main) {
+            pics.clear()
+            failedPages.clear()
+            loadedPages.clear()
+            val pages = cachedTotalPages?.coerceAtLeast(1) ?: 1
+            totalPages = pages
+            percentLoad = 1f
+            isPageRequestInFlight = false
+            isRetryingFailedPages = false
+            loadedPages[1] = corrected
+            pics.addAll(corrected)
+        }
+    }
+
+    suspend fun bundleSnapshotOrNull(): LAlbumPicsBundleSnapshot? = withContext(Dispatchers.Main) {
+        if (failedPages.isNotEmpty() || percentLoad < 1f || pics.isEmpty()) {
+            return@withContext null
+        }
+        LAlbumPicsBundleSnapshot(
+            pics = pics.toList(),
+            totalPages = totalPages
+        )
     }
 
     private suspend fun appendPage(page: PageLoadResult, pages: Int) {

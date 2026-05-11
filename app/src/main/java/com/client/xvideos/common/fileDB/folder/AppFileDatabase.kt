@@ -16,6 +16,7 @@ class AppFileDatabase @Inject constructor() {
     val cacheUrlStringRam = FileStringCacheTable(FolderTable("$root/cache_url_string_ram"))
     val cacheUrlStringRom = FileStringCacheTable(FolderTable("$root/cache_url_string_rom"))
     val lAlbumPictureCache = FileStringCacheTable(FolderTable("$root/l_album_picture_cache"))
+    val lAlbumBundleCache = FileStringCacheTable(FolderTable("$root/l_album_bundle_cache"))
     val rCacheMediaResponse = FileStringCacheTable(FolderTable("$root/r_cache_media_response"))
 
     val rSearchHistoryExplorerTable = FolderTable("$root/r_search_history_explorer")

@@ -67,6 +67,7 @@ class Repository(
 
     private val cacheUrlStringRomDao = fileDb.cacheUrlStringRom
     private val cacheUrlStringRamDao = fileDb.cacheUrlStringRam
+    private val lAlbumBundleCacheDao = fileDb.lAlbumBundleCache
 
     init {
         clearRamDao()
@@ -334,6 +335,25 @@ class Repository(
             RepositoryUriConfig.CACHE_ROM -> cacheUrlStringRomDao.delete(cacheKey)
             RepositoryUriConfig.DIRECT -> Unit
         }
+    }
+
+    suspend fun getAlbumBundleCache(albumId: Int, maxAgeMs: Long): String? {
+        val key = albumId.toString()
+        val entry = lAlbumBundleCacheDao.get(key) ?: return null
+        val ageMs = System.currentTimeMillis() - entry.timeCreate
+        if (ageMs < 0L || ageMs > maxAgeMs) {
+            lAlbumBundleCacheDao.delete(key)
+            return null
+        }
+        return entry.content
+    }
+
+    suspend fun putAlbumBundleCache(albumId: Int, content: String) {
+        lAlbumBundleCacheDao.put(albumId.toString(), content)
+    }
+
+    suspend fun deleteAlbumBundleCache(albumId: Int) {
+        lAlbumBundleCacheDao.delete(albumId.toString())
     }
 
     private suspend fun getRamCache(cacheKey: String): String? {
