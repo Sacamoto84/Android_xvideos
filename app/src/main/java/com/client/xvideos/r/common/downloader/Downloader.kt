@@ -18,6 +18,13 @@ data class ItemsRedDownload(
     val url: String = "",      //Создается на этапе закачки, и после успешной закачки не используется url mp4  //https://media.redgifs.com/VictoriousGlamorousStud.m4s
 )
 
+data class RedDownloadEnqueueReport(
+    val queuedVideo: Int = 0,
+    val queuedPreview: Int = 0,
+    val skippedNoVideoUrl: Int = 0,
+    val skippedNoPreviewUrl: Int = 0
+)
+
 /**
  * Проверка что данное имя креатор уже есть в кеше
  */
@@ -32,7 +39,8 @@ class Downloader @Inject constructor(
     @OptIn(DelicateCoroutinesApi::class)
     fun downloadRedName(item: GifsInfo, onComplete: () -> Unit = {}) {
 
-        if ((item.urls.hd.toString() == "") || (item.userName == "")) {
+        val videoUrl = item.downloadVideoUrl()
+        if ((videoUrl == null) || (item.userName == "")) {
             //Toast("Ошибка в названии файла или креатор")
             percent.value = -3f
             return
@@ -48,13 +56,12 @@ class Downloader @Inject constructor(
             val p = AppPath.r_cache_download + "/" + item.userName
             File(p).mkdirs()
 
-            val imageUrl = if(item.urls.poster != null) item.urls.poster else item.urls.thumbnail
-            val requestImage = kDownloader.newRequestBuilder(imageUrl!!, p, "${item.id}.jpg").build()
-            kDownloader.enqueue(
-                requestImage
-            )
+            item.previewUrl()?.let { imageUrl ->
+                val requestImage = kDownloader.newRequestBuilder(imageUrl, p, "${item.id}.jpg").build()
+                kDownloader.enqueue(requestImage)
+            }
 
-            val request = kDownloader.newRequestBuilder(item.urls.hd.toString(), p, "${item.id}.mp4").tag(item.id).build()
+            val request = kDownloader.newRequestBuilder(videoUrl, p, "${item.id}.mp4").tag(item.id).build()
 
             kDownloader.enqueue(
                 request,
@@ -89,11 +96,83 @@ class Downloader @Inject constructor(
 
     }
 
+    fun downloadMissingFiles(item: GifsInfo, onComplete: () -> Unit = {}): RedDownloadEnqueueReport {
+        if (item.id.isBlank() || item.userName.isBlank()) {
+            return RedDownloadEnqueueReport()
+        }
+
+        val p = AppPath.r_cache_download + "/" + item.userName
+        File(p).mkdirs()
+
+        val videoFile = File(p, "${item.id}.mp4")
+        val previewFile = File(p, "${item.id}.jpg")
+        var queuedVideo = 0
+        var queuedPreview = 0
+        var skippedNoVideoUrl = 0
+        var skippedNoPreviewUrl = 0
+
+        if (!previewFile.exists()) {
+            val previewUrl = item.previewUrl()
+            if (previewUrl == null) {
+                skippedNoPreviewUrl++
+            } else {
+                val requestImage = kDownloader.newRequestBuilder(previewUrl, p, "${item.id}.jpg").build()
+                kDownloader.enqueue(requestImage)
+                queuedPreview++
+            }
+        }
+
+        if (!videoFile.exists()) {
+            val videoUrl = item.downloadVideoUrl()
+            if (videoUrl == null) {
+                skippedNoVideoUrl++
+            } else {
+                val request = kDownloader.newRequestBuilder(videoUrl, p, "${item.id}.mp4").tag(item.id).build()
+                kDownloader.enqueue(
+                    request,
+                    onStart = {
+                        percent.value = 0f
+                    },
+                    onError = {
+                        percent.value = -3f
+                        SnackBar.error("Ошибка закачки: $it")
+                    },
+                    onProgress = { progress -> percent.value = progress / 100f },
+                    onCompleted = {
+                        percent.value = -2f
+                        onComplete()
+                    }
+                )
+                queuedVideo++
+            }
+        }
+
+        if (queuedVideo == 0) onComplete()
+
+        return RedDownloadEnqueueReport(
+            queuedVideo = queuedVideo,
+            queuedPreview = queuedPreview,
+            skippedNoVideoUrl = skippedNoVideoUrl,
+            skippedNoPreviewUrl = skippedNoPreviewUrl
+        )
+    }
+
     fun findVideoInDownload(id: String, name: String): Boolean {
         //val mainPath = AppPath.cache_download_red + "/" + name + "/" + id + ".mp4"
         val mainPath = "${AppPath.r_cache_download}/$name/$id.mp4"
         val file = File(mainPath)
         return file.exists()
+    }
+
+    private fun GifsInfo.downloadVideoUrl(): String? {
+        return urls.hd?.takeIf { it.isNotBlank() }
+            ?: urls.sd.takeIf { it.isNotBlank() }
+            ?: urls.silent?.takeIf { it.isNotBlank() }
+    }
+
+    private fun GifsInfo.previewUrl(): String? {
+        return urls.poster?.takeIf { it.isNotBlank() }
+            ?: urls.thumbnail.takeIf { it.isNotBlank() }
     }
 
 }

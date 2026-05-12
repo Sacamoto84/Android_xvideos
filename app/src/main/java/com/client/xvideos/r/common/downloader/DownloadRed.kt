@@ -11,11 +11,26 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.io.files.SystemPathSeparator
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
+
+data class RedDownloadRecoveryReport(
+    val totalInfoFiles: Int = 0,
+    val incompleteItems: Int = 0,
+    val queuedVideo: Int = 0,
+    val queuedPreview: Int = 0,
+    val invalidInfoFiles: Int = 0,
+    val skippedNoVideoUrl: Int = 0,
+    val skippedNoPreviewUrl: Int = 0
+)
+
+private data class RedDownloadRecoveryCandidate(
+    val item: GifsInfo
+)
 
 @Singleton
 class DownloadRed @Inject constructor(
@@ -76,6 +91,36 @@ class DownloadRed @Inject constructor(
         }
     }
 
+    suspend fun scanIncompleteDownloads(): RedDownloadRecoveryReport = withContext(Dispatchers.IO) {
+        scanIncompleteDownloadsInternal().report
+    }
+
+    fun recoverIncompleteDownloads(onComplete: (RedDownloadRecoveryReport) -> Unit = {}) {
+        scope.launch(Dispatchers.IO) {
+            val scan = scanIncompleteDownloadsInternal()
+            var report = scan.report
+
+            scan.candidates.forEach { candidate ->
+                val enqueueReport = downloader.downloadMissingFiles(
+                    item = candidate.item,
+                    onComplete = { refreshDownloadList() }
+                )
+                report = report.copy(
+                    queuedVideo = report.queuedVideo + enqueueReport.queuedVideo,
+                    queuedPreview = report.queuedPreview + enqueueReport.queuedPreview,
+                    skippedNoVideoUrl = report.skippedNoVideoUrl + enqueueReport.skippedNoVideoUrl,
+                    skippedNoPreviewUrl = report.skippedNoPreviewUrl + enqueueReport.skippedNoPreviewUrl
+                )
+            }
+
+            if (report.queuedVideo == 0) {
+                refreshDownloadList()
+            }
+
+            onComplete(report)
+        }
+    }
+
     fun deleteAll(onComplete: () -> Unit = {}) {
         scope.launch(Dispatchers.IO) {
             File(AppPath.r_cache_download).deleteRecursively()
@@ -109,6 +154,55 @@ class DownloadRed @Inject constructor(
 
             SnackBar.success("Gif удален")
         }
+    }
+
+    private data class RecoveryScan(
+        val report: RedDownloadRecoveryReport,
+        val candidates: List<RedDownloadRecoveryCandidate>
+    )
+
+    private fun scanIncompleteDownloadsInternal(): RecoveryScan {
+        val rootDir = File(AppPath.r_cache_download)
+        val infoFiles = if (rootDir.exists() && rootDir.isDirectory) {
+            rootDir.walkTopDown().filter { it.isFile && it.extension.equals("info", ignoreCase = true) }.toList()
+        } else {
+            emptyList()
+        }
+
+        val gson = GsonBuilder().create()
+        var invalidInfoFiles = 0
+        val candidates = mutableListOf<RedDownloadRecoveryCandidate>()
+
+        infoFiles.forEach { infoFile ->
+            runCatching {
+                val item = gson.fromJson(infoFile.readText(), GifsInfo::class.java)
+                    ?: error("Empty info json")
+                val parent = infoFile.parentFile ?: error("Missing parent folder")
+                val id = item.id.takeIf { it.isNotBlank() } ?: infoFile.nameWithoutExtension
+                val userName = item.userName.takeIf { it.isNotBlank() } ?: parent.name
+                val missingVideo = !File(parent, "$id.mp4").exists()
+                val missingPreview = !File(parent, "$id.jpg").exists()
+                if (missingVideo || missingPreview) {
+                    candidates.add(
+                        RedDownloadRecoveryCandidate(
+                            item = item.copy(id = id, userName = userName)
+                        )
+                    )
+                }
+            }.onFailure {
+                invalidInfoFiles++
+                Timber.e(it, "Ошибка при чтении R Download info: ${infoFile.absolutePath}")
+            }
+        }
+
+        return RecoveryScan(
+            report = RedDownloadRecoveryReport(
+                totalInfoFiles = infoFiles.size,
+                incompleteItems = candidates.size,
+                invalidInfoFiles = invalidInfoFiles
+            ),
+            candidates = candidates
+        )
     }
 
 }

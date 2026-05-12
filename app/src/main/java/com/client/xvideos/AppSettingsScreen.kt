@@ -100,6 +100,8 @@ import com.client.xvideos.common.util.getFolderSize
 import com.client.xvideos.common.util.toPrettyCount3
 import com.client.xvideos.l.model.ThumbnailsSize
 import com.client.xvideos.l.theme.ThemeL
+import com.client.xvideos.r.common.downloader.DownloadRed
+import com.client.xvideos.r.common.downloader.RedDownloadRecoveryReport
 import com.client.xvideos.r.common.saved.SavedRed
 import com.client.xvideos.ui.theme.XvideosTheme
 import dagger.Binds
@@ -114,7 +116,8 @@ import java.io.File
 import javax.inject.Inject
 
 class AppSettingsSM @Inject constructor(
-    val savedRed: SavedRed
+    val savedRed: SavedRed,
+    val downloadRed: DownloadRed
 ) : ScreenModel
 
 @Module
@@ -193,6 +196,7 @@ object AppSettingsScreen : Screen {
                 }
             },
             savedRed = vm.savedRed,
+            downloadRed = vm.downloadRed,
             context = context,
             onBackupDataChanged = refreshFileStats,
             onRefreshFileStats = refreshFileStats
@@ -210,6 +214,7 @@ private fun AppSettingsScreenContent(
     onClearImageCache: () -> Unit,
     onClearDownload: () -> Unit,
     savedRed: SavedRed?,
+    downloadRed: DownloadRed?,
     context: Context,
     onBackupDataChanged: () -> Unit,
     onRefreshFileStats: () -> Unit
@@ -275,6 +280,7 @@ private fun AppSettingsScreenContent(
             onClearImageCache = onClearImageCache,
             onClearDownload = onClearDownload,
             savedRed = savedRed,
+            downloadRed = downloadRed,
             context = context,
             onBackupDataChanged = onBackupDataChanged
         )
@@ -293,6 +299,7 @@ private fun AppSettingsScreenBody(
     onClearImageCache: () -> Unit,
     onClearDownload: () -> Unit,
     savedRed: SavedRed?,
+    downloadRed: DownloadRed?,
     context: Context,
     onBackupDataChanged: () -> Unit
 ) {
@@ -353,6 +360,7 @@ private fun AppSettingsScreenBody(
                     sizeRedDownload = sizeRedDownload,
                     onClearDownload = onClearDownload,
                     savedRed = savedRed,
+                    downloadRed = downloadRed,
                     isNichesCacheDownloading = isNichesCacheDownloading,
                     nichesCacheProgress = nichesCacheProgress,
                     nichesCacheSize = nichesCacheSize,
@@ -362,6 +370,7 @@ private fun AppSettingsScreenBody(
                 SettingsPage.Storage -> StorageStatisticsSection(storageStats)
                 SettingsPage.Backup -> BackupSettingsSection(
                     context = context,
+                    downloadRed = downloadRed,
                     onDataChanged = onBackupDataChanged
                 )
             }
@@ -570,11 +579,16 @@ private fun RSettingsSection(
     sizeRedDownload: Long,
     onClearDownload: () -> Unit,
     savedRed: SavedRed?,
+    downloadRed: DownloadRed?,
     isNichesCacheDownloading: Boolean,
     nichesCacheProgress: Float,
     nichesCacheSize: Int,
     nichesCacheLastModifiedHour: Long
 ) {
+    val scope = rememberCoroutineScope()
+    var isRecoveringDownload by remember { mutableStateOf(false) }
+    var recoveryReport by remember { mutableStateOf<RedDownloadRecoveryReport?>(null) }
+
     SettingsGroup {
         SettingsValueRow(
             icon = R.drawable.icon_red,
@@ -598,6 +612,39 @@ private fun RSettingsSection(
             textDialogBody = "Подтвердить очистку: ${sizeRedDownload.toPrettyCount3()}",
             textDialogButton = "Очистить",
             onClick = onClearDownload
+        )
+        SettingsDivider()
+
+        SettingsListItem(
+            icon = R.drawable.hard_drive_2_24,
+            text = "Докачать Download по .info",
+            subtitle = redDownloadRecoveryText(recoveryReport, isRecoveringDownload),
+            trailing = {
+                Button(
+                    enabled = downloadRed != null && !isRecoveringDownload,
+                    onClick = {
+                        val redDownloader = downloadRed ?: return@Button
+                        isRecoveringDownload = true
+                        scope.launch {
+                            redDownloader.recoverIncompleteDownloads { report ->
+                                scope.launch {
+                                    recoveryReport = report
+                                    isRecoveringDownload = false
+                                    if (report.incompleteItems == 0) {
+                                        SnackBar.success("Download проверен: все файлы на месте")
+                                    } else {
+                                        SnackBar.success(
+                                            "Запущено: видео ${report.queuedVideo}, превью ${report.queuedPreview}"
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ) {
+                    Text("Старт")
+                }
+            }
         )
         SettingsDivider()
 
@@ -636,6 +683,27 @@ private fun RSettingsSection(
     }
 }
 
+private fun redDownloadRecoveryText(
+    report: RedDownloadRecoveryReport?,
+    isWorking: Boolean
+): String {
+    if (isWorking) return "Сканирование .info и запуск недостающих загрузок"
+    if (report == null) return "Если после backup есть только .info, скачает недостающие mp4/jpg"
+    if (report.incompleteItems == 0) return "Все файлы на месте: ${report.totalInfoFiles} info"
+    return "Найдено ${report.incompleteItems} из ${report.totalInfoFiles} • видео ${report.queuedVideo} • превью ${report.queuedPreview}"
+}
+
+private fun redDownloadRecoverySnackText(report: RedDownloadRecoveryReport): String {
+    if (report.incompleteItems == 0) return "R Download проверен: все файлы на месте"
+    return "R Download: запущено видео ${report.queuedVideo}, превью ${report.queuedPreview}"
+}
+
+private fun shouldAutoRecoverRedDownload(selectedPaths: Set<String>): Boolean {
+    return selectedPaths.any { path ->
+        path == "R" || path == "R/Download" || path.startsWith("R/Download/")
+    }
+}
+
 @Composable
 private fun XSettingsSection() {
     val xvideosRow2 = Settings.xvideos_row2.field.collectAsStateWithLifecycle().value
@@ -668,6 +736,7 @@ private enum class BackupFlowScreen(val title: String) {
 @Composable
 private fun BackupSettingsSection(
     context: Context,
+    downloadRed: DownloadRed?,
     onDataChanged: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -746,7 +815,7 @@ private fun BackupSettingsSection(
             value = if (screen == BackupFlowScreen.CREATE) {
                 "Создание архива выбранных папок. DB, настройки и кеши не входят в ZIP."
             } else {
-                "Восстановление заменяет только выбранные папки из ZIP. Остальные данные не трогаются."
+                "Восстановление заменяет выбранные папки. Для R Download после restore автоматически проверяются .info."
             }
         )
         BackupModeSelector(
@@ -865,11 +934,25 @@ private fun BackupSettingsSection(
                             if (!isWorking) {
                                 scope.launch {
                                     isWorking = true
+                                    val autoRecoverRedDownload = shouldAutoRecoverRedDownload(selectedRestorePaths)
                                     XlrBackupManager.restoreBackup(context, uri, selectedRestorePaths)
                                         .onSuccess { report ->
                                             refreshBackupItems()
                                             onDataChanged()
                                             SnackBar.success("Backup восстановлен: ${report.files} файлов. Перезапустите приложение.")
+                                            if (autoRecoverRedDownload) {
+                                                val redDownloader = downloadRed
+                                                if (redDownloader == null) {
+                                                    SnackBar.error("R Download восстановлен, но загрузчик недоступен")
+                                                } else {
+                                                    SnackBar.success("R Download: сканирую .info")
+                                                    redDownloader.recoverIncompleteDownloads { recoveryReport ->
+                                                        scope.launch {
+                                                            SnackBar.success(redDownloadRecoverySnackText(recoveryReport))
+                                                        }
+                                                    }
+                                                }
+                                            }
                                         }
                                         .onFailure { error ->
                                             SnackBar.error(error.message ?: "Ошибка восстановления backup")
@@ -1199,6 +1282,7 @@ private fun AppSettingsScreenPreview() {
                 onClearImageCache = {},
                 onClearDownload = {},
                 savedRed = null,
+                downloadRed = null,
                 context = context.applicationContext,
                 onBackupDataChanged = {}
             )

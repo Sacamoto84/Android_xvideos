@@ -33,6 +33,7 @@ data class XlrBackupItem(
 object XlrBackupManager {
     private const val SCHEMA_VERSION = 1
     private const val MANIFEST_ENTRY = "backup.json"
+    private const val R_DOWNLOAD_PATH = "R/Download"
     private val sections = listOf("X", "L", "R")
 
     fun defaultFileName(now: Long = System.currentTimeMillis()): String {
@@ -43,7 +44,7 @@ object XlrBackupManager {
     suspend fun currentBackupItems(): List<XlrBackupItem> = withContext(Dispatchers.IO) {
         sections.flatMap { section ->
             val root = File(AppPath.main, section)
-            val rootReport = measurePath(root)
+            val rootReport = measurePath(root, section)
             val rootItem = XlrBackupItem(
                 path = section,
                 title = section,
@@ -56,9 +57,10 @@ object XlrBackupManager {
                 ?.filter { it.isDirectory }
                 ?.sortedBy { it.name.lowercase(Locale.US) }
                 ?.map { child ->
-                    val report = measurePath(child)
+                    val childPath = "$section/${child.name}"
+                    val report = measurePath(child, childPath)
                     XlrBackupItem(
-                        path = "$section/${child.name}",
+                        path = childPath,
                         title = child.name,
                         section = section,
                         parentPath = section,
@@ -204,7 +206,13 @@ object XlrBackupManager {
     }
 
     private fun writePath(zip: ZipOutputStream, source: File, entryRoot: String): XlrBackupReport {
-        if (source.isFile) return writeFile(zip, source, entryRoot)
+        if (source.isFile) {
+            return if (shouldIncludeBackupEntry(entryRoot)) {
+                writeFile(zip, source, entryRoot)
+            } else {
+                XlrBackupReport(files = 0, bytes = 0L)
+            }
+        }
         return writeDirectory(zip, source, entryRoot)
     }
 
@@ -227,6 +235,7 @@ object XlrBackupManager {
                 zip.closeEntry()
                 return@forEach
             }
+            if (!shouldIncludeBackupEntry(entryName)) return@forEach
 
             val entry = ZipEntry(entryName).apply {
                 time = file.lastModified().takeIf { it > 0L } ?: System.currentTimeMillis()
@@ -338,18 +347,35 @@ object XlrBackupManager {
         return size
     }
 
-    private fun measurePath(path: File): XlrBackupReport {
+    private fun measurePath(path: File, entryRoot: String): XlrBackupReport {
         if (!path.exists()) return XlrBackupReport(files = 0, bytes = 0L)
-        if (path.isFile) return XlrBackupReport(files = 1, bytes = path.length())
+        if (path.isFile) {
+            return if (shouldIncludeBackupEntry(entryRoot)) {
+                XlrBackupReport(files = 1, bytes = path.length())
+            } else {
+                XlrBackupReport(files = 0, bytes = 0L)
+            }
+        }
         var files = 0
         var bytes = 0L
         path.walkTopDown().forEach { file ->
             if (file.isFile) {
+                val relativePath = file.relativeTo(path)
+                    .invariantSeparatorsPath
+                    .trim('/')
+                val entryName = "$entryRoot/$relativePath"
+                if (!shouldIncludeBackupEntry(entryName)) return@forEach
                 files++
                 bytes += file.length()
             }
         }
         return XlrBackupReport(files = files, bytes = bytes)
+    }
+
+    private fun shouldIncludeBackupEntry(entryName: String): Boolean {
+        val normalized = entryName.replace('\\', '/').trim('/')
+        if (normalized == R_DOWNLOAD_PATH || normalized.startsWith("$R_DOWNLOAD_PATH/").not()) return true
+        return normalized.endsWith(".info", ignoreCase = true)
     }
 
     private fun normalizeSelectedPaths(paths: Set<String>): List<String> {

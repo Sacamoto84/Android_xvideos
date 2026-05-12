@@ -209,13 +209,13 @@ object MenuScreen : Screen {
 
         Scaffold(
             topBar = {
-                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopEnd) {
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopStart) {
                     IconButton(onClick = { navigator.push(AppSettingsScreen) }, modifier = Modifier.displayCutoutPadding().size(48.dp)) {
                         Icon(
                             Icons.Default.MoreVert,
                             contentDescription = null,
                             tint = Color.White,
-                            modifier = Modifier.size(40.dp))
+                            modifier = Modifier.size(32.dp))
                     }
                 }
             }
