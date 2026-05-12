@@ -66,8 +66,10 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.common.AppPath
+import com.client.xvideos.common.backup.XlrBackupContentMode
 import com.client.xvideos.common.backup.XlrBackupItem
 import com.client.xvideos.common.backup.XlrBackupManager
+import com.client.xvideos.common.backup.XlrBackupOptions
 import com.client.xvideos.common.backup.XlrBackupReport
 import com.client.xvideos.common.coil.CoilImageLoaderFactory
 import com.client.xvideos.common.settings.Settings
@@ -99,6 +101,8 @@ import com.client.xvideos.common.util.formatBytes
 import com.client.xvideos.common.util.getFolderSize
 import com.client.xvideos.common.util.toPrettyCount3
 import com.client.xvideos.l.model.ThumbnailsSize
+import com.client.xvideos.l.featured.saved.LDownloadRecoveryReport
+import com.client.xvideos.l.featured.saved.SavedL
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.r.common.downloader.DownloadRed
 import com.client.xvideos.r.common.downloader.RedDownloadRecoveryReport
@@ -117,7 +121,8 @@ import javax.inject.Inject
 
 class AppSettingsSM @Inject constructor(
     val savedRed: SavedRed,
-    val downloadRed: DownloadRed
+    val downloadRed: DownloadRed,
+    val savedL: SavedL
 ) : ScreenModel
 
 @Module
@@ -197,6 +202,7 @@ object AppSettingsScreen : Screen {
             },
             savedRed = vm.savedRed,
             downloadRed = vm.downloadRed,
+            savedL = vm.savedL,
             context = context,
             onBackupDataChanged = refreshFileStats,
             onRefreshFileStats = refreshFileStats
@@ -215,6 +221,7 @@ private fun AppSettingsScreenContent(
     onClearDownload: () -> Unit,
     savedRed: SavedRed?,
     downloadRed: DownloadRed?,
+    savedL: SavedL?,
     context: Context,
     onBackupDataChanged: () -> Unit,
     onRefreshFileStats: () -> Unit
@@ -281,6 +288,7 @@ private fun AppSettingsScreenContent(
             onClearDownload = onClearDownload,
             savedRed = savedRed,
             downloadRed = downloadRed,
+            savedL = savedL,
             context = context,
             onBackupDataChanged = onBackupDataChanged
         )
@@ -300,6 +308,7 @@ private fun AppSettingsScreenBody(
     onClearDownload: () -> Unit,
     savedRed: SavedRed?,
     downloadRed: DownloadRed?,
+    savedL: SavedL?,
     context: Context,
     onBackupDataChanged: () -> Unit
 ) {
@@ -371,6 +380,7 @@ private fun AppSettingsScreenBody(
                 SettingsPage.Backup -> BackupSettingsSection(
                     context = context,
                     downloadRed = downloadRed,
+                    savedL = savedL,
                     onDataChanged = onBackupDataChanged
                 )
             }
@@ -698,6 +708,18 @@ private fun redDownloadRecoverySnackText(report: RedDownloadRecoveryReport): Str
     return "R Download: запущено видео ${report.queuedVideo}, превью ${report.queuedPreview}"
 }
 
+private fun lDownloadRecoverySnackText(report: LDownloadRecoveryReport): String {
+    if (report.incompleteItems == 0) return "L Likes/Collection проверены: все файлы на месте"
+    return "L Likes/Collection: скачано media ${report.downloadedMedia}, preview ${report.downloadedPreview}"
+}
+
+private fun shouldAutoRecoverL(selectedPaths: Set<String>): Boolean {
+    return selectedPaths.any { path ->
+        path == "L" || path == "L/Likes" || path.startsWith("L/Likes/") ||
+                path == "L/Collection" || path.startsWith("L/Collection/")
+    }
+}
+
 private fun shouldAutoRecoverRedDownload(selectedPaths: Set<String>): Boolean {
     return selectedPaths.any { path ->
         path == "R" || path == "R/Download" || path.startsWith("R/Download/")
@@ -737,26 +759,32 @@ private enum class BackupFlowScreen(val title: String) {
 private fun BackupSettingsSection(
     context: Context,
     downloadRed: DownloadRed?,
+    savedL: SavedL?,
     onDataChanged: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
     var screen by rememberSaveable { mutableStateOf(BackupFlowScreen.CREATE) }
     var isWorking by rememberSaveable { mutableStateOf(false) }
+    var lBackupMode by rememberSaveable { mutableStateOf(XlrBackupContentMode.MINI) }
+    var rBackupMode by rememberSaveable { mutableStateOf(XlrBackupContentMode.MINI) }
     var backupItems by remember { mutableStateOf<List<XlrBackupItem>>(emptyList()) }
     var selectedBackupPaths by remember { mutableStateOf<Set<String>>(emptySet()) }
     var restoreUri by remember { mutableStateOf<Uri?>(null) }
     var restoreItems by remember { mutableStateOf<List<XlrBackupItem>>(emptyList()) }
     var selectedRestorePaths by remember { mutableStateOf<Set<String>>(emptySet()) }
+    val backupOptions = remember(lBackupMode, rBackupMode) {
+        XlrBackupOptions(lMode = lBackupMode, rMode = rBackupMode)
+    }
 
     suspend fun refreshBackupItems() {
-        val items = XlrBackupManager.currentBackupItems()
+        val items = XlrBackupManager.currentBackupItems(backupOptions)
         backupItems = items
         if (selectedBackupPaths.isEmpty()) {
             selectedBackupPaths = initialSectionSelection(items)
         }
     }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(backupOptions) {
         refreshBackupItems()
     }
 
@@ -770,7 +798,7 @@ private fun BackupSettingsSection(
         }
         scope.launch {
             isWorking = true
-            XlrBackupManager.createBackup(context, uri, selectedBackupPaths)
+            XlrBackupManager.createBackup(context, uri, selectedBackupPaths, backupOptions)
                 .onSuccess { report ->
                     SnackBar.success("Backup создан: ${report.files} файлов, ${formatBytes(report.bytes)}")
                     refreshBackupItems()
@@ -832,6 +860,23 @@ private fun BackupSettingsSection(
                     text = "Выбрано для архива",
                     value = if (isWorking) "Идет операция" else selectionSummaryText(backupReport)
                 )
+                SettingsDivider()
+                BackupContentModeSelector(
+                    title = "L backup",
+                    value = lBackupMode,
+                    enabled = !isWorking,
+                    description = "Мини: Likes/Collection без медиа, только metadata",
+                    onValueChange = { lBackupMode = it }
+                )
+                SettingsDivider()
+                BackupContentModeSelector(
+                    title = "R backup",
+                    value = rBackupMode,
+                    enabled = !isWorking,
+                    description = "Мини: Download без mp4/jpg, только .info",
+                    onValueChange = { rBackupMode = it }
+                )
+                SettingsDivider()
                 BackupSelectionActions(
                     enabled = !isWorking,
                     onSelectAll = { selectedBackupPaths = initialSectionSelection(backupItems) },
@@ -934,12 +979,26 @@ private fun BackupSettingsSection(
                             if (!isWorking) {
                                 scope.launch {
                                     isWorking = true
+                                    val autoRecoverL = shouldAutoRecoverL(selectedRestorePaths)
                                     val autoRecoverRedDownload = shouldAutoRecoverRedDownload(selectedRestorePaths)
                                     XlrBackupManager.restoreBackup(context, uri, selectedRestorePaths)
                                         .onSuccess { report ->
                                             refreshBackupItems()
                                             onDataChanged()
                                             SnackBar.success("Backup восстановлен: ${report.files} файлов. Перезапустите приложение.")
+                                            if (autoRecoverL) {
+                                                val lSaved = savedL
+                                                if (lSaved == null) {
+                                                    SnackBar.error("L Likes/Collection восстановлены, но L-загрузчик недоступен")
+                                                } else {
+                                                    SnackBar.success("L Likes/Collection: сканирую metadata")
+                                                    lSaved.recoverIncompleteSavedMedia { recoveryReport ->
+                                                        scope.launch {
+                                                            SnackBar.success(lDownloadRecoverySnackText(recoveryReport))
+                                                        }
+                                                    }
+                                                }
+                                            }
                                             if (autoRecoverRedDownload) {
                                                 val redDownloader = downloadRed
                                                 if (redDownloader == null) {
@@ -1007,6 +1066,47 @@ private fun BackupModeSelector(
                 }
             )
         }
+    }
+}
+
+@Composable
+private fun BackupContentModeSelector(
+    title: String,
+    value: XlrBackupContentMode,
+    enabled: Boolean,
+    description: String,
+    onValueChange: (XlrBackupContentMode) -> Unit
+) {
+    SettingsValueRow(
+        icon = R.drawable.hard_drive_2_24,
+        text = title,
+        value = "${backupContentModeTitle(value)} • $description"
+    )
+    SingleChoiceSegmentedButtonRow(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(56.dp)
+            .padding(horizontal = 16.dp, vertical = 6.dp)
+    ) {
+        XlrBackupContentMode.entries.forEachIndexed { index, mode ->
+            SegmentedButton(
+                enabled = enabled,
+                selected = value == mode,
+                onClick = { onValueChange(mode) },
+                shape = SegmentedButtonDefaults.itemShape(
+                    index = index,
+                    count = XlrBackupContentMode.entries.size
+                ),
+                label = { Text(backupContentModeTitle(mode)) }
+            )
+        }
+    }
+}
+
+private fun backupContentModeTitle(mode: XlrBackupContentMode): String {
+    return when (mode) {
+        XlrBackupContentMode.MINI -> "Мини"
+        XlrBackupContentMode.FULL -> "Полный"
     }
 }
 
@@ -1283,6 +1383,7 @@ private fun AppSettingsScreenPreview() {
                 onClearDownload = {},
                 savedRed = null,
                 downloadRed = null,
+                savedL = null,
                 context = context.applicationContext,
                 onBackupDataChanged = {}
             )
