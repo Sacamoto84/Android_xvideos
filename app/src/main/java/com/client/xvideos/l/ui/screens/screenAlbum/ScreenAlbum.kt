@@ -17,14 +17,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Scaffold
@@ -54,7 +51,6 @@ import com.client.xvideos.l.model.AlbumDetails
 import com.client.xvideos.l.net.AlbumPicsDetails
 import com.client.xvideos.l.ui.element.expandMenu.ExpandMenuType
 import com.client.xvideos.l.ui.element.lazyRowPictureDetails.L_LazyRowPictureDetails
-import com.client.xvideos.l.ui.element.lazyRowPictureDetails.LPictureSelectionState
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumDialogDeleteAlbum
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoAudiences
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoButtonSaveAlbum
@@ -156,7 +152,6 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
                     host = vm.host,
                     expandMenu = ExpandMenuType.ALBUM,
                     showInitialLoading = showInitialItemsLoading,
-                    selectionState = vm.host.selection,
                     itemBefore = {
                         Column(modifier = Modifier.padding(horizontal = 4.dp)) {
                             if (parsed != null) {
@@ -183,23 +178,6 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
                         }
                     }
                 )
-
-                AnimatedVisibility(
-                    visible = vm.host.selection.active,
-                    modifier = Modifier.align(Alignment.TopCenter),
-                    enter = fadeIn(),
-                    exit = fadeOut()
-                ) {
-                    LAlbumSelectionBar(
-                        selectedCount = vm.host.selection.selectedKeys.size,
-                        selectionState = vm.host.selection,
-                        onAddToCollection = {
-                            val selectedItems = vm.host.selection.selectedItems(vm.host.filteredPic.toList())
-                            vm.saved.collection.beginAddManyToCollection(selectedItems)
-                            vm.host.selection.clear()
-                        }
-                    )
-                }
             }
 
         }
@@ -295,33 +273,4 @@ private fun LAlbumNetworkIssuePanel(
         }
     }
 }
-
-@Composable
-private fun LAlbumSelectionBar(
-    selectedCount: Int,
-    selectionState: LPictureSelectionState,
-    onAddToCollection: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(ThemeL.grey5.copy(alpha = 0.96f))
-            .padding(horizontal = 8.dp, vertical = 6.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        IconButton(onClick = { selectionState.clear() }) {
-            Icon(Icons.Default.Close, contentDescription = null, tint = ThemeL.textColor)
-        }
-        Text(
-            "Выбрано: $selectedCount",
-            color = ThemeL.textColor,
-            style = ThemeL.Type.rowTitle,
-            modifier = Modifier.weight(1f)
-        )
-        IconButton(onClick = onAddToCollection, enabled = selectedCount > 0) {
-            Icon(Icons.Default.Add, contentDescription = null, tint = ThemeL.primaryColor)
-        }
-    }
-}
-
 

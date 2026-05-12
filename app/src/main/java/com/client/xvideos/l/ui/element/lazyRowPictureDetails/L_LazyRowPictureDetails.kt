@@ -17,14 +17,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.lazy.staggeredgrid.itemsIndexed
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.PlayArrow
@@ -42,7 +39,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -96,8 +92,7 @@ fun L_LazyRowPictureDetails(
     expandMenu: ExpandMenuType,
     tag: String = "",
     showInitialLoading: Boolean = false,
-    isCollection: Boolean = false,
-    selectionState: LPictureSelectionState? = null
+    isCollection: Boolean = false
 ) {
     val expandMenuViewModel: ExpandMenuViewModel = hiltViewModel()
     val navigator = LocalNavigator.currentOrThrow
@@ -141,7 +136,6 @@ fun L_LazyRowPictureDetails(
                         val previewUrl = item.lPreviewImageUrl(thumbnailsSize)
                         val videoUrl = item.lAnimationVideoUrl()
                         var playInline by remember(item.url_to_original, item.url_to_video) { mutableStateOf(false) }
-                        val selected = selectionState?.isSelected(item) == true
 
                         fun openFullScreen() {
                             fullScreenImageFilteredPicArray = host.filteredPic.toList()
@@ -172,8 +166,8 @@ fun L_LazyRowPictureDetails(
                                 .aspectRatio(aspect)
                                 .clipToBounds()
                                 .border(
-                                    width = if (selected) 2.dp else 0.5.dp,
-                                    color = if (selected) ThemeL.primaryColor else Color.Gray
+                                    width = 0.5.dp,
+                                    color = Color.Gray
                                 )
                         ) {
                             if (playInline && videoUrl != null) {
@@ -201,49 +195,19 @@ fun L_LazyRowPictureDetails(
                                     .matchParentSize()
                                     .combinedClickable(
                                         onClick = {
-                                            if (selectionState?.active == true) {
-                                                selectionState.toggle(item)
-                                            } else if (videoUrl != null) {
+                                            if (videoUrl != null) {
                                                 playInline = true
                                             } else {
                                                 openFullScreen()
                                             }
                                         },
                                         onLongClick = {
-                                            if (selectionState != null) {
-                                                haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
-                                                selectionState.toggle(item)
-                                            } else if (videoUrl != null) {
+                                            if (videoUrl != null) {
                                                 openFullScreen()
                                             }
                                         }
                                     )
                             )
-
-                            if (selectionState?.active == true || selected) {
-                                Box(
-                                    modifier = Modifier
-                                        .align(Alignment.TopStart)
-                                        .padding(6.dp)
-                                        .size(24.dp)
-                                        .clip(CircleShape)
-                                        .background(
-                                            if (selected) ThemeL.primaryColor
-                                            else Color.Black.copy(alpha = 0.55f)
-                                        )
-                                        .border(1.dp, Color.White.copy(alpha = 0.75f), CircleShape),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    if (selected) {
-                                        Icon(
-                                            imageVector = Icons.Default.Check,
-                                            contentDescription = null,
-                                            tint = Color.Black,
-                                            modifier = Modifier.size(16.dp)
-                                        )
-                                    }
-                                }
-                            }
 
                             if (videoUrl != null && !playInline) {
                                 Icon(

@@ -14,10 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
@@ -60,7 +57,6 @@ import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.ui.element.expandMenu.ExpandMenuType
 import com.client.xvideos.l.ui.element.lazyRowPictureDetails.L_LazyRowPictureDetails
 import com.client.xvideos.l.ui.element.lazyRowPictureDetails.LazyRowPictureDetailsHost
-import com.client.xvideos.l.ui.element.lazyRowPictureDetails.LPictureSelectionState
 import dagger.Binds
 import dagger.Module
 import dagger.assisted.Assisted
@@ -136,7 +132,6 @@ fun L_CollectionNameContent(
     }
 
     val selectedCollection = savedL.collection.currentCollectionName
-    val selectedItems = host.selection.selectedItems(host.filteredPic.toList())
     val duplicateGroups = savedL.collection.duplicateGroups.toList()
 
     if (duplicateDialogVisible) {
@@ -151,13 +146,9 @@ fun L_CollectionNameContent(
     }
 
     BackHandler {
-        if (host.selection.active) {
-            host.selection.clear()
-        } else {
-            Timber.i("iii BackHandler SavedCollectionTab")
-            onExitCollection?.invoke() ?: run {
-                savedL.collection.currentCollectionName = null
-            }
+        Timber.i("iii BackHandler SavedCollectionTab")
+        onExitCollection?.invoke() ?: run {
+            savedL.collection.currentCollectionName = null
         }
     }
 
@@ -180,31 +171,8 @@ fun L_CollectionNameContent(
                 host = host,
                 expandMenu = ExpandMenuType.LIKES,
                 tag = "lCollection",
-                isCollection = true,
-                selectionState = host.selection
+                isCollection = true
             )
-
-            AnimatedVisibility(
-                visible = host.selection.active,
-                modifier = Modifier.align(Alignment.TopCenter)
-            ) {
-                LCollectionSelectionBar(
-                    selectedCount = selectedItems.size,
-                    selectionState = host.selection,
-                    onAddToCollection = {
-                        savedL.collection.beginAddManyToCollection(selectedItems)
-                        host.selection.clear()
-                    },
-                    onSetCover = {
-                        selectedItems.firstOrNull()?.let { savedL.collection.setManualCover(it, collectionName) }
-                        host.selection.clear()
-                    },
-                    onDelete = {
-                        savedL.collection.removeAll(selectedItems, collectionName)
-                        host.selection.clear()
-                    }
-                )
-            }
         }
     }
 }
@@ -275,46 +243,6 @@ private fun LCollectionDetailTopBar(
                 label = { Text("Поиск в коллекции") },
                 textStyle = ThemeL.Type.body.copy(color = ThemeL.textColor)
             )
-        }
-    }
-}
-
-@Composable
-private fun LCollectionSelectionBar(
-    selectedCount: Int,
-    selectionState: LPictureSelectionState,
-    onAddToCollection: () -> Unit,
-    onSetCover: () -> Unit,
-    onDelete: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(ThemeL.grey5.copy(alpha = 0.96f))
-            .padding(horizontal = 8.dp, vertical = 6.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        IconButton(onClick = { selectionState.clear() }) {
-            Icon(Icons.Default.Close, contentDescription = null, tint = ThemeL.textColor)
-        }
-        Text(
-            "Выбрано: $selectedCount",
-            color = Color.White,
-            style = ThemeL.Type.rowTitle,
-            modifier = Modifier.weight(1f)
-        )
-        IconButton(onClick = onAddToCollection, enabled = selectedCount > 0) {
-            Icon(Icons.Default.Add, contentDescription = null, tint = ThemeL.primaryColor)
-        }
-        IconButton(onClick = onSetCover, enabled = selectedCount == 1) {
-            Icon(
-                Icons.Default.Image,
-                contentDescription = null,
-                tint = if (selectedCount == 1) ThemeL.primaryColor else ThemeL.grey2
-            )
-        }
-        IconButton(onClick = onDelete, enabled = selectedCount > 0) {
-            Icon(Icons.Default.Delete, contentDescription = null, tint = ThemeL.red)
         }
     }
 }
