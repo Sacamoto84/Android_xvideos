@@ -54,6 +54,7 @@ import com.client.xvideos.l.model.enum.ContentId
 import com.client.xvideos.l.net.Luscious
 import com.client.xvideos.l.ui.element.AlbumListItem
 import com.client.xvideos.l.ui.screens.screenAlbum.ScreenLAlbum
+import com.client.xvideos.l.ui.screens.screenAlbumList.L_ScreenAlbumList
 import dagger.Binds
 import dagger.Module
 import dagger.assisted.Assisted
@@ -159,7 +160,7 @@ class ScreenLAlbumLandingTag(val tag: String) : Screen {
 
                                 val filter = vm.createFilter(item)
 
-                               // navigator.push(ScreenLAlbumList.create(filter))
+                                navigator.push(L_ScreenAlbumList.create(filter))
 
 
                             })

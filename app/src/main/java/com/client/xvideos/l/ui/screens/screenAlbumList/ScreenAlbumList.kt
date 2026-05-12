@@ -56,6 +56,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.client.xvideos.l.model.AlbumListFilter as LAlbumListFilter
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.ui.element.AlbumListItem
 import com.client.xvideos.l.ui.screens.screenAlbum.ScreenLAlbum
@@ -104,13 +105,28 @@ object L_ScreenAlbumList : Screen {
 
     private fun readResolve(): Any = L_ScreenAlbumList
 
-    @OptIn(ExperimentalZoomableApi::class)
-    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+    fun create(filter: LAlbumListFilter?): Screen = ScreenLAlbumList(filter)
+
     @Composable
     override fun Content() {
+        ScreenAlbumListContent(initialFilter = null)
+    }
+}
+
+private class ScreenLAlbumList(private val initialFilter: LAlbumListFilter?) : Screen {
+    @Composable
+    override fun Content() {
+        ScreenAlbumListContent(initialFilter = initialFilter)
+    }
+}
+
+@OptIn(ExperimentalZoomableApi::class)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@Composable
+private fun Screen.ScreenAlbumListContent(initialFilter: LAlbumListFilter?) {
         val navigator = LocalNavigator.currentOrThrow
         val vm = getScreenModel<ScreenLAlbumListSM, ScreenLAlbumListSM.Factory> { factory ->
-            factory.create(null)
+            factory.create(initialFilter)
         }
         val bigList = vm.bigList
         val info = vm.info.collectAsStateWithLifecycle().value
@@ -296,9 +312,4 @@ object L_ScreenAlbumList : Screen {
                 }
             }
         }
-    }
-
 }
-
-
-
