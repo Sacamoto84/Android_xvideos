@@ -22,9 +22,14 @@ class SavedL @Inject constructor(
     val albums = SavedL_Albums(db, scope)
     val likes = SavedL_Likes(luscious, scope)
 
-    fun recoverIncompleteSavedMedia(onComplete: (LDownloadRecoveryReport) -> Unit = {}) {
+    fun recoverIncompleteSavedMedia(
+        onEvent: (String) -> Unit = {},
+        onComplete: (LDownloadRecoveryReport) -> Unit = {}
+    ) {
         scope.launch(Dispatchers.IO) {
-            val report = lRecoverIncompleteSavedMedia()
+            val report = lRecoverIncompleteSavedMedia { message ->
+                scope.launch(Dispatchers.Main) { onEvent(message) }
+            }
             withContext(Dispatchers.Main) {
                 likes.refresh()
                 collection.refreshCollectionList()

@@ -95,21 +95,29 @@ class DownloadRed @Inject constructor(
         scanIncompleteDownloadsInternal().report
     }
 
-    fun recoverIncompleteDownloads(onComplete: (RedDownloadRecoveryReport) -> Unit = {}) {
+    fun recoverIncompleteDownloads(
+        onComplete: (RedDownloadRecoveryReport) -> Unit = {},
+        onEvent: (String) -> Unit = {}
+    ) {
         scope.launch(Dispatchers.IO) {
             val scan = scanIncompleteDownloadsInternal()
             var report = scan.report
+            onEvent("R Download: info ${report.totalInfoFiles}, требуют докачки ${report.incompleteItems}")
 
             scan.candidates.forEach { candidate ->
-                val enqueueReport = downloader.downloadMissingFiles(
+                val enqueueReport = downloader.downloadMissingFilesForRecovery(
                     item = candidate.item,
-                    onComplete = { refreshDownloadList() }
+                    onComplete = { refreshDownloadList() },
+                    onEvent = onEvent
                 )
                 report = report.copy(
                     queuedVideo = report.queuedVideo + enqueueReport.queuedVideo,
                     queuedPreview = report.queuedPreview + enqueueReport.queuedPreview,
                     skippedNoVideoUrl = report.skippedNoVideoUrl + enqueueReport.skippedNoVideoUrl,
                     skippedNoPreviewUrl = report.skippedNoPreviewUrl + enqueueReport.skippedNoPreviewUrl
+                )
+                onEvent(
+                    "R Download: ${candidate.item.id} -> видео ${enqueueReport.queuedVideo}, preview ${enqueueReport.queuedPreview}"
                 )
             }
 

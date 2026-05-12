@@ -11,6 +11,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -41,6 +42,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -636,7 +638,7 @@ private fun RSettingsSection(
                         val redDownloader = downloadRed ?: return@Button
                         isRecoveringDownload = true
                         scope.launch {
-                            redDownloader.recoverIncompleteDownloads { report ->
+                            redDownloader.recoverIncompleteDownloads(onComplete = { report ->
                                 scope.launch {
                                     recoveryReport = report
                                     isRecoveringDownload = false
@@ -648,7 +650,7 @@ private fun RSettingsSection(
                                         )
                                     }
                                 }
-                            }
+                            })
                         }
                     }
                 ) {
@@ -703,14 +705,26 @@ private fun redDownloadRecoveryText(
     return "Найдено ${report.incompleteItems} из ${report.totalInfoFiles} • видео ${report.queuedVideo} • превью ${report.queuedPreview}"
 }
 
-private fun redDownloadRecoverySnackText(report: RedDownloadRecoveryReport): String {
-    if (report.incompleteItems == 0) return "R Download проверен: все файлы на месте"
-    return "R Download: запущено видео ${report.queuedVideo}, превью ${report.queuedPreview}"
+private fun redDownloadRecoveryConsoleText(report: RedDownloadRecoveryReport): String {
+    return listOf(
+        "---------",
+        "R итог",
+        "Info: всего ${report.totalInfoFiles}, неполных ${report.incompleteItems}",
+        "Скачано/очередь: видео ${report.queuedVideo}, preview ${report.queuedPreview}",
+        "Пропущено: нет video URL ${report.skippedNoVideoUrl}, нет preview URL ${report.skippedNoPreviewUrl}",
+        "Ошибки: битых info ${report.invalidInfoFiles}"
+    ).joinToString("\n")
 }
 
-private fun lDownloadRecoverySnackText(report: LDownloadRecoveryReport): String {
-    if (report.incompleteItems == 0) return "L Likes/Collection проверены: все файлы на месте"
-    return "L Likes/Collection: скачано media ${report.downloadedMedia}, preview ${report.downloadedPreview}"
+private fun lDownloadRecoveryConsoleText(report: LDownloadRecoveryReport): String {
+    return listOf(
+        "---------",
+        "L итог",
+        "Metadata: всего ${report.totalMetadataFiles}, неполных ${report.incompleteItems}",
+        "Скачано: media ${report.downloadedMedia}, preview ${report.downloadedPreview}",
+        "Пропущено: нет media URL ${report.skippedNoMediaUrl}, нет preview URL ${report.skippedNoPreviewUrl}",
+        "Ошибки: media ${report.failedMedia}, preview ${report.failedPreview}, битых metadata ${report.invalidMetadataFiles}"
+    ).joinToString("\n")
 }
 
 private fun shouldAutoRecoverL(selectedPaths: Set<String>): Boolean {
@@ -772,8 +786,16 @@ private fun BackupSettingsSection(
     var restoreUri by remember { mutableStateOf<Uri?>(null) }
     var restoreItems by remember { mutableStateOf<List<XlrBackupItem>>(emptyList()) }
     var selectedRestorePaths by remember { mutableStateOf<Set<String>>(emptySet()) }
+    val backupConsole = remember { mutableStateListOf<String>() }
     val backupOptions = remember(lBackupMode, rBackupMode) {
         XlrBackupOptions(lMode = lBackupMode, rMode = rBackupMode)
+    }
+
+    fun appendBackupLog(message: String) {
+        if (backupConsole.size >= 200) {
+            backupConsole.removeAt(0)
+        }
+        backupConsole.add(message)
     }
 
     suspend fun refreshBackupItems() {
@@ -798,12 +820,17 @@ private fun BackupSettingsSection(
         }
         scope.launch {
             isWorking = true
+            appendBackupLog(
+                "Создание backup: L=${backupContentModeTitle(backupOptions.lMode)}, R=${backupContentModeTitle(backupOptions.rMode)}"
+            )
             XlrBackupManager.createBackup(context, uri, selectedBackupPaths, backupOptions)
                 .onSuccess { report ->
+                    appendBackupLog("Backup создан: ${report.files} файлов, ${formatBytes(report.bytes)}")
                     SnackBar.success("Backup создан: ${report.files} файлов, ${formatBytes(report.bytes)}")
                     refreshBackupItems()
                 }
                 .onFailure { error ->
+                    appendBackupLog("Ошибка создания backup: ${error.message ?: error::class.java.simpleName}")
                     SnackBar.error(error.message ?: "Ошибка создания backup")
                 }
             isWorking = false
@@ -979,6 +1006,7 @@ private fun BackupSettingsSection(
                             if (!isWorking) {
                                 scope.launch {
                                     isWorking = true
+                                    appendBackupLog("Восстановление backup: ${selectionSummaryText(restoreReport)}")
                                     val autoRecoverL = shouldAutoRecoverL(selectedRestorePaths)
                                     val autoRecoverRedDownload = shouldAutoRecoverRedDownload(selectedRestorePaths)
                                     XlrBackupManager.restoreBackup(context, uri, selectedRestorePaths)
@@ -986,17 +1014,21 @@ private fun BackupSettingsSection(
                                             refreshBackupItems()
                                             onDataChanged()
                                             SnackBar.success("Backup восстановлен: ${report.files} файлов. Перезапустите приложение.")
+                                            appendBackupLog("Backup восстановлен: ${report.files} файлов, ${formatBytes(report.bytes)}")
                                             if (autoRecoverL) {
                                                 val lSaved = savedL
                                                 if (lSaved == null) {
                                                     SnackBar.error("L Likes/Collection восстановлены, но L-загрузчик недоступен")
                                                 } else {
-                                                    SnackBar.success("L Likes/Collection: сканирую metadata")
-                                                    lSaved.recoverIncompleteSavedMedia { recoveryReport ->
-                                                        scope.launch {
-                                                            SnackBar.success(lDownloadRecoverySnackText(recoveryReport))
+                                                    appendBackupLog("L Likes/Collection: сканирую metadata")
+                                                    lSaved.recoverIncompleteSavedMedia(
+                                                        onEvent = { message ->
+                                                            scope.launch { appendBackupLog(message) }
+                                                        },
+                                                        onComplete = { recoveryReport ->
+                                                            scope.launch { appendBackupLog(lDownloadRecoveryConsoleText(recoveryReport)) }
                                                         }
-                                                    }
+                                                    )
                                                 }
                                             }
                                             if (autoRecoverRedDownload) {
@@ -1004,16 +1036,20 @@ private fun BackupSettingsSection(
                                                 if (redDownloader == null) {
                                                     SnackBar.error("R Download восстановлен, но загрузчик недоступен")
                                                 } else {
-                                                    SnackBar.success("R Download: сканирую .info")
-                                                    redDownloader.recoverIncompleteDownloads { recoveryReport ->
-                                                        scope.launch {
-                                                            SnackBar.success(redDownloadRecoverySnackText(recoveryReport))
+                                                    appendBackupLog("R Download: сканирую .info")
+                                                    redDownloader.recoverIncompleteDownloads(
+                                                        onEvent = { message ->
+                                                            scope.launch { appendBackupLog(message) }
+                                                        },
+                                                        onComplete = { recoveryReport ->
+                                                            scope.launch { appendBackupLog(redDownloadRecoveryConsoleText(recoveryReport)) }
                                                         }
-                                                    }
+                                                    )
                                                 }
                                             }
                                         }
                                         .onFailure { error ->
+                                            appendBackupLog("Ошибка восстановления backup: ${error.message ?: error::class.java.simpleName}")
                                             SnackBar.error(error.message ?: "Ошибка восстановления backup")
                                         }
                                     isWorking = false
@@ -1024,6 +1060,11 @@ private fun BackupSettingsSection(
                 }
             }
         }
+        SettingsDivider()
+        BackupConsole(
+            lines = backupConsole,
+            onClear = { backupConsole.clear() }
+        )
     }
 }
 
@@ -1108,6 +1149,81 @@ private fun backupContentModeTitle(mode: XlrBackupContentMode): String {
         XlrBackupContentMode.MINI -> "Мини"
         XlrBackupContentMode.FULL -> "Полный"
     }
+}
+
+@Composable
+private fun BackupConsole(
+    lines: List<String>,
+    onClear: () -> Unit
+) {
+    val visibleLines = lines
+        .ifEmpty { listOf("Пока пусто") }
+        .flatMap { entry -> entry.lineSequence().toList() }
+
+    SettingsListItem(
+        icon = R.drawable.hard_drive_2_24,
+        text = "Консоль backup",
+        subtitle = if (lines.isEmpty()) "Здесь будет процесс восстановления файлов из сети" else "${visibleLines.size} строк",
+        trailing = {
+            TextButton(
+                enabled = lines.isNotEmpty(),
+                onClick = onClear
+            ) {
+                Text("Очистить", color = SettingsAccentColor)
+            }
+        }
+    )
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(180.dp)
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .background(SettingsTopBarColor, RoundedCornerShape(8.dp))
+            .verticalScroll(rememberScrollState())
+            .padding(10.dp)
+    ) {
+        Column {
+            visibleLines.forEach { line ->
+                BackupConsoleLine(line)
+            }
+        }
+    }
+}
+
+@Composable
+private fun BackupConsoleLine(line: String) {
+    val lower = line.lowercase()
+    val isSummary = line.startsWith("---------") || lower.contains("итог")
+    val isError = lower.contains("ошиб") ||
+            lower.contains("бит") ||
+            lower.contains("не скачан") ||
+            lower.contains("failed")
+    val isSuccess = lower.contains("скачано") ||
+            lower.contains("очередь") ||
+            lower.contains("готов") ||
+            lower.contains("создан") ||
+            lower.contains("восстановлен")
+    val isWarning = lower.contains("пропущено") ||
+            lower.contains("нет ")
+    val color = when {
+        isSummary -> SettingsAccentColor
+        isError -> ThemeL.r0
+        isSuccess -> ThemeL.g0
+        isWarning -> ThemeL.lavender
+        else -> SettingsRowTextPrimary
+    }
+    val style = if (isSummary) {
+        ThemeL.Type.rowTitle.copy(color = color)
+    } else {
+        ThemeL.Type.rowSubtitle.copy(color = color)
+    }
+
+    Text(
+        text = line,
+        color = color,
+        style = style,
+        modifier = Modifier.padding(vertical = if (isSummary) 2.dp else 1.dp)
+    )
 }
 
 @Composable
