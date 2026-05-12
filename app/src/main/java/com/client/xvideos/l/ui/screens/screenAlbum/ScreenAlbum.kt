@@ -48,6 +48,10 @@ import com.client.xvideos.common.coil.UrlImage
 import com.client.xvideos.screenRoot.LocalRootScreenModel
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.model.AlbumDetails
+import com.client.xvideos.l.model.AlbumListFilter
+import com.client.xvideos.l.model.Audience
+import com.client.xvideos.l.model.Genre
+import com.client.xvideos.l.net.graphQl.Genre as FilterGenre
 import com.client.xvideos.l.net.AlbumPicsDetails
 import com.client.xvideos.l.ui.element.expandMenu.ExpandMenuType
 import com.client.xvideos.l.ui.element.lazyRowPictureDetails.L_LazyRowPictureDetails
@@ -58,6 +62,7 @@ import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoFilterButton
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoGreeting
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.AlbumInfoTags
 import com.client.xvideos.l.ui.screens.albumLandingTag.ScreenLAlbumLandingTag
+import com.client.xvideos.l.ui.screens.screenAlbumList.L_ScreenAlbumList
 import com.client.xvideos.l.ui.screens.screenAlbum.atom.ScrollToTopButton
 import kotlinx.coroutines.delay
 import net.engawapg.lib.zoomable.ExperimentalZoomableApi
@@ -165,8 +170,12 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
                                     }
                                 }
 
-                                AlbumInfoGreeting(parsed)
-                                AlbumInfoAudiences(parsed)
+                                AlbumInfoGreeting(parsed) { genre ->
+                                    navigator.push(L_ScreenAlbumList.create(albumListFilterForGenre(genre)))
+                                }
+                                AlbumInfoAudiences(parsed) { audience ->
+                                    navigator.push(L_ScreenAlbumList.create(albumListFilterForAudience(audience)))
+                                }
                                 AlbumInfoTags(parsed) { navigator.push(ScreenLAlbumLandingTag(it)) }
                                 AlbumInfoButtonSaveAlbum(saved, onClick = { if (!saved) { vm.saveAlbum() } else { itemPendingDelete = parsed } })
                                 AlbumInfoFilterButton( parsed, vm.showOnlyAnimated, { vm.showOnlyAnimated = it })
@@ -184,6 +193,37 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
 
     }
 
+}
+
+private fun albumListFilterForGenre(genre: Genre): AlbumListFilter {
+    return AlbumListFilter(
+        genresPlus = listOf(
+            FilterGenre(
+                id = genre.id,
+                title = genre.title,
+                slug = genre.url.extractLPathSlug() ?: genre.title.lowercase().replace(" ", "-"),
+                description = "",
+                uploadingRules = "",
+                posterUrl = null,
+                actsAsWarning = genre.actsAsWarning,
+                actsAsDefault = false,
+                representsUncategorized = false,
+                url = genre.url,
+                parent = null,
+                onlyAllowsModel = null,
+                onlyContent = null
+            )
+        )
+    )
+}
+
+private fun albumListFilterForAudience(audience: Audience): AlbumListFilter {
+    return AlbumListFilter(audienceIds = "+${audience.id}")
+}
+
+private fun String.extractLPathSlug(): String? {
+    val name = trim('/').substringAfterLast('/').substringBefore('?')
+    return name.substringBeforeLast("_").takeIf { it.isNotBlank() }
 }
 
 @Composable

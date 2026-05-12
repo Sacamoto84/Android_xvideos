@@ -1,15 +1,24 @@
 package com.client.xvideos.l.ui.screens.screenAlbum.atom
 
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.model.AlbumDetails
 import com.client.xvideos.l.model.Audience
 
 @Composable
-fun AlbumInfoAudiences(parsed: AlbumDetails) {
+fun AlbumInfoAudiences(
+    parsed: AlbumDetails,
+    onAudienceClick: (Audience) -> Unit = {}
+) {
     FlowRow {
         Text("Audiences: ", color = ThemeL.textColor, style = ThemeL.Type.rowTitle)
         parsed.audiences.forEachIndexed { index, item ->
@@ -18,6 +27,12 @@ fun AlbumInfoAudiences(parsed: AlbumDetails) {
                     append(item.title)
                     if (index != parsed.audiences.lastIndex) append(",")
                 },
+                modifier = Modifier
+                    .padding(horizontal = 2.dp)
+                    .padding(vertical = 2.dp)
+                    .border(1.dp, ThemeL.secondaryColor, RoundedCornerShape(4.dp))
+                    .clickable(onClick = { onAudienceClick(item) })
+                    .padding(4.dp),
                 color = ThemeL.primaryColor,
                 style = ThemeL.Type.rowValue.copy(color = ThemeL.primaryColor),
             )
