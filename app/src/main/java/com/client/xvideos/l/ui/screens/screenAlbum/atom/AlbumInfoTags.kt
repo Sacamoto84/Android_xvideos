@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.client.xvideos.common.util.capitalizeEachWord
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.model.AlbumDetails
@@ -33,7 +34,7 @@ fun AlbumInfoTags(parsed: AlbumDetails, onClick: (String) -> Unit) {
                     .padding(4.dp)
                     .clickable(onClick = {onClick(it.text) }),
                 color = ThemeL.textColor,
-                style = ThemeL.Type.caption.copy(color = ThemeL.textColor)
+                style = ThemeL.Type.caption.copy(color = ThemeL.textColor, fontSize = 14.sp)
             )
         }
     }

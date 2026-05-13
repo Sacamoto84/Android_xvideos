@@ -2,6 +2,7 @@ package com.client.xvideos.l.ui.screens.screenAlbum.atom
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.model.AlbumDetails
 import com.client.xvideos.l.model.Audience
@@ -24,17 +26,26 @@ fun AlbumInfoGreeting(
     parsed: AlbumDetails,
     onGenreClick: (Genre) -> Unit = {}
 ) {
-    FlowRow {
+    FlowRow(
+      verticalArrangement = Arrangement.Center
+    )
+    {
         Text(
             "Genres: ",
             color = ThemeL.textColor,
-            style = ThemeL.Type.rowTitle.copy(fontWeight = FontWeight.ExtraBold)
+            style = ThemeL.Type.rowTitle.copy(fontWeight = FontWeight.ExtraBold, fontSize = 16.sp),
+
+            modifier = Modifier
+                .padding(horizontal = 2.dp)
+                .padding(vertical = 4.dp)
+                //.padding(4.dp),
+
         )
 
         parsed.genres.forEachIndexed { index, item ->
 
             var s = item.title
-            if (index != parsed.genres.lastIndex) { s += ", " }
+            //if (index != parsed.genres.lastIndex) { s += ", " }
 
             Text(
                 text = s,
@@ -45,7 +56,7 @@ fun AlbumInfoGreeting(
                     .clickable(onClick = { onGenreClick(item) })
                     .padding(4.dp),
                 color = ThemeL.primaryColor,
-                style = ThemeL.Type.rowValue.copy(color = ThemeL.primaryColor)
+                style = ThemeL.Type.rowValue.copy(color = ThemeL.primaryColor, fontSize = 14.sp)
             )
 
         }

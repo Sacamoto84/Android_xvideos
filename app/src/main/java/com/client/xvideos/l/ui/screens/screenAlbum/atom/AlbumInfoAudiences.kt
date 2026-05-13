@@ -2,30 +2,42 @@ package com.client.xvideos.l.ui.screens.screenAlbum.atom
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.client.xvideos.l.theme.ThemeL
+import androidx.compose.ui.unit.sp
 import com.client.xvideos.l.model.AlbumDetails
 import com.client.xvideos.l.model.Audience
+import com.client.xvideos.l.theme.ThemeL
 
 @Composable
 fun AlbumInfoAudiences(
     parsed: AlbumDetails,
     onAudienceClick: (Audience) -> Unit = {}
 ) {
-    FlowRow {
-        Text("Audiences: ", color = ThemeL.textColor, style = ThemeL.Type.rowTitle)
+    FlowRow(
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            "Audiences: ",
+            color = ThemeL.textColor,
+            style = ThemeL.Type.rowTitle.copy(fontWeight = FontWeight.ExtraBold, fontSize = 16.sp),
+            modifier = Modifier
+                .padding(horizontal = 2.dp)
+                .padding(vertical = 4.dp)
+        )
         parsed.audiences.forEachIndexed { index, item ->
             Text(
                 text = buildString {
                     append(item.title)
-                    if (index != parsed.audiences.lastIndex) append(",")
+                    //if (index != parsed.audiences.lastIndex) append(",")
                 },
                 modifier = Modifier
                     .padding(horizontal = 2.dp)
@@ -34,11 +46,9 @@ fun AlbumInfoAudiences(
                     .clickable(onClick = { onAudienceClick(item) })
                     .padding(4.dp),
                 color = ThemeL.primaryColor,
-                style = ThemeL.Type.rowValue.copy(color = ThemeL.primaryColor),
+                style = ThemeL.Type.rowValue.copy(color = ThemeL.primaryColor, fontSize = 14.sp),
             )
-            if (index != parsed.audiences.lastIndex) {
-                Text(" ", color = ThemeL.primaryColor)
-            }
+
         }
     }
 }
