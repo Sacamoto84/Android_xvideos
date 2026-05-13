@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.displayCutoutPadding
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -89,9 +91,10 @@ class ScreenLAlbumLandingTag(val tag: String) : Screen {
 
         Scaffold(
             containerColor = ThemeL.greyBackground,
+            modifier = Modifier.fillMaxSize()
         ) {
 
-            LazyColumn(state = vm.state) {
+            LazyColumn(state = vm.state, modifier = Modifier.fillMaxSize() ) {
 
                 item{
                     if (title != null){
@@ -102,7 +105,7 @@ class ScreenLAlbumLandingTag(val tag: String) : Screen {
                             fontSize = 32.sp,
                             fontFamily = ThemeL.fontFamilyKarla,
                             fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(start = 4.dp, top = 16.dp)
+                            modifier = Modifier.displayCutoutPadding().padding(start = 4.dp)
                         )
 
                     }
@@ -131,7 +134,7 @@ class ScreenLAlbumLandingTag(val tag: String) : Screen {
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         val itemWidth = (screenWidth - 8.dp) / 3  // учитываем padding
-                        item.items.dropLast(1).forEach { item ->
+                        item.items.take(9).forEach { item ->
                             Box(
                                 modifier = Modifier
                                     .width(itemWidth)
@@ -229,7 +232,7 @@ private fun ScreenLAlbumLandingTagPreview() {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     val itemWidth = (screenWidth - 8.dp) / 3
-                    section.items.dropLast(1).forEach { album ->
+                    section.items.take(9).forEach { album ->
                         Box(
                             modifier = Modifier
                                 .width(itemWidth)

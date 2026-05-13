@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -152,13 +153,14 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
             containerColor = ThemeL.greyBackground
         ) { padding ->
 
-            Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+            Box(modifier = Modifier.fillMaxSize())
+            {
                 L_LazyRowPictureDetails(
                     host = vm.host,
                     expandMenu = ExpandMenuType.ALBUM,
                     showInitialLoading = showInitialItemsLoading,
                     itemBefore = {
-                        Column(modifier = Modifier.padding(horizontal = 4.dp)) {
+                        Column(modifier = Modifier.displayCutoutPadding().padding(horizontal = 4.dp)) {
                             if (parsed != null) {
 
                                 Row {
