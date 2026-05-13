@@ -34,6 +34,7 @@ import com.client.xvideos.l.net.AlbumListFilterGenreCountResponse
 import com.client.xvideos.l.net.graphQl.Genre
 import com.client.xvideos.l.ui.screens.screenAlbumList.molecule.filter.atom.AlbumFilterDisplay
 import com.client.xvideos.l.ui.screens.screenAlbumList.molecule.filter.atom.AlbumListFilterAlbumType
+import com.client.xvideos.l.ui.screens.screenAlbumList.molecule.filter.atom.AlbumListFilterAudiences
 import com.client.xvideos.l.ui.screens.screenAlbumList.molecule.filter.atom.AlbumListFilterContentType
 import com.client.xvideos.l.ui.screens.screenAlbumList.molecule.filter.atom.AlbumListFilterGenres
 import com.client.xvideos.l.ui.screens.screenAlbumList.molecule.filter.atom.AlbumListFilterSize
@@ -119,6 +120,10 @@ fun AlbumListFilter(
             AlbumListFilterContentType(filter.content_id) { onFilterApply(filter.copy(content_id = it)) }
         }
 
+        Box(
+            modifier = Modifier.padding(top = 8.dp).clip(RoundedCornerShape(8.dp)).background(palette.surface).border(1.dp, palette.border, RoundedCornerShape(8.dp)).sizeIn(maxHeight = maxHeight)
+        ) { AlbumListFilterAudiences(filter) { onFilterApply(it) } }
+
         Box( modifier = Modifier.padding(top = 8.dp).clip(RoundedCornerShape(8.dp)).background(palette.surface).border(1.dp, palette.border, RoundedCornerShape(8.dp)).padding(vertical = 8.dp).padding(start = 8.dp, end = 8.dp)
         ) { AlbumListFilterSize(filter.picture_count_rank) { onFilterApply( filter.copy( picture_count_rank = it ) ) } }
 
@@ -152,6 +157,7 @@ private fun albumListFilterPreviewFilter(): com.client.xvideos.l.model.AlbumList
         display = "date_trending",
         album_type = AlbumType.Manga,
         content_id = ContentId.Hentai,
+        audienceIds = "+2+3",
         picture_count_rank = PictureCountRank.C50_100,
         genresPlus = listOf(albumListFilterPreviewGenre("38", "Monsters & Tentacles")),
         genresMinus = listOf(albumListFilterPreviewGenre("23", "SFW")),
