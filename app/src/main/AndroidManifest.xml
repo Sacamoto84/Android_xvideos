@@ -5,18 +5,16 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <uses-permission android:name="android.permission.VIBRATE" />
+
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
+
     <uses-permission
         android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
-        tools:ignore="ScopedStorage" />
-    <uses-permission android:name="android.permission.EXPAND_STATUS_BAR" />
+        tools:ignore="AllFilesAccessPolicy,ScopedStorage" />
 
     <application
         android:name=".App"
@@ -43,11 +41,13 @@
             android:name=".PermissionScreenActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Xvideos" />
+
         <activity
             android:name=".AppLockActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Xvideos" />
+
         <activity
             android:name=".SplashActivity"
             android:exported="true"
@@ -58,6 +58,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -65,7 +66,8 @@
             android:theme="@style/Theme.Xvideos"
             android:windowBackground="@color/black"
             android:windowIsTranslucent="false"
-            android:windowSoftInputMode="adjustResize"></activity>
+            android:windowSoftInputMode="adjustResize">
+        </activity>
 
         <provider
             android:name="androidx.core.content.FileProvider"

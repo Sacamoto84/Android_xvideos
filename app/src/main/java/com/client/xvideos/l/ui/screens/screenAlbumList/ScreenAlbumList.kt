@@ -5,15 +5,11 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,11 +23,9 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.rememberDrawerState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -48,15 +42,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.client.xvideos.l.model.AlbumListFilter as LAlbumListFilter
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.ui.element.AlbumListItem
 import com.client.xvideos.l.ui.screens.screenAlbum.ScreenLAlbum
@@ -66,6 +57,7 @@ import kotlinx.coroutines.launch
 import my.nanihadesuka.compose.LazyVerticalGridScrollbar
 import my.nanihadesuka.compose.ScrollbarSettings
 import net.engawapg.lib.zoomable.ExperimentalZoomableApi
+import com.client.xvideos.l.model.AlbumListFilter as LAlbumListFilter
 
 
 class DefaultPagerState1(
@@ -105,7 +97,7 @@ object L_ScreenAlbumList : Screen {
 
     private fun readResolve(): Any = L_ScreenAlbumList
 
-    fun create(filter: LAlbumListFilter?): Screen = ScreenLAlbumList(filter)
+    fun create(filter: LAlbumListFilter?, title: String = ""): Screen = ScreenLAlbumList(filter, title)
 
     @Composable
     override fun Content() {
@@ -113,17 +105,20 @@ object L_ScreenAlbumList : Screen {
     }
 }
 
-private class ScreenLAlbumList(private val initialFilter: LAlbumListFilter?) : Screen {
+private class ScreenLAlbumList(
+    private val initialFilter: LAlbumListFilter?,
+    private val title: String
+) : Screen {
     @Composable
     override fun Content() {
-        ScreenAlbumListContent(initialFilter = initialFilter)
+        ScreenAlbumListContent(initialFilter = initialFilter, title = title)
     }
 }
 
 @OptIn(ExperimentalZoomableApi::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-private fun Screen.ScreenAlbumListContent(initialFilter: LAlbumListFilter?) {
+private fun Screen.ScreenAlbumListContent(initialFilter: LAlbumListFilter?, title: String = "") {
         val navigator = LocalNavigator.currentOrThrow
         val vm = getScreenModel<ScreenLAlbumListSM, ScreenLAlbumListSM.Factory> { factory ->
             factory.create(initialFilter)
@@ -220,11 +215,13 @@ private fun Screen.ScreenAlbumListContent(initialFilter: LAlbumListFilter?) {
                         )
                         {
                             item(key = "dummy", span = { GridItemSpan(maxLineSpan) }) {
-                                Spacer(
+                                Box(
                                     Modifier
                                         .height(32.dp)
-                                        .background(ThemeL.red)
-                                )
+                                        .background(ThemeL.red).padding(start = 24.dp), contentAlignment = Alignment.CenterStart
+                                ) {
+                                    Text(text = title, color = Color.White, fontFamily = ThemeL.fontFamilyKarla)
+                                }
                             }
 
                             items(

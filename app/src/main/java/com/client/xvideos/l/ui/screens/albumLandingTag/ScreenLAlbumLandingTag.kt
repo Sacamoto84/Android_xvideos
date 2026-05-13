@@ -163,7 +163,12 @@ class ScreenLAlbumLandingTag(val tag: String) : Screen {
 
                                 val filter = vm.createFilter(item)
 
-                                navigator.push(L_ScreenAlbumList.create(filter))
+                                navigator.push(
+                                    L_ScreenAlbumList.create(
+                                        filter = filter,
+                                        title = "Tag: ${title ?: tag}"
+                                    )
+                                )
 
 
                             })

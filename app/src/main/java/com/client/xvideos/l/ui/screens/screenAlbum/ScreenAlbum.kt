@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -36,6 +37,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -164,19 +166,29 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
                             if (parsed != null) {
 
                                 Row {
-                                    UrlImage( parsed.cover.url, modifier = Modifier.size(72.dp) )
+                                    UrlImage( parsed.cover.url, modifier = Modifier.clip(RoundedCornerShape(8.dp)).size(72.dp) )
                                     Spacer(modifier = Modifier.width(4.dp))
                                     Column {
                                         Text(parsed.title, color = ThemeL.textColor, style = ThemeL.Type.rowTitle)
                                         Text( "${parsed.number_of_animated_pictures} gifs / ${parsed.number_of_pictures} pictures", color = ThemeL.textColor )
                                     }
                                 }
-
+                                Spacer(modifier = Modifier.height(4.dp))
                                 AlbumInfoGreeting(parsed) { genre ->
-                                    navigator.push(L_ScreenAlbumList.create(albumListFilterForGenre(genre)))
+                                    navigator.push(
+                                        L_ScreenAlbumList.create(
+                                            filter = albumListFilterForGenre(genre),
+                                            title = "Genre: ${genre.title}"
+                                        )
+                                    )
                                 }
                                 AlbumInfoAudiences(parsed) { audience ->
-                                    navigator.push(L_ScreenAlbumList.create(albumListFilterForAudience(audience)))
+                                    navigator.push(
+                                        L_ScreenAlbumList.create(
+                                            filter = albumListFilterForAudience(audience),
+                                            title = "Audience: ${audience.title}"
+                                        )
+                                    )
                                 }
                                 AlbumInfoTags(parsed) { navigator.push(ScreenLAlbumLandingTag(it)) }
                                 AlbumInfoButtonSaveAlbum(saved, onClick = { if (!saved) { vm.saveAlbum() } else { itemPendingDelete = parsed } })
