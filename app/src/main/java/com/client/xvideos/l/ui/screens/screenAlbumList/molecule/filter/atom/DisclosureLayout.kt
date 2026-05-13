@@ -36,6 +36,7 @@ private val style = ThemeL.Type.rowTitle.copy(fontWeight = FontWeight.Bold)
 fun DisclosureLayout(contentDisclosureHeading: String, contentDisclosurePanel: @Composable () -> Unit ) {
 
     val state = rememberDisclosureState()
+    val palette = StyleGenresTags.Palette
 
     Disclosure(state = state) {
         DisclosureHeading(backgroundColor = Color.Transparent) {
@@ -44,8 +45,8 @@ fun DisclosureLayout(contentDisclosureHeading: String, contentDisclosurePanel: @
             Row(
                 modifier = Modifier.fillMaxWidth().height(48.dp), verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon( imageVector = Icons.Default.ArrowDropDown, contentDescription = null, modifier = Modifier.rotate(degrees).size(32.dp), tint = ThemeL.textColor )
-                Text(contentDisclosureHeading, style = style)
+                Icon( imageVector = Icons.Default.ArrowDropDown, contentDescription = null, modifier = Modifier.rotate(degrees).size(32.dp), tint = palette.textSecondary )
+                Text(contentDisclosureHeading, style = style.copy(color = palette.textPrimary))
             }
 
         }

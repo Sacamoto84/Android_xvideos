@@ -35,7 +35,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.model.albumFilterDisplay
-import com.client.xvideos.r.common.ThemeRed
 
 
 @Preview(showSystemUi = false, showBackground = false)
@@ -50,6 +49,7 @@ fun PreviewAlbumFilterDisplay() {
 fun AlbumFilterDisplay(startString: String, onRequestApply: (String) -> Unit) {
 
     val list = albumFilterDisplay
+    val palette = StyleGenresTags.Palette
 
     val uniquePrimaryList = albumFilterDisplay.map { it.primary }.distinct()
 
@@ -73,9 +73,9 @@ fun AlbumFilterDisplay(startString: String, onRequestApply: (String) -> Unit) {
             Row(
                 modifier = Modifier
                     .fillMaxSize() // заполняет всю выделенную ширину
-                    .clip(RoundedCornerShape(4.dp))
-                    .border(1.dp, ThemeL.grey5, RoundedCornerShape(4.dp))
-                    .background(ThemeL.grey3)
+                    .clip(RoundedCornerShape(6.dp))
+                    .border(1.dp, palette.border, RoundedCornerShape(6.dp))
+                    .background(palette.field)
                     .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -84,27 +84,27 @@ fun AlbumFilterDisplay(startString: String, onRequestApply: (String) -> Unit) {
                     selected.primary,
                     modifier = Modifier.padding(start = 4.dp),
                     maxLines = 1,
-                    style = ThemeL.Type.rowValue
+                    style = ThemeL.Type.rowValue.copy(color = palette.textPrimary)
                 )
                 Icon(
                     Icons.Default.ArrowDropDown,
                     contentDescription = null,
-                    tint = ThemeL.textColor
+                    tint = palette.textSecondary
                 )
             }
 
             ExposedDropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
-                containerColor = ThemeRed.colorTabLevel3
+                containerColor = palette.surfaceHigh
             ) {
                 uniquePrimaryList.forEach { item ->
                     DropdownMenuItem(
                         text = {
                             Text(
                                 item,
-                                color = ThemeL.textColor,
-                                style = ThemeL.Type.rowValue
+                                color = palette.textPrimary,
+                                style = ThemeL.Type.rowValue.copy(color = palette.textPrimary)
                             )
                         },
                         onClick = {
@@ -129,9 +129,9 @@ fun AlbumFilterDisplay(startString: String, onRequestApply: (String) -> Unit) {
             Row(
                 modifier = Modifier
                     .fillMaxSize()
-                    .clip(RoundedCornerShape(4.dp))
-                    .border(1.dp, ThemeL.grey5, RoundedCornerShape(4.dp))
-                    .background(ThemeL.grey3)
+                    .clip(RoundedCornerShape(6.dp))
+                    .border(1.dp, palette.border, RoundedCornerShape(6.dp))
+                    .background(palette.field)
                     .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -140,19 +140,19 @@ fun AlbumFilterDisplay(startString: String, onRequestApply: (String) -> Unit) {
                     selected.secondary,
                     modifier = Modifier.padding(start = 4.dp),
                     maxLines = 1,
-                    style = ThemeL.Type.rowValue
+                    style = ThemeL.Type.rowValue.copy(color = palette.textPrimary)
                 )
                 Icon(
                     Icons.Default.ArrowDropDown,
                     contentDescription = null,
-                    tint = ThemeL.textColor
+                    tint = palette.textSecondary
                 )
             }
 
             ExposedDropdownMenu(
                 expanded = expanded2,
                 onDismissRequest = { expanded2 = false },
-                containerColor = ThemeRed.colorTabLevel3
+                containerColor = palette.surfaceHigh
             ) {
                 val items = list.filter { it.primary == selected.primary }
                 items.forEach { item ->
@@ -160,8 +160,8 @@ fun AlbumFilterDisplay(startString: String, onRequestApply: (String) -> Unit) {
                         text = {
                             Text(
                                 item.secondary,
-                                color = ThemeL.textColor,
-                                style = ThemeL.Type.rowValue,
+                                color = palette.textPrimary,
+                                style = ThemeL.Type.rowValue.copy(color = palette.textPrimary),
                                 maxLines = 1
                             )
                         },
@@ -182,9 +182,9 @@ fun AlbumFilterDisplay(startString: String, onRequestApply: (String) -> Unit) {
             modifier = Modifier
                 .weight(1f) // равная ширина
                 .height(48.dp)
-                .clip(RoundedCornerShape(4.dp))
-                .border(1.dp, ThemeL.grey5, RoundedCornerShape(4.dp))
-                .background(ThemeL.red)
+                .clip(RoundedCornerShape(6.dp))
+                .border(1.dp, palette.accent, RoundedCornerShape(6.dp))
+                .background(palette.accentDark)
                 .clickable(onClick = { onRequestApply(selected.request) }),
             contentAlignment = Alignment.Center
         ) {

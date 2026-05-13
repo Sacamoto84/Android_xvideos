@@ -27,12 +27,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.model.enum.PictureCountRank
-import com.client.xvideos.r.common.ThemeRed
 
 private val style = ThemeL.Type.rowTitle.copy(fontWeight = FontWeight.Bold)
 
@@ -41,6 +39,7 @@ private val style = ThemeL.Type.rowTitle.copy(fontWeight = FontWeight.Bold)
 fun AlbumListFilterSize(value: PictureCountRank, onChanged: (PictureCountRank) -> Unit) {
 
     var expanded by remember { mutableStateOf(false) }
+    val palette = StyleGenresTags.Palette
 
     val itemS = listOf("Any", "0..25", "25..50", "50..100", "200..800", "800..3200", "3200..12800")
 
@@ -59,7 +58,7 @@ fun AlbumListFilterSize(value: PictureCountRank, onChanged: (PictureCountRank) -
 
     Row(modifier = Modifier.padding(start = 4.dp). fillMaxWidth(),verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
 
-        Text("Album Size", style = style)
+        Text("Album Size", style = style.copy(color = palette.textPrimary))
 
         ExposedDropdownMenuBox(
             expanded = expanded,
@@ -71,9 +70,9 @@ fun AlbumListFilterSize(value: PictureCountRank, onChanged: (PictureCountRank) -
                 modifier = Modifier
                     .width(160.dp)
                     .fillMaxHeight()
-                    .clip(RoundedCornerShape(4.dp))
-                    .border(1.dp, Color(0xFF656565), RoundedCornerShape(4.dp))
-                    .background(Color(0xFF585858))
+                    .clip(RoundedCornerShape(6.dp))
+                    .border(1.dp, palette.border, RoundedCornerShape(6.dp))
+                    .background(palette.field)
                     .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -83,12 +82,12 @@ fun AlbumListFilterSize(value: PictureCountRank, onChanged: (PictureCountRank) -
                     a,
                     modifier = Modifier.padding(start = 8.dp),
                     maxLines = 1,
-                    style = ThemeL.Type.rowTitle.copy(fontWeight = FontWeight.Bold)
+                    style = ThemeL.Type.rowTitle.copy(color = palette.textPrimary, fontWeight = FontWeight.Bold)
                 )
                 Icon(
                     Icons.Default.ArrowDropDown,
                     contentDescription = null,
-                    tint = ThemeL.textColor
+                    tint = palette.textSecondary
                 )
 
             }
@@ -96,15 +95,15 @@ fun AlbumListFilterSize(value: PictureCountRank, onChanged: (PictureCountRank) -
             ExposedDropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
-                containerColor = ThemeRed.colorTabLevel3
+                containerColor = palette.surfaceHigh
             ) {
                 itemS.forEach { item ->
                     DropdownMenuItem(
                         text = {
                             Text(
                                 item,
-                                color = ThemeL.textColor,
-                                style = ThemeL.Type.rowValue
+                                color = palette.textPrimary,
+                                style = ThemeL.Type.rowValue.copy(color = palette.textPrimary)
                             )
                         },
                         onClick = {

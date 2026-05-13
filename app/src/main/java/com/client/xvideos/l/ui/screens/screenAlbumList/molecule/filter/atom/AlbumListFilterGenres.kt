@@ -22,7 +22,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -55,8 +54,9 @@ fun AlbumListFilterGenres(
     val allGenres = mediaCategories?.genres ?: emptyList()
 
     val genresPlusCorrect = allGenres.minus(genresPlus).minus(genresMinus).filter { filterTerms?.contains(it.title) == true }
+    val palette = StyleGenresTags.Palette
 
-    Column(modifier = Modifier.fillMaxWidth().background(Color(0xFF3F3F3F)))
+    Column(modifier = Modifier.fillMaxWidth().background(palette.surface))
     {
 
         //HorizontalDivider()
@@ -84,14 +84,14 @@ fun AlbumListFilterGenres(
             items(genresMinus) {
 
                 val s = buildAnnotatedString {
-                    withStyle(SpanStyle( color = Color(0xb3ceeefc), textDecoration = TextDecoration.Underline)) { append("NOT") }
+                    withStyle(SpanStyle( color = palette.excludedBorder, textDecoration = TextDecoration.Underline)) { append("NOT") }
                     append(" "+it.title)
                 }
 
                 Text(
                     s,
-                    color = StyleGenresTags.colorSelectTextItem,
-                    modifier = Modifier.then(StyleGenresTags.modifierSelectTextItem)
+                    color = StyleGenresTags.colorExcludedTextItem,
+                    modifier = Modifier.then(StyleGenresTags.modifierExcludedTextItem)
                         .clickable(onClick = {
                             val minus = mutableListOf<Genre>()
                             minus.addAll(genresMinus)
@@ -99,7 +99,7 @@ fun AlbumListFilterGenres(
                             val filter1 = filter.copy(genresMinus = minus)
                             onChange(filter1)
                         }),
-                    style = ThemeL.Type.bodyLarge.copy(color = StyleGenresTags.colorSelectTextItem, fontWeight = FontWeight.Bold)
+                    style = ThemeL.Type.bodyLarge.copy(color = StyleGenresTags.colorExcludedTextItem, fontWeight = FontWeight.Bold)
                 )
             }
         }
@@ -113,16 +113,15 @@ fun AlbumListFilterGenres(
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .border(2.dp, Color(0xFF303030), RoundedCornerShape(4.dp))
-                        .clip(RoundedCornerShape(4.dp))
-                        .background(Color(0xFF252525))
+                        .border(1.dp, palette.border, RoundedCornerShape(6.dp))
+                        .clip(RoundedCornerShape(6.dp))
+                        .background(palette.panelBlack)
                 ) {
 
                     item{ Spacer(Modifier.height(0.dp)) }
 
-                    items(genresPlusCorrect?.size ?: 0) {
-                        val item = genresPlusCorrect?.get(it)
-                        if (item != null) {
+                    items(genresPlusCorrect.size) {
+                        val item = genresPlusCorrect[it]
 
                             Row(
                                 modifier = Modifier
@@ -140,12 +139,12 @@ fun AlbumListFilterGenres(
                                     Icon(
                                         Icons.Default.Add,
                                         contentDescription = null,
-                                        tint = ThemeL.textColor,
+                                        tint = palette.selectedBorder,
                                         modifier = Modifier
                                             .padding(vertical = 2.dp)
                                             .padding(horizontal = 4.dp)
                                             .size(40.dp)
-                                            .border(1.dp, ThemeL.grey2, RoundedCornerShape(2.dp))
+                                            .border(1.dp, palette.selectedBorder, RoundedCornerShape(4.dp))
                                             .clickable(onClick = {
                                                 val plus = mutableListOf<Genre>()
                                                 plus.addAll(genresPlus)
@@ -157,19 +156,19 @@ fun AlbumListFilterGenres(
 
                                     Text(
                                         item.title,
-                                        color = ThemeL.textColor,
-                                        style = ThemeL.Type.rowTitle.copy(fontWeight = FontWeight.Bold)
+                                        color = palette.textPrimary,
+                                        style = ThemeL.Type.rowTitle.copy(color = palette.textPrimary, fontWeight = FontWeight.Bold)
                                     )
 
                                     Icon(
                                         Icons.Default.Remove,
                                         contentDescription = null,
-                                        tint = ThemeL.textColor,
+                                        tint = palette.excludedBorder,
                                         modifier = Modifier
                                             .padding(vertical = 2.dp)
                                             .padding(horizontal = 4.dp)
                                             .size(40.dp)
-                                            .border(1.dp, ThemeL.grey2, RoundedCornerShape(4.dp))
+                                            .border(1.dp, palette.excludedBorder, RoundedCornerShape(4.dp))
                                             .clickable(onClick = {
                                                 val minus = mutableListOf<Genre>()
                                                 minus.addAll(genresMinus)
@@ -185,12 +184,10 @@ fun AlbumListFilterGenres(
                                     filterGenreStateCount?.find { it1 -> it1.term == item.title }?.count
                                 Text(
                                     count.toString(),
-                                    color = ThemeL.textColor,
-                                    style = ThemeL.Type.rowTitle.copy(fontWeight = FontWeight.Bold)
+                                    color = palette.textSecondary,
+                                    style = ThemeL.Type.rowTitle.copy(color = palette.textSecondary, fontWeight = FontWeight.Bold)
                                 )
                             }
-
-                        }
 
                     }
 

@@ -18,12 +18,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Remove
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -43,14 +41,16 @@ fun AlbumListFilterTags(
     onChange: (AlbumListFilter) -> Unit
 ) {
 
-    val filterTerms = filterTagStateCount?.map { it.term }?.toSet()
+    val tagCountItems = filterTagStateCount.orEmpty()
+    val filterTerms = tagCountItems.map { it.term }.toSet()
 
     val tagsPlus = filter.tagPlus
     val tagsMinus = filter.tagMinus
 
-    val tagsCorrect = filterTerms?.minus(tagsPlus.map{it})?.minus(tagsMinus.map{it})?.toList()
+    val tagsCorrect = filterTerms.minus(tagsPlus.map{it}).minus(tagsMinus.map{it}).toList()
+    val palette = StyleGenresTags.Palette
 
-    Column(modifier = Modifier.fillMaxWidth().background(Color(0xFF3F3F3F)))
+    Column(modifier = Modifier.fillMaxWidth().background(palette.surface))
     {
 
         //HorizontalDivider()
@@ -76,15 +76,15 @@ fun AlbumListFilterTags(
             items(tagsMinus) {
 
                 val s = buildAnnotatedString {
-                    withStyle(SpanStyle( color = Color(0xb3ceeefc), textDecoration = TextDecoration.Underline)) { append("NOT") }
+                    withStyle(SpanStyle( color = palette.excludedBorder, textDecoration = TextDecoration.Underline)) { append("NOT") }
                     append(" $it")
                 }
 
                 Text(
                     s,
-                    color = StyleGenresTags.colorSelectTextItem,
+                    color = StyleGenresTags.colorExcludedTextItem,
                     modifier = Modifier
-                        .then(StyleGenresTags.modifierSelectTextItem)
+                        .then(StyleGenresTags.modifierExcludedTextItem)
                         .clickable(onClick = {
                             val minus = mutableListOf<String>()
                             minus.addAll(tagsMinus)
@@ -92,7 +92,7 @@ fun AlbumListFilterTags(
                             val filter1 = filter.copy(tagMinus = minus)
                             onChange(filter1)
                         }),
-                    style = ThemeL.Type.bodyLarge.copy(color = StyleGenresTags.colorSelectTextItem, fontWeight = FontWeight.Bold)
+                    style = ThemeL.Type.bodyLarge.copy(color = StyleGenresTags.colorExcludedTextItem, fontWeight = FontWeight.Bold)
                 )
             }
         }
@@ -102,15 +102,13 @@ fun AlbumListFilterTags(
                 modifier = Modifier.padding(4.dp)
             ) {
                 LazyColumn(modifier = Modifier.fillMaxWidth()
-                    .border( 2.dp, Color(0xFF303030), RoundedCornerShape(4.dp))
-                    .clip(RoundedCornerShape(4.dp))
-                    .background(Color(0xFF252525))
+                    .border( 1.dp, palette.border, RoundedCornerShape(6.dp))
+                    .clip(RoundedCornerShape(6.dp))
+                    .background(palette.panelBlack)
                 ) {
                     item{ Spacer(Modifier.height(0.dp)) }
-                    items(tagsCorrect?.size ?: 0) {
-                        val item = tagsCorrect?.get(it)
-
-                        if (item != null) {
+                    items(tagsCorrect.size) {
+                        val item = tagsCorrect[it]
 
                             Row(
                                 modifier = Modifier
@@ -127,12 +125,12 @@ fun AlbumListFilterTags(
                                     Icon(
                                         Icons.Default.Add,
                                         contentDescription = null,
-                                        tint = ThemeL.textColor,
+                                        tint = palette.selectedBorder,
                                         modifier = Modifier
                                             .padding(vertical = 2.dp)
                                             .padding(horizontal = 4.dp)
                                             .size(40.dp)
-                                            .border(1.dp, ThemeL.grey2, RoundedCornerShape(2.dp))
+                                            .border(1.dp, palette.selectedBorder, RoundedCornerShape(4.dp))
                                             .clickable(onClick = {
                                                 val plus = mutableListOf<String>()
                                                 plus.addAll(tagsPlus)
@@ -144,17 +142,17 @@ fun AlbumListFilterTags(
 
 
 
-                                    Text(item, color = ThemeL.textColor, style = ThemeL.Type.rowTitle.copy(fontWeight = FontWeight.Bold))
+                                    Text(item, color = palette.textPrimary, style = ThemeL.Type.rowTitle.copy(color = palette.textPrimary, fontWeight = FontWeight.Bold))
 
                                     Icon(
                                         Icons.Default.Remove,
                                         contentDescription = null,
-                                        tint = ThemeL.textColor,
+                                        tint = palette.excludedBorder,
                                         modifier = Modifier
                                             .padding(vertical = 2.dp)
                                             .padding(horizontal = 4.dp)
                                             .size(40.dp)
-                                            .border(1.dp, ThemeL.grey2, RoundedCornerShape(4.dp))
+                                            .border(1.dp, palette.excludedBorder, RoundedCornerShape(4.dp))
                                             .clickable(onClick = {
                                                 val minus = mutableListOf<String>()
                                                 minus.addAll(tagsMinus)
@@ -166,12 +164,10 @@ fun AlbumListFilterTags(
 
                                 }
 
-                                val count = filterTagStateCount.find { it1 -> it1.term == item }?.count ?: -1
-                                Text(count.toString(), color = ThemeL.textColor, style = ThemeL.Type.rowTitle.copy(fontWeight = FontWeight.Bold))
+                                val count = tagCountItems.find { it1 -> it1.term == item }?.count ?: -1
+                                Text(count.toString(), color = palette.textSecondary, style = ThemeL.Type.rowTitle.copy(color = palette.textSecondary, fontWeight = FontWeight.Bold))
 
                             }
-
-                        }
 
                     }
                     item{ Spacer(Modifier.height(4.dp)) }
