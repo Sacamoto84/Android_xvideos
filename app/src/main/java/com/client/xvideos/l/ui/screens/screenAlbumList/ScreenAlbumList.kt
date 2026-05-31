@@ -45,6 +45,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.core.screen.ScreenKey
+import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -109,6 +111,8 @@ private class ScreenLAlbumList(
     private val initialFilter: LAlbumListFilter?,
     private val title: String
 ) : Screen {
+    override val key: ScreenKey = uniqueScreenKey
+
     @Composable
     override fun Content() {
         ScreenAlbumListContent(initialFilter = initialFilter, title = title)
