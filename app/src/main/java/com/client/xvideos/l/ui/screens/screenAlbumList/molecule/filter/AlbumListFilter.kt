@@ -4,11 +4,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -94,8 +97,37 @@ fun AlbumListFilter(
 //            }
         }
 
-        Box(modifier = Modifier.clip(RoundedCornerShape(8.dp)).background(palette.surface).padding(6.dp)) {
-            AlbumFilterDisplay( filter.display, onRequestApply = { onFilterApply(filter.copy(display = it)) })
+        if (filter.searchQuery.isNotBlank()) {
+            // Режим поиска: сортировка по релевантности, менять нельзя — показываем только название запроса
+            Box(modifier = Modifier.clip(RoundedCornerShape(8.dp)).background(palette.surface).padding(6.dp)) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp)
+                        .clip(RoundedCornerShape(6.dp))
+                        .border(1.dp, palette.border, RoundedCornerShape(6.dp))
+                        .background(palette.field)
+                        .padding(horizontal = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        "Search:",
+                        color = palette.textSecondary,
+                        style = ThemeL.Type.rowSubtitle
+                    )
+                    Spacer(Modifier.width(6.dp))
+                    Text(
+                        filter.searchQuery,
+                        color = palette.textPrimary,
+                        style = ThemeL.Type.rowValue,
+                        maxLines = 1
+                    )
+                }
+            }
+        } else {
+            Box(modifier = Modifier.clip(RoundedCornerShape(8.dp)).background(palette.surface).padding(6.dp)) {
+                AlbumFilterDisplay( filter.display, onRequestApply = { onFilterApply(filter.copy(display = it)) })
+            }
         }
 
         Box(modifier = Modifier.padding(top = 8.dp).clip(RoundedCornerShape(8.dp)).background(palette.surface).padding(4.dp)) {

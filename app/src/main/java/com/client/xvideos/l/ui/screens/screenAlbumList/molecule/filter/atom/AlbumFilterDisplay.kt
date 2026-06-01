@@ -56,7 +56,9 @@ fun AlbumFilterDisplay(startString: String, onRequestApply: (String) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
     var expanded2 by remember { mutableStateOf(false) }
 
-    var selected by remember { mutableStateOf(list.first { it.request == startString }) }
+    var selected by remember {
+        mutableStateOf(list.firstOrNull { it.request == startString } ?: list.first())
+    }
 
     Row(
         modifier = Modifier.fillMaxWidth(),
