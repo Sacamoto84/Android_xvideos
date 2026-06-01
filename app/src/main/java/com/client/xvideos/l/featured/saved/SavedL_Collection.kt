@@ -54,15 +54,23 @@ class SavedL_Collection(
     /* ---------- Список коллекций ---------- */
 
     fun refreshCollectionList() {
-        try {
+        // Обход каталога коллекций (с подсчётом элементов/дублей и чтением
+        // metadata.json) — на IO; обновление Compose-state — на Main, иначе ANR.
+        val order = sortOrder
+        scope.launch(Dispatchers.IO) {
             Timber.i("SavedL_Collection refreshCollectionList()")
-            val items = lReadCollections(File(AppPath.l_collection), sortOrder)
-            collectionList.clear()
-            collectionList.addAll(items)
-            Timber.i("SavedL_Collection refreshCollectionList() collections:${collectionList.size}")
-        } catch (e: Exception) {
-            Timber.e(e, "SavedL_Collection refreshCollectionList() Ошибка получения списка коллекций")
-            SnackBar.error("Ошибка получения списка коллекций")
+            val items = try {
+                lReadCollections(File(AppPath.l_collection), order)
+            } catch (e: Exception) {
+                Timber.e(e, "SavedL_Collection refreshCollectionList() Ошибка получения списка коллекций")
+                SnackBar.error("Ошибка получения списка коллекций")
+                return@launch
+            }
+            withContext(Dispatchers.Main) {
+                collectionList.clear()
+                collectionList.addAll(items)
+                Timber.i("SavedL_Collection refreshCollectionList() collections:${items.size}")
+            }
         }
     }
 
@@ -143,25 +151,33 @@ class SavedL_Collection(
 
     fun refresh() {
         val collectionName = currentCollectionName ?: return
-        try {
+        scope.launch(Dispatchers.IO) {
             Timber.i("SavedL_Collection refresh() collection:$collectionName")
-            val collectionRoot = File(AppPath.l_collection, collectionName)
-            val items = lReadCollectionItems(collectionRoot)
-            listUrl.clear()
-            listUrl.addAll(items)
-            refreshDuplicates(collectionName)
-            Timber.i("SavedL_Collection refresh() files:${listUrl.size}")
-        } catch (e: Exception) {
-            Timber.e(e, "SavedL_Collection refresh() Ошибка получения списка коллекции")
-            SnackBar.error("Ошибка получения списка коллекции")
+            val items = try {
+                lReadCollectionItems(File(AppPath.l_collection, collectionName))
+            } catch (e: Exception) {
+                Timber.e(e, "SavedL_Collection refresh() Ошибка получения списка коллекции")
+                SnackBar.error("Ошибка получения списка коллекции")
+                return@launch
+            }
+            withContext(Dispatchers.Main) {
+                listUrl.clear()
+                listUrl.addAll(items)
+                Timber.i("SavedL_Collection refresh() files:${items.size}")
+            }
         }
+        refreshDuplicates(collectionName)
     }
 
     fun refreshDuplicates(collectionName: String? = currentCollectionName) {
         val name = collectionName ?: return
-        val collectionRoot = File(AppPath.l_collection, name)
-        duplicateGroups.clear()
-        duplicateGroups.addAll(lReadCollectionDuplicateGroups(collectionRoot))
+        scope.launch(Dispatchers.IO) {
+            val groups = lReadCollectionDuplicateGroups(File(AppPath.l_collection, name))
+            withContext(Dispatchers.Main) {
+                duplicateGroups.clear()
+                duplicateGroups.addAll(groups)
+            }
+        }
     }
 
     /* ---------- Элементы ---------- */
@@ -306,8 +322,13 @@ class SavedL_Collection(
     }
 
     fun refreshSmartCollectionCandidates() {
-        smartCollectionCandidates.clear()
-        smartCollectionCandidates.addAll(lReadSmartCollectionCandidates())
+        scope.launch(Dispatchers.IO) {
+            val candidates = lReadSmartCollectionCandidates()
+            withContext(Dispatchers.Main) {
+                smartCollectionCandidates.clear()
+                smartCollectionCandidates.addAll(candidates)
+            }
+        }
     }
 
     fun createSmartCollection(candidate: LSmartCollectionCandidate) {

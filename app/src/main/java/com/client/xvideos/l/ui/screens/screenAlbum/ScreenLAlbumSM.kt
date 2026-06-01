@@ -8,14 +8,12 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
-import com.client.xvideos.common.AppPath
 import com.client.xvideos.common.di.ApplicationScope
 import com.client.xvideos.common.snackbar.SnackBar
 import com.client.xvideos.l.featured.saved.SavedL
+import com.client.xvideos.l.featured.share.lDownloadMediaToShareCache
 import com.client.xvideos.l.featured.share.useCaseShareFile
 import com.client.xvideos.l.model.PicsDetails
-import com.client.xvideos.l.model.lDownloadUrl
-import com.client.xvideos.l.model.lSavedFileName
 import com.client.xvideos.l.net.AlbumInfo
 import com.client.xvideos.l.net.Luscious
 import com.client.xvideos.l.ui.element.lazyRowPictureDetails.LazyRowPictureDetailsHost
@@ -28,16 +26,12 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
-import io.ktor.client.HttpClient
-import io.ktor.client.request.get
-import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.readBytes
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.io.File
 
 class ScreenLAlbumSM @AssistedInject constructor(
     @Assisted val idAlbum: Long,
@@ -68,9 +62,7 @@ class ScreenLAlbumSM @AssistedInject constructor(
      */
     fun saveAlbum() {
         scope.launch {
-            if (albumInfo.value != null) {
-                saved.albums.add(albumInfo.value!!.albumInfo.value)
-            }
+            albumInfo.value?.let { saved.albums.add(it.albumInfo.value) }
         }
     }
 
@@ -89,36 +81,22 @@ class ScreenLAlbumSM @AssistedInject constructor(
 
 
     fun share(item: PicsDetails) {
-        scope.launch(Dispatchers.Main) {
+        // Скачивание/запись файла — на IO (потоково), системный share — на Main.
+        scope.launch(Dispatchers.IO) {
             Timber.i("!!! share item = ${item.url_to_original} isAnimated: ${item.is_animated}")
-            val fileName = item.lSavedFileName()
-            val url = item.lDownloadUrl()
-            if (fileName == null || url == null) {
-                SnackBar.error("Нет ссылки для файла")
-                return@launch
-            }
-            val client = HttpClient()
-            val downloadsDir = AppPath.l_cacheDownload
-            val file = File(downloadsDir, fileName)
             try {
-                val response: HttpResponse = client.get(url)
-                val bytes: ByteArray = response.readBytes()
-                file.writeBytes(bytes)
-                println("!!! Файл сохранен: ${file.absolutePath}")
-
-                if (file.exists()) { useCaseShareFile(context, file) }
-                else
-                {
-                    SnackBar.error("Файл не найден: ${file.absolutePath}")
-                    Timber.w("shareGifs -> Файл не существует: ${file.absolutePath}")
+                val file = lDownloadMediaToShareCache(item)
+                if (file == null) {
+                    SnackBar.error("Нет ссылки для файла")
+                    return@launch
+                }
+                withContext(Dispatchers.Main) {
+                    useCaseShareFile(context, file)
                 }
             } catch (e: Exception) {
-                SnackBar.error("shareGifs -> Ошибка при работе с файлом: ${file.absolutePath}")
-                Timber.e(e, "shareGifs -> Ошибка при работе с файлом: ${file.absolutePath}")
-            } finally {
-                client.close()
+                Timber.e(e, "L share -> ошибка при работе с файлом")
+                SnackBar.error("Ошибка при попытке поделиться файлом")
             }
-
         }
     }
 

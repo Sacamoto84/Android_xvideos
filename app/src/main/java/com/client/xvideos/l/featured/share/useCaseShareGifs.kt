@@ -1,28 +1,34 @@
 package com.client.xvideos.l.featured.share
 
-import android.content.Context
-import android.widget.Toast
 import com.client.xvideos.common.AppPath
+import com.client.xvideos.l.featured.saved.lCreateMediaClient
+import com.client.xvideos.l.featured.saved.lDownloadToFile
 import com.client.xvideos.l.model.PicsDetails
-import timber.log.Timber
+import com.client.xvideos.l.model.lDownloadUrl
+import com.client.xvideos.l.model.lSavedFileName
 import java.io.File
 
-//--- Поделиться ---
-fun useCaseShareL(context : Context, item: PicsDetails){
+/**
+ * Скачивает медиа элемента [item] в share-кеш и возвращает локальный файл.
+ *
+ * Качает потоково ([lDownloadToFile]) с корректными media-заголовками, поэтому
+ * безопасно по памяти (большие видео не буферизуются целиком в RAM) и должна
+ * вызываться на IO-диспетчере. Возвращает `null`, если у элемента нет ссылки
+ * на скачивание.
+ *
+ * @throws Exception при сетевой/файловой ошибке скачивания.
+ */
+suspend fun lDownloadMediaToShareCache(item: PicsDetails): File? {
+    val fileName = item.lSavedFileName() ?: return null
+    val url = item.lDownloadUrl() ?: return null
+    val file = File(AppPath.l_cacheDownload, fileName)
 
-    val path = "${AppPath.l_cacheDownload}/${item.url_to_original}"
-    val file = File(path)
-
+    val client = lCreateMediaClient()
     try {
-        if (file.exists()) {
-            useCaseShareFile(context, file)
-        } else {
-            Toast.makeText(context, "Файл не найден: $path", Toast.LENGTH_SHORT).show()
-            Timber.w("shareGifs -> Файл не существует: $path")
-        }
-    } catch (e: Exception) {
-        Toast.makeText(context, "Ошибка при попытке поделиться файлом", Toast.LENGTH_SHORT).show()
-        Timber.e(e, "shareGifs -> Ошибка при работе с файлом: $path")
+        lDownloadToFile(client, url, file)
+    } finally {
+        client.close()
     }
 
+    return file.takeIf { it.exists() && it.length() > 0L }
 }

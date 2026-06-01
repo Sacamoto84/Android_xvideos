@@ -6,28 +6,20 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.lifecycle.ViewModel
-import com.client.xvideos.common.AppPath
 import com.client.xvideos.common.di.ApplicationScope
 import com.client.xvideos.common.snackbar.SnackBar
 import com.client.xvideos.l.featured.saved.SavedL
+import com.client.xvideos.l.featured.share.lDownloadMediaToShareCache
 import com.client.xvideos.l.featured.share.useCaseShareFile
 import com.client.xvideos.l.model.PicsDetails
-import com.client.xvideos.l.model.lDownloadUrl
-import com.client.xvideos.l.model.lMediaRequestHeaders
-import com.client.xvideos.l.model.lSavedFileName
 import com.client.xvideos.l.net.Luscious
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.ktor.client.HttpClient
-import io.ktor.client.request.get
-import io.ktor.client.request.headers
-import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.readBytes
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.io.File
 import javax.inject.Inject
 
 @Immutable
@@ -91,7 +83,7 @@ class ExpandMenuViewModel @Inject constructor(
         SavedLikesItemExpandMenu(
             item,
             onDelete = { it ->
-                saved.likes.remove(item.url_to_original!!)
+                item.url_to_original?.let { url -> saved.likes.remove(url) }
                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
             },
             isCollection = isCollection,
@@ -111,40 +103,23 @@ class ExpandMenuViewModel @Inject constructor(
     }
 
     fun share(item: PicsDetails) {
-        scope.launch(Dispatchers.Main) {
+        // Скачиваем и пишем файл на IO (потоково, без буферизации всего файла
+        // в RAM), а системный share показываем на Main.
+        scope.launch(Dispatchers.IO) {
             Timber.i("!!! share item = ${item.url_to_original} isAnimated: ${item.is_animated}")
-            val fileName = item.lSavedFileName()
-            val url = item.lDownloadUrl()
-            if (fileName == null || url == null) {
-                SnackBar.error("Нет ссылки для файла")
-                return@launch
-            }
-            val client = HttpClient()
-            val downloadsDir = AppPath.l_cacheDownload
-            val file = File(downloadsDir, fileName)
             try {
-                val response: HttpResponse = client.get(url) {
-                    headers {
-                        lMediaRequestHeaders().forEach { (key, value) -> append(key, value) }
-                    }
+                val file = lDownloadMediaToShareCache(item)
+                if (file == null) {
+                    SnackBar.error("Нет ссылки для файла")
+                    return@launch
                 }
-                val bytes: ByteArray = response.readBytes()
-                file.writeBytes(bytes)
-                println("!!! Файл сохранен: ${file.absolutePath}")
-
-                if (file.exists()) {
+                withContext(Dispatchers.Main) {
                     useCaseShareFile(context, file)
-                } else {
-                    SnackBar.error("Файл не найден: ${file.absolutePath}")
-                    Timber.w("shareGifs -> Файл не существует: ${file.absolutePath}")
                 }
             } catch (e: Exception) {
-                SnackBar.error("shareGifs -> Ошибка при работе с файлом: ${file.absolutePath}")
-                Timber.e(e, "shareGifs -> Ошибка при работе с файлом: ${file.absolutePath}")
-            } finally {
-                client.close()
+                Timber.e(e, "L share -> ошибка при работе с файлом")
+                SnackBar.error("Ошибка при попытке поделиться файлом")
             }
-
         }
     }
 

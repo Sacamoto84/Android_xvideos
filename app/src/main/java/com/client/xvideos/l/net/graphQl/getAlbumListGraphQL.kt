@@ -6,6 +6,26 @@ import com.client.xvideos.l.model.enum.ContentId
 import com.client.xvideos.l.model.enum.PictureCountRank
 import java.util.Locale.getDefault
 
+/**
+ * Экранирует строку для безопасной вставки внутрь JSON-строкового литерала
+ * (между кавычками). Защищает тело GraphQL-запроса от поломки/инъекции, если
+ * пользовательский ввод (поисковый запрос, теги) содержит `"`, `\` и управляющие
+ * символы.
+ */
+private fun jsonEscape(value: String): String = buildString(value.length) {
+    for (c in value) {
+        when (c) {
+            '\\' -> append("\\\\")
+            '"' -> append("\\\"")
+            '\n' -> append("\\n")
+            '\r' -> append("\\r")
+            '\t' -> append("\\t")
+            '\b' -> append("\\b")
+            else -> if (c < ' ') append("\\u%04x".format(c.code)) else append(c)
+        }
+    }
+}
+
 
 fun getAlbumListGraphQL1(
     page: Int = 3,
@@ -70,12 +90,12 @@ fun getAlbumListGraphQL1(
           "variables": {
             "input": {
               "items_per_page": ${filter.itemsPerPage},
-              "display": "${filter.display}",
+              "display": "${jsonEscape(filter.display)}",
               "filters": ["""
     )
 
     if (filter.album_type != AlbumType.All) {
-        str.append("""{ "name": "album_type", "value": "${filter.album_type.value}" },""")
+        str.append("""{ "name": "album_type", "value": "${jsonEscape(filter.album_type.value)}" },""")
     }
 
 
@@ -88,7 +108,7 @@ fun getAlbumListGraphQL1(
     }
 
     if (filter.searchQuery.isNotBlank()) {
-        str.append("""{ "name": "search_query", "value": "${filter.searchQuery}" },""")
+        str.append("""{ "name": "search_query", "value": "${jsonEscape(filter.searchQuery)}" },""")
     }
 
 
@@ -100,12 +120,12 @@ fun getAlbumListGraphQL1(
         filter.tagMinus.forEach {
             tags.append("-${it.replace(" ", "_").lowercase(getDefault())}")
         }
-        str.append("""{ "name": "tagged", "value": "$tags" },""")
+        str.append("""{ "name": "tagged", "value": "${jsonEscape(tags.toString())}" },""")
     }
 
-    str.append("""{ "name": "audience_ids", "value": "${filter.audienceIds}" },""")
+    str.append("""{ "name": "audience_ids", "value": "${jsonEscape(filter.audienceIds)}" },""")
 
-    str.append("""{ "name": "language_ids", "value": "${filter.languageIds}" }""")
+    str.append("""{ "name": "language_ids", "value": "${jsonEscape(filter.languageIds)}" }""")
 
 
 
@@ -117,11 +137,11 @@ fun getAlbumListGraphQL1(
         filter.genresMinus.forEach {
             genres.append("-${it.id}")
         }
-        str.append(""",{ "name": "genre_ids", "value": "$genres" }""")
+        str.append(""",{ "name": "genre_ids", "value": "${jsonEscape(genres.toString())}" }""")
     }
 
     str.append(
-        """    
+        """
         ],
               "page": $page
             }

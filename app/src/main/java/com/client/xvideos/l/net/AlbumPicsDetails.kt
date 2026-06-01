@@ -227,10 +227,21 @@ class AlbumPicsDetails(
         withContext(Dispatchers.Main) {
             totalPages = pages
             percentLoad = page.page.toFloat() / pages
+            // Быстрый путь для последовательной загрузки (стр. 1,2,3,...): дописываем
+            // только новую страницу в хвост вместо полной пересборки всего списка
+            // (иначе это O(n²) и полная рекомпозиция на каждой странице).
+            val isContiguousTail = !loadedPages.containsKey(page.page) &&
+                    page.page == loadedPages.size + 1 &&
+                    (1..loadedPages.size).all { loadedPages.containsKey(it) }
             loadedPages[page.page] = corrected
-            pics.clear()
-            for (loadedPage in 1..pages) {
-                pics.addAll(loadedPages[loadedPage].orEmpty())
+            if (isContiguousTail) {
+                pics.addAll(corrected)
+            } else {
+                // Заполнение пропуска / ретрай страницы — пересобираем по порядку.
+                pics.clear()
+                for (loadedPage in 1..pages) {
+                    pics.addAll(loadedPages[loadedPage].orEmpty())
+                }
             }
         }
     }

@@ -125,11 +125,13 @@ class AlbumInfo(
     }
 
     /**
-     * Возвращает url миниатюры альбома
+     * Возвращает url миниатюры альбома.
+     * Вычисляется по требованию: `by lazy` зафиксировал бы пустое значение,
+     * если бы свойство прочитали до завершения асинхронной загрузки.
      */
-    val thumbnail: String by lazy { albumInfo.value.cover.url }
+    val thumbnail: String get() = albumInfo.value.cover.url
 
-    val downloadUrl: String by lazy { Luscious.Companion.HOME + albumInfo.value.download_url }
+    val downloadUrl: String get() = Luscious.Companion.HOME + albumInfo.value.download_url
 
 //    val artists: List<String> by lazy {
 //        tags.filter { it.category == "Artist" }.map { it.name }

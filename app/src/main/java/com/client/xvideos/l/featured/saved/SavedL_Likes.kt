@@ -78,16 +78,22 @@ class SavedL_Likes(
     }
 
     fun refresh() {
-        try {
+        // Чтение каталога с разбором каждого metadata.json делаем на IO,
+        // обновление Compose-state — на Main, чтобы не блокировать UI (ANR).
+        scope.launch(Dispatchers.IO) {
             Timber.i("SavedL_Likes refresh()")
-            val root = File(AppPath.l_likes)
-            val items = lReadCollectionItems(root)
-            listUrl.clear()
-            listUrl.addAll(items)
-            Timber.i("SavedL_Likes refresh() files:${listUrl.size}")
-        } catch (e: Exception) {
-            Timber.e(e, "SavedL_Likes refresh() Ошибка получения списка likes")
-            SnackBar.error("Ошибка получения списка likes")
+            val items = try {
+                lReadCollectionItems(File(AppPath.l_likes))
+            } catch (e: Exception) {
+                Timber.e(e, "SavedL_Likes refresh() Ошибка получения списка likes")
+                SnackBar.error("Ошибка получения списка likes")
+                return@launch
+            }
+            withContext(Dispatchers.Main) {
+                listUrl.clear()
+                listUrl.addAll(items)
+                Timber.i("SavedL_Likes refresh() files:${items.size}")
+            }
         }
     }
 }
