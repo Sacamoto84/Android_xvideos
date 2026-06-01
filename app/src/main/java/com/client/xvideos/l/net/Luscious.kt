@@ -2,6 +2,7 @@ package com.client.xvideos.l.net
 
 import com.client.xvideos.l.model.AlbumListFilter
 import com.client.xvideos.l.model.Landing_page_albumType
+import com.client.xvideos.l.net.graphQl.LandingPageAlbumSearch
 import com.client.xvideos.l.net.graphQl.LandingPageAlbumTag
 import com.client.xvideos.l.net.graphQl.refreshMediaCategories
 import com.client.xvideos.l.repository.Repository
@@ -73,6 +74,10 @@ class Luscious(
 
     suspend fun getLandingPageAlbumTag(tag : String =  "Blonde"): Result<Landing_page_albumType> {
         return LandingPageAlbumTag(tag, repository)
+    }
+
+    suspend fun getLandingPageAlbumSearch(search : String, limit : Int = 9): Result<Landing_page_albumType> {
+        return LandingPageAlbumSearch(search, repository, limit)
     }
 
 }

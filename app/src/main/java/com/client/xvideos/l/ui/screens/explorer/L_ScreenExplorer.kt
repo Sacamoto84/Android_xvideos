@@ -8,6 +8,7 @@ import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.FormatListBulleted
 import androidx.compose.material.icons.outlined.BookmarkBorder
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Topic
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -31,6 +32,7 @@ import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.l.featured.saved.SavedL
 import com.client.xvideos.screenRoot.LocalRootScreenModel
 import com.client.xvideos.l.ui.screens.LLoginContent
+import com.client.xvideos.l.ui.screens.explorer.tab.albumSearch.L_ScreenAlbumSearch
 import com.client.xvideos.l.ui.screens.explorer.tab.albumTopHits.L_ScreenAlbumTopHits
 import com.client.xvideos.l.ui.screens.explorer.tab.saved.L_SavedTab
 import com.client.xvideos.l.ui.screens.screenAlbumList.L_ScreenAlbumList
@@ -95,6 +97,7 @@ class L_ScreenExplorer : Screen {
                 Icons.AutoMirrored.Outlined.FormatListBulleted,
                 Icons.Outlined.BookmarkBorder,
                 Icons.Outlined.Topic,
+                Icons.Outlined.Search,
             )
         }
 
@@ -102,7 +105,8 @@ class L_ScreenExplorer : Screen {
             persistentListOf(
                 "",
                 "",
-                "bBookMark"
+                "bBookMark",
+                ""
             )
         }
 
@@ -136,6 +140,7 @@ class L_ScreenExplorer : Screen {
                     0 -> L_ScreenAlbumList.Content()
                     1 -> L_SavedTab.Content()
                     2 -> L_ScreenAlbumTopHits.Content()
+                    3 -> L_ScreenAlbumSearch.Content()
                     else -> L_SavedTab.Content()
                 }
                 //)

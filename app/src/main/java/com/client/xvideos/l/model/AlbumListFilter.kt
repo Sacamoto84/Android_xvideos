@@ -17,4 +17,5 @@ data class AlbumListFilter(
     val genresMinus: List<Genre> = emptyList(),
     val tagPlus : List<String> = emptyList(),
     val tagMinus : List<String> = emptyList(),
+    val searchQuery : String = "",
     )

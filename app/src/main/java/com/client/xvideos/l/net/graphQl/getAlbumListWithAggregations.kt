@@ -75,6 +75,10 @@ fun getAlbumListWithAggregations(
         str.append("""{ "name": "content_id", "value": "${filter.content_id.value}" },""")
     }
 
+    if (filter.searchQuery.isNotBlank()) {
+        str.append("""{ "name": "search_query", "value": "${filter.searchQuery}" },""")
+    }
+
     if (filter.tagPlus.isNotEmpty() or filter.tagMinus.isNotEmpty()) {
         val tags = StringBuilder()
         filter.tagPlus.forEach {
