@@ -104,7 +104,7 @@ fun L_DialogCollection(savedL: SavedL) {
                                 .padding(vertical = 4.dp)
                                 .clickable(onClick = {
                                     savedL.collection.addPendingToCollection(collectionItem.collection)
-                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                    haptic.performHapticFeedback(HapticFeedbackType.Confirm)
                                 }),
                             verticalAlignment = Alignment.CenterVertically
                         ) {

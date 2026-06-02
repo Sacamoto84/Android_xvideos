@@ -54,7 +54,7 @@ fun ScreenLRootBottomNavigator(
                     .background(if (selectIndex == SelectIndex.Default) colorSelect else Color.Transparent)
                     .combinedClickable(
                         onClick = {
-                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            haptic.performHapticFeedback(HapticFeedbackType.Confirm)
                             onSelected(SelectIndex.Default)
                         },
                         onLongClick = {
@@ -75,7 +75,7 @@ fun ScreenLRootBottomNavigator(
 
                         },
                         onLongClick = {
-                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            haptic.performHapticFeedback(HapticFeedbackType.Confirm)
                             onSelected(SelectIndex.Manga)
                         }
                     ),
@@ -102,7 +102,7 @@ fun ScreenLRootBottomNavigator(
 
                         },
                         onLongClick = {
-                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            haptic.performHapticFeedback(HapticFeedbackType.Confirm)
                             onSelected(SelectIndex.Hentai)
                         }
                     ),
@@ -127,7 +127,7 @@ fun ScreenLRootBottomNavigator(
 
                         },
                         onLongClick = {
-                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            haptic.performHapticFeedback(HapticFeedbackType.Confirm)
                             onSelected(SelectIndex.Porn)
                         }
                     ),

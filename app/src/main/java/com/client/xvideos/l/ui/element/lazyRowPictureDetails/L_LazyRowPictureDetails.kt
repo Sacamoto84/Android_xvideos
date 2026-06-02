@@ -243,7 +243,7 @@ fun L_LazyRowPictureDetails(
         {
             FloatingActionButton(
                 onClick = {
-                    haptic.performHapticFeedback( androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove )
+                    haptic.performHapticFeedback( androidx.compose.ui.hapticfeedback.HapticFeedbackType.Confirm )
                     scope.launch { host.state.scrollToItem(0) }
                 },
                 modifier = Modifier.padding(16.dp)

@@ -145,7 +145,7 @@ private fun R_DialogCollection(savedRed: () -> SavedRed){
                 collection
             )
             savedRed().collections.visibleDialog = false
-            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+            haptic.performHapticFeedback(HapticFeedbackType.Confirm)
         },
         savedRed = savedRed
     )

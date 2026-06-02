@@ -84,7 +84,7 @@ class ExpandMenuViewModel @Inject constructor(
             item,
             onDelete = { it ->
                 item.url_to_original?.let { url -> saved.likes.remove(url) }
-                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                haptic.performHapticFeedback(HapticFeedbackType.Confirm)
             },
             isCollection = isCollection,
             savedL = saved,

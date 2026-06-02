@@ -48,7 +48,7 @@ fun NichesBottomBar(
 
             AnimatedVisibility(visible = !isSearchFocused) {
                 ButtonUp {
-                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    haptic.performHapticFeedback(HapticFeedbackType.Confirm)
                     onUpClick()
                 }
             }

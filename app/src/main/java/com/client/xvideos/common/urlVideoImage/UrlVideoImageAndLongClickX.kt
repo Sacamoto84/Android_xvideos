@@ -48,7 +48,7 @@ fun UrlVideoImageAndLongClickX(
                 },
 
                 onLongClick = {
-                    //haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    //haptic.performHapticFeedback(HapticFeedbackType.Confirm)
                     vibrateWithPatternAndAmplitude(context = context)
                     onLongClick.invoke()
                 },
@@ -68,7 +68,7 @@ fun UrlVideoImageAndLongClickX(
                             """.trimIndent()
                         )
                     }
-                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    haptic.performHapticFeedback(HapticFeedbackType.Confirm)
                 }
             )
             .then(modifier)
@@ -84,7 +84,7 @@ fun UrlVideoImageAndLongClickX(
                 fallbackUrls = listOf(item.previewVideo),
                 onClick = {
                     isVideo = !isVideo
-                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    haptic.performHapticFeedback(HapticFeedbackType.Confirm)
                 }
             )
         } else {

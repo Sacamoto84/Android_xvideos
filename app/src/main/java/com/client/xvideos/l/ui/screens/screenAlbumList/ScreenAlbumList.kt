@@ -179,7 +179,7 @@ private fun Screen.ScreenAlbumListContent(initialFilter: LAlbumListFilter?, titl
                         totalPages = info?.totalPages ?: 1,
                         onChange = {
                             scope.launch { vm.statePager.scrollToPage(it) }
-                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            haptic.performHapticFeedback(HapticFeedbackType.Confirm)
                             vm.loadAlbumList(it)
                         }
                     )

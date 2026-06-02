@@ -77,7 +77,7 @@ fun TabRow(
                     ),
                     selected = index == state,
                     onClick = {
-                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                        haptic.performHapticFeedback(HapticFeedbackType.Confirm)
                         state = index
                         onChangeState.invoke(index)
                     },

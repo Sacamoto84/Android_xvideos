@@ -54,7 +54,7 @@ fun SortByOrder(
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = {
-            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+            haptic.performHapticFeedback(HapticFeedbackType.Confirm)
             expanded = it
         },
         modifier = Modifier

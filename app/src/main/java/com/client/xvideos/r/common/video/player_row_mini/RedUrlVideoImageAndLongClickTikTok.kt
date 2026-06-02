@@ -116,13 +116,13 @@ fun RedUrlVideoImageAndLongClickTikTok(
                     onDoubleClick.invoke()
                 },
                 onLongClick = {
-                    //haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    //haptic.performHapticFeedback(HapticFeedbackType.Confirm)
                     vibrateWithPatternAndAmplitude(context = context)
                     onLongClick.invoke()
                 },
                 onClick = {
                     isVideo = isVideo.not()
-                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    haptic.performHapticFeedback(HapticFeedbackType.Confirm)
                 }
             )
             .then(modifier),

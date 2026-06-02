@@ -339,7 +339,7 @@ private fun RedFullScreenPage(
                 vm = vm,
                 navigator = navigator,
                 downloadList = downloadList,
-                haptic = { haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove) }
+                haptic = { haptic.performHapticFeedback(HapticFeedbackType.Confirm) }
             )
         }
     }

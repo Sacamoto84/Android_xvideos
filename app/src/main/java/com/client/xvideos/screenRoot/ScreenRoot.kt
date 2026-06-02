@@ -105,7 +105,7 @@ object ScreenRoot : Screen {
             EventBus.events
                 .filterIsInstance<Event.ShowSnackBar>()
                 .collect { event ->
-                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    haptic.performHapticFeedback(HapticFeedbackType.Confirm)
                     snackBarHostState.show(event.message)
                 }
         }

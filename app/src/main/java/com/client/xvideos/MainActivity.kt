@@ -30,6 +30,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Vibration
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -219,6 +220,20 @@ object MenuScreen : Screen {
                             contentDescription = null,
                             tint = Color.White,
                             modifier = Modifier.size(32.dp))
+                    }
+                    // Демо-экран виброоткликов (HapticFeedbackType) для тестов
+                    IconButton(
+                        onClick = { navigator.push(HapticDemoScreen) },
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .displayCutoutPadding()
+                            .size(48.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.Vibration,
+                            contentDescription = "Haptic demo",
+                            tint = Color.White,
+                            modifier = Modifier.size(30.dp))
                     }
                 }
             }

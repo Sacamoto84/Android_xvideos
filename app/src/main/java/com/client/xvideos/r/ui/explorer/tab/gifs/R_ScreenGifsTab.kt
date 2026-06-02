@@ -132,7 +132,7 @@ private fun R_ScreenGifsTabContent(vm: ScreenRedExplorerGifsSM) {
                 sortType = sortType,
                 onSortSelect = { vm.lazyHost.changeSortType(it) },
                 onUpClick = {
-                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    haptic.performHapticFeedback(HapticFeedbackType.Confirm)
                     vm.lazyHost.gotoUp()
                 }
             )

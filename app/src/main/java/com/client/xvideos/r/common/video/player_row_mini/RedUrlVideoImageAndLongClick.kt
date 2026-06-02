@@ -114,7 +114,7 @@ fun RedUrlVideoImageAndLongClick(
                 },
                 onClick = {
                     isVideo = !isVideo
-                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    haptic.performHapticFeedback(HapticFeedbackType.Confirm)
                 }
             )
             .then(modifier),
