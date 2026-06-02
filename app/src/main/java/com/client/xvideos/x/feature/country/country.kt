@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,9 +40,7 @@ import com.composables.core.Menu
 import com.composables.core.MenuButton
 import com.composables.core.MenuContent
 import com.composables.core.rememberMenuState
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
@@ -60,10 +59,15 @@ fun PreviewComposeCountry() {
 
 private val countries: List<Country> by lazy { parserCountry() }
 
-var currentCountries: String by mutableStateOf("❓") //Текущая страна
-var currentCountriesUpdate: Int by mutableIntStateOf(0) //Увеличиваем при каждом изменении
+/**
+ * Глобальное состояние выбранной страны.
+ * Раньше это были две разрозненные top-level переменные — собраны в один холдер.
+ */
+object CountryState {
+    var current: String by mutableStateOf("❓")    // Текущая страна
+    var updateTrigger: Int by mutableIntStateOf(0) // Инкремент при каждой смене страны
+}
 
-@OptIn(DelicateCoroutinesApi::class)
 @Composable
 fun ComposeCountry(modifier: Modifier = Modifier) {
 
@@ -72,6 +76,8 @@ fun ComposeCountry(modifier: Modifier = Modifier) {
     val state = rememberMenuState(expanded = false)
 
     val stateLazyList = rememberLazyListState()
+
+    val scope = rememberCoroutineScope()
 
     Box(
         Modifier
@@ -95,7 +101,7 @@ fun ComposeCountry(modifier: Modifier = Modifier) {
 
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     BasicText(
-                        currentCountries,
+                        CountryState.current,
                         style = TextStyle(
                             fontWeight = FontWeight.Medium,
                             color = Color.White,
@@ -128,10 +134,10 @@ fun ComposeCountry(modifier: Modifier = Modifier) {
                                 .padding(start = 8.dp)
                                 //.border(1.dp, Color.Magenta)
                                 .clickable {
-                                    GlobalScope.launch {
+                                    scope.launch {
                                         readHtmlFromURLWebView(urlStart + it.url)
                                         withContext(Dispatchers.Main) {
-                                            currentCountriesUpdate++
+                                            CountryState.updateTrigger++
                                             Toast.makeText(
                                                 App.Companion.instance.applicationContext,
                                                 "${getFlagEmoji(it.flagClass)} ${it.name}", Toast.LENGTH_SHORT).show()
@@ -145,7 +151,7 @@ fun ComposeCountry(modifier: Modifier = Modifier) {
                                 style = TextStyle(
                                     fontFamily = emojiFont,
                                     fontSize = 28.sp,
-                                    color = if (getFlagEmoji(it.flagClass) == currentCountries) PornHubOrange else Color.LightGray
+                                    color = if (getFlagEmoji(it.flagClass) == CountryState.current) PornHubOrange else Color.LightGray
                                 )
                             )
 

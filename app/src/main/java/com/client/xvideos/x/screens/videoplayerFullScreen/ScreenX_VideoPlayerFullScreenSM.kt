@@ -33,7 +33,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
-import kotlinx.coroutines.runBlocking
+import cafe.adriel.voyager.core.model.screenModelScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @UnstableApi
@@ -56,23 +57,24 @@ class ScreenX_VideoPlayerFullScreenSM @AssistedInject constructor(
 
     var playerE by mutableStateOf<Player?>(null)
 
-    var passedString: String = ""
+    var passedString: String by mutableStateOf("")
 
     val a: MutableState<HTML5PlayerConfig?> = mutableStateOf(HTML5PlayerConfig())
 
     var positionForFullscreen by mutableLongStateOf(position)
 
     init {
-        runBlocking {
-            Timber.e("!!! ScreenVideoPlayerSM init()")
+        // Раньше здесь был runBlocking { ... } — блокировал поток создания ScreenModel (UI) → ANR.
+        screenModelScope.launch {
+            Timber.e("!!! ScreenX_VideoPlayerFullScreenSM init()")
 
-            val res = db.cacheUrlStringRom.get(url)
+            // RAM-кэш (чистится при старте процесса), чтобы истекающий HLS-токен обновлялся.
+            val res = db.cacheUrlStringRam.get(url)
             val s = if (res == null) {
                 val content = readHtmlFromURLDirect(url)
-                db.cacheUrlStringRom.put(url, content)
+                db.cacheUrlStringRam.put(url, content)
                 content
-            }
-            else
+            } else
                 res.content
 
             val script = parserItemVideo(s)
@@ -125,7 +127,9 @@ class ScreenX_VideoPlayerFullScreenSM @AssistedInject constructor(
         player.seekTo(player.currentPosition)
 
         // Создаем TrackSelectionOverride для новой дорожки
-        val trackGroup = player.currentTracks.groups[0].mediaTrackGroup
+        val groups = player.currentTracks.groups
+        if (groups.isEmpty()) return
+        val trackGroup = groups[0].mediaTrackGroup
         val override = TrackSelectionOverride(trackGroup, listOf(trackIndex))
 
         player.trackSelectionParameters =

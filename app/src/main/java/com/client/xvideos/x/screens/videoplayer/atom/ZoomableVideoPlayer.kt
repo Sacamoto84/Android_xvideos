@@ -161,8 +161,11 @@ fun ZoomableVideoPlayer(
                                 vm.listFormat.sortBy { it.height }
 
                                 if (!once) {
-                                    vm.quality = vm.listFormat.last().height
-                                    once = true
+                                    // lastOrNull(): список форматов может быть пуст, если у группы нет форматов.
+                                    vm.listFormat.lastOrNull()?.let {
+                                        vm.quality = it.height
+                                        once = true
+                                    }
                                 }
 
                             }

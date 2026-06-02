@@ -172,6 +172,7 @@ private fun Screen.ScreenAlbumListContent(initialFilter: LAlbumListFilter?, titl
                 bottomBar = {
                     AlbumListBottomBar(
                         onClickVisibleFilter = {
+                            haptic.performHapticFeedback(HapticFeedbackType.Confirm)
                             // ✅ Открываем диалог
                             showFilterDialog = true
                         },
@@ -245,6 +246,7 @@ private fun Screen.ScreenAlbumListContent(initialFilter: LAlbumListFilter?, titl
                                             numberOfAnimatedPictures = item.numberOfAnimatedPictures,
                                             numberOfPictures = item.numberOfPictures,
                                         ) {
+                                            haptic.performHapticFeedback(HapticFeedbackType.Confirm)
                                             navigator.push(ScreenLAlbum(item.id.toLong()))
                                         }
                                     }

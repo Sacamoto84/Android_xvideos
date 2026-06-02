@@ -1,6 +1,7 @@
 package com.client.xvideos.l.ui.screens.screenAlbum
 
 import android.annotation.SuppressLint
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -39,6 +40,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
@@ -86,6 +89,15 @@ class ScreenLAlbum(val idAlbum: Long) : Screen {
         val navigator = LocalNavigator.currentOrThrow
 
         val vm = getScreenModel<ScreenLAlbumSM, ScreenLAlbumSM.Factory> { factory -> factory.create(idAlbum) }
+
+        // Виброотклик при возврате из альбома. Активен только когда НЕ открыта
+        // полноэкранная картинка — в этом случае back перехватывает L_FullScreenImage
+        // (закрывает картинку), и выход из альбома не происходит.
+        val haptic = LocalHapticFeedback.current
+        BackHandler(enabled = vm.host.selectedImage == null) {
+            haptic.performHapticFeedback(HapticFeedbackType.Confirm)
+            navigator.pop()
+        }
 
         val album = vm.albumInfo.collectAsStateWithLifecycle().value
 

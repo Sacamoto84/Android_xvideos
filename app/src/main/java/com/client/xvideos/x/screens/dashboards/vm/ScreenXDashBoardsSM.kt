@@ -27,7 +27,7 @@ class ScreenXDashBoardsScreenModel @Inject constructor(
 
     fun addFavorite(item: ItemsX) = screenModelScope.launch { saved.favorites.add(item) }
     fun removeFavorite(item: ItemsX) = screenModelScope.launch { saved.favorites.remove(item) }
-    fun isFavorite(id : Long): Boolean{ return saved.favorites.list.find { it.id == id } != null }
+    fun isFavorite(id: Long): Boolean = saved.favorites.contains(id) // O(1) по множеству id
 
 }
 

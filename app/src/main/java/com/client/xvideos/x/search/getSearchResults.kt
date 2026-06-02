@@ -9,22 +9,22 @@ import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpHeaders
 import timber.log.Timber
+import java.net.URLEncoder
 
 suspend fun getSearchResults(query: String): String? {
 
-    val client = HttpClient(OkHttp)
-    {
-//        install(Logging) {
-//            level = LogLevel.INFO
-//        }
-        install(HttpTimeout)
-        {
-            requestTimeoutMillis = Long.MAX_VALUE
+    val client = HttpClient(OkHttp) {
+        install(HttpTimeout) {
+            // Конечные таймауты вместо Long.MAX_VALUE.
+            requestTimeoutMillis = 30_000
+            connectTimeoutMillis = 15_000
+            socketTimeoutMillis = 30_000
         }
 
         defaultRequest {
-            headers.append("Referer", "https://www.redgifs.com/")
-            headers.append("Origin", "https://www.redgifs.com")
+            // Referer/Origin относятся к самому сайту, а не к стороннему redgifs.
+            headers.append("Referer", "$urlStart/")
+            headers.append("Origin", urlStart)
             headers.append(HttpHeaders.UserAgent, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 YaBrowser/25.6.0.0 Safari/537.36")
             headers.append(HttpHeaders.Accept, "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
             headers.append(HttpHeaders.AcceptEncoding, "identity")
@@ -32,15 +32,16 @@ suspend fun getSearchResults(query: String): String? {
         }
     }
 
-    val url = "${urlStart}/search-suggest/$query" // Замените на реальный URL
+    // Кодируем пользовательский ввод: пробелы/спецсимволы не должны ломать URL.
+    val encodedQuery = URLEncoder.encode(query, "UTF-8").replace("+", "%20")
+    val url = "$urlStart/search-suggest/$encodedQuery"
 
-    try {
-        val response = client.get(url)
-        //println(response.toString())
-        return response.bodyAsText()
+    return try {
+        client.get(url).bodyAsText()
     } catch (e: Exception) {
         Timber.e("Ошибка " + e.message)
+        null
+    } finally {
+        client.close() // раньше клиент не закрывался → утечка пула соединений/потоков
     }
-
-    return null
 }

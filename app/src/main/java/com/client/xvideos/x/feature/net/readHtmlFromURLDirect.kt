@@ -17,7 +17,10 @@ suspend fun readHtmlFromURLDirect(url: String = "https://www.xvideos.com"): Stri
     {
         install(HttpTimeout)
         {
-            requestTimeoutMillis = Long.MAX_VALUE
+            // Конечные таймауты: зависшее соединение не должно держать корутину/ресурсы вечно.
+            requestTimeoutMillis = 30_000
+            connectTimeoutMillis = 15_000
+            socketTimeoutMillis = 30_000
         }
         followRedirects = true // Обработка редиректов
         defaultRequest {

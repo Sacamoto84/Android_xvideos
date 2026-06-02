@@ -9,57 +9,46 @@ fun parserScreenTags(html: String): ModelScreenTag {
 
     val listItems = mutableListOf<ItemsX>()
 
-    // Парсим HTML-документ
     val document: Document = Jsoup.parse(html)
 
-
-    val pageTitle =
-        document.selectFirst("h2.page-title") // Текст внутри h2 без дочерних элементов //document.select("#main > h2")
-    // Извлекаем текст
-    val title0 = pageTitle?.ownText() ?: "?" // Текст внутри h2 без дочерних элементов
+    val pageTitle = document.selectFirst("h2.page-title")
+    val title0 = pageTitle?.ownText() ?: "?"                       // Текст внутри h2 без дочерних элементов
     val title1 = pageTitle?.selectFirst("span.sub")?.text() ?: "?" // Текст внутри span.sub
 
-    val a = document.selectFirst("#content > div.mozaique.cust-nb-cols")
-    val videos = a?.select("div.frame-block.thumb-block")
+    val container = document.selectFirst("#content > div.mozaique.cust-nb-cols")
+    val videos = container?.select("div.frame-block.thumb-block")
 
-    if (videos != null) {
-        for (video in videos) {
-            val titleElement = video.selectFirst("p.title a")
-            val title = titleElement?.attr("title") ?: "Без названия"
-            val href = titleElement?.attr("href") ?: "Нет ссылки"
-            val duration = video.selectFirst("p.title .duration")?.text() ?: "Нет информации"
+    videos?.forEach { video ->
+        val titleElement = video.selectFirst("p.title a")
+        val title = titleElement?.attr("title") ?: "Без названия"
+        val href = titleElement?.attr("href") ?: "Нет ссылки"
+        val duration = video.selectFirst("p.title .duration")?.text() ?: "Нет информации"
 
-            val channelName = video.selectFirst("p.metadata .name")?.text() ?: "Нет имени канала"
-            val views = video.selectFirst("p.metadata .bg > span > span")?.ownText()?.trim() ?: "-"
-            val profileLink = video.selectFirst("p.metadata a")?.attr("href") ?: ""
+        val channelName = video.selectFirst("p.metadata .name")?.text() ?: "Нет имени канала"
+        val views = video.selectFirst("p.metadata .bg > span > span")?.ownText()?.trim() ?: "-"
+        val profileLink = video.selectFirst("p.metadata a")?.attr("href") ?: ""
 
-            listItems.add(
-                ItemsX(
-                    title = title,
-                    href = href,
-                    duration = duration,
-                    views = views,
-                    nameProfile = channelName,
-                    linkProfile = profileLink,
-                    id = 0,
-                    channel = "TODO()",
-                    previewImage = "TODO()",
-                    previewVideo = "TODO()"
-                )
+        // Реальный id из data-id; иначе — стабильный id из href.
+        // Раньше всем карточкам присваивался id = 0 и литералы "TODO()", из-за чего
+        // ключи списка и идентификация «избранного» схлопывались в один элемент.
+        val id = video.attr("data-id").toLongOrNull() ?: href.hashCode().toLong()
+        val dataSrc = video.selectFirst("img[data-src]")?.attr("data-src") ?: "null"
+
+        listItems.add(
+            ItemsX(
+                id = id,
+                title = title,
+                href = href,
+                duration = duration,
+                views = views,
+                channel = channelName,
+                previewImage = dataSrc,
+                previewVideo = parserVideoPreviewFromImageUrl(dataSrc),
+                nameProfile = channelName,
+                linkProfile = profileLink
             )
-
-            println("Название: $title")
-            println("Ссылка на видео: $href")
-            println("Длительность: $duration")
-
-            println("Просмотры: $views")
-
-            println("Канал: $channelName")
-            println("Профиль: $profileLink")
-            println("---------------")
-        }
+        )
     }
 
-    val res = ModelScreenTag(title0 = title0, title1 = title1, items = listItems)
-    return res
+    return ModelScreenTag(title0 = title0, title1 = title1, items = listItems)
 }

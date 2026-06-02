@@ -49,8 +49,7 @@ import com.client.xvideos.common.icons.IconFavorite18
 import com.client.xvideos.x.parcer.parserListVideo
 import com.client.xvideos.x.parcer.parseSiteCountryFlag
 import com.client.xvideos.urlStart
-import com.client.xvideos.x.feature.country.currentCountries
-import com.client.xvideos.x.feature.country.currentCountriesUpdate
+import com.client.xvideos.x.feature.country.CountryState
 import com.client.xvideos.x.feature.net.readHtmlFromURLWebView
 import com.client.xvideos.x.model.ItemsX
 import com.client.xvideos.common.urlVideoImage.UrlVideoImageAndLongClickX
@@ -67,7 +66,7 @@ private suspend fun openNew(numberScreen: Int = 0): SnapshotStateList<ItemsX> {
     Timber.i("!!! openNew numberScreen:$numberScreen url:$url")
     val html = readHtmlFromURLWebView(url)
     // X4: страну выставляет вызывающий, парсер остаётся чистым.
-    parseSiteCountryFlag(html)?.let { currentCountries = it }
+    parseSiteCountryFlag(html)?.let { CountryState.current = it }
     return parserListVideo(html).toMutableStateList()
 }
 
@@ -81,11 +80,9 @@ private suspend fun openNew(numberScreen: Int = 0): SnapshotStateList<ItemsX> {
 @Composable
 fun DashboardsPaginatedListScreen(pageIndex: Int, vm: ScreenXDashBoardsScreenModel) {
 
-    println("!!! DashboardsPaginatedListScreen pageIndex:$pageIndex")
-
     val l = remember { mutableStateListOf<ItemsX>() }
 
-    LaunchedEffect(key1 = pageIndex, key2 = currentCountriesUpdate) {
+    LaunchedEffect(key1 = pageIndex, key2 = CountryState.updateTrigger) {
         withContext(Dispatchers.IO) {
             l.clear()
             l.addAll(openNew(pageIndex).filter { !it.href.contains("THUMBNUM") })
@@ -98,9 +95,6 @@ fun DashboardsPaginatedListScreen(pageIndex: Int, vm: ScreenXDashBoardsScreenMod
     val itemsPerRow =
         if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE) 4 else if (vm.countRow.field.collectAsState().value) 2 else 1
 
-
-    val favorites =
-        vm.saved.favorites.list//vm.getAll.collectAsStateWithLifecycle(emptyList()).value
 
     val count = vm.countRow.field.collectAsStateWithLifecycle().value
 
@@ -168,7 +162,7 @@ fun DashboardsPaginatedListScreen(pageIndex: Int, vm: ScreenXDashBoardsScreenMod
                     }
 
                     Row(modifier = Modifier.align(Alignment.BottomEnd), horizontalArrangement = Arrangement.End) {
-                        if (favorites.any { it.id == cell.id }) {
+                        if (vm.saved.favorites.contains(cell.id)) {
                             //Индикатор что видео в фаворитах
                             Box(modifier = Modifier) { IconFavorite18(Modifier.padding(bottom = 6.dp, end = 6.dp)) }
                         }

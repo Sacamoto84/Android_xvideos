@@ -135,9 +135,12 @@ fun ZoomableVideoPlayerFullScreen(
                         }
                         vm.listFormat.sortBy { it.height }
                         if (!vm.once) {
-                            vm.once = true
-                            vm.quality = vm.listFormat.last().height
-                            Timber.d("!!! vm.quality: ${vm.quality}")
+                            // lastOrNull(): список форматов может быть пуст, если у группы нет форматов.
+                            vm.listFormat.lastOrNull()?.let {
+                                vm.once = true
+                                vm.quality = it.height
+                                Timber.d("!!! vm.quality: ${vm.quality}")
+                            }
                         }
                     }
                 }

@@ -88,10 +88,13 @@ class ScreenX_VideoPlayerSM @AssistedInject constructor(
 
             Timber.e("!!! ScreenVideoPlayerSM init()")
 
-            val res = db.cacheUrlStringRom.get(url)
+            // RAM-кэш чистится при старте процесса (clearVolatileCachesOnProcessStart),
+            // поэтому HLS-ссылки с истекающим токеном обновятся после перезапуска.
+            // ROM-кэш хранил страницу вечно → протухший токен ломал воспроизведение.
+            val res = db.cacheUrlStringRam.get(url)
             val s = if (res == null) {
                 val content = readHtmlFromURLDirect(url)
-                db.cacheUrlStringRom.put(url, content)
+                db.cacheUrlStringRam.put(url, content)
                 content
             } else
                 res.content
@@ -175,7 +178,9 @@ class ScreenX_VideoPlayerSM @AssistedInject constructor(
         player.seekTo(player.currentPosition)
 
         // Создаем TrackSelectionOverride для новой дорожки
-        val trackGroup = player.currentTracks.groups[0].mediaTrackGroup
+        val groups = player.currentTracks.groups
+        if (groups.isEmpty()) return
+        val trackGroup = groups[0].mediaTrackGroup
         val override = TrackSelectionOverride(trackGroup, listOf(trackIndex))
 
         player.trackSelectionParameters =
