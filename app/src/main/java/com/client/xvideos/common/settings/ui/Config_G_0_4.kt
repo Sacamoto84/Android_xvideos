@@ -1,6 +1,6 @@
 package com.client.xvideos.common.settings.ui
 
-import android.preference.PreferenceManager
+import com.client.xvideos.common.util.defaultSharedPreferences
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -106,7 +106,7 @@ fun PreviewConfig_G_0_4() {
     val context = LocalContext.current
     val setting = remember {
         SettingElementList<Boolean>(
-            sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context),
+            sharedPrefs = context.defaultSharedPreferences(),
             name = "l_likesTab_G_0_4",
             typeToken = JsonTypes.listOf(Boolean::class.javaObjectType),
             default = listOf(false, true, true, true, true)

@@ -2,7 +2,7 @@ package com.client.xvideos
 
 import android.app.Application
 import android.content.Context
-import android.preference.PreferenceManager
+import com.client.xvideos.common.util.defaultSharedPreferences
 import androidx.compose.runtime.ExperimentalComposeRuntimeApi
 import coil3.ImageLoader
 import coil3.SingletonImageLoader
@@ -139,7 +139,7 @@ class App : Application(), SingletonImageLoader.Factory {
         // res/xml/network_security_config.xml (доверие к ISRG Root X1), а НЕ через
         // глобальное отключение проверки TLS. Прежний trust-all код удалён.
 
-        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+        val prefs = defaultSharedPreferences()
         Settings.init(prefs)
 
 //        val loggingInterceptor = Interceptor { chain ->
@@ -207,13 +207,16 @@ class App : Application(), SingletonImageLoader.Factory {
         }
 
 
-        scope.launch {
-            EventBus.events.collect { event ->
-                if (event is Event.Log) {
-                    //saveLogToFile(event.message)
-                }
-            }
-        }
+        // Подписка-заглушка отключена (#14): тело обработки Event.Log полностью
+        // закомментировано, поэтому сам сбор событий пока бесполезен. Вернуть,
+        // когда определимся с логированием (например, записью лога в файл).
+//        scope.launch {
+//            EventBus.events.collect { event ->
+//                if (event is Event.Log) {
+//                    //saveLogToFile(event.message)
+//                }
+//            }
+//        }
 
     }
 

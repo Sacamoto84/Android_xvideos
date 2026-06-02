@@ -1,7 +1,7 @@
 package com.client.xvideos.common.applock
 
 import android.content.Context
-import android.preference.PreferenceManager
+import com.client.xvideos.common.util.defaultSharedPreferences
 import android.util.Base64
 import androidx.core.content.edit
 import com.client.xvideos.common.settings.Settings
@@ -33,7 +33,7 @@ object AppLockRepository {
     private const val MAX_BACKOFF_SHIFT = 16
 
     fun isPasswordSet(context: Context): Boolean {
-        val prefs = PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
+        val prefs = context.applicationContext.defaultSharedPreferences()
         return !prefs.getString(KEY_PASSWORD_HASH, null).isNullOrBlank() &&
                 !prefs.getString(KEY_PASSWORD_SALT, null).isNullOrBlank()
     }
@@ -53,7 +53,7 @@ object AppLockRepository {
 
         val salt = ByteArray(SALT_BYTES).also { SecureRandom().nextBytes(it) }
         val hash = hashPassword(password, salt)
-        val prefs = PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
+        val prefs = context.applicationContext.defaultSharedPreferences()
 
         prefs.edit {
             putString(KEY_PASSWORD_SALT, salt.toBase64())
@@ -65,7 +65,7 @@ object AppLockRepository {
     }
 
     fun verifyPassword(context: Context, password: String): Boolean {
-        val prefs = PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
+        val prefs = context.applicationContext.defaultSharedPreferences()
         val salt = prefs.getString(KEY_PASSWORD_SALT, null)?.fromBase64() ?: return false
         val expectedHash = prefs.getString(KEY_PASSWORD_HASH, null)?.fromBase64() ?: return false
         val actualHash = hashPassword(password, salt)
@@ -78,7 +78,7 @@ object AppLockRepository {
      * приложения не сбрасывает задержку.
      */
     fun lockoutRemainingMillis(context: Context): Long {
-        val prefs = PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
+        val prefs = context.applicationContext.defaultSharedPreferences()
         val until = prefs.getLong(KEY_LOCKOUT_UNTIL, 0L)
         return (until - System.currentTimeMillis()).coerceAtLeast(0L)
     }
@@ -89,7 +89,7 @@ object AppLockRepository {
      * после [FREE_ATTEMPTS] ошибок и ограничена [MAX_LOCKOUT_MS].
      */
     fun registerFailedAttempt(context: Context): Long {
-        val prefs = PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
+        val prefs = context.applicationContext.defaultSharedPreferences()
         val attempts = prefs.getInt(KEY_FAILED_ATTEMPTS, 0) + 1
         val lockoutUntil = if (attempts > FREE_ATTEMPTS) {
             val shift = (attempts - FREE_ATTEMPTS - 1).coerceIn(0, MAX_BACKOFF_SHIFT)
@@ -107,7 +107,7 @@ object AppLockRepository {
 
     /** Сбрасывает счётчик попыток и блокировку (вызывать после успешного ввода). */
     fun resetFailedAttempts(context: Context) {
-        val prefs = PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
+        val prefs = context.applicationContext.defaultSharedPreferences()
         prefs.edit {
             remove(KEY_FAILED_ATTEMPTS)
             remove(KEY_LOCKOUT_UNTIL)
@@ -115,7 +115,7 @@ object AppLockRepository {
     }
 
     fun clearPassword(context: Context) {
-        val prefs = PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
+        val prefs = context.applicationContext.defaultSharedPreferences()
         prefs.edit {
             remove(KEY_PASSWORD_SALT)
             remove(KEY_PASSWORD_HASH)

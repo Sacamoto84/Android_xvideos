@@ -41,6 +41,16 @@ object SafFileSystem {
         get() = context.contentResolver
 
     /**
+     * Сериализует операции «найти-или-создать» ([ensureDirectory]/[ensureFile]).
+     *
+     * Без этого параллельные загрузки в одну папку могут одновременно пройти
+     * проверку отсутствия и оба вызвать `createDocument`, из-за чего SAF создаёт
+     * дубликат с именем вида «name (1)». Блокировка реентерабельная, поэтому
+     * `ensureFile` спокойно вызывает `ensureDirectory` под тем же замком.
+     */
+    private val lock = Any()
+
+    /**
      * Проверяет, доступна ли выбранная пользователем рабочая папка.
      */
     fun isAvailable(): Boolean = WorkDirectory.hasAccess(context)
@@ -52,9 +62,9 @@ object SafFileSystem {
      * ищется среди дочерних документов. Если папки нет, она создаётся через
      * `DocumentsContract.createDocument()`.
      */
-    fun ensureDirectory(relativePath: String): Uri? {
+    fun ensureDirectory(relativePath: String): Uri? = synchronized(lock) {
         val rootUri = rootDocumentUri() ?: return null
-        var current = rootUri
+        var current: Uri = rootUri
         normalizedSegments(relativePath).forEach { segment ->
             current = findChild(current, segment, onlyDirectory = true)?.uri
                 ?: DocumentsContract.createDocument(
@@ -65,7 +75,7 @@ object SafFileSystem {
                 )
                 ?: return null
         }
-        return current
+        current
     }
 
     /**
@@ -177,7 +187,7 @@ object SafFileSystem {
      * Если на месте файла уже есть директория с таким именем, возвращает `null`,
      * чтобы не пытаться открыть папку как поток записи.
      */
-    private fun ensureFile(relativePath: String, mimeType: String): Uri? {
+    private fun ensureFile(relativePath: String, mimeType: String): Uri? = synchronized(lock) {
         val segments = normalizedSegments(relativePath)
         val fileName = segments.lastOrNull() ?: return null
         val directoryPath = segments.dropLast(1).joinToString("/")
@@ -187,7 +197,7 @@ object SafFileSystem {
         if (existing != null && !existing.isDirectory) return existing.uri
         if (existing != null && existing.isDirectory) return null
 
-        return DocumentsContract.createDocument(resolver, directoryUri, mimeType, fileName)
+        DocumentsContract.createDocument(resolver, directoryUri, mimeType, fileName)
     }
 
     /**

@@ -15,12 +15,10 @@ import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.r.common.saved.SavedRed
 import com.client.xvideos.r.model.GifsInfo
 import com.client.xvideos.ui.theme.XvideosTheme
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class, DelicateCoroutinesApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DropdownMenuItem_Like(item: GifsInfo? = null, onRunLike: () -> Unit, savedRed: ()-> SavedRed, onDismiss: () -> Unit){
     val isLiked = savedRed.invoke().likes.list.any { it.id == item?.id }
@@ -28,7 +26,11 @@ fun DropdownMenuItem_Like(item: GifsInfo? = null, onRunLike: () -> Unit, savedRe
         isLiked = isLiked,
         onClick = {
             if (item == null) return@DropdownMenuItem_LikeContent
-            GlobalScope.launch {
+            // scope из SavedRed (@ApplicationScope) живёт, пока живо приложение,
+            // поэтому переживает закрытие меню — отложенная на 200 мс мутация
+            // (нужна, чтобы список не дёргался во время анимации скрытия) точно
+            // выполнится. При этом scope управляемый, в отличие от GlobalScope.
+            savedRed.invoke().scope.launch {
                 delay(200)
                 if (!isLiked) savedRed.invoke().likes.add(item) else savedRed.invoke().likes.remove(item)
                 onRunLike.invoke()

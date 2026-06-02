@@ -3,7 +3,7 @@ package com.client.xvideos.common.storage
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.preference.PreferenceManager
+import com.client.xvideos.common.util.defaultSharedPreferences
 import android.provider.DocumentsContract
 import androidx.core.content.edit
 import timber.log.Timber
@@ -122,5 +122,5 @@ object WorkDirectory {
     /**
      * Общие настройки, где хранится URI рабочей папки.
      */
-    private fun prefs(context: Context) = PreferenceManager.getDefaultSharedPreferences(context)
+    private fun prefs(context: Context) = context.defaultSharedPreferences()
 }

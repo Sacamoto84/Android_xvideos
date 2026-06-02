@@ -15,12 +15,10 @@ import com.client.xvideos.r.common.saved.SavedRed
 import com.client.xvideos.r.model.GifsInfo
 import com.client.xvideos.r.network.api.RedApi
 import com.client.xvideos.ui.theme.XvideosTheme
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class, DelicateCoroutinesApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DropdownMenuItem_Subscribtion(item: GifsInfo? = null, redApi:()-> RedApi , savedRed: ()->SavedRed, onDismiss: () -> Unit){
 
@@ -33,7 +31,9 @@ fun DropdownMenuItem_Subscribtion(item: GifsInfo? = null, redApi:()-> RedApi , s
         onClick = {
             if (item == null) return@DropdownMenuItem_SubscriptionContent
 
-            GlobalScope.launch {
+            // см. комментарий в DropdownMenuItem_Like: управляемый scope из
+            // SavedRed вместо GlobalScope, переживающий закрытие меню.
+            savedRed.invoke().scope.launch {
                 delay(200)
                 if (!isSubscribed) {
                     try {

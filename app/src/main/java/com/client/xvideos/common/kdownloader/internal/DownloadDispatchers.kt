@@ -49,7 +49,11 @@ class DownloadDispatchers(private val dbHelper: DbHelper) {
     }
 
     private fun executeOnMainThread(block: () -> Unit) {
-        scope.launch {
+        // Колбэки слушателя (onStart/onProgress/onCompleted/...) доходят до UI,
+        // поэтому выполняем их именно на главном потоке. Раньше launch шёл на
+        // scope с Dispatchers.IO.limitedParallelism(1), и колбэки уходили на IO
+        // вопреки имени метода.
+        scope.launch(Dispatchers.Main) {
             block()
         }
     }
