@@ -1,9 +1,7 @@
 package com.client.xvideos
 
-import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
-import android.os.Build
 import android.preference.PreferenceManager
 import androidx.compose.runtime.ExperimentalComposeRuntimeApi
 import coil3.ImageLoader
@@ -22,52 +20,6 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import timber.log.Timber.DebugTree
-import java.security.SecureRandom
-import java.security.cert.X509Certificate
-import javax.net.ssl.HttpsURLConnection
-import javax.net.ssl.SSLContext
-import javax.net.ssl.TrustManager
-import javax.net.ssl.X509TrustManager
-
-/**
- * Включает доверие ко всем SSL-сертификатам для старых устройств.
- *
- * Метод меняет глобальные настройки `HttpsURLConnection`: подменяет `TrustManager`
- * и отключает проверку имени хоста. Это помогает обходить проблемы со старыми
- * корневыми сертификатами на Android M и ниже, но снижает безопасность HTTPS,
- * поэтому вызывается только в `onCreate()` для старых версий Android.
- */
-fun allowAllSSL() {
-    try {
-        val trustAllCerts = arrayOf<TrustManager>(
-            @SuppressLint("CustomX509TrustManager")
-            object : X509TrustManager {
-                @SuppressLint("TrustAllX509TrustManager")
-                override fun checkClientTrusted(
-                    chain: Array<out X509Certificate>?,
-                    authType: String?
-                ) {
-                }
-
-                @SuppressLint("TrustAllX509TrustManager")
-                override fun checkServerTrusted(
-                    chain: Array<out X509Certificate>?,
-                    authType: String?
-                ) {
-                }
-
-                override fun getAcceptedIssuers(): Array<X509Certificate> = arrayOf()
-            })
-
-        val sslContext = SSLContext.getInstance("TLS")
-        sslContext.init(null, trustAllCerts, SecureRandom())
-
-        HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.socketFactory)
-        HttpsURLConnection.setDefaultHostnameVerifier { _, _ -> true }
-    } catch (e: Exception) {
-        e.printStackTrace()
-    }
-}
 
 /**
  * Главный класс приложения.
@@ -183,9 +135,9 @@ class App : Application(), SingletonImageLoader.Factory {
         // Настроить SLF4J для использования Timber
         //System.setProperty("slf4j.provider", "com.arcao.slf4j.timber.TimberLoggerProvider")
 
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) {
-            allowAllSSL()
-        }
+        // Совместимость со старыми корневыми сертификатами обеспечивается через
+        // res/xml/network_security_config.xml (доверие к ISRG Root X1), а НЕ через
+        // глобальное отключение проверки TLS. Прежний trust-all код удалён.
 
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
         Settings.init(prefs)

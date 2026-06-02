@@ -137,10 +137,11 @@ fun CMPPlayer2(
             exoPlayer.addListener(listener)
 
             onDispose {
+                // P3: release() выполняет создатель плеера (rememberExoPlayerWithLifecycle).
+                // Здесь только снимаем слушатель и останавливаем воспроизведение.
                 exoPlayer.stop()
                 exoPlayer.clearMediaItems()
                 exoPlayer.removeListener(listener)
-                exoPlayer.release()
             }
         }
 

@@ -6,6 +6,7 @@ import com.client.xvideos.r.model.GifsInfo
 import com.client.xvideos.r.model.Order
 import com.client.xvideos.r.common.saved.SavedRed
 import com.client.xvideos.r.model.sanitizeGifsInfoList
+import kotlinx.coroutines.CancellationException
 import timber.log.Timber
 
 class ItemSavedLikesPagingSource (val order : Order, val savedRed: SavedRed): PagingSource<Int, GifsInfo>() {
@@ -14,8 +15,10 @@ class ItemSavedLikesPagingSource (val order : Order, val savedRed: SavedRed): Pa
         return try {
             Timber.i("!!! >>>ItemSavedLikesPagingSource::load() sortTop:$order")
             LoadResult.Page( data = savedRed.likes.list.toList().sanitizeGifsInfoList(), prevKey = null, nextKey = null )
+        } catch (e: CancellationException) {
+            throw e // G1
         } catch (e: Exception) {
-            Timber.e("!!! >>>ItemSavedLikesPagingSource load() Ошибка = ${e.message}")
+            Timber.e(e, "!!! >>>ItemSavedLikesPagingSource load()")
             LoadResult.Error(e)
         }
     }

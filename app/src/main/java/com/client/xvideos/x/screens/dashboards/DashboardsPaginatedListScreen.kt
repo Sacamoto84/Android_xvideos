@@ -47,7 +47,9 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.common.icons.IconFavorite18
 import com.client.xvideos.x.parcer.parserListVideo
+import com.client.xvideos.x.parcer.parseSiteCountryFlag
 import com.client.xvideos.urlStart
+import com.client.xvideos.x.feature.country.currentCountries
 import com.client.xvideos.x.feature.country.currentCountriesUpdate
 import com.client.xvideos.x.feature.net.readHtmlFromURLWebView
 import com.client.xvideos.x.model.ItemsX
@@ -63,7 +65,10 @@ private suspend fun openNew(numberScreen: Int = 0): SnapshotStateList<ItemsX> {
     val currentNumberScreen = numberScreen.coerceIn(0, 19999)
     val url = urlStart + if (currentNumberScreen == 0) "" else "/new/${currentNumberScreen}"
     Timber.i("!!! openNew numberScreen:$numberScreen url:$url")
-    return parserListVideo(readHtmlFromURLWebView(url)).toMutableStateList()
+    val html = readHtmlFromURLWebView(url)
+    // X4: страну выставляет вызывающий, парсер остаётся чистым.
+    parseSiteCountryFlag(html)?.let { currentCountries = it }
+    return parserListVideo(html).toMutableStateList()
 }
 
 

@@ -32,8 +32,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -42,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
@@ -55,6 +57,8 @@ import com.client.xvideos.common.applock.AppLockSession
 import com.client.xvideos.common.applock.DisableAppLockAutofill
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.ui.theme.XvideosTheme
+import kotlinx.coroutines.delay
+import kotlin.math.ceil
 
 class AppLockActivity : ComponentActivity() {
 
@@ -98,20 +102,43 @@ internal fun AppLockScreen(
 ) {
     DisableAppLockAutofill()
 
+    val context = LocalContext.current
     var password by rememberSaveable { mutableStateOf("") }
     var showPassword by rememberSaveable { mutableStateOf(false) }
     var errorText by rememberSaveable { mutableStateOf<String?>(null) }
-    var failedAttempts by rememberSaveable { mutableIntStateOf(0) }
+    var lockoutRemainingMs by remember {
+        mutableLongStateOf(AppLockRepository.lockoutRemainingMillis(context))
+    }
     val focusManager = LocalFocusManager.current
+    val isLockedOut = lockoutRemainingMs > 0L
+    val lockoutSeconds = ceil(lockoutRemainingMs / 1000.0).toInt()
+
+    // Пока действует блокировка — обновляем обратный отсчёт раз в полсекунды.
+    LaunchedEffect(isLockedOut) {
+        while (AppLockRepository.lockoutRemainingMillis(context) > 0L) {
+            lockoutRemainingMs = AppLockRepository.lockoutRemainingMillis(context)
+            delay(500)
+        }
+        lockoutRemainingMs = 0L
+    }
 
     fun submit() {
+        val remainingBefore = AppLockRepository.lockoutRemainingMillis(context)
+        if (remainingBefore > 0L) {
+            lockoutRemainingMs = remainingBefore
+            return
+        }
         focusManager.clearFocus()
         val success = onUnlock(password)
-        if (!success) {
-            failedAttempts += 1
+        if (success) {
+            AppLockRepository.resetFailedAttempts(context)
+        } else {
             password = ""
-            errorText = if (failedAttempts >= 2) {
-                "Код доступа не подходит"
+            val until = AppLockRepository.registerFailedAttempt(context)
+            val remaining = (until - System.currentTimeMillis()).coerceAtLeast(0L)
+            lockoutRemainingMs = remaining
+            errorText = if (remaining > 0L) {
+                "Слишком много попыток. Подождите ${ceil(remaining / 1000.0).toInt()} с"
             } else {
                 "Неверный код доступа"
             }
@@ -163,14 +190,15 @@ internal fun AppLockScreen(
                 },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
+                enabled = !isLockedOut,
                 label = { Text("Код доступа") },
-                isError = errorText != null,
+                isError = errorText != null || isLockedOut,
                 visualTransformation = if (showPassword) VisualTransformation.None else AccessCodeVisualTransformation,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Done
                 ),
-                keyboardActions = KeyboardActions(onDone = { if (password.isNotEmpty()) submit() }),
+                keyboardActions = KeyboardActions(onDone = { if (password.isNotEmpty() && !isLockedOut) submit() }),
                 textStyle = ThemeL.Type.body.copy(color = Color.White),
                 trailingIcon = {
                     IconButton(onClick = { showPassword = !showPassword }) {
@@ -183,7 +211,7 @@ internal fun AppLockScreen(
                 },
                 supportingText = {
                     Text(
-                        text = errorText ?: "",
+                        text = if (isLockedOut) "Повторите через $lockoutSeconds с" else (errorText ?: ""),
                         color = Color(0xFFFF7A7A)
                     )
                 }
@@ -191,10 +219,10 @@ internal fun AppLockScreen(
             Spacer(Modifier.height(16.dp))
             Button(
                 onClick = { submit() },
-                enabled = password.isNotBlank(),
+                enabled = password.isNotBlank() && !isLockedOut,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Разблокировать")
+                Text(if (isLockedOut) "Подождите $lockoutSeconds с" else "Разблокировать")
             }
             Spacer(Modifier.height(28.dp))
             Text(

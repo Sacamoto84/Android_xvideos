@@ -1,5 +1,7 @@
 package com.client.xvideos.x.feature.net
 
+import android.os.Handler
+import android.os.Looper
 import android.webkit.CookieManager
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
@@ -11,6 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import timber.log.Timber
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.resume
 
 suspend fun readHtmlFromURLWebView(url: String = "https://www.xvideos.com"): String =
@@ -25,6 +28,22 @@ suspend fun readHtmlFromURLWebView(url: String = "https://www.xvideos.com"): Str
 
             val webView = WebView(context)
 
+            // WebView не добавляется в иерархию View, поэтому View.post() мог бы
+            // никогда не выполниться. Уничтожаем через main-handler и ровно один раз.
+            val mainHandler = Handler(Looper.getMainLooper())
+            val destroyed = AtomicBoolean(false)
+            fun destroyWebView() {
+                if (destroyed.compareAndSet(false, true)) {
+                    mainHandler.post {
+                        runCatching {
+                            webView.stopLoading()
+                            webView.webViewClient = WebViewClient()
+                            webView.destroy()
+                        }.onFailure { Timber.w(it, "readHtmlFromURLWebView: destroy failed") }
+                    }
+                }
+            }
+
             val cookieManager = CookieManager.getInstance()
             cookieManager.setAcceptCookie(true)
             cookieManager.setAcceptThirdPartyCookies(webView, true)
@@ -33,7 +52,7 @@ suspend fun readHtmlFromURLWebView(url: String = "https://www.xvideos.com"): Str
                 javaScriptEnabled = true
                 domStorageEnabled = true
                 databaseEnabled = true
-                allowFileAccess = true
+                allowFileAccess = false
                 cacheMode = WebSettings.LOAD_DEFAULT
             }
 
@@ -44,7 +63,10 @@ suspend fun readHtmlFromURLWebView(url: String = "https://www.xvideos.com"): Str
                 override fun onPageFinished(view: WebView?, finishedUrl: String?) {
                     super.onPageFinished(view, finishedUrl)
 
-                    if (!continuation.isActive) return
+                    if (!continuation.isActive) {
+                        destroyWebView()
+                        return
+                    }
 
                     CookieManager.getInstance().flush()
 
@@ -54,19 +76,17 @@ suspend fun readHtmlFromURLWebView(url: String = "https://www.xvideos.com"): Str
 
                         Timber.i("!!!..readHtmlFromURL end $url")
 
-                        continuation
-                            .resume(
-                                html.trim('"')
-                                    .replace("\\u003C", "<")
-                                    .replace("\\n", "\n")
-                                    .replace("\\\"", "\"")
-                            )
+                        val result = html.trim('"')
+                            .replace("\\u003C", "<")
+                            .replace("\\n", "\n")
+                            .replace("\\\"", "\"")
+
+                        if (continuation.isActive) continuation.resume(result)
+                        destroyWebView()
                     }
                 }
             }
             webView.loadUrl(url)
-            continuation.invokeOnCancellation { cause ->  webView.destroy() }
+            continuation.invokeOnCancellation { destroyWebView() }
         }
     }
-
-

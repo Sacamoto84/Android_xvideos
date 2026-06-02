@@ -47,18 +47,31 @@ fun rememberExoPlayerWithLifecycle(
     val lifecycleOwner = LocalLifecycleOwner.current
     val trackSelector = remember { DefaultTrackSelector(context) }
 
-    val loadControl = DefaultLoadControl.Builder().setBufferDurationsMs(minBufferMs, maxBufferMs, bufferForPlaybackMs, bufferForPlaybackAfterRebufferM).build()
+    // P4: не пересоздаём LoadControl на каждой рекомпозиции.
+    val loadControl = remember(minBufferMs, maxBufferMs, bufferForPlaybackMs, bufferForPlaybackAfterRebufferM) {
+        DefaultLoadControl.Builder()
+            .setBufferDurationsMs(minBufferMs, maxBufferMs, bufferForPlaybackMs, bufferForPlaybackAfterRebufferM)
+            .build()
+    }
 
     val exoPlayer = remember(context) {
         ExoPlayer.Builder(context)
             .setLoadControl(loadControl)
-            //.setTrackSelector(trackSelector)
+            // P1: плеер должен использовать ТОТ ЖЕ trackSelector, на который применяется
+            // applyQualitySelection(...), иначе выбор качества — no-op.
+            .setTrackSelector(trackSelector)
             .setSeekForwardIncrementMs(1000L) // Устанавливаем приращение для перемотки вперед на 1000 мс (1 секунда)
             .setSeekBackIncrementMs(1000L)    // Опционально: Устанавливаем приращение для перемотки назад на 1000 мс
             .build().apply {
                 videoScalingMode = C.VIDEO_SCALING_MODE_SCALE_TO_FIT
                 setHandleAudioBecomingNoisy(true)
             }
+    }
+
+    // P3: единый владелец жизненного цикла плеера — тот, кто его создал.
+    // Освобождаем ровно здесь, при выходе из композиции (или смене player).
+    DisposableEffect(exoPlayer) {
+        onDispose { exoPlayer.release() }
     }
 
     LaunchedEffect(isLooping) {

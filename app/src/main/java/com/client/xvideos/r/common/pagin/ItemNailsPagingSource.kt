@@ -8,6 +8,7 @@ import com.client.xvideos.r.model.GifsInfo
 import com.client.xvideos.r.model.Order
 import com.client.xvideos.r.common.block.BlockRed
 import com.client.xvideos.r.model.sanitizeGifsInfoList
+import kotlinx.coroutines.CancellationException
 import timber.log.Timber
 
 class ItemNailsPagingSource (val order : Order, val nichesName : String, val block: BlockRed, val redApi: RedApi): PagingSource<Int, GifsInfo>() {
@@ -30,9 +31,9 @@ class ItemNailsPagingSource (val order : Order, val nichesName : String, val blo
             val response = redApi.getNiches(niches = nichesName, page = page, order = order)
 
             val gifs : List<GifsInfo> = response.gifs.sanitizeGifsInfoList()
-            val isEndReached = gifs.isEmpty() // или, если ты знаешь, что сервер вернул всё
 
-            val nextKey = if (isEndReached) { null } else { page + 1 }
+            // G4: конец пагинации по pages из ответа, без лишнего пустого запроса.
+            val nextKey = if (page < response.pages) page + 1 else null
 
             Timber.d("!!! load() a.gif.size = ${gifs.size}")
 
@@ -51,17 +52,19 @@ class ItemNailsPagingSource (val order : Order, val nichesName : String, val blo
                 nextKey = nextKey
             )
 
+        } catch (e: CancellationException) {
+            throw e // G1
         } catch (e: Exception) {
-            Timber.e("!!! ItemNailsPagingSource load() page = $page nichesName:$nichesName Ошибка = ${e.message}")
+            Timber.e(e, "!!! ItemNailsPagingSource load() page = $page nichesName:$nichesName")
             LoadResult.Error(e)
         }
     }
 
+    // G3
     override fun getRefreshKey(state: PagingState<Int, GifsInfo>): Int? {
-//        return state.anchorPosition?.let { position ->
-//            state.closestPageToPosition(position)?.prevKey?.plus(1)
-//                ?: state.closestPageToPosition(position)?.nextKey?.minus(1)
-//        }
-        return null
+        return state.anchorPosition?.let { position ->
+            val closest = state.closestPageToPosition(position)
+            closest?.prevKey?.plus(1) ?: closest?.nextKey?.minus(1)
+        }
     }
 }

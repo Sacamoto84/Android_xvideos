@@ -19,6 +19,8 @@ import io.ktor.serialization.gson.gson
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import timber.log.Timber
 
 object ApiClient {
@@ -47,14 +49,54 @@ object ApiClient {
         expectSuccess = true
     }
 
+    /**
+     * Анонимный bearer-токен redgifs. Пишется только из [loginLocked]/[refreshToken]
+     * под [tokenMutex], читается из любого потока — отсюда `@Volatile`.
+     */
+    @Volatile
     var bearerToken: String? = null
+        private set
+
+    private val tokenMutex = Mutex()
 
     data class TokenResponse(@SerializedName("token") val token: String)
 
-    suspend fun login(): Result<Boolean> {
+    /**
+     * Гарантирует наличие токена. При параллельных запросах без токена
+     * логин выполняется ровно один раз (double-checked под [tokenMutex]).
+     */
+    @PublishedApi
+    internal suspend fun ensureToken(): Result<Unit> {
+        if (bearerToken != null) return Result.success(Unit)
+        return tokenMutex.withLock {
+            if (bearerToken != null) Result.success(Unit)
+            else loginLocked().map { }
+        }
+    }
+
+    /**
+     * Принудительно обновляет токен после 401, но только если другой корутин
+     * не успел его уже заменить (сравнение с [previousToken] под мьютексом),
+     * иначе несколько параллельных 401 устроили бы шторм логинов.
+     */
+    @PublishedApi
+    internal suspend fun refreshToken(previousToken: String?): Result<Unit> {
+        return tokenMutex.withLock {
+            if (bearerToken != previousToken) {
+                Result.success(Unit)
+            } else {
+                bearerToken = null
+                loginLocked().map { }
+            }
+        }
+    }
+
+    /** Выполняет логин. Вызывать только удерживая [tokenMutex]. */
+    private suspend fun loginLocked(): Result<Boolean> {
         return try {
             Timber.i("!!! Red ApiClient login()")
-            val tokenResponse = client.get("https://api.redgifs.com/v2/auth/temporary").body<TokenResponse>()
+            val tokenResponse =
+                client.get("https://api.redgifs.com/v2/auth/temporary").body<TokenResponse>()
             bearerToken = tokenResponse.token
             Timber.i("!!! Red ApiClient login() SUCCESS - token received")
             Result.success(true)
@@ -64,168 +106,77 @@ object ApiClient {
         }
     }
 
+    suspend fun login(): Result<Boolean> = tokenMutex.withLock { loginLocked() }
+
+    /**
+     * Общая обёртка авторизованного запроса: гарантирует токен, выполняет [perform],
+     * а при 401 один раз обновляет токен и повторяет. Единая точка обработки ошибок
+     * вместо четырёх копий retry-логики.
+     */
+    @PublishedApi
+    internal suspend inline fun <T> withAuth(crossinline perform: suspend (token: String?) -> T): Result<T> {
+        ensureToken().onFailure { return Result.failure(it) }
+        return try {
+            Result.success(perform(bearerToken))
+        } catch (e: ClientRequestException) {
+            if (e.response.status == HttpStatusCode.Unauthorized) {
+                Timber.w("!!! Red ApiClient 401 Unauthorized, retrying login...")
+                val previous = bearerToken
+                if (refreshToken(previous).isSuccess) {
+                    return try {
+                        Result.success(perform(bearerToken))
+                    } catch (e2: Exception) {
+                        Timber.e(e2, "!!! Red ApiClient request FAILED after retry")
+                        Result.failure(e2)
+                    }
+                }
+            }
+            Timber.e(e, "!!! Red ApiClient request FAILED")
+            Result.failure(e)
+        } catch (e: Exception) {
+            Timber.e(e, "!!! Red ApiClient request FAILED")
+            Result.failure(e)
+        }
+    }
+
     suspend inline fun <reified T> request(
         url: String,
         params: Map<String, String> = emptyMap(),
-    ): Result<T> {
-        Timber.i("!!! Red ApiClient request() $url")
-        if (bearerToken == null) {
-            val loginResult = login()
-            if (loginResult.isFailure) return Result.failure(loginResult.exceptionOrNull()!!)
-        }
-        return try {
-            val response: T = client.get(url) {
-                bearerToken?.let { headers { append(HttpHeaders.Authorization, "Bearer $it") } }
-                params.forEach { (key, value) -> parameter(key, value) }
-            }.body()
-            Result.success(response)
-        } catch (e: ClientRequestException) {
-            if (e.response.status == HttpStatusCode.Unauthorized) {
-                Timber.w("!!! Red ApiClient request() 401 Unauthorized, retrying login...")
-                bearerToken = null
-                val loginResult = login()
-                if (loginResult.isSuccess) {
-                    return try {
-                        val response: T = client.get(url) {
-                            bearerToken?.let { headers { append(HttpHeaders.Authorization, "Bearer $it") } }
-                            params.forEach { (key, value) -> parameter(key, value) }
-                        }.body()
-                        Result.success(response)
-                    } catch (e2: Exception) {
-                        Timber.e(e2, "!!! Red ApiClient request() FAILED after retry: $url")
-                        Result.failure(e2)
-                    }
-                }
-            }
-            Timber.e(e, "!!! Red ApiClient request() FAILED: $url")
-            Result.failure(e)
-        } catch (e: Exception) {
-            Timber.e(e, "!!! Red ApiClient request() FAILED: $url")
-            Result.failure(e)
-        }
+    ): Result<T> = withAuth { token ->
+        client.get(url) {
+            token?.let { headers { append(HttpHeaders.Authorization, "Bearer $it") } }
+            params.forEach { (key, value) -> parameter(key, value) }
+        }.body()
     }
 
     suspend inline fun <reified T> request(
         route: Route,
         vararg params: Pair<String, Any> = emptyArray(),
-    ): Result<T> {
-        Timber.i("!!! Red ApiClient request() ${route.url}")
-        if (bearerToken == null) {
-            val loginResult = login()
-            if (loginResult.isFailure) return Result.failure(loginResult.exceptionOrNull()!!)
-        }
-        return try {
-            val response: T = client.get(route.url) {
-                bearerToken?.let { headers { append(HttpHeaders.Authorization, "Bearer $it") } }
-                params.forEach { (key, value) -> parameter(key, value) }
-            }.body()
-            Result.success(response)
-        } catch (e: ClientRequestException) {
-            if (e.response.status == HttpStatusCode.Unauthorized) {
-                Timber.w("!!! Red ApiClient request() 401 Unauthorized, retrying login...")
-                bearerToken = null
-                val loginResult = login()
-                if (loginResult.isSuccess) {
-                    return try {
-                        val response: T = client.get(route.url) {
-                            bearerToken?.let { headers { append(HttpHeaders.Authorization, "Bearer $it") } }
-                            params.forEach { (key, value) -> parameter(key, value) }
-                        }.body()
-                        Result.success(response)
-                    } catch (e2: Exception) {
-                        Timber.e(e2, "!!! Red ApiClient request() FAILED after retry: ${route.url}")
-                        Result.failure(e2)
-                    }
-                }
-            }
-            Timber.e(e, "!!! Red ApiClient request() FAILED: ${route.url}")
-            Result.failure(e)
-        } catch (e: Exception) {
-            Timber.e(e, "!!! Red ApiClient request() FAILED: ${route.url}")
-            Result.failure(e)
-        }
+    ): Result<T> = withAuth { token ->
+        client.get(route.url) {
+            token?.let { headers { append(HttpHeaders.Authorization, "Bearer $it") } }
+            params.forEach { (key, value) -> parameter(key, value) }
+        }.body()
     }
 
-    suspend inline fun requestText(
+    suspend fun requestText(
         route: Route,
         vararg params: Pair<String, Any> = emptyArray(),
-    ): Result<String> {
-        Timber.i("!!! Red ApiClient requestText() ${route.url}")
-        if (bearerToken == null) {
-            val loginResult = login()
-            if (loginResult.isFailure) return Result.failure(loginResult.exceptionOrNull()!!)
-        }
-        return try {
-            val response: String = client.get(route.url) {
-                bearerToken?.let { headers { append(HttpHeaders.Authorization, "Bearer $it") } }
-                params.forEach { (key, value) -> parameter(key, value) }
-            }.bodyAsText()
-            Result.success(response)
-        } catch (e: ClientRequestException) {
-            if (e.response.status == HttpStatusCode.Unauthorized) {
-                Timber.w("!!! Red ApiClient requestText() 401 Unauthorized, retrying login...")
-                bearerToken = null
-                val loginResult = login()
-                if (loginResult.isSuccess) {
-                    return try {
-                        val response: String = client.get(route.url) {
-                            bearerToken?.let { headers { append(HttpHeaders.Authorization, "Bearer $it") } }
-                            params.forEach { (key, value) -> parameter(key, value) }
-                        }.bodyAsText()
-                        Result.success(response)
-                    } catch (e2: Exception) {
-                        Timber.e(e2, "!!! Red ApiClient requestText() FAILED after retry: ${route.url}")
-                        Result.failure(e2)
-                    }
-                }
-            }
-            Timber.e(e, "!!! Red ApiClient requestText() FAILED: ${route.url}")
-            Result.failure(e)
-        } catch (e: Exception) {
-            Timber.e(e, "!!! Red ApiClient requestText() FAILED: ${route.url}")
-            Result.failure(e)
-        }
+    ): Result<String> = withAuth { token ->
+        client.get(route.url) {
+            token?.let { headers { append(HttpHeaders.Authorization, "Bearer $it") } }
+            params.forEach { (key, value) -> parameter(key, value) }
+        }.bodyAsText()
     }
 
-    suspend inline fun requestText(
+    suspend fun requestText(
         url: String,
         vararg params: Pair<String, Any> = emptyArray(),
-    ): Result<String> {
-        Timber.i("!!! Red ApiClient requestText() $url")
-        if (bearerToken == null) {
-            val loginResult = login()
-            if (loginResult.isFailure) return Result.failure(loginResult.exceptionOrNull()!!)
-        }
-        return try {
-            val response: String = client.get(url) {
-                bearerToken?.let { headers { append(HttpHeaders.Authorization, "Bearer $it") } }
-                params.forEach { (key, value) -> parameter(key, value) }
-            }.bodyAsText()
-            Result.success(response)
-        } catch (e: ClientRequestException) {
-            if (e.response.status == HttpStatusCode.Unauthorized) {
-                Timber.w("!!! Red ApiClient requestText() 401 Unauthorized, retrying login...")
-                bearerToken = null
-                val loginResult = login()
-                if (loginResult.isSuccess) {
-                    return try {
-                        val response: String = client.get(url) {
-                            bearerToken?.let { headers { append(HttpHeaders.Authorization, "Bearer $it") } }
-                            params.forEach { (key, value) -> parameter(key, value) }
-                        }.bodyAsText()
-                        Result.success(response)
-                    } catch (e2: Exception) {
-                        Timber.e(e2, "!!! Red ApiClient requestText() FAILED after retry: $url")
-                        Result.failure(e2)
-                    }
-                }
-            }
-            Timber.e(e, "!!! Red ApiClient requestText() FAILED: $url")
-            Result.failure(e)
-        } catch (e: Exception) {
-            Timber.e(e, "!!! Red ApiClient requestText() FAILED: $url")
-            Result.failure(e)
-        }
+    ): Result<String> = withAuth { token ->
+        client.get(url) {
+            token?.let { headers { append(HttpHeaders.Authorization, "Bearer $it") } }
+            params.forEach { (key, value) -> parameter(key, value) }
+        }.bodyAsText()
     }
 }
 

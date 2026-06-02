@@ -1,6 +1,5 @@
 package com.client.xvideos.common.coil
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Build
 import coil3.ImageLoader
@@ -16,11 +15,6 @@ import com.client.xvideos.common.settings.Settings
 import okhttp3.OkHttpClient
 import timber.log.Timber
 import java.io.File
-import java.security.SecureRandom
-import java.security.cert.X509Certificate
-import javax.net.ssl.SSLContext
-import javax.net.ssl.TrustManager
-import javax.net.ssl.X509TrustManager
 
 
 data class CoilProgressItem(
@@ -82,40 +76,9 @@ object CoilImageLoaderFactory {
                 }
             )
 
-        // ← Вот здесь глобальное отключение проверки сертификатов на старых Android
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) {
-            try {
-                @SuppressLint("CustomX509TrustManager", "TrustAllX509TrustManager")
-                val trustAllCerts = arrayOf<TrustManager>(
-                    object : X509TrustManager {
-                        override fun checkClientTrusted(
-                            chain: Array<out X509Certificate>?,
-                            authType: String?
-                        ) = Unit
-
-                        override fun checkServerTrusted(
-                            chain: Array<out X509Certificate>?,
-                            authType: String?
-                        ) = Unit
-
-                        override fun getAcceptedIssuers(): Array<X509Certificate> = emptyArray()
-                    }
-                )
-
-                val sslContext = SSLContext.getInstance("TLS").apply {
-                    init(null, trustAllCerts, SecureRandom())
-                }
-
-                okHttpBuilder.sslSocketFactory(
-                    sslContext.socketFactory,
-                    trustAllCerts[0] as X509TrustManager
-                )
-
-                okHttpBuilder.hostnameVerifier { _, _ -> true }
-            } catch (e: Exception) {
-                Timber.e(e, "Не удалось настроить trust-all SSL")
-            }
-        }
+        // Совместимость со старыми корневыми сертификатами обеспечивается через
+        // res/xml/network_security_config.xml (ISRG Root X1). Глобальное trust-all
+        // отключение проверки TLS удалено как небезопасное.
 
         // Try to build OkHttpClient safely. In LayoutLib (Compose Preview), building OkHttpClient
         // can fail with NoClassDefFoundError for Android-specific classes like conscrypt.

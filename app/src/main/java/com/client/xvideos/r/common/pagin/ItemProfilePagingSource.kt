@@ -2,7 +2,6 @@ package com.client.xvideos.r.common.pagin
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.client.xvideos.common.snackbar.SnackBar
 import com.client.xvideos.r.common.UsersRed
 import com.client.xvideos.r.network.api.RedApi
 import com.client.xvideos.r.model.GifsInfo
@@ -10,6 +9,7 @@ import com.client.xvideos.r.model.MediaType
 import com.client.xvideos.r.model.Order
 import com.client.xvideos.r.common.block.BlockRed
 import com.client.xvideos.r.model.sanitizeGifsInfoList
+import kotlinx.coroutines.CancellationException
 import timber.log.Timber
 
 class ItemProfilePagingSource (val profileName : String, val sort : Order, val block: BlockRed, val redApi: RedApi, val tags : List<String> = emptyList()): PagingSource<Int, GifsInfo>() {
@@ -36,9 +36,10 @@ class ItemProfilePagingSource (val profileName : String, val sort : Order, val b
 
             val responseBody = response.getOrThrow()
             val gifs : List<GifsInfo> = responseBody.gifs.sanitizeGifsInfoList()
-            val isEndReached = gifs.isEmpty() // или, если ты знаешь, что сервер вернул всё
 
-            val nextKey = if (isEndReached) { null } else { page + 1 }
+            // G4: конец пагинации определяем по метаданным ответа (pages),
+            // без лишнего «пустого» запроса в конце ленты.
+            val nextKey = if (page < responseBody.pages) page + 1 else null
 
             Timber.d("!!! load() a.gif.size = ${gifs.size}")
 
@@ -57,14 +58,20 @@ class ItemProfilePagingSource (val profileName : String, val sort : Order, val b
                 nextKey = nextKey
             )
 
+        } catch (e: CancellationException) {
+            throw e // G1: отмена корутины не должна превращаться в LoadResult.Error
         } catch (e: Exception) {
-            Timber.e("!!! ItemProfilePagingSource load() profileName:${profileName} page = $page Ошибка = ${e.message}")
-            SnackBar.error("ItemProfilePagingSource load() profileName:${profileName} page = $page Ошибка = ${e.message}")
+            // G2: показ ошибки — ответственность UI (LoadState), а не data-слоя.
+            Timber.e(e, "!!! ItemProfilePagingSource load() profileName:$profileName page = $page")
             LoadResult.Error(e)
         }
     }
 
+    // G3: при refresh сохраняем позицию вокруг anchorPosition вместо рестарта с 1-й страницы.
     override fun getRefreshKey(state: PagingState<Int, GifsInfo>): Int? {
-        return null
+        return state.anchorPosition?.let { anchor ->
+            val closest = state.closestPageToPosition(anchor)
+            closest?.prevKey?.plus(1) ?: closest?.nextKey?.minus(1)
+        }
     }
 }

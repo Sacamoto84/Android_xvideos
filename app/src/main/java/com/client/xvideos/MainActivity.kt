@@ -134,8 +134,11 @@ class MainActivity : ComponentActivity()//, ImageLoaderFactory
             return
         }
 
-        val shouldShowAppLock = intent.getBooleanExtra(EXTRA_REQUIRE_APP_LOCK, false) &&
-                AppLockRepository.shouldShowLock(this)
+        // SECURITY: показ замка определяется ИСКЛЮЧИТЕЛЬНО состоянием блокировки.
+        // Нельзя завязываться на intent-extra от вызывающего: даже если Activity
+        // запустят напрямую (напр. `adb am start`) без extra, замок обязан показаться.
+        // Extra из SplashActivity оставлен лишь как подсказка, но не как условие.
+        val shouldShowAppLock = AppLockRepository.shouldShowLock(this)
         if (shouldShowAppLock) {
             window.decorView.importantForAutofill = View.IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS
         }

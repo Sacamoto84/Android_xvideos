@@ -1,6 +1,7 @@
 package com.client.xvideos.x.parcer
 
 import com.client.xvideos.x.model.HTML5PlayerConfig
+import java.util.concurrent.ConcurrentHashMap
 import java.util.regex.Pattern
 
 fun parseHTML5Player(script: String): HTML5PlayerConfig {
@@ -26,29 +27,36 @@ fun parseHTML5Player(script: String): HTML5PlayerConfig {
         videoTitle = videoTitle ?: "",
         encodedIdVideo = encodedIdVideo ?: "",
         sponsors = listOf(), // Sponsors parsing can be added similarly
-        videoUrlLow = videoUrlLow ?: "",
-        videoUrlHigh = videoUrlHigh ?: "",
-        videoHLS = videoHLS ?: "",
-        thumbUrl = thumbUrl ?: "",
-        thumbUrl169 = thumbUrl169 ?: "",
+        // X6: JS-строки экранируют слэши как "\/" — раскодируем, иначе URL не проигрываются.
+        videoUrlLow = videoUrlLow.unescapeUrl(),
+        videoUrlHigh = videoUrlHigh.unescapeUrl(),
+        videoHLS = videoHLS.unescapeUrl(),
+        thumbUrl = thumbUrl.unescapeUrl(),
+        thumbUrl169 = thumbUrl169.unescapeUrl(),
         relatedVideos = null, // Placeholder for complex objects
-        thumbSlide = thumbSlide ?: "",
-        thumbSlideBig = thumbSlideBig ?: "",
-        thumbSlideMinute = thumbSlideMinute ?: "",
+        thumbSlide = thumbSlide.unescapeUrl(),
+        thumbSlideBig = thumbSlideBig.unescapeUrl(),
+        thumbSlideMinute = thumbSlideMinute.unescapeUrl(),
         idCDN = idCDN ?: "",
         idCdnHLS = idCdnHLS ?: "",
         fakePlayer = false, // Assuming default false
         desktopView = false, // Assuming default false
         seekBarColor = seekBarColor ?: "",
         uploaderName = uploaderName ?: "",
-        videoURL = videoURL ?: "",
-        staticPath = staticPath ?: "",
+        videoURL = videoURL.unescapeUrl(),
+        staticPath = staticPath.unescapeUrl(),
         viewData = viewData ?: ""
     )
 }
 
+// X5: компилируем каждый паттерн один раз (на видео их ~20, и функция зовётся часто).
+private val patternCache = ConcurrentHashMap<String, Pattern>()
+
 private fun extractValue(script: String, pattern: String): String? {
-    val regex = Pattern.compile(pattern)
+    val regex = patternCache.getOrPut(pattern) { Pattern.compile(pattern) }
     val matcher = regex.matcher(script)
     return if (matcher.find()) matcher.group(1) else null
 }
+
+// X6: "https:\/\/cdn\/x.mp4" -> "https://cdn/x.mp4"; null -> "".
+private fun String?.unescapeUrl(): String = this?.replace("\\/", "/") ?: ""

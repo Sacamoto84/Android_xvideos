@@ -21,7 +21,8 @@ fun getExoPlayerLifecycleObserver(
 
             Lifecycle.Event.ON_PAUSE -> handleOnPause(exoPlayer, setWasAppInBackground)
             Lifecycle.Event.ON_STOP -> handleOnStop(exoPlayer, setWasAppInBackground)
-            Lifecycle.Event.ON_DESTROY -> handleOnDestroy(exoPlayer)
+            // P3: release() сюда НЕ относится — освобождением владеет создатель плеера
+            // (DisposableEffect в rememberExoPlayerWithLifecycle). Иначе двойной владелец.
             else -> { /* No-op */
             }
         }
@@ -54,10 +55,4 @@ private fun handleOnStop(
 ) {
     exoPlayer.playWhenReady = false
     setWasAppInBackground(true)
-}
-
-private fun handleOnDestroy(
-    exoPlayer: ExoPlayer
-) {
-    exoPlayer.release()
 }

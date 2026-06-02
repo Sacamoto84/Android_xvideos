@@ -1,5 +1,6 @@
 package com.client.xvideos.common.videoplayer.host
 
+import androidx.compose.runtime.RememberObserver
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -13,6 +14,7 @@ import com.client.xvideos.common.videoplayer.util.VideoQuality
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -27,7 +29,7 @@ class MediaPlayerHost(
     isFullScreen: Boolean = false,
     headers: Map<String, String>? = null,
     drmConfig: DrmConfig? = null,
-) {
+) : RememberObserver {
     var poster by mutableStateOf(true)
 
     // Internal states
@@ -220,10 +222,29 @@ class MediaPlayerHost(
         onError?.invoke(error)
     }
 
+    /**
+     * P2: освобождает ресурсы хоста — отменяет его [scope], чтобы незавершённые
+     * `fetchAndUpdateMediaInfo`/корутины не утекали. Идемпотентно.
+     */
+    fun dispose() {
+        onEvent = null
+        onError = null
+        scope.cancel()
+    }
+
+    // RememberObserver: Compose сам зовёт onForgotten()/onAbandoned() при выходе
+    // экземпляра из композиции (в т.ч. при смене ключа remember(url){ ... }).
+    override fun onRemembered() { /* no-op */ }
+    override fun onForgotten() { dispose() }
+    override fun onAbandoned() { dispose() }
+
     private suspend fun fetchAndUpdateMediaInfo(videoUrl: String) {
-        setVideoQuality(null)
-        setAudioTrack(null)
-        setSubTitle(null)
+        // P5: запись Compose-стейта выполняем только на главном потоке.
+        withContext(Dispatchers.Main) {
+            setVideoQuality(null)
+            setAudioTrack(null)
+            setSubTitle(null)
+        }
         if (videoUrl.endsWith(".m3u8", ignoreCase = true)) {
             val m3u8Data = m3u8Helper.fetchM3U8Data(videoUrl, headers)
 

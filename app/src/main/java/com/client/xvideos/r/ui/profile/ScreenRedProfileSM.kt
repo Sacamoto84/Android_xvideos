@@ -34,6 +34,7 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -176,8 +177,10 @@ class ScreenRedProfileSM @AssistedInject constructor(
             _tags.update { it + r.tags }
             val resp = r.gifs.sanitizeGifsInfoList()
             _list.update { it + resp }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
-
+            Timber.e(e, "!!! loadNextPage failed: user=$userName page=$page")
         } finally {
             isLoading.value = false
         }

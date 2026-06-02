@@ -2,13 +2,13 @@ package com.client.xvideos.r.common.pagin
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.client.xvideos.common.snackbar.SnackBar
 import com.client.xvideos.r.common.UsersRed
 import com.client.xvideos.r.network.api.RedApi
 import com.client.xvideos.r.model.GifsInfo
 import com.client.xvideos.r.model.Order
 import com.client.xvideos.r.common.block.BlockRed
 import com.client.xvideos.r.model.sanitizeGifsInfoList
+import kotlinx.coroutines.CancellationException
 import timber.log.Timber
 
 class ItemTopPagingSource(
@@ -56,14 +56,20 @@ class ItemTopPagingSource(
                 prevKey = null,
                 nextKey = nextKey
             )
+        } catch (e: CancellationException) {
+            throw e // G1
         } catch (e: Exception) {
-            Timber.e("!!! ItemPagingSource load() page = $page Ошибка = ${e.message}")
-            SnackBar.error("ItemPagingSource load() page = $page Ошибка = ${e.message}")
+            // G2: ошибку показывает UI через LoadState, без SnackBar из data-слоя.
+            Timber.e(e, "!!! ItemTopPagingSource load() page = $page")
             LoadResult.Error(e)
         }
     }
 
+    // G3
     override fun getRefreshKey(state: PagingState<Int, GifsInfo>): Int? {
-        return null
+        return state.anchorPosition?.let { anchor ->
+            val closest = state.closestPageToPosition(anchor)
+            closest?.prevKey?.plus(1) ?: closest?.nextKey?.minus(1)
+        }
     }
 }
