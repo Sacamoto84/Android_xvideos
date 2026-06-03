@@ -1,21 +1,10 @@
 package com.client.xvideos.x.screens.videoplayer
 
-import android.content.Context
-import androidx.annotation.OptIn
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.media3.common.PlaybackParameters
-import androidx.media3.common.Player
-import androidx.media3.common.TrackSelectionOverride
-import androidx.media3.common.util.UnstableApi
-import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
-import androidx.media3.ui.AspectRatioFrameLayout
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelFactory
@@ -38,26 +27,23 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
 import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-data class FORMAT(
-    val id: Int,
-    val width: Int,
-    val height: Int,
-    val bitrate: Int,
-    val isSelect: Boolean,
-)
-
-@UnstableApi
+/**
+ * ScreenModel экрана видеоплеера X.
+ *
+ * После миграции на общий Compose-плеер ([com.client.xvideos.common.videoplayer.host.MediaPlayerHost])
+ * модель больше НЕ держит `ExoPlayer` и не управляет дорожками/скоростью напрямую —
+ * этим занимается `MediaPlayerHost`, создаваемый в `Content()`. Здесь остаётся
+ * только X-специфика: загрузка HTML страницы видео, извлечение HLS-ссылки и тегов,
+ * навигация на теги/полный экран и приём позиции, возвращаемой из fullscreen.
+ */
 class ScreenX_VideoPlayerSM @AssistedInject constructor(
     @Assisted val url: String,
-    @ApplicationContext context: Context,
     val db: AppFileDatabase
 ) : ScreenModel {
 
@@ -71,16 +57,16 @@ class ScreenX_VideoPlayerSM @AssistedInject constructor(
         Timber.e("!!! ScreenVideoPlayerSM onDispose")
     }
 
-    var playerE by mutableStateOf<Player?>(null)
-
+    /** HLS-ссылка для воспроизведения (master-playlist xvideos). */
     var passedHLS: String by mutableStateOf("")
 
+    /** Распарсенный конфиг html5-плеера (титул/превью/HLS и пр.). */
     val a: MutableState<HTML5PlayerConfig?> = mutableStateOf(HTML5PlayerConfig())
 
-    //val mediaItem: MediaItem?
-
+    /** Теги/каналы/порноактрисы для overlay поверх видео. */
     var tags by mutableStateOf(TagsModel(emptyList(), emptyList(), emptyList()))
 
+    /** Позиция (мс), возвращённая из полноэкранного режима; -1 — нет. */
     var positionFromFullscreen by mutableLongStateOf(-1L)
 
     init {
@@ -96,25 +82,21 @@ class ScreenX_VideoPlayerSM @AssistedInject constructor(
                 val content = readHtmlFromURLDirect(url)
                 db.cacheUrlStringRam.put(url, content)
                 content
-            } else
+            } else {
                 res.content
+            }
 
             val script = parserItemVideo(s)
             a.value = script?.let { parseHTML5Player(it) }
-            a
 
-            //Получить список тегов
+            // Список тегов
             tags = parserItemVideoTags(s)
-            tags
 
             passedHLS = a.value?.videoHLS.toString()
 
-            playerE = null
-
-            Timber.i("!!! ~~~ ??? LaunchedEffect started — start collecting")
+            // Возврат позиции из полноэкранного экрана
             screenModelScope.launch {
                 EventBus.events
-                    .onEach { Timber.i("!!! ~~~ EventBus emitted: $it") }
                     .filterIsInstance<Event.X_FullScreenExitPosition>()
                     .collect { event ->
                         Timber.i("!!! ~~~ collect Event.X_FullScreenExitPosition ${event.position}")
@@ -124,132 +106,30 @@ class ScreenX_VideoPlayerSM @AssistedInject constructor(
         }
     }
 
-
-    /////////////////////////////////////////////////////////
     /**
      * ## Открыть экран с нужным тегом
      */
     fun openTag(tag: String, navigator: Navigator) {
         navigator.push(ScreenTags(tag))
     }
-    /////////////////////////////////////////////////////////
-
 
     /**
-     * Общая продолжительность видео
+     * ## Открыть плеер в полном окне
+     * @param positionMs текущая позиция воспроизведения (мс), берётся из MediaPlayerHost.
      */
-    var totalDuration by mutableLongStateOf(0L)
-
-    /**
-     * Текущее время видео
-     */
-    var currentTime by mutableLongStateOf(0L)
-
-    var bufferedPercentage by mutableIntStateOf(0)
-
-    var isPlaying by mutableStateOf(false)
-
-
-    var playbackState by mutableIntStateOf(0)
-
-    val trackSelector = DefaultTrackSelector(context)
-
-
-    val listFormat = mutableStateListOf<FORMAT>()
-
-    var quality by mutableIntStateOf(0)
-
-
-    /**
-     * Скорость воспроизведения
-     */
-    var speed by mutableFloatStateOf(1.0f)
-
-    ///////////////////////////////////////////////
-    /**
-     * ## Изменить номер дорожки
-     */
-    @OptIn(UnstableApi::class)
-    fun switchTrack(trackIndex: Int) {
-        if (playerE == null) return
-        val player = playerE!!
-
-        player.stop()
-        player.seekTo(player.currentPosition)
-
-        // Создаем TrackSelectionOverride для новой дорожки
-        val groups = player.currentTracks.groups
-        if (groups.isEmpty()) return
-        val trackGroup = groups[0].mediaTrackGroup
-        val override = TrackSelectionOverride(trackGroup, listOf(trackIndex))
-
-        player.trackSelectionParameters =
-            player.trackSelectionParameters
-                .buildUpon()
-                .setOverrideForType(override).build()
-
-        player.prepare()
-        player.play()
-        // }
-
-        Timber.d("Switched to track: Track: $trackIndex")
+    fun openFullScreen(navigator: Navigator, positionMs: Long) {
+        navigator.push(ScreenX_VideoPlayerFullScreen(url, positionMs))
     }
-    ///////////////////////////////////////////////
-    /**
-     * ## Изменение скорости воспроизведения
-     */
-    fun changePlaybackSpeed(speed: Float) {
-        if (playerE == null) return
-        val player = playerE!!
-        val params = PlaybackParameters(speed) // Создаем параметры с новой скоростью
-        player.playbackParameters = params
-        Timber.d("Playback speed changed to $speed")
-        this.speed = speed
-    }
-
-    ///////////////////////////////////////////////
-    //Открыть плее в полном окне
-    fun openFullScreen(navigator: Navigator) {
-        //if (playerE == null) return
-        navigator.push(
-            ScreenX_VideoPlayerFullScreen(url, playerE?.currentPosition ?: -1L)
-        )
-    }
-
-
-    // Блок соотношения сторон
-    private var currentAspectRatios = 0
-    private val aspectRatios = listOf(
-        AspectRatioFrameLayout.RESIZE_MODE_FIT,
-        AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH,
-        AspectRatioFrameLayout.RESIZE_MODE_FIXED_HEIGHT,
-        AspectRatioFrameLayout.RESIZE_MODE_FILL,
-        AspectRatioFrameLayout.RESIZE_MODE_ZOOM
-    )
-
-    fun aspectRatiosClick(): Int {
-        currentAspectRatios = (currentAspectRatios + 1) % aspectRatios.size
-        return aspectRatios[currentAspectRatios]
-    }
-
-
 }
 
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class ScreenModuleItem {
 
-    @OptIn(UnstableApi::class)
     @Binds
     @IntoMap
     @ScreenModelFactoryKey(ScreenX_VideoPlayerSM.Factory::class)
     abstract fun bindHiltDetailsScreenModelFactory(
         hiltDetailsScreenModelFactory: ScreenX_VideoPlayerSM.Factory,
     ): ScreenModelFactory
-
 }
-
-
-
-
-

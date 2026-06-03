@@ -86,7 +86,8 @@ kotlin {
 
 dependencies {
 
-
+    // Видеоплеер вынесен в отдельный Gradle-модуль (Этап 2 рефакторинга плеера)
+    implementation project(':core-player')
 
     implementation(libs.androidx.compose.ui.android)
 
