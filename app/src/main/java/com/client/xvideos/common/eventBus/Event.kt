@@ -19,6 +19,4 @@ sealed class Event {
      */
     data class ShowSnackBar(val message: UiMessage) : Event()
 
-    data class X_FullScreenExitPosition(val position: Long) : Event()
-
 }

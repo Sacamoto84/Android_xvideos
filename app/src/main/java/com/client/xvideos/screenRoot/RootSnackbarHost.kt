@@ -31,6 +31,7 @@ import com.client.xvideos.common.snackbar.UiSnackbarVisuals
 import com.client.xvideos.r.common.ThemeRed
 import com.client.xvideos.ui.theme.XvideosTheme
 import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun RootSnackbarHost(snackBarHostState: SnackbarHostState) {
@@ -50,7 +51,7 @@ fun RootSnackbarHost(snackBarHostState: SnackbarHostState) {
                     is UiMessage.Error -> 5000L
                     else -> 2000L
                 }
-                delay(duration)
+                delay(duration.milliseconds)
                 data.dismiss()
             }
 
