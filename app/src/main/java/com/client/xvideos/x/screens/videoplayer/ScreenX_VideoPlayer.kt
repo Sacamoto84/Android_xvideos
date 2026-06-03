@@ -46,6 +46,7 @@ class ScreenX_VideoPlayer(val url: String) : Screen {
             val host = remember(vm.passedHLS) {
                 MediaPlayerHost(
                     mediaUrl = vm.passedHLS,
+                    isMuted = true, // видео X всегда без звука
                     isLooping = false,
                 )
             }

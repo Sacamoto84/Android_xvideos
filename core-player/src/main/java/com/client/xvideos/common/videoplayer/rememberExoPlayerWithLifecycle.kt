@@ -43,6 +43,8 @@ fun rememberExoPlayerWithLifecycle(
     maxBufferMs: Int = 30000,
     bufferForPlaybackMs: Int = 500,
     bufferForPlaybackAfterRebufferM: Int = 1000,
+    seekBackIncrementMs: Long = 1000L,
+    seekForwardIncrementMs: Long = 1000L,
 ): ExoPlayer {
     val lifecycleOwner = LocalLifecycleOwner.current
     val trackSelector = remember { DefaultTrackSelector(context) }
@@ -60,8 +62,8 @@ fun rememberExoPlayerWithLifecycle(
             // P1: плеер должен использовать ТОТ ЖЕ trackSelector, на который применяется
             // applyQualitySelection(...), иначе выбор качества — no-op.
             .setTrackSelector(trackSelector)
-            .setSeekForwardIncrementMs(1000L) // Устанавливаем приращение для перемотки вперед на 1000 мс (1 секунда)
-            .setSeekBackIncrementMs(1000L)    // Опционально: Устанавливаем приращение для перемотки назад на 1000 мс
+            .setSeekForwardIncrementMs(seekForwardIncrementMs) // Приращение перемотки вперёд (по умолчанию 1 сек)
+            .setSeekBackIncrementMs(seekBackIncrementMs)       // Приращение перемотки назад (по умолчанию 1 сек)
             .build().apply {
                 videoScalingMode = C.VIDEO_SCALING_MODE_SCALE_TO_FIT
                 setHandleAudioBecomingNoisy(true)
