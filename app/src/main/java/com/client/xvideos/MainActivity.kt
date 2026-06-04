@@ -69,6 +69,7 @@ import com.client.xvideos.l.ui.screens.explorer.L_ScreenExplorer
 import com.client.xvideos.r.common.saved.SavedRed
 import com.client.xvideos.r.ui.root.R_Screen_Root
 import com.client.xvideos.screenRoot.ScreenRoot
+import com.client.xvideos.x.screens.explorer.X_ScreenExplorer
 import com.client.xvideos.ui.theme.XvideosTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -242,6 +243,10 @@ object MenuScreen : Screen {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Bottom
             ) {
+
+                ButtonSelect(R.drawable.icon_xvideos_white) {
+                    navigator.push(X_ScreenExplorer())
+                }
 
                 ButtonSelect(R.drawable.icon_luscious, "buttonL") {
                     navigator.
