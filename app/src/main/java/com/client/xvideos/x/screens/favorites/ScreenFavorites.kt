@@ -102,40 +102,12 @@ internal fun FavoritesList(
                         .aspectRatio(352f / 198f)
                         .background(Color.DarkGray)
                 ) {
-
                     UrlVideoImageAndLongClickX(
                         item,
+                        modifier = Modifier.fillMaxSize(),
                         onLongClick = { onOpenFull(item) },
                         onDoubleClick = { onOpenFull(item) }
-                    ) {
-
-                        Box(modifier = Modifier.fillMaxSize()) {
-                            val offsetY = (-3).dp
-
-                            //Продолжительность видео
-                            Text(
-                                text = item.duration.dropLast(1),
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .offset(1.dp, offsetY + 1.dp),
-                                textAlign = TextAlign.Right,
-                                fontSize = 14.sp,
-                                color = Color.Black
-                            )
-
-                            Text(
-                                text = item.duration.dropLast(1),
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .offset(0.dp, offsetY),
-                                textAlign = TextAlign.Right,
-                                fontSize = 14.sp,
-                                color = Color.White
-                            )
-
-                        }
-
-                    }
+                    )
                 }
 
                 Row(
