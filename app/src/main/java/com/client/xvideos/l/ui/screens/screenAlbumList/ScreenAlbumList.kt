@@ -50,6 +50,7 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.l.theme.ThemeL
 import com.client.xvideos.l.ui.element.AlbumListItem
 import com.client.xvideos.l.ui.screens.screenAlbum.ScreenLAlbum
@@ -137,6 +138,8 @@ private fun Screen.ScreenAlbumListContent(initialFilter: LAlbumListFilter?, titl
         val scope = rememberCoroutineScope()
         var totalPages by remember { mutableIntStateOf(1) }
 
+        val columnCount = Settings.l_gifsTab_column_current_count.field.collectAsStateWithLifecycle().value
+
         // ✅ Состояние для диалога
         var showFilterDialog by remember { mutableStateOf(false) }
 
@@ -216,7 +219,7 @@ private fun Screen.ScreenAlbumListContent(initialFilter: LAlbumListFilter?, titl
                         LazyVerticalGrid(
                             state = stateGrid,
                             modifier = Modifier.fillMaxSize(),
-                            columns = GridCells.Fixed(2)
+                            columns = GridCells.Fixed(columnCount)
                         )
                         {
                             item(key = "dummy", span = { GridItemSpan(maxLineSpan) }) {

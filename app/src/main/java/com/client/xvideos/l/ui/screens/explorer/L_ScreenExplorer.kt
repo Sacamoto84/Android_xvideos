@@ -1,8 +1,11 @@
 package com.client.xvideos.l.ui.screens.explorer
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
@@ -13,10 +16,15 @@ import androidx.compose.material.icons.outlined.Topic
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.screen.Screen
@@ -46,19 +54,9 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import javax.inject.Inject
-
-@Composable
-private fun RowScope.TabNavigationItem(tab: Tab) {
-    val tabNavigator = LocalTabNavigator.current
-
-    BottomNavigationItem(
-        selected = tabNavigator.current.key == tab.key,
-        onClick = { tabNavigator.current = tab },
-        icon = { Icon(painter = tab.options.icon!!, contentDescription = tab.options.title) }
-    )
-}
 
 class L_ScreenExplorer : Screen {
 
@@ -112,42 +110,95 @@ class L_ScreenExplorer : Screen {
 
         val columnR_ScreenGifsTab = Settings.l_gifsTab_column_current_count.field.collectAsStateWithLifecycle().value
 
-        Scaffold(bottomBar = {
-            androidx.compose.foundation.layout.Column {
-                DownloadIndicator(percentDownload)
-                TabRow(
-                    containerColor = ThemeRed.colorTabLevel0,
-                    titlesIcon = l,
-                    value = vm.screenType,
-                    onChangeState = {
-                        if (it == vm.screenType) {
-                            when (it) {
-                                0 -> { ColumnSelect_AddColumn(Settings.l_gifsTab_column_current_count, Settings.l_gifsTab_G_0_4) }
-                            }
-                        }
-                        vm.screenType = it
-                    },
-                    overlay0 = { TabBarPoints(columnR_ScreenGifsTab, vm.screenType == 0) },
-                    tags = tags
-                )
-            }
-        }, containerColor = ThemeRed.colorCommonBackground2) { paddingValues ->
-            Box(modifier = Modifier.padding(bottom = paddingValues.calculateBottomPadding())) {
-
-
-                //Navigator(
-                when (vm.screenType) {
-                    0 -> L_ScreenAlbumList.Content()
-                    1 -> L_SavedTab.Content()
-                    2 -> L_ScreenAlbumTopHits.Content()
-                    3 -> L_ScreenAlbumSearch.Content()
-                    else -> L_SavedTab.Content()
+        L_ScreenExplorerContent(
+            percentDownload = percentDownload,
+            titlesIcon = l,
+            tags = tags,
+            screenType = vm.screenType,
+            columnCount = columnR_ScreenGifsTab,
+            onChangeState = {
+                if (it == vm.screenType) {
+                    when (it) {
+                        0 -> { ColumnSelect_AddColumn(Settings.l_gifsTab_column_current_count, Settings.l_gifsTab_G_0_4) }
+                    }
                 }
-                //)
-
+                vm.screenType = it
+            },
+        ) {
+            //Navigator(
+            when (vm.screenType) {
+                0 -> L_ScreenAlbumList.Content()
+                1 -> L_SavedTab.Content()
+                2 -> L_ScreenAlbumTopHits.Content()
+                3 -> L_ScreenAlbumSearch.Content()
+                else -> L_SavedTab.Content()
             }
+            //)
         }
 
+    }
+}
+
+/**
+ * Stateless-каркас экрана [L_ScreenExplorer]: нижняя панель (индикатор загрузки +
+ * [TabRow]) и слот [content] под текущую вкладку. Вынесен отдельно, чтобы не зависеть
+ * от Hilt / Voyager / [Settings] и быть пригодным для [Preview].
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@Composable
+private fun L_ScreenExplorerContent(
+    percentDownload: Float,
+    titlesIcon: ImmutableList<ImageVector>,
+    tags: ImmutableList<String>,
+    screenType: Int,
+    columnCount: Int,
+    onChangeState: (Int) -> Unit,
+    content: @Composable () -> Unit,
+) {
+    Scaffold(bottomBar = {
+        Column {
+            DownloadIndicator(percentDownload)
+            TabRow(
+                containerColor = ThemeRed.colorTabLevel0,
+                titlesIcon = titlesIcon,
+                value = screenType,
+                onChangeState = onChangeState,
+                overlay0 = { TabBarPoints(columnCount, screenType == 0) },
+                tags = tags
+            )
+        }
+    }, containerColor = ThemeRed.colorCommonBackground2) { paddingValues ->
+        Box(modifier = Modifier.padding(bottom = paddingValues.calculateBottomPadding())) {
+            content()
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun L_ScreenExplorerContentPreview() {
+    L_ScreenExplorerContent(
+        percentDownload = -2f,
+        titlesIcon = persistentListOf(
+            Icons.AutoMirrored.Outlined.FormatListBulleted,
+            Icons.Outlined.BookmarkBorder,
+            Icons.Outlined.Topic,
+            Icons.Outlined.Search,
+        ),
+        tags = persistentListOf("", "", "bBookMark", ""),
+        screenType = 0,
+        columnCount = 2,
+        onChangeState = {},
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(ThemeRed.colorCommonBackground2),
+            contentAlignment = Alignment.Center
+        ) {
+            Text("L_ScreenAlbumList", color = Color.White)
+        }
     }
 }
 

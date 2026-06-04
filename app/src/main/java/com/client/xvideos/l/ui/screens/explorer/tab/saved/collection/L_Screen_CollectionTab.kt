@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -44,6 +45,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.model.ScreenModel
@@ -311,145 +313,47 @@ fun L_SavedCollectionTabContent(
     )
 }
 
+@Preview
 @Composable
-private fun LCollectionsTopBar(
-    selectedCollection: String?,
-    sortOrder: LCollectionSortOrder,
-    onSortOrderClick: (LCollectionSortOrder) -> Unit,
-    onSmartCollectionsClick: () -> Unit
-) {
-    var menuExpanded by remember { mutableStateOf(false) }
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(ThemeL.greyBackground)
-            .padding(start = 8.dp, end = 4.dp, top = 4.dp, bottom = 4.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                ">Коллекция>${selectedCollection.orEmpty()}",
-                color = ThemeL.primaryColor,
-                fontSize = 18.sp,
-                fontFamily = ThemeL.fontFamilyPopinsRegular
-            )
-            if (selectedCollection == null) {
-                Text(
-                    sortOrder.title,
-                    color = ThemeL.grey2,
-                    fontSize = 12.sp,
-                    fontFamily = ThemeL.fontFamilyDMsanss
-                )
-            }
-        }
-
-        if (selectedCollection == null) {
-            TextButton(onClick = onSmartCollectionsClick) {
-                Icon(Icons.Default.Add, contentDescription = null, tint = ThemeL.primaryColor)
-                Spacer(Modifier.width(4.dp))
-                Text("Smart", color = ThemeL.primaryColor, style = ThemeL.Type.button)
-            }
-
-            Box {
-                IconButton(onClick = { menuExpanded = true }) {
-                    Icon(Icons.Default.MoreVert, contentDescription = null, tint = ThemeL.textColor)
-                }
-                DropdownMenu(
-                    expanded = menuExpanded,
-                    onDismissRequest = { menuExpanded = false },
-                    containerColor = ThemeL.grey5
-                ) {
-                    LCollectionSortOrder.entries.forEach { order ->
-                        DropdownMenuItem(
-                            text = {
-                                Text(
-                                    order.title,
-                                    style = ThemeL.Type.menuItem.copy(
-                                        color = if (order == sortOrder) ThemeL.primaryColor else ThemeL.textColor
-                                    )
-                                )
-                            },
-                            onClick = {
-                                onSortOrderClick(order)
-                                menuExpanded = false
-                            }
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun LSmartCollectionsDialog(
-    candidates: List<LSmartCollectionCandidate>,
-    onDismiss: () -> Unit,
-    onCreate: (LSmartCollectionCandidate) -> Unit
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Text(
-                "Smart collections",
-                fontWeight = FontWeight.Bold,
-                fontSize = 20.sp,
-                color = ThemeL.textColor
-            )
-        },
-        text = {
-            if (candidates.isEmpty()) {
-                Text(
-                    "Пока мало метаданных для авто-коллекций. Добавь несколько элементов из альбомов, где есть теги, авторы или общий album id.",
-                    color = ThemeL.grey2,
-                    style = ThemeL.Type.body
-                )
-            } else {
-                LazyColumn(
-                    state = rememberLazyListState(),
-                    modifier = Modifier.heightIn(max = 420.dp)
-                ) {
-                    items(candidates) { candidate ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(8.dp))
-                                .clickable { onCreate(candidate) }
-                                .padding(horizontal = 8.dp, vertical = 10.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(44.dp)
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .background(ThemeL.primaryColor.copy(alpha = 0.22f)),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(candidate.count.toString(), color = ThemeL.primaryColor, fontWeight = FontWeight.Bold)
-                            }
-                            Spacer(Modifier.width(10.dp))
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(candidate.title, color = Color.White, style = ThemeL.Type.rowTitle)
-                                Text(candidate.subtitle, color = ThemeL.grey2, style = ThemeL.Type.rowSubtitle)
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        confirmButton = {},
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Закрыть", style = ThemeL.Type.button.copy(color = ThemeL.primaryColor))
-            }
-        },
-        containerColor = ThemeL.grey5,
-        titleContentColor = ThemeL.textColor,
-        textContentColor = ThemeL.textColor
+private fun L_SavedCollectionTabContentPreview() {
+    L_SavedCollectionTabContent(
+        selectedCollection = null,
+        collectionList = listOf(
+            LCollectionEntity(
+                collection = "Favorites",
+                previewUrl = null,
+                itemsCount = 42,
+                lastModifiedAt = 0L,
+                duplicateCount = 0,
+                hasManualCover = false
+            ),
+            LCollectionEntity(
+                collection = "Best of 2025",
+                previewUrl = null,
+                itemsCount = 17,
+                lastModifiedAt = 0L,
+                duplicateCount = 3,
+                hasManualCover = true
+            ),
+            LCollectionEntity(
+                collection = "To watch",
+                previewUrl = null,
+                itemsCount = 5,
+                lastModifiedAt = 0L,
+                duplicateCount = 0,
+                hasManualCover = false
+            ),
+        ),
+        sortOrder = LCollectionSortOrder.RECENT,
+        gridState = rememberLazyGridState(),
+        onSortOrderClick = {},
+        onSmartCollectionsClick = {},
+        onCollectionClick = {},
+        onCollectionLongClick = {},
+        onCreateNewCollectionClick = {},
+        navigationContent = {}
     )
 }
-
 
 class ScreenSavedCollectionSM @Inject constructor(
     val savedL: SavedL,
