@@ -4,11 +4,6 @@ pluginManagement {
         mavenCentral()
         gradlePluginPortal()
 
-        maven { url = uri('https://artifactory-external.vkpartner.ru/artifactory/maven/') }
-        maven {
-            url = uri("https://mobile.maven.couchbase.com/maven2/dev/")
-            content { includeGroupByRegex "com\\.couchbase\\.lite.*" }
-        }
     }
 }
 plugins {
@@ -20,11 +15,6 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven { url = uri('https://jitpack.io') }
-        maven { url = uri('https://artifactory-external.vkpartner.ru/artifactory/maven/') }
-        maven {
-            url = uri("https://mobile.maven.couchbase.com/maven2/dev/")
-            content { includeGroupByRegex "com\\.couchbase\\.lite.*" }
-        }
     }
 }
 
