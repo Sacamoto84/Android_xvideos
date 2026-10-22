@@ -66,6 +66,11 @@ class NetworkTrafficMonitor @Inject constructor() {
         if (monitoringJob?.isActive == true) return
 
         monitoringJob = scope.launch {
+            // После паузы (приложение было в фоне) первая скорость считается от текущего
+            // момента, а не усредняется за всё время в фоне.
+            previousRxBytes = TrafficStats.getUidRxBytes(appUid)
+            previousTxBytes = TrafficStats.getUidTxBytes(appUid)
+            previousTime = System.currentTimeMillis()
             flow {
                 while (currentCoroutineContext().isActive) {
                     emit(calculateTrafficData())
@@ -94,7 +99,8 @@ class NetworkTrafficMonitor @Inject constructor() {
             return _trafficFlow.value.copy(isSupported = false)
         }
 
-        val timeDiff = (currentTime - previousTime) / timeout.toFloat()
+        // Прошедшее время в секундах: скорость считаем в байтах/с, а не за интервал опроса.
+        val timeDiff = (currentTime - previousTime) / 1000f
 
         val downloadSpeed = if (timeDiff > 0 && previousRxBytes > 0) {
             ((currentRxBytes - previousRxBytes) / timeDiff).toLong().coerceAtLeast(0L)

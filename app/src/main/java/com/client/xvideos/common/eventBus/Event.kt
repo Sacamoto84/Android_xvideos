@@ -19,4 +19,7 @@ sealed class Event {
      */
     data class ShowSnackBar(val message: UiMessage) : Event()
 
+    /** Позиция (мс), на которой закрыли полноэкранный плеер X — для продолжения в обычном. */
+    data class X_FullScreenExitPosition(val position: Long) : Event()
+
 }

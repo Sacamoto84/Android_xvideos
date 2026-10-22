@@ -12,12 +12,14 @@ import com.client.xvideos.common.fileDB.folder.AppFileDatabase
 import com.client.xvideos.r.common.block.BlockRed
 import com.client.xvideos.r.common.saved.SavedRed
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -57,18 +59,21 @@ class SplashActivity : ComponentActivity() {
 
         // Запускаем инициализацию
         lifecycleScope.launch {
-            // имитация тяжёлой работы
-            withContext(Dispatchers.IO) {
-                initApp()
+            try {
+                withContext(Dispatchers.IO) {
+                    initApp()
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                // Ошибка подготовки данных не должна ронять приложение на заставке.
+                Timber.e(e, "SplashActivity initApp failed")
             }
             isReady = true
             if (AppLockRepository.isEnabled(this@SplashActivity)) {
                 AppLockSession.lock()
             }
-            val shouldShowLock = AppLockRepository.shouldShowLock(this@SplashActivity)
-            val intent = Intent(this@SplashActivity, MainActivity::class.java)
-                .putExtra(MainActivity.EXTRA_REQUIRE_APP_LOCK, shouldShowLock)
-            startActivity(intent)
+            startActivity(Intent(this@SplashActivity, MainActivity::class.java))
             overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
             finish()
         }
@@ -90,9 +95,13 @@ class SplashActivity : ComponentActivity() {
 
             dbInstance.clearVolatileCachesOnProcessStart()
 
+            // Теги — сетевой запрос: не держим заставку, пока он идёт (особенно без сети).
+            savedRedInstance.refreshTagList()
+
             val jobs = listOf(
-                async { savedRedInstance.refreshTagList() },
-                async { blockRedInstance.refresh() },
+                // Список блокировок читается с диска; ждём его, иначе первая страница
+                // отфильтруется по пустому списку.
+                async { blockRedInstance.reload() },
                 async { savedRedInstance.likes.refresh() },
                 async { savedRedInstance.niches.refresh() },
                 async { savedRedInstance.creators.refresh() },

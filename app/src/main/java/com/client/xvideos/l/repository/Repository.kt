@@ -11,6 +11,7 @@ import com.client.xvideos.common.util.toMD5
 import com.client.xvideos.l.KtorRequestHandler
 import com.client.xvideos.l.net.Luscious
 import com.google.gson.JsonParser
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -115,6 +116,7 @@ class Repository(
                 }
             }
         }
+        catch (e: CancellationException) { throw e }
         catch (e: Exception){
             Timber.e(e, "!!! openURI() login error")
             return Result.failure(e)
@@ -156,6 +158,7 @@ class Repository(
                         //Timber.i("!!! openURI() CACHE_ROM net response:$response")
                         return checkedResponse
                     }
+                    catch (e: CancellationException) { throw e }
                     catch (e: Exception){
                         Timber.e(e, "!!! openURI() CACHE_ROM error")
                         return Result.failure(e)
@@ -192,6 +195,7 @@ class Repository(
                         if (checkedContent.contains("{\"errors\":")) { SnackBar.error(checkedContent) }
                         return checkedResponse
                     }
+                    catch (e: CancellationException) { throw e }
                     catch (e: Exception){
                         Timber.e(e, "!!! openURI() CACHE_RAM error")
                         SnackBar.error(e.message?: "openURI() CACHE_RAM error")
@@ -212,6 +216,8 @@ class Repository(
         for (attempt in 0 until HTML_CHALLENGE_RETRY_ATTEMPTS) {
             val response = try {
                 postJsonThrottled(data)
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 return Result.failure(e)
             }

@@ -6,6 +6,7 @@ import com.client.xvideos.common.json.JsonTypes
 import com.client.xvideos.common.settings.element.SettingElementBoolean
 import com.client.xvideos.common.settings.element.SettingElementInt
 import com.client.xvideos.common.settings.element.SettingElementList
+import com.client.xvideos.common.settings.element.SettingElementSecretString
 import com.client.xvideos.common.settings.element.SettingElementString
 import com.client.xvideos.l.model.ThumbnailsSize
 
@@ -89,7 +90,8 @@ object Settings {
 
     //Логин
     val l_login by lazy { SettingElementString( pref, "l_login", "") }
-    val l_pass by lazy { SettingElementString( pref, "l_pass", "") }
+    /** Пароль L хранится зашифрованным (Android Keystore); старое открытое значение "l_pass" переносится. */
+    val l_pass by lazy { SettingElementSecretString(pref, "l_pass_enc", legacyName = "l_pass") }
 
     /**
      * Размер миниатюры в галерее

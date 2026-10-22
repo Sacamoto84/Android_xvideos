@@ -19,6 +19,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.effect.ScaleAndRotateTransformation
 import androidx.media3.ui.AspectRatioFrameLayout
+import com.client.xvideos.common.videoplayer.LocalPlaybackAllowed
 import com.client.xvideos.common.videoplayer.host.DrmConfig
 import com.client.xvideos.common.videoplayer.host.MediaPlayerError
 import com.client.xvideos.common.videoplayer.model.PlayerSpeed
@@ -55,13 +56,15 @@ fun CMPPlayer2(
     poster : (Boolean) -> Unit
 ) {
     val context = LocalContext.current
+    // Под экраном блокировки воспроизведение запрещено, даже если вызывающий не на паузе.
+    val effectivePause = isPause || !LocalPlaybackAllowed.current
     val minBufferMs = 12_000
     val maxBufferMs = 45_000
 
     val exoPlayer = rememberExoPlayerWithLifecycle(
         url,
         context,
-        isPause,
+        effectivePause,
         isLiveStream,
         loop,
         headers,
@@ -110,7 +113,7 @@ fun CMPPlayer2(
             factory = { playerView },
             modifier = modifier,
             update = {
-                exoPlayer.playWhenReady = !isPause
+                exoPlayer.playWhenReady = !effectivePause
                 exoPlayer.volume = volume
                 seekToTime?.let { exoPlayer.seekTo((it * 1000).toLong()) }
                 exoPlayer.setPlaybackSpeed(speed.toFloat())

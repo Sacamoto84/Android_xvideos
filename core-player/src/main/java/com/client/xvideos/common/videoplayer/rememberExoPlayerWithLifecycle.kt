@@ -8,6 +8,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -115,9 +116,11 @@ fun rememberExoPlayerWithLifecycle(
     }
 
     var appInBackground by remember { mutableStateOf(false) }
+    // Наблюдатель живёт дольше одной рекомпозиции — читаем актуальное значение паузы.
+    val currentIsPause by rememberUpdatedState(isPause)
 
     DisposableEffect(key1 = lifecycleOwner, appInBackground) {
-        val lifecycleObserver = getExoPlayerLifecycleObserver(exoPlayer, isPause, appInBackground) {
+        val lifecycleObserver = getExoPlayerLifecycleObserver(exoPlayer, { currentIsPause }, appInBackground) {
             appInBackground = it
         }
         lifecycleOwner.lifecycle.addObserver(lifecycleObserver)

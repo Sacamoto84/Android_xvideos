@@ -25,10 +25,14 @@ fun applyQualitySelection(
 ) {
     trackSelector.setParameters(
         trackSelector.buildUponParameters().apply {
-            selectedQuality?.let {
-                setMaxVideoBitrate(it.bitrate.toInt())
-                setMinVideoBitrate(it.bitrate.toInt())
-            } ?: setMaxVideoBitrate(Int.MAX_VALUE)
+            if (selectedQuality != null) {
+                setMaxVideoBitrate(selectedQuality.bitrate.toInt())
+                setMinVideoBitrate(selectedQuality.bitrate.toInt())
+            } else {
+                // «Авто»: снимаем оба ограничения, иначе min остаётся от выбранного ранее качества.
+                setMaxVideoBitrate(Int.MAX_VALUE)
+                setMinVideoBitrate(0)
+            }
         }
     )
 }

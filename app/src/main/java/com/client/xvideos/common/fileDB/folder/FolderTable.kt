@@ -1,5 +1,6 @@
 package com.client.xvideos.common.fileDB.folder
 
+import com.client.xvideos.common.fileDB.writeTextAtomically
 import com.client.xvideos.common.util.toMD5
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
@@ -85,7 +86,9 @@ class FolderTable(
 
     private fun rowDir(key: String, createTableDir: Boolean): File {
         if (createTableDir) tableDir.mkdirs()
-        val dirName = if (safeKeyRegex.matches(key)) key else key.toMD5()
+        // "." и ".." проходят регулярку, но указывают на саму таблицу/родителя — хешируем их.
+        val isSafe = safeKeyRegex.matches(key) && key.any { it != '.' }
+        val dirName = if (isSafe) key else key.toMD5()
         return File(tableDir, dirName)
     }
 
@@ -107,15 +110,7 @@ class FolderTable(
     }
 
     private fun writeField(rowDir: File, field: String, value: String) {
-        val target = File(rowDir, fieldFileName(field))
-        val tmp = File(rowDir, "${target.name}.tmp")
-        tmp.writeText(value, Charsets.UTF_8)
-        if (target.exists() && !target.delete()) {
-            throw IllegalStateException("Cannot replace file: ${target.absolutePath}")
-        }
-        if (!tmp.renameTo(target)) {
-            throw IllegalStateException("Cannot commit file: ${target.absolutePath}")
-        }
+        File(rowDir, fieldFileName(field)).writeTextAtomically(value)
     }
 
     private fun fieldFileName(field: String): String {

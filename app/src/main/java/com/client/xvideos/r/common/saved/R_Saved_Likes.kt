@@ -25,6 +25,8 @@ class R_Saved_Likes {
         likesDb.insert(safeItem.id, safeItem)
             .onSuccess {
                 SnackBar.success("Like")
+                // Повторный лайк перезаписывает файл — не дублируем запись в списке.
+                list.removeAll { it.id == safeItem.id }
                 list.add(safeItem)
             }
             .onFailure { e ->
@@ -35,9 +37,12 @@ class R_Saved_Likes {
     fun remove(item: GifsInfo) {
         Timber.i("R_Saved_Likes remove() id:${item.id} userName:${item.userName} url:${item.urls.hd}")
         likesDb.delete(item.id)
-            .onSuccess { SnackBar.info("Unlike") }
+            .onSuccess {
+                SnackBar.info("Unlike")
+                // Убираем из памяти, а не перечитываем с диска все файлы лайков.
+                list.removeAll { it.id == item.id }
+            }
             .onFailure { e -> SnackBar.error("Ошибка удаления лайка ${e.message}") }
-        refresh()
     }
 
     @OptIn(DelicateCoroutinesApi::class)

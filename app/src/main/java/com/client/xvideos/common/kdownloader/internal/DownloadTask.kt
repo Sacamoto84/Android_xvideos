@@ -16,6 +16,7 @@ import com.client.xvideos.common.kdownloader.utils.renameFileName
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
+import timber.log.Timber
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
@@ -29,10 +30,11 @@ class DownloadTask(
     private var responseCode = 0
     private var totalBytes: Long = 0
     private var inputStream: InputStream? = null
-    private lateinit var outputStream: FileDownloadOutputStream
+    // Nullable, а не lateinit: при ошибке до открытия файла/соединения finally не должен падать.
+    private var outputStream: FileDownloadOutputStream? = null
 
     private var tempPath: String = ""
-    private lateinit var httpClient: HttpClient
+    private var httpClient: HttpClient? = null
     private var isResumeSupported = true
 
     private var lastSyncTime: Long = 0
@@ -41,14 +43,17 @@ class DownloadTask(
     private var eTag: String = ""
 
     private val dbScope = CoroutineScope(SupervisorJob() + Dispatchers.IO.limitedParallelism(1) +
-            CoroutineExceptionHandler { _, _ ->
-
-            })
+            CoroutineExceptionHandler { _, e -> Timber.e(e, "KDownloader: ошибка записи в БД загрузок") })
 
     companion object {
         private const val TIME_GAP_FOR_SYNC: Long = 2000
         private const val MIN_BYTES_FOR_SYNC: Long = 65536
         private const val BUFFER_SIZE = 1024 * 4
+        private const val MAX_PARALLEL_DOWNLOADS = 4
+
+        // Общий на все задачи: DownloadTask создаётся на каждый запрос, поэтому
+        // семафор-поле экземпляра ничего не ограничивал.
+        private val downloadSemaphore = Semaphore(MAX_PARALLEL_DOWNLOADS)
     }
 
     suspend inline fun run(
@@ -90,11 +95,6 @@ class DownloadTask(
     }
 
 
-    //private val downloadDispatcher = Dispatchers.IO.limitedParallelism(8)
-
-    // Семафор на 8 разрешений
-    private val downloadSemaphore = Semaphore(4)
-
     suspend fun run(listener: DownloadRequest.Listener) {
         downloadSemaphore.withPermit {
             withContext(Dispatchers.IO.limitedParallelism(1)) {
@@ -106,9 +106,13 @@ class DownloadTask(
 
                     if (model == null && file.exists() && dbHelper is AppDbHelper) {
                         if (!deleteTempFile()) {
-                            tempPath =
-                                tempPath.split(".")[0] + "2." + tempPath.split(".", limit = 2)[1]
-                            file = File(tempPath)
+                            // Старый temp не удалился — пишем рядом: "id.mp4.temp" -> "id2.mp4.temp".
+                            // Делим только имя файла: в пути каталога тоже бывают точки.
+                            val name = file.name
+                            val dot = name.indexOf('.')
+                            val altName = if (dot > 0) name.substring(0, dot) + "2" + name.substring(dot) else name + "2"
+                            file = File(file.parentFile, altName)
+                            tempPath = file.path
                         }
                     }
 
@@ -125,25 +129,29 @@ class DownloadTask(
                     }
 
                     // use the url to download the file with HTTP Client
-                    httpClient = DefaultHttpClient().clone()
+                    var client = DefaultHttpClient().clone()
+                    httpClient = client
 
                     req.status = Status.RUNNING
 
                     listener.onStart()
 
-                    httpClient.connect(req)
+                    client.connect(req)
 
-                    eTag = httpClient.getResponseHeader(Constants.ETAG)
+                    eTag = client.getResponseHeader(Constants.ETAG)
 
                     if (checkIfFreshStartRequiredAndStart(model)) {
                         model = null
                     }
 
-                    httpClient = getRedirectedConnectionIfAny(httpClient, req)
-                    responseCode = httpClient.getResponseCode()
+                    client = getRedirectedConnectionIfAny(httpClient ?: client, req)
+                    httpClient = client
+                    responseCode = client.getResponseCode()
 
                     if (!isSuccessful()) {
-                        listener.onError("Wrong link")
+                        req.status = Status.FAILED
+                        listener.onError("Wrong link (HTTP $responseCode)")
+                        return@withContext
                     }
 
                     setResumeSupportedOrNot()
@@ -156,7 +164,7 @@ class DownloadTask(
                     }
 
                     if (totalBytes == 0L) {
-                        totalBytes = httpClient.getContentLength()
+                        totalBytes = client.getContentLength()
                         req.totalBytes = (totalBytes)
                     }
 
@@ -164,8 +172,11 @@ class DownloadTask(
                         createAndInsertNewModel()
                     }
 
-                    inputStream = httpClient.getInputStream()
-                    if (inputStream == null) {
+                    val input = client.getInputStream()
+                    inputStream = input
+                    if (input == null) {
+                        req.status = Status.FAILED
+                        listener.onError("Empty response")
                         return@withContext
                     }
 
@@ -182,7 +193,8 @@ class DownloadTask(
                         }
                     }
 
-                    this@DownloadTask.outputStream = FileDownloadRandomAccessFile.Companion.create(file)
+                    val output = FileDownloadRandomAccessFile.Companion.create(file)
+                    this@DownloadTask.outputStream = output
 
                     if (req.status === Status.CANCELLED) {
                         deleteTempFile()
@@ -190,17 +202,17 @@ class DownloadTask(
                         listener.onError("Cancelled")
                         return@withContext
                     } else if (req.status === Status.PAUSED) {
-                        sync(outputStream)
+                        sync(output)
                         listener.onPause()
                         return@withContext
                     }
 
                     if (isResumeSupported && req.downloadedBytes != 0L) {
-                        outputStream.seek(req.downloadedBytes)
+                        output.seek(req.downloadedBytes)
                     }
 
                     do {
-                        val byteCount = inputStream!!.read(buff, 0, BUFFER_SIZE)
+                        val byteCount = input.read(buff, 0, BUFFER_SIZE)
                         if (byteCount == -1) {
                             break
                         }
@@ -211,7 +223,7 @@ class DownloadTask(
                             listener.onError("Cancelled")
                             return@withContext
                         } else if (req.status === Status.PAUSED) {
-                            sync(outputStream)
+                            sync(output)
                             listener.onPause()
                             return@withContext
                         }
@@ -226,11 +238,9 @@ class DownloadTask(
                             req.reset()
                             break
                         }
-                        outputStream.write(buff, 0, byteCount)
+                        output.write(buff, 0, byteCount)
                         req.downloadedBytes = req.downloadedBytes + byteCount
-                        withContext(Dispatchers.IO) {
-                            syncIfRequired(outputStream)
-                        }
+                        syncIfRequired(output)
 
                         var progress = 0
                         if (totalBytes > 0) {
@@ -245,7 +255,7 @@ class DownloadTask(
                         listener.onError("Cancelled")
                         return@withContext
                     } else if (req.status === Status.PAUSED) {
-                        sync(outputStream)
+                        sync(output)
                         listener.onPause()
                         return@withContext
                     }
@@ -258,9 +268,12 @@ class DownloadTask(
                 } catch (e: CancellationException) {
                     deleteTempFile()
                     req.reset()
-                    req.status = Status.FAILED
-                    listener.onError(e.toString())
-                    return@withContext
+                    // При отмене через cancel() слушатель уже получил "Cancelled" — не дублируем.
+                    if (req.status != Status.CANCELLED) {
+                        req.status = Status.FAILED
+                        listener.onError("Cancelled")
+                    }
+                    throw e
                 } catch (e: Exception) {
                     if (!isResumeSupported) {
                         deleteTempFile()
@@ -270,7 +283,7 @@ class DownloadTask(
                     listener.onError(e.toString())
                     return@withContext
                 } finally {
-                    closeAllSafely(outputStream)
+                    closeAllSafely()
                 }
             }
         }
@@ -297,10 +310,13 @@ class DownloadTask(
             deleteTempFile()
             req.downloadedBytes = 0
             req.totalBytes = 0
-            httpClient = DefaultHttpClient().clone()
-            httpClient.connect(req)
-            httpClient = getRedirectedConnectionIfAny(httpClient, req)
-            responseCode = httpClient.getResponseCode()
+            httpClient?.close()
+            val client = DefaultHttpClient().clone()
+            httpClient = client
+            client.connect(req)
+            val redirected = getRedirectedConnectionIfAny(client, req)
+            httpClient = redirected
+            responseCode = redirected.getResponseCode()
             return true
         }
         return false
@@ -317,30 +333,30 @@ class DownloadTask(
         }
     }
 
-    private suspend fun closeAllSafely(outputStream: FileDownloadOutputStream) {
+    private suspend fun closeAllSafely() {
 
         try {
-            httpClient.close()
+            httpClient?.close()
         } catch (e: Exception) {
-            e.printStackTrace()
+            Timber.w(e, "KDownloader: close http")
         }
 
         try {
-            inputStream!!.close()
+            inputStream?.close()
         } catch (e: IOException) {
-            e.printStackTrace()
+            Timber.w(e, "KDownloader: close input")
         }
 
+        val output = outputStream ?: return
         try {
-            sync(outputStream)
+            sync(output)
         } catch (e: Exception) {
-            e.printStackTrace()
+            Timber.w(e, "KDownloader: sync")
         } finally {
-
             try {
-                outputStream.close()
+                output.close()
             } catch (e: IOException) {
-                e.printStackTrace()
+                Timber.w(e, "KDownloader: close output")
             }
         }
     }
@@ -364,7 +380,7 @@ class DownloadTask(
             success = true
         } catch (e: IOException) {
             success = false
-            e.printStackTrace()
+            Timber.w(e, "KDownloader: flush")
         }
         if (success && isResumeSupported) {
             dbHelper

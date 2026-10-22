@@ -28,7 +28,7 @@ class FileDB<T>(val dirPath: String, val extension: String, private val clazz: C
 
             gson.toJson(value).also { json ->
                 require(json != "null") { "Сериализация вернула null" }
-                file.writeText(json, Charsets.UTF_8)
+                file.writeTextAtomically(json)
             }
 
             Result.success(true)
@@ -47,7 +47,7 @@ class FileDB<T>(val dirPath: String, val extension: String, private val clazz: C
 
             gson.toJson(value).also { json ->
                 require(json != "null") { "Serialization returned null" }
-                file.writeText(json, Charsets.UTF_8)
+                file.writeTextAtomically(json)
             }
 
             Result.success(true)
