@@ -6,7 +6,7 @@ import androidx.media3.exoplayer.ExoPlayer
 
 fun getExoPlayerLifecycleObserver(
     exoPlayer: ExoPlayer,
-    isPause: Boolean,
+    isPause: () -> Boolean,
     wasAppInBackground: Boolean,
     setWasAppInBackground: (Boolean) -> Unit
 ): LifecycleEventObserver {
@@ -31,12 +31,12 @@ fun getExoPlayerLifecycleObserver(
 
 private fun handleOnResume(
     exoPlayer: ExoPlayer,
-    isPause: Boolean,
+    isPause: () -> Boolean,
     wasAppInBackground: Boolean,
     setWasAppInBackground: (Boolean) -> Unit
 ) {
     if (wasAppInBackground) {
-        exoPlayer.playWhenReady = !isPause
+        exoPlayer.playWhenReady = !isPause()
     }
     setWasAppInBackground(false)
 }

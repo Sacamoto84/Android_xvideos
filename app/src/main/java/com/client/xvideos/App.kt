@@ -6,20 +6,19 @@ import com.client.xvideos.common.util.defaultSharedPreferences
 import androidx.compose.runtime.ExperimentalComposeRuntimeApi
 import coil3.ImageLoader
 import coil3.SingletonImageLoader
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ProcessLifecycleOwner
 import com.client.xvideos.common.AppPath
+import com.client.xvideos.common.applock.AppLockSession
 import com.client.xvideos.common.coil.CoilImageLoaderFactory
-import com.client.xvideos.common.eventBus.Event
-import com.client.xvideos.common.eventBus.EventBus
 import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.common.traficStatistic.NetworkTrafficMonitor
 import dagger.hilt.android.HiltAndroidApp
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
 import timber.log.Timber
 import timber.log.Timber.DebugTree
+import javax.inject.Inject
 
 /**
  * Главный класс приложения.
@@ -46,10 +45,9 @@ class App : Application(), SingletonImageLoader.Factory {
     // Сохраняем оригинальный обработчик
     private var originalHandler: Thread.UncaughtExceptionHandler? = null
 
+    // Тот же @Singleton, что и для остального графа Hilt (раньше создавался второй экземпляр вручную).
+    @Inject
     lateinit var networkTrafficMonitor: NetworkTrafficMonitor
-        private set
-
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     /**
      * Основная точка старта процесса приложения.
@@ -71,9 +69,19 @@ class App : Application(), SingletonImageLoader.Factory {
 
         if (BuildConfig.DEBUG) Timber.plant(DebugTree())
 
-        // Инициализируем монитор трафика
-        networkTrafficMonitor = NetworkTrafficMonitor()
-        networkTrafficMonitor.startMonitoring()
+        // Монитор трафика работает, только пока приложение на экране; там же
+        // отслеживаем уход в фон для повторной блокировки замком.
+        ProcessLifecycleOwner.get().lifecycle.addObserver(object : DefaultLifecycleObserver {
+            override fun onStart(owner: LifecycleOwner) {
+                AppLockSession.onAppForeground()
+                networkTrafficMonitor.startMonitoring()
+            }
+
+            override fun onStop(owner: LifecycleOwner) {
+                AppLockSession.onAppBackground()
+                networkTrafficMonitor.stopMonitoring()
+            }
+        })
 
         // Сохраняем оригинальный обработчик ПЕРЕД установкой нашего
         originalHandler = Thread.getDefaultUncaughtExceptionHandler()

@@ -1,11 +1,5 @@
 package com.client.xvideos
 
-import android.content.Intent
-import android.os.Bundle
-import android.view.View
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.BackHandler
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -37,6 +31,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -53,52 +48,21 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.client.xvideos.common.applock.AccessCodeVisualTransformation
 import com.client.xvideos.common.applock.AppLockRepository
-import com.client.xvideos.common.applock.AppLockSession
 import com.client.xvideos.common.applock.DisableAppLockAutofill
 import com.client.xvideos.l.theme.ThemeL
-import com.client.xvideos.ui.theme.XvideosTheme
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlin.math.ceil
 
-class AppLockActivity : ComponentActivity() {
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        window.decorView.importantForAutofill = View.IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS
-
-        if (!AppLockRepository.shouldShowLock(this)) {
-            navigateToMain()
-            return
-        }
-
-        setContent {
-            XvideosTheme(darkTheme = true) {
-                BackHandler { moveTaskToBack(true) }
-                AppLockScreen(
-                    onUnlock = { password ->
-                        if (AppLockRepository.verifyPassword(this, password)) {
-                            AppLockSession.unlock()
-                            navigateToMain()
-                            true
-                        } else {
-                            false
-                        }
-                    }
-                )
-            }
-        }
-    }
-
-    private fun navigateToMain() {
-        startActivity(Intent(this, MainActivity::class.java))
-        overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
-        finish()
-    }
-}
-
+/**
+ * Экран ввода кода доступа. Показывается поверх контента в [MainActivity].
+ *
+ * @param onUnlock проверяет код и возвращает `true` при успехе. Вызывается в корутине,
+ * поэтому тяжёлую проверку (PBKDF2) нужно выполнять вне главного потока.
+ */
 @Composable
 internal fun AppLockScreen(
-    onUnlock: (String) -> Boolean
+    onUnlock: suspend (String) -> Boolean
 ) {
     DisableAppLockAutofill()
 
@@ -110,6 +74,8 @@ internal fun AppLockScreen(
         mutableLongStateOf(AppLockRepository.lockoutRemainingMillis(context))
     }
     val focusManager = LocalFocusManager.current
+    val scope = rememberCoroutineScope()
+    var isChecking by remember { mutableStateOf(false) }
     val isLockedOut = lockoutRemainingMs > 0L
     val lockoutSeconds = ceil(lockoutRemainingMs / 1000.0).toInt()
 
@@ -123,24 +89,33 @@ internal fun AppLockScreen(
     }
 
     fun submit() {
+        if (isChecking) return
         val remainingBefore = AppLockRepository.lockoutRemainingMillis(context)
         if (remainingBefore > 0L) {
             lockoutRemainingMs = remainingBefore
             return
         }
         focusManager.clearFocus()
-        val success = onUnlock(password)
-        if (success) {
-            AppLockRepository.resetFailedAttempts(context)
-        } else {
-            password = ""
-            val until = AppLockRepository.registerFailedAttempt(context)
-            val remaining = (until - System.currentTimeMillis()).coerceAtLeast(0L)
-            lockoutRemainingMs = remaining
-            errorText = if (remaining > 0L) {
-                "Слишком много попыток. Подождите ${ceil(remaining / 1000.0).toInt()} с"
+        val entered = password
+        isChecking = true
+        scope.launch {
+            val success = try {
+                onUnlock(entered)
+            } finally {
+                isChecking = false
+            }
+            if (success) {
+                AppLockRepository.resetFailedAttempts(context)
             } else {
-                "Неверный код доступа"
+                password = ""
+                val until = AppLockRepository.registerFailedAttempt(context)
+                val remaining = (until - System.currentTimeMillis()).coerceAtLeast(0L)
+                lockoutRemainingMs = remaining
+                errorText = if (remaining > 0L) {
+                    "Слишком много попыток. Подождите ${ceil(remaining / 1000.0).toInt()} с"
+                } else {
+                    "Неверный код доступа"
+                }
             }
         }
     }
@@ -198,7 +173,7 @@ internal fun AppLockScreen(
                     keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Done
                 ),
-                keyboardActions = KeyboardActions(onDone = { if (password.isNotEmpty() && !isLockedOut) submit() }),
+                keyboardActions = KeyboardActions(onDone = { if (password.isNotEmpty() && !isLockedOut && !isChecking) submit() }),
                 textStyle = ThemeL.Type.body.copy(color = Color.White),
                 trailingIcon = {
                     IconButton(onClick = { showPassword = !showPassword }) {
@@ -219,7 +194,7 @@ internal fun AppLockScreen(
             Spacer(Modifier.height(16.dp))
             Button(
                 onClick = { submit() },
-                enabled = password.isNotBlank() && !isLockedOut,
+                enabled = password.isNotBlank() && !isLockedOut && !isChecking,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(if (isLockedOut) "Подождите $lockoutSeconds с" else "Разблокировать")

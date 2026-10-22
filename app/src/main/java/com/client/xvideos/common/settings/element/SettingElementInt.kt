@@ -13,7 +13,6 @@ class SettingElementInt(private val sharedPrefs: SharedPreferences, val name: St
     fun setValue(value: Int) {
         sharedPrefs.edit { putInt(name, value) }
         _galleryCheckbox.value = value
-        println("!!! setValue $value _galleryCheckbox ${ _galleryCheckbox.value} ")
     }
 
     private val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->

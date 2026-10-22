@@ -34,11 +34,10 @@ import androidx.compose.material.icons.filled.Vibration
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -62,8 +61,11 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.client.xvideos.PermissionScreenActivity.PermissionStorage
 import com.client.xvideos.common.applock.AppLockRepository
 import com.client.xvideos.common.applock.AppLockSession
+import com.client.xvideos.common.coil.CoilImageLoaderFactory
 import com.client.xvideos.common.fileDB.folder.AppFileDatabase
+import com.client.xvideos.common.settings.Settings
 import com.client.xvideos.common.util.KeepScreenOn
+import com.client.xvideos.common.videoplayer.LocalPlaybackAllowed
 import com.client.xvideos.common.videoplayer.util.VideoDiskCacheCleaner
 import com.client.xvideos.l.ui.screens.explorer.L_ScreenExplorer
 import com.client.xvideos.r.common.saved.SavedRed
@@ -74,7 +76,9 @@ import com.client.xvideos.ui.theme.XvideosTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import javax.inject.Provider
 
 /**
  * Базовый URL для стартовой точки работы с основным сайтом.
@@ -93,15 +97,13 @@ const val urlStart = "https://www.xv-ru.com"
 @AndroidEntryPoint
 class MainActivity : ComponentActivity()//, ImageLoaderFactory
 {
+    // Provider: конструктор SavedRed читает данные с диска, поэтому создаём его на IO,
+    // а не при инъекции в onCreate на главном потоке.
     @Inject
-    lateinit var savedRed: SavedRed
+    lateinit var savedRed: Provider<SavedRed>
 
     @Inject
     lateinit var appFileDatabase: javax.inject.Provider<AppFileDatabase>
-
-    companion object {
-        internal const val EXTRA_REQUIRE_APP_LOCK = "com.client.xvideos.EXTRA_REQUIRE_APP_LOCK"
-    }
 
     /**
      * Инициализирует окно, скрывает системные панели, проверяет разрешения
@@ -135,23 +137,29 @@ class MainActivity : ComponentActivity()//, ImageLoaderFactory
             return
         }
 
-        // SECURITY: показ замка определяется ИСКЛЮЧИТЕЛЬНО состоянием блокировки.
-        // Нельзя завязываться на intent-extra от вызывающего: даже если Activity
-        // запустят напрямую (напр. `adb am start`) без extra, замок обязан показаться.
-        // Extra из SplashActivity оставлен лишь как подсказка, но не как условие.
-        val shouldShowAppLock = AppLockRepository.shouldShowLock(this)
-        if (shouldShowAppLock) {
+        // SECURITY: показ замка определяется ИСКЛЮЧИТЕЛЬНО состоянием AppLockSession
+        // (только память процесса). Нельзя завязываться ни на intent-extra, ни на
+        // сохранённое состояние: после смерти процесса Android восстанавливает
+        // MainActivity в обход SplashActivity, и замок обязан показаться снова.
+        if (AppLockRepository.shouldShowLock(this)) {
             window.decorView.importantForAutofill = View.IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS
         }
 
         lifecycleScope.launch(Dispatchers.IO) {
-            appFileDatabase.get().clearVolatileCachesOnProcessStart()
+            val fileDb = appFileDatabase.get()
+            fileDb.clearVolatileCachesOnProcessStart()
+            fileDb.trimExpiredCaches()
             VideoDiskCacheCleaner.clearLegacyCaches(applicationContext)
-            savedRed.nichesCache.refreshIfStale()
+            CoilImageLoaderFactory.clearLegacyHttpCache(applicationContext)
+            savedRed.get().nichesCache.refreshIfStale()
         }
 
         setContent {
-            var isAppLocked by rememberSaveable { mutableStateOf(shouldShowAppLock) }
+            val unlocked by AppLockSession.unlocked.collectAsState()
+            val lockEnabled by Settings.app_lock_enabled.field.collectAsState()
+            val isAppLocked = lockEnabled && !unlocked && AppLockRepository.isPasswordSet(this@MainActivity)
+
+            LaunchedEffect(lockEnabled) { hideFromRecents(lockEnabled) }
 
             KeepScreenOn()
             XvideosTheme(darkTheme = true) {
@@ -173,19 +181,22 @@ class MainActivity : ComponentActivity()//, ImageLoaderFactory
 //                        CurrentScreen()
 //                    }
                     Box(modifier = Modifier.fillMaxSize()) {
-                        ScreenRoot.Content()
+                        // Контент остаётся в композиции (сохраняется навигация), но видео
+                        // под замком не играет.
+                        CompositionLocalProvider(LocalPlaybackAllowed provides !isAppLocked) {
+                            ScreenRoot.Content()
+                        }
 
                         if (isAppLocked) {
                             BackHandler { moveTaskToBack(true) }
                             AppLockScreen(
                                 onUnlock = { password ->
-                                    if (AppLockRepository.verifyPassword(this@MainActivity, password)) {
-                                        AppLockSession.unlock()
-                                        isAppLocked = false
-                                        true
-                                    } else {
-                                        false
+                                    // PBKDF2 (120k итераций) — не на главном потоке.
+                                    val ok = withContext(Dispatchers.Default) {
+                                        AppLockRepository.verifyPassword(this@MainActivity, password)
                                     }
+                                    if (ok) AppLockSession.unlock()
+                                    ok
                                 }
                             )
                         }
@@ -193,6 +204,21 @@ class MainActivity : ComponentActivity()//, ImageLoaderFactory
 
                 }
             }
+        }
+    }
+
+    /**
+     * Пока включён замок, скрывает содержимое из превью «Недавних».
+     * На Android 13+ отключается только снимок для Recents, на старых версиях
+     * приходится ставить FLAG_SECURE (он заодно запрещает скриншоты).
+     */
+    private fun hideFromRecents(hide: Boolean) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            setRecentsScreenshotEnabled(!hide)
+        } else if (hide) {
+            window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+        } else {
+            window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
         }
     }
 }

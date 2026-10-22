@@ -42,12 +42,6 @@
             android:theme="@style/Theme.Xvideos" />
 
         <activity
-            android:name=".AppLockActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.Xvideos" />
-
-        <activity
             android:name=".SplashActivity"
             android:exported="true"
             android:screenOrientation="portrait"
