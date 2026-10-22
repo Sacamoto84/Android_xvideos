@@ -33,10 +33,13 @@ class BlockRed @Inject constructor(
     }
 
     fun refresh() {
-        scope.launch {
-            _blockList.value = withContext(Dispatchers.IO) {
-                blockGetAllBlockedGifsInfo()
-            }
+        scope.launch { reload() }
+    }
+
+    /** Перечитывает список блокировок и возвращается, когда он загружен. */
+    suspend fun reload() {
+        _blockList.value = withContext(Dispatchers.IO) {
+            blockGetAllBlockedGifsInfo()
         }
     }
 

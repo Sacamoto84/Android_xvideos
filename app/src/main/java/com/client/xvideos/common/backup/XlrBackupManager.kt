@@ -189,21 +189,40 @@ object XlrBackupManager {
                     val restored = File(tempRoot, path)
                     val target = File(AppPath.main, path)
                     ensureInside(File(AppPath.main).canonicalFile, target.canonicalFile)
-                    target.deleteRecursively()
-                    target.parentFile?.mkdirs()
-                    if (restored.exists()) {
-                        if (!restored.renameTo(target)) {
-                            restored.copyRecursively(target, overwrite = true)
-                        }
-                    } else {
-                        target.mkdirs()
-                    }
+                    replaceWithRestored(target, restored)
                 }
                 report
             } finally {
                 tempRoot.deleteRecursively()
             }
         }
+    }
+
+    /**
+     * Подменяет [target] восстановленной копией. Текущие данные сначала переименовываются,
+     * а удаляются только после успешной подмены; при ошибке возвращаются на место.
+     */
+    private fun replaceWithRestored(target: File, restored: File) {
+        target.parentFile?.mkdirs()
+        val previous = File(target.parentFile, ".${target.name}.xlr_previous")
+        previous.deleteRecursively()
+        if (target.exists() && !target.renameTo(previous)) {
+            error("Не удалось подготовить к восстановлению: ${target.absolutePath}")
+        }
+        try {
+            if (restored.exists()) {
+                if (!restored.renameTo(target)) {
+                    restored.copyRecursively(target, overwrite = true)
+                }
+            } else {
+                target.mkdirs()
+            }
+        } catch (e: Exception) {
+            target.deleteRecursively()
+            if (previous.exists()) previous.renameTo(target)
+            throw e
+        }
+        previous.deleteRecursively()
     }
 
     private fun writeManifest(zip: ZipOutputStream, selectedPaths: List<String>, options: XlrBackupOptions) {

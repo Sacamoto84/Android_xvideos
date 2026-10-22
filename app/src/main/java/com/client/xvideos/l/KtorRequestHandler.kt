@@ -20,12 +20,15 @@ import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.request.url
+import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.Parameters
 import io.ktor.http.content.TextContent
 import io.ktor.http.contentType
 import io.ktor.serialization.gson.gson
+import kotlinx.coroutines.CancellationException
 import timber.log.Timber
 import java.io.IOException
 
@@ -90,13 +93,13 @@ class KtorRequestHandler(
         }.body()
     }
 
-    private suspend fun post(url: String, formData: Map<String, String> = emptyMap()): String {
+    private suspend fun post(url: String, formData: Map<String, String> = emptyMap()): HttpResponse {
         return client.post {
             url(url)
             setBody(FormDataContent(Parameters.build {
                 formData.forEach { (k, v) -> append(k, v) }
             }))
-        }.body()
+        }
     }
 
 
@@ -131,10 +134,21 @@ class KtorRequestHandler(
             "remember" to "on"
         )
 
-        val response = try {
-            post(LOGIN, formData)
+        val (status, response) = try {
+            val httpResponse = post(LOGIN, formData)
+            httpResponse.status to httpResponse.bodyAsText()
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             Timber.w(e, "L login request failed")
+            loggedIn = false
+            return false
+        }
+
+        // Страница ошибки сервера (4xx/5xx) не означает успешный вход. 3xx допустим:
+        // Ktor не следует редиректу на POST, а успешный логин обычно отвечает 302.
+        if (status.value >= 400) {
+            Timber.w("L login failed: HTTP ${status.value}")
             loggedIn = false
             return false
         }

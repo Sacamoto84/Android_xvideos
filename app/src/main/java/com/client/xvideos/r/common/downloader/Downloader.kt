@@ -1,13 +1,18 @@
 package com.client.xvideos.r.common.downloader
 
 import com.client.xvideos.common.AppPath
+import com.client.xvideos.common.di.ApplicationScope
 import com.google.gson.GsonBuilder
 import com.client.xvideos.common.kdownloader.KDownloader
 import com.client.xvideos.common.snackbar.SnackBar
 import com.client.xvideos.r.model.GifsInfo
-import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.io.File
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -31,16 +36,46 @@ data class RedDownloadEnqueueReport(
 @Singleton
 class Downloader @Inject constructor(
     val kDownloader: KDownloader,
+    @ApplicationScope private val scope: CoroutineScope,
 ) {
 
     //Процент скачивания 0..1 - начало скачивания, -2 busy, -3 error
     var percent = MutableStateFlow(-2f)
 
-    @OptIn(DelicateCoroutinesApi::class)
+    /**
+     * Прогресс активных загрузок видео (id → 0..1). Индикатор один на все загрузки,
+     * поэтому показываем среднее, а не значение последнего колбэка.
+     * Обычно колбэки приходят на главном потоке, но cancel() вызывает onError синхронно.
+     */
+    private val activeProgress = ConcurrentHashMap<String, Float>()
+
+    private fun publishProgress() {
+        percent.value = if (activeProgress.isEmpty()) -2f else activeProgress.values.average().toFloat()
+    }
+
+    private fun onVideoStart(id: String) {
+        activeProgress[id] = 0f
+        publishProgress()
+    }
+
+    private fun onVideoProgress(id: String, progress: Int) {
+        activeProgress[id] = progress / 100f
+        publishProgress()
+    }
+
+    private fun onVideoFinished(id: String, failed: Boolean) {
+        activeProgress.remove(id)
+        if (failed && activeProgress.isEmpty()) percent.value = -3f else publishProgress()
+    }
+
+    /** id и имя креатора становятся частью пути — не пускаем разделители и "..". */
+    private fun String.isSafePathSegment(): Boolean =
+        isNotBlank() && this != "." && this != ".." && none { it == '/' || it == '\\' || it == '\u0000' }
+
     fun downloadRedName(item: GifsInfo, onComplete: () -> Unit = {}) {
 
         val videoUrl = item.downloadVideoUrl()
-        if ((videoUrl == null) || (item.userName == "")) {
+        if (videoUrl == null || !item.userName.isSafePathSegment() || !item.id.isSafePathSegment()) {
             //Toast("Ошибка в названии файла или креатор")
             percent.value = -3f
             return
@@ -66,27 +101,26 @@ class Downloader @Inject constructor(
             kDownloader.enqueue(
                 request,
                 onStart = {
-                    println("!!! Запуск закачки")
-                    percent.value = 0f
+                    Timber.i("!!! Запуск закачки ${item.id}")
+                    onVideoStart(item.id)
                 },
 
                 onError = {
-                    println("!!! onError закачки: $it"); percent.value = -3f
+                    Timber.w("!!! onError закачки ${item.id}: $it")
+                    onVideoFinished(item.id, failed = true)
                     SnackBar.error("Ошибка закачки: $it")
                 },
 
-                onProgress = { it1 -> percent.value = it1 / 100f },
+                onProgress = { progress -> onVideoProgress(item.id, progress) },
                 onCompleted = {
-                    println("!!! onCompleted закачки")
-                    percent.value = -2f
-
+                    onVideoFinished(item.id, failed = false)
                     SnackBar.success("Скачивание завершено")
-                    val gson = GsonBuilder().create()
-                    val text = gson.toJson(item)
-                    File(p, "${item.id}.info").writeText(text.toString())
-
-                    onComplete()
-                    //DownloadRed.refreshDownloadList()
+                    // Запись на диск — не на главном потоке, где приходят колбэки.
+                    scope.launch(Dispatchers.IO) {
+                        runCatching { File(p, "${item.id}.info").writeText(GsonBuilder().create().toJson(item)) }
+                            .onFailure { Timber.e(it, "!!! Не удалось записать ${item.id}.info") }
+                        onComplete()
+                    }
                 },
             )
         } else {
@@ -102,7 +136,7 @@ class Downloader @Inject constructor(
         onEvent: (String) -> Unit = {},
         showSnackBarErrors: Boolean = true
     ): RedDownloadEnqueueReport {
-        if (item.id.isBlank() || item.userName.isBlank()) {
+        if (!item.id.isSafePathSegment() || !item.userName.isSafePathSegment()) {
             return RedDownloadEnqueueReport()
         }
 
@@ -146,16 +180,16 @@ class Downloader @Inject constructor(
                 kDownloader.enqueue(
                     request,
                     onStart = {
-                        percent.value = 0f
+                        onVideoStart(item.id)
                     },
                     onError = {
-                        percent.value = -3f
+                        onVideoFinished(item.id, failed = true)
                         onEvent("R Download: video не скачан ${item.id}: $it")
                         SnackBar.error("Ошибка закачки: $it")
                     },
-                    onProgress = { progress -> percent.value = progress / 100f },
+                    onProgress = { progress -> onVideoProgress(item.id, progress) },
                     onCompleted = {
-                        percent.value = -2f
+                        onVideoFinished(item.id, failed = false)
                         onEvent("R Download: video готов ${item.id}")
                         onComplete()
                     }
@@ -179,7 +213,7 @@ class Downloader @Inject constructor(
         onComplete: () -> Unit = {},
         onEvent: (String) -> Unit = {}
     ): RedDownloadEnqueueReport {
-        if (item.id.isBlank() || item.userName.isBlank()) {
+        if (!item.id.isSafePathSegment() || !item.userName.isSafePathSegment()) {
             return RedDownloadEnqueueReport()
         }
 
@@ -220,16 +254,16 @@ class Downloader @Inject constructor(
                 kDownloader.enqueue(
                     request,
                     onStart = {
-                        percent.value = 0f
+                        onVideoStart(item.id)
                         onEvent("R Download: старт video ${item.id}")
                     },
                     onError = { error ->
-                        percent.value = -3f
+                        onVideoFinished(item.id, failed = true)
                         onEvent("R Download: video не скачан ${item.id}: $error")
                     },
-                    onProgress = { progress -> percent.value = progress / 100f },
+                    onProgress = { progress -> onVideoProgress(item.id, progress) },
                     onCompleted = {
-                        percent.value = -2f
+                        onVideoFinished(item.id, failed = false)
                         onEvent("R Download: video готов ${item.id}")
                         onComplete()
                     }

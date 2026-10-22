@@ -28,4 +28,17 @@ class AppFileDatabase @Inject constructor() {
             volatileCachesCleared = true
         }
     }
+
+    /**
+     * Удаляет давно устаревшие ответы Redgifs, чтобы папка кэша не росла бесконечно.
+     * Свежесть для показа проверяется отдельно (TTL в RedApi); здесь — только уборка.
+     */
+    suspend fun trimExpiredCaches(nowMs: Long = System.currentTimeMillis()) {
+        rCacheMediaResponse.deleteOld(nowMs - R_MEDIA_RESPONSE_MAX_AGE_MS)
+    }
+
+    companion object {
+        /** Сколько хранить ответ Redgifs как запасной вариант на случай ошибки сети. */
+        const val R_MEDIA_RESPONSE_MAX_AGE_MS = 7L * 24 * 60 * 60 * 1000
+    }
 }

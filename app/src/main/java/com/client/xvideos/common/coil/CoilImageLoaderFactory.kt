@@ -54,17 +54,9 @@ object CoilImageLoaderFactory {
         val diskCacheMaxBytes = normalizedDiskCacheSizeMb().toLong() * BYTES_IN_MB
         val ramCachePercent = normalizedRamCachePercent() / 100.0
 
+        // HTTP-кэш OkHttp не подключаем: картинки и так кладёт в DiskCache сам Coil,
+        // второй кэш с тем же лимитом удваивал занимаемое место.
         val okHttpBuilder = OkHttpClient.Builder()
-            .apply {
-                if (diskCacheEnabled) {
-                    cache(
-                        okhttp3.Cache(
-                            directory = httpCacheDir(appContext),
-                            maxSize = diskCacheMaxBytes
-                        )
-                    )
-                }
-            }
             .addNetworkInterceptor(
                 ProgressInterceptor { requestUrl, bytes, total, done ->
                     CoilProgressManager.updateProgress(
@@ -117,7 +109,6 @@ object CoilImageLoaderFactory {
             .memoryCache {
                 MemoryCache.Builder()
                     .maxSizePercent(appContext, ramCachePercent)
-                    .strongReferencesEnabled(false)
                     .build()
             }
             .allowHardware(true)
@@ -158,6 +149,11 @@ object CoilImageLoaderFactory {
         clearDirectory(imageCacheDir(appContext))
         clearDirectory(httpCacheDir(appContext))
         recreate(appContext)
+    }
+
+    /** Удаляет HTTP-кэш OkHttp от прежних версий (сейчас он не используется). Вызывать вне UI-потока. */
+    fun clearLegacyHttpCache(context: Context) {
+        clearDirectory(httpCacheDir(context.applicationContext))
     }
 
     private fun imageCacheDir(context: Context): File = File(context.cacheDir, IMAGE_CACHE_DIR_NAME)

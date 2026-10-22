@@ -1,6 +1,5 @@
 package com.client.xvideos.r.network.http
 
-import android.annotation.SuppressLint
 import com.google.gson.TypeAdapter
 import com.google.gson.annotations.SerializedName
 import io.ktor.client.HttpClient
@@ -19,6 +18,7 @@ import io.ktor.serialization.gson.gson
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import timber.log.Timber
@@ -28,13 +28,12 @@ object ApiClient {
     val USER_AGENT: String =
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 YaBrowser/25.6.0.0 Safari/537.36"
 
-    @SuppressLint("CheckResult")
     val client = HttpClient(OkHttp) {
         install(ContentNegotiation) {
             gson {
-                this.registerTypeAdapter(UInt::class.java, UIntAdapter()).create()
-                this.registerTypeAdapter(ULong::class.java, ULongAdapter()).create()
-                this.registerTypeAdapter(Long::class.java, LongAdapter()).create()
+                registerTypeAdapter(UInt::class.java, UIntAdapter())
+                registerTypeAdapter(ULong::class.java, ULongAdapter())
+                registerTypeAdapter(Long::class.java, LongAdapter())
             }
         }
         defaultRequest {
@@ -100,6 +99,8 @@ object ApiClient {
             bearerToken = tokenResponse.token
             Timber.i("!!! Red ApiClient login() SUCCESS - token received")
             Result.success(true)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             Timber.e(e, "!!! Red ApiClient login() FAILED: ${e.localizedMessage}")
             Result.failure(e)
@@ -125,6 +126,8 @@ object ApiClient {
                 if (refreshToken(previous).isSuccess) {
                     return try {
                         Result.success(perform(bearerToken))
+                    } catch (e2: CancellationException) {
+                        throw e2
                     } catch (e2: Exception) {
                         Timber.e(e2, "!!! Red ApiClient request FAILED after retry")
                         Result.failure(e2)
@@ -133,6 +136,9 @@ object ApiClient {
             }
             Timber.e(e, "!!! Red ApiClient request FAILED")
             Result.failure(e)
+        } catch (e: CancellationException) {
+            // Отмена корутины — не ошибка запроса: пробрасываем, чтобы не ломать structured concurrency.
+            throw e
         } catch (e: Exception) {
             Timber.e(e, "!!! Red ApiClient request FAILED")
             Result.failure(e)

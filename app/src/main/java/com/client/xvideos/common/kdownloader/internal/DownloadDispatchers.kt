@@ -6,22 +6,20 @@ import com.client.xvideos.common.kdownloader.Status
 import com.client.xvideos.common.kdownloader.utils.getTempPath
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers
+import timber.log.Timber
 import java.io.File
 
 class DownloadDispatchers(private val dbHelper: DbHelper) {
 
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO.limitedParallelism(1) +     //main
-            CoroutineExceptionHandler { _, _ ->
-
-            })
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO +
+            CoroutineExceptionHandler { _, e -> Timber.e(e, "KDownloader: ошибка загрузки") })
 
     private val dbScope = CoroutineScope(SupervisorJob() + Dispatchers.IO.limitedParallelism(1) +
-            CoroutineExceptionHandler { _, _ ->
-
-            })
+            CoroutineExceptionHandler { _, e -> Timber.e(e, "KDownloader: ошибка записи в БД загрузок") })
 
     fun enqueue(req: DownloadRequest): Int {
-        val job = scope.launch(Dispatchers.IO.limitedParallelism(1)) {
+        // Параллелизм ограничивает общий семафор в DownloadTask.
+        val job = scope.launch {
             execute(req)
         }
         req.job = job
@@ -80,7 +78,8 @@ class DownloadDispatchers(private val dbHelper: DbHelper) {
     }
 
     fun cancelAll() {
-        scope.cancel()
+        // cancelChildren, а не cancel(): иначе scope умирает и все следующие enqueue молча не выполняются.
+        scope.coroutineContext.cancelChildren()
         dbScope.launch {
             dbHelper.empty()
         }

@@ -18,7 +18,6 @@ import com.client.xvideos.r.model.tag.TagSuggestion
 import com.client.xvideos.r.network.http.ApiClient
 import com.client.xvideos.r.network.http.Route
 import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
 import timber.log.Timber
@@ -403,35 +402,50 @@ class RedApi @Inject constructor(
 
 }
 
+/** Сколько закэшированный ответ считается свежим: топы и тренды обновляются. */
+private const val MEDIA_RESPONSE_TTL_MS = 60L * 60 * 1000
+
+private val mediaResponseGson = Gson()
+
+/**
+ * Возвращает ответ из файлового кэша, если он моложе [ttlMs], иначе идёт в сеть.
+ *
+ * Пустые ответы и ошибки в кэш не попадают. Если сеть недоступна, отдаётся
+ * устаревшая копия (если есть), иначе пробрасывается исходная ошибка запроса.
+ */
 private suspend fun cacheMediaResponse(
     route: Route,
     redApi: RedApi,
-    cache: FileStringCacheTable
+    cache: FileStringCacheTable,
+    ttlMs: Long = MEDIA_RESPONSE_TTL_MS
 ): MediaResponse {
 
     val cachedEntity = cache.get(route.url)
+    // В старых версиях при ошибке сети в кэш записывалась строка "null" — такие записи пропускаем.
+    val cachedResponse: MediaResponse? = cachedEntity?.let { entity ->
+        runCatching { mediaResponseGson.fromJson(entity.content, MediaResponse::class.java) }.getOrNull()
+    }
+    val isFresh = cachedEntity != null && System.currentTimeMillis() - cachedEntity.timeCreate < ttlMs
 
-    val gson = GsonBuilder()
-        //.registerTypeAdapter(Trace::class.java, TraceInstanceCreator())
-//        .registerTypeAdapter(UInt::class.java, UIntAdapter())
-//        .registerTypeAdapter(ULong::class.java, ULongAdapter())
-//        .registerTypeAdapter(Long::class.java, LongAdapter())
-//        .excludeFieldsWithModifiers(Modifier.ABSTRACT)
-        .create()
-
-    if (cachedEntity != null) {
-        // Десериализуем JSON из кеша
+    if (cachedResponse != null && isFresh) {
         Timber.i("!!! Берем данные из кеша ${route.url}")
-        return gson.fromJson(cachedEntity.content, MediaResponse::class.java)
-    } else {
-        Timber.i("!!! Берем данные из Сети ${route.url}")
-        // Запрос из сети
-        val res = redApi.api.request<MediaResponse>(route)
-        // Сохраняем в кеш (с текущим временем)
-        val jsonContent = gson.toJson(res.getOrNull())
-        cache.put(route.url, jsonContent)
-        return res.getOrNull()!!
+        return cachedResponse
     }
 
+    Timber.i("!!! Берем данные из Сети ${route.url}")
+    val res = redApi.api.request<MediaResponse>(route)
+    val fromNetwork = res.getOrNull()
+    if (fromNetwork != null) {
+        cache.put(route.url, mediaResponseGson.toJson(fromNetwork))
+        return fromNetwork
+    }
+
+    if (cachedResponse != null) {
+        Timber.w("!!! Сеть недоступна, отдаём устаревший кеш ${route.url}")
+        return cachedResponse
+    }
+    if (cachedEntity != null) cache.delete(route.url) // битая запись
+
+    throw res.exceptionOrNull() ?: IllegalStateException("Пустой ответ Redgifs: ${route.url}")
 }
 
